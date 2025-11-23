@@ -101,7 +101,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
           setOwnerMemberEnsured(true); // Set to true even on error to prevent infinite loop
         });
     }
-  }, [tripId, user?.id, ownerMemberEnsured]);
+  }, [tripId, user, ownerMemberEnsured]);
 
   // Fetch expenses
   const { data: expenses = [] } = useQuery<Expense[]>({

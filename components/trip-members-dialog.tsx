@@ -93,7 +93,7 @@ export function TripMembersDialog({
         console.error("Error ensuring owner member:", err);
       });
     }
-  }, [tripId, user?.id]);
+  }, [tripId, user]);
 
   const { data: members = [] } = useQuery<TripMember[]>({
     queryKey: ["trip-members", tripId],

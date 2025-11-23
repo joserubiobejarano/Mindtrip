@@ -191,13 +191,13 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       }
 
       // Build proximity and bbox parameters if we have coordinates
-      const hasCoordinates = trip.center_lat && trip.center_lng && 
+      const hasCoordinates = trip.center_lat != null && trip.center_lng != null && 
                             !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
       
       let proximityParam = "";
       let bboxParam = "";
       
-      if (hasCoordinates) {
+      if (hasCoordinates && trip.center_lat != null && trip.center_lng != null) {
         // Add proximity parameter to bias results toward trip center
         proximityParam = `&proximity=${trip.center_lng},${trip.center_lat}`;
         
