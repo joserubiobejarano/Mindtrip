@@ -474,14 +474,15 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
+                  const savedPlace = place as SavedPlace;
                   const placeResult: PlaceResult = {
-                    id: place.place_id,
-                    place_id: place.place_id,
-                    name: place.name,
-                    address: place.address || "",
-                    lat: place.lat || 0,
-                    lng: place.lng || 0,
-                    category: place.category || undefined,
+                    id: savedPlace.place_id || savedPlace.id,
+                    place_id: savedPlace.place_id,
+                    name: savedPlace.name,
+                    address: savedPlace.address || "",
+                    lat: savedPlace.lat || 0,
+                    lng: savedPlace.lng || 0,
+                    category: savedPlace.category || undefined,
                   };
                   handleAddToItinerary(placeResult);
                 }}
