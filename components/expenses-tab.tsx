@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, DollarSign } from "lucide-react";
 import { format } from "date-fns";
+import { useToast } from "@/components/ui/toast";
 import {
   Select,
   SelectContent,
@@ -77,6 +78,7 @@ interface ExpensesTabProps {
 
 export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   const { user } = useUser();
+  const { addToast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -84,6 +86,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   const [category, setCategory] = useState("");
   const [paidBy, setPaidBy] = useState<string>("");
   const [sharingMembers, setSharingMembers] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   const queryClient = useQueryClient();
 
@@ -137,14 +140,26 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   // Auto-select all members when dialog opens and default paidBy to current user
   useEffect(() => {
     if (dialogOpen && members.length > 0) {
-      if (sharingMembers.length === 0) {
-        setSharingMembers(members.map((m) => m.id));
-      }
-      // Default paidBy to current user's member entry if present
-      if (!paidBy && user?.id) {
-        const currentUserMember = members.find((m) => m.user_id === user.id);
-        if (currentUserMember) {
-          setPaidBy(currentUserMember.id);
+      // If only one member, prefill and default share with that member
+      if (members.length === 1) {
+        const singleMember = members[0];
+        if (!paidBy) {
+          setPaidBy(singleMember.id);
+        }
+        if (sharingMembers.length === 0) {
+          setSharingMembers([singleMember.id]);
+        }
+      } else {
+        // Multiple members: auto-select all
+        if (sharingMembers.length === 0) {
+          setSharingMembers(members.map((m) => m.id));
+        }
+        // Default paidBy to current user's member entry if present
+        if (!paidBy && user?.id) {
+          const currentUserMember = members.find((m) => m.user_id === user.id);
+          if (currentUserMember) {
+            setPaidBy(currentUserMember.id);
+          }
         }
       }
     }
@@ -202,7 +217,9 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         .select()
         .single();
 
-      if (expenseError) throw expenseError;
+      if (expenseError) {
+        throw new Error(expenseError.message || "Failed to create expense");
+      }
       if (!expense) throw new Error("Failed to create expense");
 
       // Create shares (equal split)
@@ -217,7 +234,9 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         .from("expense_shares")
         .insert(shares);
 
-      if (sharesError) throw sharesError;
+      if (sharesError) {
+        throw new Error(sharesError.message || "Failed to create expense shares");
+      }
 
       return expense;
     },
@@ -226,6 +245,16 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
       queryClient.invalidateQueries({ queryKey: ["expense-balances", tripId] });
       resetForm();
       setDialogOpen(false);
+      setError(null);
+    },
+    onError: (error: Error) => {
+      const errorMessage = error.message || "Failed to create expense. Please try again.";
+      setError(errorMessage);
+      addToast({
+        variant: "destructive",
+        title: "Error creating expense",
+        description: errorMessage,
+      });
     },
   });
 
@@ -369,10 +398,16 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              setError(null);
               createExpense.mutate();
             }}
             className="space-y-4 py-4"
           >
+            {error && (
+              <div className="text-sm text-destructive p-3 bg-destructive/10 rounded-md border border-destructive/20">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="description">Description *</Label>
               <Input
@@ -426,10 +461,15 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               <Label htmlFor="paid_by">Paid By *</Label>
               {members.length === 0 ? (
                 <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
-                  Add at least one tripmate to start tracking expenses.
+                  Loading members...
                 </div>
               ) : (
-                <Select value={paidBy} onValueChange={setPaidBy} required>
+                <Select 
+                  value={paidBy} 
+                  onValueChange={setPaidBy} 
+                  required
+                  disabled={members.length === 1}
+                >
                   <SelectTrigger id="paid_by">
                     <SelectValue placeholder="Select member" />
                   </SelectTrigger>
@@ -447,7 +487,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               <Label>Share With *</Label>
               {members.length === 0 ? (
                 <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
-                  Add at least one tripmate to start tracking expenses.
+                  Loading members...
                 </div>
               ) : (
                 <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">

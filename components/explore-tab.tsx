@@ -10,7 +10,7 @@ import { useDays } from "@/hooks/use-days";
 import { AddToItineraryDialog } from "@/components/add-to-itinerary-dialog";
 import { ExploreMap } from "@/components/explore-map";
 import { PlaceDetailsPanel } from "@/components/place-details-panel";
-import { Loader2, Search, MapPin, Star } from "lucide-react";
+import { Loader2, Search, MapPin, Star, Hotel } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   savePlace,
@@ -191,13 +191,12 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       const response = await fetch(url);
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error searching places", {
+        console.error("Mapbox Geocoding API error:", {
           status: response.status,
+          url: response.url,
           statusText: response.statusText,
-          body: errorText,
         });
-        setError("We couldn't load places for this filter, please try again.");
+        setError("We couldn't load places right now. Please check your Mapbox token or browser extensions and try again.");
         setResults([]);
         return;
       }
@@ -206,7 +205,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       
       if (!data || !Array.isArray(data.features)) {
         console.error("Error searching places: Invalid response format", data);
-        setError("We couldn't load places for this filter, please try again.");
+        setError("We couldn't load places right now. Please check your Mapbox token or browser extensions and try again.");
         setResults([]);
         return;
       }
@@ -266,7 +265,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       setResults(resultsWithPlaceIds);
     } catch (err) {
       console.error("Error searching places", err);
-      setError("We couldn't load places for this filter, please try again.");
+      setError("We couldn't load places right now. Please check your Mapbox token or browser extensions and try again.");
       setResults([]);
     } finally {
       setLoading(false);
@@ -534,10 +533,43 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         </p>
       </div>
 
+      {/* Book Hotels Card */}
+      {trip.start_date && trip.end_date && (
+        <div className="mb-4">
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Hotel className="h-5 w-5" />
+                Need a place to stay?
+              </CardTitle>
+              <CardDescription>
+                Search hotels for your trip dates and destination.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={() => {
+                  const city = trip.destination_name || trip.title;
+                  const startDate = new Date(trip.start_date);
+                  const endDate = new Date(trip.end_date);
+                  const checkin = format(startDate, "yyyy-MM-dd");
+                  const checkout = format(endDate, "yyyy-MM-dd");
+                  const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
+                  window.open(url, "_blank", "noopener,noreferrer");
+                }}
+                className="w-full sm:w-auto"
+              >
+                Search hotels
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Main Content - 2 column grid on desktop, stacked on mobile */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
+      <div className="flex-1 flex flex-col-reverse md:grid md:grid-cols-[40%_60%] gap-6 overflow-hidden min-h-0">
         {/* Left Column - Search, Filters, Results */}
-        <div className="flex flex-col overflow-hidden">
+        <div className="flex flex-col overflow-hidden order-2 md:order-none">
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="mb-4">
             <div className="relative">
@@ -634,7 +666,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
           {/* Place Details Panel - Mobile (below list) */}
           {selectedPlace && (
-            <div ref={detailsPanelRef} className="lg:hidden mt-4">
+            <div ref={detailsPanelRef} className="md:hidden mt-4">
               <PlaceDetailsPanel
                 place={selectedPlace}
                 isSaved={
@@ -652,8 +684,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
           )}
         </div>
 
-        {/* Right Column - Map (desktop) */}
-        <div className="hidden lg:flex flex-col overflow-hidden">
+        {/* Right Column - Map */}
+        <div className="flex flex-col overflow-hidden order-1 md:order-none h-[50vh] md:h-auto">
           <div className="flex-1 min-h-0">
             <ExploreMap
               tripId={tripId}
@@ -669,7 +701,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
           {/* Place Details Panel - Desktop (below map) */}
           {selectedPlace && (
-            <div ref={detailsPanelRef} className="mt-4">
+            <div ref={detailsPanelRef} className="hidden md:block mt-4">
               <PlaceDetailsPanel
                 place={selectedPlace}
                 isSaved={

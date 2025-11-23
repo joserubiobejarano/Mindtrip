@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Share2, Users, ArrowLeft, Hotel, MoreVertical, Trash2 } from "lucide-react";
+import { Plus, Share2, Users, ArrowLeft, MoreVertical, Trash2 } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { useActivities } from "@/hooks/use-activities";
@@ -21,6 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
 import type { PlannedActivity } from "@/types/ai";
+import type { AiItinerary } from "@/app/api/ai-itinerary/route";
 
 interface ItineraryTabProps {
   tripId: string;
@@ -45,6 +46,9 @@ export function ItineraryTab({
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
   const [autoPlanning, setAutoPlanning] = useState(false);
+  const [aiItinerary, setAiItinerary] = useState<AiItinerary | null>(null);
+  const [loadingAiItinerary, setLoadingAiItinerary] = useState(false);
+  const [aiItineraryError, setAiItineraryError] = useState<string | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -319,39 +323,6 @@ export function ItineraryTab({
         </div>
       </div>
 
-      {/* Book Hotels Card */}
-      {trip.start_date && trip.end_date && (
-        <div className="mb-4">
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Hotel className="h-5 w-5" />
-                Need a place to stay?
-              </CardTitle>
-              <CardDescription>
-                Search hotels for your trip dates.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => {
-                  const city = trip.destination_name || trip.title;
-                  const startDate = new Date(trip.start_date);
-                  const endDate = new Date(trip.end_date);
-                  const checkin = format(startDate, "yyyy-MM-dd");
-                  const checkout = format(endDate, "yyyy-MM-dd");
-                  const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
-                  window.open(url, "_blank", "noopener,noreferrer");
-                }}
-                className="w-full sm:w-auto"
-              >
-                Search hotels
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
       {/* Day Selector */}
       <div className="mb-4">
         <DaySelector
@@ -380,6 +351,110 @@ export function ItineraryTab({
             </Button>
           )}
         </div>
+
+        {/* Smart Itinerary Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Smart itinerary</h2>
+            {!aiItinerary && (
+              <Button
+                onClick={async () => {
+                  setLoadingAiItinerary(true);
+                  setAiItineraryError(null);
+                  try {
+                    const response = await fetch("/api/ai-itinerary", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ tripId }),
+                    });
+
+                    if (!response.ok) {
+                      const error = await response.json();
+                      throw new Error(error.error || "Failed to generate itinerary");
+                    }
+
+                    const { itinerary } = await response.json();
+                    setAiItinerary(itinerary);
+                  } catch (error) {
+                    console.error("Error generating AI itinerary:", error);
+                    setAiItineraryError(
+                      error instanceof Error
+                        ? error.message
+                        : "Failed to generate itinerary. Please try again."
+                    );
+                  } finally {
+                    setLoadingAiItinerary(false);
+                  }
+                }}
+                disabled={loadingAiItinerary}
+                size="sm"
+                variant="outline"
+              >
+                {loadingAiItinerary ? "Generating..." : "Generate smart itinerary"}
+              </Button>
+            )}
+          </div>
+
+          {aiItineraryError && (
+            <div className="text-sm text-destructive p-3 bg-destructive/10 rounded-md border border-destructive/20 mb-4">
+              {aiItineraryError}
+            </div>
+          )}
+
+          {aiItinerary && (
+            <div className="space-y-6">
+              <div className="p-4 bg-muted rounded-lg">
+                <h3 className="font-semibold text-lg mb-2">{aiItinerary.tripTitle}</h3>
+                <p className="text-sm text-muted-foreground">{aiItinerary.summary}</p>
+              </div>
+
+              {aiItinerary.days.map((day, dayIdx) => (
+                <Card key={dayIdx} className="overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">{day.title}</CardTitle>
+                    <CardDescription>
+                      {format(new Date(day.date), "EEEE, MMMM d, yyyy")} • {day.theme}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {day.sections.map((section, sectionIdx) => (
+                      <div
+                        key={sectionIdx}
+                        className={sectionIdx < day.sections.length - 1 ? "pb-4 border-b" : ""}
+                      >
+                        <h4 className="font-semibold text-sm mb-2">{section.partOfDay}</h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {section.description}
+                        </p>
+                        {section.suggestions.length > 0 && (
+                          <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                            {section.suggestions.map((suggestion, sugIdx) => (
+                              <li key={sugIdx}>{suggestion}</li>
+                            ))}
+                          </ul>
+                        )}
+                        {section.seasonalNotes && (
+                          <p className="text-xs text-muted-foreground mt-2 italic">
+                            {section.seasonalNotes}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Divider */}
+        {aiItinerary && (
+          <div className="my-6 border-t">
+            <h2 className="text-xl font-semibold mt-6 mb-4">Your itinerary</h2>
+          </div>
+        )}
 
         {selectedDayId ? (
           <ActivityList

@@ -13,9 +13,14 @@ export function TripLayout({ leftPanel, rightPanel }: TripLayoutProps) {
   const router = useRouter();
 
   return (
-    <div className="h-screen flex overflow-hidden">
-      {/* Left Sidebar - 40% width */}
-      <div className="w-[40%] border-r border-border overflow-y-auto bg-background flex flex-col">
+    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+      {/* Map Area - On top for mobile, right side for desktop */}
+      <div className="h-[40vh] md:h-auto md:w-[60%] bg-muted order-first md:order-none">
+        {rightPanel}
+      </div>
+      
+      {/* Left Sidebar - 40% width on desktop, full width on mobile */}
+      <div className="flex-1 md:w-[40%] border-t md:border-t-0 md:border-r border-border overflow-y-auto bg-background flex flex-col">
         {/* Header with Back button */}
         <div className="p-6 pb-0 border-b border-border">
           <Button
@@ -32,11 +37,6 @@ export function TripLayout({ leftPanel, rightPanel }: TripLayoutProps) {
         <div className="flex-1 overflow-y-auto">
           {leftPanel}
         </div>
-      </div>
-      
-      {/* Right Map Area - 60% width */}
-      <div className="w-[60%] bg-muted">
-        {rightPanel}
       </div>
     </div>
   );
