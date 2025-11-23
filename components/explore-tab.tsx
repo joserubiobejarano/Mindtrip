@@ -71,13 +71,13 @@ interface Trip {
 
 const MAPBOX_BASE = "https://api.mapbox.com/geocoding/v5/mapbox.places";
 
-const FILTER_PRESETS = {
+const FILTER_PRESETS: Record<string, { label: string; query?: string; categories?: string }> = {
   museums: { label: "Museums", query: "museum", categories: "museum" },
   parks: { label: "Parks & Nature", query: "park", categories: "park,garden" },
   food: { label: "Food", query: "restaurant", categories: "restaurant,food" },
   nightlife: { label: "Nightlife", query: "bar", categories: "bar,nightclub" },
-  shopping: { label: "Shopping", query: "shopping", categories: "shop,mall" },
-  neighborhoods: { label: "Neighborhoods", query: "neighborhood", categories: "" },
+  shopping: { label: "Shopping", query: "shop", categories: "shop,mall" },
+  neighborhoods: { label: "Neighborhoods", query: "", categories: "" },
 } as const;
 
 const FILTER_OPTIONS = Object.values(FILTER_PRESETS);
@@ -214,72 +214,42 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       return;
     }
 
-    // Determine searchText based on user query and filter
-    const cityName = trip.destination_name || "";
-    let searchText = "";
-
-    if (userQuery.trim()) {
-      // User typed something in the search bar
-      searchText = `${userQuery.trim()} in ${cityName}`;
-    } else if (activeFilter) {
-      // User clicked a filter chip
-      switch (activeFilter) {
-        case "museums":
-          searchText = `museum in ${cityName}`;
-          break;
-        case "parks":
-          searchText = `park in ${cityName}`;
-          break;
-        case "food":
-          searchText = `restaurant in ${cityName}`;
-          break;
-        case "nightlife":
-          searchText = `bar in ${cityName}`;
-          break;
-        case "shopping":
-          searchText = `shopping mall in ${cityName}`;
-          break;
-        case "neighborhoods":
-          // Special case for neighborhoods - handled separately
-          break;
-        default:
-          searchText = "";
-      }
-    }
-
-    // Don't hit Mapbox with empty search text
-    if (!searchText && activeFilter !== "neighborhoods") {
-      setError("Please enter a search query or select a filter.");
-      setResults([]);
-      setQueryWasTried(true);
-      return;
-    }
-
     setLoading(true);
     setError(null);
     setQueryWasTried(true);
 
     try {
-      let url = "";
+      let url: URL;
 
       if (activeFilter === "neighborhoods") {
         // Special case for neighborhoods
-        const cityQuery = cityName || "";
-        if (!cityQuery) {
-          setError("Trip destination is required for searching neighborhoods.");
-          setResults([]);
-          setLoading(false);
-          return;
-        }
-        url = `${MAPBOX_BASE}/${encodeURIComponent(cityQuery)}.json?limit=20&types=neighborhood&proximity=${trip.center_lng},${trip.center_lat}&language=en&access_token=${mapboxToken}`;
+        const cityQuery = trip.destination_name || "city";
+        url = new URL(
+          `${MAPBOX_BASE}/${encodeURIComponent(cityQuery)}.json`
+        );
+        url.searchParams.set("access_token", mapboxToken);
+        url.searchParams.set("limit", "10");
+        url.searchParams.set("types", "neighborhood");
+        url.searchParams.set("proximity", `${trip.center_lng},${trip.center_lat}`);
       } else {
-        // For Museums / Parks & Nature / Food / Nightlife / Shopping
-        url = `${MAPBOX_BASE}/${encodeURIComponent(searchText)}.json?limit=20&types=poi&proximity=${trip.center_lng},${trip.center_lat}&language=en&access_token=${mapboxToken}`;
+        // For POI-based filters (Museums, Parks, Food, Nightlife, Shopping)
+        const baseQuery =
+          userQuery?.trim() ||
+          FILTER_PRESETS[activeFilter || ""]?.query ||
+          "point of interest";
+        
+        url = new URL(
+          `${MAPBOX_BASE}/${encodeURIComponent(baseQuery)}.json`
+        );
+        url.searchParams.set("access_token", mapboxToken);
+        url.searchParams.set("limit", "20");
+        url.searchParams.set("types", "poi");
+        url.searchParams.set("proximity", `${trip.center_lng},${trip.center_lat}`);
       }
 
-      console.log("Mapbox URL", url.replace(mapboxToken, "TOKEN_HIDDEN"));
+      console.log("Mapbox URL", url.toString().replace(mapboxToken, "TOKEN_HIDDEN"));
 
-      const res = await fetch(url);
+      const res = await fetch(url.toString());
       
       if (!res.ok) {
         const errorText = await res.text();
@@ -291,9 +261,17 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       }
 
       const data = await res.json();
-      console.log("Mapbox features", data.features);
+      const features = data.features ?? [];
+      
+      console.log("Mapbox features length", features.length, features);
 
-      const places: PlaceResult[] = (data.features ?? [])
+      // Filter features by place_type
+      const filtered =
+        activeFilter === "neighborhoods"
+          ? features.filter((f: any) => f.place_type?.includes("neighborhood"))
+          : features.filter((f: any) => f.place_type?.includes("poi"));
+
+      const places: PlaceResult[] = filtered
         .filter((f: any) => Array.isArray(f.center) && f.center.length === 2)
         .map((feature: any) => ({
           id: feature.id,
