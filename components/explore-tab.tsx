@@ -190,21 +190,36 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         searchQuery = `${query.trim()} in ${cityName}`;
       }
 
-      // Build proximity parameter if we have coordinates
-      const hasProximity = trip.center_lat && trip.center_lng && 
-                          !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
-      const proximityParam = hasProximity 
-        ? `&proximity=${trip.center_lng},${trip.center_lat}`
-        : "";
+      // Build proximity and bbox parameters if we have coordinates
+      const hasCoordinates = trip.center_lat && trip.center_lng && 
+                            !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
+      
+      let proximityParam = "";
+      let bboxParam = "";
+      
+      if (hasCoordinates) {
+        // Add proximity parameter to bias results toward trip center
+        proximityParam = `&proximity=${trip.center_lng},${trip.center_lat}`;
+        
+        // Calculate bbox around trip center (±0.5º ≈ 50km)
+        const delta = 0.5;
+        const minLng = trip.center_lng - delta;
+        const maxLng = trip.center_lng + delta;
+        const minLat = trip.center_lat - delta;
+        const maxLat = trip.center_lat + delta;
+        
+        // bbox format: minLng,minLat,maxLng,maxLat
+        bboxParam = `&bbox=${minLng},${minLat},${maxLng},${maxLat}`;
+      }
 
       // Try with types=poi first, but if that fails, try without type restriction
       let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         searchQuery
-      )}.json?types=poi&limit=20${proximityParam}&access_token=${mapboxToken}`;
+      )}.json?types=poi&limit=20${proximityParam}${bboxParam}&access_token=${mapboxToken}`;
 
       console.log("Mapbox search URL:", url.replace(mapboxToken, "TOKEN_HIDDEN"));
       console.log("Search query:", searchQuery);
-      console.log("Has proximity:", hasProximity, hasProximity ? `${trip.center_lng},${trip.center_lat}` : "none");
+      console.log("Has coordinates:", hasCoordinates, hasCoordinates ? `${trip.center_lng},${trip.center_lat}` : "none");
 
       let res = await fetch(url);
       let data = await res.json();
@@ -214,7 +229,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         console.log("No results with types=poi, trying without type restriction");
         url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
           searchQuery
-        )}.json?limit=20${proximityParam}&access_token=${mapboxToken}`;
+        )}.json?limit=20${proximityParam}${bboxParam}&access_token=${mapboxToken}`;
         
         res = await fetch(url);
         data = await res.json();
