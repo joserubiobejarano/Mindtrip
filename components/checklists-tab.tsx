@@ -449,7 +449,7 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
           <DialogHeader>
             <DialogTitle>New Checklist</DialogTitle>
             <DialogDescription>
-              Create a new checklist (e.g., "Packing", "To-do", "Restaurants").
+              Create a new checklist (e.g., &quot;Packing&quot;, &quot;To-do&quot;, &quot;Restaurants&quot;).
             </DialogDescription>
           </DialogHeader>
           <form

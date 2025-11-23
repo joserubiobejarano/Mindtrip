@@ -37,6 +37,7 @@ export function TripsList() {
     if (userId) {
       fetchTrips();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const fetchTrips = async () => {

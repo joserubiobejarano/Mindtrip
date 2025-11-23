@@ -44,7 +44,7 @@ export function ActivityList({
   if (activities.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-8">
-        No activities yet. Click "Add Activity" to get started!
+        No activities yet. Click &quot;Add Activity&quot; to get started!
       </div>
     );
   }

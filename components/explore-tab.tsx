@@ -76,6 +76,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     if (tripId && user?.id) {
       loadSavedPlaces();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId, user?.id]);
 
   const loadSavedPlaces = async () => {
@@ -574,7 +575,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                 </div>
               ) : savedPlaces.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  You haven't saved any places yet.
+                  You haven&apos;t saved any places yet.
                 </p>
               ) : (
                 <div className="space-y-3 mb-4">

@@ -35,6 +35,7 @@ export function PlaceSearch({ onSelectPlace, selectedPlaceId }: PlaceSearchProps
     if (selectedPlaceId) {
       fetchPlaceDetails(selectedPlaceId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPlaceId]);
 
   useEffect(() => {

@@ -89,6 +89,7 @@ export function NewTripDialog({
     if (destination && !title.trim()) {
       setTitle(`Trip to ${destination.placeName}`);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [destination]); // Only depend on destination, not title, to avoid re-triggering
 
   // Reset form when dialog closes

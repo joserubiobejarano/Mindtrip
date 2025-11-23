@@ -82,6 +82,7 @@ export function ShareTripDialog({
     if (open && !publicSlug) {
       createShareLink();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   return (
