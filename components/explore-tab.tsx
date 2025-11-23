@@ -4,13 +4,14 @@ import { useState, FormEvent, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { AddToItineraryDialog } from "@/components/add-to-itinerary-dialog";
 import { ExploreMap } from "@/components/explore-map";
 import { PlaceDetailsPanel } from "@/components/place-details-panel";
 import { Loader2, Search, MapPin, Star, Hotel } from "lucide-react";
+import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
 import {
   savePlace,
