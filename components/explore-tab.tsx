@@ -177,11 +177,48 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     setQueryWasTried(true);
 
     try {
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        query.trim()
-      )}.json?types=poi&limit=10&proximity=${trip.center_lng},${trip.center_lat}&access_token=${mapboxToken}`;
+      // Build query - for category searches, combine with city name for better results
+      const cityName = trip.destination_name || trip.title || "";
+      let searchQuery = query.trim();
+      
+      // If it's a generic category term and we have a city, search in that city
+      const isCategorySearch = ["museum", "park", "restaurant", "bar", "shopping mall", "neighborhood"].includes(
+        query.trim().toLowerCase()
+      );
+      
+      if (isCategorySearch && cityName) {
+        searchQuery = `${query.trim()} in ${cityName}`;
+      }
 
-      const res = await fetch(url);
+      // Build proximity parameter if we have coordinates
+      const hasProximity = trip.center_lat && trip.center_lng && 
+                          !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
+      const proximityParam = hasProximity 
+        ? `&proximity=${trip.center_lng},${trip.center_lat}`
+        : "";
+
+      // Try with types=poi first, but if that fails, try without type restriction
+      let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+        searchQuery
+      )}.json?types=poi&limit=20${proximityParam}&access_token=${mapboxToken}`;
+
+      console.log("Mapbox search URL:", url.replace(mapboxToken, "TOKEN_HIDDEN"));
+      console.log("Search query:", searchQuery);
+      console.log("Has proximity:", hasProximity, hasProximity ? `${trip.center_lng},${trip.center_lat}` : "none");
+
+      let res = await fetch(url);
+      let data = await res.json();
+
+      // If no results with types=poi, try without type restriction
+      if (!res.ok || !data.features || data.features.length === 0) {
+        console.log("No results with types=poi, trying without type restriction");
+        url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          searchQuery
+        )}.json?limit=20${proximityParam}&access_token=${mapboxToken}`;
+        
+        res = await fetch(url);
+        data = await res.json();
+      }
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -191,10 +228,29 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         return;
       }
 
-      const data = await res.json();
       console.log("raw mapbox features", data.features);
+      console.log("total features:", data.features?.length || 0);
 
-      const nextPlaces: PlaceResult[] = (data.features ?? []).map((feature: any) => ({
+      // Filter to only POIs and places (not addresses, neighborhoods, etc.)
+      let poiFeatures = (data.features ?? []).filter((feature: any) => {
+        // Include POIs, landmarks, and places
+        const types = feature.place_type || [];
+        return (
+          types.includes("poi") ||
+          types.includes("landmark") ||
+          (types.includes("place") && feature.properties?.category)
+        );
+      });
+
+      console.log("filtered POI features:", poiFeatures.length);
+
+      // If filtering removed all results, use all features but prioritize POIs
+      if (poiFeatures.length === 0 && data.features && data.features.length > 0) {
+        console.log("No POIs found, using all features");
+        poiFeatures = data.features;
+      }
+
+      const nextPlaces: PlaceResult[] = poiFeatures.map((feature: any) => ({
         id: feature.id,
         name: feature.text || feature.place_name || "Unknown place",
         address: feature.place_name ?? "",
@@ -211,6 +267,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         })
       );
 
+      console.log("final results count:", resultsWithPlaceIds.length);
       setResults(resultsWithPlaceIds);
     } catch (err) {
       console.error("searchPlaces failed", err);
