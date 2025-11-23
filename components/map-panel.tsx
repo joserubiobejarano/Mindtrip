@@ -72,7 +72,32 @@ export function MapPanel({
       return;
     }
 
-    getDayRoute(activities).then((result) => {
+    // Transform activities to match getDayRoute's expected format
+    // Filter out activities without valid coordinates
+    const activitiesWithValidPlaces = activities
+      .filter(
+        (activity) =>
+          activity.place &&
+          activity.place.lat != null &&
+          activity.place.lng != null &&
+          !isNaN(activity.place.lat) &&
+          !isNaN(activity.place.lng)
+      )
+      .map((activity) => ({
+        id: activity.id,
+        place: {
+          lat: activity.place!.lat!,
+          lng: activity.place!.lng!,
+        },
+      }));
+
+    if (activitiesWithValidPlaces.length < 2) {
+      setRouteLine(null);
+      setRouteLegs([]);
+      return;
+    }
+
+    getDayRoute(activitiesWithValidPlaces).then((result) => {
       setRouteLine(result.routeLineGeoJson);
       setRouteLegs(result.legs);
     });
