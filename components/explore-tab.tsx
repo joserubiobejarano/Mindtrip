@@ -580,7 +580,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       {/* Main Content - 2 column grid on desktop, stacked on mobile */}
       <div className="flex-1 flex flex-col-reverse md:grid md:grid-cols-[40%_60%] gap-6 overflow-hidden min-h-0">
         {/* Left Column - Search, Filters, Results */}
-        <div className="flex flex-col overflow-hidden order-2 md:order-none">
+        <div className="flex flex-col overflow-hidden order-2 md:order-none bg-white">
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="mb-4">
             <div className="relative">
