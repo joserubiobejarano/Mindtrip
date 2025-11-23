@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ItineraryTab } from "@/components/itinerary-tab";
 import { ExpensesTab } from "@/components/expenses-tab";
@@ -13,6 +14,7 @@ interface TripTabsProps {
   selectedDayId: string | null;
   onSelectDay: (dayId: string) => void;
   onActivitySelect?: (activityId: string) => void;
+  onTabChange?: (tab: string) => void;
 }
 
 export function TripTabs({
@@ -21,11 +23,18 @@ export function TripTabs({
   selectedDayId,
   onSelectDay,
   onActivitySelect,
+  onTabChange,
 }: TripTabsProps) {
   const { data: trip } = useTrip(tripId);
+  const [activeTab, setActiveTab] = useState("itinerary");
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    onTabChange?.(value);
+  };
 
   return (
-    <Tabs defaultValue="itinerary" className="h-full flex flex-col">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
       <TabsList className="mb-4">
         <TabsTrigger value="explore">Explore</TabsTrigger>
         <TabsTrigger value="itinerary">Itinerary</TabsTrigger>

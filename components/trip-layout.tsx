@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 
 interface TripLayoutProps {
   leftPanel: React.ReactNode;
-  rightPanel: React.ReactNode;
+  rightPanel: React.ReactNode | null;
 }
 
 export function TripLayout({ leftPanel, rightPanel }: TripLayoutProps) {
@@ -15,12 +15,14 @@ export function TripLayout({ leftPanel, rightPanel }: TripLayoutProps) {
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Map Area - On top for mobile, right side for desktop */}
-      <div className="h-[40vh] md:h-auto md:w-[60%] bg-muted order-first md:order-none">
-        {rightPanel}
-      </div>
+      {rightPanel && (
+        <div className="h-[40vh] md:h-auto md:w-[60%] bg-muted order-first md:order-none">
+          {rightPanel}
+        </div>
+      )}
       
-      {/* Left Sidebar - 40% width on desktop, full width on mobile */}
-      <div className="flex-1 md:w-[40%] border-t md:border-t-0 md:border-r border-border overflow-y-auto bg-background flex flex-col">
+      {/* Left Sidebar - 40% width on desktop when map is visible, full width when map is hidden */}
+      <div className={`flex-1 ${rightPanel ? 'md:w-[40%]' : 'md:w-full'} border-t md:border-t-0 ${rightPanel ? 'md:border-r' : ''} border-border overflow-y-auto bg-background flex flex-col`}>
         {/* Header with Back button */}
         <div className="p-6 pb-0 border-b border-border">
           <Button

@@ -17,6 +17,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const { data: trip } = useTrip(tripId);
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("itinerary");
   const supabase = createClient();
   const [ownerMemberChecked, setOwnerMemberChecked] = useState(false);
 
@@ -78,14 +79,17 @@ export function TripDetail({ tripId }: { tripId: string }) {
           selectedDayId={selectedDayId}
           onSelectDay={setSelectedDayId}
           onActivitySelect={setSelectedActivityId}
+          onTabChange={setActiveTab}
         />
       }
       rightPanel={
-        <MapPanel
-          tripId={tripId}
-          selectedDayId={selectedDayId}
-          selectedActivityId={selectedActivityId}
-        />
+        activeTab !== "explore" ? (
+          <MapPanel
+            tripId={tripId}
+            selectedDayId={selectedDayId}
+            selectedActivityId={selectedActivityId}
+          />
+        ) : null
       }
     />
   );
