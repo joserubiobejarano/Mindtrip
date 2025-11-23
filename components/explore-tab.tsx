@@ -547,227 +547,216 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   };
 
   return (
-    <div className="p-6 h-full flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">
-          {trip.destination_name || trip.title}
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Discover places in {trip.destination_name || "your destination"}
-        </p>
+    <div className="h-[calc(100vh-80px)] flex overflow-hidden">
+      {/* Left: Map */}
+      <div className="flex-1 min-w-0">
+        {trip.center_lat != null && trip.center_lng != null ? (
+          <GoogleMapBase
+            center={{ lat: trip.center_lat, lng: trip.center_lng }}
+            zoom={12}
+            markers={[
+              ...results.map((place) => ({
+                id: place.place_id || place.id,
+                lat: place.lat,
+                lng: place.lng,
+              })),
+              ...savedPlaces
+                .filter((place) => place.lat != null && place.lng != null)
+                .map((place) => ({
+                  id: place.place_id,
+                  lat: place.lat!,
+                  lng: place.lng!,
+                })),
+            ]}
+            onMarkerClick={(id) => {
+              // Find the place by id
+              const place =
+                results.find((p) => (p.place_id || p.id) === id) ||
+                savedPlaces.find((p) => p.place_id === id);
+              if (place) {
+                handlePlaceSelect(place);
+              }
+            }}
+            onMapLoad={(map) => {
+              setMapInstance(map);
+              // Create PlacesService from the map
+              const service = new google.maps.places.PlacesService(map);
+              setPlacesService(service);
+            }}
+            className="h-full w-full"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <p className="text-sm text-muted-foreground">
+              Trip location is required to display the map.
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Main Content - 2 column grid on desktop, stacked on mobile */}
-      <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
-        <div className="flex-1 grid md:grid-cols-[2fr_1fr] gap-4 min-h-0">
-          {/* Left: Map */}
-          <div className="rounded-lg border overflow-hidden flex-1 min-h-0">
-            {trip.center_lat != null && trip.center_lng != null ? (
-              <GoogleMapBase
-                center={{ lat: trip.center_lat, lng: trip.center_lng }}
-                zoom={12}
-                markers={[
-                  ...results.map((place) => ({
-                    id: place.place_id || place.id,
-                    lat: place.lat,
-                    lng: place.lng,
-                  })),
-                  ...savedPlaces
-                    .filter((place) => place.lat != null && place.lng != null)
-                    .map((place) => ({
-                      id: place.place_id,
-                      lat: place.lat!,
-                      lng: place.lng!,
-                    })),
-                ]}
-                onMarkerClick={(id) => {
-                  // Find the place by id
-                  const place =
-                    results.find((p) => (p.place_id || p.id) === id) ||
-                    savedPlaces.find((p) => p.place_id === id);
-                  if (place) {
-                    handlePlaceSelect(place);
+      {/* Right: Side Panel */}
+      <aside className="w-full max-w-md border-l bg-white flex flex-col">
+        {/* Hotel Card */}
+        {trip.start_date && trip.end_date && (
+          <div className="p-4 border-b">
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Hotel className="h-5 w-5" />
+                  Need a place to stay?
+                </CardTitle>
+                <CardDescription>
+                  Search hotels for your trip dates and destination.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => {
+                    const city = trip.destination_name || trip.title;
+                    const startDate = new Date(trip.start_date);
+                    const endDate = new Date(trip.end_date);
+                    const checkin = format(startDate, "yyyy-MM-dd");
+                    const checkout = format(endDate, "yyyy-MM-dd");
+                    const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
+                    window.open(url, "_blank", "noopener,noreferrer");
+                  }}
+                  className="w-full"
+                >
+                  Search hotels
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Search Input + Filter Chips */}
+        <div className="p-4 border-b space-y-3">
+          <form onSubmit={handleSearchSubmit}>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder='Search for a place or type "museum"...'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim().length >= 2) {
+                    handleSearchSubmit(e as any);
                   }
                 }}
-                onMapLoad={(map) => {
-                  setMapInstance(map);
-                  // Create PlacesService from the map
-                  const service = new google.maps.places.PlacesService(map);
-                  setPlacesService(service);
-                }}
-                className="h-full"
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                <p className="text-sm text-muted-foreground">
-                  Trip location is required to display the map.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Right: Side Panel */}
-          <div className="flex flex-col gap-3 min-h-0 overflow-hidden">
-            {/* Hotel Card */}
-            {trip.start_date && trip.end_date && (
-              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Hotel className="h-5 w-5" />
-                    Need a place to stay?
-                  </CardTitle>
-                  <CardDescription>
-                    Search hotels for your trip dates and destination.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    onClick={() => {
-                      const city = trip.destination_name || trip.title;
-                      const startDate = new Date(trip.start_date);
-                      const endDate = new Date(trip.end_date);
-                      const checkin = format(startDate, "yyyy-MM-dd");
-                      const checkout = format(endDate, "yyyy-MM-dd");
-                      const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
-                      window.open(url, "_blank", "noopener,noreferrer");
-                    }}
-                    className="w-full"
-                  >
-                    Search hotels
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Search Input */}
-            <form onSubmit={handleSearchSubmit}>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder='Search for a place or type "museum"...'
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && searchQuery.trim().length >= 2) {
-                      handleSearchSubmit(e as any);
-                    }
-                  }}
-                />
-              </div>
-            </form>
-
-            {/* Filter Chips */}
-            <div className="flex flex-wrap gap-2">
-              {(Object.keys(FILTER_PRESETS) as ExploreFilter[]).map((filterKey) => {
-                const filter = FILTER_PRESETS[filterKey];
-                const isSelected = selectedFilter === filterKey;
-                
-                return (
-                  <Button
-                    key={filterKey}
-                    variant={isSelected ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleFilterClick(filterKey)}
-                    disabled={loading}
-                  >
-                    {loading && isSelected ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      filter.label
-                    )}
-                  </Button>
-                );
-              })}
             </div>
+          </form>
 
-            {/* Saved Places + Results */}
-            <div className="flex-1 overflow-y-auto">
-              {/* Saved Places Section */}
-              {user?.id && (
-                <div className="mb-4">
-                  <h2 className="text-lg font-semibold mb-3">Saved places</h2>
-                  {loadingSaved ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    </div>
-                  ) : savedPlaces.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      You haven&apos;t saved any places yet.
-                    </p>
+          {/* Filter Chips */}
+          <div className="flex flex-wrap gap-2">
+            {(Object.keys(FILTER_PRESETS) as ExploreFilter[]).map((filterKey) => {
+              const filter = FILTER_PRESETS[filterKey];
+              const isSelected = selectedFilter === filterKey;
+              
+              return (
+                <Button
+                  key={filterKey}
+                  variant={isSelected ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleFilterClick(filterKey)}
+                  disabled={loading}
+                >
+                  {loading && isSelected ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Loading...
+                    </>
                   ) : (
-                    <div className="space-y-3 mb-4">
-                      {savedPlaces.map((place) => (
-                        <PlaceCard key={place.place_id} place={place} isFromSaved />
-                      ))}
-                    </div>
+                    filter.label
                   )}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Saved Places + Results - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {/* Saved Places Section */}
+          {user?.id && (
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold mb-3">Saved places</h2>
+              {loadingSaved ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
-              )}
-
-              {/* Results */}
-              {loading && (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                </div>
-              )}
-
-              {error && (
-                <div className="text-sm text-destructive py-4">{error}</div>
-              )}
-
-              {!loading &&
-                !error &&
-                results.length === 0 &&
-                !queryWasTried && (
-                  <div className="text-sm text-muted-foreground py-8 text-center">
-                    Search for a place or click a filter to discover places
-                  </div>
-                )}
-
-              {!loading &&
-                !error &&
-                results.length === 0 &&
-                queryWasTried && (
-                  <div className="text-sm text-muted-foreground py-8 text-center">
-                    No results found. Try a different search.
-                  </div>
-                )}
-
-              {!loading && results.length > 0 && (
-                <div className="space-y-3">
-                  {results.map((place) => (
-                    <PlaceCard key={place.id} place={place} />
+              ) : savedPlaces.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  You haven&apos;t saved any places yet.
+                </p>
+              ) : (
+                <div className="space-y-3 mb-4">
+                  {savedPlaces.map((place) => (
+                    <PlaceCard key={place.place_id} place={place} isFromSaved />
                   ))}
                 </div>
               )}
-
-              {/* Place Details Panel - Mobile (below list) */}
-              {selectedPlace && (
-                <div ref={detailsPanelRef} className="md:hidden mt-4">
-                  <PlaceDetailsPanel
-                    place={selectedPlace}
-                    isSaved={
-                      selectedPlace.place_id
-                        ? isPlaceSaved(selectedPlace.place_id)
-                        : false
-                    }
-                    isToggling={
-                      selectedPlace.place_id === togglingPlaceId ? true : false
-                    }
-                    onToggleSave={() => handleToggleSave(selectedPlace)}
-                    onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
-                  />
-                </div>
-              )}
             </div>
-          </div>
+          )}
+
+          {/* Results */}
+          {loading && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+
+          {error && (
+            <div className="text-sm text-destructive py-4">{error}</div>
+          )}
+
+          {!loading &&
+            !error &&
+            results.length === 0 &&
+            !queryWasTried && (
+              <div className="text-sm text-muted-foreground py-8 text-center">
+                Search for a place or click a filter to discover places
+              </div>
+            )}
+
+          {!loading &&
+            !error &&
+            results.length === 0 &&
+            queryWasTried && (
+              <div className="text-sm text-muted-foreground py-8 text-center">
+                No results found. Try a different search.
+              </div>
+            )}
+
+          {!loading && results.length > 0 && (
+            <div className="space-y-3">
+              {results.map((place) => (
+                <PlaceCard key={place.id} place={place} />
+              ))}
+            </div>
+          )}
+
+          {/* Place Details Panel - Mobile (below list) */}
+          {selectedPlace && (
+            <div ref={detailsPanelRef} className="md:hidden mt-4">
+              <PlaceDetailsPanel
+                place={selectedPlace}
+                isSaved={
+                  selectedPlace.place_id
+                    ? isPlaceSaved(selectedPlace.place_id)
+                    : false
+                }
+                isToggling={
+                  selectedPlace.place_id === togglingPlaceId ? true : false
+                }
+                onToggleSave={() => handleToggleSave(selectedPlace)}
+                onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
+              />
+            </div>
+          )}
         </div>
-      </div>
+      </aside>
 
       {/* Place Details Panel - Desktop (below grid) */}
       {selectedPlace && (
