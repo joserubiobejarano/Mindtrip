@@ -15,6 +15,9 @@ import { ShareTripDialog } from "@/components/share-trip-dialog";
 import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { useRouter } from "next/navigation";
 import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
+import { addActivitiesForDay } from "@/lib/supabase/activities";
+import { useQueryClient } from "@tanstack/react-query";
+import type { PlannedActivity } from "@/types/ai";
 
 interface ItineraryTabProps {
   tripId: string;
@@ -36,7 +39,9 @@ export function ItineraryTab({
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
+  const [autoPlanning, setAutoPlanning] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
   const { data: days, isLoading: daysLoading } = useDays(tripId);
@@ -129,6 +134,42 @@ export function ItineraryTab({
   const handleSelectActivity = (activityId: string) => {
     if (onActivitySelect) {
       onActivitySelect(activityId);
+    }
+  };
+
+  const handleAutoPlanDay = async () => {
+    if (!selectedDayId) return;
+
+    setAutoPlanning(true);
+    try {
+      const response = await fetch("/api/ai/plan-day", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tripId,
+          dayId: selectedDayId,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to plan day");
+      }
+
+      const { activities } = await response.json() as { activities: PlannedActivity[] };
+
+      if (activities && activities.length > 0) {
+        await addActivitiesForDay(selectedDayId, activities);
+        // Refresh activities
+        queryClient.invalidateQueries({ queryKey: ["activities", selectedDayId] });
+      }
+    } catch (error) {
+      console.error("Error auto-planning day:", error);
+      alert(error instanceof Error ? error.message : "Failed to auto-plan this day. Please try again.");
+    } finally {
+      setAutoPlanning(false);
     }
   };
 
@@ -234,11 +275,22 @@ export function ItineraryTab({
 
       {/* Activities Section */}
       <div className="flex-1 overflow-y-auto">
-        <div className="mb-4">
+        <div className="mb-4 flex gap-2 flex-wrap">
           <Button onClick={handleAddActivity} size="sm">
             <Plus className="mr-2 h-4 w-4" />
             Add Activity
           </Button>
+          {selectedDayId && (
+            <Button
+              onClick={handleAutoPlanDay}
+              size="sm"
+              variant="outline"
+              disabled={autoPlanning}
+            >
+              <span className="mr-2">✨</span>
+              {autoPlanning ? "Planning..." : "Auto-plan this day"}
+            </Button>
+          )}
         </div>
 
         {selectedDayId ? (
