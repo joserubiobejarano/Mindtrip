@@ -71,54 +71,6 @@ interface Trip {
 
 const MAPBOX_BASE = "https://api.mapbox.com/geocoding/v5/mapbox.places";
 
-const FILTER_CONFIG: Record<
-  ExploreFilter,
-  { defaultQuery: string; types: string }
-> = {
-  museums: { defaultQuery: "museum", types: "poi" },
-  parks: { defaultQuery: "park", types: "poi" },
-  food: { defaultQuery: "restaurant", types: "poi" },
-  nightlife: { defaultQuery: "bar", types: "poi" },
-  shopping: { defaultQuery: "shop", types: "poi" },
-  neighborhoods: {
-    defaultQuery: "neighborhood",
-    types: "neighborhood,locality,place",
-  },
-};
-
-function buildMapboxUrl(options: {
-  trip: Trip;
-  filter: ExploreFilter;
-  searchText: string;
-  mapboxToken: string;
-}) {
-  const { trip, filter, searchText, mapboxToken } = options;
-  const { defaultQuery, types } = FILTER_CONFIG[filter];
-  const query = (searchText || defaultQuery || trip.destination_name || "").trim() || "points of interest";
-  const lng = trip.center_lng ?? 0;
-  const lat = trip.center_lat ?? 0;
-
-  // small bounding box around the trip center so results stay in/near that city
-  const delta = 0.3;
-  const bbox = [
-    lng - delta,
-    lat - delta,
-    lng + delta,
-    lat + delta,
-  ].join(",");
-
-  const params = new URLSearchParams({
-    access_token: mapboxToken,
-    limit: "20",
-    types,
-    proximity: `${lng},${lat}`,
-    bbox,
-    language: "en",
-  });
-
-  return `${MAPBOX_BASE}/${encodeURIComponent(query)}.json?${params.toString()}`;
-}
-
 const FILTER_PRESETS = {
   museums: { label: "Museums", query: "museum", categories: "museum" },
   parks: { label: "Parks & Nature", query: "park", categories: "park,garden" },
@@ -237,7 +189,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     }
   };
 
-  const searchPlaces = async (query: string, filterOverride?: ExploreFilter) => {
+  const searchPlaces = async (userQuery: string, filterOverride?: ExploreFilter) => {
     if (!trip) return;
 
     if (!mapboxToken) {
@@ -248,8 +200,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       return;
     }
 
-    // Determine active filter: use override, then selectedFilter, then default to "museums"
-    const activeFilter: ExploreFilter = filterOverride || selectedFilter || "museums";
+    // Determine active filter: use override, then selectedFilter
+    const activeFilter: ExploreFilter | null = filterOverride || selectedFilter;
 
     // Validate trip coordinates
     const hasCoordinates = trip.center_lat != null && trip.center_lng != null && 
@@ -262,62 +214,94 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       return;
     }
 
+    // Determine searchText based on user query and filter
+    const cityName = trip.destination_name || "";
+    let searchText = "";
+
+    if (userQuery.trim()) {
+      // User typed something in the search bar
+      searchText = `${userQuery.trim()} in ${cityName}`;
+    } else if (activeFilter) {
+      // User clicked a filter chip
+      switch (activeFilter) {
+        case "museums":
+          searchText = `museum in ${cityName}`;
+          break;
+        case "parks":
+          searchText = `park in ${cityName}`;
+          break;
+        case "food":
+          searchText = `restaurant in ${cityName}`;
+          break;
+        case "nightlife":
+          searchText = `bar in ${cityName}`;
+          break;
+        case "shopping":
+          searchText = `shopping mall in ${cityName}`;
+          break;
+        case "neighborhoods":
+          // Special case for neighborhoods - handled separately
+          break;
+        default:
+          searchText = "";
+      }
+    }
+
+    // Don't hit Mapbox with empty search text
+    if (!searchText && activeFilter !== "neighborhoods") {
+      setError("Please enter a search query or select a filter.");
+      setResults([]);
+      setQueryWasTried(true);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setQueryWasTried(true);
 
     try {
-      const url = buildMapboxUrl({
-        trip: trip as Trip,
-        filter: activeFilter,
-        searchText: query.trim(),
-        mapboxToken,
-      });
+      let url = "";
+
+      if (activeFilter === "neighborhoods") {
+        // Special case for neighborhoods
+        const cityQuery = cityName || "";
+        if (!cityQuery) {
+          setError("Trip destination is required for searching neighborhoods.");
+          setResults([]);
+          setLoading(false);
+          return;
+        }
+        url = `${MAPBOX_BASE}/${encodeURIComponent(cityQuery)}.json?limit=20&types=neighborhood&proximity=${trip.center_lng},${trip.center_lat}&language=en&access_token=${mapboxToken}`;
+      } else {
+        // For Museums / Parks & Nature / Food / Nightlife / Shopping
+        url = `${MAPBOX_BASE}/${encodeURIComponent(searchText)}.json?limit=20&types=poi&proximity=${trip.center_lng},${trip.center_lat}&language=en&access_token=${mapboxToken}`;
+      }
 
       console.log("Mapbox URL", url.replace(mapboxToken, "TOKEN_HIDDEN"));
 
-      const response = await fetch(url);
+      const res = await fetch(url);
       
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Mapbox error", response.status, text);
-        setLoading(false);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Mapbox error", res.status, errorText);
+        setError("We could not load places. Try again in a moment.");
         setResults([]);
-        setError("Could not load places. Please try again.");
+        setLoading(false);
         return;
       }
 
-      const data = await response.json();
-      console.log("mapbox features", data.features);
+      const data = await res.json();
+      console.log("Mapbox features", data.features);
 
-      const features: any[] = Array.isArray(data.features) ? data.features : [];
-
-      const places = features
-        .filter((f) => Array.isArray(f.center) && f.center.length === 2)
-        .map((f) => {
-          const [lng, lat] = f.center;
-          return {
-            id: f.id,
-            name: f.text || f.place_name || "Unknown place",
-            address: f.place_name || "",
-            lat,
-            lng,
-            category: f.properties?.category || undefined,
-          };
-        });
-
-      // Sort by distance from trip center
-      if (trip.center_lat != null && trip.center_lng != null) {
-        places.sort((a, b) => {
-          const distanceA = Math.sqrt(
-            Math.pow(a.lat - trip.center_lat!, 2) + Math.pow(a.lng - trip.center_lng!, 2)
-          );
-          const distanceB = Math.sqrt(
-            Math.pow(b.lat - trip.center_lat!, 2) + Math.pow(b.lng - trip.center_lng!, 2)
-          );
-          return distanceA - distanceB;
-        });
-      }
+      const places: PlaceResult[] = (data.features ?? [])
+        .filter((f: any) => Array.isArray(f.center) && f.center.length === 2)
+        .map((feature: any) => ({
+          id: feature.id,
+          name: feature.text || feature.place_name || "Unknown place",
+          address: feature.place_name || "",
+          lat: feature.center[1],
+          lng: feature.center[0],
+        }));
 
       // Upsert all places to database and attach place_id
       const resultsWithPlaceIds = await Promise.all(
@@ -341,9 +325,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim().length >= 2) {
-      // Use current selectedFilter or default to "museums"
-      const activeFilter: ExploreFilter = selectedFilter || "museums";
-      searchPlaces(searchQuery.trim(), activeFilter);
+      // Pass the user query - searchPlaces will handle the searchText construction
+      searchPlaces(searchQuery.trim());
     }
   };
 
@@ -356,7 +339,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     if (filterKey) {
       setSelectedFilter(filterKey);
       setSearchQuery("");
-      // Pass the filter and use empty search text (will use defaultQuery from FILTER_CONFIG)
+      // Pass empty query and the filter - searchPlaces will construct searchText from filter
       searchPlaces("", filterKey);
     }
   };
@@ -615,10 +598,10 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       </div>
 
       {/* Main Content - 2 column grid on desktop, stacked on mobile */}
-      <div className="flex flex-col gap-4 h-[calc(100vh-120px)]">
-        <div className="grid md:grid-cols-[2fr_1fr] gap-4 h-full">
+      <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+        <div className="flex-1 grid md:grid-cols-[2fr_1fr] gap-4 min-h-0">
           {/* Left: Map */}
-          <div className="rounded-lg border overflow-hidden h-full">
+          <div className="rounded-lg border overflow-hidden flex-1 min-h-0">
             <ExploreMap
               tripId={tripId}
               centerLat={trip.center_lat}
@@ -632,7 +615,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
           </div>
 
           {/* Right: Side Panel */}
-          <div className="flex flex-col gap-3 min-h-0">
+          <div className="flex flex-col gap-3 min-h-0 overflow-hidden">
             {/* Hotel Card */}
             {trip.start_date && trip.end_date && (
               <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
@@ -656,7 +639,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                       const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
                       window.open(url, "_blank", "noopener,noreferrer");
                     }}
-                    className="w-full sm:w-auto"
+                    className="w-full"
                   >
                     Search hotels
                   </Button>
