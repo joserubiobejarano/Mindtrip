@@ -133,7 +133,13 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         .eq("trip_id", tripId);
 
       if (error) throw error;
-      return (data || []) as TripMember[];
+      // Sort by display_name if available, otherwise by email
+      const sorted = (data || []).sort((a, b) => {
+        const aName = (a as any).display_name || a.email || "";
+        const bName = (b as any).display_name || b.email || "";
+        return aName.localeCompare(bName);
+      });
+      return sorted as TripMember[];
     },
   });
 
@@ -268,7 +274,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   };
 
   const getMemberName = (member: TripMember | { email: string | null; profile?: { full_name: string | null } | null }) => {
-    return member.profile?.full_name || member.email || "Unknown";
+    return (member as any).display_name || member.profile?.full_name || member.email || "Unknown";
   };
 
   return (
@@ -461,7 +467,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               <Label htmlFor="paid_by">Paid By *</Label>
               {members.length === 0 ? (
                 <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
-                  Loading members...
+                  Add at least one tripmate to start tracking expenses.
                 </div>
               ) : (
                 <Select 
@@ -487,7 +493,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               <Label>Share With *</Label>
               {members.length === 0 ? (
                 <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
-                  Loading members...
+                  Add at least one tripmate to start tracking expenses.
                 </div>
               ) : (
                 <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">

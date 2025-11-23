@@ -16,11 +16,9 @@ import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { useRouter } from "next/navigation";
 import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
-import { addActivitiesForDay } from "@/lib/supabase/activities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
-import type { PlannedActivity } from "@/types/ai";
 import type { AiItinerary } from "@/app/api/ai-itinerary/route";
 
 interface ItineraryTabProps {
@@ -45,7 +43,6 @@ export function ItineraryTab({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
-  const [autoPlanning, setAutoPlanning] = useState(false);
   const [aiItinerary, setAiItinerary] = useState<AiItinerary | null>(null);
   const [loadingAiItinerary, setLoadingAiItinerary] = useState(false);
   const [aiItineraryError, setAiItineraryError] = useState<string | null>(null);
@@ -146,68 +143,6 @@ export function ItineraryTab({
   const handleSelectActivity = (activityId: string) => {
     if (onActivitySelect) {
       onActivitySelect(activityId);
-    }
-  };
-
-  const handleAutoPlanDay = async () => {
-    if (!selectedDayId) return;
-
-    setAutoPlanning(true);
-    try {
-      const response = await fetch("/api/ai/plan-day", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          tripId,
-          dayId: selectedDayId,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        const errorMessage = error.error || "Failed to plan day";
-        console.error("Error auto-planning day:", error);
-        addToast({
-          variant: "destructive",
-          title: "Failed to auto-plan day",
-          description: errorMessage,
-        });
-        return;
-      }
-
-      const { activities } = await response.json() as { activities: PlannedActivity[] };
-
-      if (activities && activities.length > 0) {
-        await addActivitiesForDay(selectedDayId, activities);
-        // Refresh activities
-        queryClient.invalidateQueries({ queryKey: ["activities", selectedDayId] });
-        
-        const day = days?.find((d) => d.id === selectedDayId);
-        const dateStr = day ? format(new Date(day.date), "MMM d, yyyy") : "this day";
-        addToast({
-          variant: "success",
-          title: "Day planned successfully",
-          description: `Planned ${activities.length} activities for ${dateStr}`,
-        });
-      } else {
-        addToast({
-          variant: "default",
-          title: "No activities generated",
-          description: "The AI couldn't generate activities for this day. Try again or add activities manually.",
-        });
-      }
-    } catch (error) {
-      console.error("Error auto-planning day:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to auto-plan this day. Please try again.";
-      addToast({
-        variant: "destructive",
-        title: "Error",
-        description: errorMessage,
-      });
-    } finally {
-      setAutoPlanning(false);
     }
   };
 
@@ -339,23 +274,15 @@ export function ItineraryTab({
             <Plus className="mr-2 h-4 w-4" />
             Add Activity
           </Button>
-          {selectedDayId && (
-            <Button
-              onClick={handleAutoPlanDay}
-              size="sm"
-              variant="outline"
-              disabled={autoPlanning}
-            >
-              <span className="mr-2">✨</span>
-              {autoPlanning ? "Planning..." : "Auto-plan this day"}
-            </Button>
-          )}
         </div>
 
         {/* Smart Itinerary Section */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Smart itinerary</h2>
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold mb-1">Smart itinerary</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Get a season-aware, story-like itinerary for your whole trip.
+            </p>
             {!aiItinerary && (
               <Button
                 onClick={async () => {
@@ -390,7 +317,6 @@ export function ItineraryTab({
                 }}
                 disabled={loadingAiItinerary}
                 size="sm"
-                variant="outline"
               >
                 {loadingAiItinerary ? "Generating..." : "Generate smart itinerary"}
               </Button>
@@ -404,16 +330,22 @@ export function ItineraryTab({
           )}
 
           {aiItinerary && (
-            <div className="space-y-6">
-              <div className="p-4 bg-muted rounded-lg">
-                <h3 className="font-semibold text-lg mb-2">{aiItinerary.tripTitle}</h3>
-                <p className="text-sm text-muted-foreground">{aiItinerary.summary}</p>
-              </div>
+            <div className="space-y-6 bg-muted/30 p-6 rounded-lg border">
+              {/* Hero card for trip title and description */}
+              <Card className="bg-muted/50 border-2">
+                <CardHeader>
+                  <CardTitle className="text-2xl mb-2">{aiItinerary.tripTitle}</CardTitle>
+                  <CardDescription className="text-base">{aiItinerary.summary}</CardDescription>
+                </CardHeader>
+              </Card>
 
+              {/* Day sections */}
               {aiItinerary.days.map((day, dayIdx) => (
                 <Card key={dayIdx} className="overflow-hidden">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">{day.title}</CardTitle>
+                    <CardTitle className="text-lg font-bold">
+                      Day {dayIdx + 1} – {day.title}
+                    </CardTitle>
                     <CardDescription>
                       {format(new Date(day.date), "EEEE, MMMM d, yyyy")} • {day.theme}
                     </CardDescription>
@@ -424,19 +356,19 @@ export function ItineraryTab({
                         key={sectionIdx}
                         className={sectionIdx < day.sections.length - 1 ? "pb-4 border-b" : ""}
                       >
-                        <h4 className="font-semibold text-sm mb-2">{section.partOfDay}</h4>
-                        <p className="text-sm text-muted-foreground mb-2">
+                        <h4 className="font-bold text-base mb-2">{section.partOfDay}</h4>
+                        <p className="text-sm text-muted-foreground mb-3">
                           {section.description}
                         </p>
                         {section.suggestions.length > 0 && (
-                          <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                          <ul className="list-disc list-inside space-y-1 text-sm text-foreground ml-4">
                             {section.suggestions.map((suggestion, sugIdx) => (
                               <li key={sugIdx}>{suggestion}</li>
                             ))}
                           </ul>
                         )}
                         {section.seasonalNotes && (
-                          <p className="text-xs text-muted-foreground mt-2 italic">
+                          <p className="text-xs text-muted-foreground mt-3 italic">
                             {section.seasonalNotes}
                           </p>
                         )}

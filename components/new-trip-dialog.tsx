@@ -186,18 +186,26 @@ export function NewTripDialog({
       if (daysError) throw daysError;
 
       // Create owner member entry
+      const userEmail = user?.primaryEmailAddress?.emailAddress || null;
+      const displayName = user?.firstName && user?.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : userEmail || null;
+
       const { error: memberError } = await supabase
         .from("trip_members")
         .insert({
           trip_id: trip.id,
           user_id: userId,
-          email: user?.primaryEmailAddress?.emailAddress || null,
+          email: userEmail,
           role: "owner",
+          display_name: displayName,
         });
 
       if (memberError) {
         console.error("Error creating owner member:", memberError);
-        // Don't throw - trip is already created, just log the error
+        // Rollback: delete the trip if member creation fails
+        await supabase.from("trips").delete().eq("id", trip.id);
+        throw new Error("Failed to create trip member. Please try again.");
       }
 
       onOpenChange(false);

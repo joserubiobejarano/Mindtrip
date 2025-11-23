@@ -72,6 +72,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const { data: days } = useDays(tripId);
   const supabase = createClient();
 
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
   // Load saved places on mount
   useEffect(() => {
     if (tripId && user?.id) {
@@ -163,10 +165,9 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       return;
     }
 
-    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     if (!mapboxToken) {
       console.error("Missing NEXT_PUBLIC_MAPBOX_TOKEN");
-      setError("Map search is not configured. Please contact support.");
+      setError("Map data is temporarily unavailable. Please check the Mapbox API key.");
       return;
     }
 
@@ -180,77 +181,33 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
     try {
       // Build URL with proximity based on trip center coordinates
-      const hasProximity = trip.center_lat && trip.center_lng;
-      const proximityParam = hasProximity
-        ? `&proximity=${trip.center_lng},${trip.center_lat}`
-        : "";
-
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         query
-      )}.json?types=poi&limit=10${proximityParam}&access_token=${mapboxToken}`;
+      )}.json?types=poi&limit=12&proximity=${trip.center_lng},${trip.center_lat}&access_token=${mapboxToken}`;
 
       const response = await fetch(url);
 
       if (!response.ok) {
-        console.error("Mapbox Geocoding API error:", {
-          status: response.status,
-          url: response.url,
-          statusText: response.statusText,
-        });
-        setError("We couldn't load places right now. Please check your Mapbox token or browser extensions and try again.");
-        setResults([]);
-        return;
+        throw new Error(`Mapbox API error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
       
       if (!data || !Array.isArray(data.features)) {
-        console.error("Error searching places: Invalid response format", data);
-        setError("We couldn't load places right now. Please check your Mapbox token or browser extensions and try again.");
-        setResults([]);
-        return;
+        throw new Error("Invalid response format from Mapbox API");
       }
 
       const mappedResults: PlaceResult[] = (data.features || []).map(
         (feature: any) => {
           const [lng, lat] = feature.center || [];
 
-          // Extract place name (feature.text is the primary name for POIs)
-          const name =
-            feature.text ||
-            feature.properties?.name ||
-            feature.place_name?.split(",")[0] ||
-            "Unknown";
-
-          // Extract address (context provides location details)
-          const address =
-            feature.properties?.address ||
-            (feature.context
-              ?.filter(
-                (ctx: any) =>
-                  ctx.id?.startsWith("place") ||
-                  ctx.id?.startsWith("postcode") ||
-                  ctx.id?.startsWith("district")
-              )
-              .map((ctx: any) => ctx.text)
-              .join(", ")) ||
-            feature.place_name ||
-            "";
-
-          // Extract category from properties or place_type
-          const category =
-            feature.properties?.category ||
-            feature.properties?.poi_category ||
-            feature.place_type?.[0] ||
-            undefined;
-
           return {
             id: feature.id,
-            name: name,
-            address: address || name, // Fallback to name if no address
+            name: feature.text || feature.properties?.name || feature.place_name?.split(",")[0] || "Unknown",
+            address: feature.place_name || feature.properties?.address || "",
             lat: lat || 0,
             lng: lng || 0,
-            category: category,
+            category: feature.properties?.category || "",
           };
         }
       );
@@ -266,7 +223,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       setResults(resultsWithPlaceIds);
     } catch (err) {
       console.error("Error searching places", err);
-      setError("We couldn't load places right now. Please check your Mapbox token or browser extensions and try again.");
+      setError("Something went wrong loading places. Please try again.");
       setResults([]);
     } finally {
       setLoading(false);
@@ -283,6 +240,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const handleFilterClick = (filterQuery: string) => {
     setSelectedFilter(filterQuery);
     setSearchQuery("");
+    setResults([]);
     searchPlaces(filterQuery);
   };
 
@@ -532,6 +490,11 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         <p className="text-sm text-muted-foreground mt-1">
           Discover places in {trip.destination_name || "your destination"}
         </p>
+        {!mapboxToken && (
+          <div className="mt-2 text-sm text-destructive bg-destructive/10 p-2 rounded-md border border-destructive/20">
+            Map data is temporarily unavailable. Please check the Mapbox API key.
+          </div>
+        )}
       </div>
 
       {/* Book Hotels Card */}
@@ -599,7 +562,14 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                 onClick={() => handleFilterClick(filter.query)}
                 disabled={loading}
               >
-                {filter.label}
+                {loading && selectedFilter === filter.query ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  filter.label
+                )}
               </Button>
             ))}
           </div>
