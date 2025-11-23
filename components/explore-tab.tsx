@@ -69,18 +69,14 @@ interface Trip {
   destination_place_id: string | null;
 }
 
-const MAPBOX_BASE = "https://api.mapbox.com/geocoding/v5/mapbox.places";
-
-const FILTER_PRESETS: Record<string, { label: string; query?: string; categories?: string }> = {
-  museums: { label: "Museums", query: "museum", categories: "museum" },
-  parks: { label: "Parks & Nature", query: "park", categories: "park,garden" },
-  food: { label: "Food", query: "restaurant", categories: "restaurant,food" },
-  nightlife: { label: "Nightlife", query: "bar", categories: "bar,nightclub" },
-  shopping: { label: "Shopping", query: "shop", categories: "shop,mall" },
-  neighborhoods: { label: "Neighborhoods", query: "", categories: "" },
+const FILTER_PRESETS: Record<ExploreFilter, { label: string; query: string }> = {
+  museums: { label: "Museums", query: "museum" },
+  parks: { label: "Parks & Nature", query: "park" },
+  food: { label: "Food", query: "restaurant" },
+  nightlife: { label: "Nightlife", query: "bar" },
+  shopping: { label: "Shopping", query: "shop" },
+  neighborhoods: { label: "Neighborhoods", query: "" },
 } as const;
-
-const FILTER_OPTIONS = Object.values(FILTER_PRESETS);
 
 export function ExploreTab({ tripId }: ExploreTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,6 +107,15 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId, user?.id]);
+
+  // Initial load: search for museums when trip is available
+  useEffect(() => {
+    if (trip && mapboxToken && trip.center_lat != null && trip.center_lng != null) {
+      searchPlaces({ filterKey: "museums" });
+      setSelectedFilter("museums");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip?.id, mapboxToken]);
 
   const loadSavedPlaces = async () => {
     if (!user?.id) return;
@@ -189,19 +194,10 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     }
   };
 
-  const searchPlaces = async (userQuery: string, filterOverride?: ExploreFilter) => {
-    if (!trip) return;
+  const searchPlaces = async (options?: { filterKey?: ExploreFilter; textQuery?: string }) => {
+    if (!trip || !mapboxToken) return;
 
-    if (!mapboxToken) {
-      console.error("Missing NEXT_PUBLIC_MAPBOX_TOKEN");
-      setError("Map data is temporarily unavailable. Please check the Mapbox API key.");
-      setQueryWasTried(true);
-      setResults([]);
-      return;
-    }
-
-    // Determine active filter: use override, then selectedFilter
-    const activeFilter: ExploreFilter | null = filterOverride || selectedFilter;
+    const { filterKey, textQuery } = options ?? {};
 
     // Validate trip coordinates
     const hasCoordinates = trip.center_lat != null && trip.center_lng != null && 
@@ -219,71 +215,89 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     setQueryWasTried(true);
 
     try {
-      let url: URL;
+      const lng = trip.center_lng;
+      const lat = trip.center_lat;
+      const cityName = trip.destination_name || "";
 
-      if (activeFilter === "neighborhoods") {
-        // Special case for neighborhoods
-        const cityQuery = trip.destination_name || "city";
-        url = new URL(
-          `${MAPBOX_BASE}/${encodeURIComponent(cityQuery)}.json`
-        );
-        url.searchParams.set("access_token", mapboxToken);
-        url.searchParams.set("limit", "10");
-        url.searchParams.set("types", "neighborhood");
-        url.searchParams.set("proximity", `${trip.center_lng},${trip.center_lat}`);
+      let rawQuery: string;
+
+      if (filterKey === "neighborhoods") {
+        // Neighborhoods: just search for the city name, Mapbox will return neighborhoods
+        rawQuery = cityName;
+      } else if (textQuery && textQuery.trim().length > 0) {
+        // User typed a custom query: "<user text> <city>"
+        rawQuery = `${textQuery.trim()} ${cityName}`.trim();
+      } else if (filterKey) {
+        // Use category word + city, e.g. "museum Madrid"
+        const preset = FILTER_PRESETS[filterKey];
+        const base = preset?.query ?? preset?.label ?? "";
+        rawQuery = `${base} ${cityName}`.trim();
       } else {
-        // For POI-based filters (Museums, Parks, Food, Nightlife, Shopping)
-        const baseQuery =
-          userQuery?.trim() ||
-          FILTER_PRESETS[activeFilter || ""]?.query ||
-          "point of interest";
-        
-        url = new URL(
-          `${MAPBOX_BASE}/${encodeURIComponent(baseQuery)}.json`
-        );
-        url.searchParams.set("access_token", mapboxToken);
-        url.searchParams.set("limit", "20");
-        url.searchParams.set("types", "poi");
-        url.searchParams.set("proximity", `${trip.center_lng},${trip.center_lat}`);
+        // Fallback: just the city
+        rawQuery = cityName;
       }
 
-      console.log("Mapbox URL", url.toString().replace(mapboxToken, "TOKEN_HIDDEN"));
+      const encoded = encodeURIComponent(rawQuery);
 
-      const res = await fetch(url.toString());
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Mapbox error", res.status, errorText);
-        setError("We could not load places. Try again in a moment.");
+      // IMPORTANT: for now we DO NOT use types=poi in the URL, we filter on the client.
+      let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json` +
+        `?access_token=${mapboxToken}` +
+        `&limit=15` +
+        `&proximity=${lng},${lat}`;
+
+      // For neighborhoods, we still tell Mapbox we care about neighborhoods
+      if (filterKey === "neighborhoods") {
+        url += `&types=neighborhood`;
+      }
+
+      console.log("Mapbox URL", url.replace(/access_token=[^&]+/, "access_token=HIDDEN"));
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error("Mapbox response not OK", response.status, await response.text());
         setResults([]);
         setLoading(false);
+        setError("Error searching places.");
         return;
       }
 
-      const data = await res.json();
-      const features = data.features ?? [];
-      
-      console.log("Mapbox features length", features.length, features);
+      const data = await response.json();
+      const features = Array.isArray(data.features) ? data.features : [];
 
-      // Filter features by place_type
-      const filtered =
-        activeFilter === "neighborhoods"
-          ? features.filter((f: any) => f.place_type?.includes("neighborhood"))
-          : features.filter((f: any) => f.place_type?.includes("poi"));
+      console.log("Mapbox raw features length", features.length, features);
 
-      const places: PlaceResult[] = filtered
+      let filtered = features;
+
+      if (filterKey === "neighborhoods") {
+        filtered = features.filter(
+          (f: any) => Array.isArray(f.place_type) && f.place_type.includes("neighborhood")
+        );
+      } else {
+        // Default: keep only POIs
+        filtered = features.filter(
+          (f: any) => Array.isArray(f.place_type) && f.place_type.includes("poi")
+        );
+      }
+
+      console.log("Filtered features length", filtered.length);
+
+      const mapped: PlaceResult[] = filtered
         .filter((f: any) => Array.isArray(f.center) && f.center.length === 2)
-        .map((feature: any) => ({
-          id: feature.id,
-          name: feature.text || feature.place_name || "Unknown place",
-          address: feature.place_name || "",
-          lat: feature.center[1],
-          lng: feature.center[0],
+        .map((f: any) => ({
+          id: f.id,
+          name: f.text || f.place_name || "Unnamed place",
+          address: f.place_name ?? "",
+          lat: f.center[1],
+          lng: f.center[0],
+          category: f.properties?.category
+            ? String(f.properties.category).split(",").map((s: string) => s.trim())[0]
+            : undefined,
         }));
 
       // Upsert all places to database and attach place_id
       const resultsWithPlaceIds = await Promise.all(
-        places.map(async (place) => {
+        mapped.map(async (place) => {
           const place_id = await upsertPlace(place);
           return { ...place, place_id: place_id || undefined };
         })
@@ -292,8 +306,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       setResults(resultsWithPlaceIds);
       setError(resultsWithPlaceIds.length === 0 ? "No results found. Try a different search." : null);
     } catch (err) {
-      console.error("searchPlaces failed", err);
-      setError("Something went wrong loading places. Please try again.");
+      console.error("Error searching places", err);
+      setError("Error searching places.");
       setResults([]);
     } finally {
       setLoading(false);
@@ -303,23 +317,15 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim().length >= 2) {
-      // Pass the user query - searchPlaces will handle the searchText construction
-      searchPlaces(searchQuery.trim());
+      setSelectedFilter(null);
+      searchPlaces({ textQuery: searchQuery.trim() });
     }
   };
 
-  const handleFilterClick = (filterQuery: string | undefined) => {
-    // Find the filter key from the query
-    const filterKey = Object.keys(FILTER_PRESETS).find(
-      (key) => FILTER_PRESETS[key as keyof typeof FILTER_PRESETS].query === filterQuery
-    ) as ExploreFilter | undefined;
-    
-    if (filterKey) {
-      setSelectedFilter(filterKey);
-      setSearchQuery("");
-      // Pass empty query and the filter - searchPlaces will construct searchText from filter
-      searchPlaces("", filterKey);
-    }
+  const handleFilterClick = (filterKey: ExploreFilter) => {
+    setSelectedFilter(filterKey);
+    setSearchQuery("");
+    searchPlaces({ filterKey });
   };
 
   const handlePlaceSelect = (place: PlaceResult | SavedPlace) => {
@@ -645,19 +651,16 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
             {/* Filter Chips */}
             <div className="flex flex-wrap gap-2">
-              {FILTER_OPTIONS.map((filter) => {
-                // Find the filter key for this filter
-                const filterKey = Object.keys(FILTER_PRESETS).find(
-                  (key) => FILTER_PRESETS[key as keyof typeof FILTER_PRESETS].query === filter.query
-                ) as ExploreFilter | undefined;
-                const isSelected = filterKey && selectedFilter === filterKey;
+              {(Object.keys(FILTER_PRESETS) as ExploreFilter[]).map((filterKey) => {
+                const filter = FILTER_PRESETS[filterKey];
+                const isSelected = selectedFilter === filterKey;
                 
                 return (
                   <Button
-                    key={filter.label}
+                    key={filterKey}
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handleFilterClick(filter.query)}
+                    onClick={() => handleFilterClick(filterKey)}
                     disabled={loading}
                   >
                     {loading && isSelected ? (
