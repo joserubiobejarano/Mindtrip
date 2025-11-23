@@ -49,7 +49,7 @@ const FILTER_OPTIONS = [
   { label: "Parks & Nature", query: "park" },
   { label: "Food", query: "restaurant" },
   { label: "Nightlife", query: "bar" },
-  { label: "Shopping", query: "shopping" },
+  { label: "Shopping", query: "shopping mall" },
   { label: "Neighborhoods", query: "neighborhood" },
 ];
 
@@ -59,6 +59,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [queryWasTried, setQueryWasTried] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<PlaceResult | SavedPlace | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [savedPlaceIds, setSavedPlaceIds] = useState<Set<string>>(new Set());
@@ -160,63 +161,51 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   };
 
   const searchPlaces = async (query: string) => {
-    if (!query || query.length < 2) {
-      setResults([]);
-      return;
-    }
+    if (!trip) return;
+    if (!query.trim()) return;
 
     if (!mapboxToken) {
       console.error("Missing NEXT_PUBLIC_MAPBOX_TOKEN");
       setError("Map data is temporarily unavailable. Please check the Mapbox API key.");
-      return;
-    }
-
-    if (!trip) {
-      setError("Trip information is not available. Please try again.");
+      setQueryWasTried(true);
+      setResults([]);
       return;
     }
 
     setLoading(true);
     setError(null);
+    setQueryWasTried(true);
 
     try {
-      // Build URL with proximity based on trip center coordinates
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        query
-      )}.json?types=poi&limit=12&proximity=${trip.center_lng},${trip.center_lat}&access_token=${mapboxToken}`;
+        query.trim()
+      )}.json?types=poi&limit=10&proximity=${trip.center_lng},${trip.center_lat}&access_token=${mapboxToken}`;
 
-      const response = await fetch(url);
+      const res = await fetch(url);
 
-      if (!response.ok) {
-        throw new Error(`Mapbox API error: ${response.status} ${response.statusText}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Mapbox geocoding error", res.status, errorText);
+        setError(`Failed to search places. Please try again.`);
+        setResults([]);
+        return;
       }
 
-      const data = await response.json();
-      console.log('raw mapbox features', data.features);
-      
-      if (!data || !Array.isArray(data.features)) {
-        throw new Error("Invalid response format from Mapbox API");
-      }
+      const data = await res.json();
+      console.log("raw mapbox features", data.features);
 
-      // Map all features to PlaceResult format, handling missing properties
-      const mappedResults: PlaceResult[] = (data.features || []).map(
-        (feature: any) => {
-          const [lng, lat] = feature.center || [];
-
-          return {
-            id: feature.id,
-            name: feature.text || feature.place_name || "Unknown",
-            address: feature.place_name || "",
-            lat: lat || 0,
-            lng: lng || 0,
-            category: feature.properties?.category || undefined,
-          };
-        }
-      );
+      const nextPlaces: PlaceResult[] = (data.features ?? []).map((feature: any) => ({
+        id: feature.id,
+        name: feature.text || feature.place_name || "Unknown place",
+        address: feature.place_name ?? "",
+        lat: feature.center?.[1] ?? 0,
+        lng: feature.center?.[0] ?? 0,
+        category: feature.properties?.category || undefined,
+      }));
 
       // Upsert all places to database and attach place_id
       const resultsWithPlaceIds = await Promise.all(
-        mappedResults.map(async (place) => {
+        nextPlaces.map(async (place) => {
           const place_id = await upsertPlace(place);
           return { ...place, place_id: place_id || undefined };
         })
@@ -224,7 +213,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
       setResults(resultsWithPlaceIds);
     } catch (err) {
-      console.error("Error searching places", err);
+      console.error("searchPlaces failed", err);
       setError("Something went wrong loading places. Please try again.");
       setResults([]);
     } finally {
@@ -242,7 +231,6 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const handleFilterClick = (filterQuery: string) => {
     setSelectedFilter(filterQuery);
     setSearchQuery("");
-    setResults([]);
     searchPlaces(filterQuery);
   };
 
@@ -613,7 +601,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
             {!loading &&
               !error &&
               results.length === 0 &&
-              !selectedFilter && (
+              !queryWasTried && (
                 <div className="text-sm text-muted-foreground py-8 text-center">
                   Search for a place or click a filter to discover places
                 </div>
@@ -622,7 +610,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
             {!loading &&
               !error &&
               results.length === 0 &&
-              selectedFilter && (
+              queryWasTried && (
                 <div className="text-sm text-muted-foreground py-8 text-center">
                   No results found. Try a different search.
                 </div>
