@@ -8,6 +8,7 @@ import { useDays } from "@/hooks/use-days";
 import { useTrip } from "@/hooks/use-trip";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
+import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
 
 interface MapPanelProps {
   tripId: string;
@@ -24,6 +25,8 @@ export function MapPanel({
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [routeLine, setRouteLine] = useState<GeoJSON.LineString | null>(null);
+  const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
 
   const { data: days } = useDays(tripId);
   const { data: trip } = useTrip(tripId);
@@ -35,6 +38,12 @@ export function MapPanel({
     if (!mapContainer.current || !mapboxToken || map.current) return;
 
     mapboxgl.accessToken = mapboxToken;
+    
+    // Disable Mapbox telemetry to prevent errors from ad blockers
+    if (typeof mapboxgl !== "undefined" && "setTelemetryEnabled" in mapboxgl) {
+      // @ts-expect-error: mapboxgl.setTelemetryEnabled may not be typed
+      mapboxgl.setTelemetryEnabled(false);
+    }
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -54,6 +63,58 @@ export function MapPanel({
       }
     };
   }, [mapboxToken]);
+
+  // Fetch route when activities change
+  useEffect(() => {
+    if (!activities || activities.length === 0) {
+      setRouteLine(null);
+      setRouteLegs([]);
+      return;
+    }
+
+    getDayRoute(activities).then((result) => {
+      setRouteLine(result.routeLineGeoJson);
+      setRouteLegs(result.legs);
+    });
+  }, [activities]);
+
+  // Update route layer on map when routeLine changes
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    // Remove existing route layer and source if they exist
+    if (map.current.getLayer("route-line")) {
+      map.current.removeLayer("route-line");
+    }
+    if (map.current.getSource("route")) {
+      map.current.removeSource("route");
+    }
+
+    // Add route if available
+    if (routeLine) {
+      map.current.addSource("route", {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          geometry: routeLine,
+          properties: {},
+        },
+      });
+
+      map.current.addLayer({
+        id: "route-line",
+        type: "line",
+        source: "route",
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-width": 4,
+        },
+      });
+    }
+  }, [routeLine, mapLoaded]);
 
   // Update markers when activities change
   useEffect(() => {
@@ -128,8 +189,17 @@ export function MapPanel({
       markersRef.current.push(marker);
     });
 
-    // Fit map to show all markers
-    if (activitiesWithPlaces.length > 1) {
+    // Fit map to route if available, otherwise to markers
+    if (routeLine && routeLine.coordinates && routeLine.coordinates.length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      routeLine.coordinates.forEach((coord) => {
+        bounds.extend([coord[0], coord[1]]);
+      });
+      map.current.fitBounds(bounds, {
+        padding: 50,
+        duration: 1000,
+      });
+    } else if (activitiesWithPlaces.length > 1) {
       const bounds = new mapboxgl.LngLatBounds();
       activitiesWithPlaces.forEach((activity) => {
         if (activity.place && activity.place.lat && activity.place.lng) {
@@ -150,7 +220,7 @@ export function MapPanel({
         });
       }
     }
-  }, [activities, selectedActivityId, mapLoaded, trip]);
+  }, [activities, selectedActivityId, mapLoaded, trip, routeLine]);
 
   if (!mapboxToken) {
     return (

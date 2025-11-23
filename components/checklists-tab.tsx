@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Trash2, Check, List, Plus as PlusIcon } from "lucide-react";
+import { Plus, Trash2, Plus as PlusIcon, ChevronDown } from "lucide-react";
 import { useRealtimeChecklists } from "@/hooks/use-realtime-checklists";
 
 interface Checklist {
@@ -35,17 +35,101 @@ interface ChecklistsTabProps {
   tripId: string;
 }
 
+interface ChecklistTemplate {
+  title: string;
+  items: string[];
+}
+
+type TemplateType = "city-weekend" | "beach-holiday" | "backpacking-trip";
+
+const CHECKLIST_TEMPLATES: Record<TemplateType, ChecklistTemplate[]> = {
+  "city-weekend": [
+    {
+      title: "Packing",
+      items: [
+        "Comfortable walking shoes",
+        "Light jacket",
+        "Power bank",
+        "Camera",
+      ],
+    },
+    {
+      title: "To-do",
+      items: [
+        "Download offline maps",
+        "Check museum opening hours",
+        "Buy public transport card",
+      ],
+    },
+  ],
+  "beach-holiday": [
+    {
+      title: "Packing",
+      items: [
+        "Swimsuit",
+        "Sunscreen (SPF 50)",
+        "Beach towel",
+        "Flip flops",
+      ],
+    },
+    {
+      title: "To-do",
+      items: [
+        "Check weather forecast",
+        "Book sunbeds / umbrella",
+      ],
+    },
+  ],
+  "backpacking-trip": [
+    {
+      title: "Packing",
+      items: [
+        "Backpack",
+        "Reusable water bottle",
+        "First aid kit",
+        "Laundry bag",
+      ],
+    },
+    {
+      title: "To-do",
+      items: [
+        "Confirm hostel bookings",
+        "Scan passport & documents",
+      ],
+    },
+  ],
+};
+
 export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
   const [checklistDialogOpen, setChecklistDialogOpen] = useState(false);
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
   const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(null);
   const [checklistTitle, setChecklistTitle] = useState("");
   const [itemTitle, setItemTitle] = useState("");
+  const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
+  const templateMenuRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const queryClient = useQueryClient();
 
   // Enable realtime sync
   useRealtimeChecklists(tripId);
+
+  // Close template menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (templateMenuRef.current && !templateMenuRef.current.contains(event.target as Node)) {
+        setTemplateMenuOpen(false);
+      }
+    };
+
+    if (templateMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [templateMenuOpen]);
 
   // Fetch checklists
   const { data: checklists = [] } = useQuery<Checklist[]>({
@@ -171,14 +255,106 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
     setItemDialogOpen(true);
   };
 
+  const applyTemplate = useMutation({
+    mutationFn: async (templateType: TemplateType) => {
+      const templates = CHECKLIST_TEMPLATES[templateType];
+      
+      // Insert all checklists first
+      const checklistInserts = templates.map((template) => ({
+        trip_id: tripId,
+        title: template.title,
+      }));
+
+      const { data: insertedChecklists, error: checklistError } = await supabase
+        .from("checklists")
+        .insert(checklistInserts)
+        .select();
+
+      if (checklistError) throw checklistError;
+
+      // Insert all items for each checklist
+      const itemInserts: Array<{
+        checklist_id: string;
+        title: string;
+        checked: boolean;
+        order_number: number;
+      }> = [];
+
+      insertedChecklists.forEach((checklist, checklistIndex) => {
+        const template = templates[checklistIndex];
+        template.items.forEach((itemTitle, itemIndex) => {
+          itemInserts.push({
+            checklist_id: checklist.id,
+            title: itemTitle,
+            checked: false,
+            order_number: itemIndex + 1,
+          });
+        });
+      });
+
+      if (itemInserts.length > 0) {
+        const { error: itemError } = await supabase
+          .from("checklist_items")
+          .insert(itemInserts);
+
+        if (itemError) throw itemError;
+      }
+
+      return { checklists: insertedChecklists, items: itemInserts };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["checklists", tripId] });
+      setTemplateMenuOpen(false);
+    },
+  });
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Checklists</h2>
-        <Button onClick={() => setChecklistDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Checklist
-        </Button>
+        <div className="flex gap-2">
+          <div className="relative" ref={templateMenuRef}>
+            <Button
+              variant="outline"
+              onClick={() => setTemplateMenuOpen(!templateMenuOpen)}
+              disabled={applyTemplate.isPending}
+            >
+              Use a template
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+            {templateMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 rounded-md border bg-popover shadow-md z-50">
+                <div className="p-1">
+                  <button
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
+                    onClick={() => applyTemplate.mutate("city-weekend")}
+                    disabled={applyTemplate.isPending}
+                  >
+                    City weekend
+                  </button>
+                  <button
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
+                    onClick={() => applyTemplate.mutate("beach-holiday")}
+                    disabled={applyTemplate.isPending}
+                  >
+                    Beach holiday
+                  </button>
+                  <button
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
+                    onClick={() => applyTemplate.mutate("backpacking-trip")}
+                    disabled={applyTemplate.isPending}
+                  >
+                    Backpacking trip
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          <Button onClick={() => setChecklistDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Checklist
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

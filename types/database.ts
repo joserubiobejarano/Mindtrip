@@ -128,6 +128,7 @@ export interface Database {
       places: {
         Row: {
           id: string
+          trip_id: string | null
           name: string
           address: string | null
           lat: number | null
@@ -138,6 +139,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          trip_id?: string | null
           name: string
           address?: string | null
           lat?: number | null
@@ -148,12 +150,36 @@ export interface Database {
         }
         Update: {
           id?: string
+          trip_id?: string | null
           name?: string
           address?: string | null
           lat?: number | null
           lng?: number | null
           category?: string | null
           external_id?: string | null
+          created_at?: string
+        }
+      }
+      saved_places: {
+        Row: {
+          id: string
+          trip_id: string
+          user_id: string
+          place_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          trip_id: string
+          user_id: string
+          place_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          trip_id?: string
+          user_id?: string
+          place_id?: string
           created_at?: string
         }
       }

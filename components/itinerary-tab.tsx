@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Share2, Users, ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Share2, Users, ArrowLeft, Hotel } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { useActivities } from "@/hooks/use-activities";
@@ -13,6 +14,7 @@ import { format } from "date-fns";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
 import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { useRouter } from "next/navigation";
+import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
 
 interface ItineraryTabProps {
   tripId: string;
@@ -33,6 +35,7 @@ export function ItineraryTab({
   const [editingActivity, setEditingActivity] = useState<any>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
+  const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
   const router = useRouter();
 
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
@@ -44,6 +47,18 @@ export function ItineraryTab({
     deleteActivity,
     isLoading: activitiesLoading,
   } = useActivities(selectedDayId || "");
+
+  // Fetch route legs when activities change
+  useEffect(() => {
+    if (!activities || activities.length === 0) {
+      setRouteLegs([]);
+      return;
+    }
+
+    getDayRoute(activities).then((result) => {
+      setRouteLegs(result.legs);
+    });
+  }, [activities]);
 
   const handleAddActivity = () => {
     setEditingActivity(null);
@@ -130,14 +145,14 @@ export function ItineraryTab({
               {format(new Date(trip.end_date), "MMM d, yyyy")}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Button
               variant="outline"
-              size="icon"
               onClick={() => setMembersDialogOpen(true)}
-              title="Trip Members"
+              className="flex items-center gap-2"
             >
               <Users className="h-4 w-4" />
+              <span>Tripmates</span>
             </Button>
             <Button
               variant="outline"
@@ -150,6 +165,39 @@ export function ItineraryTab({
           </div>
         </div>
       </div>
+
+      {/* Book Hotels Card */}
+      {trip.start_date && trip.end_date && (
+        <div className="mb-4">
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Hotel className="h-5 w-5" />
+                Need a place to stay?
+              </CardTitle>
+              <CardDescription>
+                Search hotels for your trip dates.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={() => {
+                  const city = trip.destination_name || trip.title;
+                  const startDate = new Date(trip.start_date);
+                  const endDate = new Date(trip.end_date);
+                  const checkin = format(startDate, "yyyy-MM-dd");
+                  const checkout = format(endDate, "yyyy-MM-dd");
+                  const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
+                  window.open(url, "_blank", "noopener,noreferrer");
+                }}
+                className="w-full sm:w-auto"
+              >
+                Search hotels
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Day Selector */}
       <div className="mb-4">
@@ -172,6 +220,7 @@ export function ItineraryTab({
         {selectedDayId ? (
           <ActivityList
             activities={activities}
+            routeLegs={routeLegs}
             onEdit={handleEditActivity}
             onDelete={handleDeleteActivity}
             onSelect={handleSelectActivity}

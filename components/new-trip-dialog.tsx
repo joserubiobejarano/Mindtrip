@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +82,7 @@ export function NewTripDialog({
 
   const router = useRouter();
   const supabase = createClient();
+  const { user } = useUser();
   
   // Auto-fill title when destination is selected and title is empty
   useEffect(() => {
@@ -181,6 +183,22 @@ export function NewTripDialog({
         .insert(dayRecords);
 
       if (daysError) throw daysError;
+
+      // Create owner member entry
+      const { error: memberError } = await supabase
+        .from("trip_members")
+        .insert({
+          trip_id: trip.id,
+          user_id: userId,
+          email: user?.primaryEmailAddress?.emailAddress || null,
+          display_name: user?.fullName || null,
+          role: "owner",
+        });
+
+      if (memberError) {
+        console.error("Error creating owner member:", memberError);
+        // Don't throw - trip is already created, just log the error
+      }
 
       onOpenChange(false);
       onSuccess();

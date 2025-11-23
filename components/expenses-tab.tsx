@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,13 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, DollarSign } from "lucide-react";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Expense {
   id: string;
@@ -28,6 +35,7 @@ interface Expense {
   created_at: string;
   paid_by_member: {
     email: string | null;
+    display_name: string | null;
     profile?: {
       full_name: string | null;
     } | null;
@@ -48,11 +56,20 @@ interface Expense {
 interface TripMember {
   id: string;
   email: string | null;
+  display_name: string | null;
   user_id: string | null;
   profile?: {
     full_name: string | null;
   } | null;
 }
+
+const EXPENSE_CATEGORIES = [
+  "Food",
+  "Accommodation",
+  "Transport",
+  "Activities",
+  "Other",
+];
 
 interface ExpensesTabProps {
   tripId: string;
@@ -80,6 +97,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
           *,
           paid_by_member:trip_members!expenses_paid_by_member_id_fkey(
             email,
+            display_name,
             profile:profiles(full_name)
           ),
           shares:expense_shares(
@@ -88,6 +106,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
             amount,
             member:trip_members!expense_shares_member_id_fkey(
               email,
+              display_name,
               profile:profiles(full_name)
             )
           )
@@ -117,27 +136,38 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     },
   });
 
-  // Calculate balances
+  // Auto-select all members when dialog opens
+  useEffect(() => {
+    if (dialogOpen && members.length > 0 && sharingMembers.length === 0) {
+      setSharingMembers(members.map((m) => m.id));
+    }
+  }, [dialogOpen, members, sharingMembers.length]);
+
+  // Calculate balances (only for default currency for now)
   const balances = useQuery<Record<string, number>>({
-    queryKey: ["expense-balances", tripId, expenses],
+    queryKey: ["expense-balances", tripId, expenses, members, defaultCurrency],
     queryFn: async () => {
       const balanceMap: Record<string, number> = {};
 
+      // Initialize balances for all members
       members.forEach((member) => {
         balanceMap[member.id] = 0;
       });
 
-      expenses.forEach((expense) => {
-        // Add amount paid by member
-        balanceMap[expense.paid_by_member_id] =
-          (balanceMap[expense.paid_by_member_id] || 0) + expense.amount;
+      // Only calculate for expenses in default currency
+      expenses
+        .filter((expense) => expense.currency === defaultCurrency)
+        .forEach((expense) => {
+          // Add amount paid by member (they are owed this)
+          balanceMap[expense.paid_by_member_id] =
+            (balanceMap[expense.paid_by_member_id] || 0) + expense.amount;
 
-        // Subtract shares
-        expense.shares.forEach((share) => {
-          balanceMap[share.member_id] =
-            (balanceMap[share.member_id] || 0) - share.amount;
+          // Subtract shares (each member owes their share)
+          expense.shares.forEach((share) => {
+            balanceMap[share.member_id] =
+              (balanceMap[share.member_id] || 0) - share.amount;
+          });
         });
-      });
 
       return balanceMap;
     },
@@ -201,7 +231,10 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     setSharingMembers([]);
   };
 
-  const getMemberName = (member: { email: string | null; profile?: { full_name: string | null } | null }) => {
+  const getMemberName = (member: TripMember | { email: string | null; display_name?: string | null; profile?: { full_name: string | null } | null }) => {
+    if ('display_name' in member && member.display_name) {
+      return member.display_name;
+    }
     return member.profile?.full_name || member.email || "Unknown";
   };
 
@@ -219,31 +252,41 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
       {balances.data && Object.keys(balances.data).length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Balance per Person</CardTitle>
-            <CardDescription>Positive = owed, Negative = owes</CardDescription>
+            <CardTitle>Balance Summary</CardTitle>
+            <CardDescription>
+              Positive = is owed, Negative = owes
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {members.map((member) => {
                 const balance = balances.data![member.id] || 0;
+                // Round values close to zero
+                const roundedBalance = Math.abs(balance) < 0.01 ? 0 : balance;
+                
                 return (
                   <div
                     key={member.id}
-                    className="flex justify-between items-center p-2 rounded-md bg-muted"
+                    className="flex justify-between items-center p-3 rounded-md bg-muted"
                   >
-                    <span>{getMemberName(member)}</span>
-                    <span
-                      className={
-                        balance > 0
-                          ? "text-green-600 font-semibold"
-                          : balance < 0
-                          ? "text-red-600 font-semibold"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      {balance > 0 ? "+" : ""}
-                      {currency} {balance.toFixed(2)}
-                    </span>
+                    <span className="font-medium">{getMemberName(member)}</span>
+                    <div className="text-right">
+                      <span
+                        className={
+                          roundedBalance > 0
+                            ? "text-green-600 dark:text-green-400 font-semibold"
+                            : roundedBalance < 0
+                            ? "text-red-600 dark:text-red-400 font-semibold"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        {roundedBalance > 0 ? "+" : ""}
+                        {defaultCurrency} {Math.abs(roundedBalance).toFixed(2)}
+                      </span>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {roundedBalance > 0 ? "(is owed)" : roundedBalance < 0 ? "(owes)" : "(settled)"}
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -354,55 +397,71 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Input
-                id="category"
-                placeholder="e.g., Accommodation, Food, Transport"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              />
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {EXPENSE_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="paid_by">Paid By *</Label>
-              <select
-                id="paid_by"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                value={paidBy}
-                onChange={(e) => setPaidBy(e.target.value)}
-                required
-              >
-                <option value="">Select member</option>
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {getMemberName(member)}
-                  </option>
-                ))}
-              </select>
+              {members.length === 0 ? (
+                <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
+                  Add at least one tripmate to start tracking expenses.
+                </div>
+              ) : (
+                <Select value={paidBy} onValueChange={setPaidBy} required>
+                  <SelectTrigger id="paid_by">
+                    <SelectValue placeholder="Select member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((member) => (
+                      <SelectItem key={member.id} value={member.id}>
+                        {getMemberName(member)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <div className="space-y-2">
               <Label>Share With *</Label>
-              <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">
-                {members.map((member) => (
-                  <label
-                    key={member.id}
-                    className="flex items-center gap-2 cursor-pointer p-1 hover:bg-muted rounded"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={sharingMembers.includes(member.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSharingMembers([...sharingMembers, member.id]);
-                        } else {
-                          setSharingMembers(
-                            sharingMembers.filter((id) => id !== member.id)
-                          );
-                        }
-                      }}
-                    />
-                    <span>{getMemberName(member)}</span>
-                  </label>
-                ))}
-              </div>
+              {members.length === 0 ? (
+                <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
+                  Add at least one tripmate to start tracking expenses.
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">
+                  {members.map((member) => (
+                    <label
+                      key={member.id}
+                      className="flex items-center gap-2 cursor-pointer p-1 hover:bg-muted rounded"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={sharingMembers.includes(member.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSharingMembers([...sharingMembers, member.id]);
+                          } else {
+                            setSharingMembers(
+                              sharingMembers.filter((id) => id !== member.id)
+                            );
+                          }
+                        }}
+                      />
+                      <span>{getMemberName(member)}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button
