@@ -33,7 +33,7 @@ export function TripTabs({
         <TabsTrigger value="checklists">Checklists</TabsTrigger>
       </TabsList>
       <div className="flex-1 overflow-hidden">
-        <TabsContent value="explore" className="h-full mt-0 overflow-y-auto">
+        <TabsContent value="explore" className="h-full mt-0">
           <ExploreTab tripId={tripId} />
         </TabsContent>
         <TabsContent value="itinerary" className="h-full mt-0">
