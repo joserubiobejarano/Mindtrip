@@ -39,16 +39,13 @@ interface TripMember {
   id: string;
   user_id: string | null;
   email: string | null;
+  display_name: string | null;
   role: "owner" | "editor" | "viewer";
-  profile?: {
-    full_name: string | null;
-    email: string;
-  } | null;
 }
 
 // Helper to get initials from name or email
 function getInitials(member: TripMember): string {
-  const name = member.profile?.full_name || member.email || "";
+  const name = member.display_name || member.email || "";
   const parts = name.trim().split(/\s+/);
   if (parts.length >= 2) {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -58,7 +55,7 @@ function getInitials(member: TripMember): string {
 
 // Helper to get display name
 function getDisplayName(member: TripMember): string {
-  return member.profile?.full_name || member.email || "Unknown";
+  return member.display_name || member.email || "Unknown";
 }
 
 // Helper to get role badge color
@@ -103,14 +100,14 @@ export function TripMembersDialog({
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trip_members")
-        .select(`
-          *,
-          profile:profiles(id, full_name, email)
-        `)
+        .select("*")
         .eq("trip_id", tripId)
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching trip members:", error.message);
+        throw error;
+      }
       return (data || []) as TripMember[];
     },
     enabled: open,
@@ -122,25 +119,22 @@ export function TripMembersDialog({
 
   const inviteMember = useMutation({
     mutationFn: async (data: { email: string; role: "editor" | "viewer" }) => {
-      // Check if user exists
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .eq("email", data.email)
-        .single();
-
       const { data: member, error } = await supabase
         .from("trip_members")
         .insert({
           trip_id: tripId,
-          user_id: profile?.id || null,
+          user_id: null, // Will be set when user signs up
           email: data.email,
           role: data.role,
+          display_name: null, // Will be set when user signs up
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error inviting member:", error.message);
+        throw error;
+      }
       return member;
     },
     onSuccess: () => {
@@ -246,7 +240,7 @@ export function TripMembersDialog({
                                 <span className="text-xs text-muted-foreground">(You)</span>
                               )}
                             </div>
-                            {member.profile?.full_name && member.email && (
+                            {member.display_name && member.email && (
                               <div className="text-sm text-muted-foreground">
                                 {member.email}
                               </div>

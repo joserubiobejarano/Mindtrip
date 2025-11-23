@@ -37,20 +37,18 @@ interface Expense {
   paid_by_member_id: string;
   created_at: string;
   paid_by_member: {
+    id: string;
     email: string | null;
-    profile?: {
-      full_name: string | null;
-    } | null;
+    display_name: string | null;
   };
   shares: Array<{
     id: string;
     member_id: string;
     amount: number;
     member: {
+      id: string;
       email: string | null;
-      profile?: {
-        full_name: string | null;
-      } | null;
+      display_name: string | null;
     };
   }>;
 }
@@ -58,10 +56,8 @@ interface Expense {
 interface TripMember {
   id: string;
   email: string | null;
+  display_name: string | null;
   user_id: string | null;
-  profile?: {
-    full_name: string | null;
-  } | null;
 }
 
 const EXPENSE_CATEGORIES = [
@@ -91,14 +87,21 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   const supabase = createClient();
   const queryClient = useQueryClient();
 
-  // Ensure current user is a trip member
+  // Ensure current user is a trip member before loading data
+  const [ownerMemberEnsured, setOwnerMemberEnsured] = useState(false);
+  
   useEffect(() => {
-    if (tripId && user?.id) {
-      ensureOwnerMember(tripId, user).catch((err) => {
-        console.error("Error ensuring owner member:", err);
-      });
+    if (tripId && user?.id && !ownerMemberEnsured) {
+      ensureOwnerMember(tripId, user)
+        .then(() => {
+          setOwnerMemberEnsured(true);
+        })
+        .catch((err) => {
+          console.error("Error ensuring owner member:", err);
+          setOwnerMemberEnsured(true); // Set to true even on error to prevent infinite loop
+        });
     }
-  }, [tripId, user?.id]);
+  }, [tripId, user?.id, ownerMemberEnsured]);
 
   // Fetch expenses
   const { data: expenses = [] } = useQuery<Expense[]>({
@@ -109,25 +112,31 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         .select(`
           *,
           paid_by_member:trip_members!expenses_paid_by_member_id_fkey(
+            id,
             email,
-            profile:profiles(full_name)
+            display_name
           ),
           shares:expense_shares(
             id,
             member_id,
             amount,
             member:trip_members!expense_shares_member_id_fkey(
+              id,
               email,
-              profile:profiles(full_name)
+              display_name
             )
           )
         `)
         .eq("trip_id", tripId)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching expenses:", error.message);
+        throw error;
+      }
       return (data || []) as Expense[];
     },
+    enabled: ownerMemberEnsured,
   });
 
   // Fetch trip members
@@ -136,21 +145,23 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trip_members")
-        .select(`
-          *,
-          profile:profiles(full_name)
-        `)
-        .eq("trip_id", tripId);
+        .select("*")
+        .eq("trip_id", tripId)
+        .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching trip members:", error.message);
+        throw error;
+      }
       // Sort by display_name if available, otherwise by email
       const sorted = (data || []).sort((a, b) => {
-        const aName = (a as any).display_name || a.email || "";
-        const bName = (b as any).display_name || b.email || "";
+        const aName = a.display_name || a.email || "";
+        const bName = b.display_name || b.email || "";
         return aName.localeCompare(bName);
       });
       return sorted as TripMember[];
     },
+    enabled: ownerMemberEnsured,
   });
 
   // Auto-select all members when dialog opens and default paidBy to current user
@@ -234,9 +245,13 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         .single();
 
       if (expenseError) {
+        console.error("Error creating expense:", expenseError.message);
         throw new Error(expenseError.message || "Failed to create expense");
       }
-      if (!expense) throw new Error("Failed to create expense");
+      if (!expense) {
+        console.error("Error creating expense: No expense returned");
+        throw new Error("Failed to create expense");
+      }
 
       // Create shares (equal split)
       const shareAmount = amountNum / sharingMembers.length;
@@ -251,6 +266,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         .insert(shares);
 
       if (sharesError) {
+        console.error("Error creating expense shares:", sharesError.message);
         throw new Error(sharesError.message || "Failed to create expense shares");
       }
 
@@ -283,8 +299,8 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     setSharingMembers([]);
   };
 
-  const getMemberName = (member: TripMember | { email: string | null; profile?: { full_name: string | null } | null }) => {
-    return (member as any).display_name || member.profile?.full_name || member.email || "Unknown";
+  const getMemberName = (member: TripMember | { email: string | null; display_name?: string | null }) => {
+    return member.display_name || member.email || "Unknown";
   };
 
   return (
