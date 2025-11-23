@@ -36,3 +36,6 @@ We don't want files hanging around, so every file needs to be organize in it's p
 
 ## Deployment Rules
 - Generate infrastructure files (Dockerfile, CI/CD YAMLs) according to /scripts/ and /.github/ conventions.
+
+## Removing Files Rules
+- NEVER rremove or delete a file that is outsite of the folder where the project lives.

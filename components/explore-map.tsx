@@ -33,7 +33,6 @@ interface ExploreMapProps {
   selectedPlace: PlaceResult | SavedPlace | null;
   onPlaceSelect?: (place: PlaceResult | SavedPlace) => void;
   height?: string;
-  className?: string;
 }
 
 export function ExploreMap({
@@ -45,7 +44,6 @@ export function ExploreMap({
   selectedPlace,
   onPlaceSelect,
   height = "100%",
-  className,
 }: ExploreMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -242,7 +240,7 @@ export function ExploreMap({
   }
 
   return (
-    <div className={`relative w-full overflow-hidden ${className || "rounded-lg border"}`} style={{ height }}>
+    <div className="relative w-full rounded-lg overflow-hidden border" style={{ height }}>
       <div ref={mapContainer} className="h-full w-full" />
       {/* Map controls */}
       {mapLoaded && map.current && (

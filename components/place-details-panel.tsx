@@ -31,7 +31,6 @@ interface PlaceDetailsPanelProps {
   isToggling: boolean;
   onToggleSave: () => void;
   onAddToItinerary: () => void;
-  variant?: "default" | "compact";
 }
 
 export function PlaceDetailsPanel({
@@ -40,7 +39,6 @@ export function PlaceDetailsPanel({
   isToggling,
   onToggleSave,
   onAddToItinerary,
-  variant = "default",
 }: PlaceDetailsPanelProps) {
   const { user } = useUser();
 
@@ -50,8 +48,8 @@ export function PlaceDetailsPanel({
       : null;
 
   return (
-    <Card className={`${variant === "compact" ? "mt-0 border-0 shadow-none bg-transparent" : "mt-4"}`}>
-      <CardHeader className={`${variant === "compact" ? "pb-2 pl-0 pr-0 pt-0" : "pb-3"}`}>
+    <Card className="mt-4">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-xl flex-1">{place.name}</CardTitle>
           {user?.id && place.place_id && (
@@ -80,7 +78,7 @@ export function PlaceDetailsPanel({
           </div>
         )}
       </CardHeader>
-      <CardContent className={`space-y-4 ${variant === "compact" ? "pl-0 pr-0 pb-0" : ""}`}>
+      <CardContent className="space-y-4">
         {place.category && (
           <div>
             <span className="text-xs px-2 py-1 bg-muted rounded-md">
