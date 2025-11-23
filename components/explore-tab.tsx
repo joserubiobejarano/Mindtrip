@@ -44,14 +44,16 @@ interface ExploreTabProps {
   tripId: string;
 }
 
-const FILTER_OPTIONS = [
-  { label: "Museums", query: "museum" },
-  { label: "Parks & Nature", query: "park" },
-  { label: "Food", query: "restaurant" },
-  { label: "Nightlife", query: "bar" },
-  { label: "Shopping", query: "shopping mall" },
-  { label: "Neighborhoods", query: "neighborhood" },
-];
+const FILTER_PRESETS = {
+  museums: { label: "Museums", query: "museum", categories: "museum" },
+  parks: { label: "Parks & Nature", query: "park", categories: "park,garden" },
+  food: { label: "Food", query: "restaurant", categories: "restaurant,food" },
+  nightlife: { label: "Nightlife", query: "bar", categories: "bar,nightclub" },
+  shopping: { label: "Shopping", query: "shopping", categories: "shop,mall" },
+  neighborhoods: { label: "Neighborhoods", query: "neighborhood", categories: "" },
+} as const;
+
+const FILTER_OPTIONS = Object.values(FILTER_PRESETS);
 
 export function ExploreTab({ tripId }: ExploreTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -177,63 +179,50 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     setQueryWasTried(true);
 
     try {
-      // Build query - for category searches, combine with city name for better results
-      const cityName = trip.destination_name || trip.title || "";
-      let searchQuery = query.trim();
-      
-      // If it's a generic category term and we have a city, search in that city
-      const isCategorySearch = ["museum", "park", "restaurant", "bar", "shopping mall", "neighborhood"].includes(
-        query.trim().toLowerCase()
+      // Find matching filter preset if this is a filter query
+      const filterKey = Object.keys(FILTER_PRESETS).find(
+        (key) => FILTER_PRESETS[key as keyof typeof FILTER_PRESETS].query === query.trim().toLowerCase()
       );
-      
-      if (isCategorySearch && cityName) {
-        searchQuery = `${query.trim()} in ${cityName}`;
-      }
+      const preset = filterKey ? FILTER_PRESETS[filterKey as keyof typeof FILTER_PRESETS] : null;
+      const isNeighborhoodsFilter = preset?.query === "neighborhood";
 
-      // Build proximity and bbox parameters if we have coordinates
+      // Build search query - use the preset query or the user's typed query
+      const searchQuery = preset ? preset.query : query.trim();
+
+      // Build proximity parameter - always use trip center if available
       const hasCoordinates = trip.center_lat != null && trip.center_lng != null && 
                             !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
       
-      let proximityParam = "";
-      let bboxParam = "";
-      
-      if (hasCoordinates && trip.center_lat != null && trip.center_lng != null) {
-        // Add proximity parameter to bias results toward trip center
-        proximityParam = `&proximity=${trip.center_lng},${trip.center_lat}`;
-        
-        // Calculate bbox around trip center (±0.5º ≈ 50km)
-        const delta = 0.5;
-        const minLng = trip.center_lng - delta;
-        const maxLng = trip.center_lng + delta;
-        const minLat = trip.center_lat - delta;
-        const maxLat = trip.center_lat + delta;
-        
-        // bbox format: minLng,minLat,maxLng,maxLat
-        bboxParam = `&bbox=${minLng},${minLat},${maxLng},${maxLat}`;
+      if (!hasCoordinates) {
+        setError("Trip location is required for searching places.");
+        setResults([]);
+        return;
       }
 
-      // Try with types=poi first, but if that fails, try without type restriction
+      const proximityParam = `&proximity=${trip.center_lng},${trip.center_lat}`;
+
+      // Build URL - always use types=poi for free-text searches and non-neighborhood filters
       let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         searchQuery
-      )}.json?types=poi&limit=20${proximityParam}${bboxParam}&access_token=${mapboxToken}`;
+      )}.json?limit=20${proximityParam}&access_token=${mapboxToken}`;
+
+      // Add types=poi for all searches except neighborhoods filter
+      if (!isNeighborhoodsFilter) {
+        url += "&types=poi";
+      }
+
+      // Add categories parameter if preset has categories
+      if (preset && preset.categories) {
+        url += `&categories=${encodeURIComponent(preset.categories)}`;
+      }
 
       console.log("Mapbox search URL:", url.replace(mapboxToken, "TOKEN_HIDDEN"));
       console.log("Search query:", searchQuery);
-      console.log("Has coordinates:", hasCoordinates, hasCoordinates ? `${trip.center_lng},${trip.center_lat}` : "none");
+      console.log("Preset:", preset);
+      console.log("Proximity:", `${trip.center_lng},${trip.center_lat}`);
 
-      let res = await fetch(url);
-      let data = await res.json();
-
-      // If no results with types=poi, try without type restriction
-      if (!res.ok || !data.features || data.features.length === 0) {
-        console.log("No results with types=poi, trying without type restriction");
-        url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          searchQuery
-        )}.json?limit=20${proximityParam}${bboxParam}&access_token=${mapboxToken}`;
-        
-        res = await fetch(url);
-        data = await res.json();
-      }
+      const res = await fetch(url);
+      const data = await res.json();
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -243,28 +232,21 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         return;
       }
 
-      console.log("raw mapbox features", data.features);
+      console.log("mapbox features", data.features);
       console.log("total features:", data.features?.length || 0);
 
-      // Filter to only POIs and places (not addresses, neighborhoods, etc.)
-      let poiFeatures = (data.features ?? []).filter((feature: any) => {
-        // Include POIs, landmarks, and places
-        const types = feature.place_type || [];
-        return (
-          types.includes("poi") ||
-          types.includes("landmark") ||
-          (types.includes("place") && feature.properties?.category)
-        );
-      });
+      // Filter to only POIs for all filters except neighborhoods
+      let poiFeatures = data.features ?? [];
+      if (!isNeighborhoodsFilter) {
+        poiFeatures = poiFeatures.filter((feature: any) => {
+          const types = feature.place_type || [];
+          return Array.isArray(types) && types.includes("poi");
+        });
+      }
 
       console.log("filtered POI features:", poiFeatures.length);
 
-      // If filtering removed all results, use all features but prioritize POIs
-      if (poiFeatures.length === 0 && data.features && data.features.length > 0) {
-        console.log("No POIs found, using all features");
-        poiFeatures = data.features;
-      }
-
+      // Map features to PlaceResult
       const nextPlaces: PlaceResult[] = poiFeatures.map((feature: any) => ({
         id: feature.id,
         name: feature.text || feature.place_name || "Unknown place",
@@ -273,6 +255,19 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         lng: feature.center?.[0] ?? 0,
         category: feature.properties?.category || undefined,
       }));
+
+      // Sort by distance from trip center
+      if (trip.center_lat != null && trip.center_lng != null) {
+        nextPlaces.sort((a, b) => {
+          const distanceA = Math.sqrt(
+            Math.pow(a.lat - trip.center_lat!, 2) + Math.pow(a.lng - trip.center_lng!, 2)
+          );
+          const distanceB = Math.sqrt(
+            Math.pow(b.lat - trip.center_lat!, 2) + Math.pow(b.lng - trip.center_lng!, 2)
+          );
+          return distanceA - distanceB;
+        });
+      }
 
       // Upsert all places to database and attach place_id
       const resultsWithPlaceIds = await Promise.all(
@@ -303,7 +298,9 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const handleFilterClick = (filterQuery: string) => {
     setSelectedFilter(filterQuery);
     setSearchQuery("");
-    searchPlaces(filterQuery);
+    // Use the query from the preset
+    const preset = Object.values(FILTER_PRESETS).find(p => p.query === filterQuery);
+    searchPlaces(preset ? preset.query : filterQuery);
   };
 
   const handlePlaceSelect = (place: PlaceResult | SavedPlace) => {
@@ -593,8 +590,43 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       )}
 
       {/* Main Content - 2 column grid on desktop, stacked on mobile */}
-      <div className="flex-1 flex flex-col-reverse md:grid md:grid-cols-[40%_60%] gap-6 overflow-hidden min-h-0">
-        {/* Left Column - Search, Filters, Results */}
+      <div className="flex-1 flex flex-col md:grid md:grid-cols-[2fr_1fr] gap-6 overflow-hidden min-h-0">
+        {/* Left Column - Map */}
+        <div className="flex flex-col overflow-hidden order-1 md:order-none h-[50vh] md:h-auto">
+          <div className="flex-1 min-h-0">
+            <ExploreMap
+              tripId={tripId}
+              centerLat={trip.center_lat}
+              centerLng={trip.center_lng}
+              searchResults={results}
+              savedPlaces={savedPlaces}
+              selectedPlace={selectedPlace}
+              onPlaceSelect={handlePlaceSelect}
+              height="100%"
+            />
+          </div>
+
+          {/* Place Details Panel - Desktop (below map) */}
+          {selectedPlace && (
+            <div ref={detailsPanelRef} className="hidden md:block mt-4">
+              <PlaceDetailsPanel
+                place={selectedPlace}
+                isSaved={
+                  selectedPlace.place_id
+                    ? isPlaceSaved(selectedPlace.place_id)
+                    : false
+                }
+                isToggling={
+                  selectedPlace.place_id === togglingPlaceId ? true : false
+                }
+                onToggleSave={() => handleToggleSave(selectedPlace)}
+                onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Right Column - Search, Filters, Results */}
         <div className="flex flex-col overflow-hidden order-2 md:order-none bg-white">
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="mb-4">
@@ -700,41 +732,6 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
           {/* Place Details Panel - Mobile (below list) */}
           {selectedPlace && (
             <div ref={detailsPanelRef} className="md:hidden mt-4">
-              <PlaceDetailsPanel
-                place={selectedPlace}
-                isSaved={
-                  selectedPlace.place_id
-                    ? isPlaceSaved(selectedPlace.place_id)
-                    : false
-                }
-                isToggling={
-                  selectedPlace.place_id === togglingPlaceId ? true : false
-                }
-                onToggleSave={() => handleToggleSave(selectedPlace)}
-                onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Right Column - Map */}
-        <div className="flex flex-col overflow-hidden order-1 md:order-none h-[50vh] md:h-auto">
-          <div className="flex-1 min-h-0">
-            <ExploreMap
-              tripId={tripId}
-              centerLat={trip.center_lat}
-              centerLng={trip.center_lng}
-              searchResults={results}
-              savedPlaces={savedPlaces}
-              selectedPlace={selectedPlace}
-              onPlaceSelect={handlePlaceSelect}
-              height="100%"
-            />
-          </div>
-
-          {/* Place Details Panel - Desktop (below map) */}
-          {selectedPlace && (
-            <div ref={detailsPanelRef} className="hidden md:block mt-4">
               <PlaceDetailsPanel
                 place={selectedPlace}
                 isSaved={
