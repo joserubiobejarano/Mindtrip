@@ -240,7 +240,7 @@ export function ExploreMap({
   }
 
   return (
-    <div className="relative w-full rounded-lg overflow-hidden border" style={{ height }}>
+    <div className="relative w-full h-full" style={{ height }}>
       <div ref={mapContainer} className="h-full w-full" />
       {/* Map controls */}
       {mapLoaded && map.current && (

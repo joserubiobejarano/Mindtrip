@@ -44,6 +44,81 @@ interface ExploreTabProps {
   tripId: string;
 }
 
+type ExploreFilter =
+  | "museums"
+  | "parks"
+  | "food"
+  | "nightlife"
+  | "shopping"
+  | "neighborhoods";
+
+interface Trip {
+  id: string;
+  title: string;
+  start_date: string;
+  end_date: string;
+  default_currency: string;
+  owner_id: string;
+  center_lat: number | null;
+  center_lng: number | null;
+  budget_level: string | null;
+  daily_budget: number | null;
+  interests: string[] | null;
+  destination_name: string | null;
+  destination_country: string | null;
+  destination_place_id: string | null;
+}
+
+const MAPBOX_BASE = "https://api.mapbox.com/geocoding/v5/mapbox.places";
+
+const FILTER_CONFIG: Record<
+  ExploreFilter,
+  { defaultQuery: string; types: string }
+> = {
+  museums: { defaultQuery: "museum", types: "poi" },
+  parks: { defaultQuery: "park", types: "poi" },
+  food: { defaultQuery: "restaurant", types: "poi" },
+  nightlife: { defaultQuery: "bar", types: "poi" },
+  shopping: { defaultQuery: "shop", types: "poi" },
+  neighborhoods: {
+    defaultQuery: "neighborhood",
+    types: "neighborhood,locality,place",
+  },
+};
+
+function buildMapboxUrl(options: {
+  trip: Trip;
+  filter: ExploreFilter;
+  searchText: string;
+  mapboxToken: string;
+}) {
+  const { trip, filter, searchText, mapboxToken } = options;
+  const { defaultQuery, types } = FILTER_CONFIG[filter];
+  const query = (searchText || defaultQuery || trip.destination_name || "").trim() || "points of interest";
+  const lng = trip.center_lng ?? 0;
+  const lat = trip.center_lat ?? 0;
+
+  // small bounding box around the trip center so results stay in/near that city
+  const delta = 0.3;
+  const bbox = [
+    lng - delta,
+    lat - delta,
+    lng + delta,
+    lat + delta,
+  ].join(",");
+
+  const params = new URLSearchParams({
+    access_token: mapboxToken,
+    limit: "20",
+    types,
+    proximity: `${lng},${lat}`,
+    bbox,
+    language: "en",
+  });
+
+  return `${MAPBOX_BASE}/${encodeURIComponent(query)}.json?${params.toString()}`;
+}
+
 const FILTER_PRESETS = {
   museums: { label: "Museums", query: "museum", categories: "museum" },
   parks: { label: "Parks & Nature", query: "park", categories: "park,garden" },
@@ -57,7 +132,7 @@ const FILTER_OPTIONS = Object.values(FILTER_PRESETS);
 
 export function ExploreTab({ tripId }: ExploreTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<ExploreFilter | null>(null);
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -162,9 +237,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     }
   };
 
-  const searchPlaces = async (query: string) => {
+  const searchPlaces = async (query: string, filterOverride?: ExploreFilter) => {
     if (!trip) return;
-    if (!query.trim()) return;
 
     if (!mapboxToken) {
       console.error("Missing NEXT_PUBLIC_MAPBOX_TOKEN");
@@ -174,91 +248,67 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       return;
     }
 
+    // Determine active filter: use override, then selectedFilter, then default to "museums"
+    const activeFilter: ExploreFilter = filterOverride || selectedFilter || "museums";
+
+    // Validate trip coordinates
+    const hasCoordinates = trip.center_lat != null && trip.center_lng != null && 
+                          !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
+    
+    if (!hasCoordinates) {
+      setError("Trip location is required for searching places.");
+      setResults([]);
+      setQueryWasTried(true);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setQueryWasTried(true);
 
     try {
-      // Find matching filter preset if this is a filter query
-      const filterKey = Object.keys(FILTER_PRESETS).find(
-        (key) => FILTER_PRESETS[key as keyof typeof FILTER_PRESETS].query === query.trim().toLowerCase()
-      );
-      const preset = filterKey ? FILTER_PRESETS[filterKey as keyof typeof FILTER_PRESETS] : null;
-      const isNeighborhoodsFilter = preset?.query === "neighborhood";
+      const url = buildMapboxUrl({
+        trip: trip as Trip,
+        filter: activeFilter,
+        searchText: query.trim(),
+        mapboxToken,
+      });
 
-      // Build search query - use the preset query or the user's typed query
-      const searchQuery = preset ? preset.query : query.trim();
+      console.log("Mapbox URL", url.replace(mapboxToken, "TOKEN_HIDDEN"));
 
-      // Build proximity parameter - always use trip center if available
-      const hasCoordinates = trip.center_lat != null && trip.center_lng != null && 
-                            !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
+      const response = await fetch(url);
       
-      if (!hasCoordinates) {
-        setError("Trip location is required for searching places.");
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Mapbox error", response.status, text);
+        setLoading(false);
         setResults([]);
+        setError("Could not load places. Please try again.");
         return;
       }
 
-      const proximityParam = `&proximity=${trip.center_lng},${trip.center_lat}`;
-
-      // Build URL - always use types=poi for free-text searches and non-neighborhood filters
-      let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        searchQuery
-      )}.json?limit=20${proximityParam}&access_token=${mapboxToken}`;
-
-      // Add types=poi for all searches except neighborhoods filter
-      if (!isNeighborhoodsFilter) {
-        url += "&types=poi";
-      }
-
-      // Add categories parameter if preset has categories
-      if (preset && preset.categories) {
-        url += `&categories=${encodeURIComponent(preset.categories)}`;
-      }
-
-      console.log("Mapbox search URL:", url.replace(mapboxToken, "TOKEN_HIDDEN"));
-      console.log("Search query:", searchQuery);
-      console.log("Preset:", preset);
-      console.log("Proximity:", `${trip.center_lng},${trip.center_lat}`);
-
-      const res = await fetch(url);
-      const data = await res.json();
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Mapbox geocoding error", res.status, errorText);
-        setError(`Failed to search places. Please try again.`);
-        setResults([]);
-        return;
-      }
-
+      const data = await response.json();
       console.log("mapbox features", data.features);
-      console.log("total features:", data.features?.length || 0);
 
-      // Filter to only POIs for all filters except neighborhoods
-      let poiFeatures = data.features ?? [];
-      if (!isNeighborhoodsFilter) {
-        poiFeatures = poiFeatures.filter((feature: any) => {
-          const types = feature.place_type || [];
-          return Array.isArray(types) && types.includes("poi");
+      const features: any[] = Array.isArray(data.features) ? data.features : [];
+
+      const places = features
+        .filter((f) => Array.isArray(f.center) && f.center.length === 2)
+        .map((f) => {
+          const [lng, lat] = f.center;
+          return {
+            id: f.id,
+            name: f.text || f.place_name || "Unknown place",
+            address: f.place_name || "",
+            lat,
+            lng,
+            category: f.properties?.category || undefined,
+          };
         });
-      }
-
-      console.log("filtered POI features:", poiFeatures.length);
-
-      // Map features to PlaceResult
-      const nextPlaces: PlaceResult[] = poiFeatures.map((feature: any) => ({
-        id: feature.id,
-        name: feature.text || feature.place_name || "Unknown place",
-        address: feature.place_name ?? "",
-        lat: feature.center?.[1] ?? 0,
-        lng: feature.center?.[0] ?? 0,
-        category: feature.properties?.category || undefined,
-      }));
 
       // Sort by distance from trip center
       if (trip.center_lat != null && trip.center_lng != null) {
-        nextPlaces.sort((a, b) => {
+        places.sort((a, b) => {
           const distanceA = Math.sqrt(
             Math.pow(a.lat - trip.center_lat!, 2) + Math.pow(a.lng - trip.center_lng!, 2)
           );
@@ -271,14 +321,14 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
       // Upsert all places to database and attach place_id
       const resultsWithPlaceIds = await Promise.all(
-        nextPlaces.map(async (place) => {
+        places.map(async (place) => {
           const place_id = await upsertPlace(place);
           return { ...place, place_id: place_id || undefined };
         })
       );
 
-      console.log("final results count:", resultsWithPlaceIds.length);
       setResults(resultsWithPlaceIds);
+      setError(resultsWithPlaceIds.length === 0 ? "No results found. Try a different search." : null);
     } catch (err) {
       console.error("searchPlaces failed", err);
       setError("Something went wrong loading places. Please try again.");
@@ -291,16 +341,24 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim().length >= 2) {
-      searchPlaces(searchQuery.trim());
+      // Use current selectedFilter or default to "museums"
+      const activeFilter: ExploreFilter = selectedFilter || "museums";
+      searchPlaces(searchQuery.trim(), activeFilter);
     }
   };
 
   const handleFilterClick = (filterQuery: string) => {
-    setSelectedFilter(filterQuery);
-    setSearchQuery("");
-    // Use the query from the preset
-    const preset = Object.values(FILTER_PRESETS).find(p => p.query === filterQuery);
-    searchPlaces(preset ? preset.query : filterQuery);
+    // Find the filter key from the query
+    const filterKey = Object.keys(FILTER_PRESETS).find(
+      (key) => FILTER_PRESETS[key as keyof typeof FILTER_PRESETS].query === filterQuery
+    ) as ExploreFilter | undefined;
+    
+    if (filterKey) {
+      setSelectedFilter(filterKey);
+      setSearchQuery("");
+      // Pass the filter and use empty search text (will use defaultQuery from FILTER_CONFIG)
+      searchPlaces("", filterKey);
+    }
   };
 
   const handlePlaceSelect = (place: PlaceResult | SavedPlace) => {
@@ -556,44 +614,11 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         )}
       </div>
 
-      {/* Book Hotels Card */}
-      {trip.start_date && trip.end_date && (
-        <div className="mb-4">
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Hotel className="h-5 w-5" />
-                Need a place to stay?
-              </CardTitle>
-              <CardDescription>
-                Search hotels for your trip dates and destination.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => {
-                  const city = trip.destination_name || trip.title;
-                  const startDate = new Date(trip.start_date);
-                  const endDate = new Date(trip.end_date);
-                  const checkin = format(startDate, "yyyy-MM-dd");
-                  const checkout = format(endDate, "yyyy-MM-dd");
-                  const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
-                  window.open(url, "_blank", "noopener,noreferrer");
-                }}
-                className="w-full sm:w-auto"
-              >
-                Search hotels
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
       {/* Main Content - 2 column grid on desktop, stacked on mobile */}
-      <div className="flex-1 flex flex-col md:grid md:grid-cols-[2fr_1fr] gap-6 overflow-hidden min-h-0">
-        {/* Left Column - Map */}
-        <div className="flex flex-col overflow-hidden order-1 md:order-none h-[50vh] md:h-auto">
-          <div className="flex-1 min-h-0">
+      <div className="flex flex-col gap-4 h-[calc(100vh-120px)]">
+        <div className="grid md:grid-cols-[2fr_1fr] gap-4 h-full">
+          {/* Left: Map */}
+          <div className="rounded-lg border overflow-hidden h-full">
             <ExploreMap
               tripId={tripId}
               centerLat={trip.center_lat}
@@ -606,150 +631,189 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
             />
           </div>
 
-          {/* Place Details Panel - Desktop (below map) */}
-          {selectedPlace && (
-            <div ref={detailsPanelRef} className="hidden md:block mt-4">
-              <PlaceDetailsPanel
-                place={selectedPlace}
-                isSaved={
-                  selectedPlace.place_id
-                    ? isPlaceSaved(selectedPlace.place_id)
-                    : false
-                }
-                isToggling={
-                  selectedPlace.place_id === togglingPlaceId ? true : false
-                }
-                onToggleSave={() => handleToggleSave(selectedPlace)}
-                onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
-              />
+          {/* Right: Side Panel */}
+          <div className="flex flex-col gap-3 min-h-0">
+            {/* Hotel Card */}
+            {trip.start_date && trip.end_date && (
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Hotel className="h-5 w-5" />
+                    Need a place to stay?
+                  </CardTitle>
+                  <CardDescription>
+                    Search hotels for your trip dates and destination.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    onClick={() => {
+                      const city = trip.destination_name || trip.title;
+                      const startDate = new Date(trip.start_date);
+                      const endDate = new Date(trip.end_date);
+                      const checkin = format(startDate, "yyyy-MM-dd");
+                      const checkout = format(endDate, "yyyy-MM-dd");
+                      const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
+                      window.open(url, "_blank", "noopener,noreferrer");
+                    }}
+                    className="w-full sm:w-auto"
+                  >
+                    Search hotels
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Search Input */}
+            <form onSubmit={handleSearchSubmit}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder='Search for a place or type "museum"...'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && searchQuery.trim().length >= 2) {
+                      handleSearchSubmit(e as any);
+                    }
+                  }}
+                />
+              </div>
+            </form>
+
+            {/* Filter Chips */}
+            <div className="flex flex-wrap gap-2">
+              {FILTER_OPTIONS.map((filter) => {
+                // Find the filter key for this filter
+                const filterKey = Object.keys(FILTER_PRESETS).find(
+                  (key) => FILTER_PRESETS[key as keyof typeof FILTER_PRESETS].query === filter.query
+                ) as ExploreFilter | undefined;
+                const isSelected = filterKey && selectedFilter === filterKey;
+                
+                return (
+                  <Button
+                    key={filter.query}
+                    variant={isSelected ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleFilterClick(filter.query)}
+                    disabled={loading}
+                  >
+                    {loading && isSelected ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      filter.label
+                    )}
+                  </Button>
+                );
+              })}
             </div>
-          )}
-        </div>
 
-        {/* Right Column - Search, Filters, Results */}
-        <div className="flex flex-col overflow-hidden order-2 md:order-none bg-white">
-          {/* Search Input */}
-          <form onSubmit={handleSearchSubmit} className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder='Search for a place or type "museum"...'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && searchQuery.trim().length >= 2) {
-                    handleSearchSubmit(e as any);
-                  }
-                }}
-              />
-            </div>
-          </form>
-
-          {/* Filter Chips */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {FILTER_OPTIONS.map((filter) => (
-              <Button
-                key={filter.query}
-                variant={selectedFilter === filter.query ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleFilterClick(filter.query)}
-                disabled={loading}
-              >
-                {loading && selectedFilter === filter.query ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  filter.label
-                )}
-              </Button>
-            ))}
-          </div>
-
-          {/* Saved Places Section */}
-          {user?.id && (
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-3">Saved places</h2>
-              {loadingSaved ? (
-                <div className="flex items-center justify-center py-4">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            {/* Saved Places + Results */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Saved Places Section */}
+              {user?.id && (
+                <div className="mb-4">
+                  <h2 className="text-lg font-semibold mb-3">Saved places</h2>
+                  {loadingSaved ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : savedPlaces.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      You haven&apos;t saved any places yet.
+                    </p>
+                  ) : (
+                    <div className="space-y-3 mb-4">
+                      {savedPlaces.map((place) => (
+                        <PlaceCard key={place.place_id} place={place} isFromSaved />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ) : savedPlaces.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  You haven&apos;t saved any places yet.
-                </p>
-              ) : (
-                <div className="space-y-3 mb-4">
-                  {savedPlaces.map((place) => (
-                    <PlaceCard key={place.place_id} place={place} isFromSaved />
+              )}
+
+              {/* Results */}
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+
+              {error && (
+                <div className="text-sm text-destructive py-4">{error}</div>
+              )}
+
+              {!loading &&
+                !error &&
+                results.length === 0 &&
+                !queryWasTried && (
+                  <div className="text-sm text-muted-foreground py-8 text-center">
+                    Search for a place or click a filter to discover places
+                  </div>
+                )}
+
+              {!loading &&
+                !error &&
+                results.length === 0 &&
+                queryWasTried && (
+                  <div className="text-sm text-muted-foreground py-8 text-center">
+                    No results found. Try a different search.
+                  </div>
+                )}
+
+              {!loading && results.length > 0 && (
+                <div className="space-y-3">
+                  {results.map((place) => (
+                    <PlaceCard key={place.id} place={place} />
                   ))}
                 </div>
               )}
+
+              {/* Place Details Panel - Mobile (below list) */}
+              {selectedPlace && (
+                <div ref={detailsPanelRef} className="md:hidden mt-4">
+                  <PlaceDetailsPanel
+                    place={selectedPlace}
+                    isSaved={
+                      selectedPlace.place_id
+                        ? isPlaceSaved(selectedPlace.place_id)
+                        : false
+                    }
+                    isToggling={
+                      selectedPlace.place_id === togglingPlaceId ? true : false
+                    }
+                    onToggleSave={() => handleToggleSave(selectedPlace)}
+                    onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
+                  />
+                </div>
+              )}
             </div>
-          )}
-
-          {/* Results */}
-          <div className="flex-1 overflow-y-auto">
-            {loading && (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            )}
-
-            {error && (
-              <div className="text-sm text-destructive py-4">{error}</div>
-            )}
-
-            {!loading &&
-              !error &&
-              results.length === 0 &&
-              !queryWasTried && (
-                <div className="text-sm text-muted-foreground py-8 text-center">
-                  Search for a place or click a filter to discover places
-                </div>
-              )}
-
-            {!loading &&
-              !error &&
-              results.length === 0 &&
-              queryWasTried && (
-                <div className="text-sm text-muted-foreground py-8 text-center">
-                  No results found. Try a different search.
-                </div>
-              )}
-
-            {!loading && results.length > 0 && (
-              <div className="space-y-3">
-                {results.map((place) => (
-                  <PlaceCard key={place.id} place={place} />
-                ))}
-              </div>
-            )}
           </div>
-
-          {/* Place Details Panel - Mobile (below list) */}
-          {selectedPlace && (
-            <div ref={detailsPanelRef} className="md:hidden mt-4">
-              <PlaceDetailsPanel
-                place={selectedPlace}
-                isSaved={
-                  selectedPlace.place_id
-                    ? isPlaceSaved(selectedPlace.place_id)
-                    : false
-                }
-                isToggling={
-                  selectedPlace.place_id === togglingPlaceId ? true : false
-                }
-                onToggleSave={() => handleToggleSave(selectedPlace)}
-                onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
-              />
-            </div>
-          )}
         </div>
       </div>
 
+      {/* Place Details Panel - Desktop (below grid) */}
+      {selectedPlace && (
+        <div ref={detailsPanelRef} className="hidden md:block">
+          <PlaceDetailsPanel
+            place={selectedPlace}
+            isSaved={
+              selectedPlace.place_id
+                ? isPlaceSaved(selectedPlace.place_id)
+                : false
+            }
+            isToggling={
+              selectedPlace.place_id === togglingPlaceId ? true : false
+            }
+            onToggleSave={() => handleToggleSave(selectedPlace)}
+            onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
+          />
+        </div>
+      )}
 
       {/* Add to Itinerary Dialog */}
       {selectedPlace && (
