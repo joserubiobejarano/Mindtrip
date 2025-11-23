@@ -192,22 +192,24 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       }
 
       const data = await response.json();
+      console.log('raw mapbox features', data.features);
       
       if (!data || !Array.isArray(data.features)) {
         throw new Error("Invalid response format from Mapbox API");
       }
 
+      // Map all features to PlaceResult format, handling missing properties
       const mappedResults: PlaceResult[] = (data.features || []).map(
         (feature: any) => {
           const [lng, lat] = feature.center || [];
 
           return {
             id: feature.id,
-            name: feature.text || feature.properties?.name || feature.place_name?.split(",")[0] || "Unknown",
-            address: feature.place_name || feature.properties?.address || "",
+            name: feature.text || feature.place_name || "Unknown",
+            address: feature.place_name || "",
             lat: lat || 0,
             lng: lng || 0,
-            category: feature.properties?.category || "",
+            category: feature.properties?.category || undefined,
           };
         }
       );

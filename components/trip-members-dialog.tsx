@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserPlus, Trash2 } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { cn } from "@/lib/utils";
+import { ensureOwnerMember } from "@/lib/supabase/trip-members";
 
 interface TripMembersDialogProps {
   open: boolean;
@@ -87,6 +88,15 @@ export function TripMembersDialog({
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { data: trip } = useTrip(tripId);
+
+  // Ensure current user is a trip member
+  useEffect(() => {
+    if (tripId && user?.id) {
+      ensureOwnerMember(tripId, user).catch((err) => {
+        console.error("Error ensuring owner member:", err);
+      });
+    }
+  }, [tripId, user?.id]);
 
   const { data: members = [] } = useQuery<TripMember[]>({
     queryKey: ["trip-members", tripId],

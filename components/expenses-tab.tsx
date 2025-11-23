@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ensureOwnerMember } from "@/lib/supabase/trip-members";
 
 interface Expense {
   id: string;
@@ -89,6 +90,15 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   const queryClient = useQueryClient();
+
+  // Ensure current user is a trip member
+  useEffect(() => {
+    if (tripId && user?.id) {
+      ensureOwnerMember(tripId, user).catch((err) => {
+        console.error("Error ensuring owner member:", err);
+      });
+    }
+  }, [tripId, user?.id]);
 
   // Fetch expenses
   const { data: expenses = [] } = useQuery<Expense[]>({
