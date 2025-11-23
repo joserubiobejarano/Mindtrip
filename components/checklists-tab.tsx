@@ -257,7 +257,15 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
 
   const applyTemplate = useMutation({
     mutationFn: async (templateType: TemplateType) => {
+      if (!tripId) {
+        throw new Error("Trip ID is required");
+      }
+
       const templates = CHECKLIST_TEMPLATES[templateType];
+      
+      if (!templates || templates.length === 0) {
+        throw new Error("Template not found");
+      }
       
       // Insert all checklists first
       const checklistInserts = templates.map((template) => ({
@@ -270,7 +278,14 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
         .insert(checklistInserts)
         .select();
 
-      if (checklistError) throw checklistError;
+      if (checklistError) {
+        console.error("Error creating checklists:", checklistError);
+        throw checklistError;
+      }
+
+      if (!insertedChecklists || insertedChecklists.length === 0) {
+        throw new Error("Failed to create checklists");
+      }
 
       // Insert all items for each checklist
       const itemInserts: Array<{
@@ -281,14 +296,24 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
       }> = [];
 
       insertedChecklists.forEach((checklist, checklistIndex) => {
+        if (!checklist || !checklist.id) {
+          console.error("Invalid checklist at index", checklistIndex);
+          return;
+        }
         const template = templates[checklistIndex];
+        if (!template || !Array.isArray(template.items)) {
+          console.error("Invalid template at index", checklistIndex);
+          return;
+        }
         template.items.forEach((itemTitle, itemIndex) => {
-          itemInserts.push({
-            checklist_id: checklist.id,
-            title: itemTitle,
-            checked: false,
-            order_number: itemIndex + 1,
-          });
+          if (itemTitle) {
+            itemInserts.push({
+              checklist_id: checklist.id,
+              title: itemTitle,
+              checked: false,
+              order_number: itemIndex + 1,
+            });
+          }
         });
       });
 
@@ -297,7 +322,10 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
           .from("checklist_items")
           .insert(itemInserts);
 
-        if (itemError) throw itemError;
+        if (itemError) {
+          console.error("Error creating checklist items:", itemError);
+          throw itemError;
+        }
       }
 
       return { checklists: insertedChecklists, items: itemInserts };
@@ -305,6 +333,10 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["checklists", tripId] });
       setTemplateMenuOpen(false);
+    },
+    onError: (error: Error) => {
+      console.error("Error applying template:", error);
+      // Error is already logged, user will see it via the mutation state
     },
   });
 
@@ -326,22 +358,40 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
               <div className="absolute right-0 mt-2 w-48 rounded-md border bg-popover shadow-md z-50">
                 <div className="p-1">
                   <button
-                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
-                    onClick={() => applyTemplate.mutate("city-weekend")}
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => {
+                      try {
+                        applyTemplate.mutate("city-weekend");
+                      } catch (error) {
+                        console.error("Error applying template:", error);
+                      }
+                    }}
                     disabled={applyTemplate.isPending}
                   >
                     City weekend
                   </button>
                   <button
-                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
-                    onClick={() => applyTemplate.mutate("beach-holiday")}
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => {
+                      try {
+                        applyTemplate.mutate("beach-holiday");
+                      } catch (error) {
+                        console.error("Error applying template:", error);
+                      }
+                    }}
                     disabled={applyTemplate.isPending}
                   >
                     Beach holiday
                   </button>
                   <button
-                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
-                    onClick={() => applyTemplate.mutate("backpacking-trip")}
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => {
+                      try {
+                        applyTemplate.mutate("backpacking-trip");
+                      } catch (error) {
+                        console.error("Error applying template:", error);
+                      }
+                    }}
                     disabled={applyTemplate.isPending}
                   >
                     Backpacking trip

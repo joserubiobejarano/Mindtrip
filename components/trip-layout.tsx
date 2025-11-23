@@ -1,16 +1,37 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
 interface TripLayoutProps {
   leftPanel: React.ReactNode;
   rightPanel: React.ReactNode;
 }
 
 export function TripLayout({ leftPanel, rightPanel }: TripLayoutProps) {
+  const router = useRouter();
+
   return (
     <div className="h-screen flex overflow-hidden">
       {/* Left Sidebar - 40% width */}
-      <div className="w-[40%] border-r border-border overflow-y-auto bg-background">
-        {leftPanel}
+      <div className="w-[40%] border-r border-border overflow-y-auto bg-background flex flex-col">
+        {/* Header with Back button */}
+        <div className="p-6 pb-0 border-b border-border">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/trips")}
+            className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to trips
+          </Button>
+        </div>
+        {/* Panel content */}
+        <div className="flex-1 overflow-y-auto">
+          {leftPanel}
+        </div>
       </div>
       
       {/* Right Map Area - 60% width */}

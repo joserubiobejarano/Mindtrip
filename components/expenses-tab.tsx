@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,6 @@ interface Expense {
   created_at: string;
   paid_by_member: {
     email: string | null;
-    display_name: string | null;
     profile?: {
       full_name: string | null;
     } | null;
@@ -56,7 +56,6 @@ interface Expense {
 interface TripMember {
   id: string;
   email: string | null;
-  display_name: string | null;
   user_id: string | null;
   profile?: {
     full_name: string | null;
@@ -77,6 +76,7 @@ interface ExpensesTabProps {
 }
 
 export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
+  const { user } = useUser();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -97,7 +97,6 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
           *,
           paid_by_member:trip_members!expenses_paid_by_member_id_fkey(
             email,
-            display_name,
             profile:profiles(full_name)
           ),
           shares:expense_shares(
@@ -106,7 +105,6 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
             amount,
             member:trip_members!expense_shares_member_id_fkey(
               email,
-              display_name,
               profile:profiles(full_name)
             )
           )
@@ -136,12 +134,21 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     },
   });
 
-  // Auto-select all members when dialog opens
+  // Auto-select all members when dialog opens and default paidBy to current user
   useEffect(() => {
-    if (dialogOpen && members.length > 0 && sharingMembers.length === 0) {
-      setSharingMembers(members.map((m) => m.id));
+    if (dialogOpen && members.length > 0) {
+      if (sharingMembers.length === 0) {
+        setSharingMembers(members.map((m) => m.id));
+      }
+      // Default paidBy to current user's member entry if present
+      if (!paidBy && user?.id) {
+        const currentUserMember = members.find((m) => m.user_id === user.id);
+        if (currentUserMember) {
+          setPaidBy(currentUserMember.id);
+        }
+      }
     }
-  }, [dialogOpen, members, sharingMembers.length]);
+  }, [dialogOpen, members, sharingMembers.length, paidBy, user?.id]);
 
   // Calculate balances (only for default currency for now)
   const balances = useQuery<Record<string, number>>({
@@ -217,8 +224,8 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses", tripId] });
       queryClient.invalidateQueries({ queryKey: ["expense-balances", tripId] });
-      setDialogOpen(false);
       resetForm();
+      setDialogOpen(false);
     },
   });
 
@@ -231,10 +238,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     setSharingMembers([]);
   };
 
-  const getMemberName = (member: TripMember | { email: string | null; display_name?: string | null; profile?: { full_name: string | null } | null }) => {
-    if ('display_name' in member && member.display_name) {
-      return member.display_name;
-    }
+  const getMemberName = (member: TripMember | { email: string | null; profile?: { full_name: string | null } | null }) => {
     return member.profile?.full_name || member.email || "Unknown";
   };
 
@@ -346,7 +350,15 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
       </div>
 
       {/* Add Expense Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog 
+        open={dialogOpen} 
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            resetForm();
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Expense</DialogTitle>

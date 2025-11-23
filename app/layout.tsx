@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
+import { AppHeader } from "@/components/app-header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,15 +34,7 @@ export default function RootLayout({
     <ClerkProvider publishableKey={publishableKey}>
       <html lang="en">
         <body className={inter.className}>
-          <header>
-            <SignedOut>
-              <SignInButton forceRedirectUrl="/trips" />
-              <SignUpButton forceRedirectUrl="/trips" />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
+          <AppHeader />
           <Providers>{children}</Providers>
         </body>
       </html>

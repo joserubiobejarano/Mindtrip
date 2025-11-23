@@ -192,7 +192,6 @@ export function NewTripDialog({
           trip_id: trip.id,
           user_id: userId,
           email: user?.primaryEmailAddress?.emailAddress || null,
-          display_name: user?.fullName || null,
           role: "owner",
         });
 

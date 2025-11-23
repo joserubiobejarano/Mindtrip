@@ -169,12 +169,17 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       return;
     }
 
+    if (!trip) {
+      setError("Trip information is not available. Please try again.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Build URL with or without proximity based on trip center coordinates
-      const hasProximity = trip?.center_lat && trip?.center_lng;
+      // Build URL with proximity based on trip center coordinates
+      const hasProximity = trip.center_lat && trip.center_lng;
       const proximityParam = hasProximity
         ? `&proximity=${trip.center_lng},${trip.center_lat}`
         : "";
@@ -183,29 +188,29 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         query
       )}.json?types=poi&limit=10${proximityParam}&access_token=${mapboxToken}`;
 
-      let response: Response;
-      try {
-        response = await fetch(url);
-      } catch (fetchError) {
-        console.error("Mapbox search error", fetchError);
-        setError("Something went wrong while searching places. Please try again.");
-        setResults([]);
-        return;
-      }
+      const response = await fetch(url);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Mapbox search error", {
+        console.error("Error searching places", {
           status: response.status,
           statusText: response.statusText,
           body: errorText,
         });
-        setError("Something went wrong while searching places. Please try again.");
+        setError("We couldn't load places for this filter, please try again.");
         setResults([]);
         return;
       }
 
       const data = await response.json();
+      
+      if (!data || !Array.isArray(data.features)) {
+        console.error("Error searching places: Invalid response format", data);
+        setError("We couldn't load places for this filter, please try again.");
+        setResults([]);
+        return;
+      }
+
       const mappedResults: PlaceResult[] = (data.features || []).map(
         (feature: any) => {
           const [lng, lat] = feature.center || [];
@@ -260,8 +265,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
       setResults(resultsWithPlaceIds);
     } catch (err) {
-      console.error("Mapbox search error", err);
-      setError("Something went wrong while searching places. Please try again.");
+      console.error("Error searching places", err);
+      setError("We couldn't load places for this filter, please try again.");
       setResults([]);
     } finally {
       setLoading(false);

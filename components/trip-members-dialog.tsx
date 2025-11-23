@@ -38,7 +38,6 @@ interface TripMember {
   id: string;
   user_id: string | null;
   email: string | null;
-  display_name: string | null;
   role: "owner" | "editor" | "viewer";
   profile?: {
     full_name: string | null;
@@ -48,7 +47,7 @@ interface TripMember {
 
 // Helper to get initials from name or email
 function getInitials(member: TripMember): string {
-  const name = member.display_name || member.profile?.full_name || member.email || "";
+  const name = member.profile?.full_name || member.email || "";
   const parts = name.trim().split(/\s+/);
   if (parts.length >= 2) {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -58,7 +57,7 @@ function getInitials(member: TripMember): string {
 
 // Helper to get display name
 function getDisplayName(member: TripMember): string {
-  return member.display_name || member.profile?.full_name || member.email || "Unknown";
+  return member.profile?.full_name || member.email || "Unknown";
 }
 
 // Helper to get role badge color
@@ -126,7 +125,6 @@ export function TripMembersDialog({
           trip_id: tripId,
           user_id: profile?.id || null,
           email: data.email,
-          display_name: null,
           role: data.role,
         })
         .select()
@@ -238,7 +236,7 @@ export function TripMembersDialog({
                                 <span className="text-xs text-muted-foreground">(You)</span>
                               )}
                             </div>
-                            {member.display_name && member.email && (
+                            {member.profile?.full_name && member.email && (
                               <div className="text-sm text-muted-foreground">
                                 {member.email}
                               </div>

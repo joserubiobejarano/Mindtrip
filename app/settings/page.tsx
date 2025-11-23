@@ -1,0 +1,226 @@
+"use client";
+
+import { useUser } from "@clerk/nextjs";
+import { createClient } from "@/lib/supabase/client";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/toast";
+
+const CURRENCIES = [
+  "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR", "MXN",
+  "BRL", "ZAR", "SGD", "HKD", "NOK", "SEK", "DKK", "PLN", "RUB", "TRY",
+  "NZD", "KRW", "THB", "IDR", "PHP", "MYR", "VND", "AED", "SAR", "ILS"
+];
+
+export default function SettingsPage() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  const { addToast } = useToast();
+  const supabase = createClient();
+  const queryClient = useQueryClient();
+
+  const [displayName, setDisplayName] = useState("");
+  const [defaultCurrency, setDefaultCurrency] = useState("USD");
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Fetch profile
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        // PGRST116 is "not found" - that's okay, we'll create it
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!user?.id && isLoaded,
+  });
+
+  // Update local state when profile loads
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.full_name || user?.fullName || "");
+      // Check if default_currency exists in profile (may need migration)
+      if ((profile as any).default_currency) {
+        setDefaultCurrency((profile as any).default_currency);
+      }
+    } else if (user) {
+      setDisplayName(user.fullName || "");
+    }
+  }, [profile, user]);
+
+  const saveProfile = useMutation({
+    mutationFn: async () => {
+      if (!user?.id) throw new Error("User not authenticated");
+
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          email: user.primaryEmailAddress?.emailAddress || "",
+          full_name: displayName || null,
+          default_currency: defaultCurrency,
+        }, {
+          onConflict: "id",
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile", user?.id] });
+      addToast({
+        variant: "success",
+        title: "Settings saved",
+        description: "Your account settings have been updated.",
+      });
+    },
+    onError: (error) => {
+      console.error("Error saving profile:", error);
+      addToast({
+        variant: "destructive",
+        title: "Failed to save settings",
+        description: "Please try again.",
+      });
+    },
+  });
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveProfile.mutateAsync();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!isLoaded || isLoading) {
+    return (
+      <div className="min-h-screen bg-background p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-muted-foreground">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    router.push("/sign-in");
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Account Settings</h1>
+          <p className="text-muted-foreground">
+            Manage your account preferences and settings.
+          </p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Information</CardTitle>
+            <CardDescription>
+              Your account information from Clerk
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Name</Label>
+              <Input
+                value={user.fullName || ""}
+                disabled
+                className="bg-muted"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Managed by Clerk
+              </p>
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input
+                value={user.primaryEmailAddress?.emailAddress || ""}
+                disabled
+                className="bg-muted"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Managed by Clerk
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Preferences</CardTitle>
+            <CardDescription>
+              Customize your display name and default currency
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="displayName">Display Name</Label>
+              <Input
+                id="displayName"
+                placeholder="Enter your display name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                This name will be shown to other trip members
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="defaultCurrency">Default Currency</Label>
+              <Select value={defaultCurrency} onValueChange={setDefaultCurrency}>
+                <SelectTrigger id="defaultCurrency">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Default currency for new trips
+              </p>
+            </div>
+            <div className="pt-4">
+              <Button
+                onClick={handleSave}
+                disabled={isSaving || saveProfile.isPending}
+              >
+                {isSaving || saveProfile.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+

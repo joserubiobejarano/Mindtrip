@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Share2, Users, ArrowLeft, Hotel } from "lucide-react";
+import { Plus, Share2, Users, ArrowLeft, Hotel, MoreVertical, Trash2 } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { useActivities } from "@/hooks/use-activities";
@@ -13,10 +13,13 @@ import { ActivityDialog } from "@/components/activity-dialog";
 import { format } from "date-fns";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
 import { TripMembersDialog } from "@/components/trip-members-dialog";
+import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { useRouter } from "next/navigation";
 import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
 import { addActivitiesForDay } from "@/lib/supabase/activities";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/toast";
+import { createClient } from "@/lib/supabase/client";
 import type { PlannedActivity } from "@/types/ai";
 
 interface ItineraryTabProps {
@@ -38,10 +41,15 @@ export function ItineraryTab({
   const [editingActivity, setEditingActivity] = useState<any>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
   const [autoPlanning, setAutoPlanning] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
+  const settingsMenuRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
 
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
   const { data: days, isLoading: daysLoading } = useDays(tripId);
@@ -155,7 +163,14 @@ export function ItineraryTab({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to plan day");
+        const errorMessage = error.error || "Failed to plan day";
+        console.error("Error auto-planning day:", error);
+        addToast({
+          variant: "destructive",
+          title: "Failed to auto-plan day",
+          description: errorMessage,
+        });
+        return;
       }
 
       const { activities } = await response.json() as { activities: PlannedActivity[] };
@@ -164,14 +179,70 @@ export function ItineraryTab({
         await addActivitiesForDay(selectedDayId, activities);
         // Refresh activities
         queryClient.invalidateQueries({ queryKey: ["activities", selectedDayId] });
+        
+        const day = days?.find((d) => d.id === selectedDayId);
+        const dateStr = day ? format(new Date(day.date), "MMM d, yyyy") : "this day";
+        addToast({
+          variant: "success",
+          title: "Day planned successfully",
+          description: `Planned ${activities.length} activities for ${dateStr}`,
+        });
+      } else {
+        addToast({
+          variant: "default",
+          title: "No activities generated",
+          description: "The AI couldn't generate activities for this day. Try again or add activities manually.",
+        });
       }
     } catch (error) {
       console.error("Error auto-planning day:", error);
-      alert(error instanceof Error ? error.message : "Failed to auto-plan this day. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to auto-plan this day. Please try again.";
+      addToast({
+        variant: "destructive",
+        title: "Error",
+        description: errorMessage,
+      });
     } finally {
       setAutoPlanning(false);
     }
   };
+
+  const handleDeleteTrip = async () => {
+    if (!trip) return;
+
+    try {
+      // Delete the trip - related rows will be deleted via CASCADE
+      const { error } = await supabase
+        .from("trips")
+        .delete()
+        .eq("id", tripId);
+
+      if (error) throw error;
+
+      router.push("/trips");
+    } catch (error) {
+      console.error("Error deleting trip:", error);
+      addToast({
+        variant: "destructive",
+        title: "Failed to delete trip",
+        description: "Please try again.",
+      });
+    }
+  };
+
+  // Close settings menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (settingsMenuRef.current && !settingsMenuRef.current.contains(event.target as Node)) {
+        setSettingsMenuOpen(false);
+      }
+    };
+
+    if (settingsMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [settingsMenuOpen]);
 
   if (tripLoading || daysLoading) {
     return (
@@ -195,15 +266,6 @@ export function ItineraryTab({
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push("/trips")}
-              className="mb-2 -ml-2 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to trips
-            </Button>
             <h1 className="text-2xl font-bold">{trip.title}</h1>
             <p className="text-sm text-muted-foreground">
               {format(new Date(trip.start_date), "MMM d")} -{" "}
@@ -227,6 +289,32 @@ export function ItineraryTab({
             >
               <Share2 className="h-4 w-4" />
             </Button>
+            {trip.owner_id === userId && (
+              <div className="relative" ref={settingsMenuRef}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setSettingsMenuOpen(!settingsMenuOpen)}
+                  title="Trip Settings"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+                {settingsMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-background border rounded-md shadow-lg z-10">
+                    <button
+                      onClick={() => {
+                        setSettingsMenuOpen(false);
+                        setDeleteDialogOpen(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-muted flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete trip
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -330,6 +418,13 @@ export function ItineraryTab({
         onOpenChange={setMembersDialogOpen}
         tripId={tripId}
         userId={userId}
+      />
+
+      <DeleteTripDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteTrip}
+        tripTitle={trip.title}
       />
     </div>
   );

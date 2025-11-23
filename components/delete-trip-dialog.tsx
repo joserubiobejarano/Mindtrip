@@ -34,7 +34,7 @@ export function DeleteTripDialog({
         <DialogHeader>
           <DialogTitle>Delete this trip?</DialogTitle>
           <DialogDescription>
-            This will permanently delete {tripTitle ? `"${tripTitle}"` : "this trip"} and all its activities, expenses, and checklists. This action cannot be undone.
+            Are you sure? This will delete {tripTitle ? `"${tripTitle}"` : "this trip"} and all its activities, expenses, and checklists.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
