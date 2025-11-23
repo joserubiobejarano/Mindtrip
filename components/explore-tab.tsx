@@ -308,7 +308,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     }
   };
 
-  const handleFilterClick = (filterQuery: string) => {
+  const handleFilterClick = (filterQuery: string | undefined) => {
     // Find the filter key from the query
     const filterKey = Object.keys(FILTER_PRESETS).find(
       (key) => FILTER_PRESETS[key as keyof typeof FILTER_PRESETS].query === filterQuery
@@ -654,7 +654,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                 
                 return (
                   <Button
-                    key={filter.query}
+                    key={filter.label}
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
                     onClick={() => handleFilterClick(filter.query)}
