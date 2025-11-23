@@ -1,9 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import type { PlannedActivity } from '@/types/ai'
 
-import { createClient } from '@/lib/supabase/client'
-import type { PlannedActivity } from '@/types/ai'
-
 export async function addActivitiesForDay(
   dayId: string,
   activities: PlannedActivity[]
