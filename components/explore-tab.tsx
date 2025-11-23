@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { AddToItineraryDialog } from "@/components/add-to-itinerary-dialog";
-import { ExploreMap } from "@/components/explore-map";
+import { GoogleMapBase, BaseMarker } from "@/components/google-map-base";
 import { PlaceDetailsPanel } from "@/components/place-details-panel";
 import { Loader2, Search, MapPin, Star, Hotel } from "lucide-react";
 import { format } from "date-fns";
@@ -19,9 +19,15 @@ import {
   getSavedPlaces,
   getSavedPlaceIds,
 } from "@/lib/supabase/saved-places";
+import {
+  getPlaceTypeForFilter,
+  mapGooglePlaceToPlaceResult,
+  searchNearbyPlaces,
+  searchPlacesByText,
+} from "@/lib/google-places";
 
 interface PlaceResult {
-  id: string; // Mapbox external_id
+  id: string; // Google place_id or external_id
   place_id?: string; // Database place ID (after upsert)
   name: string;
   address: string;
@@ -98,7 +104,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const { data: days } = useDays(tripId);
   const supabase = createClient();
 
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const [placesService, setPlacesService] = useState<google.maps.places.PlacesService | null>(null);
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
   // Load saved places on mount
   useEffect(() => {
@@ -108,14 +115,32 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId, user?.id]);
 
-  // Initial load: search for museums when trip is available
+  // Initial load: search for museums when trip and places service are available
   useEffect(() => {
-    if (trip && mapboxToken && trip.center_lat != null && trip.center_lng != null) {
+    if (
+      trip &&
+      placesService &&
+      trip.center_lat != null &&
+      trip.center_lng != null
+    ) {
       searchPlaces({ filterKey: "museums" });
       setSelectedFilter("museums");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trip?.id, mapboxToken]);
+  }, [trip?.id, placesService]);
+
+  // Center map on selected place
+  useEffect(() => {
+    if (!mapInstance || !selectedPlace) return;
+
+    const lat = selectedPlace.lat;
+    const lng = selectedPlace.lng;
+
+    if (!lat || !lng || lat === 0 || lng === 0) return;
+
+    mapInstance.panTo({ lat, lng });
+    mapInstance.setZoom(14);
+  }, [selectedPlace, mapInstance]);
 
   const loadSavedPlaces = async () => {
     if (!user?.id) return;
@@ -155,7 +180,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     if (!tripId) return null;
 
     try {
-      // Check if place with this external_id already exists for this trip
+      // Check if place with this external_id (Google place_id) already exists for this trip
       const { data: existingPlace } = await supabase
         .from("places")
         .select("id")
@@ -195,14 +220,17 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   };
 
   const searchPlaces = async (options?: { filterKey?: ExploreFilter; textQuery?: string }) => {
-    if (!trip || !mapboxToken) return;
+    if (!trip || !placesService) return;
 
     const { filterKey, textQuery } = options ?? {};
 
     // Validate trip coordinates
-    const hasCoordinates = trip.center_lat != null && trip.center_lng != null && 
-                          !isNaN(trip.center_lat) && !isNaN(trip.center_lng);
-    
+    const hasCoordinates =
+      trip.center_lat != null &&
+      trip.center_lng != null &&
+      !isNaN(trip.center_lat) &&
+      !isNaN(trip.center_lng);
+
     if (!hasCoordinates) {
       setError("Trip location is required for searching places.");
       setResults([]);
@@ -215,85 +243,35 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     setQueryWasTried(true);
 
     try {
-      const lng = trip.center_lng;
-      const lat = trip.center_lat;
+      const location = {
+        lat: trip.center_lat!,
+        lng: trip.center_lng!,
+      };
       const cityName = trip.destination_name || "";
 
-      let rawQuery: string;
+      let googlePlaces: Awaited<ReturnType<typeof searchNearbyPlaces>> | Awaited<ReturnType<typeof searchPlacesByText>>;
 
-      if (filterKey === "neighborhoods") {
-        // Neighborhoods: just search for the city name, Mapbox will return neighborhoods
-        rawQuery = cityName;
-      } else if (textQuery && textQuery.trim().length > 0) {
-        // User typed a custom query: "<user text> <city>"
-        rawQuery = `${textQuery.trim()} ${cityName}`.trim();
+      if (textQuery && textQuery.trim().length > 0) {
+        // Text search: "<user text> in <city>"
+        const query = cityName ? `${textQuery.trim()} in ${cityName}` : textQuery.trim();
+        googlePlaces = await searchPlacesByText(placesService, query, location, 15000);
+      } else if (filterKey === "neighborhoods") {
+        // For neighborhoods, use text search with city name
+        const query = cityName || trip.title;
+        googlePlaces = await searchPlacesByText(placesService, query, location, 15000);
       } else if (filterKey) {
-        // Use category word + city, e.g. "museum Madrid"
-        const preset = FILTER_PRESETS[filterKey];
-        const base = preset?.query ?? preset?.label ?? "";
-        rawQuery = `${base} ${cityName}`.trim();
+        // Filter-based search using nearbySearch
+        const placeType = getPlaceTypeForFilter(filterKey);
+        googlePlaces = await searchNearbyPlaces(placesService, location, placeType, 10000);
       } else {
-        // Fallback: just the city
-        rawQuery = cityName;
+        // Fallback: search for restaurants
+        googlePlaces = await searchNearbyPlaces(placesService, location, "restaurant", 10000);
       }
 
-      const encoded = encodeURIComponent(rawQuery);
-
-      // IMPORTANT: for now we DO NOT use types=poi in the URL, we filter on the client.
-      let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json` +
-        `?access_token=${mapboxToken}` +
-        `&limit=15` +
-        `&proximity=${lng},${lat}`;
-
-      // For neighborhoods, we still tell Mapbox we care about neighborhoods
-      if (filterKey === "neighborhoods") {
-        url += `&types=neighborhood`;
-      }
-
-      console.log("Mapbox URL", url.replace(/access_token=[^&]+/, "access_token=HIDDEN"));
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        console.error("Mapbox response not OK", response.status, await response.text());
-        setResults([]);
-        setLoading(false);
-        setError("Error searching places.");
-        return;
-      }
-
-      const data = await response.json();
-      const features = Array.isArray(data.features) ? data.features : [];
-
-      console.log("Mapbox raw features length", features.length, features);
-
-      let filtered = features;
-
-      if (filterKey === "neighborhoods") {
-        filtered = features.filter(
-          (f: any) => Array.isArray(f.place_type) && f.place_type.includes("neighborhood")
-        );
-      } else {
-        // Default: keep only POIs
-        filtered = features.filter(
-          (f: any) => Array.isArray(f.place_type) && f.place_type.includes("poi")
-        );
-      }
-
-      console.log("Filtered features length", filtered.length);
-
-      const mapped: PlaceResult[] = filtered
-        .filter((f: any) => Array.isArray(f.center) && f.center.length === 2)
-        .map((f: any) => ({
-          id: f.id,
-          name: f.text || f.place_name || "Unnamed place",
-          address: f.place_name ?? "",
-          lat: f.center[1],
-          lng: f.center[0],
-          category: f.properties?.category
-            ? String(f.properties.category).split(",").map((s: string) => s.trim())[0]
-            : undefined,
-        }));
+      // Map Google Places results to our PlaceResult format
+      const mapped: PlaceResult[] = googlePlaces.map((place) =>
+        mapGooglePlaceToPlaceResult(place)
+      );
 
       // Upsert all places to database and attach place_id
       const resultsWithPlaceIds = await Promise.all(
@@ -304,7 +282,11 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       );
 
       setResults(resultsWithPlaceIds);
-      setError(resultsWithPlaceIds.length === 0 ? "No results found. Try a different search." : null);
+      setError(
+        resultsWithPlaceIds.length === 0
+          ? "No results found. Try a different search."
+          : null
+      );
     } catch (err) {
       console.error("Error searching places", err);
       setError("Error searching places.");
@@ -574,11 +556,6 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         <p className="text-sm text-muted-foreground mt-1">
           Discover places in {trip.destination_name || "your destination"}
         </p>
-        {!mapboxToken && (
-          <div className="mt-2 text-sm text-destructive bg-destructive/10 p-2 rounded-md border border-destructive/20">
-            Map data is temporarily unavailable. Please check the Mapbox API key.
-          </div>
-        )}
       </div>
 
       {/* Main Content - 2 column grid on desktop, stacked on mobile */}
@@ -586,16 +563,48 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
         <div className="flex-1 grid md:grid-cols-[2fr_1fr] gap-4 min-h-0">
           {/* Left: Map */}
           <div className="rounded-lg border overflow-hidden flex-1 min-h-0">
-            <ExploreMap
-              tripId={tripId}
-              centerLat={trip.center_lat}
-              centerLng={trip.center_lng}
-              searchResults={results}
-              savedPlaces={savedPlaces}
-              selectedPlace={selectedPlace}
-              onPlaceSelect={handlePlaceSelect}
-              height="100%"
-            />
+            {trip.center_lat != null && trip.center_lng != null ? (
+              <GoogleMapBase
+                center={{ lat: trip.center_lat, lng: trip.center_lng }}
+                zoom={12}
+                markers={[
+                  ...results.map((place) => ({
+                    id: place.place_id || place.id,
+                    lat: place.lat,
+                    lng: place.lng,
+                  })),
+                  ...savedPlaces
+                    .filter((place) => place.lat != null && place.lng != null)
+                    .map((place) => ({
+                      id: place.place_id,
+                      lat: place.lat!,
+                      lng: place.lng!,
+                    })),
+                ]}
+                onMarkerClick={(id) => {
+                  // Find the place by id
+                  const place =
+                    results.find((p) => (p.place_id || p.id) === id) ||
+                    savedPlaces.find((p) => p.place_id === id);
+                  if (place) {
+                    handlePlaceSelect(place);
+                  }
+                }}
+                onMapLoad={(map) => {
+                  setMapInstance(map);
+                  // Create PlacesService from the map
+                  const service = new google.maps.places.PlacesService(map);
+                  setPlacesService(service);
+                }}
+                className="h-full"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                <p className="text-sm text-muted-foreground">
+                  Trip location is required to display the map.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Right: Side Panel */}
