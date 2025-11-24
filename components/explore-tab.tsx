@@ -428,6 +428,11 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     return savedPlaceIds.has(placeId);
   };
 
+  // Type guard to check if a place is a PlaceResult (not a SavedPlace)
+  const isPlaceResult = (place: PlaceResult | SavedPlace): place is PlaceResult => {
+    return !("trip_id" in place);
+  };
+
   if (!trip) {
     return (
       <div className="p-6">
@@ -580,7 +585,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                 {place.category}
               </span>
             )}
-            {!isFromSaved && "id" in place && (
+            {!isFromSaved && "id" in place && isPlaceResult(place) && (
               <Button
                 size="sm"
                 onClick={(e) => {
