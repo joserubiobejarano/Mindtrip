@@ -906,12 +906,16 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                   <PlaceDetailsPanel
                     place={normalizedPlace as any}
                     isSaved={
-                      ("id" in selectedPlace && isPlaceSaved(selectedPlace.id)) ||
-                      ("place_id" in selectedPlace && selectedPlace.place_id && isPlaceSaved(selectedPlace.place_id))
+                      !!(
+                        ("id" in selectedPlace && isPlaceSaved(selectedPlace.id)) ||
+                        ("place_id" in selectedPlace && selectedPlace.place_id && isPlaceSaved(selectedPlace.place_id))
+                      )
                     }
                     isToggling={
-                      ("id" in selectedPlace && selectedPlace.id === savingPlaceId) ||
-                      ("place_id" in selectedPlace && selectedPlace.place_id === savingPlaceId)
+                      !!(
+                        ("id" in selectedPlace && selectedPlace.id === savingPlaceId) ||
+                        ("place_id" in selectedPlace && selectedPlace.place_id === savingPlaceId)
+                      )
                     }
                     onToggleSave={() => {
                       if ("id" in selectedPlace && isPlaceResult(selectedPlace)) {
