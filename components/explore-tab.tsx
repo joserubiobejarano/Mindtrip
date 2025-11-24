@@ -629,7 +629,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       address: savedPlace.address || "",
       lat: savedPlace.lat || 0,
       lng: savedPlace.lng || 0,
-      category: savedPlace.category || undefined,
+      category: undefined, // SavedPlace doesn't have category
     };
   };
 
