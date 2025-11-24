@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Share2, Users, ArrowLeft, MoreVertical, Trash2 } from "lucide-react";
@@ -401,11 +402,14 @@ export function ItineraryTab({
                       {activitiesWithPhotos.length > 0 && (
                         <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
                           {activitiesWithPhotos.map((activity, imgIdx) => (
-                            <img
+                            <Image
                               key={imgIdx}
                               src={activity.photoUrl!}
                               alt={activity.title}
+                              width={144}
+                              height={96}
                               className="h-24 w-36 rounded-lg object-cover flex-shrink-0"
+                              unoptimized
                             />
                           ))}
                         </div>

@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -470,8 +471,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
     // Get photo URL and types
     const photoUrl = "photoUrl" in place ? place.photoUrl : "photo_url" in place ? place.photo_url : null;
-    const types = "types" in place ? place.types : "types" in place ? place.types : undefined;
-    const goodFor = getGoodForLabel(types || null);
+    const types = "types" in place ? (place.types ?? undefined) : undefined;
+    const goodFor = getGoodForLabel(types);
 
     return (
       <Card
@@ -491,10 +492,13 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 {photoUrl ? (
-                  <img
+                  <Image
                     src={photoUrl}
                     alt={place.name}
+                    width={64}
+                    height={64}
                     className="h-16 w-16 rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                    unoptimized
                   />
                 ) : (
                   <div className="h-16 w-16 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400 cursor-pointer hover:opacity-90 transition-opacity">
@@ -505,10 +509,13 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
             ) : (
               <>
                 {photoUrl ? (
-                  <img
+                  <Image
                     src={photoUrl}
                     alt={place.name}
+                    width={64}
+                    height={64}
                     className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
+                    unoptimized
                   />
                 ) : (
                   <div className="h-16 w-16 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400 flex-shrink-0">
