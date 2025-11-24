@@ -13,6 +13,8 @@ interface PlaceResult {
   lat: number;
   lng: number;
   category?: string;
+  photoUrl?: string | null;
+  types?: string[];
 }
 
 interface SavedPlace {
@@ -42,10 +44,13 @@ export function PlaceDetailsPanel({
 }: PlaceDetailsPanelProps) {
   const { user } = useUser();
 
-  const mapsUrl =
-    place.lat && place.lng
-      ? `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`
-      : null;
+  // Prefer place_id-based URL if we have the Google place_id, otherwise use coordinates
+  const googlePlaceId = "id" in place && place.id ? place.id : null;
+  const mapsUrl = googlePlaceId
+    ? `https://www.google.com/maps/place/?q=place_id:${googlePlaceId}`
+    : place.lat && place.lng
+    ? `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`
+    : null;
 
   return (
     <Card className="mt-4">

@@ -19,7 +19,42 @@ import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
-import type { AiItinerary } from "@/app/api/ai-itinerary/route";
+import type { AiItinerary, ActivitySuggestion } from "@/app/api/ai-itinerary/route";
+
+/**
+ * Get a human-readable "good for" label based on place types
+ * Reused from Explore tab
+ */
+function getGoodForLabel(types: string[] | undefined): string | null {
+  if (!types || types.length === 0) return null;
+
+  const t = types;
+
+  if (t.includes("park") || t.includes("tourist_attraction")) {
+    return "Ideal if you like parks and nature";
+  }
+  if (t.includes("museum") || t.includes("art_gallery")) {
+    return "Ideal if you enjoy art and museums";
+  }
+  if (t.includes("restaurant") || t.includes("cafe")) {
+    return "Great if you love food spots";
+  }
+  if (t.includes("bar") || t.includes("night_club")) {
+    return "Nice if you like nightlife";
+  }
+  if (t.includes("shopping_mall") || t.includes("store")) {
+    return "Perfect if you like shopping";
+  }
+
+  return null;
+}
+
+/**
+ * Check if a suggestion is an ActivitySuggestion object
+ */
+function isActivitySuggestion(suggestion: string | ActivitySuggestion): suggestion is ActivitySuggestion {
+  return typeof suggestion === 'object' && suggestion !== null && 'title' in suggestion;
+}
 
 interface ItineraryTabProps {
   tripId: string;
@@ -340,43 +375,82 @@ export function ItineraryTab({
               </Card>
 
               {/* Day sections */}
-              {aiItinerary.days.map((day, dayIdx) => (
-                <Card key={dayIdx} className="overflow-hidden">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg font-bold">
-                      Day {dayIdx + 1} – {day.title}
-                    </CardTitle>
-                    <CardDescription>
-                      {format(new Date(day.date), "EEEE, MMMM d, yyyy")} • {day.theme}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {day.sections.map((section, sectionIdx) => (
-                      <div
-                        key={sectionIdx}
-                        className={sectionIdx < day.sections.length - 1 ? "pb-4 border-b" : ""}
-                      >
-                        <h4 className="font-bold text-base mb-2">{section.partOfDay}</h4>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {section.description}
-                        </p>
-                        {section.suggestions.length > 0 && (
-                          <ul className="list-disc list-inside space-y-1 text-sm text-foreground ml-4">
-                            {section.suggestions.map((suggestion, sugIdx) => (
-                              <li key={sugIdx}>{suggestion}</li>
-                            ))}
-                          </ul>
-                        )}
-                        {section.seasonalNotes && (
-                          <p className="text-xs text-muted-foreground mt-3 italic">
-                            {section.seasonalNotes}
+              {aiItinerary.days.map((day, dayIdx) => {
+                // Extract all activities with photos from this day
+                const activitiesWithPhotos: ActivitySuggestion[] = []
+                day.sections.forEach(section => {
+                  section.suggestions.forEach(suggestion => {
+                    if (isActivitySuggestion(suggestion) && suggestion.photoUrl) {
+                      activitiesWithPhotos.push(suggestion)
+                    }
+                  })
+                })
+
+                return (
+                  <Card key={dayIdx} className="overflow-hidden">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg font-bold">
+                        Day {dayIdx + 1} – {day.title}
+                      </CardTitle>
+                      <CardDescription>
+                        {format(new Date(day.date), "EEEE, MMMM d, yyyy")} • {day.theme}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Image grid for activities with photos */}
+                      {activitiesWithPhotos.length > 0 && (
+                        <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
+                          {activitiesWithPhotos.map((activity, imgIdx) => (
+                            <img
+                              key={imgIdx}
+                              src={activity.photoUrl!}
+                              alt={activity.title}
+                              className="h-24 w-36 rounded-lg object-cover flex-shrink-0"
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {day.sections.map((section, sectionIdx) => (
+                        <div
+                          key={sectionIdx}
+                          className={sectionIdx < day.sections.length - 1 ? "pb-4 border-b" : ""}
+                        >
+                          <h4 className="font-bold text-base mb-2">{section.partOfDay}</h4>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            {section.description}
                           </p>
-                        )}
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              ))}
+                          {section.suggestions.length > 0 && (
+                            <ul className="list-disc list-inside space-y-2 text-sm text-foreground ml-4">
+                              {section.suggestions.map((suggestion, sugIdx) => {
+                                const activity = isActivitySuggestion(suggestion) ? suggestion : null
+                                const title = activity ? activity.title : String(suggestion)
+                                const goodFor = activity?.goodFor
+
+                                return (
+                                  <li key={sugIdx} className="space-y-1">
+                                    <span>{title}</span>
+                                    {goodFor && (
+                                      <div className="text-xs text-muted-foreground ml-4 italic">
+                                        {goodFor}
+                                      </div>
+                                    )}
+                                  </li>
+                                )
+                              })}
+                            </ul>
+                          )}
+                          {section.seasonalNotes && (
+                            <p className="text-xs text-muted-foreground mt-3 italic">
+                              {section.seasonalNotes}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           )}
         </div>

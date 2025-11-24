@@ -31,6 +31,8 @@ interface PlaceResult {
   lat: number;
   lng: number;
   category?: string;
+  photoUrl?: string | null;
+  types?: string[];
 }
 
 interface Day {

@@ -24,6 +24,7 @@ export interface GooglePlaceResult {
   types?: string[];
   rating?: number;
   user_ratings_total?: number;
+  photos?: google.maps.places.PlacePhoto[];
 }
 
 /**
@@ -63,6 +64,8 @@ export function mapGooglePlaceToPlaceResult(
   lat: number;
   lng: number;
   category?: string;
+  photoUrl?: string | null;
+  types?: string[];
 } {
   const lat = place.geometry.location.lat();
   const lng = place.geometry.location.lng();
@@ -71,6 +74,17 @@ export function mapGooglePlaceToPlaceResult(
   // Extract primary category from types array
   const category = place.types?.[0]?.replace(/_/g, " ") || undefined;
 
+  // Extract photo URL if available
+  let photoUrl: string | null = null;
+  if (place.photos && place.photos.length > 0) {
+    try {
+      photoUrl = place.photos[0].getUrl({ maxWidth: 400, maxHeight: 400 });
+    } catch (err) {
+      console.error("Error getting photo URL:", err);
+      photoUrl = null;
+    }
+  }
+
   return {
     id: place.place_id,
     name: place.name || "Unnamed place",
@@ -78,6 +92,8 @@ export function mapGooglePlaceToPlaceResult(
     lat,
     lng,
     category,
+    photoUrl,
+    types: place.types,
   };
 }
 
