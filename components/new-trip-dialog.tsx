@@ -21,7 +21,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
 import { eachDayOfInterval, format } from "date-fns";
@@ -49,12 +48,13 @@ export function NewTripDialog({
   userId,
 }: NewTripDialogProps) {
   const [destination, setDestination] = useState<DestinationOption | null>(null);
-  const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [currency, setCurrency] = useState("EUR");
-  const [budgetLevel, setBudgetLevel] = useState("comfort");
+  const [numberOfPeople, setNumberOfPeople] = useState<string>("");
   const [dailyBudget, setDailyBudget] = useState<string>("");
+  const [hotelAddress, setHotelAddress] = useState("");
+  const [findAccommodation, setFindAccommodation] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,28 +80,42 @@ export function NewTripDialog({
     { value: "neighborhoods", label: "Neighborhoods" },
   ];
 
+  // Auto-generate trip title based on destination and dates
+  const generateTripTitle = (dest: DestinationOption | null, start: string, end: string): string => {
+    if (!dest) return "";
+    const cityName = dest.placeName;
+    if (!start || !end) return `Trip to ${cityName}`;
+    
+    const startDate = new Date(start);
+    const month = startDate.toLocaleDateString("en-US", { month: "long" });
+    const season = getSeason(startDate);
+    
+    return `${season} getaway to ${cityName}`;
+  };
+
+  const getSeason = (date: Date): string => {
+    const month = date.getMonth();
+    if (month >= 2 && month <= 4) return "Spring";
+    if (month >= 5 && month <= 7) return "Summer";
+    if (month >= 8 && month <= 10) return "Fall";
+    return "Winter";
+  };
+
   const router = useRouter();
   const supabase = createClient();
   const { user } = useUser();
   
-  // Auto-fill title when destination is selected and title is empty
-  useEffect(() => {
-    if (destination && !title.trim()) {
-      setTitle(`Trip to ${destination.placeName}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [destination]); // Only depend on destination, not title, to avoid re-triggering
-
   // Reset form when dialog closes
   useEffect(() => {
     if (!open) {
       setDestination(null);
-      setTitle("");
       setStartDate("");
       setEndDate("");
       setCurrency("EUR");
-      setBudgetLevel("comfort");
+      setNumberOfPeople("");
       setDailyBudget("");
+      setHotelAddress("");
+      setFindAccommodation(false);
       setInterests([]);
       setError(null);
     }
@@ -125,7 +139,7 @@ export function NewTripDialog({
     setError(null);
 
     try {
-      if (!title || !startDate || !endDate || !currency) {
+      if (!destination || !startDate || !endDate || !currency) {
         throw new Error("Please fill in all required fields");
       }
 
@@ -136,8 +150,14 @@ export function NewTripDialog({
         throw new Error("End date must be after start date");
       }
 
+      // Auto-generate title
+      const title = generateTripTitle(destination, startDate, endDate);
+
       // Prepare daily budget - convert to number or null
       const dailyBudgetNum = dailyBudget ? parseFloat(dailyBudget) : null;
+      
+      // Prepare number of people - convert to integer or null
+      const numberOfPeopleNum = numberOfPeople ? parseInt(numberOfPeople, 10) : null;
 
       // Extract coordinates and destination info from selected destination
       const [centerLng, centerLat] = destination?.center || [null, null];
@@ -155,12 +175,14 @@ export function NewTripDialog({
           start_date: startDate,
           end_date: endDate,
           default_currency: currency,
-          budget_level: budgetLevel,
           daily_budget: dailyBudgetNum,
+          number_of_people: numberOfPeopleNum,
+          hotel_address: findAccommodation ? null : (hotelAddress || null),
+          find_accommodation: findAccommodation,
           interests: interests.length > 0 ? interests : null,
-          destination_name: destination?.placeName || null,
+          destination_name: destination.placeName || null,
           destination_country: destinationCountry || null,
-          destination_place_id: destination?.id || null,
+          destination_place_id: destination.id || null,
           center_lat: centerLat || null,
           center_lng: centerLng || null,
           owner_id: userId,
@@ -208,9 +230,27 @@ export function NewTripDialog({
         throw new Error("Failed to create trip member. Please try again.");
       }
 
+      // Auto-generate itinerary
+      try {
+        const itineraryResponse = await fetch("/api/ai-itinerary", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ tripId: trip.id }),
+        });
+
+        if (!itineraryResponse.ok) {
+          console.error("Failed to generate itinerary, but trip was created");
+        }
+      } catch (itineraryError) {
+        console.error("Error generating itinerary:", itineraryError);
+        // Don't fail the trip creation if itinerary generation fails
+      }
+
       onOpenChange(false);
       onSuccess();
-      router.push(`/trips/${trip.id}`);
+      router.push(`/trips/${trip.id}?tab=itinerary`);
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -220,114 +260,132 @@ export function NewTripDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Trip</DialogTitle>
+          <DialogTitle className="text-xl">Create New Trip</DialogTitle>
           <DialogDescription>
-            Plan your next adventure. You can add activities later.
+            Plan your next adventure. We&apos;ll generate a smart itinerary for you.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
+          <div className="space-y-6 py-4">
+            {/* Destination */}
             <div className="space-y-2">
-              <Label htmlFor="destination">Where to?</Label>
+              <Label htmlFor="destination" className="text-base font-medium">Destination</Label>
               <DestinationAutocomplete
                 value={destination}
                 onChange={setDestination}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="title">Trip Title</Label>
-              <Input
-                id="title"
-                placeholder="e.g., Summer in Paris"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="start_date">Start Date</Label>
-              <Input
-                id="start_date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="end_date">End Date</Label>
-              <Input
-                id="end_date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
-              <Select value={currency} onValueChange={setCurrency} required>
-                <SelectTrigger id="currency">
-                  <SelectValue placeholder="Select a currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencyOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+            <div className="border-t pt-4">
+              <h3 className="text-base font-medium mb-4">Travel Dates</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start_date">Start Date</Label>
+                  <Input
+                    id="start_date"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end_date">End Date</Label>
+                  <Input
+                    id="end_date"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Budget Level</Label>
-              <RadioGroup value={budgetLevel} onValueChange={setBudgetLevel}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="backpacker" id="backpacker" />
-                  <Label htmlFor="backpacker" className="font-normal cursor-pointer">
-                    Backpacker
-                  </Label>
+            <div className="border-t pt-4">
+              <h3 className="text-base font-medium mb-4">Trip Details</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="number_of_people">How many people are traveling?</Label>
+                  <Input
+                    id="number_of_people"
+                    type="number"
+                    placeholder="e.g., 2"
+                    value={numberOfPeople}
+                    onChange={(e) => setNumberOfPeople(e.target.value)}
+                    min="1"
+                  />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="budget" id="budget" />
-                  <Label htmlFor="budget" className="font-normal cursor-pointer">
-                    Budget
-                  </Label>
+                <div className="space-y-2">
+                  <Label htmlFor="currency">Currency</Label>
+                  <Select value={currency} onValueChange={setCurrency} required>
+                    <SelectTrigger id="currency">
+                      <SelectValue placeholder="Select a currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currencyOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="comfort" id="comfort" />
-                  <Label htmlFor="comfort" className="font-normal cursor-pointer">
-                    Comfort
-                  </Label>
+                <div className="space-y-2">
+                  <Label htmlFor="daily_budget">Daily Budget (optional)</Label>
+                  <Input
+                    id="daily_budget"
+                    type="number"
+                    placeholder="e.g., 100"
+                    value={dailyBudget}
+                    onChange={(e) => setDailyBudget(e.target.value)}
+                    min="0"
+                    step="0.01"
+                  />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="luxury" id="luxury" />
-                  <Label htmlFor="luxury" className="font-normal cursor-pointer">
-                    Luxury
-                  </Label>
-                </div>
-              </RadioGroup>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="daily_budget">Daily Budget (approx.)</Label>
-              <Input
-                id="daily_budget"
-                type="number"
-                placeholder="e.g., 100"
-                value={dailyBudget}
-                onChange={(e) => setDailyBudget(e.target.value)}
-                min="0"
-                step="0.01"
-              />
+            <div className="border-t pt-4">
+              <h3 className="text-base font-medium mb-4">Accommodation</h3>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="find_accommodation"
+                    checked={findAccommodation}
+                    onCheckedChange={(checked) => {
+                      setFindAccommodation(checked as boolean);
+                      if (checked) {
+                        setHotelAddress("");
+                      }
+                    }}
+                  />
+                  <Label htmlFor="find_accommodation" className="font-normal cursor-pointer">
+                    Find me a great place to stay
+                  </Label>
+                </div>
+                {!findAccommodation && (
+                  <div className="space-y-2">
+                    <Label htmlFor="hotel_address">Hotel / Accommodation Address</Label>
+                    <Input
+                      id="hotel_address"
+                      placeholder="Enter address or search..."
+                      value={hotelAddress}
+                      onChange={(e) => setHotelAddress(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      We&apos;ll use this to help plan your itinerary
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Interests</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="border-t pt-4">
+              <h3 className="text-base font-medium mb-4">Interests</h3>
+              <div className="grid grid-cols-2 gap-3">
                 {interestOptions.map((option) => (
                   <div key={option.value} className="flex items-center space-x-2">
                     <Checkbox

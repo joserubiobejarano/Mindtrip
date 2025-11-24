@@ -31,7 +31,7 @@ export interface GooglePlaceResult {
  * Map Google Place type to our filter categories
  */
 export function getPlaceTypeForFilter(
-  filter: "museums" | "parks" | "food" | "nightlife" | "shopping" | "neighborhoods"
+  filter: "museums" | "parks" | "food" | "nightlife" | "shopping" | "neighborhoods" | "highlights"
 ): GooglePlaceType | GooglePlaceType[] {
   switch (filter) {
     case "museums":
@@ -47,6 +47,9 @@ export function getPlaceTypeForFilter(
       return "shopping_mall";
     case "neighborhoods":
       return "neighborhood";
+    case "highlights":
+      // For highlights, we'll use text search, so return empty
+      return [];
     default:
       return "restaurant";
   }

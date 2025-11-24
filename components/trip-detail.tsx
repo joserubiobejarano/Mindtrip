@@ -1,23 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 import { TripLayout } from "@/components/trip-layout";
 import { TripTabs } from "@/components/trip-tabs";
-import { MapPanel } from "@/components/map-panel";
+import { TripMapPanel } from "@/components/trip-map-panel";
 import { useDays } from "@/hooks/use-days";
 import { useRealtimeActivities } from "@/hooks/use-realtime-activities";
 import { createClient } from "@/lib/supabase/client";
 import { useTrip } from "@/hooks/use-trip";
+import { BaseMarker } from "@/components/google-map-base";
 
 export function TripDetail({ tripId }: { tripId: string }) {
   const { user } = useUser();
   const userId = user?.id;
+  const searchParams = useSearchParams();
   const { data: days } = useDays(tripId);
   const { data: trip } = useTrip(tripId);
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("itinerary");
+  const initialTab = searchParams.get("tab") || "itinerary";
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
+  const [exploreMarkers, setExploreMarkers] = useState<BaseMarker[]>([]);
+  const [exploreCenter, setExploreCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [exploreZoom, setExploreZoom] = useState<number | undefined>(undefined);
+  const exploreMarkerClickHandlerRef = useRef<((id: string) => void) | null>(null);
   const supabase = createClient();
   const [ownerMemberChecked, setOwnerMemberChecked] = useState(false);
 
@@ -70,6 +78,12 @@ export function TripDetail({ tripId }: { tripId: string }) {
     return <div>Please sign in to view this trip.</div>;
   }
 
+  const handleExploreMarkerClick = (id: string) => {
+    if (exploreMarkerClickHandlerRef.current) {
+      exploreMarkerClickHandlerRef.current(id);
+    }
+  };
+
   return (
     <TripLayout
       leftPanel={
@@ -80,16 +94,26 @@ export function TripDetail({ tripId }: { tripId: string }) {
           onSelectDay={setSelectedDayId}
           onActivitySelect={setSelectedActivityId}
           onTabChange={setActiveTab}
+          initialTab={initialTab}
+          onExploreMapUpdate={(markers, center, zoom) => {
+            setExploreMarkers(markers);
+            setExploreCenter(center);
+            setExploreZoom(zoom);
+          }}
+          onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
         />
       }
       rightPanel={
-        activeTab !== "explore" ? (
-          <MapPanel
-            tripId={tripId}
-            selectedDayId={selectedDayId}
-            selectedActivityId={selectedActivityId}
-          />
-        ) : null
+        <TripMapPanel
+          tripId={tripId}
+          selectedDayId={selectedDayId}
+          selectedActivityId={selectedActivityId}
+          activeTab={activeTab}
+          exploreMarkers={exploreMarkers}
+          exploreCenter={exploreCenter}
+          exploreZoom={exploreZoom}
+          onExploreMarkerClick={handleExploreMarkerClick}
+        />
       }
     />
   );

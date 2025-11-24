@@ -425,20 +425,39 @@ export function ItineraryTab({
                             {section.description}
                           </p>
                           {section.suggestions.length > 0 && (
-                            <ul className="list-disc list-inside space-y-2 text-sm text-foreground ml-4">
+                            <ul className="list-none space-y-3 text-sm text-foreground">
                               {section.suggestions.map((suggestion, sugIdx) => {
                                 const activity = isActivitySuggestion(suggestion) ? suggestion : null
                                 const title = activity ? activity.title : String(suggestion)
                                 const goodFor = activity?.goodFor
+                                const photoUrl = activity?.photoUrl
 
                                 return (
-                                  <li key={sugIdx} className="space-y-1">
-                                    <span>{title}</span>
-                                    {goodFor && (
-                                      <div className="text-xs text-muted-foreground ml-4 italic">
-                                        {goodFor}
+                                  <li key={sugIdx} className="flex items-start gap-3">
+                                    {photoUrl ? (
+                                      <div className="flex-shrink-0 mt-0.5">
+                                        <Image
+                                          src={photoUrl}
+                                          alt={title}
+                                          width={64}
+                                          height={64}
+                                          className="h-16 w-16 rounded-lg object-cover"
+                                          unoptimized
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="flex-shrink-0 w-4 h-4 mt-1.5">
+                                        <div className="w-2 h-2 rounded-full bg-primary" />
                                       </div>
                                     )}
+                                    <div className="flex-1 min-w-0 space-y-1">
+                                      <span className="block">{title}</span>
+                                      {goodFor && (
+                                        <div className="text-xs text-muted-foreground italic">
+                                          {goodFor}
+                                        </div>
+                                      )}
+                                    </div>
                                   </li>
                                 )
                               })}

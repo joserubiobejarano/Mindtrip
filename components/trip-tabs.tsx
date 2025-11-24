@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ItineraryTab } from "@/components/itinerary-tab";
 import { ExpensesTab } from "@/components/expenses-tab";
@@ -15,6 +15,12 @@ interface TripTabsProps {
   onSelectDay: (dayId: string) => void;
   onActivitySelect?: (activityId: string) => void;
   onTabChange?: (tab: string) => void;
+  onExploreMapUpdate?: (
+    markers: import("@/components/google-map-base").BaseMarker[],
+    center: { lat: number; lng: number } | null,
+    zoom: number | undefined
+  ) => void;
+  onExploreMarkerClickRef?: React.MutableRefObject<((id: string) => void) | null>;
 }
 
 export function TripTabs({
@@ -24,9 +30,19 @@ export function TripTabs({
   onSelectDay,
   onActivitySelect,
   onTabChange,
-}: TripTabsProps) {
+  onExploreMapUpdate,
+  onExploreMarkerClickRef,
+  initialTab,
+}: TripTabsProps & { initialTab?: string }) {
   const { data: trip } = useTrip(tripId);
-  const [activeTab, setActiveTab] = useState("itinerary");
+  const [activeTab, setActiveTab] = useState(initialTab || "itinerary");
+
+  // Update activeTab when initialTab changes (e.g., from URL query param)
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -43,7 +59,11 @@ export function TripTabs({
       </TabsList>
       <div className="flex-1 overflow-hidden">
         <TabsContent value="explore" className="h-full mt-0">
-          <ExploreTab tripId={tripId} />
+          <ExploreTab
+            tripId={tripId}
+            onMapUpdate={onExploreMapUpdate}
+            onMarkerClickRef={onExploreMarkerClickRef}
+          />
         </TabsContent>
         <TabsContent value="itinerary" className="h-full mt-0">
           <ItineraryTab

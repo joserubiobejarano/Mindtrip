@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { AddToItineraryDialog } from "@/components/add-to-itinerary-dialog";
-import { GoogleMapBase, BaseMarker } from "@/components/google-map-base";
+import { BaseMarker } from "@/components/google-map-base";
 import { PlaceDetailsPanel } from "@/components/place-details-panel";
+import { PlaceDetailsDrawer } from "@/components/place-details-drawer";
 import { Loader2, Search, MapPin, Star, Hotel } from "lucide-react";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
@@ -40,6 +41,8 @@ interface PlaceResult {
   photoUrl?: string | null;
   types?: string[];
   googleMapsUrl?: string; // Google Maps URL for this place
+  rating?: number; // For sorting
+  user_ratings_total?: number; // For sorting
 }
 
 interface SavedPlace {
@@ -58,6 +61,12 @@ interface SavedPlace {
 
 interface ExploreTabProps {
   tripId: string;
+  onMapUpdate?: (
+    markers: import("@/components/google-map-base").BaseMarker[],
+    center: { lat: number; lng: number } | null,
+    zoom: number | undefined
+  ) => void;
+  onMarkerClickRef?: React.MutableRefObject<((id: string) => void) | null>;
 }
 
 type ExploreFilter =
@@ -66,7 +75,8 @@ type ExploreFilter =
   | "food"
   | "nightlife"
   | "shopping"
-  | "neighborhoods";
+  | "neighborhoods"
+  | "highlights";
 
 interface Trip {
   id: string;
@@ -92,6 +102,7 @@ const FILTER_PRESETS: Record<ExploreFilter, { label: string; query: string }> = 
   nightlife: { label: "Nightlife", query: "bar" },
   shopping: { label: "Shopping", query: "shop" },
   neighborhoods: { label: "Neighborhoods", query: "" },
+  highlights: { label: "Highlights", query: "tourist attractions" },
 } as const;
 
 /**
@@ -121,7 +132,7 @@ function getGoodForLabel(types: string[] | undefined): string | null {
   return null;
 }
 
-export function ExploreTab({ tripId }: ExploreTabProps) {
+export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<ExploreFilter | null>(null);
   const [results, setResults] = useState<PlaceResult[]>([]);
@@ -130,6 +141,8 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const [queryWasTried, setQueryWasTried] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<PlaceResult | SavedPlace | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [savedPlaceIds, setSavedPlaceIds] = useState<Set<string>>(new Set());
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
   const [loadingSaved, setLoadingSaved] = useState(false);
@@ -142,8 +155,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   const supabase = createClient();
   const { addToast } = useToast();
 
-  const [placesService, setPlacesService] = useState<google.maps.places.PlacesService | null>(null);
-  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const mapServiceRef = useRef<google.maps.places.PlacesService | null>(null);
 
   // Load saved places on mount
   useEffect(() => {
@@ -157,7 +169,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   useEffect(() => {
     if (
       trip &&
-      placesService &&
+      mapServiceRef.current &&
       trip.center_lat != null &&
       trip.center_lng != null
     ) {
@@ -165,20 +177,67 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       setSelectedFilter("museums");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trip?.id, placesService]);
+  }, [trip?.id, mapServiceRef.current]);
 
-  // Center map on selected place
+  // Update map markers and center when results or saved places change
   useEffect(() => {
-    if (!mapInstance || !selectedPlace) return;
+    if (!trip || trip.center_lat == null || trip.center_lng == null) {
+      if (onMapUpdate) {
+        onMapUpdate([], null, undefined);
+      }
+      return;
+    }
 
-    const lat = selectedPlace.lat;
-    const lng = selectedPlace.lng;
+    const markers: import("@/components/google-map-base").BaseMarker[] = [
+      ...results.map((place) => ({
+        id: place.place_id || place.id,
+        lat: place.lat,
+        lng: place.lng,
+      })),
+      ...savedPlaces
+        .filter((place) => place.lat != null && place.lng != null)
+        .map((place) => ({
+          id: place.place_id,
+          lat: place.lat!,
+          lng: place.lng!,
+        })),
+    ];
 
-    if (!lat || !lng || lat === 0 || lng === 0) return;
+    let center: { lat: number; lng: number } | null = null;
+    let zoom: number | undefined = undefined;
 
-    mapInstance.panTo({ lat, lng });
-    mapInstance.setZoom(14);
-  }, [selectedPlace, mapInstance]);
+    if (selectedPlace && selectedPlace.lat && selectedPlace.lng) {
+      center = { lat: selectedPlace.lat, lng: selectedPlace.lng };
+      zoom = 14;
+    } else if (trip.center_lat != null && trip.center_lng != null) {
+      center = { lat: trip.center_lat, lng: trip.center_lng };
+      zoom = 12;
+    }
+
+    if (onMapUpdate) {
+      onMapUpdate(markers, center, zoom);
+    }
+  }, [results, savedPlaces, selectedPlace, trip, onMapUpdate]);
+
+  // Initialize PlacesService - create a temporary map instance for the service
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.google && window.google.maps && !mapServiceRef.current) {
+      // Create a temporary hidden map div to initialize PlacesService
+      const tempDiv = document.createElement("div");
+      tempDiv.style.display = "none";
+      document.body.appendChild(tempDiv);
+      const tempMap = new google.maps.Map(tempDiv, {
+        center: { lat: 0, lng: 0 },
+        zoom: 1,
+      });
+      mapServiceRef.current = new google.maps.places.PlacesService(tempMap);
+      
+      // Cleanup
+      return () => {
+        document.body.removeChild(tempDiv);
+      };
+    }
+  }, []);
 
   const loadSavedPlaces = async () => {
     setLoadingSaved(true);
@@ -250,7 +309,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
   };
 
   const searchPlaces = async (options?: { filterKey?: ExploreFilter; textQuery?: string }) => {
-    if (!trip || !placesService) return;
+    if (!trip || !mapServiceRef.current) return;
 
     const { filterKey, textQuery } = options ?? {};
 
@@ -281,30 +340,77 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
       let googlePlaces: Awaited<ReturnType<typeof searchNearbyPlaces>> | Awaited<ReturnType<typeof searchPlacesByText>>;
 
+      const service = mapServiceRef.current;
       if (textQuery && textQuery.trim().length > 0) {
         // Text search: "<user text> in <city>"
         const query = cityName ? `${textQuery.trim()} in ${cityName}` : textQuery.trim();
-        googlePlaces = await searchPlacesByText(placesService, query, location, 15000);
+        googlePlaces = await searchPlacesByText(service, query, location, 15000);
       } else if (filterKey === "neighborhoods") {
         // For neighborhoods, use text search with city name
         const query = cityName || trip.title;
-        googlePlaces = await searchPlacesByText(placesService, query, location, 15000);
+        googlePlaces = await searchPlacesByText(service, query, location, 15000);
+      } else if (filterKey === "highlights") {
+        // For highlights, search for tourist attractions
+        const query = cityName
+          ? `tourist attractions things to do in ${cityName}`
+          : "tourist attractions things to do";
+        googlePlaces = await searchPlacesByText(service, query, location, 15000);
       } else if (filterKey) {
         // Filter-based search using nearbySearch
         const placeType = getPlaceTypeForFilter(filterKey);
-        googlePlaces = await searchNearbyPlaces(placesService, location, placeType, 10000);
+        googlePlaces = await searchNearbyPlaces(service, location, placeType, 10000);
       } else {
         // Fallback: search for restaurants
-        googlePlaces = await searchNearbyPlaces(placesService, location, "restaurant", 10000);
+        googlePlaces = await searchNearbyPlaces(service, location, "restaurant", 10000);
       }
 
       // Map Google Places results to our PlaceResult format
-      const mapped: PlaceResult[] = googlePlaces.map((place) => {
+      let mapped: PlaceResult[] = googlePlaces.map((place) => {
         const result = mapGooglePlaceToPlaceResult(place);
         // Add Google Maps URL
         const googleMapsUrl = `https://www.google.com/maps/place/?q=place_id:${result.id}`;
-        return { ...result, googleMapsUrl };
+        // Preserve rating and user_ratings_total for sorting
+        return {
+          ...result,
+          googleMapsUrl,
+          rating: place.rating,
+          user_ratings_total: place.user_ratings_total,
+        } as PlaceResult & { rating?: number; user_ratings_total?: number };
       });
+
+      // For highlights, filter out food/nightlife places
+      if (filterKey === "highlights") {
+        const excludeTypes = [
+          "restaurant",
+          "cafe",
+          "bar",
+          "night_club",
+          "food",
+          "meal_takeaway",
+          "meal_delivery",
+        ];
+        mapped = mapped.filter((place) => {
+          const types = place.types || [];
+          return !types.some((type) => excludeTypes.includes(type));
+        });
+      }
+
+      // Sort by user_ratings_total DESC, then rating DESC
+      mapped.sort((a, b) => {
+        const aRatings = (a as any).user_ratings_total || 0;
+        const bRatings = (b as any).user_ratings_total || 0;
+        if (bRatings !== aRatings) {
+          return bRatings - aRatings;
+        }
+        const aRating = (a as any).rating || 0;
+        const bRating = (b as any).rating || 0;
+        return bRating - aRating;
+      });
+
+      // Limit highlights to top 30
+      if (filterKey === "highlights") {
+        mapped = mapped.slice(0, 30);
+      }
 
       // Upsert all places to database and attach place_id
       const resultsWithPlaceIds = await Promise.all(
@@ -345,13 +451,31 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
   const handlePlaceSelect = (place: PlaceResult | SavedPlace) => {
     setSelectedPlace(place);
-    // Scroll to details panel if it exists
-    setTimeout(() => {
-      detailsPanelRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-    }, 100);
+    // Get the Google place_id
+    const placeId = "id" in place ? place.id : place.place_id;
+    setSelectedPlaceId(placeId);
+    setDrawerOpen(true);
+    
+    // Update map center to selected place
+    if (place.lat && place.lng) {
+      if (onMapUpdate) {
+        const markers: BaseMarker[] = [
+          ...results.map((p) => ({
+            id: p.place_id || p.id,
+            lat: p.lat,
+            lng: p.lng,
+          })),
+          ...savedPlaces
+            .filter((p) => p.lat != null && p.lng != null)
+            .map((p) => ({
+              id: p.place_id,
+              lat: p.lat!,
+              lng: p.lng!,
+            })),
+        ];
+        onMapUpdate(markers, { lat: place.lat, lng: place.lng }, 14);
+      }
+    }
   };
 
   const handleAddToItinerary = (place: PlaceResult | SavedPlace) => {
@@ -391,9 +515,10 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
 
       if (error) {
         console.error("Error saving place:", error);
+        const errorMessage = error.message || "Failed to save place. Please try again.";
         addToast({
           title: "Error",
-          description: "Failed to save place. Please try again.",
+          description: errorMessage,
           variant: "destructive",
         });
         return;
@@ -406,7 +531,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       await loadSavedPlaces();
 
       addToast({
-        title: "Saved to your plan",
+        title: "Added to your plan",
         description: "This place will be included in your Smart itinerary.",
         variant: "success",
       });
@@ -531,15 +656,14 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
       >
         <CardHeader className="pb-3">
           <div className="flex gap-3">
-            {/* Thumbnail - clickable to open Google Maps */}
-            {googleMapsUrl ? (
-              <a
-                href={googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-shrink-0"
-                onClick={(e) => e.stopPropagation()}
-              >
+            {/* Thumbnail - clickable to open drawer */}
+            <div
+              className="flex-shrink-0 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePlaceSelect(place);
+              }}
+            >
                 {photoUrl ? (
                   <Image
                     src={photoUrl}
@@ -550,74 +674,35 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                     unoptimized
                   />
                 ) : (
-                  <div className="h-16 w-16 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400 cursor-pointer hover:opacity-90 transition-opacity">
+                  <div className="h-16 w-16 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400 hover:opacity-90 transition-opacity">
                     No image
                   </div>
                 )}
-              </a>
-            ) : (
-              <>
-                {photoUrl ? (
-                  <Image
-                    src={photoUrl}
-                    alt={place.name}
-                    width={64}
-                    height={64}
-                    className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="h-16 w-16 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400 flex-shrink-0">
-                    No image
-                  </div>
-                )}
-              </>
-            )}
+            </div>
 
-            {/* Content - clickable to open Google Maps */}
-            <div className="flex-1 min-w-0">
-              {googleMapsUrl ? (
-                <a
-                  href={googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg flex-1 cursor-pointer hover:text-primary transition-colors">
-                      {place.name}
-                    </CardTitle>
-                  </div>
-                  {place.address && (
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      <span>{place.address}</span>
-                    </div>
-                  )}
-                  {goodFor && (
-                    <div className="text-xs text-muted-foreground mt-1.5">
-                      {goodFor}
-                    </div>
-                  )}
-                </a>
-              ) : (
-                <>
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg flex-1">{place.name}</CardTitle>
-                  </div>
-                  {place.address && (
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      <span>{place.address}</span>
-                    </div>
-                  )}
-                  {goodFor && (
-                    <div className="text-xs text-muted-foreground mt-1.5">
-                      {goodFor}
-                    </div>
-                  )}
-                </>
+            {/* Content - clickable to open drawer */}
+            <div
+              className="flex-1 min-w-0 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePlaceSelect(place);
+              }}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="text-lg flex-1 hover:text-primary transition-colors">
+                  {place.name}
+                </CardTitle>
+              </div>
+              {place.address && (
+                <div className="flex items-start gap-2 text-sm text-muted-foreground mt-1">
+                  <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span>{place.address}</span>
+                </div>
+              )}
+              {goodFor && (
+                <div className="text-xs text-muted-foreground mt-1.5">
+                  {goodFor}
+                </div>
               )}
             </div>
           </div>
@@ -644,9 +729,9 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
                     Saving...
                   </>
                 ) : saved ? (
-                  "Saved to plan"
+                  "Added to plan"
                 ) : (
-                  "Save to plan"
+                  "Add to plan"
                 )}
               </Button>
             )}
@@ -677,73 +762,43 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     };
   };
 
-  return (
-    <div className="flex h-full overflow-hidden">
-      {/* Left: Map */}
-      <div className="flex-1 min-w-0">
-        <div className="h-full w-full">
-          {trip.center_lat != null && trip.center_lng != null ? (
-            <GoogleMapBase
-              center={{ lat: trip.center_lat, lng: trip.center_lng }}
-              zoom={12}
-              markers={[
-                ...results.map((place) => ({
-                  id: place.place_id || place.id,
-                  lat: place.lat,
-                  lng: place.lng,
-                })),
-                ...savedPlaces
-                  .filter((place) => place.lat != null && place.lng != null)
-                  .map((place) => ({
-                    id: place.place_id,
-                    lat: place.lat!,
-                    lng: place.lng!,
-                  })),
-              ]}
-              onMarkerClick={(id) => {
-                // Find the place by id
-                const place =
-                  results.find((p) => (p.place_id || p.id) === id) ||
-                  savedPlaces.find((p) => p.place_id === id);
-                if (place) {
-                  // Convert SavedPlace to PlaceResult if needed
-                  if ("trip_id" in place) {
-                    const placeResult: PlaceResult = {
-                      id: place.place_id,
-                      name: place.name,
-                      address: place.address || "",
-                      lat: place.lat || 0,
-                      lng: place.lng || 0,
-                      photoUrl: place.photo_url,
-                      types: place.types || undefined,
-                      googleMapsUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
-                    };
-                    handlePlaceSelect(placeResult);
-                  } else {
-                    handlePlaceSelect(place);
-                  }
-                }
-              }}
-              onMapLoad={(map) => {
-                setMapInstance(map);
-                // Create PlacesService from the map
-                const service = new google.maps.places.PlacesService(map);
-                setPlacesService(service);
-              }}
-              className="h-full w-full"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100">
-              <p className="text-sm text-muted-foreground">
-                Trip location is required to display the map.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+  // Expose marker click handler via ref
+  useEffect(() => {
+    if (onMarkerClickRef) {
+      onMarkerClickRef.current = (id: string) => {
+        const place =
+          results.find((p) => (p.place_id || p.id) === id) ||
+          savedPlaces.find((p) => p.place_id === id);
+        if (place) {
+          if ("trip_id" in place) {
+            const placeResult: PlaceResult = {
+              id: place.place_id,
+              name: place.name,
+              address: place.address || "",
+              lat: place.lat || 0,
+              lng: place.lng || 0,
+              photoUrl: place.photo_url,
+              types: place.types || undefined,
+              googleMapsUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
+            };
+            handlePlaceSelect(placeResult);
+          } else {
+            handlePlaceSelect(place);
+          }
+        }
+      };
+    }
+    return () => {
+      if (onMarkerClickRef) {
+        onMarkerClickRef.current = null;
+      }
+    };
+  }, [results, savedPlaces, onMarkerClickRef]);
 
-      {/* Right: Side Panel */}
-      <aside className="w-full max-w-md border-l bg-white flex flex-col">
+  return (
+    <div className="h-full flex flex-col">
+      {/* Side Panel */}
+      <aside className="w-full flex flex-col h-full">
         {/* Hotel Card */}
         {trip.start_date && trip.end_date && (
           <div className="p-4 border-b">
@@ -830,7 +885,7 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
           <div className="mb-4">
             <h2 className="text-lg font-semibold mb-2">Saved places</h2>
             <p className="text-sm text-muted-foreground mb-3">
-              Save places you like. We will use them to build your Smart itinerary later.
+              Save places you like. We&apos;ll use them to build your Smart itinerary later.
             </p>
             {loadingSaved ? (
               <div className="flex items-center justify-center py-4">
@@ -941,6 +996,25 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
           days={days || []}
         />
       )}
+
+      {/* Place Details Drawer */}
+      <PlaceDetailsDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        placeId={selectedPlaceId}
+        placeName={selectedPlace?.name}
+        activeFilter={selectedFilter}
+        onAddToPlan={() => {
+          if (selectedPlace && isPlaceResult(selectedPlace)) {
+            handleSaveToPlan(selectedPlace);
+          }
+        }}
+        onAddToItinerary={() => {
+          if (selectedPlace) {
+            handleAddToItinerary(selectedPlace);
+          }
+        }}
+      />
     </div>
   );
 }

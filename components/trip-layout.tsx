@@ -14,15 +14,15 @@ export function TripLayout({ leftPanel, rightPanel }: TripLayoutProps) {
 
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
-      {/* Map Area - On top for mobile, right side for desktop */}
+      {/* Map Area - Left side, full height, flex-1 */}
       {rightPanel && (
-        <div className="h-[40vh] md:h-auto md:w-[60%] bg-muted order-first md:order-none">
+        <div className="h-[40vh] md:h-auto flex-1 order-first md:order-none">
           {rightPanel}
         </div>
       )}
       
-      {/* Left Sidebar - 40% width on desktop when map is visible, full width when map is hidden */}
-      <div className={`flex-1 ${rightPanel ? 'md:w-[40%]' : 'md:w-full'} border-t md:border-t-0 ${rightPanel ? 'md:border-r' : ''} border-border overflow-y-auto bg-background flex flex-col`}>
+      {/* Right Panel - Fixed width, scrollable */}
+      <div className={`${rightPanel ? 'md:w-[400px]' : 'md:w-full'} border-t md:border-t-0 ${rightPanel ? 'md:border-l' : ''} border-border overflow-y-auto bg-background flex flex-col`}>
         {/* Header with Back button */}
         <div className="p-6 pb-0 border-b border-border">
           <Button

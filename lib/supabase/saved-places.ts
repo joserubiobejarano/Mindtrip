@@ -63,7 +63,21 @@ export async function savePlaceForTrip({
     source: "explore",
   });
 
-  return { error: error ? new Error(error.message) : null };
+  if (error) {
+    console.error("Error saving place to saved_places:", {
+      error,
+      errorMessage: error.message,
+      errorCode: error.code,
+      errorDetails: error.details,
+      errorHint: error.hint,
+      tripId,
+      placeId: place.id,
+      placeName: place.name,
+    });
+    return { error: new Error(error.message || "Failed to save place") };
+  }
+
+  return { error: null };
 }
 
 /**
