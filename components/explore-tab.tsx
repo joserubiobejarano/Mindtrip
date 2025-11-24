@@ -433,6 +433,50 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
     return !("trip_id" in place);
   };
 
+  // Convert PlaceResult | SavedPlace to the format expected by PlaceDetailsPanel
+  // This normalizes the types to match PlaceDetailsPanel's expected interface
+  const normalizePlaceForDetailsPanel = (
+    place: PlaceResult | SavedPlace
+  ): {
+    id: string;
+    place_id?: string;
+    name: string;
+    address: string;
+    lat: number;
+    lng: number;
+    category?: string;
+    photoUrl?: string | null;
+    types?: string[];
+  } => {
+    if (isPlaceResult(place)) {
+      return {
+        id: place.id,
+        place_id: place.place_id,
+        name: place.name,
+        address: place.address,
+        lat: place.lat,
+        lng: place.lng,
+        category: place.category,
+        photoUrl: place.photoUrl,
+        types: place.types,
+      };
+    } else {
+      // It's a SavedPlace - convert to PlaceResult format
+      const savedPlace = place as SavedPlace;
+      return {
+        id: savedPlace.place_id,
+        place_id: savedPlace.place_id,
+        name: savedPlace.name,
+        address: savedPlace.address || "",
+        lat: savedPlace.lat || 0,
+        lng: savedPlace.lng || 0,
+        category: undefined,
+        photoUrl: savedPlace.photo_url,
+        types: savedPlace.types || undefined,
+      };
+    }
+  };
+
   if (!trip) {
     return (
       <div className="p-6">
@@ -856,25 +900,28 @@ export function ExploreTab({ tripId }: ExploreTabProps) {
           {/* Place Details Panel - Mobile (below list) */}
           {selectedPlace && (
             <div ref={detailsPanelRef} className="md:hidden mt-4">
-              {("id" in selectedPlace || "place_id" in selectedPlace) && (
-                <PlaceDetailsPanel
-                  place={selectedPlace}
-                  isSaved={
-                    ("id" in selectedPlace && isPlaceSaved(selectedPlace.id)) ||
-                    ("place_id" in selectedPlace && selectedPlace.place_id && isPlaceSaved(selectedPlace.place_id))
-                  }
-                  isToggling={
-                    ("id" in selectedPlace && selectedPlace.id === savingPlaceId) ||
-                    ("place_id" in selectedPlace && selectedPlace.place_id === savingPlaceId)
-                  }
-                  onToggleSave={() => {
-                    if ("id" in selectedPlace) {
-                      handleSaveToPlan(selectedPlace);
+              {("id" in selectedPlace || "place_id" in selectedPlace) && (() => {
+                const normalizedPlace = normalizePlaceForDetailsPanel(selectedPlace);
+                return (
+                  <PlaceDetailsPanel
+                    place={normalizedPlace as any}
+                    isSaved={
+                      ("id" in selectedPlace && isPlaceSaved(selectedPlace.id)) ||
+                      ("place_id" in selectedPlace && selectedPlace.place_id && isPlaceSaved(selectedPlace.place_id))
                     }
-                  }}
-                  onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
-                />
-              )}
+                    isToggling={
+                      ("id" in selectedPlace && selectedPlace.id === savingPlaceId) ||
+                      ("place_id" in selectedPlace && selectedPlace.place_id === savingPlaceId)
+                    }
+                    onToggleSave={() => {
+                      if ("id" in selectedPlace && isPlaceResult(selectedPlace)) {
+                        handleSaveToPlan(selectedPlace);
+                      }
+                    }}
+                    onAddToItinerary={() => handleAddToItinerary(selectedPlace)}
+                  />
+                );
+              })()}
             </div>
           )}
         </div>
