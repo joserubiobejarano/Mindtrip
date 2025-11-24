@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect, useRef } from "react";
+import { useState, FormEvent, useEffect, useRef, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -449,10 +449,10 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
     searchPlaces({ filterKey });
   };
 
-  const handlePlaceSelect = (place: PlaceResult | SavedPlace) => {
+  const handlePlaceSelect = useCallback((place: PlaceResult | SavedPlace) => {
     setSelectedPlace(place);
     // Get the Google place_id
-    const placeId = "id" in place ? place.id : place.place_id;
+    const placeId = isPlaceResult(place) ? place.id : place.place_id;
     setSelectedPlaceId(placeId);
     setDrawerOpen(true);
     
@@ -476,7 +476,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         onMapUpdate(markers, { lat: place.lat, lng: place.lng }, 14);
       }
     }
-  };
+  }, [results, savedPlaces, onMapUpdate]);
 
   const handleAddToItinerary = (place: PlaceResult | SavedPlace) => {
     setSelectedPlace(place);
@@ -601,6 +601,39 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
       };
     }
   };
+
+  // Expose marker click handler via ref
+  useEffect(() => {
+    if (onMarkerClickRef) {
+      onMarkerClickRef.current = (id: string) => {
+        const place =
+          results.find((p) => (p.place_id || p.id) === id) ||
+          savedPlaces.find((p) => p.place_id === id);
+        if (place) {
+          if ("trip_id" in place) {
+            const placeResult: PlaceResult = {
+              id: place.place_id,
+              name: place.name,
+              address: place.address || "",
+              lat: place.lat || 0,
+              lng: place.lng || 0,
+              photoUrl: place.photo_url,
+              types: place.types || undefined,
+              googleMapsUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
+            };
+            handlePlaceSelect(placeResult);
+          } else {
+            handlePlaceSelect(place);
+          }
+        }
+      };
+    }
+    return () => {
+      if (onMarkerClickRef) {
+        onMarkerClickRef.current = null;
+      }
+    };
+  }, [results, savedPlaces, onMarkerClickRef, handlePlaceSelect]);
 
   if (!trip) {
     return (
@@ -761,39 +794,6 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
       category: undefined, // SavedPlace doesn't have category
     };
   };
-
-  // Expose marker click handler via ref
-  useEffect(() => {
-    if (onMarkerClickRef) {
-      onMarkerClickRef.current = (id: string) => {
-        const place =
-          results.find((p) => (p.place_id || p.id) === id) ||
-          savedPlaces.find((p) => p.place_id === id);
-        if (place) {
-          if ("trip_id" in place) {
-            const placeResult: PlaceResult = {
-              id: place.place_id,
-              name: place.name,
-              address: place.address || "",
-              lat: place.lat || 0,
-              lng: place.lng || 0,
-              photoUrl: place.photo_url,
-              types: place.types || undefined,
-              googleMapsUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
-            };
-            handlePlaceSelect(placeResult);
-          } else {
-            handlePlaceSelect(place);
-          }
-        }
-      };
-    }
-    return () => {
-      if (onMarkerClickRef) {
-        onMarkerClickRef.current = null;
-      }
-    };
-  }, [results, savedPlaces, onMarkerClickRef]);
 
   return (
     <div className="h-full flex flex-col">

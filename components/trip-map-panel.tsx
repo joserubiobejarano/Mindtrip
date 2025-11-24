@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { GoogleMapBase, BaseMarker } from "@/components/google-map-base";
 import { useTrip } from "@/hooks/use-trip";
 import { useActivities } from "@/hooks/use-activities";
@@ -77,7 +77,7 @@ export function TripMapPanel({
   }, [activities, selectedDayId, activeTab]);
 
   // Get center and zoom based on active tab
-  const getMapCenter = () => {
+  const getMapCenter = useCallback(() => {
     if (activeTab === "explore" && exploreCenter) {
       return exploreCenter;
     }
@@ -85,14 +85,14 @@ export function TripMapPanel({
       return { lat: trip.center_lat, lng: trip.center_lng };
     }
     return { lat: 0, lng: 0 };
-  };
+  }, [activeTab, exploreCenter, trip?.center_lat, trip?.center_lng]);
 
-  const getMapZoom = () => {
+  const getMapZoom = useCallback(() => {
     if (activeTab === "explore" && exploreZoom != null) {
       return exploreZoom;
     }
     return 12;
-  };
+  }, [activeTab, exploreZoom]);
 
   // Get markers based on active tab
   const getMarkers = (): BaseMarker[] => {
@@ -159,7 +159,7 @@ export function TripMapPanel({
       mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
       mapInstance.setZoom(12);
     }
-  }, [activeTab, exploreCenter, exploreZoom, mapInstance, activities, trip]);
+  }, [activeTab, exploreCenter, exploreZoom, mapInstance, activities, trip, getMapCenter, getMapZoom]);
 
   if (!trip) {
     return (
