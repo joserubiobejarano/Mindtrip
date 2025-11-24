@@ -16,6 +16,9 @@ interface Trip {
   destination_name: string | null;
   destination_country: string | null;
   destination_place_id: string | null;
+  find_accommodation: boolean | null;
+  accommodation_address: string | null;
+  auto_accommodation: any;
 }
 
 export function useTrip(tripId: string) {

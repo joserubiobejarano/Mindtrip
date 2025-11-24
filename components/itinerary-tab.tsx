@@ -21,6 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
 import type { AiItinerary, ActivitySuggestion } from "@/app/api/ai-itinerary/route";
+import { AccommodationCard } from "@/components/trips/AccommodationCard";
 
 /**
  * Get a human-readable "good for" label based on place types
@@ -82,6 +83,7 @@ export function ItineraryTab({
   const [aiItinerary, setAiItinerary] = useState<AiItinerary | null>(null);
   const [loadingAiItinerary, setLoadingAiItinerary] = useState(false);
   const [aiItineraryError, setAiItineraryError] = useState<string | null>(null);
+  const [loadingAccommodation, setLoadingAccommodation] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -219,6 +221,40 @@ export function ItineraryTab({
     }
   }, [settingsMenuOpen]);
 
+  // Auto-fetch accommodation if find_accommodation is true and auto_accommodation is null
+  useEffect(() => {
+    if (
+      trip &&
+      trip.find_accommodation &&
+      !trip.auto_accommodation &&
+      !loadingAccommodation
+    ) {
+      setLoadingAccommodation(true);
+      fetch("/api/accommodation/find", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tripId }),
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to find accommodation");
+          }
+          // Refresh trip data
+          queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
+        })
+        .catch((error) => {
+          console.error("Error finding accommodation:", error);
+          // Don't show error to user, just log it
+        })
+        .finally(() => {
+          setLoadingAccommodation(false);
+        });
+    }
+  }, [trip, tripId, loadingAccommodation, queryClient]);
+
   if (tripLoading || daysLoading) {
     return (
       <div className="p-6">
@@ -302,6 +338,13 @@ export function ItineraryTab({
           onSelectDay={onSelectDay}
         />
       </div>
+
+      {/* Accommodation Card */}
+      {trip.auto_accommodation && (
+        <div className="mb-6">
+          <AccommodationCard accommodation={trip.auto_accommodation} />
+        </div>
+      )}
 
       {/* Activities Section */}
       <div className="flex-1 overflow-y-auto">
