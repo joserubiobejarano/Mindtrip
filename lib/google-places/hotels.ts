@@ -93,12 +93,7 @@ export function searchHotels(
       } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
         resolve([]);
       } else {
-        // Don't reject for zero results, just return empty
-        if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-             resolve([]);
-        } else {
-             reject(new Error(`Hotel search failed: ${status}`));
-        }
+        reject(new Error(`Hotel search failed: ${status}`));
       }
     });
   });
