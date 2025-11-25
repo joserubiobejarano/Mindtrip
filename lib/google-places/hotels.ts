@@ -56,6 +56,10 @@ export function searchHotels(
         );
         
         let hotels: HotelResult[] = validPlaces.map((place) => {
+          // TypeScript narrowing: we know geometry and location exist due to filter
+          const geometry = place.geometry!;
+          const location = geometry.location!;
+          
           let photoUrl: string | undefined;
           if (place.photos && place.photos.length > 0) {
             try {
@@ -75,8 +79,8 @@ export function searchHotels(
             types: place.types,
             geometry: {
               location: {
-                lat: place.geometry!.location.lat(),
-                lng: place.geometry!.location.lng(),
+                lat: location.lat(),
+                lng: location.lng(),
               },
             },
           };
