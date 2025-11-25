@@ -349,7 +349,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         // For neighborhoods, use text search with city name
         const query = cityName || trip.title;
         googlePlaces = await searchPlacesByText(service, query, location, 15000);
-      } else if (filterKey === "main" || filterKey === "highlights") {
+      } else if (filterKey === "main") {
         // For main places, search for tourist attractions
         const query = cityName
           ? `tourist attractions things to do in ${cityName}`
