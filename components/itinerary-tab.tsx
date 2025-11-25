@@ -443,7 +443,7 @@ export function ItineraryTab({
       </div>
 
       {/* Hotel Banner */}
-      {!trip.accommodation_name && (
+      {!trip.accommodation_address && (
         <div className="mb-6">
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
             <CardHeader className="pb-3">
