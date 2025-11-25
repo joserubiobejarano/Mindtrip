@@ -50,8 +50,10 @@ export function searchHotels(
 
     service.nearbySearch(request, (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        // Filter out places without place_id before mapping
-        const validPlaces = results.filter((place) => place.place_id);
+        // Filter out places without place_id or geometry before mapping
+        const validPlaces = results.filter(
+          (place) => place.place_id && place.geometry && place.geometry.location
+        );
         
         let hotels: HotelResult[] = validPlaces.map((place) => {
           let photoUrl: string | undefined;
@@ -73,8 +75,8 @@ export function searchHotels(
             types: place.types,
             geometry: {
               location: {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng(),
+                lat: place.geometry!.location.lat(),
+                lng: place.geometry!.location.lng(),
               },
             },
           };
