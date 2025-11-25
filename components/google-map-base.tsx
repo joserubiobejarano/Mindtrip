@@ -10,7 +10,7 @@ export interface BaseMarker {
 }
 
 export interface GoogleMapBaseProps {
-  center: { lat: number; lng: number };
+  center: { lat: number; lng: number } | null;
   zoom?: number;
   markers?: BaseMarker[];
   routePath?: google.maps.LatLngLiteral[];
@@ -20,6 +20,7 @@ export interface GoogleMapBaseProps {
 }
 
 const DEFAULT_ZOOM = 12;
+const DEFAULT_CENTER = { lat: 0, lng: 0 };
 
 export function GoogleMapBase({
   center,
@@ -53,11 +54,13 @@ export function GoogleMapBase({
     );
   }
 
+  const mapCenter = center || DEFAULT_CENTER;
+
   return (
     <div className={`w-full h-full ${className}`}>
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
-        center={center}
+        center={mapCenter}
         zoom={zoom}
         options={mapOptions}
         onLoad={(map) => {
