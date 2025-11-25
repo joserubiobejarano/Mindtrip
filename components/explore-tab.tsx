@@ -144,7 +144,7 @@ function getGoodForLabel(types: string[] | undefined): string | null {
 
 export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<ExploreFilter>("main");
+  const [selectedFilter, setSelectedFilter] = useState<ExploreFilter | null>("main");
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
