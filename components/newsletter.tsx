@@ -51,8 +51,8 @@ export function Newsletter() {
           </div>
 
           <p className="text-xs text-gray-500 mt-4">
-            Just so you know, we'll be able to see if you receive and open our emails to help us monitor the 
-            success of our marketing campaigns. You'll find further details in our data protection notice.
+            Just so you know, we&apos;ll be able to see if you receive and open our emails to help us monitor the 
+            success of our marketing campaigns. You&apos;ll find further details in our data protection notice.
           </p>
 
           {/* Decorative corner dots */}

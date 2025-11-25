@@ -296,7 +296,7 @@ export default function HomePage() {
             <h2 className="text-4xl md:text-5xl mb-4 text-gray-900">
               Need ideas?
             </h2>
-            <p className="text-xl text-gray-600">Explore the world's most breathtaking locations</p>
+            <p className="text-xl text-gray-600">Explore the world&apos;s most breathtaking locations</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
