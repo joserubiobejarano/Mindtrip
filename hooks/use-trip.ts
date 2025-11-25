@@ -19,6 +19,7 @@ interface Trip {
   find_accommodation: boolean | null;
   accommodation_address: string | null;
   auto_accommodation: any;
+  itinerary: any; // JSONB column
 }
 
 export function useTrip(tripId: string) {

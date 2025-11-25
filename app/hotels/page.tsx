@@ -1,0 +1,35 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@clerk/nextjs";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+export default function HotelsPage() {
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace("/trips");
+    }
+  }, [isSignedIn, router]);
+
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="max-w-2xl mx-auto px-4 text-center">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Hotels</h1>
+        <p className="text-lg text-gray-600 mb-8">
+          Hotel search functionality is coming soon. Start planning your trip to discover accommodations.
+        </p>
+        <Link href="/">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+            Start Planning
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+

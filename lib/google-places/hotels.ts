@@ -8,6 +8,7 @@ export interface HotelResult {
   formatted_address: string;
   rating?: number;
   user_ratings_total?: number;
+  price_level?: number;
   photo_reference?: string;
   types?: string[];
   geometry: {
@@ -30,22 +31,23 @@ export function searchHotels(
   radius: number = 15000
 ): Promise<HotelResult[]> {
   return new Promise((resolve, reject) => {
-    // Map our hotel type to Google Places types
-    let placeType: string | undefined;
+    // Map our hotel type to Google Places types and keywords
+    let placeType: string = "lodging";
+    let keyword: string | undefined;
+
     if (type === "hotel") {
-      placeType = "lodging";
+      keyword = "hotel";
     } else if (type === "hostel") {
-      // Hostels are also lodging, but we'll filter by name/type later
-      placeType = "lodging";
+      keyword = "hostel";
     } else if (type === "apartment") {
-      // Apartments might be lodging or real_estate_agency
-      placeType = "lodging";
+      keyword = "apartment OR aparthotel";
     }
 
     const request: google.maps.places.PlaceSearchRequest = {
       location: new google.maps.LatLng(location.lat, location.lng),
       radius,
-      type: placeType || "lodging",
+      type: placeType,
+      keyword: keyword,
     };
 
     service.nearbySearch(request, (results, status) => {
@@ -55,7 +57,7 @@ export function searchHotels(
           (place) => place.place_id && place.geometry && place.geometry.location
         );
         
-        let hotels: HotelResult[] = validPlaces.map((place) => {
+        const hotels: HotelResult[] = validPlaces.map((place) => {
           // TypeScript narrowing: we know geometry and location exist due to filter
           const geometry = place.geometry!;
           const location = geometry.location!;
@@ -75,6 +77,7 @@ export function searchHotels(
             formatted_address: place.formatted_address || place.vicinity || "",
             rating: place.rating,
             user_ratings_total: place.user_ratings_total,
+            price_level: place.price_level,
             photo_reference: photoUrl,
             types: place.types,
             geometry: {
@@ -86,44 +89,16 @@ export function searchHotels(
           };
         });
 
-        // Filter by type if specified
-        if (type === "hostel") {
-          hotels = hotels.filter(
-            (h) =>
-              h.types?.some((t) =>
-                t.toLowerCase().includes("hostel")
-              ) ||
-              h.name.toLowerCase().includes("hostel")
-          );
-        } else if (type === "apartment") {
-          hotels = hotels.filter(
-            (h) =>
-              h.types?.some((t) =>
-                t.toLowerCase().includes("apartment") ||
-                t.toLowerCase().includes("real_estate")
-              ) ||
-              h.name.toLowerCase().includes("apartment")
-          );
-        } else if (type === "hotel") {
-          // Filter out hostels and apartments
-          hotels = hotels.filter(
-            (h) =>
-              !h.types?.some((t) =>
-                t.toLowerCase().includes("hostel")
-              ) &&
-              !h.name.toLowerCase().includes("hostel") &&
-              !h.types?.some((t) =>
-                t.toLowerCase().includes("apartment")
-              ) &&
-              !h.name.toLowerCase().includes("apartment")
-          );
-        }
-
         resolve(hotels);
       } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
         resolve([]);
       } else {
-        reject(new Error(`Hotel search failed: ${status}`));
+        // Don't reject for zero results, just return empty
+        if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+             resolve([]);
+        } else {
+             reject(new Error(`Hotel search failed: ${status}`));
+        }
       }
     });
   });
@@ -146,4 +121,3 @@ export function getHotelPhotoUrl(
   }
   return null;
 }
-

@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Star, MapPin, ExternalLink, Loader2 } from "lucide-react";
+import { Star, MapPin, ExternalLink, Loader2, ArrowLeft } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { GoogleMapBase } from "@/components/google-map-base";
 import type { BaseMarker } from "@/components/google-map-base";
@@ -28,6 +29,7 @@ interface HotelSearchProps {
 
 export function HotelSearch({ tripId }: HotelSearchProps) {
   const { data: trip } = useTrip(tripId);
+  const [rawHotels, setRawHotels] = useState<HotelResult[]>([]);
   const [hotels, setHotels] = useState<HotelResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +42,7 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
   const mapServiceRef = useRef<google.maps.places.PlacesService | null>(null);
   const supabase = createClient();
   const { addToast } = useToast();
+  const router = useRouter();
 
   // Initialize PlacesService
   useEffect(() => {
@@ -82,7 +85,7 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
         return bScore - aScore;
       });
 
-      setHotels(sorted);
+      setRawHotels(sorted);
     } catch (err) {
       console.error("Error searching hotels:", err);
       setError(err instanceof Error ? err.message : "Failed to search hotels");
@@ -90,6 +93,40 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
       setLoading(false);
     }
   }, [trip, hotelType]);
+
+  // Filter hotels based on budget
+  useEffect(() => {
+    if (rawHotels.length === 0) {
+      setHotels([]);
+      return;
+    }
+
+    const filtered = rawHotels.filter((hotel) => {
+      // If price_level is missing, include it (generous filtering)
+      if (hotel.price_level === undefined || hotel.price_level === null) return true;
+      
+      // Approximate mapping:
+      // 0: Free
+      // 1: Inexpensive (< $50)
+      // 2: Moderate ($50 - $100)
+      // 3: Expensive ($100 - $200)
+      // 4: Very Expensive (> $200)
+
+      // Max budget filter
+      if (budgetMax < 50 && hotel.price_level > 1) return false;
+      if (budgetMax < 100 && hotel.price_level > 2) return false;
+      if (budgetMax < 200 && hotel.price_level > 3) return false;
+
+      // Min budget filter
+      if (budgetMin > 200 && hotel.price_level < 4) return false;
+      if (budgetMin > 100 && hotel.price_level < 3) return false;
+      if (budgetMin > 50 && hotel.price_level < 2) return false;
+
+      return true;
+    });
+
+    setHotels(filtered);
+  }, [rawHotels, budgetMin, budgetMax]);
 
   // Search hotels when filters change
   useEffect(() => {
@@ -201,6 +238,15 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
       <div className="w-1/2 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/trips/${tripId}`)}
+            className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to trip
+          </Button>
           <h1 className="text-2xl font-bold mb-2">Find a place to stay</h1>
           <p className="text-sm text-muted-foreground">
             {trip.destination_name || trip.title}

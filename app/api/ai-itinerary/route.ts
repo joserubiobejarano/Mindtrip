@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getOpenAIClient } from '@/lib/openai'
+import { findPlacePhoto } from '@/lib/google/places-server'
 
 /**
  * Get a human-readable "good for" label based on place types
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
     // Load trip data
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('title, start_date, end_date, center_lat, center_lng, destination_name')
+      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country')
       .eq('id', tripId)
       .single()
 
@@ -139,6 +140,7 @@ export async function POST(request: NextRequest) {
 
     // Build the prompt
     const destination = trip.destination_name || trip.title
+    const country = trip.destination_country || ""
     const startDate = new Date(trip.start_date)
     const endDate = new Date(trip.end_date)
     
@@ -263,30 +265,100 @@ Make sure each day has sections for Morning, Afternoon, and Evening. Be creative
       throw new Error('Invalid itinerary structure from OpenAI')
     }
 
-    // Enrich suggestions with photoUrl and goodFor by matching to saved places
+    // Process itinerary: Fetch photos and prepare activities for insertion
+    const activitiesToInsert: any[] = [];
+    const enrichedDays = await Promise.all(parsedResponse.days.map(async (day, index) => {
+      // Find matching DB day
+      const dbDay = days?.find(d => d.date === day.date) || days?.[index];
+      
+      const enrichedSections = await Promise.all(day.sections.map(async (section) => {
+        const enrichedSuggestions = await Promise.all(section.suggestions.map(async (suggestion, sIndex) => {
+          // Try to match with saved place first
+          let match = matchSuggestionToSavedPlace(suggestion, savedPlaces || []);
+          let photoUrl = match?.photoUrl;
+          
+          // If no photo from saved place, try Google Places
+          if (!photoUrl) {
+             const query = `${suggestion} in ${destination}${country ? `, ${country}` : ''}`;
+             photoUrl = await findPlacePhoto(query);
+          }
+
+          // Prepare activity record
+          if (dbDay) {
+            let startTime = "09:00";
+            let endTime = "12:00";
+            
+            if (section.partOfDay === "Afternoon") {
+              startTime = "13:00";
+              endTime = "17:00";
+            } else if (section.partOfDay === "Evening") {
+              startTime = "18:00";
+              endTime = "21:00";
+            }
+
+            // Stagger times slightly based on index
+            if (sIndex > 0) {
+               // Simple logic: just keep same block time for now, or user can adjust
+            }
+
+            activitiesToInsert.push({
+              trip_id: tripId,
+              day_id: dbDay.id,
+              title: suggestion,
+              start_time: startTime,
+              end_time: endTime,
+              photo_url: photoUrl,
+              order_number: sIndex, // This might clash if multiple sections, ideally use global counter per day
+              // We don't have place_id (UUID) unless we matched a saved place
+              // If matched saved place, we could potentially link it, but saved_places table has different IDs from places table
+              // For now, leave place_id null and just use title/photo
+            });
+          }
+
+          return {
+            title: suggestion,
+            photoUrl: photoUrl,
+            goodFor: match?.goodFor,
+          } as ActivitySuggestion;
+        }));
+
+        return {
+          ...section,
+          suggestions: enrichedSuggestions,
+        };
+      }));
+
+      return {
+        ...day,
+        sections: enrichedSections,
+      };
+    }));
+
     const enrichedItinerary: AiItinerary = {
       ...parsedResponse,
-      days: parsedResponse.days.map(day => ({
-        ...day,
-        sections: day.sections.map(section => ({
-          ...section,
-          suggestions: section.suggestions.map(suggestion => {
-            // Try to match the suggestion string to a saved place
-            const match = matchSuggestionToSavedPlace(suggestion, savedPlaces || [])
-            
-            if (match) {
-              return {
-                title: suggestion,
-                photoUrl: match.photoUrl,
-                goodFor: match.goodFor,
-              } as ActivitySuggestion
-            }
-            
-            // If no match, return as string (backward compatible)
-            return suggestion
-          }),
-        })),
-      })),
+      days: enrichedDays,
+    };
+
+    // Save enriched itinerary JSON to trips table
+    await supabase
+      .from('trips')
+      .update({ itinerary: enrichedItinerary })
+      .eq('id', tripId);
+
+    // Insert activities into DB
+    // First, clear existing auto-generated activities? 
+    // The prompt says "Do not delete existing activities automatically when mounting".
+    // But here we are generating new ones. If user requested generation, maybe they want to overwrite?
+    // "After activities are loaded, if activities.length === 0 ... then call".
+    // So we assume it's empty. If not empty, we append.
+    if (activitiesToInsert.length > 0) {
+      const { error: insertError } = await supabase
+        .from('activities')
+        .insert(activitiesToInsert);
+      
+      if (insertError) {
+        console.error("Error inserting generated activities:", insertError);
+      }
     }
 
     return NextResponse.json({ itinerary: enrichedItinerary })

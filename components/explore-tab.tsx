@@ -12,7 +12,8 @@ import { AddToItineraryDialog } from "@/components/add-to-itinerary-dialog";
 import { BaseMarker } from "@/components/google-map-base";
 import { PlaceDetailsPanel } from "@/components/place-details-panel";
 import { PlaceDetailsDrawer } from "@/components/place-details-drawer";
-import { Loader2, Search, MapPin, Star, Hotel } from "lucide-react";
+import { HotelSearchBanner } from "@/components/hotel-search-banner";
+import { Loader2, Search, MapPin, Star } from "lucide-react";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -831,35 +832,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
       <aside className="w-full flex flex-col h-full">
         {/* Hotel Card */}
         {trip.start_date && trip.end_date && (
-          <div className="p-4 border-b">
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Hotel className="h-5 w-5" />
-                  Need a place to stay?
-                </CardTitle>
-                <CardDescription>
-                  Search hotels for your trip dates and destination.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={() => {
-                    const city = trip.destination_name || trip.title;
-                    const startDate = new Date(trip.start_date);
-                    const endDate = new Date(trip.end_date);
-                    const checkin = format(startDate, "yyyy-MM-dd");
-                    const checkout = format(endDate, "yyyy-MM-dd");
-                    const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`;
-                    window.open(url, "_blank", "noopener,noreferrer");
-                  }}
-                  className="w-full"
-                >
-                  Search hotels
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          <HotelSearchBanner tripId={tripId} className="p-4 border-b" />
         )}
 
         {/* Search Input + Filter Chips */}

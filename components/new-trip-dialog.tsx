@@ -42,8 +42,6 @@ export function NewTripDialog({
   const [destination, setDestination] = useState<DestinationOption | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [accommodationAddress, setAccommodationAddress] = useState("");
-  const [findAccommodation, setFindAccommodation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{
@@ -81,8 +79,6 @@ export function NewTripDialog({
       setDestination(null);
       setStartDate("");
       setEndDate("");
-      setAccommodationAddress("");
-      setFindAccommodation(false);
       setError(null);
     }
   }, [open]);
@@ -151,8 +147,6 @@ export function NewTripDialog({
           start_date: startDate,
           end_date: endDate,
           default_currency: "USD",
-          accommodation_address: findAccommodation ? null : (accommodationAddress || null),
-          find_accommodation: findAccommodation,
           destination_name: destination?.placeName || null,
           destination_country: destinationCountry || null,
           destination_place_id: destination?.id || null,
@@ -212,19 +206,19 @@ export function NewTripDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden flex flex-col">
         {/* Header with icon and gradient background */}
         <DialogHeader className="bg-gradient-to-r from-sky-50 to-emerald-50 px-6 py-5 border-b flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-gray-900">
             Create New Trip
           </DialogTitle>
           <p className="text-sm text-gray-600 mt-1">
-            Plan your next adventure. We&apos;ll generate a smart itinerary for you.
+            Tell us where and when. We&apos;ll use this to plan your itinerary.
           </p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          <div className="px-6 py-6 space-y-6 overflow-y-auto flex-1">
+          <div className="px-6 py-6 space-y-4 overflow-y-auto flex-1">
             {/* Destination */}
             <div className="space-y-2">
               <Label htmlFor="destination" className="text-base font-medium">
@@ -245,7 +239,7 @@ export function NewTripDialog({
             </div>
 
             {/* Travel Dates */}
-            <div className="border-t pt-6 space-y-4">
+            <div className="border-t pt-4 space-y-4">
               <h3 className="text-base font-medium">Travel Dates</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -285,45 +279,6 @@ export function NewTripDialog({
               </div>
             </div>
 
-            {/* Accommodation Section */}
-            <div className="border-t pt-6 space-y-4">
-              <h3 className="text-base font-medium">Accommodation</h3>
-              <div className="space-y-4">
-                {!findAccommodation && (
-                  <div className="space-y-2">
-                    <Label htmlFor="accommodation_address">
-                      Accommodation Address (optional)
-                    </Label>
-                    <Input
-                      id="accommodation_address"
-                      placeholder="Enter address..."
-                      value={accommodationAddress}
-                      onChange={(e) => setAccommodationAddress(e.target.value)}
-                      className="rounded-lg"
-                    />
-                  </div>
-                )}
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="find_accommodation"
-                    checked={findAccommodation}
-                    onCheckedChange={(checked) => {
-                      setFindAccommodation(checked as boolean);
-                      if (checked) {
-                        setAccommodationAddress("");
-                      }
-                    }}
-                  />
-                  <Label htmlFor="find_accommodation" className="font-normal cursor-pointer">
-                    I want you to find me a great place to stay
-                  </Label>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                We&apos;ll use this to help plan your itinerary around where you&apos;re staying.
-              </p>
-            </div>
-
             {error && (
               <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg border border-destructive/20">
                 {error}
@@ -332,17 +287,17 @@ export function NewTripDialog({
           </div>
 
           {/* Footer with centered buttons */}
-          <DialogFooter className="px-6 py-4 bg-gray-50 border-t justify-center gap-3 flex-shrink-0">
+          <DialogFooter className="px-6 py-4 bg-gray-50 border-t justify-center gap-3 flex-shrink-0 flex sm:justify-center">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
-              className="rounded-lg"
+              className="rounded-lg w-28"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="rounded-lg">
+            <Button type="submit" disabled={loading} className="rounded-lg w-28">
               {loading ? "Creating..." : "Create Trip"}
             </Button>
           </DialogFooter>

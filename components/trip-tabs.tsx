@@ -63,7 +63,7 @@ export function TripTabs({
             onMarkerClickRef={onExploreMarkerClickRef}
           />
         </TabsContent>
-        <TabsContent value="itinerary" className="h-full mt-0">
+        <TabsContent value="itinerary" forceMount className="h-full mt-0 data-[state=inactive]:hidden">
           <ItineraryTab
             tripId={tripId}
             userId={userId}

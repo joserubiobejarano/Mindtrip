@@ -3,9 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
-import { TripLayout } from "@/components/trip-layout";
+import { TripShell } from "@/components/trip-shell";
 import { TripTabs } from "@/components/trip-tabs";
-import { TripMapPanel } from "@/components/trip-map-panel";
 import { useDays } from "@/hooks/use-days";
 import { useRealtimeActivities } from "@/hooks/use-realtime-activities";
 import { createClient } from "@/lib/supabase/client";
@@ -87,37 +86,32 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
   return (
     <GoogleMapsProvider>
-      <TripLayout
-        leftPanel={
-          <TripTabs
-            tripId={tripId}
-            userId={userId}
-            selectedDayId={selectedDayId}
-            onSelectDay={setSelectedDayId}
-            onActivitySelect={setSelectedActivityId}
-            onTabChange={setActiveTab}
-            initialTab={initialTab}
-            onExploreMapUpdate={(markers, center, zoom) => {
-              setExploreMarkers(markers);
-              setExploreCenter(center);
-              setExploreZoom(zoom);
-            }}
-            onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
-          />
-        }
-        rightPanel={
-          <TripMapPanel
-            tripId={tripId}
-            selectedDayId={selectedDayId}
-            selectedActivityId={selectedActivityId}
-            activeTab={activeTab}
-            exploreMarkers={exploreMarkers}
-            exploreCenter={exploreCenter}
-            exploreZoom={exploreZoom}
-            onExploreMarkerClick={handleExploreMarkerClick}
-          />
-        }
-      />
+      <TripShell
+        tripId={tripId}
+        activeTab={activeTab}
+        selectedDayId={selectedDayId}
+        selectedActivityId={selectedActivityId}
+        exploreMarkers={exploreMarkers}
+        exploreCenter={exploreCenter}
+        exploreZoom={exploreZoom}
+        onExploreMarkerClick={handleExploreMarkerClick}
+      >
+        <TripTabs
+          tripId={tripId}
+          userId={userId}
+          selectedDayId={selectedDayId}
+          onSelectDay={setSelectedDayId}
+          onActivitySelect={setSelectedActivityId}
+          onTabChange={setActiveTab}
+          initialTab={initialTab}
+          onExploreMapUpdate={(markers, center, zoom) => {
+            setExploreMarkers(markers);
+            setExploreCenter(center);
+            setExploreZoom(zoom);
+          }}
+          onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
+        />
+      </TripShell>
     </GoogleMapsProvider>
   );
 }
