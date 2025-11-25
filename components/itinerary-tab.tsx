@@ -227,6 +227,44 @@ export function ItineraryTab({
     }
   }, [settingsMenuOpen]);
 
+  const loadChatMessages = useCallback(async () => {
+    const { data, error } = await getChatMessages(tripId);
+    if (!error && data) {
+      setChatMessages(data);
+    }
+  }, [tripId]);
+
+  const generateItinerary = useCallback(async () => {
+    setLoadingAiItinerary(true);
+    setAiItineraryError(null);
+    try {
+      const response = await fetch("/api/ai-itinerary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tripId }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to generate itinerary");
+      }
+
+      const { itinerary } = await response.json();
+      setAiItinerary(itinerary);
+    } catch (error) {
+      console.error("Error generating AI itinerary:", error);
+      setAiItineraryError(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate itinerary. Please try again."
+      );
+    } finally {
+      setLoadingAiItinerary(false);
+    }
+  }, [tripId]);
+
   // Auto-generate itinerary if no activities exist
   useEffect(() => {
     if (
@@ -257,13 +295,6 @@ export function ItineraryTab({
       chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatMessages]);
-
-  const loadChatMessages = useCallback(async () => {
-    const { data, error } = await getChatMessages(tripId);
-    if (!error && data) {
-      setChatMessages(data);
-    }
-  }, [tripId]);
 
   const handleSendChat = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -326,37 +357,6 @@ export function ItineraryTab({
       setSendingChat(false);
     }
   };
-
-  const generateItinerary = useCallback(async () => {
-    setLoadingAiItinerary(true);
-    setAiItineraryError(null);
-    try {
-      const response = await fetch("/api/ai-itinerary", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tripId }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to generate itinerary");
-      }
-
-      const { itinerary } = await response.json();
-      setAiItinerary(itinerary);
-    } catch (error) {
-      console.error("Error generating AI itinerary:", error);
-      setAiItineraryError(
-        error instanceof Error
-          ? error.message
-          : "Failed to generate itinerary. Please try again."
-      );
-    } finally {
-      setLoadingAiItinerary(false);
-    }
-  }, [tripId]);
 
   if (tripLoading || daysLoading) {
     return (
