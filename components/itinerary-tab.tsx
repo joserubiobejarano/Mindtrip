@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Share2, Users, ArrowLeft, MoreVertical, Trash2, Loader2, MessageSquare, Send, ChevronDown, ChevronUp } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
@@ -241,14 +242,14 @@ export function ItineraryTab({
       setHasCheckedForItinerary(true);
       generateItinerary();
     }
-  }, [trip, days, activities, aiItinerary, loadingAiItinerary, hasCheckedForItinerary]);
+  }, [trip, days, activities, aiItinerary, loadingAiItinerary, hasCheckedForItinerary, generateItinerary]);
 
   // Load chat messages
   useEffect(() => {
     if (tripId && chatOpen) {
       loadChatMessages();
     }
-  }, [tripId, chatOpen]);
+  }, [tripId, chatOpen, loadChatMessages]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -257,12 +258,12 @@ export function ItineraryTab({
     }
   }, [chatMessages]);
 
-  const loadChatMessages = async () => {
+  const loadChatMessages = useCallback(async () => {
     const { data, error } = await getChatMessages(tripId);
     if (!error && data) {
       setChatMessages(data);
     }
-  };
+  }, [tripId]);
 
   const handleSendChat = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -326,7 +327,7 @@ export function ItineraryTab({
     }
   };
 
-  const generateItinerary = async () => {
+  const generateItinerary = useCallback(async () => {
     setLoadingAiItinerary(true);
     setAiItineraryError(null);
     try {
@@ -355,7 +356,7 @@ export function ItineraryTab({
     } finally {
       setLoadingAiItinerary(false);
     }
-  };
+  }, [tripId]);
 
   if (tripLoading || daysLoading) {
     return (
@@ -645,7 +646,7 @@ export function ItineraryTab({
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {chatMessages.length === 0 && (
                   <div className="text-sm text-muted-foreground text-center py-8">
-                    Start a conversation about your trip. Ask questions like "I already visited X, what now?" or "Can you suggest alternatives?"
+                    Start a conversation about your trip. Ask questions like &quot;I already visited X, what now?&quot; or &quot;Can you suggest alternatives?&quot;
                   </div>
                 )}
                 {chatMessages.map((msg) => (

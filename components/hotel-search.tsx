@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,14 +59,7 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
     }
   }, []);
 
-  // Search hotels when filters change
-  useEffect(() => {
-    if (trip && trip.center_lat != null && trip.center_lng != null && mapServiceRef.current) {
-      searchHotelsForTrip();
-    }
-  }, [trip, hotelType, mapServiceRef.current]);
-
-  const searchHotelsForTrip = async () => {
+  const searchHotelsForTrip = useCallback(async () => {
     if (!trip || !mapServiceRef.current || trip.center_lat == null || trip.center_lng == null) {
       return;
     }
@@ -96,7 +89,14 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [trip, hotelType]);
+
+  // Search hotels when filters change
+  useEffect(() => {
+    if (trip && trip.center_lat != null && trip.center_lng != null && mapServiceRef.current) {
+      searchHotelsForTrip();
+    }
+  }, [trip, hotelType, searchHotelsForTrip]);
 
   const handleViewDetails = (hotel: HotelResult) => {
     setSelectedHotel(hotel);
