@@ -96,7 +96,7 @@ interface Trip {
 }
 
 const FILTER_PRESETS: Record<ExploreFilter, { label: string; query: string }> = {
-  main: { label: "Main Places", query: "tourist attractions" },
+  main: { label: "Main places", query: "tourist attractions" },
   museums: { label: "Museums", query: "museum" },
   parks: { label: "Parks & Nature", query: "park" },
   food: { label: "Food", query: "restaurant" },
@@ -104,6 +104,16 @@ const FILTER_PRESETS: Record<ExploreFilter, { label: string; query: string }> = 
   shopping: { label: "Shopping", query: "shop" },
   neighborhoods: { label: "Neighborhoods", query: "" },
 } as const;
+
+const FILTER_ORDER: ExploreFilter[] = [
+  "main",
+  "museums",
+  "parks",
+  "food",
+  "nightlife",
+  "shopping",
+  "neighborhoods",
+];
 
 /**
  * Get a human-readable "good for" label based on place types
@@ -134,7 +144,7 @@ function getGoodForLabel(types: string[] | undefined): string | null {
 
 export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<ExploreFilter | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<ExploreFilter>("main");
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -171,10 +181,10 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
       trip &&
       mapServiceRef.current &&
       trip.center_lat != null &&
-      trip.center_lng != null
+      trip.center_lng != null &&
+      selectedFilter === "main"
     ) {
       searchPlaces({ filterKey: "main" });
-      setSelectedFilter("main");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trip?.id, mapServiceRef.current]);
@@ -350,11 +360,11 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         const query = cityName || trip.title;
         googlePlaces = await searchPlacesByText(service, query, location, 15000);
       } else if (filterKey === "main") {
-        // For main places, search for tourist attractions
+        // For main places, search for tourist attractions (most important POIs)
         const query = cityName
-          ? `tourist attractions things to do in ${cityName}`
-          : "tourist attractions things to do";
-        googlePlaces = await searchPlacesByText(service, query, location, 15000);
+          ? `top tourist attractions landmarks in ${cityName}`
+          : "top tourist attractions landmarks";
+        googlePlaces = await searchPlacesByText(service, query, location, 20000);
       } else if (filterKey) {
         // Filter-based search using nearbySearch
         const placeType = getPlaceTypeForFilter(filterKey);
@@ -378,7 +388,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         } as PlaceResult & { rating?: number; user_ratings_total?: number };
       });
 
-      // For main places, filter out food/nightlife places
+      // For main places, filter out food/nightlife places and sort by rating/reviews
       if (filterKey === "main") {
         const excludeTypes = [
           "restaurant",
@@ -388,6 +398,8 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
           "food",
           "meal_takeaway",
           "meal_delivery",
+          "bakery",
+          "meal_delivery",
         ];
         mapped = mapped.filter((place) => {
           const types = place.types || [];
@@ -395,7 +407,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         });
       }
 
-      // Sort by user_ratings_total DESC, then rating DESC
+      // Sort by user_ratings_total DESC, then rating DESC (especially important for main places)
       mapped.sort((a, b) => {
         const aRatings = (a as any).user_ratings_total || 0;
         const bRatings = (b as any).user_ratings_total || 0;
@@ -407,7 +419,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         return bRating - aRating;
       });
 
-      // Limit main places to top 30
+      // Limit main places to top 30 (most iconic spots)
       if (filterKey === "main") {
         mapped = mapped.slice(0, 30);
       }
@@ -446,7 +458,9 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
   const handleFilterClick = (filterKey: ExploreFilter) => {
     setSelectedFilter(filterKey);
     setSearchQuery("");
-    searchPlaces({ filterKey });
+    if (filterKey) {
+      searchPlaces({ filterKey });
+    }
   };
 
   const handlePlaceSelect = useCallback((place: PlaceResult | SavedPlace) => {
@@ -722,9 +736,21 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
               }}
             >
               <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-lg flex-1 hover:text-primary transition-colors">
-                  {place.name}
-                </CardTitle>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-lg hover:text-primary transition-colors">
+                      {place.name}
+                    </CardTitle>
+                    {saved && (
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                    )}
+                  </div>
+                  {saved && (
+                    <span className="text-xs text-muted-foreground mt-0.5 inline-block">
+                      In your plan
+                    </span>
+                  )}
+                </div>
               </div>
               {place.address && (
                 <div className="flex items-start gap-2 text-sm text-muted-foreground mt-1">
@@ -750,6 +776,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
             {!isFromSaved && "id" in place && isPlaceResult(place) && (
               <Button
                 size="sm"
+                variant={saved ? "outline" : "default"}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSaveToPlan(place);
@@ -762,7 +789,10 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
                     Saving...
                   </>
                 ) : saved ? (
-                  "Added to plan"
+                  <>
+                    <Star className="mr-2 h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    In your plan
+                  </>
                 ) : (
                   "Add to plan"
                 )}
@@ -853,7 +883,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
 
           {/* Filter Chips */}
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(FILTER_PRESETS) as ExploreFilter[]).map((filterKey) => {
+            {FILTER_ORDER.map((filterKey) => {
               const filter = FILTER_PRESETS[filterKey];
               const isSelected = selectedFilter === filterKey;
               

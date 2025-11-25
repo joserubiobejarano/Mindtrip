@@ -1,7 +1,8 @@
 "use client";
 
-import { useJsApiLoader, GoogleMap, Marker, Polyline } from "@react-google-maps/api";
+import { GoogleMap, Marker, Polyline } from "@react-google-maps/api";
 import { useMemo } from "react";
+import { useGoogleMaps } from "./google-maps-provider";
 
 export interface BaseMarker {
   id: string;
@@ -31,10 +32,7 @@ export function GoogleMapBase({
   className = "",
   onMapLoad,
 }: GoogleMapBaseProps) {
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-    libraries: ["places"],
-  });
+  const { isLoaded } = useGoogleMaps();
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({

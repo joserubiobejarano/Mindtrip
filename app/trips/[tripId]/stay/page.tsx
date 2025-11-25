@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { HotelSearch } from "@/components/hotel-search";
+import { HotelSearchWrapper } from "@/components/hotel-search-wrapper";
 
 export default async function StayPage({
   params,
@@ -42,7 +42,7 @@ export default async function StayPage({
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-hidden">
-        <HotelSearch tripId={tripId} />
+        <HotelSearchWrapper tripId={tripId} />
       </div>
     </div>
   );

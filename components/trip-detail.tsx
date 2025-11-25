@@ -11,6 +11,7 @@ import { useRealtimeActivities } from "@/hooks/use-realtime-activities";
 import { createClient } from "@/lib/supabase/client";
 import { useTrip } from "@/hooks/use-trip";
 import { BaseMarker } from "@/components/google-map-base";
+import { GoogleMapsProvider } from "@/components/google-maps-provider";
 
 export function TripDetail({ tripId }: { tripId: string }) {
   const { user } = useUser();
@@ -85,37 +86,39 @@ export function TripDetail({ tripId }: { tripId: string }) {
   };
 
   return (
-    <TripLayout
-      leftPanel={
-        <TripTabs
-          tripId={tripId}
-          userId={userId}
-          selectedDayId={selectedDayId}
-          onSelectDay={setSelectedDayId}
-          onActivitySelect={setSelectedActivityId}
-          onTabChange={setActiveTab}
-          initialTab={initialTab}
-          onExploreMapUpdate={(markers, center, zoom) => {
-            setExploreMarkers(markers);
-            setExploreCenter(center);
-            setExploreZoom(zoom);
-          }}
-          onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
-        />
-      }
-      rightPanel={
-        <TripMapPanel
-          tripId={tripId}
-          selectedDayId={selectedDayId}
-          selectedActivityId={selectedActivityId}
-          activeTab={activeTab}
-          exploreMarkers={exploreMarkers}
-          exploreCenter={exploreCenter}
-          exploreZoom={exploreZoom}
-          onExploreMarkerClick={handleExploreMarkerClick}
-        />
-      }
-    />
+    <GoogleMapsProvider>
+      <TripLayout
+        leftPanel={
+          <TripTabs
+            tripId={tripId}
+            userId={userId}
+            selectedDayId={selectedDayId}
+            onSelectDay={setSelectedDayId}
+            onActivitySelect={setSelectedActivityId}
+            onTabChange={setActiveTab}
+            initialTab={initialTab}
+            onExploreMapUpdate={(markers, center, zoom) => {
+              setExploreMarkers(markers);
+              setExploreCenter(center);
+              setExploreZoom(zoom);
+            }}
+            onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
+          />
+        }
+        rightPanel={
+          <TripMapPanel
+            tripId={tripId}
+            selectedDayId={selectedDayId}
+            selectedActivityId={selectedActivityId}
+            activeTab={activeTab}
+            exploreMarkers={exploreMarkers}
+            exploreCenter={exploreCenter}
+            exploreZoom={exploreZoom}
+            onExploreMarkerClick={handleExploreMarkerClick}
+          />
+        }
+      />
+    </GoogleMapsProvider>
   );
 }
 

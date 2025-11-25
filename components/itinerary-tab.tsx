@@ -12,7 +12,7 @@ import { useActivities } from "@/hooks/use-activities";
 import { DaySelector } from "@/components/day-selector";
 import { ActivityList } from "@/components/activity-list";
 import { ActivityDialog } from "@/components/activity-dialog";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
 import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
@@ -89,7 +89,10 @@ export function ItineraryTab({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [sendingChat, setSendingChat] = useState(false);
+  const [chatHasMore, setChatHasMore] = useState(false);
+  const [loadingChatMessages, setLoadingChatMessages] = useState(false);
   const chatMessagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -105,6 +108,7 @@ export function ItineraryTab({
     deleteActivity,
     isLoading: activitiesLoading,
   } = useActivities(selectedDayId || "");
+  const [allActivitiesCount, setAllActivitiesCount] = useState<number | null>(null);
 
   // Fetch route legs when activities change
   useEffect(() => {
@@ -227,11 +231,19 @@ export function ItineraryTab({
     }
   }, [settingsMenuOpen]);
 
-  const loadChatMessages = useCallback(async () => {
-    const { data, error } = await getChatMessages(tripId);
+  const loadChatMessages = useCallback(async (limit: number = 20, offset: number = 0) => {
+    setLoadingChatMessages(true);
+    const { data, error, hasMore } = await getChatMessages(tripId, limit, offset);
     if (!error && data) {
-      setChatMessages(data);
+      if (offset === 0) {
+        setChatMessages(data);
+      } else {
+        // Prepend older messages
+        setChatMessages((prev) => [...data, ...prev]);
+      }
+      setChatHasMore(hasMore);
     }
+    setLoadingChatMessages(false);
   }, [tripId]);
 
   const generateItinerary = useCallback(async () => {
@@ -265,14 +277,38 @@ export function ItineraryTab({
     }
   }, [tripId]);
 
-  // Auto-generate itinerary if no activities exist
+  // Check total activities count across all days
+  useEffect(() => {
+    if (!tripId || !days || days.length === 0) {
+      setAllActivitiesCount(null);
+      return;
+    }
+
+    const checkAllActivities = async () => {
+      const { count, error } = await supabase
+        .from("activities")
+        .select("id", { count: "exact", head: true })
+        .in("day_id", days.map(d => d.id));
+
+      if (error) {
+        console.error("Error checking activities:", error);
+        setAllActivitiesCount(null);
+      } else {
+        setAllActivitiesCount(count || 0);
+      }
+    };
+
+    checkAllActivities();
+  }, [tripId, days, supabase]);
+
+  // Auto-generate itinerary if no activities exist across all days
   useEffect(() => {
     if (
       trip &&
       days &&
       days.length > 0 &&
-      activities &&
-      activities.length === 0 &&
+      allActivitiesCount !== null &&
+      allActivitiesCount === 0 &&
       !aiItinerary &&
       !loadingAiItinerary &&
       !hasCheckedForItinerary
@@ -280,21 +316,24 @@ export function ItineraryTab({
       setHasCheckedForItinerary(true);
       generateItinerary();
     }
-  }, [trip, days, activities, aiItinerary, loadingAiItinerary, hasCheckedForItinerary, generateItinerary]);
+  }, [trip, days, allActivitiesCount, aiItinerary, loadingAiItinerary, hasCheckedForItinerary, generateItinerary]);
 
-  // Load chat messages
+  // Load chat messages when chat opens
   useEffect(() => {
-    if (tripId && chatOpen) {
-      loadChatMessages();
+    if (tripId && chatOpen && chatMessages.length === 0) {
+      loadChatMessages(20, 0);
     }
-  }, [tripId, chatOpen, loadChatMessages]);
+  }, [tripId, chatOpen, loadChatMessages, chatMessages.length]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
-    if (chatMessagesEndRef.current) {
-      chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (chatMessagesEndRef.current && chatOpen) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        chatMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     }
-  }, [chatMessages]);
+  }, [chatMessages, chatOpen]);
 
   const handleSendChat = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -343,7 +382,7 @@ export function ItineraryTab({
       });
 
       // Reload to get real messages from DB
-      await loadChatMessages();
+      await loadChatMessages(20, 0);
     } catch (error) {
       console.error("Error sending chat message:", error);
       addToast({
@@ -351,8 +390,19 @@ export function ItineraryTab({
         description: "Failed to send message. Please try again.",
         variant: "destructive",
       });
-      // Remove temp message on error
-      setChatMessages((prev) => prev.filter((m) => !m.id.startsWith("temp-")));
+      // Remove temp user message on error, but keep it in the list with error state
+      setChatMessages((prev) => {
+        const withoutTemp = prev.filter((m) => !m.id.startsWith("temp-"));
+        // Add error message for assistant
+        const errorMessage: ChatMessage = {
+          id: `error-${Date.now()}`,
+          trip_id: tripId,
+          role: "assistant",
+          content: "Failed – please try again",
+          created_at: new Date().toISOString(),
+        };
+        return [...withoutTemp, errorMessage];
+      });
     } finally {
       setSendingChat(false);
     }
@@ -442,27 +492,25 @@ export function ItineraryTab({
         />
       </div>
 
-      {/* Hotel Banner */}
-      {!trip.accommodation_address && (
-        <div className="mb-6">
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Need a great place to stay?</CardTitle>
-              <CardDescription>
-                We can help you find a hotel, hostel or apartment that fits your trip.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => router.push(`/trips/${tripId}/stay`)}
-                className="w-full"
-              >
-                Find a place to stay
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Hotel Card */}
+      <div className="mb-4">
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Need a place to stay?</CardTitle>
+            <CardDescription>
+              Search hotels for your trip dates and destination.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => router.push(`/trips/${tripId}/stay`)}
+              className="w-full"
+            >
+              Search hotels
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Activities Section */}
       <div className="flex-1 overflow-y-auto">
@@ -631,7 +679,10 @@ export function ItineraryTab({
           >
             <div className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              <h2 className="text-lg font-semibold">Chat about this trip</h2>
+              <div className="text-left">
+                <h2 className="text-lg font-semibold">Chat about this trip</h2>
+                <p className="text-xs text-muted-foreground">Ask questions or tweak your plan.</p>
+              </div>
             </div>
             {chatOpen ? (
               <ChevronUp className="h-5 w-5" />
@@ -643,32 +694,61 @@ export function ItineraryTab({
           {chatOpen && (
             <div className="mt-4 border rounded-lg flex flex-col" style={{ height: "400px" }}>
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {chatMessages.length === 0 && (
+              <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+                {chatHasMore && (
+                  <div className="text-center">
+                    <button
+                      onClick={() => loadChatMessages(20, chatMessages.length)}
+                      disabled={loadingChatMessages}
+                      className="text-xs text-primary hover:underline disabled:opacity-50"
+                    >
+                      {loadingChatMessages ? "Loading..." : "Load earlier messages"}
+                    </button>
+                  </div>
+                )}
+                {chatMessages.length === 0 && !loadingChatMessages && (
                   <div className="text-sm text-muted-foreground text-center py-8">
                     Start a conversation about your trip. Ask questions like &quot;I already visited X, what now?&quot; or &quot;Can you suggest alternatives?&quot;
                   </div>
                 )}
-                {chatMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
+                {chatMessages.map((msg) => {
+                  const isError = msg.id.startsWith("error-");
+                  const isUser = msg.role === "user";
+                  const timestamp = formatDistanceToNow(new Date(msg.created_at), { addSuffix: true });
+                  
+                  return (
                     <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
-                      }`}
+                      key={msg.id}
+                      className={`flex ${isUser ? "justify-end" : "justify-start"}`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      <div className="flex flex-col max-w-[80%]">
+                        <div
+                          className={`rounded-lg p-3 ${
+                            isUser
+                              ? "bg-primary text-primary-foreground"
+                              : isError
+                              ? "bg-destructive/10 text-destructive border border-destructive/20"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        </div>
+                        <span className={`text-xs text-muted-foreground mt-1 ${isUser ? "text-right" : "text-left"}`}>
+                          {timestamp}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {sendingChat && (
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg p-3">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                    <div className="flex flex-col max-w-[80%]">
+                      <div className="bg-muted rounded-lg p-3">
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-sm text-muted-foreground">Thinking...</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -685,7 +765,11 @@ export function ItineraryTab({
                     disabled={sendingChat}
                     className="flex-1"
                   />
-                  <Button type="submit" disabled={sendingChat || !chatInput.trim()} size="icon">
+                  <Button 
+                    type="submit" 
+                    disabled={sendingChat || !chatInput.trim()} 
+                    size="icon"
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>

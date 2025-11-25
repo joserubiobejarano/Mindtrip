@@ -202,7 +202,7 @@ export function NewTripDialog({
 
       onOpenChange(false);
       onSuccess();
-      router.push(`/trips/${trip.id}`);
+      router.push(`/trips/${trip.id}?tab=itinerary`);
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
