@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Share2, Users, ArrowLeft, MoreVertical, Trash2, Loader2, MessageSquare, Send, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Share2, Users, ArrowLeft, MoreVertical, Trash2, Loader2, MessageSquare, Send, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { useActivities } from "@/hooks/use-activities";
