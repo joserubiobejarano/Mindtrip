@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ItineraryTab } from "@/components/itinerary-tab";
 import { ExpensesTab } from "@/components/expenses-tab";
-import { ChecklistsTab } from "@/components/checklists-tab";
 import { ExploreTab } from "@/components/explore-tab";
 import { useTrip } from "@/hooks/use-trip";
 
@@ -55,7 +54,6 @@ export function TripTabs({
         <TabsTrigger value="explore">Explore</TabsTrigger>
         <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
         <TabsTrigger value="expenses">Expenses</TabsTrigger>
-        <TabsTrigger value="checklists">Checklists</TabsTrigger>
       </TabsList>
       <div className="flex-1 overflow-hidden">
         <TabsContent value="explore" className="h-full mt-0">
@@ -79,9 +77,6 @@ export function TripTabs({
             tripId={tripId}
             defaultCurrency={trip?.default_currency || "USD"}
           />
-        </TabsContent>
-        <TabsContent value="checklists" className="h-full mt-0 overflow-y-auto">
-          <ChecklistsTab tripId={tripId} />
         </TabsContent>
       </div>
     </Tabs>

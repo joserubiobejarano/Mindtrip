@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Share2, Users, ArrowLeft, MoreVertical, Trash2 } from "lucide-react";
+import { Plus, Share2, Users, ArrowLeft, MoreVertical, Trash2, Loader2, MessageSquare, Send, ChevronDown, ChevronUp } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useDays } from "@/hooks/use-days";
 import { useActivities } from "@/hooks/use-activities";
@@ -21,7 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
 import type { AiItinerary, ActivitySuggestion } from "@/app/api/ai-itinerary/route";
-import { AccommodationCard } from "@/components/trips/AccommodationCard";
+import { getChatMessages, saveChatMessage, type ChatMessage } from "@/lib/supabase/trip-chat-messages";
 
 /**
  * Get a human-readable "good for" label based on place types
@@ -83,7 +83,12 @@ export function ItineraryTab({
   const [aiItinerary, setAiItinerary] = useState<AiItinerary | null>(null);
   const [loadingAiItinerary, setLoadingAiItinerary] = useState(false);
   const [aiItineraryError, setAiItineraryError] = useState<string | null>(null);
-  const [loadingAccommodation, setLoadingAccommodation] = useState(false);
+  const [hasCheckedForItinerary, setHasCheckedForItinerary] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [sendingChat, setSendingChat] = useState(false);
+  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -221,39 +226,136 @@ export function ItineraryTab({
     }
   }, [settingsMenuOpen]);
 
-  // Auto-fetch accommodation if find_accommodation is true and auto_accommodation is null
+  // Auto-generate itinerary if no activities exist
   useEffect(() => {
     if (
       trip &&
-      trip.find_accommodation &&
-      !trip.auto_accommodation &&
-      !loadingAccommodation
+      days &&
+      days.length > 0 &&
+      activities &&
+      activities.length === 0 &&
+      !aiItinerary &&
+      !loadingAiItinerary &&
+      !hasCheckedForItinerary
     ) {
-      setLoadingAccommodation(true);
-      fetch("/api/accommodation/find", {
+      setHasCheckedForItinerary(true);
+      generateItinerary();
+    }
+  }, [trip, days, activities, aiItinerary, loadingAiItinerary, hasCheckedForItinerary]);
+
+  // Load chat messages
+  useEffect(() => {
+    if (tripId && chatOpen) {
+      loadChatMessages();
+    }
+  }, [tripId, chatOpen]);
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatMessagesEndRef.current) {
+      chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages]);
+
+  const loadChatMessages = async () => {
+    const { data, error } = await getChatMessages(tripId);
+    if (!error && data) {
+      setChatMessages(data);
+    }
+  };
+
+  const handleSendChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || sendingChat) return;
+
+    const userMessage = chatInput.trim();
+    setChatInput("");
+    setSendingChat(true);
+
+    // Add user message optimistically
+    const tempUserMessage: ChatMessage = {
+      id: `temp-${Date.now()}`,
+      trip_id: tripId,
+      role: "user",
+      content: userMessage,
+      created_at: new Date().toISOString(),
+    };
+    setChatMessages((prev) => [...prev, tempUserMessage]);
+
+    try {
+      const response = await fetch(`/api/trips/${tripId}/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      const { message: assistantMessage } = await response.json();
+
+      // Remove temp message and add real ones
+      setChatMessages((prev) => {
+        const withoutTemp = prev.filter((m) => !m.id.startsWith("temp-"));
+        const tempAssistantMessage: ChatMessage = {
+          id: `temp-assistant-${Date.now()}`,
+          trip_id: tripId,
+          role: "assistant",
+          content: assistantMessage,
+          created_at: new Date().toISOString(),
+        };
+        return [...withoutTemp, tempAssistantMessage];
+      });
+
+      // Reload to get real messages from DB
+      await loadChatMessages();
+    } catch (error) {
+      console.error("Error sending chat message:", error);
+      addToast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+      // Remove temp message on error
+      setChatMessages((prev) => prev.filter((m) => !m.id.startsWith("temp-")));
+    } finally {
+      setSendingChat(false);
+    }
+  };
+
+  const generateItinerary = async () => {
+    setLoadingAiItinerary(true);
+    setAiItineraryError(null);
+    try {
+      const response = await fetch("/api/ai-itinerary", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ tripId }),
-      })
-        .then(async (response) => {
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || "Failed to find accommodation");
-          }
-          // Refresh trip data
-          queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
-        })
-        .catch((error) => {
-          console.error("Error finding accommodation:", error);
-          // Don't show error to user, just log it
-        })
-        .finally(() => {
-          setLoadingAccommodation(false);
-        });
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to generate itinerary");
+      }
+
+      const { itinerary } = await response.json();
+      setAiItinerary(itinerary);
+    } catch (error) {
+      console.error("Error generating AI itinerary:", error);
+      setAiItineraryError(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate itinerary. Please try again."
+      );
+    } finally {
+      setLoadingAiItinerary(false);
     }
-  }, [trip, tripId, loadingAccommodation, queryClient]);
+  };
 
   if (tripLoading || daysLoading) {
     return (
@@ -339,10 +441,25 @@ export function ItineraryTab({
         />
       </div>
 
-      {/* Accommodation Card */}
-      {trip.auto_accommodation && (
+      {/* Hotel Banner */}
+      {!trip.accommodation_name && (
         <div className="mb-6">
-          <AccommodationCard accommodation={trip.auto_accommodation} />
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Need a great place to stay?</CardTitle>
+              <CardDescription>
+                We can help you find a hotel, hostel or apartment that fits your trip.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={() => router.push(`/trips/${tripId}/stay`)}
+                className="w-full"
+              >
+                Find a place to stay
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -362,43 +479,20 @@ export function ItineraryTab({
             <p className="text-sm text-muted-foreground mb-4">
               Get a season-aware, story-like itinerary for your whole trip.
             </p>
-            {!aiItinerary && (
+            {!aiItinerary && !loadingAiItinerary && (
               <Button
-                onClick={async () => {
-                  setLoadingAiItinerary(true);
-                  setAiItineraryError(null);
-                  try {
-                    const response = await fetch("/api/ai-itinerary", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({ tripId }),
-                    });
-
-                    if (!response.ok) {
-                      const error = await response.json();
-                      throw new Error(error.error || "Failed to generate itinerary");
-                    }
-
-                    const { itinerary } = await response.json();
-                    setAiItinerary(itinerary);
-                  } catch (error) {
-                    console.error("Error generating AI itinerary:", error);
-                    setAiItineraryError(
-                      error instanceof Error
-                        ? error.message
-                        : "Failed to generate itinerary. Please try again."
-                    );
-                  } finally {
-                    setLoadingAiItinerary(false);
-                  }
-                }}
+                onClick={generateItinerary}
                 disabled={loadingAiItinerary}
                 size="sm"
               >
-                {loadingAiItinerary ? "Generating..." : "Generate smart itinerary"}
+                Generate smart itinerary
               </Button>
+            )}
+            {loadingAiItinerary && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generating your itinerary...
+              </div>
             )}
           </div>
 
@@ -527,6 +621,77 @@ export function ItineraryTab({
             <h2 className="text-xl font-semibold mt-6 mb-4">Your itinerary</h2>
           </div>
         )}
+
+        {/* Chat Section */}
+        <div className="mt-6 border-t pt-6">
+          <button
+            onClick={() => setChatOpen(!chatOpen)}
+            className="w-full flex items-center justify-between p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              <h2 className="text-lg font-semibold">Chat about this trip</h2>
+            </div>
+            {chatOpen ? (
+              <ChevronUp className="h-5 w-5" />
+            ) : (
+              <ChevronDown className="h-5 w-5" />
+            )}
+          </button>
+
+          {chatOpen && (
+            <div className="mt-4 border rounded-lg flex flex-col" style={{ height: "400px" }}>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {chatMessages.length === 0 && (
+                  <div className="text-sm text-muted-foreground text-center py-8">
+                    Start a conversation about your trip. Ask questions like "I already visited X, what now?" or "Can you suggest alternatives?"
+                  </div>
+                )}
+                {chatMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+                {sendingChat && (
+                  <div className="flex justify-start">
+                    <div className="bg-muted rounded-lg p-3">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
+                  </div>
+                )}
+                <div ref={chatMessagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <form onSubmit={handleSendChat} className="border-t p-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Ask about your trip..."
+                    disabled={sendingChat}
+                    className="flex-1"
+                  />
+                  <Button type="submit" disabled={sendingChat || !chatInput.trim()} size="icon">
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
 
         {selectedDayId ? (
           <ActivityList

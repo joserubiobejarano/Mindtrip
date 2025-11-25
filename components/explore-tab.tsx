@@ -70,13 +70,13 @@ interface ExploreTabProps {
 }
 
 type ExploreFilter =
+  | "main"
   | "museums"
   | "parks"
   | "food"
   | "nightlife"
   | "shopping"
-  | "neighborhoods"
-  | "highlights";
+  | "neighborhoods";
 
 interface Trip {
   id: string;
@@ -96,13 +96,13 @@ interface Trip {
 }
 
 const FILTER_PRESETS: Record<ExploreFilter, { label: string; query: string }> = {
+  main: { label: "Main Places", query: "tourist attractions" },
   museums: { label: "Museums", query: "museum" },
   parks: { label: "Parks & Nature", query: "park" },
   food: { label: "Food", query: "restaurant" },
   nightlife: { label: "Nightlife", query: "bar" },
   shopping: { label: "Shopping", query: "shop" },
   neighborhoods: { label: "Neighborhoods", query: "" },
-  highlights: { label: "Highlights", query: "tourist attractions" },
 } as const;
 
 /**
@@ -165,7 +165,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId, user?.id]);
 
-  // Initial load: search for museums when trip and places service are available
+  // Initial load: search for main places when trip and places service are available
   useEffect(() => {
     if (
       trip &&
@@ -173,8 +173,8 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
       trip.center_lat != null &&
       trip.center_lng != null
     ) {
-      searchPlaces({ filterKey: "museums" });
-      setSelectedFilter("museums");
+      searchPlaces({ filterKey: "main" });
+      setSelectedFilter("main");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trip?.id, mapServiceRef.current]);
@@ -349,8 +349,8 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         // For neighborhoods, use text search with city name
         const query = cityName || trip.title;
         googlePlaces = await searchPlacesByText(service, query, location, 15000);
-      } else if (filterKey === "highlights") {
-        // For highlights, search for tourist attractions
+      } else if (filterKey === "main" || filterKey === "highlights") {
+        // For main places, search for tourist attractions
         const query = cityName
           ? `tourist attractions things to do in ${cityName}`
           : "tourist attractions things to do";
@@ -378,8 +378,8 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         } as PlaceResult & { rating?: number; user_ratings_total?: number };
       });
 
-      // For highlights, filter out food/nightlife places
-      if (filterKey === "highlights") {
+      // For main places, filter out food/nightlife places
+      if (filterKey === "main") {
         const excludeTypes = [
           "restaurant",
           "cafe",
@@ -407,8 +407,8 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         return bRating - aRating;
       });
 
-      // Limit highlights to top 30
-      if (filterKey === "highlights") {
+      // Limit main places to top 30
+      if (filterKey === "main") {
         mapped = mapped.slice(0, 30);
       }
 
@@ -531,8 +531,8 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
       await loadSavedPlaces();
 
       addToast({
-        title: "Added to your plan",
-        description: "This place will be included in your Smart itinerary.",
+        title: "Saved to your plan",
+        description: "We'll use this when building your Smart itinerary.",
         variant: "success",
       });
     } catch (err) {

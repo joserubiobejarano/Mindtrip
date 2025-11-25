@@ -1,0 +1,127 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { getOpenAIClient } from "@/lib/openai";
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ tripId: string }> }
+) {
+  try {
+    const { tripId } = await params;
+    const body = await request.json();
+    const { message } = body;
+
+    if (!message || typeof message !== "string") {
+      return NextResponse.json(
+        { error: "Message is required" },
+        { status: 400 }
+      );
+    }
+
+    const supabase = await createClient();
+
+    // Load trip data
+    const { data: trip, error: tripError } = await supabase
+      .from("trips")
+      .select("title, start_date, end_date, destination_name")
+      .eq("id", tripId)
+      .single();
+
+    if (tripError || !trip) {
+      return NextResponse.json(
+        { error: "Trip not found" },
+        { status: 404 }
+      );
+    }
+
+    // Load recent chat messages (last 10)
+    const { data: recentMessages, error: messagesError } = await supabase
+      .from("trip_chat_messages")
+      .select("role, content")
+      .eq("trip_id", tripId)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (messagesError) {
+      console.error("Error loading chat messages:", messagesError);
+      // Continue without previous messages
+    }
+
+    // Save user message
+    const { error: saveUserError } = await supabase
+      .from("trip_chat_messages")
+      .insert({
+        trip_id: tripId,
+        role: "user",
+        content: message,
+      });
+
+    if (saveUserError) {
+      console.error("Error saving user message:", saveUserError);
+      // Continue anyway
+    }
+
+    // Build context for GPT
+    const destination = trip.destination_name || trip.title;
+    const startDate = new Date(trip.start_date);
+    const endDate = new Date(trip.end_date);
+    
+    // Format recent messages for context
+    const conversationHistory = recentMessages
+      ? recentMessages.reverse().map((m) => `${m.role}: ${m.content}`).join("\n")
+      : "";
+
+    const prompt = `You are a helpful travel planning assistant for MindTrip. The user is planning a trip to ${destination} from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}.
+
+${conversationHistory ? `Recent conversation:\n${conversationHistory}\n` : ""}
+
+User's current question: ${message}
+
+Please provide a helpful response. Be concise and practical. If the user asks about modifying the itinerary, you can suggest changes but note that full itinerary updates will be handled separately.
+
+Respond in a friendly, conversational tone.`;
+
+    // Call OpenAI
+    const openai = getOpenAIClient();
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful travel planning assistant. Be concise and practical.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+    });
+
+    const assistantMessage = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
+
+    // Save assistant message
+    const { error: saveAssistantError } = await supabase
+      .from("trip_chat_messages")
+      .insert({
+        trip_id: tripId,
+        role: "assistant",
+        content: assistantMessage,
+      });
+
+    if (saveAssistantError) {
+      console.error("Error saving assistant message:", saveAssistantError);
+    }
+
+    return NextResponse.json({ message: assistantMessage });
+  } catch (error) {
+    console.error("Error in /api/trips/[tripId]/chat:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
+  }
+}
+

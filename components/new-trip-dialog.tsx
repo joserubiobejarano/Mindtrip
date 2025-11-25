@@ -46,6 +46,11 @@ export function NewTripDialog({
   const [findAccommodation, setFindAccommodation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{
+    destination?: string;
+    startDate?: string;
+    endDate?: string;
+  }>({});
 
   const generateTripTitle = (dest: DestinationOption | null, start: string, end: string): string => {
     if (!dest) return "";
@@ -86,22 +91,52 @@ export function NewTripDialog({
     return null;
   }
 
+  const validateForm = (): boolean => {
+    const errors: typeof fieldErrors = {};
+    let isValid = true;
+
+    if (!destination) {
+      errors.destination = "Destination is required";
+      isValid = false;
+    }
+
+    if (!startDate) {
+      errors.startDate = "Start date is required";
+      isValid = false;
+    }
+
+    if (!endDate) {
+      errors.endDate = "End date is required";
+      isValid = false;
+    }
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (end < start) {
+        errors.endDate = "End date must be after start date";
+        isValid = false;
+      }
+    }
+
+    setFieldErrors(errors);
+    return isValid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setFieldErrors({});
+
+    if (!validateForm()) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      if (!destination || !startDate || !endDate) {
-        throw new Error("Please fill in all required fields");
-      }
-
       const start = new Date(startDate);
       const end = new Date(endDate);
-
-      if (end < start) {
-        throw new Error("End date must be after start date");
-      }
 
       const title = generateTripTitle(destination, startDate, endDate);
       const [centerLng, centerLat] = destination?.center || [null, null];
@@ -165,25 +200,9 @@ export function NewTripDialog({
         throw new Error("Failed to create trip member. Please try again.");
       }
 
-      try {
-        const itineraryResponse = await fetch("/api/ai-itinerary", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ tripId: trip.id }),
-        });
-
-        if (!itineraryResponse.ok) {
-          console.error("Failed to generate itinerary, but trip was created");
-        }
-      } catch (itineraryError) {
-        console.error("Error generating itinerary:", itineraryError);
-      }
-
       onOpenChange(false);
       onSuccess();
-      router.push(`/trips/${trip.id}?tab=itinerary`);
+      router.push(`/trips/${trip.id}`);
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -193,19 +212,19 @@ export function NewTripDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden">
+      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden max-h-[80vh] flex flex-col">
         {/* Header with icon and gradient background */}
-        <DialogHeader className="bg-gradient-to-r from-sky-50 to-emerald-50 px-6 py-5 border-b">
-          <div className="flex items-center gap-3">
-            <div className="text-3xl">🌍</div>
-            <DialogTitle className="text-2xl font-bold text-gray-900">
-              Create New Trip
-            </DialogTitle>
-          </div>
+        <DialogHeader className="bg-gradient-to-r from-sky-50 to-emerald-50 px-6 py-5 border-b flex-shrink-0">
+          <DialogTitle className="text-2xl font-bold text-gray-900">
+            Create New Trip
+          </DialogTitle>
+          <p className="text-sm text-gray-600 mt-1">
+            Plan your next adventure. We&apos;ll generate a smart itinerary for you.
+          </p>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
-          <div className="px-6 py-6 space-y-6">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="px-6 py-6 space-y-6 overflow-y-auto flex-1">
             {/* Destination */}
             <div className="space-y-2">
               <Label htmlFor="destination" className="text-base font-medium">
@@ -213,24 +232,38 @@ export function NewTripDialog({
               </Label>
               <DestinationAutocomplete
                 value={destination}
-                onChange={setDestination}
+                onChange={(value) => {
+                  setDestination(value);
+                  if (value) {
+                    setFieldErrors((prev) => ({ ...prev, destination: undefined }));
+                  }
+                }}
               />
+              {fieldErrors.destination && (
+                <p className="text-sm text-destructive">{fieldErrors.destination}</p>
+              )}
             </div>
 
             {/* Travel Dates */}
             <div className="border-t pt-6 space-y-4">
               <h3 className="text-base font-medium">Travel Dates</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="start_date">Start Date</Label>
                   <Input
                     id="start_date"
                     type="date"
                     value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
+                    }}
                     required
                     className="rounded-lg"
                   />
+                  {fieldErrors.startDate && (
+                    <p className="text-sm text-destructive">{fieldErrors.startDate}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="end_date">End Date</Label>
@@ -238,10 +271,16 @@ export function NewTripDialog({
                     id="end_date"
                     type="date"
                     value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      setFieldErrors((prev) => ({ ...prev, endDate: undefined }));
+                    }}
                     required
                     className="rounded-lg"
                   />
+                  {fieldErrors.endDate && (
+                    <p className="text-sm text-destructive">{fieldErrors.endDate}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -253,7 +292,7 @@ export function NewTripDialog({
                 {!findAccommodation && (
                   <div className="space-y-2">
                     <Label htmlFor="accommodation_address">
-                      Hotel / Accommodation address (optional)
+                      Accommodation Address (optional)
                     </Label>
                     <Input
                       id="accommodation_address"
@@ -281,7 +320,7 @@ export function NewTripDialog({
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
-                We&apos;ll use this to build your personalized itinerary.
+                We&apos;ll use this to help plan your itinerary around where you&apos;re staying.
               </p>
             </div>
 
@@ -293,7 +332,7 @@ export function NewTripDialog({
           </div>
 
           {/* Footer with centered buttons */}
-          <DialogFooter className="px-6 py-4 bg-gray-50 border-t justify-center gap-3">
+          <DialogFooter className="px-6 py-4 bg-gray-50 border-t justify-center gap-3 flex-shrink-0">
             <Button
               type="button"
               variant="outline"
