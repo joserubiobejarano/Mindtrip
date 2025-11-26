@@ -96,10 +96,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
 
-    // Load trip data
+    // Load trip data including existing itinerary
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country')
+      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country, itinerary')
       .eq('id', tripId)
       .single()
 
@@ -108,6 +108,11 @@ export async function POST(request: NextRequest) {
         { error: 'Trip not found' },
         { status: 404 }
       )
+    }
+
+    // If itinerary already exists, return it instead of regenerating
+    if (trip.itinerary) {
+      return NextResponse.json({ itinerary: trip.itinerary })
     }
 
     // Load days for the trip

@@ -28,9 +28,9 @@ export function TripShell({
   onExploreMarkerClick,
 }: TripShellProps) {
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden">
-      {/* Map Panel - Left (Top on Mobile) */}
-      <div className="w-full md:w-1/2 h-[40vh] md:h-auto border-r relative order-first">
+    <div className="h-[calc(100vh-80px)] flex flex-col md:flex-row overflow-hidden bg-gradient-to-br from-purple-50/30 via-white to-orange-50/20">
+      {/* Map Panel - Left (Top on Mobile) - 40% width on desktop */}
+      <div className="w-full md:flex-[0.4] h-[40vh] md:h-auto border-r-2 border-black/10 relative order-first">
         <TripMapPanel
           tripId={tripId}
           selectedDayId={selectedDayId}
@@ -43,8 +43,8 @@ export function TripShell({
         />
       </div>
 
-      {/* Content Panel - Right (Bottom on Mobile) */}
-      <div className="flex-1 flex flex-col bg-white overflow-hidden h-[60vh] md:h-auto relative z-10">
+      {/* Content Panel - Right (Bottom on Mobile) - 60% width on desktop */}
+      <div className="flex-[1] md:flex-[0.6] flex flex-col bg-white/80 backdrop-blur-sm overflow-hidden h-[60vh] md:h-auto relative z-10 shadow-lg border-l-2 border-black/10">
         {children}
       </div>
     </div>

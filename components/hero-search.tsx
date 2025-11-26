@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { DestinationAutocomplete } from "@/components/destination-autocomplete";
 import { type DestinationOption } from "@/hooks/use-create-trip";
 import { Input } from "@/components/ui/input";
+import { DateRangePicker } from "@/components/date-range-picker";
 
 interface HeroSearchProps {
   destination: DestinationOption | null;
@@ -43,7 +44,7 @@ export function HeroSearch({
         boxShadow: '8px 8px 0px rgba(0, 0, 0, 1)'
       }}
     >
-      <div className="grid md:grid-cols-6 gap-4">
+      <div className="grid md:grid-cols-5 gap-4">
         <div className="md:col-span-2 relative">
           <label className="block text-sm mb-2 text-gray-600">Where to?</label>
           <div className="relative">
@@ -57,33 +58,16 @@ export function HeroSearch({
           </div>
         </div>
 
-        <div className="relative">
-          <label className="block text-sm mb-2 text-gray-600">Check-in</label>
-          <div className="relative">
-            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 size-5 z-10" />
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => onStartDateChange(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-blue-600 focus:bg-white transition-all outline-none"
-              placeholder="Add dates"
-            />
-          </div>
-        </div>
-
-        <div className="relative">
-          <label className="block text-sm mb-2 text-gray-600">Check-out</label>
-          <div className="relative">
-            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 size-5 z-10" />
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => onEndDateChange(e.target.value)}
-              min={startDate || undefined}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-blue-600 focus:bg-white transition-all outline-none"
-              placeholder="Add dates"
-            />
-          </div>
+        <div className="md:col-span-2 relative">
+          <label className="block text-sm mb-2 text-gray-600">Check-in / Check-out</label>
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={onStartDateChange}
+            onEndDateChange={onEndDateChange}
+            className="w-full py-4 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-blue-600 focus:bg-white transition-all"
+            placeholder="Add dates"
+          />
         </div>
 
         <div className="relative">

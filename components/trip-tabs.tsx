@@ -50,11 +50,28 @@ export function TripTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
-      <TabsList className="mb-4">
-        <TabsTrigger value="explore">Explore</TabsTrigger>
-        <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
-        <TabsTrigger value="expenses">Expenses</TabsTrigger>
-      </TabsList>
+      <div className="px-6 pt-6 pb-0">
+        <TabsList className="mb-4 bg-gray-100 rounded-xl p-1 border-2 border-black/10">
+          <TabsTrigger 
+            value="explore"
+            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-lg font-medium"
+          >
+            Explore
+          </TabsTrigger>
+          <TabsTrigger 
+            value="itinerary"
+            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-lg font-medium"
+          >
+            Itinerary
+          </TabsTrigger>
+          <TabsTrigger 
+            value="expenses"
+            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-lg font-medium"
+          >
+            Expenses
+          </TabsTrigger>
+        </TabsList>
+      </div>
       <div className="flex-1 overflow-hidden">
         <TabsContent value="explore" className="h-full mt-0">
           <ExploreTab

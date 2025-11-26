@@ -14,14 +14,17 @@ export function AppHeader() {
         </Link>
         <div className="flex items-center gap-4">
           <SignedOut>
-            <SignInButton forceRedirectUrl="/trips">
+            <SignInButton forceRedirectUrl="/">
               <Button variant="ghost">Sign In</Button>
             </SignInButton>
-            <SignUpButton forceRedirectUrl="/trips">
+            <SignUpButton forceRedirectUrl="/">
               <Button>Sign Up</Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
+            <Link href="/trips">
+              <Button variant="ghost">My trips</Button>
+            </Link>
             <Link href="/settings">
               <Button variant="ghost" size="icon" title="Settings">
                 <Settings className="h-5 w-5" />

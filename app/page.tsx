@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -13,7 +13,8 @@ import {
   Map,
   Calendar,
   Users,
-  Sparkles
+  Sparkles,
+  Plane
 } from "lucide-react";
 import { useCreateTrip, type DestinationOption } from "@/hooks/use-create-trip";
 import { HeroSearch } from "@/components/hero-search";
@@ -37,12 +38,6 @@ export default function HomePage() {
   const [searchError, setSearchError] = useState<string | null>(null);
 
   const { createTrip, loading: creatingTrip } = useCreateTrip();
-
-  useEffect(() => {
-    if (isSignedIn) {
-      router.replace("/trips");
-    }
-  }, [isSignedIn, router]);
 
   const handleCTAClick = () => {
     if (isSignedIn) {
@@ -194,15 +189,33 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-4">
-              <Link href="/sign-in">
-                <Button variant="ghost" className="hidden md:flex">Sign In</Button>
-              </Link>
-              <Button 
-                onClick={handleCTAClick}
-                className="bg-orange-500 hover:bg-orange-600 text-white border-2 border-black"
-              >
-                Get Started
-              </Button>
+              <SignedOut>
+                <Link href="/sign-in">
+                  <Button variant="ghost" className="hidden md:flex">Sign In</Button>
+                </Link>
+                <Button 
+                  onClick={handleCTAClick}
+                  className="bg-orange-500 hover:bg-orange-600 text-white border-2 border-black"
+                >
+                  Get Started
+                </Button>
+              </SignedOut>
+              <SignedIn>
+                <div className="flex items-center gap-2">
+                  <Link href="/trips">
+                    <Button variant="ghost" className="hidden md:flex">
+                      My trips
+                    </Button>
+                  </Link>
+                  <UserButton 
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-10 h-10"
+                      }
+                    }}
+                  />
+                </div>
+              </SignedIn>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="size-6" />
               </Button>
