@@ -174,7 +174,7 @@ export default function HomePage() {
         className="sticky top-0 z-50 bg-white border-b-4 border-black"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-24 py-4">
             <Link href="/" className="flex items-center gap-2">
               <div className="bg-purple-500 p-2 rounded-xl border-2 border-black">
                 <Globe2 className="size-6 text-white" />
@@ -225,7 +225,7 @@ export default function HomePage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section id="hero" className="relative overflow-hidden pt-20 pb-32 px-4">
+      <section id="hero" className="relative overflow-hidden pt-24 pb-32 px-4">
         <FloatingShapes />
         
         <div className="relative max-w-7xl mx-auto text-center">
@@ -234,21 +234,19 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="inline-block mb-6">
+            <div className="inline-block mb-8">
               <div className="bg-purple-500 text-white px-6 py-2 rounded-full inline-flex items-center gap-2 border-2 border-black">
                 <span className="text-sm">Plan every part of your trip in one place</span>
               </div>
             </div>
 
-            <h1 className="text-5xl md:text-7xl mb-6 text-gray-900">
-              Your Next Adventure
+            <h1 className="text-5xl md:text-7xl mb-12 text-gray-900">
+              Your Next
               <br />
-              Starts Here
+              Adventure
+              <br />
+              Starts Here.
             </h1>
-            
-            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-              Discover amazing destinations and plan your perfect trip
-            </p>
           </motion.div>
 
           <HeroSearch

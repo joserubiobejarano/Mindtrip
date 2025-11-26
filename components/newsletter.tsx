@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export function Newsletter() {
   return (
     <section className="py-20 px-4 relative overflow-hidden">
-      {/* Wavy background */}
+      {/* Diagonal separator - matching the style from GetTheApp section */}
       <div className="absolute inset-0 bg-cyan-400" style={{
         clipPath: 'polygon(0 10%, 100% 0, 100% 90%, 0 100%)'
       }}></div>
@@ -27,11 +27,10 @@ export function Newsletter() {
             </div>
             <div>
               <h2 className="text-3xl md:text-4xl mb-3 text-gray-900">
-                Join our adventurous community!
+                Plan smarter, travel better.
               </h2>
               <p className="text-gray-600 text-sm md:text-base">
-                By signing up, you agree to receive marketing emails from MindTrip.com. 
-                Limited ads as group companies about travel tips and offers for similar products.
+                Get AI-built itineraries, destination ideas and hotel deals straight to your inbox. No spam, just travel inspo.
               </p>
             </div>
           </div>
@@ -40,7 +39,7 @@ export function Newsletter() {
             <div className="flex-1 relative">
               <input
                 type="email"
-                placeholder="Your email address"
+                placeholder="Enter your email"
                 className="w-full px-6 py-4 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-purple-600 focus:bg-white transition-all outline-none"
               />
             </div>
@@ -49,11 +48,6 @@ export function Newsletter() {
               <ArrowRight className="ml-2 size-5" />
             </Button>
           </div>
-
-          <p className="text-xs text-gray-500 mt-4">
-            Just so you know, we&apos;ll be able to see if you receive and open our emails to help us monitor the 
-            success of our marketing campaigns. You&apos;ll find further details in our data protection notice.
-          </p>
 
           {/* Decorative corner dots */}
           <div className="absolute top-6 right-6 w-3 h-3 bg-black rounded-full"></div>

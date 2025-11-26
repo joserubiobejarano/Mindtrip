@@ -39,13 +39,13 @@ export function HeroSearch({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
       onSubmit={onSubmit}
-      className="bg-white rounded-3xl shadow-2xl p-6 max-w-5xl mx-auto border-4 border-black"
+      className="bg-white rounded-3xl shadow-2xl p-6 max-w-6xl mx-auto border-4 border-black"
       style={{
         boxShadow: '8px 8px 0px rgba(0, 0, 0, 1)'
       }}
     >
-      <div className="grid md:grid-cols-5 gap-4">
-        <div className="md:col-span-2 relative">
+      <div className="flex flex-col md:flex-row gap-4 items-end">
+        <div className="flex-1 md:flex-[2] relative">
           <label className="block text-sm mb-2 text-gray-600">Where to?</label>
           <div className="relative">
             <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600 size-5 z-10" />
@@ -58,7 +58,7 @@ export function HeroSearch({
           </div>
         </div>
 
-        <div className="md:col-span-2 relative">
+        <div className="flex-1 md:flex-[2] relative">
           <label className="block text-sm mb-2 text-gray-600">Check-in / Check-out</label>
           <DateRangePicker
             startDate={startDate}
@@ -70,7 +70,7 @@ export function HeroSearch({
           />
         </div>
 
-        <div className="relative">
+        <div className="flex-1 relative">
           <label className="block text-sm mb-2 text-gray-600">Travelers</label>
           <div className="relative">
             <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-green-600 size-5 z-10" />
@@ -85,14 +85,13 @@ export function HeroSearch({
           </div>
         </div>
 
-        <div className="flex items-end">
+        <div className="flex-1 md:flex-shrink-0">
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-14 rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all border-2 border-black"
+            className="w-full md:w-auto h-14 px-8 rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all border-2 border-black"
           >
-            <Search className="mr-2 size-5" />
-            {loading ? "Searching..." : "Search"}
+            {loading ? "Planning..." : "Start planning"}
           </Button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getOpenAIClient } from '@/lib/openai'
 import { findPlacePhoto } from '@/lib/google/places-server'
+import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries'
 
 /**
  * Get a human-readable "good for" label based on place types
@@ -96,10 +97,22 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
 
-    // Load trip data including existing itinerary
+    // Check if smart itinerary already exists
+    const { data: existingItinerary, error: itineraryError } = await getSmartItinerary(tripId)
+    
+    if (existingItinerary) {
+      return NextResponse.json({ itinerary: existingItinerary })
+    }
+
+    if (itineraryError) {
+      console.error('Error checking smart itinerary:', itineraryError)
+      // Continue to generate new itinerary if check fails
+    }
+
+    // Load trip data
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country, itinerary')
+      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country')
       .eq('id', tripId)
       .single()
 
@@ -108,11 +121,6 @@ export async function POST(request: NextRequest) {
         { error: 'Trip not found' },
         { status: 404 }
       )
-    }
-
-    // If itinerary already exists, return it instead of regenerating
-    if (trip.itinerary) {
-      return NextResponse.json({ itinerary: trip.itinerary })
     }
 
     // Load days for the trip
@@ -344,11 +352,12 @@ Make sure each day has sections for Morning, Afternoon, and Evening. Be creative
       days: enrichedDays,
     };
 
-    // Save enriched itinerary JSON to trips table
-    await supabase
-      .from('trips')
-      .update({ itinerary: enrichedItinerary })
-      .eq('id', tripId);
+    // Save enriched itinerary JSON to smart_itineraries table
+    const { error: saveError } = await upsertSmartItinerary(tripId, enrichedItinerary);
+    if (saveError) {
+      console.error('Error saving smart itinerary:', saveError);
+      // Continue even if save fails - we still return the itinerary
+    }
 
     // Insert activities into DB
     // First, clear existing auto-generated activities? 

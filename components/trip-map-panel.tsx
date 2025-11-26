@@ -32,6 +32,7 @@ export function TripMapPanel({
   const { activities } = useActivities(selectedDayId || "");
   const [routePath, setRoutePath] = useState<google.maps.LatLngLiteral[]>([]);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // Calculate route for itinerary tab
   useEffect(() => {
@@ -123,6 +124,31 @@ export function TripMapPanel({
     // For itinerary, we could add activity selection here if needed
   };
 
+  // Get user location on mount (Explore tab only)
+  useEffect(() => {
+    if (activeTab !== "explore") return;
+    
+    if (typeof window !== "undefined" && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          // Silently fail - keep using trip center
+          console.log("Geolocation error:", error.message);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 300000, // Cache for 5 minutes
+        }
+      );
+    }
+  }, [activeTab]);
+
   // Update map center/zoom when switching tabs or explore state changes
   useEffect(() => {
     if (!mapInstance) return;
@@ -130,10 +156,19 @@ export function TripMapPanel({
     const center = getMapCenter();
     const zoom = getMapZoom();
 
-    if (activeTab === "explore" && exploreCenter) {
-      mapInstance.panTo(center);
-      if (exploreZoom != null) {
-        mapInstance.setZoom(exploreZoom);
+    if (activeTab === "explore") {
+      // On Explore tab, prefer user location if available, otherwise use exploreCenter or trip center
+      if (userLocation && !exploreCenter) {
+        mapInstance.panTo(userLocation);
+        mapInstance.setZoom(14);
+      } else if (exploreCenter) {
+        mapInstance.panTo(exploreCenter);
+        if (exploreZoom != null) {
+          mapInstance.setZoom(exploreZoom);
+        }
+      } else if (trip?.center_lat != null && trip?.center_lng != null) {
+        mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
+        mapInstance.setZoom(12);
       }
     } else if (activeTab === "itinerary" && activities && activities.length > 0) {
       const activitiesWithPlaces = activities.filter(
@@ -159,7 +194,7 @@ export function TripMapPanel({
       mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
       mapInstance.setZoom(12);
     }
-  }, [activeTab, exploreCenter, exploreZoom, mapInstance, activities, trip, getMapCenter, getMapZoom]);
+  }, [activeTab, exploreCenter, exploreZoom, mapInstance, activities, trip, userLocation, getMapCenter, getMapZoom]);
 
   if (!trip) {
     return (

@@ -126,7 +126,7 @@ export function DateRangePicker({
           {displayText()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start" ref={popoverRef}>
+      <PopoverContent className="w-auto p-0" align="start" side="bottom" sideOffset={8} ref={popoverRef}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <Button
