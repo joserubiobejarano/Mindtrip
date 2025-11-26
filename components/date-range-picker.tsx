@@ -45,12 +45,18 @@ export function DateRangePicker({
 
   // Set current month to start date when it's selected
   useEffect(() => {
-    if (start && !end) {
-      setCurrentMonth(start);
-    } else if (start) {
-      setCurrentMonth(start);
+    if (start) {
+      // Only update if the month is different to avoid infinite loops
+      const startMonth = start.getMonth();
+      const startYear = start.getFullYear();
+      const currentMonthValue = currentMonth.getMonth();
+      const currentYear = currentMonth.getFullYear();
+      
+      if (startMonth !== currentMonthValue || startYear !== currentYear) {
+        setCurrentMonth(new Date(startYear, startMonth, 1));
+      }
     }
-  }, [start, end]);
+  }, [start]);
 
   const handleDateClick = (date: Date) => {
     const dateStr = format(date, "yyyy-MM-dd");

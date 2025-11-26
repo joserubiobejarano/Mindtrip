@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     // Check if smart itinerary already exists
     const { data: existingItinerary, error: itineraryError } = await getSmartItinerary(tripId)
     
-    if (existingItinerary) {
+    if (existingItinerary && !itineraryError) {
       return NextResponse.json({ itinerary: existingItinerary })
     }
 

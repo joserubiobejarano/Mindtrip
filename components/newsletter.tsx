@@ -30,7 +30,10 @@ export function Newsletter() {
                 Plan smarter, travel better.
               </h2>
               <p className="text-gray-600 text-sm md:text-base">
-                Get AI-built itineraries, destination ideas and hotel deals straight to your inbox. No spam, just travel inspo.
+                Get built itineraries, destination ideas and hotel deals straight to your inbox.
+              </p>
+              <p className="text-sm text-sky-900 font-medium mt-1">
+                No spam, just travel inspo.
               </p>
             </div>
           </div>
