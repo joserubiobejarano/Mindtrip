@@ -740,6 +740,7 @@ export function ItineraryTab({
             )}
           </div>
         )}
+        </div>
 
         {/* Chat Panel - Bottom of Itinerary Tab */}
         <div className="border-t bg-white shadow-lg flex flex-col" style={{ maxHeight: '300px' }}>
