@@ -72,10 +72,12 @@ export function ItineraryTab({
     isLoading: activitiesLoading,
   } = useActivities(selectedDayId || "");
 
-  // Load itinerary from smart_itineraries table on mount
-  // The GET endpoint will return existing itinerary or generate one if missing
+  // Load itinerary from smart_itineraries table - fetch only once per tripId
+  // The GET endpoint will return existing itinerary or generate one if missing (idempotent)
   useEffect(() => {
-    if (!tripId || aiItinerary || loadingAiItinerary) return;
+    if (!tripId) return;
+
+    let cancelled = false;
 
     const loadItinerary = async () => {
       setLoadingAiItinerary(true);
@@ -83,28 +85,40 @@ export function ItineraryTab({
       try {
         const response = await fetch(`/api/trips/${tripId}/smart-itinerary`);
 
+        if (cancelled) return;
+
         if (!response.ok) {
-          throw new Error("Failed to load smart itinerary");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to load smart itinerary");
         }
 
         const { itinerary } = await response.json();
+        if (cancelled) return;
+
         if (itinerary) {
           setAiItinerary(itinerary);
         }
       } catch (error) {
+        if (cancelled) return;
         console.error("Error loading itinerary:", error);
         setAiItineraryError(
           error instanceof Error
             ? error.message
-            : "Failed to load itinerary. Please try again."
+            : "We couldn't load your itinerary. Please refresh the page or try again later."
         );
       } finally {
-        setLoadingAiItinerary(false);
+        if (!cancelled) {
+          setLoadingAiItinerary(false);
+        }
       }
     };
 
     loadItinerary();
-  }, [tripId, aiItinerary, loadingAiItinerary]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tripId]); // Only depend on tripId - never re-fetch on tab switches
 
   // Note: The itinerary is now loaded automatically via the GET endpoint above
   // which will return existing itinerary or generate one if missing (idempotent).
@@ -313,7 +327,7 @@ export function ItineraryTab({
         <div className="flex-1 overflow-y-auto pr-2">
         
         {/* Loading State Card - only show when loading and no itinerary exists */}
-        {loadingAiItinerary && !aiItinerary && (
+        {loadingAiItinerary && !aiItinerary && !aiItineraryError && (
           <Card className="mb-6 border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-purple-100 shadow-lg rounded-2xl">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Loader2 className="h-10 w-10 animate-spin text-purple-600 mb-4" />
@@ -327,10 +341,15 @@ export function ItineraryTab({
           </Card>
         )}
 
-        {aiItineraryError && (
-          <div className="text-sm text-destructive p-3 bg-destructive/10 rounded-md border border-destructive/20 mb-6">
-            {aiItineraryError}
-          </div>
+        {/* Error State - show friendly message in the same style as loading */}
+        {aiItineraryError && !aiItinerary && (
+          <Card className="mb-6 border-2 border-red-300 bg-gradient-to-br from-red-50 to-red-100 shadow-lg rounded-2xl">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-base font-medium text-red-900 text-center">
+                {aiItineraryError || "We couldn't load your itinerary. Please refresh the page or try again later."}
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Smart Itinerary View */}
