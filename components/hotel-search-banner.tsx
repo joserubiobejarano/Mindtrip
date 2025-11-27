@@ -8,10 +8,51 @@ import { Hotel, Plane } from "lucide-react";
 interface HotelSearchBannerProps {
   tripId: string;
   className?: string;
+  compact?: boolean;
 }
 
-export function HotelSearchBanner({ tripId, className }: HotelSearchBannerProps) {
+export function HotelSearchBanner({ tripId, className, compact = false }: HotelSearchBannerProps) {
   const router = useRouter();
+
+  if (compact) {
+    return (
+      <div className={className}>
+        <div className="flex flex-row gap-4 mb-4 max-w-4xl">
+          {/* Hotels Card */}
+          <div className="flex-1 rounded-3xl border border-slate-200 bg-gradient-to-br from-[#fdf7ff] via-white to-[#f3f6ff] shadow-[0_12px_0_#000] px-6 py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Hotel className="h-4 w-4 text-blue-600" />
+              <h3 className="text-sm font-semibold text-gray-900">Need a place to stay?</h3>
+            </div>
+            <p className="text-xs text-gray-600 mb-3">Search hotels for your trip dates and destination.</p>
+            <Button
+              onClick={() => router.push(`/trips/${tripId}/stay`)}
+              size="sm"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white border-2 border-black rounded-xl text-xs"
+            >
+              Search hotels
+            </Button>
+          </div>
+
+          {/* Flights Card */}
+          <div className="flex-1 rounded-3xl border border-slate-200 bg-gradient-to-br from-[#fdf7ff] via-white to-[#f3f6ff] shadow-[0_12px_0_#000] px-6 py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Plane className="h-4 w-4 text-purple-600" />
+              <h3 className="text-sm font-semibold text-gray-900">Need flights?</h3>
+            </div>
+            <p className="text-xs text-gray-600 mb-3">Find flights that match your trip dates.</p>
+            <Button
+              onClick={() => router.push("/flights")}
+              size="sm"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white border-2 border-black rounded-xl text-xs"
+            >
+              Search flights
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={className}>

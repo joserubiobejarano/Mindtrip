@@ -63,8 +63,11 @@ function matchSuggestionToSavedPlace(
 
 export type ActivitySuggestion = {
   title: string
+  description?: string
   photoUrl?: string | null
   goodFor?: string | null
+  placeId?: string | null
+  alreadyVisited?: boolean
 }
 
 export type AiItinerary = {
@@ -74,10 +77,14 @@ export type AiItinerary = {
     date: string
     title: string
     theme: string
+    summary: string
+    heroImages: string[]
     sections: {
       partOfDay: "Morning" | "Afternoon" | "Evening"
+      label?: string
       description: string
-      suggestions: (string | ActivitySuggestion)[]
+      activities?: ActivitySuggestion[]
+      suggestions?: (string | ActivitySuggestion)[]
       seasonalNotes?: string
     }[]
   }[]
@@ -101,7 +108,7 @@ export async function POST(request: NextRequest) {
     const { data: existingItinerary, error: itineraryError } = await getSmartItinerary(tripId)
     
     if (existingItinerary && !itineraryError) {
-      return NextResponse.json({ itinerary: existingItinerary })
+      return NextResponse.json({ itinerary: existingItinerary, fromCache: true })
     }
 
     if (itineraryError) {
@@ -179,7 +186,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    const prompt = `You are helping create a smart itinerary for MindTrip, a travel planning application.
+    const prompt = `You are an expert travel planner. Create a detailed, story-like itinerary in JSON format.
 
 Trip Details:
 - Destination: ${destination}
@@ -189,15 +196,31 @@ Trip Details:
 Days to plan:
 ${daysInfo.map(d => `- Day ${d.dayNumber}: ${d.dayOfWeek}, ${d.month} ${d.day}, ${d.year} (${d.date})`).join('\n')}
 
-Please create a comprehensive itinerary that:
-1. Takes into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
-2. Uses the destination city "${destination}" to anchor recommendations
-3. Prioritizes incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing
-4. Avoids booking links or specific booking recommendations - just give ideas and context
-5. Provides realistic timing and themes for each day
-6. Includes seasonal considerations (weather, local events, etc.)
+Requirements:
+- 1 entry per day of the trip.
+- Each day has:
+    - "title": short name for the day.
+    - "date": ISO date string (YYYY-MM-DD).
+    - "theme": short label like "Cultural Immersion" or "Food & Markets".
+    - "summary": 3-5 sentences describing the day in depth (tone: friendly, vivid, like a travel blog).
+    - "heroImages": 4-6 photo search terms for that day (for a horizontal gallery), e.g. ["Madrid Royal Palace", "Retiro Park Madrid", "Tapas bar Madrid"].
+    - "sections": morning / afternoon / evening. Each section has:
+         - "label": "Morning", "Afternoon", or "Evening"
+         - "description": 3-4 sentences describing what to do during this part of the day
+         - "activities": array of activities. Each activity has:
+              - "name": activity name
+              - "description": 2-3 sentences with practical info (opening hours, tips, what to expect)
+              - "placeId": null (always null for now)
+              - "alreadyVisited": false (always false for now)
+- Take into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
+- Use the destination city "${destination}" to anchor recommendations
+- Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing
+- Avoid booking links or specific booking recommendations - just give ideas and context
+- Provide realistic timing and themes for each day
+- Include seasonal considerations (weather, local events, etc.)
+- Make the text rich, descriptive, and engaging - like a travel blog post
 
-Return a JSON object with this exact structure:
+Return ONLY valid JSON with this exact structure:
 {
   "tripTitle": "A descriptive title for this trip",
   "summary": "A 2-3 sentence overview of the trip",
@@ -206,11 +229,20 @@ Return a JSON object with this exact structure:
       "date": "YYYY-MM-DD",
       "title": "Day title (e.g., 'Arrival and City Exploration')",
       "theme": "Theme for the day (e.g., 'Cultural Immersion', 'Nature & Relaxation')",
+      "summary": "3-5 sentences describing the day in depth, friendly and vivid tone",
+      "heroImages": ["Photo search term 1", "Photo search term 2", "Photo search term 3", "Photo search term 4"],
       "sections": [
         {
-          "partOfDay": "Morning" | "Afternoon" | "Evening",
-          "description": "A paragraph describing what to do during this part of the day",
-          "suggestions": ["Suggestion 1", "Suggestion 2", "Suggestion 3"],
+          "label": "Morning",
+          "description": "3-4 sentences describing what to do during this part of the day",
+          "activities": [
+            {
+              "name": "Activity name",
+              "description": "2-3 sentences with practical info",
+              "placeId": null,
+              "alreadyVisited": false
+            }
+          ],
           "seasonalNotes": "Optional note about seasonal considerations"
         }
       ]
@@ -218,7 +250,7 @@ Return a JSON object with this exact structure:
   ]
 }
 
-Make sure each day has sections for Morning, Afternoon, and Evening. Be creative but realistic.`
+Make sure each day has sections for Morning, Afternoon, and Evening with 4-6 activities total per day. Be creative but realistic.`
 
     // Call OpenAI
     const openai = getOpenAIClient()
@@ -245,7 +277,13 @@ Make sure each day has sections for Morning, Afternoon, and Evening. Be creative
     }
 
     // Parse the JSON response
-    // GPT returns suggestions as strings, we'll enrich them below
+    type RawActivity = {
+      name: string
+      description: string
+      placeId: string | null
+      alreadyVisited: boolean
+    }
+
     type RawAiItinerary = {
       tripTitle: string
       summary: string
@@ -253,10 +291,12 @@ Make sure each day has sections for Morning, Afternoon, and Evening. Be creative
         date: string
         title: string
         theme: string
+        summary: string
+        heroImages: string[]
         sections: {
-          partOfDay: "Morning" | "Afternoon" | "Evening"
+          label: string
           description: string
-          suggestions: string[]
+          activities: RawActivity[]
           seasonalNotes?: string
         }[]
       }[]
@@ -280,19 +320,31 @@ Make sure each day has sections for Morning, Afternoon, and Evening. Be creative
 
     // Process itinerary: Fetch photos and prepare activities for insertion
     const activitiesToInsert: any[] = [];
+    let globalOrderCounter = 0;
+    
     const enrichedDays = await Promise.all(parsedResponse.days.map(async (day, index) => {
       // Find matching DB day
       const dbDay = days?.find(d => d.date === day.date) || days?.[index];
       
+      // Fetch photos for hero images
+      const heroPhotoUrls = await Promise.all(
+        (day.heroImages || []).slice(0, 6).map(async (searchTerm) => {
+          const query = `${searchTerm} in ${destination}${country ? `, ${country}` : ''}`;
+          return await findPlacePhoto(query);
+        })
+      );
+
       const enrichedSections = await Promise.all(day.sections.map(async (section) => {
-        const enrichedSuggestions = await Promise.all(section.suggestions.map(async (suggestion, sIndex) => {
+        const partOfDay = section.label as "Morning" | "Afternoon" | "Evening";
+        
+        const enrichedActivities = await Promise.all(section.activities.map(async (activity, aIndex) => {
           // Try to match with saved place first
-          let match = matchSuggestionToSavedPlace(suggestion, savedPlaces || []);
+          let match = matchSuggestionToSavedPlace(activity.name, savedPlaces || []);
           let photoUrl = match?.photoUrl;
           
           // If no photo from saved place, try Google Places
           if (!photoUrl) {
-             const query = `${suggestion} in ${destination}${country ? `, ${country}` : ''}`;
+             const query = `${activity.name} in ${destination}${country ? `, ${country}` : ''}`;
              photoUrl = await findPlacePhoto(query);
           }
 
@@ -301,48 +353,47 @@ Make sure each day has sections for Morning, Afternoon, and Evening. Be creative
             let startTime = "09:00";
             let endTime = "12:00";
             
-            if (section.partOfDay === "Afternoon") {
+            if (partOfDay === "Afternoon") {
               startTime = "13:00";
               endTime = "17:00";
-            } else if (section.partOfDay === "Evening") {
+            } else if (partOfDay === "Evening") {
               startTime = "18:00";
               endTime = "21:00";
-            }
-
-            // Stagger times slightly based on index
-            if (sIndex > 0) {
-               // Simple logic: just keep same block time for now, or user can adjust
             }
 
             activitiesToInsert.push({
               trip_id: tripId,
               day_id: dbDay.id,
-              title: suggestion,
+              title: activity.name,
               start_time: startTime,
               end_time: endTime,
               photo_url: photoUrl,
-              order_number: sIndex, // This might clash if multiple sections, ideally use global counter per day
-              // We don't have place_id (UUID) unless we matched a saved place
-              // If matched saved place, we could potentially link it, but saved_places table has different IDs from places table
-              // For now, leave place_id null and just use title/photo
+              order_number: globalOrderCounter++,
             });
           }
 
           return {
-            title: suggestion,
+            title: activity.name,
+            description: activity.description,
             photoUrl: photoUrl,
             goodFor: match?.goodFor,
+            placeId: activity.placeId,
+            alreadyVisited: activity.alreadyVisited || false,
           } as ActivitySuggestion;
         }));
 
         return {
-          ...section,
-          suggestions: enrichedSuggestions,
+          partOfDay: partOfDay,
+          label: section.label,
+          description: section.description,
+          activities: enrichedActivities,
+          seasonalNotes: section.seasonalNotes,
         };
       }));
 
       return {
         ...day,
+        heroImages: heroPhotoUrls.filter(url => url !== null) as string[],
         sections: enrichedSections,
       };
     }));
@@ -375,7 +426,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening. Be creative
       }
     }
 
-    return NextResponse.json({ itinerary: enrichedItinerary })
+    return NextResponse.json({ itinerary: enrichedItinerary, fromCache: false })
   } catch (error) {
     console.error('Error in /api/ai-itinerary:', error)
     const errorMessage =
