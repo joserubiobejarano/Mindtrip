@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries'
+import { getOrCreateSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries'
 import type { AiItinerary } from '@/app/api/ai-itinerary/route'
 
 /**
  * GET /api/trips/[tripId]/smart-itinerary
- * Returns the cached smart itinerary for a trip, or null if not found
+ * Returns the cached smart itinerary for a trip, or generates one if not found
  */
 export async function GET(
   request: NextRequest,
@@ -37,20 +37,63 @@ export async function GET(
       )
     }
 
-    // Get cached itinerary
-    const { data: itinerary, error } = await getSmartItinerary(tripId)
+    // Get or create itinerary (idempotent - returns existing if present, generates if not)
+    const { itinerary, fromCache } = await getOrCreateSmartItinerary(tripId)
 
-    if (error) {
-      console.error('Error fetching smart itinerary:', error)
+    return NextResponse.json({ itinerary, fromCache })
+  } catch (error) {
+    console.error('Error in GET /api/trips/[tripId]/smart-itinerary:', error)
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred'
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * POST /api/trips/[tripId]/smart-itinerary
+ * Explicitly regenerates the smart itinerary (force regenerate)
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ tripId: string }> }
+) {
+  try {
+    const { tripId } = await params
+
+    if (!tripId) {
       return NextResponse.json(
-        { error: 'Failed to fetch itinerary' },
-        { status: 500 }
+        { error: 'tripId is required' },
+        { status: 400 }
       )
     }
 
-    return NextResponse.json({ itinerary })
+    const supabase = await createClient()
+
+    // Verify user has access to this trip
+    const { data: trip, error: tripError } = await supabase
+      .from('trips')
+      .select('id')
+      .eq('id', tripId)
+      .single()
+
+    if (tripError || !trip) {
+      return NextResponse.json(
+        { error: 'Trip not found' },
+        { status: 404 }
+      )
+    }
+
+    // Force regenerate itinerary
+    const { itinerary, fromCache } = await getOrCreateSmartItinerary(tripId, {
+      forceRegenerate: true,
+    })
+
+    return NextResponse.json({ itinerary, fromCache })
   } catch (error) {
-    console.error('Error in GET /api/trips/[tripId]/smart-itinerary:', error)
+    console.error('Error in POST /api/trips/[tripId]/smart-itinerary:', error)
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred'
     return NextResponse.json(
