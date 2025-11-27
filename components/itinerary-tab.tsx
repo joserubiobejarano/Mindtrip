@@ -327,7 +327,7 @@ export function ItineraryTab({
 
       {/* Content Area */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-y-auto pr-2 pb-6">
+        <div className="flex-1 overflow-y-auto pr-2 pb-10">
         
         {/* Loading State Card - only show when loading and no itinerary exists */}
         {isLoading && !smartItinerary && !error && (
@@ -361,10 +361,10 @@ export function ItineraryTab({
             {/* Intro Card */}
             <Card className="bg-gradient-to-br from-white to-gray-50 border-none shadow-sm ring-1 ring-black/5">
               <CardHeader>
-                <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
+                <CardTitle className="text-3xl font-bold text-slate-900 mb-2">
                   {smartItinerary.tripTitle}
                 </CardTitle>
-                <CardDescription className="text-lg leading-relaxed text-gray-700">
+                <CardDescription className="text-base leading-relaxed text-slate-900">
                   {smartItinerary.summary}
                 </CardDescription>
               </CardHeader>
@@ -412,7 +412,7 @@ export function ItineraryTab({
                     {/* Day Summary */}
                     {(day as any).summary && (
                       <div className="p-6 bg-white border-b">
-                        <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-slate-700">
+                        <p className="mt-3 text-sm md:text-base leading-relaxed text-slate-900">
                           {(day as any).summary}
                         </p>
                       </div>
@@ -434,7 +434,7 @@ export function ItineraryTab({
                             
                             {/* Section Description */}
                             {section.description && (
-                              <p className="text-sm text-gray-600 mb-4 leading-relaxed max-w-3xl">
+                              <p className="text-sm md:text-base leading-relaxed text-slate-900 mb-4">
                                 {section.description}
                               </p>
                             )}
@@ -484,7 +484,7 @@ export function ItineraryTab({
                                             {isVisited && <Check className="h-4 w-4 text-green-600" />}
                                           </h5>
                                           {description && (
-                                            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                                            <p className="text-sm md:text-base leading-relaxed text-slate-900 mt-2">
                                               {description}
                                             </p>
                                           )}
@@ -494,11 +494,10 @@ export function ItineraryTab({
                                             </p>
                                           )}
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-8 w-8 p-0"
+                                        <div className="flex items-center gap-2">
+                                          <button
+                                            type="button"
+                                            className="inline-flex items-center rounded-full bg-sky-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-1"
                                             onClick={async () => {
                                               const newVisited = !isVisited;
                                               setVisitedPlaces(prev => {
@@ -533,16 +532,11 @@ export function ItineraryTab({
                                             }}
                                             title={isVisited ? "Mark as not visited" : "Mark as visited"}
                                           >
-                                            {isVisited ? (
-                                              <Check className="h-4 w-4 text-green-600" />
-                                            ) : (
-                                              <Check className="h-4 w-4 text-gray-400" />
-                                            )}
-                                          </Button>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-8 w-8 p-0 text-gray-400 hover:text-destructive"
+                                            ✓ Visited
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="inline-flex items-center rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-1"
                                             onClick={async () => {
                                               // Remove from day - update local state
                                               const updatedItinerary = { ...smartItinerary! };
@@ -570,8 +564,8 @@ export function ItineraryTab({
                                             }}
                                             title="Remove from day"
                                           >
-                                            <X className="h-4 w-4" />
-                                          </Button>
+                                            ✕ Remove
+                                          </button>
                                         </div>
                                       </div>
                                     </div>
@@ -641,7 +635,7 @@ export function ItineraryTab({
         )}
         
         {/* Trip Assistant Widget - At bottom center of content */}
-        <div className="mt-8">
+        <div className="mt-8 mb-8">
           <TripAssistantWidget tripId={tripId} />
         </div>
         </div>

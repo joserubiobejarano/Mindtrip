@@ -187,6 +187,51 @@ export async function generateSmartItineraryWithOpenAI(
     };
   });
 
+  const systemPrompt = `You are MindTrip, an expert travel planner.
+
+Goal:
+- Generate a rich, story-like itinerary stored as JSON.
+- The frontend will show a big intro paragraph for the whole trip,
+  then per-day sections with Morning / Afternoon / Evening blocks,
+  each block containing 2–4 activities.
+
+Style:
+- Use warm, descriptive but concise language.
+- For the trip intro and each time-of-day description, write
+  3–6 full sentences (not just one short line).
+- Give concrete details: what the traveler sees, feels, eats, and does.
+- Mention practical hints when useful (e.g. "arrive a bit earlier to avoid queues",
+  "perfect place for photos", "great spot to warm up in winter").
+
+JSON structure:
+{
+  "title": string,
+  "summary": string, // 4–7 sentences about the overall trip
+  "days": [
+    {
+      "date": "YYYY-MM-DD",
+      "title": string,
+      "subtitle": string,
+      "sections": [
+        {
+          "timeOfDay": "Morning" | "Afternoon" | "Evening",
+          "description": string, // 3–6 sentences
+          "activities": [
+            {
+              "name": string,
+              "description": string, // 2–4 sentences
+              "placeId": string | null,
+              "photoUrl": string | null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+- Always return valid JSON only, no markdown or explanations.`;
+
   const prompt = `You are an expert travel planner. Create a detailed, story-like itinerary in JSON format.
 
 Trip Details:
@@ -203,14 +248,14 @@ Requirements:
     - "title": short name for the day.
     - "date": ISO date string (YYYY-MM-DD).
     - "theme": short label like "Cultural Immersion" or "Food & Markets".
-    - "summary": 3-5 sentences describing the day in depth (tone: friendly, vivid, like a travel blog).
+    - "summary": 4-7 sentences describing the day in depth (tone: friendly, vivid, like a travel blog). Be descriptive and paint a picture of the experience.
     - "heroImages": 4-6 photo search terms for that day (for a horizontal gallery), e.g. ["Madrid Royal Palace", "Retiro Park Madrid", "Tapas bar Madrid"].
     - "sections": morning / afternoon / evening. Each section has:
          - "label": "Morning", "Afternoon", or "Evening"
-         - "description": 3-4 sentences describing what to do during this part of the day
+         - "description": 3-6 sentences describing what to do during this part of the day. Be detailed and evocative - describe the atmosphere, what travelers will see, feel, and experience. Include practical tips like arrival times, what to bring, or seasonal considerations.
          - "activities": array of activities. Each activity has:
               - "name": activity name
-              - "description": 2-3 sentences with practical info (opening hours, tips, what to expect)
+              - "description": 2-4 sentences with practical info (opening hours, tips, what to expect, what makes it special). Be specific and helpful.
               - "placeId": null (always null for now)
               - "alreadyVisited": false (always false for now)
 - Take into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
@@ -220,26 +265,27 @@ Requirements:
 - Provide realistic timing and themes for each day
 - Include seasonal considerations (weather, local events, etc.)
 - Make the text rich, descriptive, and engaging - like a travel blog post
+- Write longer, more detailed descriptions for the trip summary, day summaries, and section descriptions (aim for 3-6 sentences each, not just 1-2)
 
 Return ONLY valid JSON with this exact structure:
 {
   "tripTitle": "A descriptive title for this trip",
-  "summary": "A 2-3 sentence overview of the trip",
+  "summary": "A 4-7 sentence overview of the trip - be descriptive and paint a vivid picture",
   "days": [
     {
       "date": "YYYY-MM-DD",
       "title": "Day title (e.g., 'Arrival and City Exploration')",
       "theme": "Theme for the day (e.g., 'Cultural Immersion', 'Nature & Relaxation')",
-      "summary": "3-5 sentences describing the day in depth, friendly and vivid tone",
+      "summary": "4-7 sentences describing the day in depth, friendly and vivid tone - be descriptive",
       "heroImages": ["Photo search term 1", "Photo search term 2", "Photo search term 3", "Photo search term 4"],
       "sections": [
         {
           "label": "Morning",
-          "description": "3-4 sentences describing what to do during this part of the day",
+          "description": "3-6 sentences describing what to do during this part of the day - be detailed and evocative",
           "activities": [
             {
               "name": "Activity name",
-              "description": "2-3 sentences with practical info",
+              "description": "2-4 sentences with practical info - be specific and helpful",
               "placeId": null,
               "alreadyVisited": false
             }
@@ -260,8 +306,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with 4-6 act
     messages: [
       {
         role: 'system',
-        content:
-          'You are a helpful travel planning assistant. Always return valid JSON matching the exact structure requested. No markdown formatting, just pure JSON.',
+        content: systemPrompt,
       },
       {
         role: 'user',

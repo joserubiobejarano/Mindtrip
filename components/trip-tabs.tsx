@@ -49,29 +49,35 @@ export function TripTabs({
     onTabChange?.(value);
   };
 
+  const tabs = [
+    { slug: "explore", label: "Explore" },
+    { slug: "itinerary", label: "Itinerary" },
+    { slug: "expenses", label: "Expenses" },
+  ];
+
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
       <div className="px-6 pt-6 pb-0">
-        <TabsList className="mb-4 bg-gray-100 rounded-xl p-1 border-2 border-black/10">
-          <TabsTrigger 
-            value="explore"
-            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-lg font-medium"
-          >
-            Explore
-          </TabsTrigger>
-          <TabsTrigger 
-            value="itinerary"
-            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-lg font-medium"
-          >
-            Itinerary
-          </TabsTrigger>
-          <TabsTrigger 
-            value="expenses"
-            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-lg font-medium"
-          >
-            Expenses
-          </TabsTrigger>
-        </TabsList>
+        <div className="mb-6 flex items-center justify-start">
+          <div className="inline-flex rounded-[999px] border-[3px] border-black bg-white px-1 py-1 shadow-[6px_6px_0_0_rgba(0,0,0,1)] gap-1">
+            {tabs.map((tab) => {
+              const isActive = tab.slug === activeTab;
+              return (
+                <button
+                  key={tab.slug}
+                  onClick={() => handleTabChange(tab.slug)}
+                  className={`px-4 py-2 text-sm font-semibold rounded-[999px] transition ${
+                    isActive
+                      ? "bg-orange-500 text-white"
+                      : "bg-transparent text-slate-800 hover:bg-slate-100"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
         {/* Hotel & Flight Boxes - only show on Itinerary tab, positioned directly under tabs */}
         {activeTab === "itinerary" && trip?.start_date && trip?.end_date && (
           <div className="mb-6">
