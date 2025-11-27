@@ -128,8 +128,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let tripId: string | undefined
   try {
-    const { tripId } = await params
+    const resolvedParams = await params
+    tripId = resolvedParams.tripId
 
     if (!tripId) {
       return NextResponse.json(
@@ -177,8 +179,10 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let tripId: string | undefined
   try {
-    const { tripId } = await params
+    const resolvedParams = await params
+    tripId = resolvedParams.tripId
     const body = await request.json()
     const { itinerary } = body
 
