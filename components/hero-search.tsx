@@ -45,7 +45,7 @@ export function HeroSearch({
       }}
     >
       <div className="flex flex-col md:flex-row gap-4 items-end">
-        <div className="flex-1 relative w-full">
+        <div className="flex-[3] relative w-full">
           <label className="block text-sm font-medium mb-2 text-gray-700">Where to?</label>
           <div className="relative">
             <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600 size-5 z-10" />

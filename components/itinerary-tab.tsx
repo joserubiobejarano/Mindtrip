@@ -54,8 +54,8 @@ export function ItineraryTab({
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
   const [smartItinerary, setSmartItinerary] = useState<AiItinerary | null>(null);
-  const [loadingAiItinerary, setLoadingAiItinerary] = useState(false);
-  const [aiItineraryError, setAiItineraryError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { addToast } = useToast();
   const settingsMenuRef = useRef<HTMLDivElement>(null);
@@ -74,14 +74,15 @@ export function ItineraryTab({
 
   // Load itinerary from smart_itineraries table - fetch only once per tripId
   // The GET endpoint will return existing itinerary or generate one if missing (idempotent)
+  // Response shape: { id, trip_id, content, created_at }
   useEffect(() => {
     if (!tripId) return;
 
     let cancelled = false;
 
     const loadItinerary = async () => {
-      setLoadingAiItinerary(true);
-      setAiItineraryError(null);
+      setIsLoading(true);
+      setError(null);
       try {
         const res = await fetch(`/api/trips/${tripId}/smart-itinerary`);
 
@@ -94,17 +95,18 @@ export function ItineraryTab({
         const data = await res.json();
         if (cancelled) return;
 
-        if (!cancelled) {
-          setSmartItinerary(data);
+        // Extract content from the response (data.content is the jsonb object)
+        if (!cancelled && data && data.content) {
+          setSmartItinerary(data.content);
         }
       } catch (err) {
         console.error('[smart-itinerary] frontend error', err);
         if (!cancelled) {
-          setAiItineraryError('We couldn\'t load your itinerary. Please try again.');
+          setError('We couldn\'t load your itinerary. Please try again.');
         }
       } finally {
         if (!cancelled) {
-          setLoadingAiItinerary(false);
+          setIsLoading(false);
         }
       }
     };
@@ -323,7 +325,7 @@ export function ItineraryTab({
         <div className="flex-1 overflow-y-auto pr-2">
         
         {/* Loading State Card - only show when loading and no itinerary exists */}
-        {loadingAiItinerary && !smartItinerary && !aiItineraryError && (
+        {isLoading && !smartItinerary && !error && (
           <Card className="mb-6 border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-purple-100 shadow-lg rounded-2xl">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Loader2 className="h-10 w-10 animate-spin text-purple-600 mb-4" />
@@ -338,11 +340,11 @@ export function ItineraryTab({
         )}
 
         {/* Error State - show friendly message in the same style as loading */}
-        {aiItineraryError && !smartItinerary && (
+        {error && !smartItinerary && (
           <Card className="mb-6 border-2 border-red-300 bg-gradient-to-br from-red-50 to-red-100 shadow-lg rounded-2xl">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="text-base font-medium text-red-900 text-center">
-                {aiItineraryError || "We couldn't load your itinerary. Please refresh the page or try again later."}
+                {error || "We couldn't load your itinerary. Please refresh the page or try again later."}
               </p>
             </CardContent>
           </Card>
@@ -587,7 +589,7 @@ export function ItineraryTab({
               )
             })}
           </div>
-        ) : !loadingAiItinerary && !aiItineraryError ? (
+        ) : !isLoading && !error ? (
           // Empty state - no itinerary yet
           <Card className="mb-6 border-2 border-gray-200 bg-white shadow-sm rounded-2xl">
             <CardContent className="flex flex-col items-center justify-center py-12">

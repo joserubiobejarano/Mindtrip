@@ -120,7 +120,7 @@ function matchSuggestionToSavedPlace(
 /**
  * Generate a smart itinerary using OpenAI
  */
-async function generateSmartItineraryWithOpenAI(
+export async function generateSmartItineraryWithOpenAI(
   tripId: string,
   supabase: Awaited<ReturnType<typeof createClient>>
 ): Promise<AiItinerary> {
