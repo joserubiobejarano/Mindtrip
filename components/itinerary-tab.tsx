@@ -16,7 +16,6 @@ import { format, formatDistanceToNow } from "date-fns";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
 import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
-import { HotelSearchBanner } from "@/components/hotel-search-banner";
 import { useRouter } from "next/navigation";
 import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
 import { useToast } from "@/components/ui/toast";
@@ -74,35 +73,46 @@ export function ItineraryTab({
 
   // Load itinerary from smart_itineraries table - fetch only once per tripId
   // The GET endpoint will return existing itinerary or generate one if missing (idempotent)
-  // Response shape: { id, trip_id, content, created_at }
+  // Response shape: { itinerary: AiItinerary, source: 'existing' | 'generated' }
   useEffect(() => {
     if (!tripId) return;
 
     let cancelled = false;
 
-    const loadItinerary = async () => {
-      setIsLoading(true);
-      setError(null);
+    const fetchItinerary = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+
         const res = await fetch(`/api/trips/${tripId}/smart-itinerary`);
 
         if (cancelled) return;
 
         if (!res.ok) {
-          throw new Error('Failed to load smart itinerary');
+          const body = await res.json().catch(() => ({}));
+          console.error('[smart-itinerary] frontend error', {
+            status: res.status,
+            body,
+          });
+          if (!cancelled) {
+            setError('We couldn\'t load your itinerary. Please try again.');
+            setIsLoading(false);
+          }
+          return;
         }
 
-        const data = await res.json();
+        const body = await res.json();
+
         if (cancelled) return;
 
-        // Extract content from the response (data.content is the jsonb object)
-        if (!cancelled && data && data.content) {
-          setSmartItinerary(data.content);
+        if (!cancelled && body && body.itinerary) {
+          setSmartItinerary(body.itinerary);
         }
       } catch (err) {
-        console.error('[smart-itinerary] frontend error', err);
+        console.error('[smart-itinerary] frontend exception', err);
         if (!cancelled) {
           setError('We couldn\'t load your itinerary. Please try again.');
+          setIsLoading(false);
         }
       } finally {
         if (!cancelled) {
@@ -111,7 +121,7 @@ export function ItineraryTab({
       }
     };
 
-    loadItinerary();
+    fetchItinerary();
 
     return () => {
       cancelled = true;
@@ -258,11 +268,6 @@ export function ItineraryTab({
 
   return (
     <div className="p-6 h-full flex flex-col overflow-hidden bg-gray-50/50">
-      {/* Hotel & Flight Boxes - positioned right below tabs */}
-      {trip.start_date && trip.end_date && (
-        <HotelSearchBanner tripId={tripId} className="mb-6" compact={true} />
-      )}
-
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">

@@ -48,22 +48,26 @@ export async function GET(
       .from('smart_itineraries')
       .select('id, trip_id, content, created_at')
       .eq('trip_id', tripId)
-      .order('created_at', { ascending: false })
-      .limit(1)
       .maybeSingle()
 
     // 4) If existingError is not null, log it and return 500
     if (existingError) {
-      console.error('[smart-itinerary] select error', existingError)
+      console.error('[smart-itinerary] Error fetching existing itinerary', {
+        tripId,
+        error: existingError,
+      })
       return NextResponse.json(
-        { error: 'Could not load itinerary' },
+        { error: 'Failed to load smart itinerary' },
         { status: 500 }
       )
     }
 
-    // 5) If existing exists, return it directly
+    // 5) If existing exists, return it directly (NO regeneration)
     if (existing) {
-      return NextResponse.json(existing)
+      return NextResponse.json(
+        { itinerary: existing.content, source: 'existing' },
+        { status: 200 }
+      )
     }
 
     // 6) If there is no existing row: Load the trip from trips table
@@ -71,57 +75,75 @@ export async function GET(
       .from('trips')
       .select('id, title, start_date, end_date, destination_name, destination_country, center_lat, center_lng')
       .eq('id', tripId)
-      .single()
+      .maybeSingle()
 
-    if (tripError || !trip) {
-      console.error('[smart-itinerary] trip not found', { tripId, tripError })
+    if (tripError) {
+      console.error('[smart-itinerary] Error loading trip before generation', {
+        tripId,
+        error: tripError,
+      })
+      return NextResponse.json(
+        { error: 'Failed to load trip details' },
+        { status: 500 }
+      )
+    }
+
+    if (!trip) {
+      console.error('[smart-itinerary] Trip not found', { tripId })
       return NextResponse.json(
         { error: 'Trip not found' },
         { status: 404 }
       )
     }
 
-    // 7) Call the existing helper that generates the AI itinerary
-    // The helper returns a plain JS object (AiItinerary), not a JSON string
+    // 7) Generate the itinerary using existing helper
     let itineraryObject: AiItinerary
     try {
       const raw = await generateSmartItineraryWithOpenAI(tripId, supabase)
       // Ensure it's an object (it should already be, but just in case)
       itineraryObject = typeof raw === 'string' ? JSON.parse(raw) : raw
     } catch (genError) {
-      console.error('[smart-itinerary] generation failed', { tripId, genError })
+      console.error('[smart-itinerary] Error generating itinerary', {
+        tripId,
+        error: genError,
+      })
       return NextResponse.json(
-        { error: 'Failed to load smart itinerary' },
+        { error: 'Failed to generate smart itinerary' },
         { status: 500 }
       )
     }
 
-    // 8) Insert ONE row into smart_itineraries
-    // CRITICAL: Pass itineraryObject as a JS object, NOT a JSON string
-    // PostgREST will automatically cast it to jsonb
-    const { data: insertData, error: insertError } = await supabase
+    // 8) Insert the generated itinerary
+    const { data: inserted, error: insertError } = await supabase
       .from('smart_itineraries')
       .insert({
         trip_id: tripId,
         content: itineraryObject, // Pass as object, not stringified
       })
       .select('id, trip_id, content, created_at')
-      .single()
+      .maybeSingle()
 
-    // 9) If insertError is not null, log it and return 500
-    if (insertError) {
-      console.error('[smart-itinerary] insert error', insertError)
+    if (insertError || !inserted) {
+      console.error('[smart-itinerary] Error inserting new itinerary', {
+        tripId,
+        error: insertError,
+      })
       return NextResponse.json(
-        { error: 'Failed to load smart itinerary' },
+        { error: 'Failed to save smart itinerary' },
         { status: 500 }
       )
     }
 
-    // 10) Return the inserted row as JSON
-    return NextResponse.json(insertData)
-  } catch (error) {
-    // Wrap the whole handler in try/catch
-    console.error('[smart-itinerary] unexpected error', error)
+    // 9) Return the inserted itinerary
+    return NextResponse.json(
+      { itinerary: inserted.content, source: 'generated' },
+      { status: 201 }
+    )
+  } catch (err) {
+    console.error('[smart-itinerary] Unhandled error in GET', {
+      tripId,
+      error: err,
+    })
     return NextResponse.json(
       { error: 'Failed to load smart itinerary' },
       { status: 500 }
@@ -184,7 +206,10 @@ export async function POST(
       .single()
 
     if (insertError) {
-      console.error('[smart-itinerary] POST insert error', insertError)
+      console.error('[smart-itinerary] POST insert error', {
+        tripId,
+        error: insertError,
+      })
       return NextResponse.json(
         { error: 'Failed to regenerate itinerary' },
         { status: 500 }
@@ -195,7 +220,7 @@ export async function POST(
   } catch (error) {
     console.error('[smart-itinerary] POST failed', { tripId, error })
     return NextResponse.json(
-      { error: 'Failed to load smart itinerary' },
+      { error: 'Failed to regenerate smart itinerary' },
       { status: 500 }
     )
   }
@@ -262,7 +287,10 @@ export async function PATCH(
       .single()
 
     if (updateError) {
-      console.error('[smart-itinerary] PATCH update error', updateError)
+      console.error('[smart-itinerary] PATCH update error', {
+        tripId,
+        error: updateError,
+      })
       return NextResponse.json(
         { error: 'Failed to update itinerary' },
         { status: 500 }

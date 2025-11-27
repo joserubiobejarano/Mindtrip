@@ -39,9 +39,9 @@ export function HeroSearch({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
       onSubmit={onSubmit}
-      className="bg-white rounded-3xl shadow-lg p-6 max-w-7xl w-full mx-auto border-4 border-black"
+      className="bg-white rounded-3xl p-7 max-w-7xl w-full mx-auto border-4 border-black"
       style={{
-        boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.1)'
+        boxShadow: '8px 8px 0px rgba(0, 0, 0, 1)'
       }}
     >
       <div className="flex flex-col md:flex-row gap-4 items-end">
