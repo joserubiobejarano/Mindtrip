@@ -53,7 +53,7 @@ export function ItineraryTab({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([]);
-  const [aiItinerary, setAiItinerary] = useState<AiItinerary | null>(null);
+  const [smartItinerary, setSmartItinerary] = useState<AiItinerary | null>(null);
   const [loadingAiItinerary, setLoadingAiItinerary] = useState(false);
   const [aiItineraryError, setAiItineraryError] = useState<string | null>(null);
   const router = useRouter();
@@ -83,29 +83,25 @@ export function ItineraryTab({
       setLoadingAiItinerary(true);
       setAiItineraryError(null);
       try {
-        const response = await fetch(`/api/trips/${tripId}/smart-itinerary`);
+        const res = await fetch(`/api/trips/${tripId}/smart-itinerary`);
 
         if (cancelled) return;
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || "Failed to load smart itinerary");
+        if (!res.ok) {
+          throw new Error('Failed to load smart itinerary');
         }
 
-        const { itinerary } = await response.json();
+        const data = await res.json();
         if (cancelled) return;
 
-        if (itinerary) {
-          setAiItinerary(itinerary);
+        if (!cancelled) {
+          setSmartItinerary(data);
         }
-      } catch (error) {
-        if (cancelled) return;
-        console.error("Error loading itinerary:", error);
-        setAiItineraryError(
-          error instanceof Error
-            ? error.message
-            : "We couldn't load your itinerary. Please refresh the page or try again later."
-        );
+      } catch (err) {
+        console.error('[smart-itinerary] frontend error', err);
+        if (!cancelled) {
+          setAiItineraryError('We couldn\'t load your itinerary. Please try again.');
+        }
       } finally {
         if (!cancelled) {
           setLoadingAiItinerary(false);
@@ -118,7 +114,7 @@ export function ItineraryTab({
     return () => {
       cancelled = true;
     };
-  }, [tripId]); // Only depend on tripId - never re-fetch on tab switches
+  }, [tripId]);
 
   // Note: The itinerary is now loaded automatically via the GET endpoint above
   // which will return existing itinerary or generate one if missing (idempotent).
@@ -327,7 +323,7 @@ export function ItineraryTab({
         <div className="flex-1 overflow-y-auto pr-2">
         
         {/* Loading State Card - only show when loading and no itinerary exists */}
-        {loadingAiItinerary && !aiItinerary && !aiItineraryError && (
+        {loadingAiItinerary && !smartItinerary && !aiItineraryError && (
           <Card className="mb-6 border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-purple-100 shadow-lg rounded-2xl">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Loader2 className="h-10 w-10 animate-spin text-purple-600 mb-4" />
@@ -342,7 +338,7 @@ export function ItineraryTab({
         )}
 
         {/* Error State - show friendly message in the same style as loading */}
-        {aiItineraryError && !aiItinerary && (
+        {aiItineraryError && !smartItinerary && (
           <Card className="mb-6 border-2 border-red-300 bg-gradient-to-br from-red-50 to-red-100 shadow-lg rounded-2xl">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="text-base font-medium text-red-900 text-center">
@@ -353,22 +349,22 @@ export function ItineraryTab({
         )}
 
         {/* Smart Itinerary View */}
-        {aiItinerary ? (
+        {smartItinerary && smartItinerary.days && smartItinerary.days.length > 0 ? (
           <div className="space-y-8 pb-10">
             {/* Intro Card */}
             <Card className="bg-gradient-to-br from-white to-gray-50 border-none shadow-sm ring-1 ring-black/5">
               <CardHeader>
                 <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
-                  {aiItinerary.tripTitle}
+                  {smartItinerary.tripTitle}
                 </CardTitle>
                 <CardDescription className="text-lg leading-relaxed text-gray-700">
-                  {aiItinerary.summary}
+                  {smartItinerary.summary}
                 </CardDescription>
               </CardHeader>
             </Card>
 
             {/* Days */}
-            {aiItinerary.days.map((day, dayIdx) => {
+            {smartItinerary.days.map((day, dayIdx) => {
               // Use heroImages if available, otherwise extract from activities
               const heroImages = (day as any).heroImages || [];
               const displayPhotos = heroImages.slice(0, 6);
@@ -416,7 +412,7 @@ export function ItineraryTab({
                     )}
 
                     <div className="p-6 space-y-8 bg-white">
-                      {day.sections.map((section, sectionIdx) => {
+                      {day.sections?.map((section, sectionIdx) => {
                         // Handle both old format (suggestions) and new format (activities)
                         const activities = (section as any).activities || section.suggestions || [];
                         const partOfDay = section.partOfDay || (section as any).label || "Morning";
@@ -437,7 +433,7 @@ export function ItineraryTab({
                             )}
                             
                             <div className="space-y-3">
-                              {activities.map((activity: any, actIdx: number) => {
+                              {activities?.map((activity: any, actIdx: number) => {
                                 const activityObj = isActivitySuggestion(activity) ? activity : {
                                   title: typeof activity === 'string' ? activity : activity.name || activity.title,
                                   description: activity.description || null,
@@ -509,13 +505,13 @@ export function ItineraryTab({
                                               });
                                               
                                               // Update itinerary state
-                                              const updatedItinerary = { ...aiItinerary! };
+                                              const updatedItinerary = { ...smartItinerary! };
                                               const day = updatedItinerary.days[dayIdx];
                                               const section = day.sections[sectionIdx];
                                               if ((section as any).activities) {
                                                 (section as any).activities[actIdx].alreadyVisited = newVisited;
                                               }
-                                              setAiItinerary(updatedItinerary);
+                                              setSmartItinerary(updatedItinerary);
                                               
                                               // Persist to backend
                                               try {
@@ -542,7 +538,7 @@ export function ItineraryTab({
                                             className="h-8 w-8 p-0 text-gray-400 hover:text-destructive"
                                             onClick={async () => {
                                               // Remove from day - update local state
-                                              const updatedItinerary = { ...aiItinerary! };
+                                              const updatedItinerary = { ...smartItinerary! };
                                               const day = updatedItinerary.days[dayIdx];
                                               const section = day.sections[sectionIdx];
                                               
@@ -552,7 +548,7 @@ export function ItineraryTab({
                                                 section.suggestions = section.suggestions.filter((_, idx) => idx !== actIdx);
                                               }
                                               
-                                              setAiItinerary(updatedItinerary);
+                                              setSmartItinerary(updatedItinerary);
                                               
                                               // Persist to backend
                                               try {
@@ -591,6 +587,15 @@ export function ItineraryTab({
               )
             })}
           </div>
+        ) : !loadingAiItinerary && !aiItineraryError ? (
+          // Empty state - no itinerary yet
+          <Card className="mb-6 border-2 border-gray-200 bg-white shadow-sm rounded-2xl">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-base font-medium text-gray-700 text-center">
+                No itinerary yet. Try generating one or adding activities.
+              </p>
+            </CardContent>
+          </Card>
         ) : (
           // Fallback / Manual View
           <div className="space-y-6">
