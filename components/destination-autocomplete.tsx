@@ -31,6 +31,7 @@ interface DestinationAutocompleteProps {
   onChange: (destination: DestinationOption | null) => void;
   className?: string;
   placeholder?: string;
+  inputClassName?: string;
 }
 
 export function DestinationAutocomplete({
@@ -38,6 +39,7 @@ export function DestinationAutocomplete({
   onChange,
   className,
   placeholder = "Where to?",
+  inputClassName,
 }: DestinationAutocompleteProps) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<DestinationOption[]>([]);
@@ -189,7 +191,7 @@ export function DestinationAutocomplete({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
-          className="pr-10"
+          className={cn("pr-10", inputClassName)}
         />
         {query && (
           <Button

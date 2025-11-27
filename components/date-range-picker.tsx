@@ -14,6 +14,7 @@ interface DateRangePickerProps {
   onEndDateChange: (date: string) => void;
   className?: string;
   placeholder?: string;
+  hideIcon?: boolean;
 }
 
 export function DateRangePicker({
@@ -23,6 +24,7 @@ export function DateRangePicker({
   onEndDateChange,
   className,
   placeholder = "Select dates",
+  hideIcon = false,
 }: DateRangePickerProps) {
   const [open, setOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -127,12 +129,13 @@ export function DateRangePicker({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal pl-12",
+            "w-full justify-start text-left font-normal",
+            !hideIcon && "pl-12",
             !start && !end && "text-muted-foreground",
             className
           )}
         >
-          <Calendar className="mr-2 h-4 w-4 absolute left-4" />
+          {!hideIcon && <Calendar className="mr-2 h-4 w-4 absolute left-4" />}
           {displayText()}
         </Button>
       </PopoverTrigger>
