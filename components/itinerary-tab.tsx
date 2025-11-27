@@ -246,6 +246,11 @@ export function ItineraryTab({
 
   return (
     <div className="p-6 h-full flex flex-col overflow-hidden bg-gray-50/50">
+      {/* Hotel & Flight Boxes - positioned right below tabs */}
+      {trip.start_date && trip.end_date && (
+        <HotelSearchBanner tripId={tripId} className="mb-6" compact={true} />
+      )}
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">
@@ -302,9 +307,6 @@ export function ItineraryTab({
           </div>
         </div>
       </div>
-
-      {/* Hotel Banner */}
-      <HotelSearchBanner tripId={tripId} className="mb-6" compact={true} />
 
       {/* Content Area */}
       <div className="flex-1 overflow-hidden flex flex-col">

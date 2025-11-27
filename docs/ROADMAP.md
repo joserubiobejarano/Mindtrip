@@ -80,47 +80,81 @@ This document tracks the development progress of the MindTrip travel planning ap
 - [x] Created development roadmap
 - [x] Created mobile app roadmap
 
+### Phase 11 - AI-Powered Trip Assistant & Smart Features
+- [x] Trip Assistant chat interface (AI-powered conversational assistant)
+- [x] Chat message persistence and history
+- [x] Context-aware trip assistance (considers trip details, dates, destination)
+- [x] Smart Itinerary generation (full multi-day AI-generated itineraries)
+- [x] Day-by-day itinerary with sections (Morning, Afternoon, Evening)
+- [x] Activity suggestions with photos and descriptions
+- [x] Hero image galleries for each day
+- [x] Smart itinerary caching and regeneration
+- [x] Integration with saved places in itinerary generation
+
+### Phase 12 - Accommodation & Hotel Search
+- [x] Hotel search functionality using Google Places API
+- [x] Hotel type filtering (hotel, hostel, apartment)
+- [x] Budget range filtering
+- [x] Hotel search results with ratings and reviews
+- [x] Hotel details view with photos
+- [x] Booking.com integration (external links)
+- [x] Set accommodation for trip
+- [x] Dedicated "Stay" page for accommodation search
+- [x] Map integration for hotel locations
+- [x] Accommodation auto-suggestion API endpoint
+
+### Phase 13 - Google Places Integration
+- [x] Full Google Places API integration
+- [x] Place search by text and nearby search
+- [x] Place details with photos
+- [x] Place type filtering
+- [x] Place saving/bookmarking functionality
+- [x] Saved places integration with Explore tab
+- [x] Place photo fetching for activities and itineraries
+- [x] Server-side place photo API
+
 ## 🚧 In Progress
 
 _Currently no features in progress_
 
 ## 📋 Planned Features
 
-### Phase 11 - Enhanced User Experience
+### Phase 14 - Enhanced User Experience
 - [ ] Trip templates and presets
-- [ ] Activity suggestions based on destination
 - [ ] Weather integration for trip dates
-- [ ] Photo uploads and galleries
+- [ ] Photo uploads and galleries (user-uploaded photos)
 - [ ] Notes and journaling features
 - [ ] Trip statistics and analytics
+- [ ] Activity photo uploads
 
-### Phase 12 - Advanced Collaboration
-- [ ] Real-time chat for trip members
+### Phase 15 - Advanced Collaboration
+- [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-### Phase 13 - Mobile App Development
+### Phase 16 - Mobile App Development
 - [ ] Native iOS and Android app (see [mobile-roadmap.md](./mobile-roadmap.md))
 - [ ] Expo React Native implementation
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 
-### Phase 14 - Web Mobile Optimization
+### Phase 17 - Web Mobile Optimization
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-### Phase 15 - Advanced Features
+### Phase 18 - Advanced Features
 - [ ] Budget tracking and alerts
-- [ ] Integration with booking services
+- [ ] Enhanced booking service integrations (beyond Booking.com links)
 - [ ] Calendar sync (Google Calendar, iCal)
-- [ ] Export to various formats (PDF, CSV, JSON)
+- [ ] Export to various formats (CSV, JSON - PDF already implemented)
+- [ ] Flight search and booking (placeholder page exists)
 
-### Phase 16 - Performance & Scalability
+### Phase 19 - Performance & Scalability
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -136,8 +170,23 @@ _No known issues currently documented_
 - Database schema uses TEXT for user IDs to support Clerk's ID format
 - Realtime features require enabling replication in Supabase dashboard
 - Mapbox token is required for map and geocoding features
+- Google Maps API key is required for Places API, hotel search, and place photos
+- OpenAI API key is required for AI day planning, smart itineraries, and Trip Assistant chat
+- Additional database tables may need to be created manually:
+  - `trip_chat_messages` - for Trip Assistant chat history
+  - `smart_itineraries` - for cached AI-generated itineraries
+  - `saved_places` - migration file exists in `database/migrations/supabase-add-saved-places-table.sql`
 
 ## 🔄 Recent Updates
+
+- **2025-01-XX**: Major feature additions and roadmap update
+  - Added Trip Assistant chat interface with AI-powered trip planning assistance
+  - Implemented Smart Itinerary generation with full multi-day planning
+  - Added hotel/accommodation search with Google Places integration
+  - Created dedicated Stay page for finding accommodations
+  - Integrated Google Places API for place search, photos, and details
+  - Updated roadmap to reflect all completed features
+  - Documented current project state and remaining work
 
 - **2025-01-XX**: Mobile roadmap and feature documentation
   - Created comprehensive mobile app roadmap (see [mobile-roadmap.md](./mobile-roadmap.md))

@@ -4,6 +4,14 @@ import { getOrCreateSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/
 import type { AiItinerary } from '@/app/api/ai-itinerary/route'
 
 /**
+ * Validate if a string is a valid UUID
+ */
+function isValidUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  return uuidRegex.test(str)
+}
+
+/**
  * GET /api/trips/[tripId]/smart-itinerary
  * Returns the cached smart itinerary for a trip, or generates one if not found
  */
@@ -14,9 +22,17 @@ export async function GET(
   try {
     const { tripId } = await params
 
+    // Validate tripId is present and looks like a UUID
     if (!tripId) {
       return NextResponse.json(
         { error: 'tripId is required' },
+        { status: 400 }
+      )
+    }
+
+    if (!isValidUUID(tripId)) {
+      return NextResponse.json(
+        { error: 'Invalid tripId format' },
         { status: 400 }
       )
     }
@@ -37,16 +53,53 @@ export async function GET(
       )
     }
 
-    // Get or create itinerary (idempotent - returns existing if present, generates if not)
-    const { itinerary, fromCache } = await getOrCreateSmartItinerary(tripId)
+    // FIRST: Try to load existing itinerary from smart_itineraries table
+    const { data: existing, error: loadError } = await supabase
+      .from('smart_itineraries')
+      .select('id, content')
+      .eq('trip_id', tripId)
+      .maybeSingle()
 
-    return NextResponse.json({ itinerary, fromCache })
+    // If there was an error loading, log it and return error (do NOT call OpenAI)
+    if (loadError) {
+      console.error('Error loading smart itinerary', loadError)
+      return NextResponse.json(
+        { error: 'Failed to load smart itinerary' },
+        { status: 500 }
+      )
+    }
+
+    // If existing itinerary found, return it immediately (no regeneration, no OpenAI call)
+    if (existing) {
+      return NextResponse.json(
+        { itinerary: existing.content },
+        { status: 200 }
+      )
+    }
+
+    // ONLY if no existing itinerary: generate a new one using the helper
+    // This will call OpenAI and save the result
+    try {
+      const { itinerary: generatedItinerary } = await getOrCreateSmartItinerary(tripId)
+      
+      // The helper already saves it, so just return the generated itinerary
+      return NextResponse.json(
+        { itinerary: generatedItinerary },
+        { status: 200 }
+      )
+    } catch (genError) {
+      console.error('Error generating smart itinerary', genError)
+      // If generation fails, try to save what we can (though generation failed)
+      // But actually, if generation failed, we don't have an itinerary to save
+      return NextResponse.json(
+        { error: 'Failed to generate itinerary' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
-    console.error('Error in GET /api/trips/[tripId]/smart-itinerary:', error)
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error occurred'
+    console.error('Unhandled error in smart itinerary route', error)
     return NextResponse.json(
-      { error: errorMessage },
+      { error: 'Unexpected error loading itinerary' },
       { status: 500 }
     )
   }
