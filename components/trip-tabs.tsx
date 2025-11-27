@@ -6,7 +6,6 @@ import { ItineraryTab } from "@/components/itinerary-tab";
 import { ExpensesTab } from "@/components/expenses-tab";
 import { ExploreTab } from "@/components/explore-tab";
 import { useTrip } from "@/hooks/use-trip";
-import { HotelSearchBanner } from "@/components/hotel-search-banner";
 
 interface TripTabsProps {
   tripId: string;
@@ -78,12 +77,6 @@ export function TripTabs({
             })}
           </div>
         </div>
-        {/* Hotel & Flight Boxes - only show on Itinerary tab, positioned directly under tabs */}
-        {activeTab === "itinerary" && trip?.start_date && trip?.end_date && (
-          <div className="mb-6">
-            <HotelSearchBanner tripId={tripId} compact={true} />
-          </div>
-        )}
       </div>
       <div className="flex-1 overflow-hidden">
         <TabsContent value="explore" className="h-full mt-0">
