@@ -21,7 +21,7 @@ import { getDayRoute, RouteLeg } from "@/lib/mapboxDirections";
 import { useToast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
 import type { AiItinerary, ActivitySuggestion } from "@/app/api/ai-itinerary/route";
-import { TripAssistantPanel } from "@/components/trip-assistant-panel";
+import { TripAssistantWidget } from "@/components/trip-assistant-widget";
 
 /**
  * Check if a suggestion is an ActivitySuggestion object
@@ -327,7 +327,7 @@ export function ItineraryTab({
 
       {/* Content Area */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-y-auto pr-2">
+        <div className="flex-1 overflow-y-auto pr-2 pb-6">
         
         {/* Loading State Card - only show when loading and no itinerary exists */}
         {isLoading && !smartItinerary && !error && (
@@ -639,10 +639,12 @@ export function ItineraryTab({
             )}
           </div>
         )}
+        
+        {/* Trip Assistant Widget - At bottom center of content */}
+        <div className="mt-8">
+          <TripAssistantWidget tripId={tripId} />
         </div>
-
-        {/* Trip Assistant Panel - Bottom of Itinerary Tab */}
-        <TripAssistantPanel tripId={tripId} />
+        </div>
       </div>
 
       {/* Dialogs */}
