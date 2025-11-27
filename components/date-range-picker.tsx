@@ -47,9 +47,10 @@ export function DateRangePicker({
 
   // Set current month to start date when it's selected
   useEffect(() => {
-    if (start) {
-      const startMonth = start.getMonth();
-      const startYear = start.getFullYear();
+    if (startDate) {
+      const startDateObj = new Date(startDate);
+      const startMonth = startDateObj.getMonth();
+      const startYear = startDateObj.getFullYear();
       
       setCurrentMonth((prevMonth) => {
         const prevMonthValue = prevMonth.getMonth();
@@ -62,7 +63,7 @@ export function DateRangePicker({
         return prevMonth;
       });
     }
-  }, [start]);
+  }, [startDate]);
 
   const handleDateClick = (date: Date) => {
     const dateStr = format(date, "yyyy-MM-dd");

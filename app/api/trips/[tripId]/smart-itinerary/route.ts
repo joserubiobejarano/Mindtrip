@@ -20,8 +20,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let tripId: string | undefined
   try {
-    const { tripId } = await params
+    const resolvedParams = await params
+    tripId = resolvedParams.tripId
 
     // 1) Validate tripId is a valid UUID; if not, return 400
     if (!tripId) {
