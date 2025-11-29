@@ -67,10 +67,31 @@ export function ItineraryTab({
         // First, try to fetch existing
         const res = await fetch(`/api/trips/${tripId}/smart-itinerary`);
         
+        console.log("[smart-itinerary] HTTP status", res.status);
+
         if (!res.ok) {
-           const err = await res.json();
-           if (active) setLoadingError(err.error || 'Failed to load');
-           return;
+          const errorText = await res.text().catch(() => "");
+          console.error(
+            "[smart-itinerary] HTTP error response:",
+            res.status,
+            errorText
+          );
+          if (active) {
+            setErrorCode(`HTTP_${res.status}`);
+            setLoadingError(`Request failed with status ${res.status}`);
+            setIsStreaming(false);
+          }
+          return;
+        }
+
+        if (!res.body) {
+          console.error("[smart-itinerary] No response body from API route");
+          if (active) {
+            setErrorCode("NO_STREAM");
+            setLoadingError("No response body received");
+            setIsStreaming(false);
+          }
+          return;
         }
 
         const contentType = res.headers.get('content-type');

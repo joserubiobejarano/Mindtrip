@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 import OpenAI from "openai";
 import { SmartItinerary } from "@/types/itinerary";
 import { findPlacePhoto } from "@/lib/google/places-server";
 
-// We use the Edge runtime as requested
-export const runtime = "edge";
+// Remove edge runtime as requested
+// export const runtime = "edge";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -123,200 +123,190 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  const resolvedParams = await params;
-  const tripId = resolvedParams.tripId;
+  try {
+    const resolvedParams = await params;
+    const tripId = resolvedParams.tripId;
 
-  const encoder = new TextEncoder();
+    if (!tripId) {
+      console.error("[smart-itinerary] Missing tripId param");
+      return new NextResponse("Error: MISSING_TRIP_ID", { status: 400 });
+    }
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const enqueue = (text: string) => {
-        controller.enqueue(encoder.encode(text + "\n"));
-      };
+    // Initialize Supabase client
+    const supabase = await createClient();
 
-      try {
-        // 1) Basic validation
-        if (!tripId) {
-          enqueue("Error: INVALID_TRIP_ID");
-          controller.close();
-          return;
-        }
+    const encoder = new TextEncoder();
 
-        // 2) Supabase client
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+    const stream = new ReadableStream({
+      async start(controller) {
+        const enqueue = (text: string) => {
+          controller.enqueue(encoder.encode(text + "\n"));
+        };
 
-        // 3) Check if itinerary already exists (idempotent)
-        const { data: existing, error: existingError } = await supabase
-          .from("smart_itineraries")
-          .select("content")
-          .eq("trip_id", tripId)
-          .maybeSingle();
+        try {
+          // 3) Check if itinerary already exists (idempotent)
+          const { data: existing, error: existingError } = await supabase
+            .from("smart_itineraries")
+            .select("content")
+            .eq("trip_id", tripId)
+            .maybeSingle();
 
-        if (existingError) {
-          console.error("[smart-itinerary] error fetching existing", existingError);
-        }
+          if (existingError) {
+            console.error("[smart-itinerary] error fetching existing", existingError);
+          }
 
-        if (existing?.content) {
-          // Nothing to regenerate, just tell frontend to reload
+          if (existing?.content) {
+            // Nothing to regenerate, just tell frontend to reload
+            enqueue("__ITINERARY_READY__");
+            controller.close();
+            return;
+          }
+
+          // Fetch Trip Data for prompt
+          const { data: trip, error: tripError } = await supabase
+            .from("trips")
+            .select("id, title, start_date, end_date, destination_name, destination_country")
+            .eq("id", tripId)
+            .single();
+
+          if (tripError || !trip) {
+            enqueue("Error: TRIP_NOT_FOUND");
+            controller.close();
+            return;
+          }
+
+          // Load saved places
+          const { data: savedPlaces } = await supabase
+            .from("saved_places")
+            .select("name, types")
+            .eq("trip_id", tripId)
+            .limit(10);
+
+          // 4) Stream some progress lines to keep user engaged
+          enqueue("PROGRESS: Analyzing trip details...");
+          
+          // 5) Call OpenAI once and accumulate ALL text
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            stream: false,
+            messages: [
+              {
+                role: "system",
+                content: SYSTEM_PROMPT,
+              },
+              {
+                role: "user",
+                content: buildUserPromptFromTrip(trip, savedPlaces || []),
+              },
+            ],
+          });
+
+          const rawOutput = completion.choices[0]?.message?.content ?? "";
+          
+          // Let's parse the output to send any PROGRESS lines found in the LLM response before the JSON
+          const lines = rawOutput.split('\n');
+          for (const line of lines) {
+              if (line.trim().startsWith("PROGRESS:")) {
+                  enqueue(line.trim());
+              }
+          }
+
+          console.log("[smart-itinerary] rawOutput length:", rawOutput.length);
+
+          // 6) Extract JSON between JSON_START / JSON_END
+          const startMarker = "JSON_START";
+          const endMarker = "JSON_END";
+          const startIndex = rawOutput.indexOf(startMarker);
+          const endIndex = rawOutput.indexOf(endMarker);
+
+          if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
+            console.error("[smart-itinerary] Missing JSON markers", {
+              startIndex,
+              endIndex,
+            });
+            enqueue("Error: JSON_MARKER_NOT_FOUND");
+            controller.close();
+            return;
+          }
+
+          const jsonString = rawOutput
+            .slice(startIndex + startMarker.length, endIndex)
+            .trim();
+
+          let itinerary: SmartItinerary;
+
+          try {
+            itinerary = JSON.parse(jsonString);
+          } catch (err) {
+            console.error("[smart-itinerary] JSON parse error", err);
+            console.error(
+              "[smart-itinerary] JSON snippet:",
+              jsonString.slice(0, 1000)
+            );
+            enqueue("Error: JSON_PARSE_ERROR");
+            controller.close();
+            return;
+          }
+
+          // 7) Enrich photos
+          enqueue("PROGRESS: Finding photos for key places...");
+          try {
+              const destination = trip.destination_name || trip.title;
+              for (const day of itinerary.days) {
+                  for (const place of day.places) {
+                      try {
+                          const query = `${place.name} in ${destination}`;
+                          const photoUrl = await findPlacePhoto(query);
+                          if (photoUrl) {
+                              place.photos = [photoUrl];
+                          }
+                      } catch (photoErr) {
+                           console.error(`[smart-itinerary] Photo error for ${place.name}`, photoErr);
+                      }
+                  }
+              }
+          } catch (photoErr) {
+            console.error("[smart-itinerary] photo enrichment error", photoErr);
+          }
+
+          // 8) Save to Supabase
+          const { error: insertError } = await supabase
+            .from("smart_itineraries")
+            .insert({
+              trip_id: tripId,
+              content: itinerary,
+            });
+
+          if (insertError) {
+            console.error("[smart-itinerary] insert error", insertError);
+            enqueue("Error: DB_INSERT_ERROR");
+            controller.close();
+            return;
+          }
+
+          // 9) Done – tell frontend to reload itinerary from DB
           enqueue("__ITINERARY_READY__");
           controller.close();
-          return;
-        }
 
-        // Fetch Trip Data for prompt
-        const { data: trip, error: tripError } = await supabase
-          .from("trips")
-          .select("id, title, start_date, end_date, destination_name, destination_country")
-          .eq("id", tripId)
-          .single();
-
-        if (tripError || !trip) {
-          enqueue("Error: TRIP_NOT_FOUND");
-          controller.close();
-          return;
-        }
-
-        // Load saved places
-        const { data: savedPlaces } = await supabase
-          .from("saved_places")
-          .select("name, types")
-          .eq("trip_id", tripId)
-          .limit(10);
-
-        // 4) Stream some progress lines to keep user engaged
-        enqueue("PROGRESS: Analyzing trip details...");
-        
-        // 5) Call OpenAI once and accumulate ALL text
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o-mini", // Using mini for speed/cost as in prompt example (or gpt-4o if preferred, prompt said gpt-4.1-mini which likely means 4o-mini)
-          stream: false,
-          messages: [
-            {
-              role: "system",
-              content: SYSTEM_PROMPT,
-            },
-            {
-              role: "user",
-              content: buildUserPromptFromTrip(trip, savedPlaces || []),
-            },
-          ],
-        });
-
-        const rawOutput = completion.choices[0]?.message?.content ?? "";
-        // Extract progress lines from raw output if any, and send them?
-        // The prompt says "output... PROGRESS lines... then JSON".
-        // Since we are NOT streaming from OpenAI, we get the whole blob.
-        // We should parse the lines and send PROGRESS ones if we want to simulate or just send what we got.
-        // However, the prompt says "Stream some progress lines to keep user engaged" BEFORE calling OpenAI.
-        // But OpenAI response will also contain PROGRESS lines according to the system prompt.
-        // If we want to show those, we would need to parse rawOutput.
-        
-        // Let's parse the output to send any PROGRESS lines found in the LLM response before the JSON
-        const lines = rawOutput.split('\n');
-        for (const line of lines) {
-            if (line.trim().startsWith("PROGRESS:")) {
-                enqueue(line.trim());
-            }
-        }
-
-        console.log("[smart-itinerary] rawOutput length:", rawOutput.length);
-
-        // 6) Extract JSON between JSON_START / JSON_END
-        const startMarker = "JSON_START";
-        const endMarker = "JSON_END";
-        const startIndex = rawOutput.indexOf(startMarker);
-        const endIndex = rawOutput.indexOf(endMarker);
-
-        if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
-          console.error("[smart-itinerary] Missing JSON markers", {
-            startIndex,
-            endIndex,
-          });
-          enqueue("Error: JSON_MARKER_NOT_FOUND");
-          controller.close();
-          return;
-        }
-
-        const jsonString = rawOutput
-          .slice(startIndex + startMarker.length, endIndex)
-          .trim();
-
-        let itinerary: SmartItinerary;
-
-        try {
-          itinerary = JSON.parse(jsonString);
-        } catch (err) {
-          console.error("[smart-itinerary] JSON parse error", err);
-          console.error(
-            "[smart-itinerary] JSON snippet:",
-            jsonString.slice(0, 1000)
+        } catch (error) {
+          console.error("[smart-itinerary] Fatal error inside stream", error);
+          controller.enqueue(
+            encoder.encode("Error: FAILED_TO_GENERATE_ITINERARY\n")
           );
-          enqueue("Error: JSON_PARSE_ERROR");
           controller.close();
-          return;
         }
+      },
+    });
 
-        // 7) Enrich photos
-        enqueue("PROGRESS: Finding photos for key places...");
-        try {
-            const destination = trip.destination_name || trip.title;
-            for (const day of itinerary.days) {
-                for (const place of day.places) {
-                    // Simple rate limiting or parallelism could be applied here
-                    try {
-                        const query = `${place.name} in ${destination}`;
-                        // We await strictly to avoid overwhelming if many places
-                        const photoUrl = await findPlacePhoto(query);
-                        if (photoUrl) {
-                            place.photos = [photoUrl];
-                        }
-                    } catch (photoErr) {
-                         // ignore individual photo errors
-                         console.error(`[smart-itinerary] Photo error for ${place.name}`, photoErr);
-                    }
-                }
-            }
-        } catch (photoErr) {
-          console.error("[smart-itinerary] photo enrichment error", photoErr);
-        }
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    });
 
-        // 8) Save to Supabase
-        const { error: insertError } = await supabase
-          .from("smart_itineraries")
-          .insert({
-            trip_id: tripId,
-            content: itinerary, // Supabase expects JSON, SmartItinerary fits
-          });
-
-        if (insertError) {
-          console.error("[smart-itinerary] insert error", insertError);
-          enqueue("Error: DB_INSERT_ERROR");
-          controller.close();
-          return;
-        }
-
-        // 9) Done – tell frontend to reload itinerary from DB
-        enqueue("__ITINERARY_READY__");
-        controller.close();
-
-      } catch (error) {
-        console.error("[smart-itinerary] Fatal error", error);
-        // Always finish the stream with an error line & close
-        controller.enqueue(
-          encoder.encode("Error: FAILED_TO_GENERATE_ITINERARY\n")
-        );
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
-    },
-  });
+  } catch (error) {
+    console.error("[smart-itinerary] Top-level error", error);
+    return new NextResponse("Error: TOP_LEVEL_ERROR", { status: 500 });
+  }
 }
