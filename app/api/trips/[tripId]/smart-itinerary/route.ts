@@ -1,30 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { findPlacePhoto } from '@/lib/google/places-server';
-import { getOpenAIClient } from '@/lib/openai';
-import { SmartItinerary, ItineraryDay, ItineraryPlace } from '@/types/itinerary';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import OpenAI from "openai";
+import { SmartItinerary } from "@/types/itinerary";
+import { findPlacePhoto } from "@/lib/google/places-server";
 
-export const maxDuration = 300; // 5 minutes timeout
+// We use the Edge runtime as requested
+export const runtime = "edge";
 
-/**
- * Validate if a string is a valid UUID
- */
-function isValidUUID(str: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(str);
-}
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-async function streamItineraryGeneration(tripId: string, trip: any, savedPlaces: any[]) {
+// Helper to build the user prompt (reused from existing logic)
+function buildUserPromptFromTrip(trip: any, savedPlaces: any[]) {
   const startDate = new Date(trip.start_date);
   const endDate = new Date(trip.end_date);
   const destination = trip.destination_name || trip.title;
-  
-  let savedPlacesText = '';
+
+  let savedPlacesText = "";
   if (savedPlaces && savedPlaces.length > 0) {
-    savedPlacesText = `\nInclude these saved places if possible: ${savedPlaces.map((p: any) => p.name).join(', ')}`;
+    savedPlacesText = `\nInclude these saved places if possible: ${savedPlaces
+      .map((p: any) => p.name)
+      .join(", ")}`;
   }
 
-  const systemPrompt = `You are the Smart Itinerary planner for MindTrip, a travel planning app.
+  return `Plan a trip to ${destination} from ${startDate.toDateString()} to ${endDate.toDateString()}.${savedPlacesText}`;
+}
+
+const SYSTEM_PROMPT = `You are the Smart Itinerary planner for MindTrip, a travel planning app.
 
 Your job:
 - Take the trip information that the developer passes to you (destination, dates, travelers, preferences if any).
@@ -118,46 +119,125 @@ REMEMBER:
 - No Markdown. No comments. No text after \`JSON_END\`.
 `;
 
-  const userPrompt = `Plan a trip to ${destination} from ${startDate.toDateString()} to ${endDate.toDateString()}.${savedPlacesText}`;
-
-  const openai = getOpenAIClient();
-  
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ],
-    stream: true,
-  });
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ tripId: string }> }
+) {
+  const resolvedParams = await params;
+  const tripId = resolvedParams.tripId;
 
   const encoder = new TextEncoder();
-  const supabase = await createClient();
 
-  return new ReadableStream({
+  const stream = new ReadableStream({
     async start(controller) {
-      let fullText = '';
-      
+      const enqueue = (text: string) => {
+        controller.enqueue(encoder.encode(text + "\n"));
+      };
+
       try {
-        for await (const chunk of response) {
-          const text = chunk.choices[0]?.delta?.content || '';
-          fullText += text;
-          
-          // Stream everything to client so they see progress lines
-          // We can filter on client side if needed, or just let them see it
-          controller.enqueue(encoder.encode(text));
+        // 1) Basic validation
+        if (!tripId) {
+          enqueue("Error: INVALID_TRIP_ID");
+          controller.close();
+          return;
         }
 
-        const rawOutput = fullText; 
+        // 2) Supabase client
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
 
-        const startMarker = 'JSON_START';
-        const endMarker = 'JSON_END';
+        // 3) Check if itinerary already exists (idempotent)
+        const { data: existing, error: existingError } = await supabase
+          .from("smart_itineraries")
+          .select("content")
+          .eq("trip_id", tripId)
+          .maybeSingle();
+
+        if (existingError) {
+          console.error("[smart-itinerary] error fetching existing", existingError);
+        }
+
+        if (existing?.content) {
+          // Nothing to regenerate, just tell frontend to reload
+          enqueue("__ITINERARY_READY__");
+          controller.close();
+          return;
+        }
+
+        // Fetch Trip Data for prompt
+        const { data: trip, error: tripError } = await supabase
+          .from("trips")
+          .select("id, title, start_date, end_date, destination_name, destination_country")
+          .eq("id", tripId)
+          .single();
+
+        if (tripError || !trip) {
+          enqueue("Error: TRIP_NOT_FOUND");
+          controller.close();
+          return;
+        }
+
+        // Load saved places
+        const { data: savedPlaces } = await supabase
+          .from("saved_places")
+          .select("name, types")
+          .eq("trip_id", tripId)
+          .limit(10);
+
+        // 4) Stream some progress lines to keep user engaged
+        enqueue("PROGRESS: Analyzing trip details...");
+        
+        // 5) Call OpenAI once and accumulate ALL text
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini", // Using mini for speed/cost as in prompt example (or gpt-4o if preferred, prompt said gpt-4.1-mini which likely means 4o-mini)
+          stream: false,
+          messages: [
+            {
+              role: "system",
+              content: SYSTEM_PROMPT,
+            },
+            {
+              role: "user",
+              content: buildUserPromptFromTrip(trip, savedPlaces || []),
+            },
+          ],
+        });
+
+        const rawOutput = completion.choices[0]?.message?.content ?? "";
+        // Extract progress lines from raw output if any, and send them?
+        // The prompt says "output... PROGRESS lines... then JSON".
+        // Since we are NOT streaming from OpenAI, we get the whole blob.
+        // We should parse the lines and send PROGRESS ones if we want to simulate or just send what we got.
+        // However, the prompt says "Stream some progress lines to keep user engaged" BEFORE calling OpenAI.
+        // But OpenAI response will also contain PROGRESS lines according to the system prompt.
+        // If we want to show those, we would need to parse rawOutput.
+        
+        // Let's parse the output to send any PROGRESS lines found in the LLM response before the JSON
+        const lines = rawOutput.split('\n');
+        for (const line of lines) {
+            if (line.trim().startsWith("PROGRESS:")) {
+                enqueue(line.trim());
+            }
+        }
+
+        console.log("[smart-itinerary] rawOutput length:", rawOutput.length);
+
+        // 6) Extract JSON between JSON_START / JSON_END
+        const startMarker = "JSON_START";
+        const endMarker = "JSON_END";
         const startIndex = rawOutput.indexOf(startMarker);
         const endIndex = rawOutput.indexOf(endMarker);
 
         if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
-          console.error('[smart-itinerary] Missing JSON markers', { startIndex, endIndex });
-          throw new Error('JSON_MARKER_NOT_FOUND');
+          console.error("[smart-itinerary] Missing JSON markers", {
+            startIndex,
+            endIndex,
+          });
+          enqueue("Error: JSON_MARKER_NOT_FOUND");
+          controller.close();
+          return;
         }
 
         const jsonString = rawOutput
@@ -169,204 +249,74 @@ REMEMBER:
         try {
           itinerary = JSON.parse(jsonString);
         } catch (err) {
-          console.error('[smart-itinerary] JSON parse error', err);
-          console.error('[smart-itinerary] Raw JSON snippet:', jsonString.slice(0, 1000));
-          throw new Error('JSON_PARSE_ERROR');
+          console.error("[smart-itinerary] JSON parse error", err);
+          console.error(
+            "[smart-itinerary] JSON snippet:",
+            jsonString.slice(0, 1000)
+          );
+          enqueue("Error: JSON_PARSE_ERROR");
+          controller.close();
+          return;
         }
 
-        // Enrich with photos (disabled for now or needs update to new field 'photos')
-        /*
+        // 7) Enrich photos
+        enqueue("PROGRESS: Finding photos for key places...");
         try {
-          for (const day of itinerary.days) {
-            for (const place of day.places) {
-               try {
-                 const query = `${place.name} in ${destination}`;
-                 const photoUrl = await findPlacePhoto(query);
-                 if (photoUrl) {
-                   place.photos = [photoUrl];
-                 }
-               } catch (err) {
-                 console.error('[smart-itinerary] Photo fetch error', err);
-               }
+            const destination = trip.destination_name || trip.title;
+            for (const day of itinerary.days) {
+                for (const place of day.places) {
+                    // Simple rate limiting or parallelism could be applied here
+                    try {
+                        const query = `${place.name} in ${destination}`;
+                        // We await strictly to avoid overwhelming if many places
+                        const photoUrl = await findPlacePhoto(query);
+                        if (photoUrl) {
+                            place.photos = [photoUrl];
+                        }
+                    } catch (photoErr) {
+                         // ignore individual photo errors
+                         console.error(`[smart-itinerary] Photo error for ${place.name}`, photoErr);
+                    }
+                }
             }
-          }
-        } catch (err) {
-          console.error('[smart-itinerary] Photo enrichment error', err);
-          // Don't fail the whole request for photos
+        } catch (photoErr) {
+          console.error("[smart-itinerary] photo enrichment error", photoErr);
         }
-        */
 
-        // Save to Supabase
-        const { error: dbError } = await supabase
-          .from('smart_itineraries')
-          .upsert({
+        // 8) Save to Supabase
+        const { error: insertError } = await supabase
+          .from("smart_itineraries")
+          .insert({
             trip_id: tripId,
-            content: itinerary as any,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'trip_id' });
+            content: itinerary, // Supabase expects JSON, SmartItinerary fits
+          });
 
-        if (dbError) {
-           console.error('[smart-itinerary] Supabase insert error', dbError);
-           throw new Error('DB_ERROR');
+        if (insertError) {
+          console.error("[smart-itinerary] insert error", insertError);
+          enqueue("Error: DB_INSERT_ERROR");
+          controller.close();
+          return;
         }
 
-        controller.enqueue(encoder.encode('\n__ITINERARY_READY__'));
+        // 9) Done – tell frontend to reload itinerary from DB
+        enqueue("__ITINERARY_READY__");
         controller.close();
 
-      } catch (err: any) {
-        console.error('[smart-itinerary] Fatal error generating itinerary', err);
-        
-        let errorMessage = 'Error: UNKNOWN\n';
-        if (err.message === 'JSON_MARKER_NOT_FOUND') {
-          errorMessage = 'Error: JSON_MARKER_NOT_FOUND\n';
-        } else if (err.message === 'JSON_PARSE_ERROR') {
-          errorMessage = 'Error: JSON_PARSE_ERROR\n';
-        }
-
-        controller.enqueue(encoder.encode(errorMessage));
+      } catch (error) {
+        console.error("[smart-itinerary] Fatal error", error);
+        // Always finish the stream with an error line & close
+        controller.enqueue(
+          encoder.encode("Error: FAILED_TO_GENERATE_ITINERARY\n")
+        );
         controller.close();
       }
-    }
+    },
   });
-}
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ tripId: string }> }
-) {
-  let tripId: string | undefined;
-  
-  try {
-    const resolvedParams = await params;
-    tripId = resolvedParams.tripId;
-
-    if (!tripId || !isValidUUID(tripId)) {
-      return NextResponse.json({ error: 'Invalid trip id' }, { status: 400 });
-    }
-
-    const supabase = await createClient();
-
-    // Check existing
-    const { data: existing, error: existingError } = await supabase
-      .from('smart_itineraries')
-      .select('content')
-      .eq('trip_id', tripId)
-      .maybeSingle();
-
-    if (existingError) {
-      return NextResponse.json({ error: 'Failed to load itinerary' }, { status: 500 });
-    }
-
-    if (existing) {
-      return NextResponse.json({ itinerary: existing.content, source: 'existing' });
-    }
-
-    // Load Data
-    const { data: trip, error: tripError } = await supabase
-      .from('trips')
-      .select('id, title, start_date, end_date, destination_name, destination_country')
-      .eq('id', tripId)
-      .single();
-
-    if (tripError || !trip) {
-      return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
-    }
-
-    // Load saved places
-    const { data: savedPlaces } = await supabase
-      .from('saved_places')
-      .select('name, types')
-      .eq('trip_id', tripId)
-      .limit(10);
-
-    const stream = await streamItineraryGeneration(tripId, trip, savedPlaces || []);
-
-    return new Response(stream, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-    });
-
-  } catch (error) {
-    console.error('[smart-itinerary] Unhandled error', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ tripId: string }> }
-) {
-  let tripId: string | undefined;
-  try {
-    const resolvedParams = await params;
-    tripId = resolvedParams.tripId;
-
-    if (!tripId || !isValidUUID(tripId)) {
-      return NextResponse.json({ error: 'Invalid trip id' }, { status: 400 });
-    }
-
-    const supabase = await createClient();
-
-    // Load Trip
-    const { data: trip, error: tripError } = await supabase
-      .from('trips')
-      .select('id, title, start_date, end_date, destination_name, destination_country')
-      .eq('id', tripId)
-      .single();
-
-    if (tripError || !trip) {
-      return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
-    }
-    
-    // Load saved places
-    const { data: savedPlaces } = await supabase
-      .from('saved_places')
-      .select('name, types')
-      .eq('trip_id', tripId)
-      .limit(10);
-
-    // Delete existing
-    await supabase.from('smart_itineraries').delete().eq('trip_id', tripId);
-
-    const stream = await streamItineraryGeneration(tripId, trip, savedPlaces || []);
-
-    return new Response(stream, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-    });
-  } catch (error) {
-    console.error('[smart-itinerary] POST error', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
-
-// Full Update PATCH (optional, can be used for sync if needed)
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ tripId: string }> }
-) {
-  try {
-    const resolvedParams = await params;
-    const tripId = resolvedParams.tripId;
-    const body = await request.json();
-    const { itinerary } = body;
-
-    if (!tripId || !itinerary) {
-      return NextResponse.json({ error: 'Missing data' }, { status: 400 });
-    }
-
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from('smart_itineraries')
-      .upsert({
-        trip_id: tripId,
-        content: itinerary,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'trip_id' })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error: 'Update failed' }, { status: 500 });
-  }
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
 }

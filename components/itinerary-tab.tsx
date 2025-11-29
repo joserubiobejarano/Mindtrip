@@ -62,11 +62,12 @@ export function ItineraryTab({
       try {
         setLoadingError(null);
         setErrorCode(null);
+        setStreamText([]);
+        
         // First, try to fetch existing
         const res = await fetch(`/api/trips/${tripId}/smart-itinerary`);
         
         if (!res.ok) {
-           // If error, show error
            const err = await res.json();
            if (active) setLoadingError(err.error || 'Failed to load');
            return;
@@ -83,58 +84,70 @@ export function ItineraryTab({
         } else {
            // Text stream -> Generating
            if (active) setIsStreaming(true);
-           const reader = res.body?.getReader();
-           if (!reader) return;
+           if (!res.body) return;
 
+           const reader = res.body.getReader();
            const decoder = new TextDecoder();
-           let buffer = '';
+           let done = false;
+           let buffered = "";
            
-           while (true) {
-             const { done, value } = await reader.read();
-             if (done) break;
+           while (!done) {
+             const { value, done: streamDone } = await reader.read();
+             done = streamDone;
              
-             const chunk = decoder.decode(value, { stream: true });
-             buffer += chunk;
-             
-             // Check for specific error message
-             if (buffer.includes('Error:')) {
-                const errorLine = buffer.split('\n').find(l => l.startsWith('Error:'));
-                if (errorLine) {
-                    const code = errorLine.replace('Error: ', '').trim();
-                    if (active) {
-                        setErrorCode(code);
-                        setLoadingError('We couldn’t generate your itinerary. Please try again in a moment.');
-                        setIsStreaming(false);
-                    }
-                }
-                break;
-             }
+             if (value) {
+               buffered += decoder.decode(value, { stream: true });
+               const lines = buffered.split("\n");
+               buffered = lines.pop() ?? ""; // keep the last partial line
+               
+               for (const lineRaw of lines) {
+                 const line = lineRaw.trim();
+                 if (!line) continue;
 
-             // Check for marker
-             if (buffer.includes('__ITINERARY_READY__')) {
-               // Reload full JSON
-               setLoadingError(null);
-               const finalRes = await fetch(`/api/trips/${tripId}/smart-itinerary`);
-               if (finalRes.ok) {
-                 const finalData = await finalRes.json();
-                 if (active && finalData.itinerary) {
-                   setSmartItinerary(finalData.itinerary);
-                   setIsStreaming(false);
+                 if (line === "__ITINERARY_READY__") {
+                   // Stop reading, refetch itinerary from Supabase, stop loading
+                   // We fetch again to get the full JSON structure
+                   const finalRes = await fetch(`/api/trips/${tripId}/smart-itinerary`);
+                   if (finalRes.ok) {
+                     const finalData = await finalRes.json();
+                     if (active && finalData.itinerary) {
+                        setSmartItinerary(finalData.itinerary);
+                     }
+                   }
+                   if (active) setIsStreaming(false);
+                   reader.cancel();
+                   return;
+                 }
+
+                 if (line.startsWith("Error:")) {
+                   const code = line.replace("Error:", "").trim();
+                   if (active) {
+                     setErrorCode(code || "UNKNOWN");
+                     setLoadingError("We couldn’t generate your itinerary. Please try again.");
+                     setIsStreaming(false);
+                   }
+                   reader.cancel();
+                   return;
+                 }
+
+                 if (line.startsWith("PROGRESS:")) {
+                   const msg = line.replace("PROGRESS:", "").trim();
+                   if (active) {
+                     setStreamText((prev) => [...prev, msg]);
+                   }
+                 } else {
+                   // Ignore debug lines
+                   console.debug("[smart-itinerary stream]", line);
                  }
                }
-               break;
-             } else {
-               // Split by lines and update stream text
-               const lines = buffer.split('\n').filter(l => l.trim() !== '');
-               // Filter out JSON_START/JSON_END lines if visible
-               const cleanLines = lines.filter(l => !l.includes('JSON_START') && !l.includes('JSON_END'));
-               if (active) setStreamText(cleanLines);
              }
            }
+           if (active) setIsStreaming(false);
         }
       } catch (err) {
         console.error("Load error", err);
         if (active) setLoadingError("Something went wrong loading your itinerary.");
+        if (active) setIsStreaming(false);
       }
     }
 
