@@ -271,7 +271,7 @@ export function ItineraryTab({
               <CardContent className="py-8">
                  <div className="flex flex-col items-center justify-center text-center">
                    <Loader2 className="h-8 w-8 text-purple-600 animate-spin mb-4" />
-                   <h3 className="text-lg font-semibold text-purple-900 mb-4">We're crafting your itinerary...</h3>
+                   <h3 className="text-lg font-semibold text-purple-900 mb-4">We&apos;re crafting your itinerary...</h3>
                    <div className="space-y-2 text-purple-800 font-medium">
                      {streamText.slice(-3).map((line, i) => (
                        <p key={i} className="animate-pulse">{line}</p>
