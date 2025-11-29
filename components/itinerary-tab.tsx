@@ -40,6 +40,7 @@ export function ItineraryTab({
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamText, setStreamText] = useState<string[]>([]);
   const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -60,6 +61,7 @@ export function ItineraryTab({
     async function loadOrStream() {
       try {
         setLoadingError(null);
+        setErrorCode(null);
         // First, try to fetch existing
         const res = await fetch(`/api/trips/${tripId}/smart-itinerary`);
         
@@ -95,10 +97,15 @@ export function ItineraryTab({
              buffer += chunk;
              
              // Check for specific error message
-             if (buffer.includes('Error: Failed to generate itinerary.')) {
-                if (active) {
-                   setLoadingError('We couldn’t generate your itinerary. Please try again in a moment.');
-                   setIsStreaming(false);
+             if (buffer.includes('Error:')) {
+                const errorLine = buffer.split('\n').find(l => l.startsWith('Error:'));
+                if (errorLine) {
+                    const code = errorLine.replace('Error: ', '').trim();
+                    if (active) {
+                        setErrorCode(code);
+                        setLoadingError('We couldn’t generate your itinerary. Please try again in a moment.');
+                        setIsStreaming(false);
+                    }
                 }
                 break;
              }
@@ -119,7 +126,9 @@ export function ItineraryTab({
              } else {
                // Split by lines and update stream text
                const lines = buffer.split('\n').filter(l => l.trim() !== '');
-               if (active) setStreamText(lines);
+               // Filter out JSON_START/JSON_END lines if visible
+               const cleanLines = lines.filter(l => !l.includes('JSON_START') && !l.includes('JSON_END'));
+               if (active) setStreamText(cleanLines);
              }
            }
         }
@@ -308,7 +317,7 @@ export function ItineraryTab({
               {/* Days */}
               <div className="space-y-12">
                 {smartItinerary.days.map((day) => {
-                  const dayImages = day.places.flatMap(p => p.pictures);
+                  const dayImages = day.places.flatMap(p => p.photos || []);
                   
                   return (
                     <Card 
@@ -347,7 +356,7 @@ export function ItineraryTab({
 
                       <CardContent className="p-6 space-y-6">
                         <div className="prose prose-neutral max-w-none text-slate-900">
-                          <p>{day.description}</p>
+                          <p>{day.summary}</p>
                         </div>
 
                         <div className="space-y-4 mt-6">
@@ -360,8 +369,8 @@ export function ItineraryTab({
                               }}
                             >
                                <div className="flex-shrink-0 relative w-24 h-24 rounded-md overflow-hidden bg-gray-200">
-                                 {place.pictures[0] ? (
-                                   <Image src={place.pictures[0]} alt={place.name} fill className="object-cover" />
+                                 {place.photos && place.photos[0] ? (
+                                   <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
                                  ) : (
                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
                                      <MapPin className="h-8 w-8" />
@@ -413,6 +422,9 @@ export function ItineraryTab({
             <div className="w-full rounded-2xl border bg-red-50 border-red-200 px-8 py-10 text-center shadow-sm mb-8">
               <h3 className="text-red-900 font-semibold text-lg mb-2">We couldn&apos;t generate your itinerary</h3>
               <p className="text-red-700 mb-6">{loadingError}</p>
+              {errorCode && (process.env.NODE_ENV !== 'production') && (
+                  <p className="text-xs text-red-400 mb-4">Debug: {errorCode}</p>
+              )}
               <Button onClick={() => window.location.reload()} variant="outline" className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800">
                 Retry
               </Button>

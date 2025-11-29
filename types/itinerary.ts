@@ -1,25 +1,26 @@
 export interface ItineraryPlace {
-  id: string;           // uuid
+  id: string;
   name: string;
-  summary: string;      // 1–3 sentences
-  pictures: string[];   // image URLs
+  summary: string;
+  photos: string[];
   visited: boolean;
+  tags: string[];
+  neighborhood?: string;
+  timeOfDay?: "morning" | "afternoon" | "evening" | "night" | "flex";
 }
 
 export interface ItineraryDay {
-  id: string;           // uuid
-  index: number;        // 1-based day number
-  date: string;         // ISO date string
-  title: string;        // “Day 1 – Arrival and City Exploration”
-  theme: string;        // “Cultural immersion”, etc.
-  description: string;  // 1–2 paragraphs describing the day
+  id: string;
+  index: number;
+  date: string;
+  title: string;
+  summary: string;
+  theme?: string;
   places: ItineraryPlace[];
 }
 
 export interface SmartItinerary {
-  tripId: string;
-  title: string;        // overall trip title
-  summary: string;      // overall trip narrative
+  title: string;
+  summary: string;
   days: ItineraryDay[];
 }
-
