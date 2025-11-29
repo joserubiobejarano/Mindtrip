@@ -124,29 +124,37 @@ Rules:
         
         try {
            itinerary = JSON.parse(jsonStr);
-        } catch (e) {
-           console.error('[smart-itinerary] JSON Parse Error', e);
-           console.log('Full text:', fullText);
-           throw new Error('Invalid JSON format');
+        } catch (err) {
+           console.error('[smart-itinerary] JSON parse error', err);
+           console.error('[smart-itinerary] Raw output snippet:', fullText.slice(0, 1000));
+           throw new Error('JSON_PARSE_ERROR');
         }
 
         // Enrich with photos
-        for (const day of itinerary.days) {
-          for (const place of day.places) {
-             try {
-               const query = `${place.name} in ${destination}`;
-               const photoUrl = await findPlacePhoto(query);
-               if (photoUrl) {
-                 place.pictures = [photoUrl];
+        try {
+          // Temporarily disabled photo enrichment
+          /*
+          for (const day of itinerary.days) {
+            for (const place of day.places) {
+               try {
+                 const query = `${place.name} in ${destination}`;
+                 const photoUrl = await findPlacePhoto(query);
+                 if (photoUrl) {
+                   place.pictures = [photoUrl];
+                 }
+               } catch (err) {
+                 console.error('[smart-itinerary] Photo fetch error', err);
                }
-             } catch (err) {
-               console.error('[smart-itinerary] Photo fetch error', err);
-             }
+            }
           }
+          */
+        } catch (err) {
+          console.error('[smart-itinerary] Photo enrichment error', err);
+          throw new Error('PHOTO_ENRICHMENT_ERROR');
         }
 
         // Save to Supabase
-        const { error: saveError } = await supabase
+        const { error: dbError } = await supabase
           .from('smart_itineraries')
           .upsert({
             trip_id: tripId,
@@ -154,16 +162,19 @@ Rules:
             updated_at: new Date().toISOString()
           }, { onConflict: 'trip_id' });
 
-        if (saveError) {
-           throw new Error('Failed to save itinerary to database');
+        if (dbError) {
+           console.error('[smart-itinerary] Supabase insert error', dbError);
+           throw new Error('DB_ERROR');
         }
 
         controller.enqueue(encoder.encode('\n__ITINERARY_READY__'));
         controller.close();
 
       } catch (err) {
-        console.error('[smart-itinerary] Stream error', err);
-        controller.enqueue(encoder.encode('\nError: Failed to generate itinerary.'));
+        console.error('[smart-itinerary] Fatal error generating itinerary', err);
+        // If the error is one of our known codes, we might want to send that to client, 
+        // but for now the requirement says "Error: Failed to generate itinerary."
+        controller.enqueue(encoder.encode('Error: Failed to generate itinerary.\n'));
         controller.close();
       }
     }

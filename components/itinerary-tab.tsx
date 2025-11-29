@@ -94,9 +94,19 @@ export function ItineraryTab({
              const chunk = decoder.decode(value, { stream: true });
              buffer += chunk;
              
+             // Check for specific error message
+             if (buffer.includes('Error: Failed to generate itinerary.')) {
+                if (active) {
+                   setLoadingError('We couldn’t generate your itinerary. Please try again in a moment.');
+                   setIsStreaming(false);
+                }
+                break;
+             }
+
              // Check for marker
              if (buffer.includes('__ITINERARY_READY__')) {
                // Reload full JSON
+               setLoadingError(null);
                const finalRes = await fetch(`/api/trips/${tripId}/smart-itinerary`);
                if (finalRes.ok) {
                  const finalData = await finalRes.json();
@@ -108,8 +118,6 @@ export function ItineraryTab({
                break;
              } else {
                // Split by lines and update stream text
-               // We only want to show the latest few lines or all lines?
-               // "Display each streamed line... purple box should show a list of progress lines"
                const lines = buffer.split('\n').filter(l => l.trim() !== '');
                if (active) setStreamText(lines);
              }
@@ -273,19 +281,17 @@ export function ItineraryTab({
           
           {/* Streaming State */}
           {isStreaming && (
-            <Card className="mb-8 border-2 border-purple-300 bg-purple-50">
-              <CardContent className="py-8">
-                 <div className="flex flex-col items-center justify-center text-center">
-                   <Loader2 className="h-8 w-8 text-purple-600 animate-spin mb-4" />
-                   <h3 className="text-lg font-semibold text-purple-900 mb-4">We&apos;re crafting your itinerary...</h3>
-                   <div className="space-y-2 text-purple-800 font-medium">
-                     {streamText.slice(-3).map((line, i) => (
-                       <p key={i} className="animate-pulse">{line}</p>
-                     ))}
-                   </div>
+            <div className="w-full rounded-2xl border bg-orange-50/60 border-orange-200/70 px-8 py-10 text-center shadow-sm mb-8">
+               <div className="flex flex-col items-center justify-center">
+                 <Loader2 className="h-8 w-8 text-orange-500 animate-spin mb-4" />
+                 <h3 className="text-slate-900 font-semibold text-lg mb-4">We&apos;re crafting your itinerary...</h3>
+                 <div className="text-slate-700 text-sm mt-2 space-y-1">
+                   {streamText.slice(-3).map((line, i) => (
+                     <p key={i} className="animate-pulse">{line}</p>
+                   ))}
                  </div>
-              </CardContent>
-            </Card>
+               </div>
+            </div>
           )}
 
           {/* Loaded Itinerary */}
@@ -404,9 +410,12 @@ export function ItineraryTab({
           )}
           
           {loadingError && !smartItinerary && (
-            <div className="text-center py-12 text-red-600">
-              <p>{loadingError}</p>
-              <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">Retry</Button>
+            <div className="w-full rounded-2xl border bg-red-50 border-red-200 px-8 py-10 text-center shadow-sm mb-8">
+              <h3 className="text-red-900 font-semibold text-lg mb-2">We couldn&apos;t generate your itinerary</h3>
+              <p className="text-red-700 mb-6">{loadingError}</p>
+              <Button onClick={() => window.location.reload()} variant="outline" className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800">
+                Retry
+              </Button>
             </div>
           )}
         </div>
