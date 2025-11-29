@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, Maximize2, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, Maximize2, ChevronLeft, ChevronRight, MessageSquare, Send } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { format } from "date-fns";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
@@ -49,6 +49,7 @@ export function ItineraryTab({
   // Chat state
   const [chatMessage, setChatMessage] = useState("");
   const [isChatting, setIsChatting] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
   
   const router = useRouter();
   const { addToast } = useToast();
@@ -243,9 +244,9 @@ export function ItineraryTab({
     if (!chatMessage.trim() || isChatting) return;
 
     setIsChatting(true);
+    setChatError(null);
     const msg = chatMessage;
-    setChatMessage("");
-
+    
     try {
       const res = await fetch(`/api/trips/${tripId}/itinerary-chat`, {
         method: 'POST',
@@ -253,15 +254,20 @@ export function ItineraryTab({
         body: JSON.stringify({ message: msg })
       });
 
-      if (!res.ok) throw new Error('Chat failed');
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'Chat failed');
+      }
 
       const data = await res.json();
       if (data.itinerary) {
         setSmartItinerary(data.itinerary);
+        setChatMessage(""); // Only clear on success
         addToast({ title: "Itinerary updated!" });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      setChatError(error.message || "Failed to update itinerary");
       addToast({ variant: "destructive", title: "Failed to update itinerary" });
     } finally {
       setIsChatting(false);
@@ -344,7 +350,7 @@ export function ItineraryTab({
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 py-8">
           
           {/* Streaming State */}
           {isStreaming && (
@@ -363,20 +369,40 @@ export function ItineraryTab({
 
           {/* Loaded Itinerary */}
           {smartItinerary && !isStreaming && (
-            <div className="space-y-8">
+            <div className="space-y-8 pb-10">
               {/* Trip Summary */}
               <div className="text-center space-y-4 mb-10">
                 <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
                 <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
                    <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
                 </div>
+                {/* Trip-level Affiliate Suggestions */}
+                {smartItinerary.affiliateSuggestions?.length ? (
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                    {smartItinerary.affiliateSuggestions.map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        className="inline-flex items-center rounded-full border border-purple-300 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-800 hover:bg-purple-100 transition-colors"
+                      >
+                        {a.cta}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
               </div>
 
               {/* Days */}
               <div className="space-y-12">
                 {smartItinerary.days.map((day) => {
-                  const dayImages = day.places.flatMap(p => p.photos || []);
+                  // Fallback: use day.photos if available, else gather from places.
+                  const dayImages = (day.photos && day.photos.length > 0) 
+                    ? day.photos 
+                    : day.places.flatMap(p => p.photos || []);
                   
+                  // Limit to 4 images for the banner
+                  const bannerImages = dayImages.slice(0, 4);
+
                   return (
                     <Card 
                       key={day.id} 
@@ -397,16 +423,16 @@ export function ItineraryTab({
                         </div>
                       </CardHeader>
                       
-                      {/* Image Gallery */}
-                      {dayImages.length > 0 && (
-                        <div className="w-full h-48 flex overflow-x-auto scrollbar-hide bg-gray-100">
-                          {dayImages.map((img, idx) => (
+                      {/* Image Gallery - Desktop: Row of up to 4 images. Mobile: Horizontal scroll. */}
+                      {bannerImages.length > 0 && (
+                        <div className="w-full aspect-[16/9] sm:aspect-[3/1] md:aspect-[4/1] flex overflow-x-auto sm:overflow-hidden bg-gray-100 scrollbar-hide">
+                          {bannerImages.map((img, idx) => (
                             <div 
                               key={idx} 
-                              className="relative h-full min-w-[200px] flex-1 cursor-pointer hover:opacity-90 transition-opacity"
+                              className="relative h-full min-w-[80%] sm:min-w-0 sm:flex-1 cursor-pointer hover:opacity-90 transition-opacity"
                               onClick={() => openLightbox(img, dayImages)}
                             >
-                              <Image src={img} alt={`Day ${day.index}`} fill className="object-cover border-r border-white/20" />
+                              <Image src={img} alt={`Day ${day.index} - ${idx + 1}`} fill className="object-cover border-r border-white/20 last:border-r-0" />
                             </div>
                           ))}
                         </div>
@@ -417,16 +443,31 @@ export function ItineraryTab({
                           <p>{day.summary}</p>
                         </div>
 
+                        {/* Day-level Affiliate Suggestions */}
+                        {day.affiliateSuggestions?.length ? (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {day.affiliateSuggestions.map((a) => (
+                              <button
+                                key={a.id}
+                                type="button"
+                                className="inline-flex items-center rounded-full border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-800 hover:bg-orange-100 transition-colors"
+                              >
+                                {a.cta}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+
                         <div className="space-y-4 mt-6">
                           {day.places.map((place) => (
                             <div 
                               key={place.id} 
-                              className={`flex gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                              className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                               onClick={(e) => {
                                 onActivitySelect?.(place.id);
                               }}
                             >
-                               <div className="flex-shrink-0 relative w-24 h-24 rounded-md overflow-hidden bg-gray-200">
+                               <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
                                  {place.photos && place.photos[0] ? (
                                    <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
                                  ) : (
@@ -436,34 +477,45 @@ export function ItineraryTab({
                                  )}
                                </div>
                                <div className="flex-1 min-w-0">
-                                 <div className="flex justify-between items-start">
-                                   <h4 className="font-bold text-lg text-slate-900 truncate pr-4">{place.name}</h4>
-                                   <div className="flex gap-2">
+                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                                   <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
+                                   <div className="flex gap-2 self-start">
                                      <button
                                        onClick={(e) => {
                                          e.stopPropagation();
                                          handleUpdatePlace(day.id, place.id, { visited: !place.visited });
                                        }}
-                                       className={`p-1.5 rounded-full border transition-colors ${place.visited ? 'bg-green-100 text-green-700 border-green-200' : 'text-gray-400 hover:text-green-600 hover:bg-green-50'}`}
-                                       title="Mark visited"
+                                       className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 transition-colors ${
+                                         place.visited 
+                                           ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+                                           : 'bg-blue-500 text-white hover:bg-blue-600'
+                                       }`}
+                                       title={place.visited ? "Mark as not visited" : "Mark as visited"}
                                      >
-                                       <Check className="h-4 w-4" />
+                                       <Check className="h-3 w-3" />
+                                       {place.visited ? "Visited" : "Visit"}
                                      </button>
                                      <button
                                        onClick={(e) => {
                                          e.stopPropagation();
                                          handleUpdatePlace(day.id, place.id, { remove: true });
                                        }}
-                                       className="p-1.5 rounded-full border text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                       title="Remove"
+                                       className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 bg-red-500 text-white hover:bg-red-600 transition-colors"
+                                       title="Remove place"
                                      >
-                                       <X className="h-4 w-4" />
+                                       <X className="h-3 w-3" />
+                                       Remove
                                      </button>
                                    </div>
                                  </div>
-                                 <p className="text-slate-700 text-sm mt-1 leading-relaxed line-clamp-2">
+                                 <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
                                    {place.summary}
                                  </p>
+                                 {place.area && (
+                                   <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                                     {place.area}
+                                   </span>
+                                 )}
                                </div>
                             </div>
                           ))}
@@ -472,6 +524,47 @@ export function ItineraryTab({
                     </Card>
                   );
                 })}
+              </div>
+
+              {/* Tips & Notes */}
+              {smartItinerary.tips?.length ? (
+                <section className="mt-10 rounded-2xl border bg-white/80 p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold mb-3 text-slate-900">Additional Tips &amp; Notes</h2>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                    {smartItinerary.tips.map((tip) => (
+                      <li key={tip.id}>{tip.text}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {/* Chat Input - Moved to flow */}
+              <div className="mt-12 p-6 border rounded-2xl bg-gray-50/50">
+                <h3 className="text-lg font-semibold mb-2 text-slate-900">Edit Itinerary</h3>
+                <p className="text-sm text-slate-500 mb-4">Ask me to add places, move things around, or change themes.</p>
+                <form onSubmit={handleChatSubmit} className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={chatMessage}
+                      onChange={(e) => setChatMessage(e.target.value)}
+                      placeholder="e.g. 'Add a lunch spot on Day 1', 'Move Sagrada Familia to Day 2'"
+                      className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
+                      disabled={isChatting}
+                    />
+                    {/* <MessageSquare className="absolute left-3 top-3 h-5 w-5 text-gray-400" /> */}
+                  </div>
+                  <Button 
+                    type="submit" 
+                    disabled={isChatting || !chatMessage.trim()} 
+                    className="rounded-xl px-6 bg-purple-600 hover:bg-purple-700 h-auto"
+                  >
+                    {isChatting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                  </Button>
+                </form>
+                {chatError && (
+                  <p className="text-sm text-red-600 mt-2">{chatError}</p>
+                )}
               </div>
             </div>
           )}
@@ -489,26 +582,6 @@ export function ItineraryTab({
             </div>
           )}
         </div>
-      </div>
-
-      {/* Chat Bar */}
-      <div className="p-4 border-t bg-white">
-        <form onSubmit={handleChatSubmit} className="max-w-4xl mx-auto flex gap-2">
-          <div className="relative flex-1">
-             <input
-               type="text"
-               value={chatMessage}
-               onChange={(e) => setChatMessage(e.target.value)}
-               placeholder="Edit this itinerary (e.g., 'Add a lunch spot on Day 1', 'Change Day 2 theme to Art')"
-               className="w-full pl-10 pr-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
-               disabled={isChatting || !smartItinerary}
-             />
-             <MessageSquare className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          </div>
-          <Button type="submit" disabled={isChatting || !smartItinerary || !chatMessage.trim()} className="rounded-full bg-purple-600 hover:bg-purple-700">
-            {isChatting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update'}
-          </Button>
-        </form>
       </div>
 
       {/* Dialogs */}

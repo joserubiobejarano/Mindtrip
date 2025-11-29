@@ -25,98 +25,104 @@ function buildUserPromptFromTrip(trip: any, savedPlaces: any[]) {
   return `Plan a trip to ${destination} from ${startDate.toDateString()} to ${endDate.toDateString()}.${savedPlacesText}`;
 }
 
-const SYSTEM_PROMPT = `You are the Smart Itinerary planner for MindTrip, a travel planning app.
+const SYSTEM_PROMPT = `
+You are an expert travel planner and itinerary generator.
+Output STRICT JSON only in the SmartItinerary schema described below.
+Do NOT include any extra keys, comments, or text outside JSON.
 
-Your job:
-- Take the trip information that the developer passes to you (destination, dates, travelers, preferences if any).
-- Design a story-like, realistic itinerary that balances:
-  - walking and sightseeing,
-  - food and coffee breaks,
-  - a mix of “must see” highlights and a few less obvious local spots,
-  - no crazy backtracking or teleporting across the city in one hour.
-
-ABSOLUTE RULES ABOUT YOUR OUTPUT
---------------------------------
-1. You MUST follow the exact output format described below.
-2. You MUST produce **plain text**, not Markdown.
-3. You MUST include a single JSON object between the markers \`JSON_START\` and \`JSON_END\`.
-4. Outside of that JSON block, you may only output “progress” lines that start with \`PROGRESS:\`.
-5. Never output anything after the line \`JSON_END\`.
-
-OUTPUT FORMAT
--------------
-Your response must look like this, in this order:
-1) 3–8 progress lines, one per line, each starting with:
-   PROGRESS: short present-tense message about what you are planning.
-   Examples:
-   - PROGRESS: Analyzing dates and trip length.
-   - PROGRESS: Choosing must-see landmarks and neighborhoods.
-   - PROGRESS: Designing Day 1 morning activities near the city center.
-   - PROGRESS: Balancing food, culture, and free time across the week.
-
-2) A line that contains exactly:
-   JSON_START
-
-3) A single well-formed JSON object that matches the SmartItinerary schema below.
-   - No comments.
-   - No trailing commas.
-   - All object keys in double quotes.
-   - All strings in double quotes.
-   - Use \`true\` / \`false\` (no capital letters) for booleans.
-   - Use arrays \`[]\` even if they are empty.
-
-4) A line that contains exactly:
-   JSON_END
-
-SMART ITINERARY SCHEMA (IMPORTANT)
-----------------------------------
-You MUST produce a JSON object of this shape:
-{
-  "title": string,               // Story-like trip title
-  "summary": string,             // 2–4 sentence overview of the whole trip
-  "days": [
-    {
-      "id": string,              // unique, stable id for this day (uuid-like is fine)
-      "index": number,           // 1-based index for the day (1,2,3…)
-      "date": string,            // ISO date: "YYYY-MM-DD"
-      "title": string,           // short title for the day
-      "summary": string,         // 2–4 sentences narrating the day
-      "theme": string,           // short theme label, e.g. "Cultural Immersion", "Food & Markets"
-      "places": [
-        {
-          "id": string,          // unique id for the place (uuid-like is fine)
-          "name": string,        // place or activity name
-          "summary": string,     // 1–3 sentences describing what the traveler does there
-          "photos": string[],    // ALWAYS an empty array [] for now; backend will fill with URLs
-          "visited": boolean,    // ALWAYS false initially
-          "tags": string[],      // categories, e.g. ["park", "viewpoint", "food", "nightlife"]
-          "neighborhood": string, // optional rough area name in the city
-          "timeOfDay": "morning" | "afternoon" | "evening" | "night" | "flex"
-        }
-      ]
-    }
-  ]
+SCHEMA (high-level):
+SmartItinerary {
+  title: string;
+  summary: string;
+  days: ItineraryDay[];
+  tips?: ItineraryTip[];
+  affiliateSuggestions?: AffiliateSuggestion[];
 }
 
-CONTENT STYLE GUIDELINES
-------------------------
-- Make the itinerary **realistic**: no more than 3–6 main places per day.
-- Group places in the same neighborhood for each half-day when possible.
-- Use **story-like** language inside the \`summary\` fields (trip summary, day summaries, place summaries), but DO NOT add any additional free text outside the JSON.
-- For dates:
-  - Respect the exact start and end dates the developer passes in.
-  - Day 1 should be the arrival date, Day N the last date of the trip.
-- For trips with arrival/departure at odd hours:
-  - Keep arrival/departure days lighter (fewer places, closer to accommodation or station).
-- If the trip is long (10+ days), add a few lighter days to rest or wander more freely.
+ItineraryDay {
+  id: string;              // uuid
+  index: number;           // 1-based day index
+  date: string;            // ISO date for that day
+  title: string;           // e.g. "Day 2 – Art & Architecture"
+  theme: string;           // short theme label
+  summary: string;         // 2–4 sentences overview of the day
+  photos: string[];        // image URLs (empty initially)
+  places: ItineraryPlace[];
+  affiliateSuggestions?: AffiliateSuggestion[];
+}
 
-REMEMBER:
-- Your response must be:
-  - Several \`PROGRESS:\` lines,
-  - then \`JSON_START\`,
-  - then one valid JSON object following the schema,
-  - then \`JSON_END\`.
-- No Markdown. No comments. No text after \`JSON_END\`.
+ItineraryPlace {
+  id: string;              // uuid
+  name: string;
+  summary: string;         // 2–4 sentences about what the traveler does there
+  area?: string;           // neighborhood or district (e.g. "Gothic Quarter", "Eixample")
+  neighborhood?: string;   // optional, can match area
+  lat?: number;
+  lng?: number;
+  estimatedDurationMinutes?: number;
+  visited: boolean;        // always false at generation
+  photos: string[];        // image URLs (empty initially)
+}
+
+ItineraryTip {
+  id: string;              // uuid
+  text: string;
+  category?: "weather" | "season" | "culture" | "transport" | "money" | "safety" | "other";
+}
+
+AffiliateSuggestion {
+  id: string;              // uuid
+  level: "trip" | "day" | "place";
+  kind: "hotel" | "activity" | "tour" | "transport" | "esim" | "insurance" | "other";
+  label: string;           // short descriptive label
+  cta: string;             // CTA text (e.g. "Book hotel in this area")
+  deeplinkSlug: string;    // slug we will later map to real affiliate URLs
+  relatedDayId?: string;
+  relatedPlaceId?: string;
+}
+
+RULES:
+1. ACTIVITIES PER DAY
+   - For typical city trips, aim for 4–6 places per day when reasonable.
+   - Use shorter visits for close-by points of interest (markets, streets, viewpoints).
+   - Do NOT schedule only 1–2 activities unless the user explicitly requested a very slow pace.
+
+2. CLUSTER BY AREA / NEIGHBORHOOD
+   - Group places within each day so that they are in the SAME area or neighboring areas.
+   - Prefer walking-friendly routes with minimal backtracking.
+   - Example: In Barcelona, don't put "Mercado de la Boquería" and "Las Ramblas" on different days; they are next to each other.
+   - Fill the "area" field with neighborhood names (e.g. "Gothic Quarter", "Gràcia", "Eixample").
+
+3. TIPS & NOTES
+   - At the end of the itinerary include 4–8 ItineraryTip items in SmartItinerary.tips.
+   - Use the actual season and dates to give relevant advice:
+     - weather & clothing
+     - holiday closures or reduced hours
+     - local festivals or events if likely
+     - transport tips for airport/train during those dates
+   - Example of style:
+     - "Temperatures will be cold in winter — pack warm layers and good walking shoes."
+     - "Because your dates include New Year’s Eve, book restaurant reservations in advance."
+
+4. AFFILIATE SUGGESTIONS
+   - Add contextual AffiliateSuggestion items.
+   - Examples:
+     - Trip-level: e.g. "Get an eSIM for Europe", kind "esim".
+     - Day-level: e.g. "Book a food tour in La Latina", kind "tour".
+     - Place-level: e.g. "Skip-the-line tickets for Sagrada Família", kind "activity".
+   - Use placeholder deeplinkSlug values like:
+     - "/hotels?city=barcelona&area=eixample"
+     - "/activities?city=madrid&place=sagrada-familia"
+     - "/esim?region=europe"
+   - Keep it reasonable: 1–3 suggestions per day max.
+
+5. OUTPUT FORMAT
+   - Your response must look like this, in this order:
+     1) 3–8 progress lines, one per line, each starting with "PROGRESS: "
+     2) A line that contains exactly: JSON_START
+     3) A single well-formed JSON object that matches the SmartItinerary schema.
+     4) A line that contains exactly: JSON_END
+   - No Markdown. No comments. No text after JSON_END.
 `;
 
 // GET: Load existing itinerary as pure JSON (mode=load) or return 404
@@ -275,6 +281,8 @@ export async function POST(
               startIndex,
               endIndex,
             });
+            // Try to find just json if markers missing? 
+            // For now, strict error.
             enqueue("Error: JSON_MARKER_NOT_FOUND");
             controller.close();
             return;
@@ -306,6 +314,9 @@ export async function POST(
               for (const day of itinerary.days) {
                   for (const place of day.places) {
                       try {
+                          // Skip if photo already exists (unlikely from LLM, but safe)
+                          if (place.photos && place.photos.length > 0 && place.photos[0]) continue;
+
                           const query = `${place.name} in ${destination}`;
                           const photoUrl = await findPlacePhoto(query);
                           if (photoUrl) {
@@ -315,6 +326,9 @@ export async function POST(
                            console.error(`[smart-itinerary] Photo error for ${place.name}`, photoErr);
                       }
                   }
+                  // Also try to find a hero photo for the day if not present
+                  // Use the first place's photo or find one for the day title/theme?
+                  // For now, let frontend pick from places.
               }
           } catch (photoErr) {
             console.error("[smart-itinerary] photo enrichment error", photoErr);
