@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Search, MapPin, Calendar, Users, MessageCircle, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -34,9 +34,48 @@ export function HeroSearch({
   onSubmit,
   loading = false,
 }: HeroSearchProps) {
-  const [chatMessage, setChatMessage] = useState("");
+  const [chatInput, setChatInput] = useState("");
   const [parsingIntent, setParsingIntent] = useState(false);
   const [intentError, setIntentError] = useState<string | null>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
+
+  const chatSuggestions = [
+    {
+      id: 'weekend-madrid',
+      label: 'Plan a weekend in Madrid',
+      prompt:
+        'Plan a 3-day weekend in Madrid in March for 2 people, focusing on food, culture, and some nightlife.',
+    },
+    {
+      id: 'summer-europe',
+      label: 'Backpacking in Europe',
+      prompt:
+        'Create a 10-day backpacking route across 3–4 cities in Europe starting from Madrid, using mostly trains and buses.',
+    },
+    {
+      id: 'family-trip',
+      label: 'Family trip',
+      prompt:
+        'Suggest a 7-day family-friendly trip with kids (8 and 10 years old), somewhere warm in December, flying from Madrid.',
+    },
+    {
+      id: 'romantic-citybreak',
+      label: 'Romantic city break',
+      prompt:
+        'Find a romantic 4-day city break in Europe in spring for a couple who loves coffee shops, viewpoints, and photography.',
+    },
+    {
+      id: 'workation',
+      label: 'Workation ideas',
+      prompt:
+        'Recommend 3 workation destinations with good Wi-Fi, cafes to work from, and mild weather in winter, flying from Madrid.',
+    },
+  ];
+
+  const handleSuggestionClick = (prompt: string) => {
+    setChatInput(prompt);
+    chatInputRef.current?.focus();
+  };
 
   const searchDestinationByName = async (destinationName: string): Promise<DestinationOption | null> => {
     try {
@@ -100,10 +139,10 @@ export function HeroSearch({
 
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatMessage.trim() || parsingIntent) return;
+    if (!chatInput.trim() || parsingIntent) return;
 
-    const message = chatMessage.trim();
-    setChatMessage("");
+    const message = chatInput.trim();
+    setChatInput("");
     setIntentError(null);
     setParsingIntent(true);
 
@@ -160,10 +199,7 @@ export function HeroSearch({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="bg-white rounded-3xl p-7 max-w-7xl w-full mx-auto border-4 border-black"
-      style={{
-        boxShadow: '8px 8px 0px rgba(0, 0, 0, 1)'
-      }}
+      className="bg-white rounded-[32px] border-[3px] border-black px-6 py-8 max-w-7xl w-full mx-auto shadow-[0_8px_0_#000]"
     >
       <form onSubmit={onSubmit}>
         <div className="flex flex-col md:flex-row gap-4 items-end">
@@ -228,23 +264,38 @@ export function HeroSearch({
       {/* Divider */}
       <div className="my-6 border-t border-gray-300" />
 
+      {/* Chat Suggestions */}
+      <div className="mt-4 mb-2 flex flex-wrap gap-2">
+        {chatSuggestions.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => handleSuggestionClick(s.prompt)}
+            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition"
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       {/* Chat Input Bar */}
       <form onSubmit={handleChatSubmit} className="relative">
-        <div className="flex items-center gap-3 rounded-full border-[3px] border-black bg-white px-4 py-2.5 shadow-[6px_6px_0px_rgba(0,0,0,1)] focus-within:shadow-[4px_4px_0px_rgba(0,0,0,1)] transition-all">
+        <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-50 flex-shrink-0">
             <MessageCircle className="h-4 w-4 text-purple-600" />
           </span>
           <input
+            ref={chatInputRef}
             type="text"
-            value={chatMessage}
-            onChange={(e) => setChatMessage(e.target.value)}
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
             placeholder="Or tell us where to go..."
             className="flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
             disabled={parsingIntent}
           />
           <button
             type="submit"
-            disabled={parsingIntent || !chatMessage.trim()}
+            disabled={parsingIntent || !chatInput.trim()}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff7a00] text-white shadow-sm transition hover:translate-y-[1px] hover:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
           >
             {parsingIntent ? (
