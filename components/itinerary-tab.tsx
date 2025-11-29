@@ -19,11 +19,17 @@ import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 interface ItineraryTabProps {
   tripId: string;
   userId: string;
+  selectedDayId?: string | null;
+  onSelectDay?: (dayId: string) => void;
+  onActivitySelect?: (activityId: string) => void;
 }
 
 export function ItineraryTab({
   tripId,
   userId,
+  selectedDayId,
+  onSelectDay,
+  onActivitySelect,
 }: ItineraryTabProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
@@ -299,7 +305,12 @@ export function ItineraryTab({
                   const dayImages = day.places.flatMap(p => p.pictures);
                   
                   return (
-                    <Card key={day.id} className="overflow-hidden border shadow-sm">
+                    <Card 
+                      key={day.id} 
+                      id={`day-${day.id}`}
+                      className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-purple-500' : ''}`}
+                      onClick={() => onSelectDay?.(day.id)}
+                    >
                       <CardHeader className="bg-gray-50 border-b pb-4">
                         <div className="flex justify-between items-start">
                           <div>
@@ -335,7 +346,13 @@ export function ItineraryTab({
 
                         <div className="space-y-4 mt-6">
                           {day.places.map((place) => (
-                            <div key={place.id} className={`flex gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}>
+                            <div 
+                              key={place.id} 
+                              className={`flex gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                              onClick={(e) => {
+                                onActivitySelect?.(place.id);
+                              }}
+                            >
                                <div className="flex-shrink-0 relative w-24 h-24 rounded-md overflow-hidden bg-gray-200">
                                  {place.pictures[0] ? (
                                    <Image src={place.pictures[0]} alt={place.name} fill className="object-cover" />
@@ -350,14 +367,20 @@ export function ItineraryTab({
                                    <h4 className="font-bold text-lg text-slate-900 truncate pr-4">{place.name}</h4>
                                    <div className="flex gap-2">
                                      <button
-                                       onClick={() => handleUpdatePlace(day.id, place.id, { visited: !place.visited })}
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         handleUpdatePlace(day.id, place.id, { visited: !place.visited });
+                                       }}
                                        className={`p-1.5 rounded-full border transition-colors ${place.visited ? 'bg-green-100 text-green-700 border-green-200' : 'text-gray-400 hover:text-green-600 hover:bg-green-50'}`}
                                        title="Mark visited"
                                      >
                                        <Check className="h-4 w-4" />
                                      </button>
                                      <button
-                                       onClick={() => handleUpdatePlace(day.id, place.id, { remove: true })}
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         handleUpdatePlace(day.id, place.id, { remove: true });
+                                       }}
                                        className="p-1.5 rounded-full border text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                                        title="Remove"
                                      >
