@@ -1,310 +1,312 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { generateSmartItineraryWithOpenAI } from '@/lib/supabase/smart-itineraries'
-import type { AiItinerary } from '@/app/api/ai-itinerary/route'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { findPlacePhoto } from '@/lib/google/places-server';
+import { getOpenAIClient } from '@/lib/openai';
+import { SmartItinerary, ItineraryDay, ItineraryPlace } from '@/types/itinerary';
+
+export const maxDuration = 300; // 5 minutes timeout
 
 /**
  * Validate if a string is a valid UUID
  */
 function isValidUUID(str: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  return uuidRegex.test(str)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
 }
 
-/**
- * GET /api/trips/[tripId]/smart-itinerary
- * Returns the smart itinerary for a trip, or generates one if not found.
- * This route is fully idempotent - it will never re-generate an itinerary if one already exists.
- */
+async function streamItineraryGeneration(tripId: string, trip: any, savedPlaces: any[]) {
+  const startDate = new Date(trip.start_date);
+  const endDate = new Date(trip.end_date);
+  const destination = trip.destination_name || trip.title;
+  
+  let savedPlacesText = '';
+  if (savedPlaces && savedPlaces.length > 0) {
+    savedPlacesText = `\nInclude these saved places if possible: ${savedPlaces.map((p: any) => p.name).join(', ')}`;
+  }
+
+  const systemPrompt = `You are an expert travel planner.
+Your goal is to plan a detailed itinerary for a trip to ${destination}.
+
+Process:
+1. First, output short progress lines describing your thought process, one per line.
+   Examples:
+   "Analyzing trip duration and season..."
+   "Selecting top rated restaurants..."
+   "Designing Day 1 route..."
+   
+2. Then, output a single valid JSON object matching this schema:
+{
+  "tripId": "${tripId}",
+  "title": "Trip Title",
+  "summary": "Overall trip summary...",
+  "days": [
+    {
+      "id": "uuid",
+      "index": 1,
+      "date": "YYYY-MM-DD",
+      "title": "Day Title",
+      "theme": "Theme",
+      "description": "Day description...",
+      "places": [
+        {
+          "id": "uuid",
+          "name": "Place Name",
+          "summary": "Place summary...",
+          "pictures": [],
+          "visited": false
+        }
+      ]
+    }
+  ]
+}
+
+Rules:
+- The JSON must be the LAST thing you output.
+- The JSON must be valid.
+- Leave "pictures" arrays empty (we will fill them).
+- Generate UUIDs for ids.
+- Do NOT output markdown code blocks for the JSON, just the raw JSON string starting with { and ending with }.
+- Ensure you output at least 3-4 progress lines before the JSON.
+`;
+
+  const userPrompt = `Plan a trip to ${destination} from ${startDate.toDateString()} to ${endDate.toDateString()}.${savedPlacesText}`;
+
+  const openai = getOpenAIClient();
+  
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ],
+    stream: true,
+  });
+
+  const encoder = new TextEncoder();
+  const supabase = await createClient();
+
+  return new ReadableStream({
+    async start(controller) {
+      let fullText = '';
+      let jsonStarted = false;
+
+      try {
+        for await (const chunk of response) {
+          const text = chunk.choices[0]?.delta?.content || '';
+          fullText += text;
+
+          if (!jsonStarted) {
+            const jsonStartIndex = fullText.indexOf('{');
+            if (jsonStartIndex !== -1) {
+              jsonStarted = true;
+              // Send the part before JSON if it was just received
+              const chunkIndexInFull = fullText.length - text.length;
+              if (chunkIndexInFull < jsonStartIndex) {
+                 const partToSend = text.substring(0, jsonStartIndex - chunkIndexInFull);
+                 controller.enqueue(encoder.encode(partToSend));
+              }
+            } else {
+              controller.enqueue(encoder.encode(text));
+            }
+          }
+        }
+
+        // Process JSON
+        const jsonStartIndex = fullText.indexOf('{');
+        const jsonEndIndex = fullText.lastIndexOf('}');
+        
+        if (jsonStartIndex === -1 || jsonEndIndex === -1) {
+          throw new Error('Failed to generate valid JSON itinerary');
+        }
+
+        const jsonStr = fullText.substring(jsonStartIndex, jsonEndIndex + 1);
+        let itinerary: SmartItinerary;
+        
+        try {
+           itinerary = JSON.parse(jsonStr);
+        } catch (e) {
+           console.error('[smart-itinerary] JSON Parse Error', e);
+           console.log('Full text:', fullText);
+           throw new Error('Invalid JSON format');
+        }
+
+        // Enrich with photos
+        for (const day of itinerary.days) {
+          for (const place of day.places) {
+             try {
+               const query = `${place.name} in ${destination}`;
+               const photoUrl = await findPlacePhoto(query);
+               if (photoUrl) {
+                 place.pictures = [photoUrl];
+               }
+             } catch (err) {
+               console.error('[smart-itinerary] Photo fetch error', err);
+             }
+          }
+        }
+
+        // Save to Supabase
+        const { error: saveError } = await supabase
+          .from('smart_itineraries')
+          .upsert({
+            trip_id: tripId,
+            content: itinerary as any,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'trip_id' });
+
+        if (saveError) {
+           throw new Error('Failed to save itinerary to database');
+        }
+
+        controller.enqueue(encoder.encode('\n__ITINERARY_READY__'));
+        controller.close();
+
+      } catch (err) {
+        console.error('[smart-itinerary] Stream error', err);
+        controller.enqueue(encoder.encode('\nError: Failed to generate itinerary.'));
+        controller.close();
+      }
+    }
+  });
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let tripId: string | undefined
+  let tripId: string | undefined;
+  
   try {
-    const resolvedParams = await params
-    tripId = resolvedParams.tripId
+    const resolvedParams = await params;
+    tripId = resolvedParams.tripId;
 
-    // 1) Validate tripId is a valid UUID; if not, return 400
-    if (!tripId) {
-      console.error('[smart-itinerary] missing tripId')
-      return NextResponse.json(
-        { error: 'Invalid trip id' },
-        { status: 400 }
-      )
+    if (!tripId || !isValidUUID(tripId)) {
+      return NextResponse.json({ error: 'Invalid trip id' }, { status: 400 });
     }
 
-    if (!isValidUUID(tripId)) {
-      console.error('[smart-itinerary] invalid tripId format', { tripId })
-      return NextResponse.json(
-        { error: 'Invalid trip id' },
-        { status: 400 }
-      )
-    }
+    const supabase = await createClient();
 
-    // 2) Create Supabase server client
-    const supabase = await createClient()
-
-    // 3) First try to LOAD an existing itinerary
+    // Check existing
     const { data: existing, error: existingError } = await supabase
       .from('smart_itineraries')
-      .select('id, trip_id, content, created_at')
+      .select('content')
       .eq('trip_id', tripId)
-      .maybeSingle()
+      .maybeSingle();
 
-    // 4) If existingError is not null, log it and return 500
     if (existingError) {
-      console.error('[smart-itinerary] Error fetching existing itinerary', {
-        tripId,
-        error: existingError,
-      })
-      return NextResponse.json(
-        { error: 'Failed to load smart itinerary' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to load itinerary' }, { status: 500 });
     }
 
-    // 5) If existing exists, return it directly (NO regeneration)
     if (existing) {
-      return NextResponse.json(
-        { itinerary: existing.content, source: 'existing' },
-        { status: 200 }
-      )
+      return NextResponse.json({ itinerary: existing.content, source: 'existing' });
     }
 
-    // 6) If there is no existing row: Load the trip from trips table
+    // Load Data
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('id, title, start_date, end_date, destination_name, destination_country, center_lat, center_lng')
+      .select('id, title, start_date, end_date, destination_name, destination_country')
       .eq('id', tripId)
-      .maybeSingle()
+      .single();
 
-    if (tripError) {
-      console.error('[smart-itinerary] Error loading trip before generation', {
-        tripId,
-        error: tripError,
-      })
-      return NextResponse.json(
-        { error: 'Failed to load trip details' },
-        { status: 500 }
-      )
+    if (tripError || !trip) {
+      return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
-    if (!trip) {
-      console.error('[smart-itinerary] Trip not found', { tripId })
-      return NextResponse.json(
-        { error: 'Trip not found' },
-        { status: 404 }
-      )
-    }
+    // Load saved places
+    const { data: savedPlaces } = await supabase
+      .from('saved_places')
+      .select('name, types')
+      .eq('trip_id', tripId)
+      .limit(10);
 
-    // 7) Generate the itinerary using existing helper
-    let itineraryObject: AiItinerary
-    try {
-      const raw = await generateSmartItineraryWithOpenAI(tripId, supabase)
-      // Ensure it's an object (it should already be, but just in case)
-      itineraryObject = typeof raw === 'string' ? JSON.parse(raw) : raw
-    } catch (genError) {
-      console.error('[smart-itinerary] Error generating itinerary', {
-        tripId,
-        error: genError,
-      })
-      return NextResponse.json(
-        { error: 'Failed to generate smart itinerary' },
-        { status: 500 }
-      )
-    }
+    const stream = await streamItineraryGeneration(tripId, trip, savedPlaces || []);
 
-    // 8) Insert the generated itinerary
-    const { data: inserted, error: insertError } = await supabase
-      .from('smart_itineraries')
-      .insert({
-        trip_id: tripId,
-        content: itineraryObject, // Pass as object, not stringified
-      })
-      .select('id, trip_id, content, created_at')
-      .maybeSingle()
+    return new Response(stream, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
 
-    if (insertError || !inserted) {
-      console.error('[smart-itinerary] Error inserting new itinerary', {
-        tripId,
-        error: insertError,
-      })
-      return NextResponse.json(
-        { error: 'Failed to save smart itinerary' },
-        { status: 500 }
-      )
-    }
-
-    // 9) Return the inserted itinerary
-    return NextResponse.json(
-      { itinerary: inserted.content, source: 'generated' },
-      { status: 201 }
-    )
-  } catch (err) {
-    console.error('[smart-itinerary] Unhandled error in GET', {
-      tripId,
-      error: err,
-    })
-    return NextResponse.json(
-      { error: 'Failed to load smart itinerary' },
-      { status: 500 }
-    )
+  } catch (error) {
+    console.error('[smart-itinerary] Unhandled error', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-/**
- * POST /api/trips/[tripId]/smart-itinerary
- * Explicitly regenerates the smart itinerary (force regenerate)
- */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let tripId: string | undefined
+  let tripId: string | undefined;
   try {
-    const resolvedParams = await params
-    tripId = resolvedParams.tripId
+    const resolvedParams = await params;
+    tripId = resolvedParams.tripId;
 
-    if (!tripId) {
-      return NextResponse.json(
-        { error: 'tripId is required' },
-        { status: 400 }
-      )
+    if (!tripId || !isValidUUID(tripId)) {
+      return NextResponse.json({ error: 'Invalid trip id' }, { status: 400 });
     }
 
-    const supabase = await createClient()
+    const supabase = await createClient();
 
-    // Verify user has access to this trip
+    // Load Trip
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('id')
+      .select('id, title, start_date, end_date, destination_name, destination_country')
       .eq('id', tripId)
-      .single()
+      .single();
 
     if (tripError || !trip) {
-      return NextResponse.json(
-        { error: 'Trip not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
-
-    // Force regenerate itinerary
-    const itineraryObject = await generateSmartItineraryWithOpenAI(tripId, supabase)
-
-    // Delete existing and insert new
-    await supabase
-      .from('smart_itineraries')
-      .delete()
+    
+    // Load saved places
+    const { data: savedPlaces } = await supabase
+      .from('saved_places')
+      .select('name, types')
       .eq('trip_id', tripId)
+      .limit(10);
 
-    const { data: insertData, error: insertError } = await supabase
-      .from('smart_itineraries')
-      .insert({
-        trip_id: tripId,
-        content: itineraryObject,
-      })
-      .select('id, trip_id, content, created_at')
-      .single()
+    // Delete existing
+    await supabase.from('smart_itineraries').delete().eq('trip_id', tripId);
 
-    if (insertError) {
-      console.error('[smart-itinerary] POST insert error', {
-        tripId,
-        error: insertError,
-      })
-      return NextResponse.json(
-        { error: 'Failed to regenerate itinerary' },
-        { status: 500 }
-      )
-    }
+    const stream = await streamItineraryGeneration(tripId, trip, savedPlaces || []);
 
-    return NextResponse.json(insertData)
+    return new Response(stream, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
   } catch (error) {
-    console.error('[smart-itinerary] POST failed', { tripId, error })
-    return NextResponse.json(
-      { error: 'Failed to regenerate smart itinerary' },
-      { status: 500 }
-    )
+    console.error('[smart-itinerary] POST error', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-/**
- * PATCH /api/trips/[tripId]/smart-itinerary
- * Updates the smart itinerary content (e.g., when user marks activities as visited/removed)
- */
+// Full Update PATCH (optional, can be used for sync if needed)
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let tripId: string | undefined
   try {
-    const resolvedParams = await params
-    tripId = resolvedParams.tripId
-    const body = await request.json()
-    const { itinerary } = body
+    const resolvedParams = await params;
+    const tripId = resolvedParams.tripId;
+    const body = await request.json();
+    const { itinerary } = body;
 
-    if (!tripId) {
-      return NextResponse.json(
-        { error: 'tripId is required' },
-        { status: 400 }
-      )
+    if (!tripId || !itinerary) {
+      return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    if (!itinerary) {
-      return NextResponse.json(
-        { error: 'itinerary is required' },
-        { status: 400 }
-      )
-    }
-
-    const supabase = await createClient()
-
-    // Verify user has access to this trip
-    const { data: trip, error: tripError } = await supabase
-      .from('trips')
-      .select('id')
-      .eq('id', tripId)
-      .single()
-
-    if (tripError || !trip) {
-      return NextResponse.json(
-        { error: 'Trip not found' },
-        { status: 404 }
-      )
-    }
-
-    // Update the itinerary - pass as object, not string
-    const { data: updateData, error: updateError } = await supabase
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('smart_itineraries')
-      .upsert(
-        {
-          trip_id: tripId,
-          content: itinerary as AiItinerary, // Pass as object
-        },
-        {
-          onConflict: 'trip_id',
-        }
-      )
-      .select('id, trip_id, content, created_at')
-      .single()
+      .upsert({
+        trip_id: tripId,
+        content: itinerary,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'trip_id' })
+      .select()
+      .single();
 
-    if (updateError) {
-      console.error('[smart-itinerary] PATCH update error', {
-        tripId,
-        error: updateError,
-      })
-      return NextResponse.json(
-        { error: 'Failed to update itinerary' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json(updateData)
+    if (error) throw error;
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('[smart-itinerary] PATCH failed', { tripId, error })
-    return NextResponse.json(
-      { error: 'Failed to update smart itinerary' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
 }
