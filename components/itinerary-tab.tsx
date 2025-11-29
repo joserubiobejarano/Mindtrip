@@ -98,7 +98,42 @@ export function ItineraryTab({
         
         if (contentType && contentType.includes('application/json')) {
            // We have JSON -> Existing itinerary
-           const data = await res.json();
+           // Read as text first to strip markers before parsing
+           const raw = await res.text();
+           console.log("[smart-itinerary] raw load response", raw);
+           
+           // 1) Strip the __ITINERARY_READY__ marker if it exists
+           let cleaned = raw;
+           const markerIndex = cleaned.indexOf("__ITINERARY_READY__");
+           if (markerIndex !== -1) {
+             cleaned = cleaned.slice(0, markerIndex);
+           }
+           
+           // 2) If there are progress lines or other text before the JSON,
+           //    keep everything from the first '{' onwards
+           const firstBrace = cleaned.indexOf("{");
+           if (firstBrace > 0) {
+             cleaned = cleaned.slice(firstBrace);
+           }
+           cleaned = cleaned.trim();
+           
+           let data: { itinerary?: SmartItinerary };
+           try {
+             data = JSON.parse(cleaned);
+           } catch (err) {
+             console.error("[smart-itinerary] JSON parse failed in loadItinerary", {
+               raw,
+               cleaned,
+               err,
+             });
+             if (active) {
+               setErrorCode("JSON_PARSE_ERROR");
+               setLoadingError("Failed to parse itinerary data");
+               setIsStreaming(false);
+             }
+             return;
+           }
+           
            if (data.itinerary) {
              if (active) setSmartItinerary(data.itinerary);
            }
@@ -130,9 +165,35 @@ export function ItineraryTab({
                    // We fetch again to get the full JSON structure
                    const finalRes = await fetch(`/api/trips/${tripId}/smart-itinerary`);
                    if (finalRes.ok) {
-                     const finalData = await finalRes.json();
-                     if (active && finalData.itinerary) {
-                        setSmartItinerary(finalData.itinerary);
+                     // Read as text first to strip markers before parsing
+                     const raw = await finalRes.text();
+                     
+                     // 1) Strip the __ITINERARY_READY__ marker if it exists
+                     let cleaned = raw;
+                     const markerIndex = cleaned.indexOf("__ITINERARY_READY__");
+                     if (markerIndex !== -1) {
+                       cleaned = cleaned.slice(0, markerIndex);
+                     }
+                     
+                     // 2) If there are progress lines or other text before the JSON,
+                     //    keep everything from the first '{' onwards
+                     const firstBrace = cleaned.indexOf("{");
+                     if (firstBrace > 0) {
+                       cleaned = cleaned.slice(firstBrace);
+                     }
+                     cleaned = cleaned.trim();
+                     
+                     try {
+                       const finalData = JSON.parse(cleaned);
+                       if (active && finalData.itinerary) {
+                         setSmartItinerary(finalData.itinerary);
+                       }
+                     } catch (err) {
+                       console.error("[smart-itinerary] JSON parse failed after stream", {
+                         raw,
+                         cleaned,
+                         err,
+                       });
                      }
                    }
                    if (active) setIsStreaming(false);
