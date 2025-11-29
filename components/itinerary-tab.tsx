@@ -41,6 +41,7 @@ export function ItineraryTab({
   const [streamText, setStreamText] = useState<string[]>([]);
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -54,191 +55,153 @@ export function ItineraryTab({
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
 
-  // Load existing or start stream
+  // Load existing itinerary from API (pure JSON, no markers)
+  async function loadSmartItineraryFromApi() {
+    if (!tripId) return;
+    
+    const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, {
+      method: "GET",
+    });
+    
+    console.log("[smart-itinerary] HTTP status (load)", res.status);
+    
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error("[smart-itinerary] load error", res.status, text);
+      setErrorCode(`LOAD_HTTP_${res.status}`);
+      setSmartItinerary(null);
+      return;
+    }
+    
+    const json = (await res.json()) as SmartItinerary;
+    console.log("[smart-itinerary] loaded itinerary", json);
+    setSmartItinerary(json);
+    setErrorCode(null);
+  }
+
+  // Start streaming generation (POST) - only reads text chunks, watches for __ITINERARY_READY__
+  async function startSmartItineraryGeneration() {
+    if (!tripId) return;
+    
+    setIsGenerating(true);
+    setIsStreaming(true);
+    setStreamText([]);
+    setErrorCode(null);
+    
+    const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
+      method: "POST",
+    });
+    
+    console.log("[smart-itinerary] HTTP status (stream)", res.status);
+    
+    if (!res.body) {
+      console.error("[smart-itinerary] stream: no body");
+      setIsGenerating(false);
+      setIsStreaming(false);
+      setErrorCode("STREAM_NO_BODY");
+      return;
+    }
+    
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = "";
+    
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      
+      const chunk = decoder.decode(value, { stream: true });
+      fullText += chunk;
+      
+      // Show progress lines in the UI (only PROGRESS: lines)
+      const newLines = chunk
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l && l.startsWith("PROGRESS:"));
+      
+      if (newLines.length) {
+        // Extract just the message part after "PROGRESS:"
+        const progressMessages = newLines.map((l) => l.replace("PROGRESS:", "").trim());
+        setStreamText((prev) => [...prev, ...progressMessages]);
+      }
+      
+      // Check for error lines
+      for (const line of newLines) {
+        if (line.startsWith("Error:")) {
+          const code = line.replace("Error:", "").trim();
+          setErrorCode(code || "UNKNOWN");
+          setLoadingError("We couldn't generate your itinerary. Please try again.");
+          setIsGenerating(false);
+          setIsStreaming(false);
+          reader.cancel();
+          return;
+        }
+      }
+      
+      // Check for ready marker
+      if (fullText.includes("__ITINERARY_READY__")) {
+        console.log("[smart-itinerary] ready marker received");
+        break;
+      }
+    }
+    
+    // Stream finished → now load the saved itinerary JSON via a separate GET
+    await loadSmartItineraryFromApi();
+    setIsGenerating(false);
+    setIsStreaming(false);
+  }
+
+  // Load existing or start generation
   useEffect(() => {
     let active = true;
 
-    async function loadOrStream() {
+    async function loadOrGenerate() {
       try {
         setLoadingError(null);
         setErrorCode(null);
         setStreamText([]);
         
-        // First, try to fetch existing
-        const res = await fetch(`/api/trips/${tripId}/smart-itinerary`);
+        // First, try to load existing itinerary
+        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, {
+          method: "GET",
+        });
         
-        console.log("[smart-itinerary] HTTP status", res.status);
-
-        if (!res.ok) {
-          const errorText = await res.text().catch(() => "");
-          console.error(
-            "[smart-itinerary] HTTP error response:",
-            res.status,
-            errorText
-          );
+        if (res.ok) {
+          // Itinerary exists, load it
+          const json = (await res.json()) as SmartItinerary;
           if (active) {
-            setErrorCode(`HTTP_${res.status}`);
-            setLoadingError(`Request failed with status ${res.status}`);
-            setIsStreaming(false);
+            setSmartItinerary(json);
+            setErrorCode(null);
           }
-          return;
-        }
-
-        if (!res.body) {
-          console.error("[smart-itinerary] No response body from API route");
+        } else if (res.status === 404) {
+          // No itinerary found, auto-start generation
           if (active) {
-            setErrorCode("NO_STREAM");
-            setLoadingError("No response body received");
-            setIsStreaming(false);
+            await startSmartItineraryGeneration();
           }
-          return;
-        }
-
-        const contentType = res.headers.get('content-type');
-        
-        if (contentType && contentType.includes('application/json')) {
-           // We have JSON -> Existing itinerary
-           // Read as text first to strip markers before parsing
-           const raw = await res.text();
-           console.log("[smart-itinerary] raw load response", raw);
-           
-           // 1) Strip the __ITINERARY_READY__ marker if it exists
-           let cleaned = raw;
-           const markerIndex = cleaned.indexOf("__ITINERARY_READY__");
-           if (markerIndex !== -1) {
-             cleaned = cleaned.slice(0, markerIndex);
-           }
-           
-           // 2) If there are progress lines or other text before the JSON,
-           //    keep everything from the first '{' onwards
-           const firstBrace = cleaned.indexOf("{");
-           if (firstBrace > 0) {
-             cleaned = cleaned.slice(firstBrace);
-           }
-           cleaned = cleaned.trim();
-           
-           let data: { itinerary?: SmartItinerary };
-           try {
-             data = JSON.parse(cleaned);
-           } catch (err) {
-             console.error("[smart-itinerary] JSON parse failed in loadItinerary", {
-               raw,
-               cleaned,
-               err,
-             });
-             if (active) {
-               setErrorCode("JSON_PARSE_ERROR");
-               setLoadingError("Failed to parse itinerary data");
-               setIsStreaming(false);
-             }
-             return;
-           }
-           
-           if (data.itinerary) {
-             if (active) setSmartItinerary(data.itinerary);
-           }
         } else {
-           // Text stream -> Generating
-           if (active) setIsStreaming(true);
-           if (!res.body) return;
-
-           const reader = res.body.getReader();
-           const decoder = new TextDecoder();
-           let done = false;
-           let buffered = "";
-           
-           while (!done) {
-             const { value, done: streamDone } = await reader.read();
-             done = streamDone;
-             
-             if (value) {
-               buffered += decoder.decode(value, { stream: true });
-               const lines = buffered.split("\n");
-               buffered = lines.pop() ?? ""; // keep the last partial line
-               
-               for (const lineRaw of lines) {
-                 const line = lineRaw.trim();
-                 if (!line) continue;
-
-                 if (line === "__ITINERARY_READY__") {
-                   // Stop reading, refetch itinerary from Supabase, stop loading
-                   // We fetch again to get the full JSON structure
-                   const finalRes = await fetch(`/api/trips/${tripId}/smart-itinerary`);
-                   if (finalRes.ok) {
-                     // Read as text first to strip markers before parsing
-                     const raw = await finalRes.text();
-                     
-                     // 1) Strip the __ITINERARY_READY__ marker if it exists
-                     let cleaned = raw;
-                     const markerIndex = cleaned.indexOf("__ITINERARY_READY__");
-                     if (markerIndex !== -1) {
-                       cleaned = cleaned.slice(0, markerIndex);
-                     }
-                     
-                     // 2) If there are progress lines or other text before the JSON,
-                     //    keep everything from the first '{' onwards
-                     const firstBrace = cleaned.indexOf("{");
-                     if (firstBrace > 0) {
-                       cleaned = cleaned.slice(firstBrace);
-                     }
-                     cleaned = cleaned.trim();
-                     
-                     try {
-                       const finalData = JSON.parse(cleaned);
-                       if (active && finalData.itinerary) {
-                         setSmartItinerary(finalData.itinerary);
-                       }
-                     } catch (err) {
-                       console.error("[smart-itinerary] JSON parse failed after stream", {
-                         raw,
-                         cleaned,
-                         err,
-                       });
-                     }
-                   }
-                   if (active) setIsStreaming(false);
-                   reader.cancel();
-                   return;
-                 }
-
-                 if (line.startsWith("Error:")) {
-                   const code = line.replace("Error:", "").trim();
-                   if (active) {
-                     setErrorCode(code || "UNKNOWN");
-                     setLoadingError("We couldn’t generate your itinerary. Please try again.");
-                     setIsStreaming(false);
-                   }
-                   reader.cancel();
-                   return;
-                 }
-
-                 if (line.startsWith("PROGRESS:")) {
-                   const msg = line.replace("PROGRESS:", "").trim();
-                   if (active) {
-                     setStreamText((prev) => [...prev, msg]);
-                   }
-                 } else {
-                   // Ignore debug lines
-                   console.debug("[smart-itinerary stream]", line);
-                 }
-               }
-             }
-           }
-           if (active) setIsStreaming(false);
+          // Other error
+          const text = await res.text().catch(() => "");
+          console.error("[smart-itinerary] load error", res.status, text);
+          if (active) {
+            setErrorCode(`LOAD_HTTP_${res.status}`);
+            setLoadingError(`Request failed with status ${res.status}`);
+          }
         }
       } catch (err) {
         console.error("Load error", err);
-        if (active) setLoadingError("Something went wrong loading your itinerary.");
-        if (active) setIsStreaming(false);
+        if (active) {
+          setLoadingError("Something went wrong loading your itinerary.");
+          setIsStreaming(false);
+        }
       }
     }
 
-    if (tripId && !smartItinerary) {
-      loadOrStream();
+    if (tripId && !smartItinerary && !isGenerating) {
+      loadOrGenerate();
     }
 
     return () => { active = false; };
-  }, [tripId, smartItinerary]);
+  }, [tripId]);
 
   const handleUpdatePlace = async (dayId: string, placeId: string, updates: { visited?: boolean, remove?: boolean }) => {
     if (!smartItinerary) return;

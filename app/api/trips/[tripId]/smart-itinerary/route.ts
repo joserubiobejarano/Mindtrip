@@ -119,7 +119,58 @@ REMEMBER:
 - No Markdown. No comments. No text after \`JSON_END\`.
 `;
 
+// GET: Load existing itinerary as pure JSON (mode=load) or return 404
 export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ tripId: string }> }
+) {
+  try {
+    const resolvedParams = await params;
+    const tripId = resolvedParams.tripId;
+    const { searchParams } = new URL(req.url);
+    const mode = searchParams.get("mode");
+
+    if (!tripId) {
+      console.error("[smart-itinerary] Missing tripId param");
+      return new NextResponse("Error: MISSING_TRIP_ID", { status: 400 });
+    }
+
+    // Only handle mode=load for GET
+    if (mode !== "load") {
+      return new NextResponse("Error: Use POST to generate itinerary", { status: 400 });
+    }
+
+    // Initialize Supabase client
+    const supabase = await createClient();
+
+    // Look up the itinerary row in smart_itineraries by trip_id
+    const { data: existing, error: existingError } = await supabase
+      .from("smart_itineraries")
+      .select("content")
+      .eq("trip_id", tripId)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error("[smart-itinerary] error fetching existing", existingError);
+      return NextResponse.json({ error: "DATABASE_ERROR" }, { status: 500 });
+    }
+
+    if (!existing?.content) {
+      // Not found → return 404
+      return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+    }
+
+    // Found → return pure JSON (content is already a JSON object, not a string)
+    return NextResponse.json(existing.content);
+
+  } catch (error) {
+    console.error("[smart-itinerary] Top-level error", error);
+    return new NextResponse("Error: TOP_LEVEL_ERROR", { status: 500 });
+  }
+}
+
+// POST: Stream generation progress and save to Supabase
+export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
@@ -144,7 +195,7 @@ export async function GET(
         };
 
         try {
-          // 3) Check if itinerary already exists (idempotent)
+          // Check if itinerary already exists (idempotent)
           const { data: existing, error: existingError } = await supabase
             .from("smart_itineraries")
             .select("content")
@@ -182,10 +233,10 @@ export async function GET(
             .eq("trip_id", tripId)
             .limit(10);
 
-          // 4) Stream some progress lines to keep user engaged
+          // Stream some progress lines to keep user engaged
           enqueue("PROGRESS: Analyzing trip details...");
           
-          // 5) Call OpenAI once and accumulate ALL text
+          // Call OpenAI once and accumulate ALL text
           const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             stream: false,
@@ -203,7 +254,7 @@ export async function GET(
 
           const rawOutput = completion.choices[0]?.message?.content ?? "";
           
-          // Let's parse the output to send any PROGRESS lines found in the LLM response before the JSON
+          // Parse the output to send any PROGRESS lines found in the LLM response before the JSON
           const lines = rawOutput.split('\n');
           for (const line of lines) {
               if (line.trim().startsWith("PROGRESS:")) {
@@ -213,7 +264,7 @@ export async function GET(
 
           console.log("[smart-itinerary] rawOutput length:", rawOutput.length);
 
-          // 6) Extract JSON between JSON_START / JSON_END
+          // Extract JSON between JSON_START / JSON_END
           const startMarker = "JSON_START";
           const endMarker = "JSON_END";
           const startIndex = rawOutput.indexOf(startMarker);
@@ -248,7 +299,7 @@ export async function GET(
             return;
           }
 
-          // 7) Enrich photos
+          // Enrich photos
           enqueue("PROGRESS: Finding photos for key places...");
           try {
               const destination = trip.destination_name || trip.title;
@@ -269,12 +320,12 @@ export async function GET(
             console.error("[smart-itinerary] photo enrichment error", photoErr);
           }
 
-          // 8) Save to Supabase
+          // Save to Supabase (pure JSON object, no markers)
           const { error: insertError } = await supabase
             .from("smart_itineraries")
             .insert({
               trip_id: tripId,
-              content: itinerary,
+              content: itinerary, // This is already a parsed JSON object, not a string
             });
 
           if (insertError) {
@@ -284,7 +335,7 @@ export async function GET(
             return;
           }
 
-          // 9) Done – tell frontend to reload itinerary from DB
+          // Done – tell frontend to reload itinerary from DB
           enqueue("__ITINERARY_READY__");
           controller.close();
 
