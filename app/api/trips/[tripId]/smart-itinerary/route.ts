@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { streamObject } from 'ai';
+import { generateObject } from 'ai';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,6 +11,10 @@ const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 export async function POST(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
   try {
     const { tripId } = await params;
+
+    if (!tripId) {
+      return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
+    }
 
     const supabase = await createClient();
     
@@ -54,32 +58,60 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
          - In "tripTips", include season- and date-based advice (weather, holidays, opening hours, local events) specific to the trip dates.
          - Use "visited" = false.
          - Fill "tags" with relevant keywords.
+      
+      3. OUTPUT ONLY JSON matching the SmartItinerary schema. Do not include any text outside the JSON structure.
     `;
 
     const userPrompt = `Trip details:\n${JSON.stringify(tripMeta)}\n\nGenerate the full itinerary.`;
 
-    const result = await streamObject({
+    console.log('[smart-itinerary] generating itinerary for trip', tripId);
+
+    // Generate itinerary using non-streaming generateObject
+    const { object: itinerary } = await generateObject({
       model: openai('gpt-4o-mini'),
       system,
       prompt: userPrompt,
       schema: smartItinerarySchema,
-      onFinish: async ({ object }) => {
-        if (object) {
-          const supabase = await createClient();
-          await supabase.from('smart_itineraries').upsert({
-            trip_id: tripId,
-            content: object,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'trip_id' });
-        }
-      }
     });
 
-    return result.toTextStreamResponse();
+    console.log('[smart-itinerary] generated itinerary for trip', tripId);
+
+    // Save into Supabase
+    const { data, error: upsertError } = await supabase
+      .from('smart_itineraries')
+      .upsert(
+        {
+          trip_id: tripId,
+          content: itinerary,
+          updated_at: new Date().toISOString()
+        },
+        { onConflict: 'trip_id' }
+      )
+      .select('content')
+      .single();
+
+    if (upsertError) {
+      console.error('[smart-itinerary] upsert error', upsertError);
+      return NextResponse.json(
+        { error: 'Failed to save itinerary' },
+        { status: 500 }
+      );
+    }
+
+    console.log('[smart-itinerary] saved itinerary row for trip', tripId);
+
+    // Return the saved content
+    return NextResponse.json(
+      { itinerary: data.content },
+      { status: 200 }
+    );
 
   } catch (error) {
-    console.error('[smart-itinerary] Error', error);
-    return NextResponse.json({ error: 'Generation failed' }, { status: 500 });
+    console.error('[smart-itinerary] POST error', error);
+    return NextResponse.json(
+      { error: 'Failed to generate itinerary' },
+      { status: 500 }
+    );
   }
 }
 

@@ -62,7 +62,6 @@ export function ItineraryTab({
   const [smartItinerary, setSmartItinerary] = useState<SmartItinerary | null>(null);
   const [status, setStatus] = useState<ItineraryStatus>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [progressLines, setProgressLines] = useState<string[]>([]);
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -88,7 +87,6 @@ export function ItineraryTab({
     console.log('[itinerary-tab] generateSmartItinerary: POST /smart-itinerary for trip', tripId);
     setError(null);
     setStatus('generating');
-    setProgressLines(['Starting your itinerary...']);
     
     try {
       const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
@@ -101,61 +99,15 @@ export function ItineraryTab({
         throw new Error(`Generation failed with status ${res.status}`);
       }
 
-      if (!res.body) {
-        throw new Error("No stream body");
+      const data = await res.json();
+      console.log('[itinerary-tab] generateSmartItinerary: received itinerary from POST', data);
+
+      if (!data.itinerary) {
+        throw new Error('No itinerary in response');
       }
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let buffer = '';
-      let finalItinerary: SmartItinerary | null = null;
-      
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split('\n\n');
-        buffer = parts.pop() || '';
-        
-        for (const part of parts) {
-          if (!part.startsWith('data:')) continue;
-          
-          try {
-            const json = JSON.parse(part.replace(/^data:\s*/, ''));
-            
-            if (json.type === 'text') {
-              setProgressLines(prev => [...prev, json.value]);
-            }
-            if (json.type === 'object') {
-              finalItinerary = json.value as SmartItinerary;
-              setSmartItinerary(finalItinerary);
-            }
-          } catch (e) {
-             // ignore parse errors for partial chunks if needed
-          }
-        }
-      }
-
-      // After streaming completes, the onFinish callback in the API route saves to DB
-      // We should reload from DB to get the final saved version, or use the final streamed object
-      if (finalItinerary) {
-        console.log('[itinerary-tab] generateSmartItinerary: received itinerary from stream', finalItinerary);
-        setSmartItinerary(finalItinerary);
-        setStatus('loaded');
-      } else {
-        // If we didn't get a final object from stream, try loading from DB
-        console.log('[itinerary-tab] generateSmartItinerary: stream completed, loading from DB...');
-        const loadRes = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
-        if (loadRes.ok) {
-          const loadData = await loadRes.json();
-          console.log('[itinerary-tab] generateSmartItinerary: loaded itinerary from DB', loadData);
-          setSmartItinerary(loadData.itinerary);
-          setStatus('loaded');
-        } else {
-          throw new Error('Generation completed but failed to load saved itinerary');
-        }
-      }
+      setSmartItinerary(data.itinerary);
+      setStatus('loaded');
     } catch (err) {
       console.error('[itinerary-tab] generateSmartItinerary error', err);
       setError('Failed to generate itinerary. Please try again.');
@@ -334,13 +286,6 @@ export function ItineraryTab({
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>{subtitle}</span>
         </div>
-        {progressLines.length > 0 && (
-          <div className="mt-4 space-y-1">
-            {progressLines.map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
-          </div>
-        )}
       </CardContent>
     </Card>
   );
