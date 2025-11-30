@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getOpenAIClient } from '@/lib/openai';
+import { isSmartItinerary, SmartItinerary } from '@/types/itinerary';
 
 export const maxDuration = 300;
 
@@ -104,7 +105,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       );
     }
 
-    console.log('[smart-itinerary] generated itinerary for trip', tripId);
+    // Log raw object from model for debugging
+    console.log('[smart-itinerary] raw object from model:', JSON.stringify(itinerary, null, 2));
+
+    // Validate the itinerary structure before saving
+    if (!isSmartItinerary(itinerary)) {
+      console.error('[smart-itinerary] Invalid itinerary shape', JSON.stringify(itinerary, null, 2));
+      return NextResponse.json(
+        { error: 'Model returned an invalid itinerary payload' },
+        { status: 500 },
+      );
+    }
+
+    console.log('[smart-itinerary] validated itinerary for trip', tripId, 'days:', itinerary.days.length);
 
     // Save to Supabase
     const { data, error } = await supabase
@@ -112,7 +125,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       .upsert(
         {
           trip_id: tripId,
-          content: itinerary, // content column should be jsonb
+          content: itinerary as SmartItinerary, // content column should be jsonb
           updated_at: new Date().toISOString()
         },
         { onConflict: 'trip_id' },
@@ -177,6 +190,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
     if (!data?.content) {
       return NextResponse.json({ error: 'not-found' }, { status: 404 });
     }
+
+    console.log('[smart-itinerary] loaded from DB:', JSON.stringify(data.content, null, 2));
 
     // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
     return NextResponse.json(

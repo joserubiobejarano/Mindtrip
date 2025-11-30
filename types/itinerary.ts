@@ -54,3 +54,73 @@ export interface AffiliateSuggestion {
   relatedDayId?: string;
   relatedPlaceId?: string;
 }
+
+/**
+ * Type guard to validate that an object matches the SmartItinerary interface
+ */
+export function isSmartItinerary(obj: any): obj is SmartItinerary {
+  if (!obj || typeof obj !== 'object') {
+    return false;
+  }
+
+  // Check top-level required fields
+  if (typeof obj.title !== 'string' || typeof obj.summary !== 'string') {
+    return false;
+  }
+
+  // Check days array
+  if (!Array.isArray(obj.days) || obj.days.length === 0) {
+    return false;
+  }
+
+  // Validate each day
+  for (const day of obj.days) {
+    if (
+      typeof day.id !== 'string' ||
+      typeof day.index !== 'number' ||
+      typeof day.title !== 'string' ||
+      typeof day.date !== 'string' ||
+      typeof day.theme !== 'string' ||
+      typeof day.areaCluster !== 'string' ||
+      typeof day.overview !== 'string' ||
+      !Array.isArray(day.photos) ||
+      !Array.isArray(day.slots) ||
+      day.slots.length === 0
+    ) {
+      return false;
+    }
+
+    // Validate each slot
+    for (const slot of day.slots) {
+      if (
+        typeof slot.label !== 'string' ||
+        typeof slot.summary !== 'string' ||
+        !Array.isArray(slot.places)
+      ) {
+        return false;
+      }
+
+      // Validate each place
+      for (const place of slot.places) {
+        if (
+          typeof place.id !== 'string' ||
+          typeof place.name !== 'string' ||
+          typeof place.description !== 'string' ||
+          typeof place.area !== 'string' ||
+          typeof place.visited !== 'boolean' ||
+          !Array.isArray(place.photos) ||
+          !Array.isArray(place.tags)
+        ) {
+          return false;
+        }
+      }
+    }
+  }
+
+  // tripTips is optional, but if present must be an array of strings
+  if (obj.tripTips !== undefined && !Array.isArray(obj.tripTips)) {
+    return false;
+  }
+
+  return true;
+}
