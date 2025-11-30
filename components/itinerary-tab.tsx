@@ -101,10 +101,11 @@ export function ItineraryTab({
         throw new Error(body?.error || `Generation failed with status ${res.status}`);
       }
 
-      const data = await res.json();
-      console.log('[itinerary-tab] generateSmartItinerary: received itinerary from POST', data);
+      const json = await res.json();
+      console.log('[itinerary-tab] generateSmartItinerary: received itinerary from POST', json);
 
-      setSmartItinerary(data.itinerary);
+      // POST now returns bare SmartItinerary directly
+      setSmartItinerary(json);
       setStatus('loaded');
     } catch (err) {
       console.error('[itinerary-tab] generateSmartItinerary error', err);
@@ -141,10 +142,10 @@ export function ItineraryTab({
       }
 
       // CASE 3: we have data
-      const data = await res.json();
-      console.log('[itinerary-tab] loadOrGenerate: loaded itinerary from DB', data);
-      // GET handler returns { itinerary: data.content }
-      setSmartItinerary(data.itinerary);
+      const json = await res.json();
+      console.log('[itinerary-tab] loadOrGenerate: loaded itinerary from DB', json);
+      // GET handler now returns bare SmartItinerary directly
+      setSmartItinerary(json);
       setStatus('loaded');
     } catch (err) {
       console.error('[itinerary-tab] loadOrGenerate error', err);
@@ -225,9 +226,10 @@ export function ItineraryTab({
         return;
       }
 
-      const data = await res.json();
-      if (data.itinerary) {
-        setSmartItinerary(data.itinerary);
+      const json = await res.json();
+      // itinerary-chat now returns bare SmartItinerary directly
+      if (json && json.days) {
+        setSmartItinerary(json);
         setChatMessage("");
       }
     } catch (error: any) {
@@ -374,18 +376,26 @@ export function ItineraryTab({
 
           {/* Loaded Itinerary */}
           {status === 'loaded' && smartItinerary && (
-            <div className="space-y-8 pb-10">
-              {/* Trip Summary */}
-              <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
-                <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
-                <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
-                   <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
-                </div>
-              </div>
+            <>
+              {/* Safety guard: check if days is a valid array */}
+              {!Array.isArray(smartItinerary.days) ? (
+                <ErrorCard
+                  message="There was a problem with your itinerary. Please try generating it again."
+                  onRetry={loadOrGenerate}
+                />
+              ) : (
+                <div className="space-y-8 pb-10">
+                  {/* Trip Summary */}
+                  <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
+                    <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
+                    <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
+                       <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
+                    </div>
+                  </div>
 
-              {/* Days */}
-              <div className="space-y-12">
-                {smartItinerary.days.map((day) => {
+                  {/* Days */}
+                  <div className="space-y-12">
+                    {smartItinerary.days.map((day) => {
                   // Gather all photos from slots for the gallery
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
@@ -510,59 +520,61 @@ export function ItineraryTab({
                 })}
               </div>
 
-              {/* Tips & Notes */}
-              {smartItinerary.tripTips?.length ? (
-                <section className="mt-10 rounded-2xl border bg-white/80 p-6 shadow-sm max-w-4xl mx-auto">
-                  <h2 className="text-lg font-semibold mb-3 text-slate-900">Trip Tips &amp; Notes</h2>
-                  <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                    {smartItinerary.tripTips.map((tip, i) => (
-                      <li key={i}>{tip}</li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
+                  {/* Tips & Notes */}
+                  {smartItinerary.tripTips?.length ? (
+                    <section className="mt-10 rounded-2xl border bg-white/80 p-6 shadow-sm max-w-4xl mx-auto">
+                      <h2 className="text-lg font-semibold mb-3 text-slate-900">Trip Tips &amp; Notes</h2>
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                        {smartItinerary.tripTips.map((tip, i) => (
+                          <li key={i}>{tip}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  ) : null}
 
-               {/* Global Affiliates */}
-               <div className="max-w-4xl mx-auto mt-12 mb-8 text-center p-8 bg-slate-50 rounded-2xl border border-slate-100">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-4">You&apos;ll probably need...</h3>
-                    <div className="flex flex-wrap justify-center gap-4">
-                        <Button variant="outline" className="bg-white">Get an eSIM</Button>
-                        <Button variant="outline" className="bg-white">Travel Insurance</Button>
-                        <Button variant="outline" className="bg-white">Airport Transfer</Button>
-                    </div>
-               </div>
+                   {/* Global Affiliates */}
+                   <div className="max-w-4xl mx-auto mt-12 mb-8 text-center p-8 bg-slate-50 rounded-2xl border border-slate-100">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-4">You&apos;ll probably need...</h3>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <Button variant="outline" className="bg-white">Get an eSIM</Button>
+                            <Button variant="outline" className="bg-white">Travel Insurance</Button>
+                            <Button variant="outline" className="bg-white">Airport Transfer</Button>
+                        </div>
+                   </div>
 
-              {/* Chat Input - At the end, not sticky */}
-              <section className="max-w-5xl mx-auto my-8">
-                <div className="p-6 border rounded-2xl bg-gray-50/50">
-                    <h3 className="text-lg font-semibold mb-2 text-slate-900">Edit this itinerary</h3>
-                    <p className="text-sm text-slate-500 mb-4">Ask me to add places, move things around, or change themes.</p>
-                    <form onSubmit={handleChatSubmit} className="flex gap-2">
-                    <div className="relative flex-1">
-                        <input
-                        type="text"
-                        value={chatMessage}
-                        onChange={(e) => setChatMessage(e.target.value)}
-                        placeholder="e.g. 'Add a lunch spot on Day 1', 'Move Sagrada Familia to Day 2'"
-                        className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
-                        disabled={isChatting}
-                        />
+                  {/* Chat Input - At the end, not sticky */}
+                  <section className="max-w-5xl mx-auto my-8">
+                    <div className="p-6 border rounded-2xl bg-gray-50/50">
+                        <h3 className="text-lg font-semibold mb-2 text-slate-900">Edit this itinerary</h3>
+                        <p className="text-sm text-slate-500 mb-4">Ask me to add places, move things around, or change themes.</p>
+                        <form onSubmit={handleChatSubmit} className="flex gap-2">
+                        <div className="relative flex-1">
+                            <input
+                            type="text"
+                            value={chatMessage}
+                            onChange={(e) => setChatMessage(e.target.value)}
+                            placeholder="e.g. 'Add a lunch spot on Day 1', 'Move Sagrada Familia to Day 2'"
+                            className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
+                            disabled={isChatting}
+                            />
+                        </div>
+                        <Button 
+                            type="submit" 
+                            disabled={isChatting || !chatMessage.trim()} 
+                            className="rounded-xl px-6 bg-purple-600 hover:bg-purple-700 h-auto"
+                        >
+                            {isChatting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                        </Button>
+                        </form>
+                        {chatError && (
+                        <p className="text-sm text-red-600 mt-2">{chatError}</p>
+                        )}
                     </div>
-                    <Button 
-                        type="submit" 
-                        disabled={isChatting || !chatMessage.trim()} 
-                        className="rounded-xl px-6 bg-purple-600 hover:bg-purple-700 h-auto"
-                    >
-                        {isChatting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                    </Button>
-                    </form>
-                    {chatError && (
-                    <p className="text-sm text-red-600 mt-2">{chatError}</p>
-                    )}
+                  </section>
+
                 </div>
-              </section>
-
-            </div>
+              )}
+            </>
           )}
 
           {/* Fallback: if status is loaded but no itinerary (shouldn't happen, but safety check) */}

@@ -132,7 +132,8 @@ Do NOT change the overall structure (keys, arrays).
       return NextResponse.json({ error: 'db-error' }, { status: 500 });
     }
 
-    return NextResponse.json({ itinerary: updatedRow.content });
+    // Return bare SmartItinerary directly (updated is already the SmartItinerary object)
+    return NextResponse.json(updated);
 
   } catch (err) {
     console.error('[itinerary-chat] Error', err);

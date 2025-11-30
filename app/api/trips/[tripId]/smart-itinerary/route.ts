@@ -130,9 +130,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
 
     console.log('[smart-itinerary] saved itinerary row for trip', tripId);
 
-    // Return the saved itinerary directly to the client
+    // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
     return NextResponse.json(
-      { itinerary: data.content },
+      data.content,
       { status: 200 },
     );
   } catch (err: any) {
@@ -178,8 +178,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
       return NextResponse.json({ error: 'not-found' }, { status: 404 });
     }
 
+    // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
     return NextResponse.json(
-      { itinerary: data.content },
+      data.content,
       { status: 200 }
     );
   } catch (err) {
