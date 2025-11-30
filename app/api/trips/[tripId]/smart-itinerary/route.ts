@@ -86,13 +86,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
     }
 
     const supabase = await createClient();
-    
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (!user || authError) {
-      console.error('[smart-itinerary GET] unauthorized', authError);
-      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-    }
 
     // Load itinerary from database
     const { data, error } = await supabase
