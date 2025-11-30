@@ -1,99 +1,141 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getOpenAIClient } from '@/lib/openai';
+import OpenAI from 'openai';
 import { SmartItinerary } from '@/types/itinerary';
 
-export const maxDuration = 300; // Set timeout to 5 minutes
+export const maxDuration = 300;
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ tripId: string }> }
-) {
+const SMART_ITINERARY_SCHEMA_TEXT = `
+interface ItineraryPlace {
+  id: string;
+  name: string;
+  description: string;
+  area: string;       // e.g. "Gothic Quarter"
+  neighborhood: string | null;
+  photos: string[];
+  visited: boolean;
+  tags: string[];     // "food", "viewpoint", etc.
+}
+
+type TimeOfDay = 'morning' | 'afternoon' | 'evening';
+
+interface ItinerarySlot {
+  label: TimeOfDay;
+  summary: string;
+  places: ItineraryPlace[];
+}
+
+interface ItineraryDay {
+  id: string;
+  index: number;
+  date: string;
+  title: string;
+  theme: string;
+  areaCluster: string; // main area for that day
+  photos: string[];
+  overview: string;
+  slots: ItinerarySlot[]; // usually 3
+}
+
+interface SmartItinerary {
+  title: string;
+  summary: string;
+  days: ItineraryDay[];
+  tripTips: string[]; // trip-wide tips (season, holidays, packing)
+}
+`;
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
   try {
+    const { tripId } = await params;
     const { message } = await req.json();
+
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Missing message' }, { status: 400 });
     }
 
-    const resolvedParams = await params;
-    const tripId = resolvedParams.tripId;
-
+    // 1) Auth + Supabase
     const supabase = await createClient();
-    const { data: row, error } = await supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (!user || authError) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    }
+
+    // 2) Load existing itinerary
+    const { data: row, error: fetchError } = await supabase
       .from('smart_itineraries')
       .select('content')
       .eq('trip_id', tripId)
       .single();
 
-    if (error || !row?.content) {
-      return NextResponse.json({ error: 'Itinerary not found' }, { status: 404 });
+    if (fetchError || !row) {
+      console.error('[itinerary-chat] missing itinerary', fetchError);
+      return NextResponse.json({ error: 'no-itinerary' }, { status: 400 });
     }
 
     const currentItinerary = row.content as unknown as SmartItinerary;
 
-    const SYSTEM_PROMPT = `
-You are an expert travel planner editing an existing trip itinerary.
+    // 3) Call OpenAI
+    const system = `
+You are an assistant that edits a JSON itinerary object.
+ALWAYS reply with ONLY valid JSON matching this TypeScript type, nothing else:
 
-You are given:
-- The CURRENT itinerary JSON (with days, places, tips, and affiliateSuggestions).
-- A USER REQUEST describing modifications.
+${SMART_ITINERARY_SCHEMA_TEXT}
 
-Your job:
-- Apply ONLY the requested changes.
-- Keep IDs (trip, day, place, tips, affiliateSuggestions) stable whenever possible.
-- Do NOT drop existing content unless it conflicts with the user's request.
-- Ensure every day still has a coherent flow and reasonable number of activities.
-
-Important:
-- Respond with a SINGLE JSON object in the SmartItinerary format.
-- Do NOT include any extra text, commentary, or markdown.
+You are given the current itinerary JSON and a user request.
+Modify ONLY the necessary parts (days, places, tips), keep ids stable when possible.
+Do NOT change the overall structure (keys, arrays).
 `;
 
-    const openai = getOpenAIClient();
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
     const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_ITINERARY_MODEL_ID || 'gpt-4o', // Use specific model or fallback
+      model: 'gpt-4o-mini', // or 'gpt-4o' if preferred/available
+      temperature: 0.4,
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        {
-          role: 'user',
-          content: JSON.stringify({
-            currentItinerary,
-            userRequest: message,
-          }),
-        },
+        { role: 'system', content: system },
+        { role: 'user', content: `Current itinerary JSON:\n${JSON.stringify(currentItinerary)}` },
+        { role: 'user', content: `User request:\n${message}` },
       ],
-      response_format: { type: 'json_object' },
+      response_format: { type: 'json_object' }
     });
 
-    const raw = response.choices[0]?.message?.content ?? '{}';
+    const raw = response.choices[0]?.message?.content ?? '';
+
+    // 4) Strip code fences and parse safely
+    function extractJson(raw: string) {
+      const cleaned = raw
+        .replace(/```json/gi, '')
+        .replace(/```/g, '')
+        .trim();
+      return JSON.parse(cleaned);
+    }
+
     let updated: SmartItinerary;
-    
     try {
-        updated = JSON.parse(raw);
-    } catch (e) {
-        console.error("JSON parse error in chat edit", e);
-        return NextResponse.json({ error: 'Failed to parse itinerary from AI' }, { status: 500 });
+      updated = extractJson(raw);
+    } catch (err) {
+      console.error('[itinerary-chat] JSON parse error', raw, err);
+      return NextResponse.json({ error: 'bad-json' }, { status: 500 });
     }
 
-    // basic sanity check
-    if (!updated?.days || !Array.isArray(updated.days)) {
-      console.error("Invalid itinerary shape", updated);
-      return NextResponse.json({ error: 'Invalid itinerary JSON from model' }, { status: 500 });
-    }
-
-    const { error: updateError } = await supabase
+    // 5) Save back to Supabase
+    const { data: updatedRow, error: updateError } = await supabase
       .from('smart_itineraries')
-      .update({ content: updated as any }) // Casting as any to bypass Supabase JSON type strictness if needed
-      .eq('trip_id', tripId);
+      .update({ content: updated as any })
+      .eq('trip_id', tripId)
+      .select()
+      .single();
 
     if (updateError) {
-      console.error('[itinerary-chat] Supabase update failed', updateError);
-      return NextResponse.json({ error: 'Failed to save itinerary' }, { status: 500 });
+      console.error('[itinerary-chat] supabase update error', updateError);
+      return NextResponse.json({ error: 'db-error' }, { status: 500 });
     }
 
-    return NextResponse.json({ itinerary: updated });
+    return NextResponse.json({ itinerary: updatedRow.content });
+
   } catch (err) {
     console.error('[itinerary-chat] Error', err);
-    return NextResponse.json({ error: 'Chat edit failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

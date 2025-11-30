@@ -20,6 +20,7 @@ The mobile app is not just a responsive version of the website; it's designed to
 ### Backend & Data
 - **Supabase JavaScript Client**: The same Supabase instance and database schema used by the web app. This means mobile users see the same trips, activities, and data as web users in real-time.
 - **React Query (TanStack Query)**: For data fetching, caching, and synchronization. React Query handles the complexity of keeping data fresh, managing loading states, and handling errors gracefully.
+- **Structured Itinerary Schema**: The mobile app will consume the same structured itinerary JSON schema stored in `smart_itineraries` table, using Zod for runtime validation (shared TypeScript types from web app).
 
 ### Authentication
 - **Clerk React Native SDK**: Clerk provides a native mobile SDK that handles authentication flows, social logins (Google, Apple), and session management. It integrates seamlessly with our existing Clerk setup on the web, so users can sign in once and access both platforms.
@@ -763,8 +764,10 @@ Build the core screens for viewing trips:
   
 - [ ] **Itinerary Tab (Read-Only)**:
   - Day selector
-  - Activities list for selected day
-  - Activity cards (read-only)
+  - Smart itinerary view with slots (morning, afternoon, evening)
+  - Activities/places list for selected day
+  - Activity/place cards with photos (read-only)
+  - Image galleries and lightbox viewer
   - Map view toggle showing activities
   
 - [ ] **Explore Tab (Read-Only)**:
@@ -805,10 +808,16 @@ Add the ability to create and edit trip content:
   - Link to existing place or create new
   
 - [ ] **Itinerary Enhancements**:
-  - Drag-to-reorder activities
+  - Display structured smart itineraries (slots, themes, area clusters)
+  - Streaming itinerary generation with progress indicators
+  - Itinerary chat editing (natural language editing via chat interface)
+  - Mark places as visited
+  - Remove places from itinerary
+  - Drag-to-reorder activities (for traditional activity-based trips)
   - Edit activity time
   - Delete activities
   - Optimistic updates
+  - Image galleries and lightbox for place photos
   
 - [ ] **Explore Functionality**:
   - Add place to itinerary from explore

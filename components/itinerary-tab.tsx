@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, Maximize2, ChevronLeft, ChevronRight, MessageSquare, Send } from "lucide-react";
+import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Send } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { format } from "date-fns";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
@@ -12,9 +12,8 @@ import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
-import { createClient } from "@/lib/supabase/client";
-import { SmartItinerary, ItineraryDay, ItineraryPlace } from "@/types/itinerary";
-import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ItineraryTabProps {
   tripId: string;
@@ -22,6 +21,28 @@ interface ItineraryTabProps {
   selectedDayId?: string | null;
   onSelectDay?: (dayId: string) => void;
   onActivitySelect?: (activityId: string) => void;
+}
+
+// Simple affiliate button component
+function AffiliateButton({ kind, day }: { kind: string, day: ItineraryDay }) {
+  // Fallback or placeholder logic for affiliates since we removed the specific AffiliateSuggestion type from explicit Day interface in new schema
+  // But we can check if we want to add hardcoded or dynamic ones. 
+  // For now, adhering to instruction "AffiliateButton kind=..."
+  // I will create a simple button.
+  
+  const labels: Record<string, string> = {
+    hotel: "Find hotels",
+    tour: "Book tours",
+    sim: "Get eSim",
+    insurance: "Travel Insurance",
+    transport: "Transport"
+  };
+
+  return (
+    <Button variant="outline" size="sm" className="text-xs h-8 bg-slate-50 text-slate-700 border-slate-200">
+      {labels[kind] || kind}
+    </Button>
+  );
 }
 
 export function ItineraryTab({
@@ -37,11 +58,9 @@ export function ItineraryTab({
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   
   const [smartItinerary, setSmartItinerary] = useState<SmartItinerary | null>(null);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [streamText, setStreamText] = useState<string[]>([]);
-  const [loadingError, setLoadingError] = useState<string | null>(null);
-  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [progressLines, setProgressLines] = useState<string[]>([]);
+  const [loadingError, setLoadingError] = useState<string | null>(null);
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -56,154 +75,91 @@ export function ItineraryTab({
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
 
-  // Load existing itinerary from API (pure JSON, no markers)
-  async function loadSmartItineraryFromApi() {
-    if (!tripId) return;
-    
-    const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, {
-      method: "GET",
-    });
-    
-    console.log("[smart-itinerary] HTTP status (load)", res.status);
-    
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.error("[smart-itinerary] load error", res.status, text);
-      setErrorCode(`LOAD_HTTP_${res.status}`);
-      setSmartItinerary(null);
-      return;
-    }
-    
-    const json = (await res.json()) as SmartItinerary;
-    console.log("[smart-itinerary] loaded itinerary", json);
-    setSmartItinerary(json);
-    setErrorCode(null);
-  }
-
-  // Start streaming generation (POST) - only reads text chunks, watches for __ITINERARY_READY__
-  async function startSmartItineraryGeneration() {
-    if (!tripId) return;
-    
-    setIsGenerating(true);
-    setIsStreaming(true);
-    setStreamText([]);
-    setErrorCode(null);
-    
-    const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
-      method: "POST",
-    });
-    
-    console.log("[smart-itinerary] HTTP status (stream)", res.status);
-    
-    if (!res.body) {
-      console.error("[smart-itinerary] stream: no body");
-      setIsGenerating(false);
-      setIsStreaming(false);
-      setErrorCode("STREAM_NO_BODY");
-      return;
-    }
-    
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let fullText = "";
-    
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      
-      const chunk = decoder.decode(value, { stream: true });
-      fullText += chunk;
-      
-      // Show progress lines in the UI (only PROGRESS: lines)
-      const newLines = chunk
-        .split("\n")
-        .map((l) => l.trim())
-        .filter((l) => l && l.startsWith("PROGRESS:"));
-      
-      if (newLines.length) {
-        // Extract just the message part after "PROGRESS:"
-        const progressMessages = newLines.map((l) => l.replace("PROGRESS:", "").trim());
-        setStreamText((prev) => [...prev, ...progressMessages]);
-      }
-      
-      // Check for error lines
-      for (const line of newLines) {
-        if (line.startsWith("Error:")) {
-          const code = line.replace("Error:", "").trim();
-          setErrorCode(code || "UNKNOWN");
-          setLoadingError("We couldn't generate your itinerary. Please try again.");
-          setIsGenerating(false);
-          setIsStreaming(false);
-          reader.cancel();
-          return;
-        }
-      }
-      
-      // Check for ready marker
-      if (fullText.includes("__ITINERARY_READY__")) {
-        console.log("[smart-itinerary] ready marker received");
-        break;
-      }
-    }
-    
-    // Stream finished → now load the saved itinerary JSON via a separate GET
-    await loadSmartItineraryFromApi();
-    setIsGenerating(false);
-    setIsStreaming(false);
-  }
-
-  // Load existing or start generation
+  // 1. Load existing or start generation
   useEffect(() => {
     let active = true;
 
     async function loadOrGenerate() {
       try {
         setLoadingError(null);
-        setErrorCode(null);
-        setStreamText([]);
         
-        // First, try to load existing itinerary
-        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, {
-          method: "GET",
-        });
+        // Try to load existing
+        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, { method: "GET" });
         
         if (res.ok) {
-          // Itinerary exists, load it
-          const json = (await res.json()) as SmartItinerary;
-          if (active) {
-            setSmartItinerary(json);
-            setErrorCode(null);
-          }
+          const json = await res.json();
+          if (active) setSmartItinerary(json);
         } else if (res.status === 404) {
-          // No itinerary found, auto-start generation
-          if (active) {
-            await startSmartItineraryGeneration();
-          }
+          // Not found, generate
+          if (active) generate();
         } else {
-          // Other error
-          const text = await res.text().catch(() => "");
-          console.error("[smart-itinerary] load error", res.status, text);
-          if (active) {
-            setErrorCode(`LOAD_HTTP_${res.status}`);
-            setLoadingError(`Request failed with status ${res.status}`);
-          }
+           console.error("Failed to load itinerary");
         }
       } catch (err) {
         console.error("Load error", err);
-        if (active) {
-          setLoadingError("Something went wrong loading your itinerary.");
-          setIsStreaming(false);
-        }
       }
     }
 
     if (tripId && !smartItinerary && !isGenerating) {
       loadOrGenerate();
     }
-
+    
     return () => { active = false; };
   }, [tripId]);
 
+  async function generate() {
+    setIsGenerating(true);
+    setProgressLines(['Starting your itinerary...']);
+    
+    try {
+      const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, { method: 'POST' });
+      
+      if (!res.body) throw new Error("No stream body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+      
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split('\n\n');
+        buffer = parts.pop() || '';
+        
+        for (const part of parts) {
+          if (!part.startsWith('data:')) continue;
+          
+          try {
+            const json = JSON.parse(part.replace(/^data:\s*/, ''));
+            
+            // Vercel AI SDK 'streamObject' protocol usually emits different structures
+            // but the user prompt specific implementation handling:
+            if (json.type === 'text') {
+              setProgressLines(prev => [...prev, json.value]);
+            }
+            if (json.type === 'object') {
+              // This is usually the partial object or final object
+              setSmartItinerary(json.value as SmartItinerary);
+            }
+            // Handling finish? The user code uses isGenerating false inside object check. 
+            // I'll set it false at the end of loop.
+          } catch (e) {
+             // ignore parse errors for partial chunks if needed
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Generation error", err);
+      setLoadingError("Failed to generate itinerary.");
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  // Handle manual updates (visited, remove)
+  // Since we have slots now, finding the place is a bit deeper.
   const handleUpdatePlace = async (dayId: string, placeId: string, updates: { visited?: boolean, remove?: boolean }) => {
     if (!smartItinerary) return;
 
@@ -212,11 +168,20 @@ export function ItineraryTab({
     const day = newItinerary.days.find(d => d.id === dayId);
     if (!day) return;
 
-    if (updates.remove) {
-      day.places = day.places.filter(p => p.id !== placeId);
-    } else if (updates.visited !== undefined) {
-      const place = day.places.find(p => p.id === placeId);
-      if (place) place.visited = updates.visited;
+    let found = false;
+    for (const slot of day.slots) {
+       if (updates.remove) {
+         const initialLen = slot.places.length;
+         slot.places = slot.places.filter(p => p.id !== placeId);
+         if (slot.places.length < initialLen) found = true;
+       } else if (updates.visited !== undefined) {
+         const place = slot.places.find(p => p.id === placeId);
+         if (place) {
+           place.visited = updates.visited;
+           found = true;
+         }
+       }
+       if (found) break;
     }
     
     setSmartItinerary(newItinerary);
@@ -234,7 +199,6 @@ export function ItineraryTab({
       });
     } catch (error) {
       console.error("Failed to sync place update", error);
-      // Revert? (Complex, skipping for now)
       addToast({ variant: "destructive", title: "Failed to save change" });
     }
   };
@@ -255,37 +219,23 @@ export function ItineraryTab({
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error || 'Chat failed');
+        setChatError('Failed to save itinerary');
+        setIsChatting(false);
+        return;
       }
 
       const data = await res.json();
       if (data.itinerary) {
         setSmartItinerary(data.itinerary);
-        setChatMessage(""); // Only clear on success
-        addToast({ title: "Itinerary updated!" });
+        setChatMessage("");
       }
     } catch (error: any) {
       console.error(error);
-      setChatError(error.message || "Failed to update itinerary");
-      addToast({ variant: "destructive", title: "Failed to update itinerary" });
+      setChatError('Failed to save itinerary');
     } finally {
       setIsChatting(false);
     }
   };
-  
-  // Close settings menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (settingsMenuRef.current && !settingsMenuRef.current.contains(event.target as Node)) {
-        setSettingsMenuOpen(false);
-      }
-    };
-    if (settingsMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [settingsMenuOpen]);
 
   // Lightbox logic
   const openLightbox = (image: string, allImages: string[]) => {
@@ -306,12 +256,26 @@ export function ItineraryTab({
     const prevIdx = (idx - 1 + lightboxImages.length) % lightboxImages.length;
     setSelectedImage(lightboxImages[prevIdx]);
   };
+  
+  // Close settings menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (settingsMenuRef.current && !settingsMenuRef.current.contains(event.target as Node)) {
+        setSettingsMenuOpen(false);
+      }
+    };
+    if (settingsMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [settingsMenuOpen]);
+
 
   if (tripLoading) return <div className="p-6">Loading...</div>;
   if (!trip) return <div className="p-6">Trip not found</div>;
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-white relative">
       {/* Header */}
       <div className="px-6 py-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
         <div>
@@ -350,57 +314,39 @@ export function ItineraryTab({
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto px-4 py-8">
           
-          {/* Streaming State */}
-          {isStreaming && (
-            <div className="w-full rounded-2xl border bg-orange-50/60 border-orange-200/70 px-8 py-10 text-center shadow-sm mb-8">
-               <div className="flex flex-col items-center justify-center">
-                 <Loader2 className="h-8 w-8 text-orange-500 animate-spin mb-4" />
-                 <h3 className="text-slate-900 font-semibold text-lg mb-4">We&apos;re crafting your itinerary...</h3>
-                 <div className="text-slate-700 text-sm mt-2 space-y-1">
-                   {streamText.slice(-3).map((line, i) => (
-                     <p key={i} className="animate-pulse">{line}</p>
-                   ))}
-                 </div>
-               </div>
-            </div>
+          {/* Generating Loading State */}
+          {isGenerating && (
+            <Card className="bg-amber-50 border-amber-100 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
+                <CardHeader>We&apos;re crafting your itinerary…</CardHeader>
+                <CardContent className="space-y-1 text-sm">
+                {progressLines.map((line, i) => (
+                    <div key={i}>{line}</div>
+                ))}
+                </CardContent>
+            </Card>
           )}
 
           {/* Loaded Itinerary */}
-          {smartItinerary && !isStreaming && (
+          {smartItinerary && (
             <div className="space-y-8 pb-10">
               {/* Trip Summary */}
-              <div className="text-center space-y-4 mb-10">
+              <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
                 <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
                 <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
                    <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
                 </div>
-                {/* Trip-level Affiliate Suggestions */}
-                {smartItinerary.affiliateSuggestions?.length ? (
-                  <div className="mt-4 flex flex-wrap justify-center gap-2">
-                    {smartItinerary.affiliateSuggestions.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        className="inline-flex items-center rounded-full border border-purple-300 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-800 hover:bg-purple-100 transition-colors"
-                      >
-                        {a.cta}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
               </div>
 
               {/* Days */}
               <div className="space-y-12">
                 {smartItinerary.days.map((day) => {
-                  // Fallback: use day.photos if available, else gather from places.
+                  // Gather all photos from slots for the gallery
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
-                    : day.places.flatMap(p => p.photos || []);
+                    : day.slots.flatMap(s => s.places.flatMap(p => p.photos || []));
                   
-                  // Limit to 4 images for the banner
                   const bannerImages = dayImages.slice(0, 4);
 
                   return (
@@ -423,16 +369,16 @@ export function ItineraryTab({
                         </div>
                       </CardHeader>
                       
-                      {/* Image Gallery - Desktop: Row of up to 4 images. Mobile: Horizontal scroll. */}
+                      {/* Image Gallery */}
                       {bannerImages.length > 0 && (
-                        <div className="w-full aspect-[16/9] sm:aspect-[3/1] md:aspect-[4/1] flex overflow-x-auto sm:overflow-hidden bg-gray-100 scrollbar-hide">
+                        <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
                           {bannerImages.map((img, idx) => (
                             <div 
                               key={idx} 
-                              className="relative h-full min-w-[80%] sm:min-w-0 sm:flex-1 cursor-pointer hover:opacity-90 transition-opacity"
+                              className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity"
                               onClick={() => openLightbox(img, dayImages)}
                             >
-                              <Image src={img} alt={`Day ${day.index} - ${idx + 1}`} fill className="object-cover border-r border-white/20 last:border-r-0" />
+                              <Image src={img} alt={`Day ${day.index} - ${idx + 1}`} fill className="object-cover" />
                             </div>
                           ))}
                         </div>
@@ -440,86 +386,80 @@ export function ItineraryTab({
 
                       <CardContent className="p-6 space-y-6">
                         <div className="prose prose-neutral max-w-none text-slate-900">
-                          <p>{day.summary}</p>
+                          <p>{day.overview}</p>
                         </div>
-
-                        {/* Day-level Affiliate Suggestions */}
-                        {day.affiliateSuggestions?.length ? (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {day.affiliateSuggestions.map((a) => (
-                              <button
-                                key={a.id}
-                                type="button"
-                                className="inline-flex items-center rounded-full border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-800 hover:bg-orange-100 transition-colors"
-                              >
-                                {a.cta}
-                              </button>
+                        
+                        {/* Slots */}
+                        <div className="space-y-8 mt-6">
+                            {day.slots.map((slot, slotIdx) => (
+                                <div key={slotIdx} className="space-y-4">
+                                    <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                                        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">{slot.label}</h3>
+                                        <span className="text-sm text-slate-400">•</span>
+                                        <span className="text-sm text-slate-600 italic">{slot.summary}</span>
+                                    </div>
+                                    
+                                    <div className="grid gap-4">
+                                        {slot.places.map((place) => (
+                                            <div 
+                                              key={place.id} 
+                                              className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                                              onClick={(e) => {
+                                                onActivitySelect?.(place.id);
+                                              }}
+                                            >
+                                               <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
+                                                 {place.photos && place.photos[0] ? (
+                                                   <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
+                                                 ) : (
+                                                   <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                     <MapPin className="h-8 w-8" />
+                                                   </div>
+                                                 )}
+                                               </div>
+                                               <div className="flex-1 min-w-0">
+                                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                                                   <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
+                                                   <div className="flex gap-2 self-start">
+                                                     <Button
+                                                       size="sm"
+                                                       variant={place.visited ? "default" : "outline"}
+                                                       onClick={(e) => {
+                                                         e.stopPropagation();
+                                                         handleUpdatePlace(day.id, place.id, { visited: !place.visited });
+                                                       }}
+                                                       className={`h-7 px-3 text-xs gap-1.5 ${place.visited ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
+                                                     >
+                                                       {place.visited && <Check className="h-3 w-3" />}
+                                                       Visited
+                                                     </Button>
+                                                   </div>
+                                                 </div>
+                                                 <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
+                                                   {place.description}
+                                                 </p>
+                                                 {place.area && (
+                                                   <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                                                     {place.area}
+                                                   </span>
+                                                 )}
+                                               </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
-                          </div>
-                        ) : null}
-
-                        <div className="space-y-4 mt-6">
-                          {day.places.map((place) => (
-                            <div 
-                              key={place.id} 
-                              className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
-                              onClick={(e) => {
-                                onActivitySelect?.(place.id);
-                              }}
-                            >
-                               <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                 {place.photos && place.photos[0] ? (
-                                   <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
-                                 ) : (
-                                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                     <MapPin className="h-8 w-8" />
-                                   </div>
-                                 )}
-                               </div>
-                               <div className="flex-1 min-w-0">
-                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                   <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
-                                   <div className="flex gap-2 self-start">
-                                     <button
-                                       onClick={(e) => {
-                                         e.stopPropagation();
-                                         handleUpdatePlace(day.id, place.id, { visited: !place.visited });
-                                       }}
-                                       className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 transition-colors ${
-                                         place.visited 
-                                           ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
-                                           : 'bg-blue-500 text-white hover:bg-blue-600'
-                                       }`}
-                                       title={place.visited ? "Mark as not visited" : "Mark as visited"}
-                                     >
-                                       <Check className="h-3 w-3" />
-                                       {place.visited ? "Visited" : "Visit"}
-                                     </button>
-                                     <button
-                                       onClick={(e) => {
-                                         e.stopPropagation();
-                                         handleUpdatePlace(day.id, place.id, { remove: true });
-                                       }}
-                                       className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 bg-red-500 text-white hover:bg-red-600 transition-colors"
-                                       title="Remove place"
-                                     >
-                                       <X className="h-3 w-3" />
-                                       Remove
-                                     </button>
-                                   </div>
-                                 </div>
-                                 <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
-                                   {place.summary}
-                                 </p>
-                                 {place.area && (
-                                   <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                                     {place.area}
-                                   </span>
-                                 )}
-                               </div>
-                            </div>
-                          ))}
                         </div>
+
+                        {/* Affiliate Buttons - Moved below activities */}
+                        <div className="mt-8 pt-6 border-t border-gray-100">
+                             <div className="flex flex-wrap gap-3">
+                                <AffiliateButton kind="hotel" day={day} />
+                                <AffiliateButton kind="tour" day={day} />
+                                <AffiliateButton kind="sim" day={day} />
+                             </div>
+                        </div>
+
                       </CardContent>
                     </Card>
                   );
@@ -527,45 +467,57 @@ export function ItineraryTab({
               </div>
 
               {/* Tips & Notes */}
-              {smartItinerary.tips?.length ? (
-                <section className="mt-10 rounded-2xl border bg-white/80 p-6 shadow-sm">
-                  <h2 className="text-lg font-semibold mb-3 text-slate-900">Additional Tips &amp; Notes</h2>
+              {smartItinerary.tripTips?.length ? (
+                <section className="mt-10 rounded-2xl border bg-white/80 p-6 shadow-sm max-w-4xl mx-auto">
+                  <h2 className="text-lg font-semibold mb-3 text-slate-900">Trip Tips &amp; Notes</h2>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                    {smartItinerary.tips.map((tip) => (
-                      <li key={tip.id}>{tip.text}</li>
+                    {smartItinerary.tripTips.map((tip, i) => (
+                      <li key={i}>{tip}</li>
                     ))}
                   </ul>
                 </section>
               ) : null}
 
-              {/* Chat Input - Moved to flow */}
-              <div className="mt-12 p-6 border rounded-2xl bg-gray-50/50">
-                <h3 className="text-lg font-semibold mb-2 text-slate-900">Edit Itinerary</h3>
-                <p className="text-sm text-slate-500 mb-4">Ask me to add places, move things around, or change themes.</p>
-                <form onSubmit={handleChatSubmit} className="flex gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      placeholder="e.g. 'Add a lunch spot on Day 1', 'Move Sagrada Familia to Day 2'"
-                      className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
-                      disabled={isChatting}
-                    />
-                    {/* <MessageSquare className="absolute left-3 top-3 h-5 w-5 text-gray-400" /> */}
-                  </div>
-                  <Button 
-                    type="submit" 
-                    disabled={isChatting || !chatMessage.trim()} 
-                    className="rounded-xl px-6 bg-purple-600 hover:bg-purple-700 h-auto"
-                  >
-                    {isChatting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                  </Button>
-                </form>
-                {chatError && (
-                  <p className="text-sm text-red-600 mt-2">{chatError}</p>
-                )}
-              </div>
+               {/* Global Affiliates */}
+               <div className="max-w-4xl mx-auto mt-12 mb-8 text-center p-8 bg-slate-50 rounded-2xl border border-slate-100">
+                    <h3 className="text-lg font-semibold text-slate-800 mb-4">You&apos;ll probably need...</h3>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        <Button variant="outline" className="bg-white">Get an eSIM</Button>
+                        <Button variant="outline" className="bg-white">Travel Insurance</Button>
+                        <Button variant="outline" className="bg-white">Airport Transfer</Button>
+                    </div>
+               </div>
+
+              {/* Chat Input - At the end, not sticky */}
+              <section className="max-w-5xl mx-auto my-8">
+                <div className="p-6 border rounded-2xl bg-gray-50/50">
+                    <h3 className="text-lg font-semibold mb-2 text-slate-900">Edit this itinerary</h3>
+                    <p className="text-sm text-slate-500 mb-4">Ask me to add places, move things around, or change themes.</p>
+                    <form onSubmit={handleChatSubmit} className="flex gap-2">
+                    <div className="relative flex-1">
+                        <input
+                        type="text"
+                        value={chatMessage}
+                        onChange={(e) => setChatMessage(e.target.value)}
+                        placeholder="e.g. 'Add a lunch spot on Day 1', 'Move Sagrada Familia to Day 2'"
+                        className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
+                        disabled={isChatting}
+                        />
+                    </div>
+                    <Button 
+                        type="submit" 
+                        disabled={isChatting || !chatMessage.trim()} 
+                        className="rounded-xl px-6 bg-purple-600 hover:bg-purple-700 h-auto"
+                    >
+                        {isChatting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                    </Button>
+                    </form>
+                    {chatError && (
+                    <p className="text-sm text-red-600 mt-2">{chatError}</p>
+                    )}
+                </div>
+              </section>
+
             </div>
           )}
           
@@ -573,9 +525,6 @@ export function ItineraryTab({
             <div className="w-full rounded-2xl border bg-red-50 border-red-200 px-8 py-10 text-center shadow-sm mb-8">
               <h3 className="text-red-900 font-semibold text-lg mb-2">We couldn&apos;t generate your itinerary</h3>
               <p className="text-red-700 mb-6">{loadingError}</p>
-              {errorCode && (process.env.NODE_ENV !== 'production') && (
-                  <p className="text-xs text-red-400 mb-4">Debug: {errorCode}</p>
-              )}
               <Button onClick={() => window.location.reload()} variant="outline" className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800">
                 Retry
               </Button>

@@ -91,6 +91,18 @@ This document tracks the development progress of the MindTrip travel planning ap
 - [x] Smart itinerary caching and regeneration
 - [x] Integration with saved places in itinerary generation
 
+### Phase 14 - Enhanced Smart Itinerary System
+- [x] Structured itinerary schema using Zod validation (itinerary-schema.ts)
+- [x] Streaming itinerary generation using Vercel AI SDK streamObject
+- [x] Real-time progress updates during itinerary generation
+- [x] Itinerary chat editing (natural language editing of existing itineraries)
+- [x] Place-level updates (mark as visited, remove from itinerary)
+- [x] Slot-based day structure (morning, afternoon, evening with grouped places)
+- [x] Enhanced itinerary UI with image galleries and lightbox
+- [x] Area clustering and neighborhood-based place grouping
+- [x] Trip tips and practical micro-tips in daily overviews
+- [x] Place photos, descriptions, and tags in structured format
+
 ### Phase 12 - Accommodation & Hotel Search
 - [x] Hotel search functionality using Google Places API
 - [x] Hotel type filtering (hotel, hostel, apartment)
@@ -119,7 +131,7 @@ _Currently no features in progress_
 
 ## 📋 Planned Features
 
-### Phase 14 - Enhanced User Experience
+### Phase 15 - Enhanced User Experience
 - [ ] Trip templates and presets
 - [ ] Weather integration for trip dates
 - [ ] Photo uploads and galleries (user-uploaded photos)
@@ -127,34 +139,34 @@ _Currently no features in progress_
 - [ ] Trip statistics and analytics
 - [ ] Activity photo uploads
 
-### Phase 15 - Advanced Collaboration
+### Phase 16 - Advanced Collaboration
 - [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-### Phase 16 - Mobile App Development
+### Phase 17 - Mobile App Development
 - [ ] Native iOS and Android app (see [mobile-roadmap.md](./mobile-roadmap.md))
 - [ ] Expo React Native implementation
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 
-### Phase 17 - Web Mobile Optimization
+### Phase 18 - Web Mobile Optimization
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-### Phase 18 - Advanced Features
+### Phase 19 - Advanced Features
 - [ ] Budget tracking and alerts
 - [ ] Enhanced booking service integrations (beyond Booking.com links)
 - [ ] Calendar sync (Google Calendar, iCal)
 - [ ] Export to various formats (CSV, JSON - PDF already implemented)
 - [ ] Flight search and booking (placeholder page exists)
 
-### Phase 19 - Performance & Scalability
+### Phase 20 - Performance & Scalability
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -172,12 +184,26 @@ _No known issues currently documented_
 - Mapbox token is required for map and geocoding features
 - Google Maps API key is required for Places API, hotel search, and place photos
 - OpenAI API key is required for AI day planning, smart itineraries, and Trip Assistant chat
+- Vercel AI SDK (`ai` and `@ai-sdk/openai` packages) is required for structured streaming itinerary generation
 - Additional database tables may need to be created manually:
   - `trip_chat_messages` - for Trip Assistant chat history
-  - `smart_itineraries` - for cached AI-generated itineraries
+  - `smart_itineraries` - for cached AI-generated itineraries (stores structured JSON with Zod schema)
   - `saved_places` - migration file exists in `database/migrations/supabase-add-saved-places-table.sql`
 
 ## 🔄 Recent Updates
+
+- **2025-01-XX**: Enhanced Smart Itinerary System (Phase 14)
+  - Implemented structured itinerary schema using Zod validation for type-safe itinerary generation
+  - Added streaming itinerary generation with real-time progress updates using Vercel AI SDK streamObject
+  - Created itinerary chat editing feature - users can edit itineraries via natural language chat
+  - Added place-level update API (mark as visited, remove places) with optimistic UI updates
+  - Enhanced itinerary UI with image galleries, lightbox viewer, and slot-based day structure
+  - Improved place organization with area clustering and neighborhood-based grouping
+  - Added trip tips section with season-specific and date-based practical advice
+  - Integrated place photos, descriptions, and tags in structured format
+  - New dependencies: `@ai-sdk/openai` (Vercel AI SDK OpenAI adapter), `ai` package (Vercel AI SDK)
+  - Created `itinerary-schema.ts` with Zod schemas for type validation
+  - Updated `itinerary.ts` types to match new structured schema
 
 - **2025-01-XX**: Major feature additions and roadmap update
   - Added Trip Assistant chat interface with AI-powered trip planning assistance

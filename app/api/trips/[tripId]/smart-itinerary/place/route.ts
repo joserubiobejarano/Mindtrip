@@ -32,18 +32,24 @@ export async function PATCH(
     const itinerary = row.content as unknown as SmartItinerary;
     let updated = false;
 
-    // 2. Find and update place
+    // 2. Find and update place in slots
     const day = itinerary.days.find(d => d.id === dayId);
-    if (day) {
-      if (remove) {
-        const initialLen = day.places.length;
-        day.places = day.places.filter(p => p.id !== placeId);
-        if (day.places.length !== initialLen) updated = true;
-      } else if (visited !== undefined) {
-        const place = day.places.find(p => p.id === placeId);
-        if (place) {
-          place.visited = visited;
-          updated = true;
+    if (day && day.slots) {
+      for (const slot of day.slots) {
+        if (remove) {
+           const initialLen = slot.places.length;
+           slot.places = slot.places.filter(p => p.id !== placeId);
+           if (slot.places.length !== initialLen) {
+             updated = true;
+             break; 
+           }
+        } else if (visited !== undefined) {
+          const place = slot.places.find(p => p.id === placeId);
+          if (place) {
+            place.visited = visited;
+            updated = true;
+            break;
+          }
         }
       }
     }
@@ -71,4 +77,3 @@ export async function PATCH(
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-

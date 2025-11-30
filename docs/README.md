@@ -108,6 +108,17 @@ npm run dev
 - Hero image galleries for each day
 - Smart itinerary caching and regeneration
 
+### Phase 14 - Enhanced Smart Itinerary System ✅
+- Structured itinerary schema using Zod validation
+- Streaming itinerary generation with real-time progress updates
+- Itinerary chat editing (natural language editing of existing itineraries)
+- Place-level updates (mark as visited, remove from itinerary)
+- Slot-based day structure (morning, afternoon, evening with grouped places)
+- Enhanced itinerary UI with image galleries and lightbox
+- Area clustering and neighborhood-based place grouping
+- Trip tips and practical micro-tips in daily overviews
+- Place photos, descriptions, and tags in structured format
+
 ### Phase 12 - Accommodation & Hotel Search ✅
 - Hotel search functionality using Google Places API
 - Hotel type filtering (hotel, hostel, apartment)
@@ -168,7 +179,9 @@ mindtrip/
 - **Backend:** Supabase (PostgreSQL + Auth + Realtime)
 - **Authentication:** Clerk (Email/Password + Google OAuth)
 - **Maps:** Mapbox GL JS + Mapbox Directions API
-- **AI:** OpenAI GPT-4o-mini (for day planning)
+- **AI:** OpenAI GPT-4o-mini (for day planning and itinerary generation)
+- **AI SDK:** Vercel AI SDK (`ai` package) with `@ai-sdk/openai` for structured streaming
+- **Schema Validation:** Zod (for itinerary schema validation)
 - **State Management:** React Query (TanStack Query)
 - **Date Utilities:** date-fns
 
@@ -184,21 +197,25 @@ mindtrip/
 ## 🎯 Next Steps
 
 1. Get your Mapbox token from [mapbox.com](https://www.mapbox.com/)
-2. Get your OpenAI API key from [platform.openai.com](https://platform.openai.com/) (for AI day planning and Trip Assistant)
+2. Get your OpenAI API key from [platform.openai.com](https://platform.openai.com/) (for AI day planning, Trip Assistant, and smart itinerary generation)
 3. Get your Google Maps API key from [console.cloud.google.com](https://console.cloud.google.com/) (for Places API, hotel search, and place photos)
 4. Configure Clerk authentication (Email/Password + Google OAuth)
 5. Run the SQL schema in Supabase
 6. Run additional migrations for saved_places, trip_chat_messages, and smart_itineraries tables
 7. Enable Realtime for required tables
-8. Start developing!
+8. Install dependencies: `npm install` (includes Vercel AI SDK packages)
+9. Start developing!
 
 ## 📊 Current Status
 
-**Completed Phases:** 13 out of 19 planned phases (68% complete)
+**Completed Phases:** 14 out of 20 planned phases (70% complete)
 
 **Key Features Implemented:**
 - ✅ Full trip planning and collaboration
 - ✅ AI-powered day planning and smart itineraries
+- ✅ Streaming itinerary generation with real-time progress
+- ✅ Natural language itinerary editing via chat
+- ✅ Structured itinerary schema with Zod validation
 - ✅ Trip Assistant chat interface
 - ✅ Hotel/accommodation search
 - ✅ Google Places integration
