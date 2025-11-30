@@ -15,6 +15,8 @@ import { useToast } from "@/components/ui/toast";
 import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
+
 interface ItineraryTabProps {
   tripId: string;
   userId: string;
@@ -58,10 +60,9 @@ export function ItineraryTab({
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   
   const [smartItinerary, setSmartItinerary] = useState<SmartItinerary | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState<ItineraryStatus>('idle');
+  const [error, setError] = useState<string | null>(null);
   const [progressLines, setProgressLines] = useState<string[]>([]);
-  const [loadingError, setLoadingError] = useState<string | null>(null);
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -77,24 +78,37 @@ export function ItineraryTab({
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
 
   const generateSmartItinerary = useCallback(async () => {
-    setIsGenerating(true);
-    // Note: We don't set isLoading(false) here because loadOrGenerate handles the transition
-    // But if called manually (Retry), we should ensure loading is false so the generation UI shows.
-    // However, the user logic says "setIsLoading(false); // switch from 'loading existing' to 'generating'"
-    // So we rely on the caller or this function to manage that state.
-    // Let's ensure isLoading is false so the generation card shows.
-    setIsLoading(false); 
-    setLoadingError(null);
+    if (!tripId) {
+      console.warn('[itinerary-tab] generateSmartItinerary: missing tripId');
+      setStatus('error');
+      setError('Missing trip id.');
+      return;
+    }
+
+    console.log('[itinerary-tab] generateSmartItinerary: POST /smart-itinerary for trip', tripId);
+    setError(null);
+    setStatus('generating');
     setProgressLines(['Starting your itinerary...']);
     
     try {
-      const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, { method: 'POST' });
-      
-      if (!res.body) throw new Error("No stream body");
+      const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
+        method: 'POST',
+      });
+
+      console.log('[itinerary-tab] generateSmartItinerary: POST status', res.status);
+
+      if (!res.ok) {
+        throw new Error(`Generation failed with status ${res.status}`);
+      }
+
+      if (!res.body) {
+        throw new Error("No stream body");
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let buffer = '';
+      let finalItinerary: SmartItinerary | null = null;
       
       while (true) {
         const { value, done } = await reader.read();
@@ -110,84 +124,90 @@ export function ItineraryTab({
           try {
             const json = JSON.parse(part.replace(/^data:\s*/, ''));
             
-            // Vercel AI SDK 'streamObject' protocol usually emits different structures
-            // but the user prompt specific implementation handling:
             if (json.type === 'text') {
               setProgressLines(prev => [...prev, json.value]);
             }
             if (json.type === 'object') {
-              // This is usually the partial object or final object
-              setSmartItinerary(json.value as SmartItinerary);
+              finalItinerary = json.value as SmartItinerary;
+              setSmartItinerary(finalItinerary);
             }
           } catch (e) {
              // ignore parse errors for partial chunks if needed
           }
         }
       }
+
+      // After streaming completes, the onFinish callback in the API route saves to DB
+      // We should reload from DB to get the final saved version, or use the final streamed object
+      if (finalItinerary) {
+        console.log('[itinerary-tab] generateSmartItinerary: received itinerary from stream', finalItinerary);
+        setSmartItinerary(finalItinerary);
+        setStatus('loaded');
+      } else {
+        // If we didn't get a final object from stream, try loading from DB
+        console.log('[itinerary-tab] generateSmartItinerary: stream completed, loading from DB...');
+        const loadRes = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
+        if (loadRes.ok) {
+          const loadData = await loadRes.json();
+          console.log('[itinerary-tab] generateSmartItinerary: loaded itinerary from DB', loadData);
+          setSmartItinerary(loadData.itinerary);
+          setStatus('loaded');
+        } else {
+          throw new Error('Generation completed but failed to load saved itinerary');
+        }
+      }
     } catch (err) {
-      console.error("Generation error", err);
-      setLoadingError("Failed to generate itinerary.");
-    } finally {
-      setIsGenerating(false);
+      console.error('[itinerary-tab] generateSmartItinerary error', err);
+      setError('Failed to generate itinerary. Please try again.');
+      setStatus('error');
     }
   }, [tripId]);
 
   const loadOrGenerate = useCallback(async () => {
-    if (!tripId) return;
+    if (!tripId) {
+      console.warn('[itinerary-tab] loadOrGenerate: missing tripId');
+      return;
+    }
 
-    setIsLoading(true);
-    setErrorState(null); // Helper to clear error
+    console.log('[itinerary-tab] loadOrGenerate: start for trip', tripId);
+    setStatus('loading');
+    setError(null);
 
     try {
       const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
+      console.log('[itinerary-tab] loadOrGenerate: GET /smart-itinerary?mode=load status', res.status);
 
-      // CASE 1: no existing itinerary → trigger generation
+      // CASE 1: no itinerary yet → trigger generation
       if (res.status === 404) {
-        // No existing itinerary; start generation
-        setIsLoading(false); // switch from "loading existing" to "generating"
-        await generateSmartItinerary(); // use the same helper used elsewhere for generation / streaming
+        console.log('[itinerary-tab] no itinerary found, starting generation…');
+        setStatus('generating');
+        await generateSmartItinerary();
         return;
       }
 
-      // CASE 2: any other non-OK status → show error
+      // CASE 2: other errors
       if (!res.ok) {
         throw new Error(`Failed to load itinerary: ${res.status}`);
       }
 
-      // CASE 3: we have data → hydrate state
+      // CASE 3: we have data
       const data = await res.json();
-      // The GET handler returns { itinerary: data.content }
-      if (data.itinerary) {
-        setSmartItinerary(data.itinerary);
-      }
+      console.log('[itinerary-tab] loadOrGenerate: loaded itinerary from DB', data);
+      // GET handler returns { itinerary: data.content }
+      setSmartItinerary(data.itinerary);
+      setStatus('loaded');
     } catch (err) {
       console.error('[itinerary-tab] loadOrGenerate error', err);
-      setLoadingError('Failed to load itinerary. Please try again.');
-    } finally {
-      // Only end the "loading existing" state here.
-      // During generation, `isGenerating` should control the UI.
-      // If we started generation (CASE 1), isLoading was already set to false there.
-      // If we finished loading (CASE 3) or error (CASE 2), we want isLoading false.
-      // However, if we called generateSmartItinerary, it is async and we awaited it?
-      // Yes, we awaited it. So when it returns, generation is done.
-      // So setting isLoading(false) here is safe.
-      setIsLoading(false);
+      setError('Failed to load itinerary. Please try again.');
+      setStatus('error');
     }
   }, [tripId, generateSmartItinerary]);
 
-  // Wrapper to set error state easily
-  const setErrorState = (msg: string | null) => {
-    setLoadingError(msg);
-  };
-
   // 1. Load existing or start generation
   useEffect(() => {
-    // Only run if we haven't loaded yet and aren't generating
-    if (tripId && !smartItinerary && !isGenerating) {
-      loadOrGenerate();
-    }
+    loadOrGenerate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripId]); // Only depend on tripId to avoid loops
+  }, [tripId]);
 
   // Handle manual updates (visited, remove)
   // Since we have slots now, finding the place is a bit deeper.
@@ -305,6 +325,44 @@ export function ItineraryTab({
   if (tripLoading) return <div className="p-6">Loading...</div>;
   if (!trip) return <div className="p-6">Trip not found</div>;
 
+  // Helper components for loading and error states
+  const LoadingCard = ({ title, subtitle }: { title: string; subtitle: string }) => (
+    <Card className="bg-amber-50 border-amber-100 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
+      <CardHeader>{title}</CardHeader>
+      <CardContent className="space-y-1 text-sm">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>{subtitle}</span>
+        </div>
+        {progressLines.length > 0 && (
+          <div className="mt-4 space-y-1">
+            {progressLines.map((line, i) => (
+              <div key={i}>{line}</div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const ErrorCard = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
+    <Card className="bg-red-50 border-red-200 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
+      <CardHeader>
+        <CardTitle className="text-red-900">We couldn&apos;t load your itinerary</CardTitle>
+        <CardDescription className="text-red-700">{message}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Button 
+          onClick={onRetry}
+          variant="outline" 
+          className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+        >
+          Retry
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="flex flex-col h-full bg-white relative">
       {/* Header */}
@@ -347,33 +405,32 @@ export function ItineraryTab({
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-4 py-8">
           
-          {/* Initial Loading State */}
-          {isLoading && !isGenerating && !loadingError && (
-            <Card className="bg-amber-50 border-amber-100 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
-              <CardHeader>Loading your itinerary…</CardHeader>
-              <CardContent className="space-y-1 text-sm">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Fetching your saved itinerary...</span>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Loading State */}
+          {status === 'loading' && (
+            <LoadingCard
+              title="We're crafting your itinerary…"
+              subtitle="Loading your saved plan…"
+            />
           )}
 
-          {/* Generating Loading State */}
-          {isGenerating && (
-            <Card className="bg-amber-50 border-amber-100 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
-                <CardHeader>We&apos;re crafting your itinerary…</CardHeader>
-                <CardContent className="space-y-1 text-sm">
-                {progressLines.map((line, i) => (
-                    <div key={i}>{line}</div>
-                ))}
-                </CardContent>
-            </Card>
+          {/* Generating State */}
+          {status === 'generating' && (
+            <LoadingCard
+              title="We're crafting your itinerary…"
+              subtitle="Designing your days and finding great spots…"
+            />
+          )}
+
+          {/* Error State */}
+          {status === 'error' && (
+            <ErrorCard
+              message={error ?? 'Something went wrong.'}
+              onRetry={loadOrGenerate}
+            />
           )}
 
           {/* Loaded Itinerary */}
-          {smartItinerary && (
+          {status === 'loaded' && smartItinerary && (
             <div className="space-y-8 pb-10">
               {/* Trip Summary */}
               <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
@@ -564,24 +621,21 @@ export function ItineraryTab({
 
             </div>
           )}
-          
-          {/* Error State */}
-          {loadingError && !smartItinerary && !isLoading && (
-            <Card className="bg-red-50 border-red-200 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
-              <CardHeader>
-                <CardTitle className="text-red-900">We couldn&apos;t load your itinerary</CardTitle>
-                <CardDescription className="text-red-700">{loadingError}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  onClick={() => loadOrGenerate()}
-                  variant="outline" 
-                  className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
-                >
-                  Retry
-                </Button>
-              </CardContent>
-            </Card>
+
+          {/* Fallback: if status is loaded but no itinerary (shouldn't happen, but safety check) */}
+          {status === 'loaded' && !smartItinerary && (
+            <ErrorCard
+              message="No itinerary yet. Try generating it again."
+              onRetry={loadOrGenerate}
+            />
+          )}
+
+          {/* Fallback: if status is idle (shouldn't happen after mount, but safety check) */}
+          {status === 'idle' && (
+            <LoadingCard
+              title="We're crafting your itinerary…"
+              subtitle="Preparing…"
+            />
           )}
         </div>
       </div>
