@@ -87,7 +87,7 @@ export function ItineraryTab({
     console.log('[itinerary-tab] generateSmartItinerary: POST /smart-itinerary for trip', tripId);
     setError(null);
     setStatus('generating');
-    
+
     try {
       const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
         method: 'POST',
@@ -96,15 +96,13 @@ export function ItineraryTab({
       console.log('[itinerary-tab] generateSmartItinerary: POST status', res.status);
 
       if (!res.ok) {
-        throw new Error(`Generation failed with status ${res.status}`);
+        const body = await res.json().catch(() => null);
+        console.error('[itinerary-tab] generateSmartItinerary: POST error body', body);
+        throw new Error(body?.error || `Generation failed with status ${res.status}`);
       }
 
       const data = await res.json();
       console.log('[itinerary-tab] generateSmartItinerary: received itinerary from POST', data);
-
-      if (!data.itinerary) {
-        throw new Error('No itinerary in response');
-      }
 
       setSmartItinerary(data.itinerary);
       setStatus('loaded');
