@@ -73,28 +73,53 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
   }
 }
 
-// Keep GET for loading existing itinerary if needed (from previous file, it was useful)
+// GET handler for loading existing itinerary
 export async function GET(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
   try {
     const { tripId } = await params;
-    const { searchParams } = new URL(req.url);
-    const mode = searchParams.get("mode");
+    const url = new URL(req.url);
+    const mode = url.searchParams.get('mode') ?? 'load';
     
     // Only handle mode=load
-    if (mode !== 'load') return new NextResponse("Error: Use POST", { status: 400 });
+    if (mode !== 'load') {
+      return NextResponse.json({ error: 'unsupported-mode' }, { status: 400 });
+    }
 
     const supabase = await createClient();
-    const { data: row, error } = await supabase
+    
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (!user || authError) {
+      console.error('[smart-itinerary GET] unauthorized', authError);
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    }
+
+    // Load itinerary from database
+    const { data, error } = await supabase
       .from('smart_itineraries')
       .select('content')
       .eq('trip_id', tripId)
-      .maybeSingle();
+      .single();
 
-    if (error) return NextResponse.json({ error: 'db-error' }, { status: 500 });
-    if (!row?.content) return NextResponse.json({ error: 'not-found' }, { status: 404 });
+    if (error) {
+      console.error('[smart-itinerary GET] supabase error', error);
+      // If no row yet → 404, frontend will decide to generate
+      if (error.code === 'PGRST116' || error.details?.includes('Results contain 0 rows')) {
+        return NextResponse.json({ error: 'not-found' }, { status: 404 });
+      }
+      return NextResponse.json({ error: 'db-error' }, { status: 500 });
+    }
 
-    return NextResponse.json(row.content);
+    if (!data?.content) {
+      return NextResponse.json({ error: 'not-found' }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { itinerary: data.content },
+      { status: 200 }
+    );
   } catch (err) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    console.error('[smart-itinerary GET] unexpected error', err);
+    return NextResponse.json({ error: 'server-error' }, { status: 500 });
   }
 }

@@ -59,6 +59,7 @@ export function ItineraryTab({
   
   const [smartItinerary, setSmartItinerary] = useState<SmartItinerary | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [progressLines, setProgressLines] = useState<string[]>([]);
   const [loadingError, setLoadingError] = useState<string | null>(null);
   
@@ -77,6 +78,8 @@ export function ItineraryTab({
 
   const generate = useCallback(async () => {
     setIsGenerating(true);
+    setIsLoading(false); // We're now generating, not loading
+    setLoadingError(null);
     setProgressLines(['Starting your itinerary...']);
     
     try {
@@ -131,23 +134,44 @@ export function ItineraryTab({
     let active = true;
 
     async function loadOrGenerate() {
+      if (!tripId) return;
+      
+      setIsLoading(true);
+      setLoadingError(null);
+      
       try {
-        setLoadingError(null);
+        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
         
-        // Try to load existing
-        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, { method: "GET" });
+        if (res.status === 404) {
+          // No itinerary yet → trigger generation logic (streaming POST)
+          if (active) {
+            setIsLoading(false);
+            await generate();
+          }
+          return;
+        }
         
-        if (res.ok) {
-          const json = await res.json();
-          if (active) setSmartItinerary(json);
-        } else if (res.status === 404) {
-          // Not found, generate
-          if (active) generate();
-        } else {
-           console.error("Failed to load itinerary");
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: 'unknown' }));
+          console.error('[itinerary-tab] load error', errorData);
+          if (active) {
+            setLoadingError('Failed to load itinerary. Please try again.');
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        const data = await res.json();
+        if (active && data.itinerary) {
+          setSmartItinerary(data.itinerary);
+          setIsLoading(false);
         }
       } catch (err) {
-        console.error("Load error", err);
+        console.error('[itinerary-tab] load error', err);
+        if (active) {
+          setLoadingError('Failed to load itinerary. Please try again.');
+          setIsLoading(false);
+        }
       }
     }
 
@@ -317,6 +341,19 @@ export function ItineraryTab({
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-4 py-8">
           
+          {/* Initial Loading State */}
+          {isLoading && !isGenerating && !loadingError && (
+            <Card className="bg-amber-50 border-amber-100 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
+              <CardHeader>Loading your itinerary…</CardHeader>
+              <CardContent className="space-y-1 text-sm">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Fetching your saved itinerary...</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Generating Loading State */}
           {isGenerating && (
             <Card className="bg-amber-50 border-amber-100 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
@@ -522,14 +559,47 @@ export function ItineraryTab({
             </div>
           )}
           
-          {loadingError && !smartItinerary && (
-            <div className="w-full rounded-2xl border bg-red-50 border-red-200 px-8 py-10 text-center shadow-sm mb-8">
-              <h3 className="text-red-900 font-semibold text-lg mb-2">We couldn&apos;t generate your itinerary</h3>
-              <p className="text-red-700 mb-6">{loadingError}</p>
-              <Button onClick={() => window.location.reload()} variant="outline" className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800">
-                Retry
-              </Button>
-            </div>
+          {/* Error State */}
+          {loadingError && !smartItinerary && !isLoading && (
+            <Card className="bg-red-50 border-red-200 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
+              <CardHeader>
+                <CardTitle className="text-red-900">We couldn&apos;t load your itinerary</CardTitle>
+                <CardDescription className="text-red-700">{loadingError}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={() => {
+                    setLoadingError(null);
+                    setIsLoading(true);
+                    // Retry loading
+                    fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`)
+                      .then(async (res) => {
+                        if (res.status === 404) {
+                          await generate();
+                        } else if (res.ok) {
+                          const data = await res.json();
+                          if (data.itinerary) {
+                            setSmartItinerary(data.itinerary);
+                            setIsLoading(false);
+                          }
+                        } else {
+                          setLoadingError('Failed to load itinerary. Please try again.');
+                          setIsLoading(false);
+                        }
+                      })
+                      .catch((err) => {
+                        console.error('[itinerary-tab] retry error', err);
+                        setLoadingError('Failed to load itinerary. Please try again.');
+                        setIsLoading(false);
+                      });
+                  }} 
+                  variant="outline" 
+                  className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+                >
+                  Retry
+                </Button>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
