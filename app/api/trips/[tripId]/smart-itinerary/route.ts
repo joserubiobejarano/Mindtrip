@@ -63,45 +63,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       system,
       prompt: userPrompt,
       schema: smartItinerarySchema,
-      onStep(step) {
-        // Log steps if needed, or we rely on the stream to send progress
-        // note: streamObject doesn't stream text progress in the same way streamText does, 
-        // but passing it to client via headers or other means is possible.
-        // However, the user instructions say: "The text stream includes special data... progress and final JSON"
-        // and in frontend "if (json.type === 'text') { setProgressLines... }"
-        // streamObject doesn't natively mix text chunks in the output stream unless we assume the 'progress' comes from somewhere else
-        // or we are using a specific feature.
-        // BUT, looking at the user snippet: 
-        // "This lets us stream 'progress' steps to the client... onStep(step) { ... }"
-        // Actually, streamObject result structure handles the object stream.
-        // The user frontend code expects specific JSON structure from the stream: { type: 'text', value: ... } and { type: 'object', value: ... }
-        // The default result.toTextStreamResponse() sends the partial object or final object.
-        // It does NOT send 'text' type events for progress logs unless we inject them?
-        // Wait, standard Vercel AI SDK `streamObject` output is:
-        // 0:{"title":...} (deltas) or structured data.
-        
-        // The user provided a specific manual decoding loop in frontend:
-        // if (json.type === 'text') ... if (json.type === 'object') ...
-        
-        // To support this, I might need to verify what `result.toTextStreamResponse()` outputs.
-        // Usually it outputs parts. 
-        // Maybe the user assumes I can send custom messages?
-        // With `streamObject`, we primarily get the object.
-        // However, I will stick to standard `streamObject` usage.
-        // If the frontend code provided by the user is hypothetical ("Wire the frontend..."), I should adapt it to what the SDK actually provides, 
-        // OR try to match it.
-        // The SDK's `toTextStreamResponse()` for `streamObject` typically streams the object construction.
-        // The user code suggests:
-        // const result = await streamObject({ ... })
-        // return result.toTextStreamResponse();
-        
-        // The user might be confusing `streamText` which can have tool calls etc. 
-        // But for `streamObject`, the main output is the object.
-        // I will trust `streamObject` and `toTextStreamResponse` work together.
-        // The frontend code provided handles `json.type === 'text'` which might not be emitted by default `streamObject`.
-        // I will assume `gpt-4o-mini` is fast enough or the object updates serve as progress.
-        // I will add a console log as requested.
-      },
     });
 
     return result.toTextStreamResponse();

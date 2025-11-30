@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,39 +75,7 @@ export function ItineraryTab({
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
 
-  // 1. Load existing or start generation
-  useEffect(() => {
-    let active = true;
-
-    async function loadOrGenerate() {
-      try {
-        setLoadingError(null);
-        
-        // Try to load existing
-        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, { method: "GET" });
-        
-        if (res.ok) {
-          const json = await res.json();
-          if (active) setSmartItinerary(json);
-        } else if (res.status === 404) {
-          // Not found, generate
-          if (active) generate();
-        } else {
-           console.error("Failed to load itinerary");
-        }
-      } catch (err) {
-        console.error("Load error", err);
-      }
-    }
-
-    if (tripId && !smartItinerary && !isGenerating) {
-      loadOrGenerate();
-    }
-    
-    return () => { active = false; };
-  }, [tripId]);
-
-  async function generate() {
+  const generate = useCallback(async () => {
     setIsGenerating(true);
     setProgressLines(['Starting your itinerary...']);
     
@@ -156,7 +124,40 @@ export function ItineraryTab({
     } finally {
       setIsGenerating(false);
     }
-  }
+  }, [tripId]);
+
+  // 1. Load existing or start generation
+  useEffect(() => {
+    let active = true;
+
+    async function loadOrGenerate() {
+      try {
+        setLoadingError(null);
+        
+        // Try to load existing
+        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`, { method: "GET" });
+        
+        if (res.ok) {
+          const json = await res.json();
+          if (active) setSmartItinerary(json);
+        } else if (res.status === 404) {
+          // Not found, generate
+          if (active) generate();
+        } else {
+           console.error("Failed to load itinerary");
+        }
+      } catch (err) {
+        console.error("Load error", err);
+      }
+    }
+
+    if (tripId && !smartItinerary && !isGenerating) {
+      loadOrGenerate();
+    }
+    
+    return () => { active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripId, generate]);
 
   // Handle manual updates (visited, remove)
   // Since we have slots now, finding the place is a bit deeper.
