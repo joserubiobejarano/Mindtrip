@@ -809,7 +809,7 @@ Add the ability to create and edit trip content:
   
 - [ ] **Itinerary Enhancements**:
   - Display structured smart itineraries (slots, themes, area clusters)
-  - Streaming itinerary generation with progress indicators
+  - Smart itinerary generation with structured JSON format
   - Itinerary chat editing (natural language editing via chat interface)
   - Mark places as visited
   - Remove places from itinerary

@@ -109,15 +109,16 @@ npm run dev
 - Smart itinerary caching and regeneration
 
 ### Phase 14 - Enhanced Smart Itinerary System ✅
-- Structured itinerary schema using Zod validation
-- Streaming itinerary generation with real-time progress updates
-- Itinerary chat editing (natural language editing of existing itineraries)
-- Place-level updates (mark as visited, remove from itinerary)
+- Structured itinerary schema using Zod validation (itinerary-schema.ts)
+- Smart itinerary generation with structured JSON format (SmartItinerary type)
+- Itinerary chat editing API (natural language editing via `/api/trips/[tripId]/itinerary-chat`)
+- Place-level updates API (mark as visited, remove places via `/api/trips/[tripId]/smart-itinerary/place`)
 - Slot-based day structure (morning, afternoon, evening with grouped places)
-- Enhanced itinerary UI with image galleries and lightbox
+- Enhanced itinerary UI with image galleries and lightbox viewer
 - Area clustering and neighborhood-based place grouping
 - Trip tips and practical micro-tips in daily overviews
 - Place photos, descriptions, and tags in structured format
+- Automatic photo enrichment from Google Places API
 
 ### Phase 12 - Accommodation & Hotel Search ✅
 - Hotel search functionality using Google Places API
@@ -129,6 +130,8 @@ npm run dev
 - Set accommodation for trip
 - Dedicated "Stay" page for accommodation search
 - Map integration for hotel locations
+- Accommodation auto-suggestion API (`/api/accommodation/find`)
+- Automatic best hotel recommendation based on trip destination
 
 ### Phase 13 - Google Places Integration ✅
 - Full Google Places API integration
@@ -180,7 +183,6 @@ mindtrip/
 - **Authentication:** Clerk (Email/Password + Google OAuth)
 - **Maps:** Mapbox GL JS + Mapbox Directions API
 - **AI:** OpenAI GPT-4o-mini (for day planning and itinerary generation)
-- **AI SDK:** Vercel AI SDK (`ai` package) with `@ai-sdk/openai` for structured streaming
 - **Schema Validation:** Zod (for itinerary schema validation)
 - **State Management:** React Query (TanStack Query)
 - **Date Utilities:** date-fns
@@ -203,7 +205,7 @@ mindtrip/
 5. Run the SQL schema in Supabase
 6. Run additional migrations for saved_places, trip_chat_messages, and smart_itineraries tables
 7. Enable Realtime for required tables
-8. Install dependencies: `npm install` (includes Vercel AI SDK packages)
+8. Install dependencies: `npm install`
 9. Start developing!
 
 ## 📊 Current Status
@@ -213,12 +215,12 @@ mindtrip/
 **Key Features Implemented:**
 - ✅ Full trip planning and collaboration
 - ✅ AI-powered day planning and smart itineraries
-- ✅ Streaming itinerary generation with real-time progress
-- ✅ Natural language itinerary editing via chat
-- ✅ Structured itinerary schema with Zod validation
-- ✅ Trip Assistant chat interface
-- ✅ Hotel/accommodation search
-- ✅ Google Places integration
+- ✅ Structured itinerary generation with Zod schema validation
+- ✅ Natural language itinerary editing via chat API
+- ✅ Place-level updates (mark visited, remove from itinerary)
+- ✅ Trip Assistant chat interface with message history
+- ✅ Hotel/accommodation search with auto-suggestion
+- ✅ Google Places integration with photo enrichment
 - ✅ Expense tracking and checklists
 - ✅ Public sharing and PDF export
 

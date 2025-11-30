@@ -93,15 +93,16 @@ This document tracks the development progress of the MindTrip travel planning ap
 
 ### Phase 14 - Enhanced Smart Itinerary System
 - [x] Structured itinerary schema using Zod validation (itinerary-schema.ts)
-- [x] Streaming itinerary generation using Vercel AI SDK streamObject
-- [x] Real-time progress updates during itinerary generation
-- [x] Itinerary chat editing (natural language editing of existing itineraries)
-- [x] Place-level updates (mark as visited, remove from itinerary)
+- [x] Smart itinerary generation with structured JSON format (SmartItinerary type)
+- [x] Itinerary chat editing API (natural language editing of existing itineraries via `/api/trips/[tripId]/itinerary-chat`)
+- [x] Place-level updates API (mark as visited, remove from itinerary via `/api/trips/[tripId]/smart-itinerary/place`)
 - [x] Slot-based day structure (morning, afternoon, evening with grouped places)
-- [x] Enhanced itinerary UI with image galleries and lightbox
+- [x] Enhanced itinerary UI with image galleries and lightbox viewer
 - [x] Area clustering and neighborhood-based place grouping
 - [x] Trip tips and practical micro-tips in daily overviews
 - [x] Place photos, descriptions, and tags in structured format
+- [x] Dual itinerary system support (legacy AiItinerary format and new SmartItinerary format)
+- [x] Automatic photo enrichment from Google Places API for places and days
 
 ### Phase 12 - Accommodation & Hotel Search
 - [x] Hotel search functionality using Google Places API
@@ -113,7 +114,8 @@ This document tracks the development progress of the MindTrip travel planning ap
 - [x] Set accommodation for trip
 - [x] Dedicated "Stay" page for accommodation search
 - [x] Map integration for hotel locations
-- [x] Accommodation auto-suggestion API endpoint
+- [x] Accommodation auto-suggestion API endpoint (`/api/accommodation/find`)
+- [x] Automatic best hotel recommendation based on trip destination
 
 ### Phase 13 - Google Places Integration
 - [x] Full Google Places API integration
@@ -184,42 +186,87 @@ _No known issues currently documented_
 - Mapbox token is required for map and geocoding features
 - Google Maps API key is required for Places API, hotel search, and place photos
 - OpenAI API key is required for AI day planning, smart itineraries, and Trip Assistant chat
-- Vercel AI SDK (`ai` and `@ai-sdk/openai` packages) is required for structured streaming itinerary generation
 - Additional database tables may need to be created manually:
   - `trip_chat_messages` - for Trip Assistant chat history
-  - `smart_itineraries` - for cached AI-generated itineraries (stores structured JSON with Zod schema)
+  - `smart_itineraries` - for cached AI-generated itineraries (stores structured JSON with Zod schema validation)
   - `saved_places` - migration file exists in `database/migrations/supabase-add-saved-places-table.sql`
+- Two itinerary systems are supported:
+  - Legacy: `/api/ai-itinerary` - returns AiItinerary format (simpler structure)
+  - New: `/api/trips/[tripId]/smart-itinerary` - returns SmartItinerary format (structured with slots, area clusters, trip tips)
+
+## 🔌 API Endpoints Reference
+
+### AI & Itinerary Generation
+- `POST /api/ai/plan-day` - Generate AI activity suggestions for a specific day
+  - Body: `{ tripId: string, dayId: string }`
+  - Returns: `{ activities: PlannedActivity[] }`
+
+- `POST /api/ai-itinerary` - Generate legacy format itinerary (AiItinerary)
+  - Body: `{ tripId: string }`
+  - Returns: `{ itinerary: AiItinerary, fromCache: boolean }`
+
+- `POST /api/trips/[tripId]/smart-itinerary` - Generate new format smart itinerary (SmartItinerary)
+  - Returns: `SmartItinerary` (structured format with slots, area clusters, trip tips)
+
+- `GET /api/trips/[tripId]/smart-itinerary?mode=load` - Load existing smart itinerary
+  - Returns: `SmartItinerary` or 404 if not found
+
+- `POST /api/trips/[tripId]/itinerary-chat` - Edit itinerary via natural language chat
+  - Body: `{ message: string }`
+  - Returns: Updated `SmartItinerary`
+
+- `PATCH /api/trips/[tripId]/smart-itinerary/place` - Update place in itinerary
+  - Body: `{ dayId: string, placeId: string, visited?: boolean, remove?: boolean }`
+  - Returns: `{ success: boolean }`
+
+### Trip Assistant
+- `POST /api/trips/[tripId]/chat` - Send message to Trip Assistant
+  - Body: `{ message: string }`
+  - Returns: `{ message: string }` (assistant response)
+  - Persists conversation history in `trip_chat_messages` table
+
+### Accommodation
+- `POST /api/accommodation/find` - Find best accommodation for a trip
+  - Body: `{ tripId: string }`
+  - Returns: `{ accommodation: AccommodationResult }`
+  - Automatically saves to trip's `auto_accommodation` field
+
+### Travel Intent (Future)
+- `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates
 
-- **2025-01-XX**: Enhanced Smart Itinerary System (Phase 14)
-  - Implemented structured itinerary schema using Zod validation for type-safe itinerary generation
-  - Added streaming itinerary generation with real-time progress updates using Vercel AI SDK streamObject
-  - Created itinerary chat editing feature - users can edit itineraries via natural language chat
-  - Added place-level update API (mark as visited, remove places) with optimistic UI updates
-  - Enhanced itinerary UI with image galleries, lightbox viewer, and slot-based day structure
+- **2025-01-XX**: Enhanced Smart Itinerary System (Phase 14) - Complete
+  - Implemented structured itinerary schema using Zod validation (`itinerary-schema.ts`) for type-safe itinerary generation
+  - Created new SmartItinerary format with slot-based structure (morning/afternoon/evening) and area clustering
+  - Implemented itinerary chat editing API (`/api/trips/[tripId]/itinerary-chat`) - natural language editing of existing itineraries
+  - Added place-level update API (`/api/trips/[tripId]/smart-itinerary/place`) - mark places as visited or remove from itinerary
+  - Enhanced itinerary UI with image galleries, lightbox viewer, and structured day display
   - Improved place organization with area clustering and neighborhood-based grouping
   - Added trip tips section with season-specific and date-based practical advice
-  - Integrated place photos, descriptions, and tags in structured format
-  - New dependencies: `@ai-sdk/openai` (Vercel AI SDK OpenAI adapter), `ai` package (Vercel AI SDK)
-  - Created `itinerary-schema.ts` with Zod schemas for type validation
-  - Updated `itinerary.ts` types to match new structured schema
+  - Integrated automatic photo enrichment from Google Places API for places and day hero images
+  - Created `itinerary-schema.ts` with Zod schemas for runtime validation
+  - Updated `itinerary.ts` types to match new structured SmartItinerary schema
+  - Note: Both legacy AiItinerary format (`/api/ai-itinerary`) and new SmartItinerary format (`/api/trips/[tripId]/smart-itinerary`) are supported
 
-- **2025-01-XX**: Major feature additions and roadmap update
-  - Added Trip Assistant chat interface with AI-powered trip planning assistance
-  - Implemented Smart Itinerary generation with full multi-day planning
-  - Added hotel/accommodation search with Google Places integration
-  - Created dedicated Stay page for finding accommodations
-  - Integrated Google Places API for place search, photos, and details
-  - Updated roadmap to reflect all completed features
-  - Documented current project state and remaining work
+- **2025-01-XX**: Accommodation & Hotel Search (Phase 12) - Complete
+  - Added accommodation auto-suggestion API endpoint (`/api/accommodation/find`)
+  - Implemented automatic best hotel recommendation based on trip destination using Google Places API
+  - Hotel search results sorted by rating and review count
+  - Integration with trip accommodation storage
 
-- **2025-01-XX**: Mobile roadmap and feature documentation
-  - Created comprehensive mobile app roadmap (see [mobile-roadmap.md](./mobile-roadmap.md))
-  - Documented AI day planning feature
-  - Documented user settings and preferences
-  - Documented route optimization and place saving features
-  - Updated roadmap with all completed features
+- **2025-01-XX**: AI-Powered Trip Assistant & Smart Features (Phase 11) - Complete
+  - Added Trip Assistant chat interface (`/api/trips/[tripId]/chat`) with AI-powered trip planning assistance
+  - Implemented chat message persistence and history in `trip_chat_messages` table
+  - Context-aware trip assistance (considers trip details, dates, destination)
+  - Smart Itinerary generation with full multi-day planning
+  - Integration with saved places in itinerary generation
+
+- **2025-01-XX**: Google Places Integration (Phase 13) - Complete
+  - Full Google Places API integration for place search, photos, and details
+  - Server-side place photo API for secure photo fetching
+  - Place type filtering and nearby search functionality
+  - Saved places integration with Explore tab
 
 - **2025-11-22**: Code cleanup and organization
   - Removed legacy `itinerary-panel.tsx` component
