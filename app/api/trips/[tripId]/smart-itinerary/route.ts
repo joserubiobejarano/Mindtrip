@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getOpenAIClient } from '@/lib/openai';
 import { SmartItinerary } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
+import { findPlacePhoto } from '@/lib/google/places-server';
 
 export const maxDuration = 300;
 
@@ -172,6 +173,30 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     console.log('[smart-itinerary] validated itinerary for trip', tripId, 'days:', validatedItinerary.days.length);
+
+    // Enrich places with photos from Google Places API
+    const destination = trip.destination_name || trip.title;
+    const cityOrArea = destination;
+    
+    // Enrich all days in parallel, but places sequentially within each day to avoid rate limits
+    await Promise.all(validatedItinerary.days.map(async (day) => {
+      // Enrich each place's photos sequentially
+      for (const slot of day.slots) {
+        for (const place of slot.places) {
+          // Only enrich if photos array is empty or missing
+          if (!place.photos || place.photos.length === 0) {
+            const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+            place.photos = photoUrl ? [photoUrl] : [];
+          }
+        }
+      }
+      
+      // Set day.photos from place photos (first 4 photos from all places in the day)
+      const allPlacePhotos = day.slots.flatMap(slot => 
+        slot.places.flatMap(place => place.photos || [])
+      );
+      day.photos = allPlacePhotos.slice(0, 4);
+    }));
 
     // Save to Supabase - content is the SmartItinerary object directly, not wrapped
     const { data, error } = await supabase

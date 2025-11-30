@@ -475,18 +475,29 @@ export function ItineraryTab({
                                                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                                                    <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
                                                    <div className="flex gap-2 self-start">
-                                                     <Button
-                                                       size="sm"
-                                                       variant={place.visited ? "default" : "outline"}
+                                                     <button
                                                        onClick={(e) => {
                                                          e.stopPropagation();
                                                          handleUpdatePlace(day.id, place.id, { visited: !place.visited });
                                                        }}
-                                                       className={`h-7 px-3 text-xs gap-1.5 ${place.visited ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
+                                                       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 gap-1.5 ${
+                                                         place.visited
+                                                           ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                                           : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                                                       }`}
                                                      >
                                                        {place.visited && <Check className="h-3 w-3" />}
-                                                       Visited
-                                                     </Button>
+                                                       {place.visited ? "Visited" : "Mark as visited"}
+                                                     </button>
+                                                     <button
+                                                       onClick={(e) => {
+                                                         e.stopPropagation();
+                                                         handleUpdatePlace(day.id, place.id, { remove: true });
+                                                       }}
+                                                       className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition h-7"
+                                                     >
+                                                       Remove
+                                                     </button>
                                                    </div>
                                                  </div>
                                                  <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
