@@ -63,6 +63,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       system,
       prompt: userPrompt,
       schema: smartItinerarySchema,
+      onFinish: async ({ object }) => {
+        if (object) {
+          const supabase = await createClient();
+          await supabase.from('smart_itineraries').upsert({
+            trip_id: tripId,
+            content: object,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'trip_id' });
+        }
+      }
     });
 
     return result.toTextStreamResponse();

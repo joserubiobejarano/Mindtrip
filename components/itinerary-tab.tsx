@@ -76,9 +76,14 @@ export function ItineraryTab({
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
 
-  const generate = useCallback(async () => {
+  const generateSmartItinerary = useCallback(async () => {
     setIsGenerating(true);
-    setIsLoading(false); // We're now generating, not loading
+    // Note: We don't set isLoading(false) here because loadOrGenerate handles the transition
+    // But if called manually (Retry), we should ensure loading is false so the generation UI shows.
+    // However, the user logic says "setIsLoading(false); // switch from 'loading existing' to 'generating'"
+    // So we rely on the caller or this function to manage that state.
+    // Let's ensure isLoading is false so the generation card shows.
+    setIsLoading(false); 
     setLoadingError(null);
     setProgressLines(['Starting your itinerary...']);
     
@@ -114,8 +119,6 @@ export function ItineraryTab({
               // This is usually the partial object or final object
               setSmartItinerary(json.value as SmartItinerary);
             }
-            // Handling finish? The user code uses isGenerating false inside object check. 
-            // I'll set it false at the end of loop.
           } catch (e) {
              // ignore parse errors for partial chunks if needed
           }
@@ -129,59 +132,62 @@ export function ItineraryTab({
     }
   }, [tripId]);
 
+  const loadOrGenerate = useCallback(async () => {
+    if (!tripId) return;
+
+    setIsLoading(true);
+    setErrorState(null); // Helper to clear error
+
+    try {
+      const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
+
+      // CASE 1: no existing itinerary → trigger generation
+      if (res.status === 404) {
+        // No existing itinerary; start generation
+        setIsLoading(false); // switch from "loading existing" to "generating"
+        await generateSmartItinerary(); // use the same helper used elsewhere for generation / streaming
+        return;
+      }
+
+      // CASE 2: any other non-OK status → show error
+      if (!res.ok) {
+        throw new Error(`Failed to load itinerary: ${res.status}`);
+      }
+
+      // CASE 3: we have data → hydrate state
+      const data = await res.json();
+      // The GET handler returns { itinerary: data.content }
+      if (data.itinerary) {
+        setSmartItinerary(data.itinerary);
+      }
+    } catch (err) {
+      console.error('[itinerary-tab] loadOrGenerate error', err);
+      setLoadingError('Failed to load itinerary. Please try again.');
+    } finally {
+      // Only end the "loading existing" state here.
+      // During generation, `isGenerating` should control the UI.
+      // If we started generation (CASE 1), isLoading was already set to false there.
+      // If we finished loading (CASE 3) or error (CASE 2), we want isLoading false.
+      // However, if we called generateSmartItinerary, it is async and we awaited it?
+      // Yes, we awaited it. So when it returns, generation is done.
+      // So setting isLoading(false) here is safe.
+      setIsLoading(false);
+    }
+  }, [tripId, generateSmartItinerary]);
+
+  // Wrapper to set error state easily
+  const setErrorState = (msg: string | null) => {
+    setLoadingError(msg);
+  };
+
   // 1. Load existing or start generation
   useEffect(() => {
-    let active = true;
-
-    async function loadOrGenerate() {
-      if (!tripId) return;
-      
-      setIsLoading(true);
-      setLoadingError(null);
-      
-      try {
-        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
-        
-        if (res.status === 404) {
-          // No itinerary yet → trigger generation logic (streaming POST)
-          if (active) {
-            setIsLoading(false);
-            await generate();
-          }
-          return;
-        }
-        
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({ error: 'unknown' }));
-          console.error('[itinerary-tab] load error', errorData);
-          if (active) {
-            setLoadingError('Failed to load itinerary. Please try again.');
-            setIsLoading(false);
-          }
-          return;
-        }
-
-        const data = await res.json();
-        if (active && data.itinerary) {
-          setSmartItinerary(data.itinerary);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error('[itinerary-tab] load error', err);
-        if (active) {
-          setLoadingError('Failed to load itinerary. Please try again.');
-          setIsLoading(false);
-        }
-      }
-    }
-
+    // Only run if we haven't loaded yet and aren't generating
     if (tripId && !smartItinerary && !isGenerating) {
       loadOrGenerate();
     }
-    
-    return () => { active = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripId, generate]);
+  }, [tripId]); // Only depend on tripId to avoid loops
 
   // Handle manual updates (visited, remove)
   // Since we have slots now, finding the place is a bit deeper.
@@ -568,31 +574,7 @@ export function ItineraryTab({
               </CardHeader>
               <CardContent>
                 <Button 
-                  onClick={() => {
-                    setLoadingError(null);
-                    setIsLoading(true);
-                    // Retry loading
-                    fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`)
-                      .then(async (res) => {
-                        if (res.status === 404) {
-                          await generate();
-                        } else if (res.ok) {
-                          const data = await res.json();
-                          if (data.itinerary) {
-                            setSmartItinerary(data.itinerary);
-                            setIsLoading(false);
-                          }
-                        } else {
-                          setLoadingError('Failed to load itinerary. Please try again.');
-                          setIsLoading(false);
-                        }
-                      })
-                      .catch((err) => {
-                        console.error('[itinerary-tab] retry error', err);
-                        setLoadingError('Failed to load itinerary. Please try again.');
-                        setIsLoading(false);
-                      });
-                  }} 
+                  onClick={() => loadOrGenerate()}
                   variant="outline" 
                   className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
                 >
