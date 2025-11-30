@@ -7,7 +7,7 @@ export const itineraryPlaceSchema = z.object({
   area: z.string().describe("Neighborhood or area name, e.g. 'Gothic Quarter'"),
   neighborhood: z.string().nullable().describe("Specific neighborhood if applicable"),
   photos: z.array(z.string()).describe("Array of photo URLs"),
-  visited: z.boolean().default(false),
+  visited: z.boolean().describe("Whether the place has been visited (should be false for new itineraries)"),
   tags: z.array(z.string()).describe("Tags like 'food', 'viewpoint', 'history'"),
 });
 

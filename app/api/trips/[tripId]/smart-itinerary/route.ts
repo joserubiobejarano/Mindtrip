@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getOpenAIClient } from '@/lib/openai';
-import { isSmartItinerary, SmartItinerary } from '@/types/itinerary';
+import { SmartItinerary } from '@/types/itinerary';
+import { smartItinerarySchema } from '@/types/itinerary-schema';
 
 export const maxDuration = 300;
 
@@ -56,10 +57,47 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       2. Content:
          - In each day's "overview", include practical micro-tips (best time to visit, ticket warnings, busy hours).
          - In "tripTips", include season- and date-based advice (weather, holidays, opening hours, local events) specific to the trip dates.
-         - Use "visited" = false.
+         - Use "visited" = false for all places.
          - Fill "tags" with relevant keywords.
       
-      3. OUTPUT ONLY JSON matching the SmartItinerary schema. Do not include any text outside the JSON structure. Reply ONLY with a single JSON object that matches the SmartItinerary schema. Do not include any explanation or markdown.
+      3. EXACT JSON SCHEMA (you MUST return exactly this structure):
+      {
+        "title": string,
+        "summary": string,
+        "days": [
+          {
+            "id": string (UUID),
+            "index": number (0-based),
+            "date": string (ISO date),
+            "title": string,
+            "theme": string,
+            "areaCluster": string,
+            "photos": string[],
+            "overview": string,
+            "slots": [
+              {
+                "label": "morning" | "afternoon" | "evening",
+                "summary": string,
+                "places": [
+                  {
+                    "id": string (UUID),
+                    "name": string,
+                    "description": string,
+                    "area": string,
+                    "neighborhood": string | null,
+                    "photos": string[],
+                    "visited": boolean (always false),
+                    "tags": string[]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tripTips": string[]
+      }
+      
+      4. OUTPUT ONLY JSON matching the SmartItinerary schema. Do not include any text outside the JSON structure. Reply ONLY with a single JSON object that matches the SmartItinerary schema. Do not include any explanation or markdown. Do not wrap the response in any other object.
     `;
 
     const userPrompt = `Trip details:\n${JSON.stringify(tripMeta)}\n\nGenerate the full itinerary.`;
@@ -106,26 +144,42 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     // Log raw object from model for debugging
-    console.log('[smart-itinerary] raw object from model:', JSON.stringify(itinerary, null, 2));
+    console.log('[smart-itinerary] SMART_ITINERARY_RAW_MODEL_OUTPUT:', JSON.stringify(itinerary, null, 2));
 
-    // Validate the itinerary structure before saving
-    if (!isSmartItinerary(itinerary)) {
-      console.error('[smart-itinerary] Invalid itinerary shape', JSON.stringify(itinerary, null, 2));
+    // Validate the itinerary structure using Zod schema
+    let validatedItinerary: SmartItinerary;
+    try {
+      validatedItinerary = smartItinerarySchema.parse(itinerary) as SmartItinerary;
+    } catch (validationError: any) {
+      // Serialize error without circular refs
+      const errorDetails = {
+        name: validationError?.name,
+        message: validationError?.message,
+        issues: validationError?.issues || validationError?.errors || [],
+        stack: validationError?.stack?.split('\n').slice(0, 5), // First 5 lines of stack
+      };
+      
+      console.error('[smart-itinerary] SMART_ITINERARY_SCHEMA_ERROR:', JSON.stringify(errorDetails, null, 2));
+      console.error('[smart-itinerary] SMART_ITINERARY_RAW_MODEL_OUTPUT:', JSON.stringify(itinerary, null, 2));
+      
       return NextResponse.json(
-        { error: 'Model returned an invalid itinerary payload' },
+        { 
+          error: 'Invalid itinerary payload', 
+          details: errorDetails 
+        },
         { status: 500 },
       );
     }
 
-    console.log('[smart-itinerary] validated itinerary for trip', tripId, 'days:', itinerary.days.length);
+    console.log('[smart-itinerary] validated itinerary for trip', tripId, 'days:', validatedItinerary.days.length);
 
-    // Save to Supabase
+    // Save to Supabase - content is the SmartItinerary object directly, not wrapped
     const { data, error } = await supabase
       .from('smart_itineraries')
       .upsert(
         {
           trip_id: tripId,
-          content: itinerary as SmartItinerary, // content column should be jsonb
+          content: validatedItinerary, // content column should be jsonb, storing SmartItinerary directly
           updated_at: new Date().toISOString()
         },
         { onConflict: 'trip_id' },
@@ -144,8 +198,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     console.log('[smart-itinerary] saved itinerary row for trip', tripId);
 
     // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
+    // No wrapping - data.content is the SmartItinerary itself
     return NextResponse.json(
-      data.content,
+      data.content as SmartItinerary,
       { status: 200 },
     );
   } catch (err: any) {
