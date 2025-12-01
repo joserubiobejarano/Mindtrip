@@ -4,13 +4,13 @@ import type { ExplorePlace } from '@/lib/google/explore-places';
 
 interface SwipeableCardProps {
   place: ExplorePlace;
-  onSwipe: (direction: 'left' | 'right' | 'up') => void;
+  onSwipeLeft: () => void;
+  onSwipeRight: () => void;
+  onSwipeUp: () => void;
   disabled?: boolean;
 }
 
-export function SwipeableCard({ place, onSwipe, disabled = false }: SwipeableCardProps) {
-  console.log('SwipeableCard render', place?.name);
-
+export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, disabled = false }: SwipeableCardProps) {
   if (!place) {
     return (
       <div className="bg-red-500 text-white p-4 rounded-xl">

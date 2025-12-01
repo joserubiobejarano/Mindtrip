@@ -38,12 +38,10 @@ export function ExploreDeck({
   hideHeader = false,
 }: ExploreDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(-1);
-  const [places, setPlaces] = useState<ExplorePlace[]>([]);
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [selectedPlaceName, setSelectedPlaceName] = useState<string | undefined>(undefined);
   const [swipeHistory, setSwipeHistory] = useState<Array<{ placeId: string; action: 'like' | 'dislike' }>>([]);
-  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Build filters based on mode - memoized to prevent unnecessary re-renders
   // Use individual filter properties for stability instead of the whole filters object
@@ -72,62 +70,25 @@ export function ExploreDeck({
   ]);
 
   const { data: session } = useExploreSession(tripId);
-  const { data: placesData, isLoading, error: placesError, refetch: refetchPlaces } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot);
+  const { data, isLoading, error: placesError } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot);
   const swipeMutation = useSwipeAction(tripId);
   const { addToast } = useToast();
 
-  // Check if user has seen onboarding (stored in localStorage)
-  useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem('explore-onboarding-seen');
-    if (!hasSeenOnboarding && places.length > 0 && currentIndex >= 0) {
-      setShowOnboarding(true);
-    }
-  }, [places.length, currentIndex]);
+  // Derive places directly from hook result
+  const places = data?.places ?? [];
 
-  // Update local places when data changes - only depend on placesData
+  // Sync currentIndex with places.length
   useEffect(() => {
-    if (placesData?.places && placesData.places.length > 0) {
-      setPlaces((prevPlaces) => {
-        // If no previous places, replace with new ones
-        if (prevPlaces.length === 0) {
-          // Set index to last card when first loading
-          setCurrentIndex(placesData.places.length - 1);
-          return placesData.places;
-        }
-        
-        // Append new places (avoid duplicates)
-        const existingIds = new Set(prevPlaces.map(p => p.place_id));
-        const newPlaces = placesData.places.filter(p => !existingIds.has(p.place_id));
-        
-        if (newPlaces.length > 0) {
-          return [...prevPlaces, ...newPlaces];
-        }
-        
-        return prevPlaces;
+    if (places.length > 0) {
+      setCurrentIndex((prev) => {
+        // if index is uninitialized or out of range, go to last card
+        if (prev === -1 || prev >= places.length) return places.length - 1;
+        return prev;
       });
-    } else if (placesData?.places && placesData.places.length === 0) {
-      // If we get empty results, clear places
-      setPlaces([]);
+    } else {
       setCurrentIndex(-1);
     }
-  }, [placesData?.places]);
-
-  // Set currentIndex when places.length changes (for when places are removed via swipe)
-  const placesLength = places?.length ?? 0;
-  useEffect(() => {
-    if (places && placesLength > 0) {
-      // Only update if current index is out of bounds
-      setCurrentIndex((prevIndex) => {
-        if (prevIndex < 0 || prevIndex >= placesLength) {
-          return placesLength - 1;
-        }
-        return prevIndex;
-      });
-    } else if (places && placesLength === 0) {
-      setCurrentIndex(-1);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placesLength]);
+  }, [places.length]);
 
   const handleSwipe = async (direction: 'left' | 'right' | 'up') => {
     if (places.length === 0 || currentIndex < 0 || currentIndex >= places.length) return;
@@ -153,7 +114,7 @@ export function ExploreDeck({
         source: mode,
       });
 
-      // If limit reached, don't decrement index or remove place
+      // If limit reached, don't decrement index
       if (response.limitReached) {
         return;
       }
@@ -164,17 +125,8 @@ export function ExploreDeck({
         return newHistory.slice(0, 3); // Keep only last 3
       });
 
-      // Remove swiped place from local array immediately for snappy UI
-      setPlaces((prev) => prev.filter(p => p.place_id !== currentPlace.place_id));
-      
-      // Decrement index to show next card (since we're showing from top of stack)
-      setCurrentIndex((prev) => Math.max(0, prev - 1));
-
-      // If we're running low on cards, prefetch more
-      const remainingAfterRemoval = places.length - 1;
-      if (remainingAfterRemoval <= 3 && placesData?.hasMore) {
-        refetchPlaces();
-      }
+      // Decrement index to show next card (only on successful swipes where limitReached is false)
+      setCurrentIndex((prev) => prev - 1);
     } catch (error) {
       // Error handling is done in the mutation
       console.error('Swipe error:', error);
@@ -201,12 +153,6 @@ export function ExploreDeck({
       console.error('Undo error:', error);
     }
   };
-
-  const likedCount = session?.likedPlaces.length || 0;
-  const hasLikedPlaces = likedCount > 0;
-  const hasMoreCards = places.length > 0 && currentIndex >= 0;
-  const isLimitReached = session?.remainingSwipes != null && session.remainingSwipes === 0;
-  const isError = placesError !== null;
 
   const handleAddToDay = async () => {
     if (!session || session.likedPlaces.length === 0 || !dayId || !slot) return;
@@ -241,11 +187,8 @@ export function ExploreDeck({
       if (onAddToDay) {
         onAddToDay(session.likedPlaces);
       }
-
-      // Optionally close the drawer (handled by parent)
     } catch (error: any) {
       console.error('Error adding places to day:', error);
-      // Error handling can be added here
     }
   };
 
@@ -257,7 +200,7 @@ export function ExploreDeck({
     );
   }
 
-  if (isError) {
+  if (placesError) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <div className="text-sm text-destructive">Error loading places. Please try again.</div>
@@ -265,7 +208,7 @@ export function ExploreDeck({
     );
   }
 
-  if (!places || places.length === 0) {
+  if (places.length === 0) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <div className="text-sm text-muted-foreground">No places found. Try changing filters.</div>
@@ -284,15 +227,6 @@ export function ExploreDeck({
   }
 
   const currentPlace = places[currentIndex];
-  if (!currentPlace) {
-    return (
-      <div className="flex items-center justify-center w-full h-full">
-        <div className="text-sm text-muted-foreground">
-          No more places. Try changing filters.
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -300,7 +234,9 @@ export function ExploreDeck({
         <div className="relative w-full max-w-2xl max-h-[80vh] flex items-center justify-center">
           <SwipeableCard
             place={currentPlace}
-            onSwipe={handleSwipe}
+            onSwipeLeft={() => handleSwipe('left')}
+            onSwipeRight={() => handleSwipe('right')}
+            onSwipeUp={() => handleSwipe('up')}
             disabled={
               swipeMutation.isPending ||
               (session?.remainingSwipes != null && session.remainingSwipes <= 0)
@@ -341,7 +277,6 @@ export function ExploreDeck({
               {
                 onSuccess: () => {
                   setDetailsDrawerOpen(false);
-                  // Optionally remove from deck or keep it
                 },
               }
             );
