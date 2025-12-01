@@ -16,6 +16,7 @@ interface TripMapPanelProps {
   exploreCenter?: { lat: number; lng: number } | null;
   exploreZoom?: number;
   onExploreMarkerClick?: (id: string) => void;
+  activePlace?: { placeId: string; lat: number; lng: number } | null;
 }
 
 export function TripMapPanel({
@@ -27,6 +28,7 @@ export function TripMapPanel({
   exploreCenter,
   exploreZoom,
   onExploreMarkerClick,
+  activePlace,
 }: TripMapPanelProps) {
   const { data: trip } = useTrip(tripId);
   const { activities } = useActivities(selectedDayId || "");
@@ -155,6 +157,20 @@ export function TripMapPanel({
     return 12;
   }, [activeTab, exploreZoom]);
   
+  // Focus map on active place when it changes (Explore tab only)
+  useEffect(() => {
+    if (!mapInstance || activeTab !== "explore" || !activePlace) return;
+
+    const { lat, lng } = activePlace;
+    if (!lat || !lng || isNaN(lat) || isNaN(lng)) return;
+
+    mapInstance.panTo({ lat, lng });
+    const currentZoom = mapInstance.getZoom();
+    if (currentZoom !== undefined && currentZoom < 14) {
+      mapInstance.setZoom(14);
+    }
+  }, [mapInstance, activeTab, activePlace?.placeId, activePlace?.lat, activePlace?.lng]);
+
   // Update map center/zoom only when switching tabs (not on every explore state change)
   useEffect(() => {
     if (!mapInstance) return;

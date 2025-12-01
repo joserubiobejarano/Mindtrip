@@ -25,6 +25,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [exploreMarkers, setExploreMarkers] = useState<BaseMarker[]>([]);
   const [exploreCenter, setExploreCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [exploreZoom, setExploreZoom] = useState<number | undefined>(undefined);
+  const [activePlace, setActivePlace] = useState<{ placeId: string; lat: number; lng: number } | null>(null);
   const exploreMarkerClickHandlerRef = useRef<((id: string) => void) | null>(null);
   const supabase = createClient();
   const [ownerMemberChecked, setOwnerMemberChecked] = useState(false);
@@ -95,6 +96,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         exploreCenter={exploreCenter}
         exploreZoom={exploreZoom}
         onExploreMarkerClick={handleExploreMarkerClick}
+        activePlace={activePlace}
       >
         <TripTabs
           tripId={tripId}
@@ -110,6 +112,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
             setExploreZoom(zoom);
           }}
           onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
+          onActivePlaceChange={setActivePlace}
         />
       </TripShell>
     </GoogleMapsProvider>

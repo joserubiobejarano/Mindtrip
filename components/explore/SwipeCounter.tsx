@@ -1,7 +1,7 @@
 "use client";
 
 import { useExploreSession } from '@/hooks/use-explore';
-import { Infinity, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SwipeCounterProps {
@@ -14,55 +14,32 @@ export function SwipeCounter({ tripId, className }: SwipeCounterProps) {
 
   if (!session) return null;
 
-  // Hide for Pro users (unlimited)
-  if (session.remainingSwipes === null) {
-    return (
-      <div className={`flex items-center gap-2 text-sm text-muted-foreground ${className}`}>
-        <Infinity className="h-4 w-4" />
-        <span>Unlimited swipes</span>
-      </div>
-    );
-  }
+  // Only show when limit is reached for free users
+  const isLimitReached = session.remainingSwipes !== null && session.remainingSwipes === 0;
 
-  const isLimitReached = session.remainingSwipes === 0;
-  const isLowSwipes = !isLimitReached && session.remainingSwipes <= 3;
+  if (!isLimitReached) return null;
 
   return (
-    <div className={`flex items-center gap-2 text-sm ${className}`}>
-      <span className={isLimitReached ? 'text-destructive font-medium' : isLowSwipes ? 'text-amber-600 font-medium' : 'text-muted-foreground'}>
-        {session.remainingSwipes} swipe{session.remainingSwipes !== 1 ? 's' : ''} remaining
-      </span>
-      {isLimitReached && (
-        <Button
-          variant="default"
-          size="sm"
-          className="ml-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-          onClick={() => {
-            window.location.href = '/settings?upgrade=true';
-          }}
-        >
-          <Sparkles className="h-3 w-3 mr-1" />
-          Upgrade to Pro
-        </Button>
-      )}
-      {isLowSwipes && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="ml-2 border-purple-200 text-purple-700 hover:bg-purple-50"
-          onClick={() => {
-            window.location.href = '/settings?upgrade=true';
-          }}
-        >
-          <Sparkles className="h-3 w-3 mr-1" />
-          Upgrade
-        </Button>
-      )}
-      {!isLimitReached && !isLowSwipes && session.remainingSwipes <= 10 && (
-        <span className="text-xs text-muted-foreground">
-          (Trip limit: {session.dailyLimit})
-        </span>
-      )}
+    <div className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 ${className}`}>
+      <div className="flex-1">
+        <p className="text-sm font-medium text-gray-900 mb-1">
+          You've reached the swipe limit for this trip.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Upgrade to continue discovering more places.
+        </p>
+      </div>
+      <Button
+        variant="default"
+        size="sm"
+        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        onClick={() => {
+          window.location.href = '/settings?upgrade=true';
+        }}
+      >
+        <Sparkles className="h-3 w-3 mr-1" />
+        Upgrade to Pro
+      </Button>
     </div>
   );
 }

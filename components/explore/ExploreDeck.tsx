@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Loader2, Heart, Undo2, X, ArrowUp, Info, Sparkles } from 'lucide-react';
+import { Loader2, Heart, Sparkles } from 'lucide-react';
 import { SwipeableCard } from './SwipeableCard';
-import { SwipeCounter } from './SwipeCounter';
+import { ExploreActions } from './ExploreActions';
 import { PlaceDetailsDrawer } from '@/components/place-details-drawer';
 import { useExplorePlaces, useExploreSession, useSwipeAction } from '@/hooks/use-explore';
 import type { ExplorePlace, ExploreFilters } from '@/lib/google/explore-places';
@@ -21,6 +21,7 @@ interface ExploreDeckProps {
   areaCluster?: string;
   onAddToItinerary?: () => void;
   onAddToDay?: (placeIds: string[]) => void;
+  onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
   className?: string;
   hideHeader?: boolean;
 }
@@ -34,6 +35,7 @@ export function ExploreDeck({
   areaCluster,
   onAddToItinerary,
   onAddToDay,
+  onActivePlaceChange,
   className,
   hideHeader = false,
 }: ExploreDeckProps) {
@@ -237,21 +239,63 @@ export function ExploreDeck({
 
   const currentPlace = places[currentIndex];
 
+  // Notify parent when active place changes (for map focus)
+  useEffect(() => {
+    if (!currentPlace || !onActivePlaceChange) return;
+    
+    onActivePlaceChange({
+      placeId: currentPlace.place_id,
+      lat: currentPlace.lat,
+      lng: currentPlace.lng,
+    });
+  }, [currentPlace?.place_id, onActivePlaceChange]);
+
+  const hasLikedPlaces = session && session.likedPlaces.length > 0;
+
   return (
     <>
-      <div className="flex items-center justify-center w-full h-full">
-        <div className="relative w-full max-w-2xl max-h-[80vh] flex items-center justify-center">
-          <SwipeableCard
-            place={currentPlace}
-            onSwipeLeft={handleSwipeLeft}
-            onSwipeRight={handleSwipeRight}
-            onSwipeUp={handleSwipeUp}
-            disabled={
-              swipeMutation.isPending ||
-              (session?.remainingSwipes != null && session.remainingSwipes <= 0)
-            }
-          />
+      <div className="flex flex-col items-center justify-center w-full h-full">
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="relative w-full max-w-[420px] lg:max-w-[480px] h-[78vh] flex items-center justify-center">
+            <SwipeableCard
+              place={currentPlace}
+              onSwipeLeft={handleSwipeLeft}
+              onSwipeRight={handleSwipeRight}
+              onSwipeUp={handleSwipeUp}
+              disabled={
+                swipeMutation.isPending ||
+                (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+              }
+            />
+          </div>
         </div>
+
+        {/* Action buttons */}
+        <ExploreActions
+          onUndo={handleUndo}
+          onDislike={handleSwipeLeft}
+          onLike={handleSwipeRight}
+          onDetails={handleSwipeUp}
+          canUndo={swipeHistory.length > 0}
+          disabled={
+            swipeMutation.isPending ||
+            (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+          }
+        />
+
+        {/* Trip-level "Add liked places to itinerary" CTA */}
+        {mode === 'trip' && hasLikedPlaces && onAddToItinerary && (
+          <div className="mt-6 px-4 w-full max-w-[420px] lg:max-w-[480px]">
+            <Button
+              onClick={onAddToItinerary}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
+              size="lg"
+            >
+              <Heart className="h-4 w-4 mr-2" />
+              Add {session.likedPlaces.length} liked place{session.likedPlaces.length !== 1 ? 's' : ''} to itinerary
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Place Details Drawer */}

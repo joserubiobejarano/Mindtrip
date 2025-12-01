@@ -20,6 +20,7 @@ interface TripTabsProps {
     zoom: number | undefined
   ) => void;
   onExploreMarkerClickRef?: React.MutableRefObject<((id: string) => void) | null>;
+  onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
 }
 
 export function TripTabs({
@@ -31,6 +32,7 @@ export function TripTabs({
   onTabChange,
   onExploreMapUpdate,
   onExploreMarkerClickRef,
+  onActivePlaceChange,
   initialTab,
 }: TripTabsProps & { initialTab?: string }) {
   const { data: trip } = useTrip(tripId);
@@ -84,6 +86,7 @@ export function TripTabs({
             tripId={tripId}
             onMapUpdate={onExploreMapUpdate}
             onMarkerClickRef={onExploreMarkerClickRef}
+            onActivePlaceChange={onActivePlaceChange}
           />
         </TabsContent>
         <TabsContent value="itinerary" forceMount className="h-full mt-0 data-[state=inactive]:hidden">

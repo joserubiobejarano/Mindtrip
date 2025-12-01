@@ -14,6 +14,7 @@ interface TripShellProps {
   exploreCenter?: { lat: number; lng: number } | null;
   exploreZoom?: number;
   onExploreMarkerClick?: (id: string) => void;
+  activePlace?: { placeId: string; lat: number; lng: number } | null;
 }
 
 export function TripShell({
@@ -26,6 +27,7 @@ export function TripShell({
   exploreCenter,
   exploreZoom,
   onExploreMarkerClick,
+  activePlace,
 }: TripShellProps) {
   const showMap = activeTab === "explore";
   
@@ -43,6 +45,7 @@ export function TripShell({
             exploreCenter={exploreCenter}
             exploreZoom={exploreZoom}
             onExploreMarkerClick={onExploreMarkerClick}
+            activePlace={activePlace}
           />
         </div>
       )}

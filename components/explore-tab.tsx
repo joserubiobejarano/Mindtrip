@@ -48,9 +48,10 @@ interface ExploreTabProps {
     zoom: number | undefined
   ) => void;
   onMarkerClickRef?: React.MutableRefObject<((id: string) => void) | null>;
+  onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
 }
 
-export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTabProps) {
+export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlaceChange }: ExploreTabProps) {
   const router = useRouter();
   const { data: trip } = useTrip(tripId);
   const { data: session, isLoading: sessionLoading } = useExploreSession(tripId);
@@ -123,16 +124,14 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
         <HotelSearchBanner tripId={tripId} className="p-4 border-b flex-shrink-0" />
       )}
 
-      {/* Filters + Swipe Counter Row - Compact at top */}
+      {/* Filters Row - Compact at top */}
       <div className="p-4 border-b flex-shrink-0">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex-1 min-w-0">
-            <ExploreFilters filters={filters} onFiltersChange={setFilters} />
-          </div>
-          <div className="flex-shrink-0">
-            <SwipeCounter tripId={tripId} />
-          </div>
-        </div>
+        <ExploreFilters filters={filters} onFiltersChange={setFilters} />
+      </div>
+
+      {/* Swipe limit message - only shown when limit is reached */}
+      <div className="px-4 pt-4 flex-shrink-0">
+        <SwipeCounter tripId={tripId} />
       </div>
 
       {/* Swipe Deck - Fills remaining space with large cards */}
@@ -143,6 +142,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
             filters={filters}
             mode="trip"
             onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
+            onActivePlaceChange={onActivePlaceChange}
             hideHeader={true}
           />
         </ExploreErrorBoundary>
