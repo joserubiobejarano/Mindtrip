@@ -166,7 +166,7 @@ export function ExploreDeck({
   const hasLikedPlaces = likedCount > 0;
   const hasMoreCards = places.length > 0 && currentIndex < places.length;
   const isLoadingMore = isLoading && places.length === 0;
-  const isLimitReached = session?.remainingSwipes !== null && session.remainingSwipes === 0;
+  const isLimitReached = session?.remainingSwipes !== null && session?.remainingSwipes === 0;
   const isError = placesError !== null || (placesData === undefined && !isLoading && places.length === 0);
 
   const handleAddToDay = async () => {
