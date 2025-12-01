@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Loader2, Heart, Undo2, X, ArrowUp, Info, Sparkles } from 'lucide-react';
@@ -44,14 +44,16 @@ export function ExploreDeck({
   const [swipeHistory, setSwipeHistory] = useState<Array<{ placeId: string; action: 'like' | 'dislike' }>>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Build filters based on mode
-  const effectiveFilters: ExploreFilters = mode === 'day' && dayId
-    ? {
-        ...filters,
-        neighborhood: areaCluster || filters.neighborhood,
-        timeOfDay: slot || filters.timeOfDay,
-      }
-    : filters;
+  // Build filters based on mode - memoized to prevent unnecessary re-renders
+  const effectiveFilters: ExploreFilters = useMemo(() => {
+    return mode === 'day' && dayId
+      ? {
+          ...filters,
+          neighborhood: areaCluster || filters.neighborhood,
+          timeOfDay: slot || filters.timeOfDay,
+        }
+      : filters;
+  }, [mode, dayId, areaCluster, slot, filters]);
 
   const { data: session } = useExploreSession(tripId);
   const { data: placesData, isLoading, error: placesError, refetch: refetchPlaces } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot);
@@ -241,7 +243,7 @@ export function ExploreDeck({
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
             <p className="text-lg font-medium mb-2 text-destructive">Unable to load places</p>
             <p className="text-sm text-muted-foreground mb-6 max-w-md">
-              We're having trouble loading places right now. Please check your connection and try again.
+              We&apos;re having trouble loading places right now. Please check your connection and try again.
             </p>
             <Button onClick={() => refetchPlaces()} variant="outline" size="lg">
               Try Again
