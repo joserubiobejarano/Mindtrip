@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserSubscriptionStatus, getUserDailySwipeLimit } from '@/lib/supabase/user-subscription';
+import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 
 export async function GET(
   req: NextRequest,
@@ -62,19 +62,20 @@ export async function GET(
       session = newSession;
     }
 
-    // Get subscription status and daily limit
-    const dailyLimit = await getUserDailySwipeLimit(userId);
+    // Get subscription status and trip limit
+    const FREE_SWIPE_LIMIT_PER_TRIP = 10;
     const { isPro } = await getUserSubscriptionStatus(userId);
 
     // Calculate remaining swipes (null for Pro users)
-    const remainingSwipes = isPro ? null : Math.max(0, dailyLimit - (session.swipe_count || 0));
+    const swipeCount = session.swipe_count || 0;
+    const remainingSwipes = isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount);
 
     return NextResponse.json({
       likedPlaces: session.liked_place_ids || [],
       discardedPlaces: session.discarded_place_ids || [],
-      swipeCount: session.swipe_count || 0,
+      swipeCount,
       remainingSwipes,
-      dailyLimit: isPro ? null : dailyLimit,
+      dailyLimit: isPro ? null : FREE_SWIPE_LIMIT_PER_TRIP, // Keep field name for backward compatibility
     });
   } catch (err) {
     console.error('GET /explore/session error:', err);

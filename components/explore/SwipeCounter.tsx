@@ -60,7 +60,7 @@ export function SwipeCounter({ tripId, className }: SwipeCounterProps) {
       )}
       {!isLimitReached && !isLowSwipes && session.remainingSwipes <= 10 && (
         <span className="text-xs text-muted-foreground">
-          (Daily limit: {session.dailyLimit})
+          (Trip limit: {session.dailyLimit})
         </span>
       )}
     </div>

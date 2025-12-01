@@ -62,6 +62,9 @@ export function ExploreDeck({
   const swipeMutation = useSwipeAction(tripId);
   const { addToast } = useToast();
 
+  // Temporary logging to verify hook is returning data
+  console.log('[ExploreDeck] places', placesData?.places?.length, 'loading', isLoading, 'error', placesError);
+
   // Check if user has seen onboarding (stored in localStorage)
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem('explore-onboarding-seen');
@@ -79,13 +82,16 @@ export function ExploreDeck({
       if (filtersChanged) {
         // Filter changed - replace places
         setPlaces(placesData.places);
-        setCurrentIndex(0);
+        // Start from the last card (top of stack)
+        setCurrentIndex(Math.max(0, placesData.places.length - 1));
         setPreviousFilters(effectiveFilters);
       } else {
         // Same filters - append new places (avoid duplicates)
         setPlaces((prevPlaces) => {
           // If no previous places, replace with new ones
           if (prevPlaces.length === 0) {
+            // Set index to last card when first loading
+            setCurrentIndex(Math.max(0, placesData.places.length - 1));
             return placesData.places;
           }
           
@@ -135,8 +141,8 @@ export function ExploreDeck({
       // Remove swiped place from local array immediately for snappy UI
       setPlaces((prev) => prev.filter(p => p.place_id !== currentPlace.place_id));
       
-      // Move to next card (index stays same since we removed current card)
-      // Don't increment currentIndex since we removed the current card
+      // Decrement index to show next card (since we're showing from top of stack)
+      setCurrentIndex((prev) => Math.max(0, prev - 1));
 
       // If we're running low on cards, prefetch more
       const remainingAfterRemoval = places.length - 1;
@@ -172,10 +178,9 @@ export function ExploreDeck({
 
   const likedCount = session?.likedPlaces.length || 0;
   const hasLikedPlaces = likedCount > 0;
-  const hasMoreCards = places.length > 0 && currentIndex < places.length;
-  const isLoadingMore = isLoading && places.length === 0;
+  const hasMoreCards = places.length > 0 && currentIndex >= 0;
   const isLimitReached = session?.remainingSwipes != null && session.remainingSwipes === 0;
-  const isError = placesError !== null || (placesData === undefined && !isLoading && places.length === 0);
+  const isError = placesError !== null;
 
   const handleAddToDay = async () => {
     if (!session || session.likedPlaces.length === 0 || !dayId || !slot) return;
@@ -260,14 +265,10 @@ export function ExploreDeck({
 
       {/* Card Stack */}
       <div className="flex-1 relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">
-        {isLoadingMore ? (
+        {isLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Loading places...</p>
-          </div>
-        ) : !isLoading && (!places || places.length === 0) ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-            <p className="text-sm text-muted-foreground">No places found. Try changing filters.</p>
+            <p className="text-sm text-muted-foreground">Loading places…</p>
           </div>
         ) : isError ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
@@ -279,13 +280,21 @@ export function ExploreDeck({
               Try Again
             </Button>
           </div>
+        ) : !places || places.length === 0 ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            <p className="text-sm text-muted-foreground">No places found. Try changing filters.</p>
+          </div>
+        ) : currentIndex < 0 ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            <p className="text-sm text-muted-foreground">No more places. Try changing filters.</p>
+          </div>
         ) : isLimitReached && !hasMoreCards ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-            <p className="text-lg font-medium mb-2">Daily swipe limit reached</p>
+            <p className="text-lg font-medium mb-2">Trip swipe limit reached</p>
             <p className="text-sm text-muted-foreground mb-6 max-w-md">
               {hasLikedPlaces
-                ? `You've reached your daily limit of ${session?.dailyLimit || 10} swipes. You've liked ${likedCount} place${likedCount !== 1 ? 's' : ''}. Upgrade to Pro for unlimited swipes!`
-                : `You've reached your daily limit of ${session?.dailyLimit || 10} swipes. Upgrade to Pro for unlimited swipes!`}
+                ? `You've reached your trip limit of ${session?.dailyLimit || 10} swipes. You've liked ${likedCount} place${likedCount !== 1 ? 's' : ''}. Upgrade to Pro for unlimited swipes!`
+                : `You've reached your trip limit of ${session?.dailyLimit || 10} swipes. Upgrade to Pro for unlimited swipes!`}
             </p>
             <div className="flex flex-col gap-3 items-center">
               {hasLikedPlaces && (
@@ -334,7 +343,7 @@ export function ExploreDeck({
             )}
           </div>
         ) : (
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full flex items-center justify-center">
             {/* Onboarding Tooltip */}
             {showOnboarding && (
               <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -390,7 +399,7 @@ export function ExploreDeck({
             )}
             <AnimatePresence mode="popLayout">
               {/* Show next 2 cards as preview - Larger cards for desktop, fill most of height */}
-              {places.slice(currentIndex, currentIndex + 3).map((place, idx) => {
+              {places.slice(Math.max(0, currentIndex), currentIndex + 3).map((place, idx) => {
                 const baseTransform = 'translate(-50%, -50%)';
                 const scaleTransform = idx > 0 ? `scale(${1 - idx * 0.05})` : '';
                 const translateYTransform = idx > 0 ? `translateY(${idx * 8}px)` : '';
@@ -399,7 +408,7 @@ export function ExploreDeck({
                 return (
                   <div
                     key={`${place.place_id}-${currentIndex + idx}`}
-                    className="absolute left-1/2 top-1/2 w-full max-w-2xl h-full max-h-[85vh]"
+                    className="absolute left-1/2 top-1/2 w-full max-w-2xl h-full max-h-[80vh]"
                     style={{
                       zIndex: 3 - idx,
                       transform: combinedTransform,

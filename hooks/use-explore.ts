@@ -156,7 +156,7 @@ export function useSwipeAction(tripId: string) {
             swipeCount: Math.max(0, previousSession.swipeCount - 1),
             remainingSwipes:
               previousSession.remainingSwipes !== null
-                ? Math.min(previousSession.dailyLimit || 0, (previousSession.remainingSwipes || 0) + 1)
+                ? Math.min(previousSession.dailyLimit || 10, (previousSession.remainingSwipes || 0) + 1)
                 : null,
           };
 
@@ -213,8 +213,8 @@ export function useSwipeAction(tripId: string) {
       // Show limit reached message and redirect to upgrade
       if (data.limitReached) {
         addToast({
-          title: 'Daily limit reached',
-          description: 'You\'ve reached your daily swipe limit. Upgrade to Pro for unlimited swipes!',
+          title: 'Trip limit reached',
+          description: 'You\'ve reached your trip swipe limit. Upgrade to Pro for unlimited swipes!',
           variant: 'default',
         });
         // Redirect to upgrade page

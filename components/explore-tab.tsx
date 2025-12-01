@@ -141,6 +141,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
           <ExploreDeck
             tripId={tripId}
             filters={filters}
+            mode="trip"
             onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
             hideHeader={true}
           />

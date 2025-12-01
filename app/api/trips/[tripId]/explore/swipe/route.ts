@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserSubscriptionStatus, getUserDailySwipeLimit } from '@/lib/supabase/user-subscription';
+import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 
 export async function POST(
   req: NextRequest,
@@ -81,47 +81,17 @@ export async function POST(
       );
     }
 
-    // Get subscription status and daily limit
-    const dailyLimit = await getUserDailySwipeLimit(userId);
+    // Get subscription status and trip limit
+    const FREE_SWIPE_LIMIT_PER_TRIP = 10;
     const { isPro } = await getUserSubscriptionStatus(userId);
+    const limit = isPro ? Infinity : FREE_SWIPE_LIMIT_PER_TRIP;
 
-    // Daily reset logic: Reset after 24 hours from first swipe of the day
-    // This is fair and doesn't require timezone lookups
-    const now = new Date();
-    const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-    
-    let swipeCount = 0;
-    let shouldReset = false;
-    
-    if (session) {
-      const lastSwipeAt = session.last_swipe_at
-        ? new Date(session.last_swipe_at)
-        : null;
-
-      // Reset if no last swipe or if it's been more than 24 hours
-      if (!lastSwipeAt) {
-        swipeCount = 0;
-        shouldReset = true;
-      } else {
-        const timeSinceLastSwipe = now.getTime() - lastSwipeAt.getTime();
-        
-        if (timeSinceLastSwipe >= TWENTY_FOUR_HOURS_MS) {
-          // More than 24 hours since last swipe - reset
-          swipeCount = 0;
-          shouldReset = true;
-        } else {
-          // Within 24 hours - keep current count
-          swipeCount = session.swipe_count || 0;
-        }
-      }
-    } else {
-      // No session - start fresh
-      swipeCount = 0;
-      shouldReset = true;
-    }
+    // Get current swipe count from session (per trip, no daily reset)
+    const swipeCount = session?.swipe_count || 0;
 
     // Check limit before mutating
-    if (!isPro && swipeCount >= dailyLimit) {
+    const limitReached = !isPro && swipeCount >= FREE_SWIPE_LIMIT_PER_TRIP;
+    if (limitReached) {
       return NextResponse.json({
         success: false,
         swipeCount,
@@ -137,7 +107,7 @@ export async function POST(
           success: false,
           error: 'No session found',
           swipeCount,
-          remainingSwipes: isPro ? null : Math.max(0, dailyLimit - swipeCount),
+          remainingSwipes: isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount),
           limitReached: false,
         });
       }
@@ -168,7 +138,7 @@ export async function POST(
           success: false,
           error: 'Place not found in session or cannot be undone',
           swipeCount,
-          remainingSwipes: isPro ? null : Math.max(0, dailyLimit - swipeCount),
+          remainingSwipes: isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount),
           limitReached: false,
         });
       }
@@ -186,7 +156,7 @@ export async function POST(
             liked_place_ids: currentLiked,
             discarded_place_ids: currentDiscarded,
             swipe_count: newSwipeCount,
-            last_swipe_at: session.last_swipe_at, // Keep original timestamp
+            last_swipe_at: session.last_swipe_at, // Keep timestamp for reference (not used in limit logic)
           },
           {
             onConflict: 'trip_id,user_id',
@@ -205,7 +175,7 @@ export async function POST(
 
       const remainingSwipes = isPro
         ? null
-        : Math.max(0, dailyLimit - newSwipeCount);
+        : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - newSwipeCount);
 
       return NextResponse.json({
         success: true,
@@ -226,7 +196,7 @@ export async function POST(
         success: false,
         error: 'Place already swiped',
         swipeCount,
-        remainingSwipes: isPro ? null : Math.max(0, dailyLimit - swipeCount),
+        remainingSwipes: isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount),
         limitReached: false,
       });
     }
@@ -243,10 +213,12 @@ export async function POST(
       updatedDiscarded.push(place_id);
     }
 
-    // Increment swipe count
+    // Increment swipe count only if limit not reached
+    // Note: We already checked limitReached above, so this should be safe
     const newSwipeCount = swipeCount + 1;
 
     // Upsert session
+    const now = new Date();
     const { data: updatedSession, error: updateError } = await supabase
       .from('explore_sessions')
       .upsert(
@@ -256,7 +228,7 @@ export async function POST(
           liked_place_ids: updatedLiked,
           discarded_place_ids: updatedDiscarded,
           swipe_count: newSwipeCount,
-          last_swipe_at: now.toISOString(),
+          last_swipe_at: now.toISOString(), // Keep for reference (not used in limit logic)
         },
         {
           onConflict: 'trip_id,user_id',
@@ -276,13 +248,13 @@ export async function POST(
     // Calculate remaining swipes
     const remainingSwipes = isPro
       ? null
-      : Math.max(0, dailyLimit - newSwipeCount);
+      : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - newSwipeCount);
 
     return NextResponse.json({
       success: true,
       swipeCount: newSwipeCount,
       remainingSwipes,
-      limitReached: !isPro && newSwipeCount >= dailyLimit,
+      limitReached: !isPro && newSwipeCount >= FREE_SWIPE_LIMIT_PER_TRIP,
     });
   } catch (err) {
     console.error('POST /explore/swipe error:', err);
