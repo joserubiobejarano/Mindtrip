@@ -100,7 +100,10 @@ export function ExploreDeck({
           if (res?.limitReached) return;
           // Track swipe in history for undo (max 3)
           setSwipeHistory((prev) => {
-            const newHistory = [{ placeId: place.place_id, action: 'dislike' }, ...prev];
+            const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
+              { placeId: place.place_id, action: 'dislike' as const },
+              ...prev,
+            ];
             return newHistory.slice(0, 3);
           });
           setCurrentIndex((prev) => prev - 1);
@@ -119,7 +122,10 @@ export function ExploreDeck({
           if (res?.limitReached) return;
           // Track swipe in history for undo (max 3)
           setSwipeHistory((prev) => {
-            const newHistory = [{ placeId: place.place_id, action: 'like' }, ...prev];
+            const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
+              { placeId: place.place_id, action: 'like' as const },
+              ...prev,
+            ];
             return newHistory.slice(0, 3);
           });
           setCurrentIndex((prev) => prev - 1);
