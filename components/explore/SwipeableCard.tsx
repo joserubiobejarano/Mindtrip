@@ -13,11 +13,12 @@ interface SwipeableCardProps {
 }
 
 export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, disabled = false }: SwipeableCardProps) {
-  if (!place) return null;
-
+  // Hooks must be called unconditionally before any early returns
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-8, 0, 8]);
+
+  if (!place) return null;
 
   const handleDragEnd = (_: any, info: { offset: { x: number; y: number } }) => {
     if (disabled) return;
