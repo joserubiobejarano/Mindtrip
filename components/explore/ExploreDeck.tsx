@@ -241,9 +241,59 @@ export function ExploreDeck({
     }
   };
 
+  // ============================================
+  // TEMPORARY DEBUG MODE - Simplified rendering
+  // ============================================
+  // TODO: Restore full functionality after debugging
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="text-sm text-muted-foreground">Loading places…</div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="text-sm text-destructive">Error loading places. Please try again.</div>
+      </div>
+    );
+  }
+
+  if (!places || places.length === 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="text-sm text-muted-foreground">No places found. Try changing filters.</div>
+      </div>
+    );
+  }
+
+  const place = places[0]; // just take the first place for now
+
+  return (
+    <div className="flex items-center justify-center w-full h-full">
+      <div className="bg-red-500 text-white p-6 rounded-2xl shadow-xl max-w-md w-full min-h-[300px] flex flex-col">
+        <div className="text-xs mb-2">DEBUG CARD</div>
+        <div className="text-lg font-semibold mb-2">{place.name ?? 'Unnamed place'}</div>
+        <div className="text-sm opacity-80 mb-4">
+          {place.address ?? 'No address'}
+        </div>
+        <div className="mt-auto text-xs opacity-80">
+          place_id: {place.place_id}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ============================================
+  // ORIGINAL CODE (COMMENTED OUT FOR DEBUGGING)
+  // ============================================
+  /*
   return (
     <div className={cn("flex flex-col h-full overflow-hidden", className)}>
-      {/* Header with swipe counter and undo button - Hidden when hideHeader is true */}
+      {/* Header with swipe counter and undo button - Hidden when hideHeader is true *//*
       {!hideHeader && (
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
           <h2 className="text-lg font-semibold">Discover Places</h2>
@@ -265,7 +315,7 @@ export function ExploreDeck({
         </div>
       )}
       
-      {/* Undo button - Show in corner when header is hidden */}
+      {/* Undo button - Show in corner when header is hidden *//*
       {hideHeader && swipeHistory.length > 0 && (
         <div className="absolute top-4 right-4 z-50">
           <Button
@@ -281,7 +331,7 @@ export function ExploreDeck({
         </div>
       )}
 
-      {/* Card Stack */}
+      {/* Card Stack *//*
       <div className="flex-1 relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">
         {isLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
@@ -362,7 +412,7 @@ export function ExploreDeck({
           </div>
         ) : (
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Onboarding Tooltip */}
+            {/* Onboarding Tooltip *//*
             {showOnboarding && (
               <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                 <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
@@ -416,7 +466,7 @@ export function ExploreDeck({
               </div>
             )}
             <AnimatePresence mode="popLayout">
-              {/* Show next 2 cards as preview - Larger cards for desktop, fill most of height */}
+              {/* Show next 2 cards as preview - Larger cards for desktop, fill most of height *//*
               {places.slice(Math.max(0, currentIndex), currentIndex + 3).map((place, idx) => {
                 const baseTransform = 'translate(-50%, -50%)';
                 const scaleTransform = idx > 0 ? `scale(${1 - idx * 0.05})` : '';
@@ -446,7 +496,7 @@ export function ExploreDeck({
               })}
             </AnimatePresence>
 
-            {/* Loading indicator when fetching more */}
+            {/* Loading indicator when fetching more *//*
             {isLoading && places.length > 0 && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -456,7 +506,7 @@ export function ExploreDeck({
         )}
       </div>
 
-      {/* Footer with action summary */}
+      {/* Footer with action summary *//*
       {hasLikedPlaces && (
         <div className="p-4 border-t bg-muted/50 flex-shrink-0">
           <div className="flex items-center justify-between gap-2">
@@ -480,7 +530,7 @@ export function ExploreDeck({
         </div>
       )}
 
-      {/* Place Details Drawer */}
+      {/* Place Details Drawer *//*
       <PlaceDetailsDrawer
         open={detailsDrawerOpen}
         onOpenChange={setDetailsDrawerOpen}
@@ -521,5 +571,6 @@ export function ExploreDeck({
       />
     </div>
   );
+  */
 }
 
