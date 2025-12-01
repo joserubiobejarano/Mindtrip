@@ -127,7 +127,7 @@ export function ExploreDeck({
   }, [places?.length]);
 
   const handleSwipe = async (direction: 'left' | 'right' | 'up') => {
-    if (places.length === 0 || currentIndex >= places.length) return;
+    if (places.length === 0 || currentIndex < 0 || currentIndex >= places.length) return;
 
     const currentPlace = places[currentIndex];
     if (!currentPlace) return;
@@ -144,11 +144,16 @@ export function ExploreDeck({
     const action: 'like' | 'dislike' = direction === 'right' ? 'like' : 'dislike';
     
     try {
-      await swipeMutation.mutateAsync({
+      const response = await swipeMutation.mutateAsync({
         placeId: currentPlace.place_id,
         action,
         source: mode,
       });
+
+      // If limit reached, don't decrement index or remove place
+      if (response.limitReached) {
+        return;
+      }
 
       // Track swipe in history for undo (max 3)
       setSwipeHistory((prev) => {
@@ -241,11 +246,6 @@ export function ExploreDeck({
     }
   };
 
-  // ============================================
-  // TEMPORARY DEBUG MODE - Simplified rendering
-  // ============================================
-  // TODO: Restore full functionality after debugging
-  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
@@ -270,21 +270,82 @@ export function ExploreDeck({
     );
   }
 
-  const place = places[0]; // just take the first place for now
-
-  return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="bg-red-500 text-white p-6 rounded-2xl shadow-xl max-w-md w-full min-h-[300px] flex flex-col">
-        <div className="text-xs mb-2">DEBUG CARD</div>
-        <div className="text-lg font-semibold mb-2">{place.name ?? 'Unnamed place'}</div>
-        <div className="text-sm opacity-80 mb-4">
-          {place.address ?? 'No address'}
-        </div>
-        <div className="mt-auto text-xs opacity-80">
-          place_id: {place.place_id}
+  if (currentIndex < 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="text-sm text-muted-foreground">
+          No more places. Try changing filters.
         </div>
       </div>
-    </div>
+    );
+  }
+
+  const currentPlace = places[currentIndex];
+  if (!currentPlace) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="text-sm text-muted-foreground">
+          No more places. Try changing filters.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="relative w-full max-w-2xl max-h-[80vh] flex items-center justify-center">
+          <SwipeableCard
+            place={currentPlace}
+            onSwipe={handleSwipe}
+            disabled={
+              swipeMutation.isPending ||
+              (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+            }
+          />
+        </div>
+      </div>
+
+      {/* Place Details Drawer */}
+      <PlaceDetailsDrawer
+        open={detailsDrawerOpen}
+        onOpenChange={setDetailsDrawerOpen}
+        placeId={selectedPlaceId}
+        placeName={selectedPlaceName}
+        onAddToPlan={() => {
+          // Handle add to plan (save to saved_places)
+          if (selectedPlaceId) {
+            const place = places.find(p => p.place_id === selectedPlaceId);
+            if (place && onAddToItinerary) {
+              // For now, just like the place and show message
+              // In future, can implement a separate "save to plan" action
+              swipeMutation.mutate(
+                { placeId: selectedPlaceId, action: 'like', source: mode },
+                {
+                  onSuccess: () => {
+                    setDetailsDrawerOpen(false);
+                  },
+                }
+              );
+            }
+          }
+        }}
+        onAddToItinerary={() => {
+          // Like the place when user clicks "Add to itinerary"
+          if (selectedPlaceId) {
+            swipeMutation.mutate(
+              { placeId: selectedPlaceId, action: 'like', source: mode },
+              {
+                onSuccess: () => {
+                  setDetailsDrawerOpen(false);
+                  // Optionally remove from deck or keep it
+                },
+              }
+            );
+          }
+        }}
+      />
+    </>
   );
 
   // ============================================
