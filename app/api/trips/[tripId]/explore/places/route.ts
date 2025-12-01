@@ -73,11 +73,11 @@ export async function GET(
     // Get query parameters for filters
     const neighborhood = url.searchParams.get('neighborhood') || undefined;
     const category = url.searchParams.get('category') || undefined;
-    const timeOfDay = url.searchParams.get('timeOfDay') || url.searchParams.get('time_of_day') as
-      | 'morning'
-      | 'afternoon'
-      | 'evening'
-      | undefined;
+    const timeOfDayParam = url.searchParams.get('timeOfDay') || url.searchParams.get('time_of_day');
+    const timeOfDay: 'morning' | 'afternoon' | 'evening' | undefined = 
+      timeOfDayParam && ['morning', 'afternoon', 'evening'].includes(timeOfDayParam)
+        ? (timeOfDayParam as 'morning' | 'afternoon' | 'evening')
+        : undefined;
     const dayId = url.searchParams.get('day_id') || undefined;
     const budget = url.searchParams.get('budget') ? parseInt(url.searchParams.get('budget')!, 10) : undefined;
     const maxDistance = url.searchParams.get('maxDistance') ? parseInt(url.searchParams.get('maxDistance')!, 10) : undefined;
