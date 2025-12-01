@@ -22,6 +22,7 @@ interface ExploreDeckProps {
   onAddToItinerary?: () => void;
   onAddToDay?: (placeIds: string[]) => void;
   className?: string;
+  hideHeader?: boolean;
 }
 
 export function ExploreDeck({
@@ -34,6 +35,7 @@ export function ExploreDeck({
   onAddToItinerary,
   onAddToDay,
   className,
+  hideHeader = false,
 }: ExploreDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [places, setPlaces] = useState<ExplorePlace[]>([]);
@@ -218,25 +220,43 @@ export function ExploreDeck({
 
   return (
     <div className={cn("flex flex-col h-full overflow-hidden", className)}>
-      {/* Header with swipe counter and undo button */}
-      <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
-        <h2 className="text-lg font-semibold">Discover Places</h2>
-        <div className="flex items-center gap-2 sm:gap-4">
-          {swipeHistory.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleUndo}
-              disabled={swipeMutation.isPending}
-              className="text-sm min-h-[44px] min-w-[44px] touch-manipulation"
-            >
-              <Undo2 className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Undo</span>
-            </Button>
-          )}
-          <SwipeCounter tripId={tripId} />
+      {/* Header with swipe counter and undo button - Hidden when hideHeader is true */}
+      {!hideHeader && (
+        <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
+          <h2 className="text-lg font-semibold">Discover Places</h2>
+          <div className="flex items-center gap-2 sm:gap-4">
+            {swipeHistory.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleUndo}
+                disabled={swipeMutation.isPending}
+                className="text-sm min-h-[44px] min-w-[44px] touch-manipulation"
+              >
+                <Undo2 className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Undo</span>
+              </Button>
+            )}
+            <SwipeCounter tripId={tripId} />
+          </div>
         </div>
-      </div>
+      )}
+      
+      {/* Undo button - Show in corner when header is hidden */}
+      {hideHeader && swipeHistory.length > 0 && (
+        <div className="absolute top-4 right-4 z-50">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleUndo}
+            disabled={swipeMutation.isPending}
+            className="text-sm min-h-[44px] min-w-[44px] touch-manipulation bg-white/90 backdrop-blur-sm shadow-md"
+          >
+            <Undo2 className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">Undo</span>
+          </Button>
+        </div>
+      )}
 
       {/* Card Stack */}
       <div className="flex-1 relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">
@@ -365,27 +385,34 @@ export function ExploreDeck({
               </div>
             )}
             <AnimatePresence mode="popLayout">
-              {/* Show next 2 cards as preview */}
-              {places.slice(currentIndex, currentIndex + 3).map((place, idx) => (
-                <div
-                  key={`${place.place_id}-${currentIndex + idx}`}
-                  className="absolute inset-4 md:inset-8 lg:inset-16"
-                  style={{
-                    zIndex: 3 - idx,
-                    transform: idx > 0 ? `scale(${1 - idx * 0.05}) translateY(${idx * 8}px)` : undefined,
-                  }}
-                >
-                  <SwipeableCard
-                    place={place}
-                    onSwipe={idx === 0 ? handleSwipe : () => {}}
-                    disabled={
-                      idx !== 0 ||
-                      swipeMutation.isPending ||
-                      (session?.remainingSwipes != null && session.remainingSwipes <= 0)
-                    }
-                  />
-                </div>
-              ))}
+              {/* Show next 2 cards as preview - Larger cards for desktop, fill most of height */}
+              {places.slice(currentIndex, currentIndex + 3).map((place, idx) => {
+                const baseTransform = 'translate(-50%, -50%)';
+                const scaleTransform = idx > 0 ? `scale(${1 - idx * 0.05})` : '';
+                const translateYTransform = idx > 0 ? `translateY(${idx * 8}px)` : '';
+                const combinedTransform = `${baseTransform} ${scaleTransform} ${translateYTransform}`.trim();
+                
+                return (
+                  <div
+                    key={`${place.place_id}-${currentIndex + idx}`}
+                    className="absolute left-1/2 top-1/2 w-full max-w-2xl h-full max-h-[85vh]"
+                    style={{
+                      zIndex: 3 - idx,
+                      transform: combinedTransform,
+                    }}
+                  >
+                    <SwipeableCard
+                      place={place}
+                      onSwipe={idx === 0 ? handleSwipe : () => {}}
+                      disabled={
+                        idx !== 0 ||
+                        swipeMutation.isPending ||
+                        (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+                      }
+                    />
+                  </div>
+                );
+              })}
             </AnimatePresence>
 
             {/* Loading indicator when fetching more */}

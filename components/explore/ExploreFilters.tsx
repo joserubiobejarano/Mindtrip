@@ -106,9 +106,9 @@ export function ExploreFilters({
   };
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
+    <div className={cn("flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center flex-wrap", className)}>
       {/* Toggle: Show places already in itinerary */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 flex-shrink-0">
         <Checkbox
           id="include-itinerary-places"
           checked={filters.includeItineraryPlaces || false}
@@ -116,22 +116,23 @@ export function ExploreFilters({
         />
         <Label
           htmlFor="include-itinerary-places"
-          className="text-sm font-normal cursor-pointer"
+          className="text-sm font-normal cursor-pointer whitespace-nowrap"
         >
           Show places already in itinerary
         </Label>
       </div>
 
       {/* Category Filter */}
-      <div>
-        <label className="text-sm font-medium mb-2 block">Category</label>
-        <div className="flex flex-wrap gap-2">
+      <div className="flex-shrink-0">
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-xs font-medium text-muted-foreground mr-1 hidden sm:inline">Category:</span>
           {CATEGORIES.map((cat) => (
             <Button
               key={cat.value}
               variant={filters.category === cat.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => handleCategoryChange(cat.value)}
+              className="text-xs"
             >
               {cat.label}
             </Button>
@@ -140,15 +141,16 @@ export function ExploreFilters({
       </div>
 
       {/* Time of Day Filter */}
-      <div>
-        <label className="text-sm font-medium mb-2 block">Time of Day</label>
-        <div className="flex flex-wrap gap-2">
+      <div className="flex-shrink-0">
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-xs font-medium text-muted-foreground mr-1 hidden sm:inline">Time:</span>
           {TIME_OF_DAY.map((time) => (
             <Button
               key={time.value}
               variant={filters.timeOfDay === time.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => handleTimeOfDayChange(time.value)}
+              className="text-xs"
             >
               {time.label}
             </Button>
@@ -160,51 +162,47 @@ export function ExploreFilters({
       {effectiveIsPro && (
         <>
           {/* Budget Filter (Pro only) */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <label className="text-sm font-medium">Budget</label>
-              <Sparkles className="h-3 w-3 text-purple-500" />
-              <span className="text-xs text-muted-foreground">Pro</span>
+          <div className="flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-muted-foreground hidden sm:inline">Budget:</label>
+              <Select
+                value={filters.budget?.toString() || ''}
+                onValueChange={handleBudgetChange}
+              >
+                <SelectTrigger className="w-[120px] h-8 text-xs">
+                  <SelectValue placeholder="Any budget" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BUDGET_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Select
-              value={filters.budget?.toString() || ''}
-              onValueChange={handleBudgetChange}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Any budget" />
-              </SelectTrigger>
-              <SelectContent>
-                {BUDGET_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Distance Filter (Pro only) */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <label className="text-sm font-medium">Distance</label>
-              <Sparkles className="h-3 w-3 text-purple-500" />
-              <span className="text-xs text-muted-foreground">Pro</span>
+          <div className="flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-muted-foreground hidden sm:inline">Distance:</label>
+              <Select
+                value={filters.maxDistance?.toString() || ''}
+                onValueChange={handleDistanceChange}
+              >
+                <SelectTrigger className="w-[120px] h-8 text-xs">
+                  <SelectValue placeholder="Any distance" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DISTANCE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Select
-              value={filters.maxDistance?.toString() || ''}
-              onValueChange={handleDistanceChange}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Any distance" />
-              </SelectTrigger>
-              <SelectContent>
-                {DISTANCE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </>
       )}

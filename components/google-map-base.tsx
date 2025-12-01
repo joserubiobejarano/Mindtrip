@@ -1,7 +1,7 @@
 "use client";
 
 import { GoogleMap, Marker, Polyline } from "@react-google-maps/api";
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import { useGoogleMaps } from "./google-maps-provider";
 import {
   DEFAULT_MAP_CONTAINER_STYLE,
@@ -28,7 +28,21 @@ export interface GoogleMapBaseProps {
 const DEFAULT_ZOOM = 12;
 const DEFAULT_CENTER = { lat: 0, lng: 0 };
 
-export function GoogleMapBase({
+// Memoize markers array to prevent unnecessary re-renders
+const MemoizedMarker = memo(({ marker, onMarkerClick }: { marker: BaseMarker; onMarkerClick?: (id: string) => void }) => (
+  <Marker
+    position={{ lat: marker.lat, lng: marker.lng }}
+    onClick={() => {
+      if (onMarkerClick) {
+        onMarkerClick(marker.id);
+      }
+    }}
+  />
+));
+
+MemoizedMarker.displayName = 'MemoizedMarker';
+
+function GoogleMapBaseComponent({
   center,
   zoom = DEFAULT_ZOOM,
   markers = [],
@@ -44,6 +58,12 @@ export function GoogleMapBase({
     []
   );
 
+  // Memoize markers to prevent re-creation on every render
+  const memoizedMarkers = useMemo(() => markers, [markers]);
+
+  // Memoize route path
+  const memoizedRoutePath = useMemo(() => routePath, [routePath]);
+
   if (!isLoaded) {
     return (
       <div className={`w-full h-full flex items-center justify-center ${className}`}>
@@ -55,7 +75,7 @@ export function GoogleMapBase({
   const mapCenter = center || DEFAULT_CENTER;
 
   return (
-    <div className={`w-full h-full ${className}`}>
+    <div className={`w-full h-full ${className}`} style={{ pointerEvents: 'auto' }}>
       <GoogleMap
         mapContainerStyle={DEFAULT_MAP_CONTAINER_STYLE}
         center={mapCenter}
@@ -67,20 +87,16 @@ export function GoogleMapBase({
           }
         }}
       >
-        {markers.map((marker) => (
-          <Marker
+        {memoizedMarkers.map((marker) => (
+          <MemoizedMarker
             key={marker.id}
-            position={{ lat: marker.lat, lng: marker.lng }}
-            onClick={() => {
-              if (onMarkerClick) {
-                onMarkerClick(marker.id);
-              }
-            }}
+            marker={marker}
+            onMarkerClick={onMarkerClick}
           />
         ))}
-        {routePath && routePath.length > 0 && (
+        {memoizedRoutePath && memoizedRoutePath.length > 0 && (
           <Polyline
-            path={routePath}
+            path={memoizedRoutePath}
             options={DEFAULT_POLYLINE_OPTIONS}
           />
         )}
@@ -88,4 +104,7 @@ export function GoogleMapBase({
     </div>
   );
 }
+
+// Export memoized component
+export const GoogleMapBase = memo(GoogleMapBaseComponent);
 

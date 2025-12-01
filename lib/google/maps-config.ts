@@ -14,10 +14,10 @@ export const DEFAULT_MAP_CONTAINER_STYLE: React.CSSProperties = {
 };
 
 export const DEFAULT_MAP_OPTIONS: google.maps.MapOptions = {
-  disableDefaultUI: false,
+  disableDefaultUI: true,
   zoomControl: true,
-  streetViewControl: false,
-  mapTypeControl: false,
+  clickableIcons: false,
+  gestureHandling: 'greedy',
 };
 
 export const DEFAULT_POLYLINE_OPTIONS: google.maps.PolylineOptions = {

@@ -77,8 +77,8 @@ export function TripMapPanel({
     });
   }, [activities, selectedDayId, activeTab]);
 
-  // Get center and zoom based on active tab
-  const getMapCenter = useCallback(() => {
+  // Get initial center and zoom based on active tab (only used on mount or tab change)
+  const getInitialMapCenter = useCallback(() => {
     if (activeTab === "explore" && exploreCenter) {
       return exploreCenter;
     }
@@ -88,7 +88,7 @@ export function TripMapPanel({
     return { lat: 0, lng: 0 };
   }, [activeTab, exploreCenter, trip?.center_lat, trip?.center_lng]);
 
-  const getMapZoom = useCallback(() => {
+  const getInitialMapZoom = useCallback(() => {
     if (activeTab === "explore" && exploreZoom != null) {
       return exploreZoom;
     }
@@ -149,52 +149,58 @@ export function TripMapPanel({
     }
   }, [activeTab]);
 
-  // Update map center/zoom when switching tabs or explore state changes
+  // Track previous tab to detect tab changes
+  const prevTabRef = useRef(activeTab);
+  
+  // Update map center/zoom only when switching tabs (not on every explore state change)
   useEffect(() => {
     if (!mapInstance) return;
 
-    const center = getMapCenter();
-    const zoom = getMapZoom();
+    const tabChanged = prevTabRef.current !== activeTab;
+    prevTabRef.current = activeTab;
 
-    if (activeTab === "explore") {
-      // On Explore tab, prefer user location if available, otherwise use exploreCenter or trip center
-      if (userLocation && !exploreCenter) {
-        mapInstance.panTo(userLocation);
-        mapInstance.setZoom(14);
-      } else if (exploreCenter) {
-        mapInstance.panTo(exploreCenter);
-        if (exploreZoom != null) {
-          mapInstance.setZoom(exploreZoom);
+    // Only update map position on tab change or initial load
+    if (tabChanged || !mapInstance.getCenter()) {
+      if (activeTab === "explore") {
+        // On Explore tab, prefer user location if available, otherwise use exploreCenter or trip center
+        if (userLocation && !exploreCenter) {
+          mapInstance.panTo(userLocation);
+          mapInstance.setZoom(14);
+        } else if (exploreCenter) {
+          mapInstance.panTo(exploreCenter);
+          if (exploreZoom != null) {
+            mapInstance.setZoom(exploreZoom);
+          }
+        } else if (trip?.center_lat != null && trip?.center_lng != null) {
+          mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
+          mapInstance.setZoom(12);
+        }
+      } else if (activeTab === "itinerary" && activities && activities.length > 0) {
+        const activitiesWithPlaces = activities.filter(
+          (activity) =>
+            activity.place &&
+            activity.place.lat != null &&
+            activity.place.lng != null
+        );
+
+        if (activitiesWithPlaces.length > 0) {
+          const bounds = new google.maps.LatLngBounds();
+          activitiesWithPlaces.forEach((activity) => {
+            if (activity.place && activity.place.lat && activity.place.lng) {
+              bounds.extend({
+                lat: activity.place.lat,
+                lng: activity.place.lng,
+              });
+            }
+          });
+          mapInstance.fitBounds(bounds);
         }
       } else if (trip?.center_lat != null && trip?.center_lng != null) {
         mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
         mapInstance.setZoom(12);
       }
-    } else if (activeTab === "itinerary" && activities && activities.length > 0) {
-      const activitiesWithPlaces = activities.filter(
-        (activity) =>
-          activity.place &&
-          activity.place.lat != null &&
-          activity.place.lng != null
-      );
-
-      if (activitiesWithPlaces.length > 0) {
-        const bounds = new google.maps.LatLngBounds();
-        activitiesWithPlaces.forEach((activity) => {
-          if (activity.place && activity.place.lat && activity.place.lng) {
-            bounds.extend({
-              lat: activity.place.lat,
-              lng: activity.place.lng,
-            });
-          }
-        });
-        mapInstance.fitBounds(bounds);
-      }
-    } else if (trip?.center_lat != null && trip?.center_lng != null) {
-      mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
-      mapInstance.setZoom(12);
     }
-  }, [activeTab, exploreCenter, exploreZoom, mapInstance, activities, trip, userLocation, getMapCenter, getMapZoom]);
+  }, [activeTab, mapInstance, activities, trip, userLocation, exploreCenter, exploreZoom]);
 
   if (!trip) {
     return (
@@ -214,11 +220,15 @@ export function TripMapPanel({
     );
   }
 
+  // Use initial center/zoom only - map will manage its own state after load
+  const initialCenter = getInitialMapCenter();
+  const initialZoom = getInitialMapZoom();
+
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full" style={{ pointerEvents: 'auto' }}>
       <GoogleMapBase
-        center={getMapCenter()}
-        zoom={getMapZoom()}
+        center={initialCenter}
+        zoom={initialZoom}
         markers={getMarkers()}
         routePath={activeTab === "itinerary" && routePath.length > 0 ? routePath : undefined}
         onMarkerClick={handleMarkerClick}

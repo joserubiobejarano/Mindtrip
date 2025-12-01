@@ -4,6 +4,7 @@ import { useState, useEffect, Component, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ExploreDeck } from "./explore/ExploreDeck";
 import { ExploreFilters } from "./explore/ExploreFilters";
+import { SwipeCounter } from "./explore/SwipeCounter";
 import { HotelSearchBanner } from "./hotel-search-banner";
 import { useTrip } from "@/hooks/use-trip";
 import { useExploreSession } from "@/hooks/use-explore";
@@ -57,6 +58,9 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
   const { addToast } = useToast();
   const [filters, setFilters] = useState<ExploreFiltersType>({});
   const [isAddingToItinerary, setIsAddingToItinerary] = useState(false);
+  
+  // Gate for showing affiliate promo boxes (currently disabled)
+  const showAffiliates = false;
 
   const handleAddToItinerary = async () => {
     if (!session || session.likedPlaces.length === 0 || isAddingToItinerary) return;
@@ -115,18 +119,25 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      {/* Hotel Banner */}
-      {trip.start_date && trip.end_date && (
+      {/* Affiliate Promo Boxes - Hidden by default */}
+      {showAffiliates && trip.start_date && trip.end_date && (
         <HotelSearchBanner tripId={tripId} className="p-4 border-b flex-shrink-0" />
       )}
 
-      {/* Filters Section */}
-      <div className="p-4 border-b flex-shrink-0 overflow-x-auto">
-        <ExploreFilters filters={filters} onFiltersChange={setFilters} />
+      {/* Filters + Swipe Counter Row - Compact at top */}
+      <div className="p-4 border-b flex-shrink-0">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <ExploreFilters filters={filters} onFiltersChange={setFilters} />
+          </div>
+          <div className="flex-shrink-0">
+            <SwipeCounter tripId={tripId} />
+          </div>
+        </div>
       </div>
 
-      {/* Swipe Deck */}
-      <div className="flex-1 overflow-hidden min-h-0">
+      {/* Swipe Deck - Fills remaining space with large cards */}
+      <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0">
         <ExploreErrorBoundary>
           {sessionLoading ? (
             <div className="flex items-center justify-center h-full">
@@ -137,6 +148,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
               tripId={tripId}
               filters={filters}
               onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
+              hideHeader={true}
             />
           )}
         </ExploreErrorBoundary>
