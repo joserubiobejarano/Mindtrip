@@ -48,6 +48,7 @@ export async function getPlaceDetails(placeId: string): Promise<{
   user_ratings_total?: number;
   photos?: Array<{ photo_reference: string }>;
   geometry?: { location: { lat: number; lng: number } };
+  editorial_summary?: { overview?: string };
 } | null> {
   if (!GOOGLE_MAPS_API_KEY) {
     console.error("Missing Google Maps API Key");
@@ -63,6 +64,7 @@ export async function getPlaceDetails(placeId: string): Promise<{
       'user_ratings_total',
       'photos',
       'geometry',
+      'editorial_summary',
     ].join(',');
 
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=${fields}&key=${GOOGLE_MAPS_API_KEY}`;
