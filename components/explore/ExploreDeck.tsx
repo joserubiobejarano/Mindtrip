@@ -109,7 +109,7 @@ export function ExploreDeck({
     }
 
     // Record swipe action
-    const action = direction === 'right' ? 'like' : 'dislike';
+    const action: 'like' | 'dislike' = direction === 'right' ? 'like' : 'dislike';
     
     try {
       await swipeMutation.mutateAsync({
