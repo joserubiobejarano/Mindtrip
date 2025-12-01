@@ -77,23 +77,6 @@ export function TripMapPanel({
     });
   }, [activities, selectedDayId, activeTab]);
 
-  // Get initial center and zoom based on active tab (only used on mount or tab change)
-  const getInitialMapCenter = useCallback(() => {
-    if (activeTab === "explore" && exploreCenter) {
-      return exploreCenter;
-    }
-    if (trip?.center_lat != null && trip?.center_lng != null) {
-      return { lat: trip.center_lat, lng: trip.center_lng };
-    }
-    return { lat: 0, lng: 0 };
-  }, [activeTab, exploreCenter, trip?.center_lat, trip?.center_lng]);
-
-  const getInitialMapZoom = useCallback(() => {
-    if (activeTab === "explore" && exploreZoom != null) {
-      return exploreZoom;
-    }
-    return 12;
-  }, [activeTab, exploreZoom]);
 
   // Get markers based on active tab
   const getMarkers = (): BaseMarker[] => {
@@ -151,6 +134,26 @@ export function TripMapPanel({
 
   // Track previous tab to detect tab changes
   const prevTabRef = useRef(activeTab);
+  
+  // Use initial center/zoom only - map will manage its own state after load
+  // Memoize to prevent unnecessary re-renders when values haven't changed
+  // IMPORTANT: Must be called before any early returns (Rules of Hooks)
+  const initialCenter = useMemo(() => {
+    if (activeTab === "explore" && exploreCenter) {
+      return exploreCenter;
+    }
+    if (trip?.center_lat != null && trip?.center_lng != null) {
+      return { lat: trip.center_lat, lng: trip.center_lng };
+    }
+    return { lat: 0, lng: 0 };
+  }, [activeTab, exploreCenter?.lat, exploreCenter?.lng, trip?.center_lat, trip?.center_lng]);
+  
+  const initialZoom = useMemo(() => {
+    if (activeTab === "explore" && exploreZoom != null) {
+      return exploreZoom;
+    }
+    return 12;
+  }, [activeTab, exploreZoom]);
   
   // Update map center/zoom only when switching tabs (not on every explore state change)
   useEffect(() => {
@@ -219,17 +222,6 @@ export function TripMapPanel({
       </div>
     );
   }
-
-  // Use initial center/zoom only - map will manage its own state after load
-  // Memoize to prevent unnecessary re-renders when values haven't changed
-  const initialCenter = useMemo(() => getInitialMapCenter(), [
-    activeTab,
-    exploreCenter?.lat,
-    exploreCenter?.lng,
-    trip?.center_lat,
-    trip?.center_lng,
-  ]);
-  const initialZoom = useMemo(() => getInitialMapZoom(), [activeTab, exploreZoom]);
 
   return (
     <div className="h-full w-full" style={{ pointerEvents: 'auto' }}>

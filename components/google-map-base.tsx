@@ -67,7 +67,7 @@ function GoogleMapBaseComponent({
   // Memoize center to prevent unnecessary re-renders
   const mapCenter = useMemo(() => {
     return center || DEFAULT_CENTER;
-  }, [center?.lat, center?.lng]);
+  }, [center]);
 
   if (!isLoaded) {
     return (
