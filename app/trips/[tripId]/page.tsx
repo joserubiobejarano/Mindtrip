@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { TripDetail } from "@/components/trip-detail";
+import { Suspense } from "react";
 
 export default async function TripDetailPage({
   params,
@@ -61,6 +62,14 @@ export default async function TripDetailPage({
     redirect("/trips");
   }
 
-  return <TripDetail tripId={tripId} />;
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background p-8">
+        <div className="text-muted-foreground">Loading trip...</div>
+      </div>
+    }>
+      <TripDetail tripId={tripId} />
+    </Suspense>
+  );
 }
 

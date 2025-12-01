@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { createClient } from "@/lib/supabase/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,10 +25,9 @@ const CURRENCIES = [
   "NZD", "KRW", "THB", "IDR", "PHP", "MYR", "VND", "AED", "SAR", "ILS"
 ];
 
-export default function SettingsPage() {
+function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { addToast } = useToast();
   const supabase = createClient();
   const queryClient = useQueryClient();
@@ -37,7 +36,6 @@ export default function SettingsPage() {
   const [defaultCurrency, setDefaultCurrency] = useState("USD");
   const [isSaving, setIsSaving] = useState(false);
   const [isPro, setIsPro] = useState(false);
-  const showUpgrade = searchParams?.get('upgrade') === 'true';
 
   // Fetch profile and subscription status
   const { data: profile, isLoading } = useQuery({
@@ -321,5 +319,26 @@ export default function SettingsPage() {
       </div>
     </div>
   );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-muted-foreground">Loading...</div>
+        </div>
+      </div>
+    }>
+      <SettingsPageContent />
+    </Suspense>
+  );
+}
+
+function SettingsPageContent() {
+  const searchParams = useSearchParams();
+  const showUpgrade = searchParams?.get('upgrade') === 'true';
+  
+  return <SettingsContent showUpgrade={showUpgrade} />;
 }
 
