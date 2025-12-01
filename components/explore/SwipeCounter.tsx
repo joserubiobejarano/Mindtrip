@@ -23,7 +23,7 @@ export function SwipeCounter({ tripId, className }: SwipeCounterProps) {
     <div className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 ${className}`}>
       <div className="flex-1">
         <p className="text-sm font-medium text-gray-900 mb-1">
-          You've reached the swipe limit for this trip.
+          You&apos;ve reached the swipe limit for this trip.
         </p>
         <p className="text-xs text-muted-foreground">
           Upgrade to continue discovering more places.

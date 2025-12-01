@@ -203,6 +203,25 @@ export function ExploreDeck({
     }
   };
 
+  // Calculate currentPlace before early returns (for useEffect hook)
+  const currentPlace = currentIndex >= 0 && places.length > 0 ? places[currentIndex] : null;
+  const currentPlaceId = currentPlace?.place_id;
+  const currentPlaceLat = currentPlace?.lat;
+  const currentPlaceLng = currentPlace?.lng;
+
+  // Notify parent when active place changes (for map focus)
+  // This hook must be called before any early returns (Rules of Hooks)
+  useEffect(() => {
+    if (!currentPlace || !onActivePlaceChange) return;
+    
+    onActivePlaceChange({
+      placeId: currentPlace.place_id,
+      lat: currentPlace.lat,
+      lng: currentPlace.lng,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPlaceId, currentPlaceLat, currentPlaceLng, onActivePlaceChange]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
@@ -227,7 +246,7 @@ export function ExploreDeck({
     );
   }
 
-  if (currentIndex < 0) {
+  if (currentIndex < 0 || !currentPlace) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <div className="text-sm text-muted-foreground">
@@ -236,19 +255,6 @@ export function ExploreDeck({
       </div>
     );
   }
-
-  const currentPlace = places[currentIndex];
-
-  // Notify parent when active place changes (for map focus)
-  useEffect(() => {
-    if (!currentPlace || !onActivePlaceChange) return;
-    
-    onActivePlaceChange({
-      placeId: currentPlace.place_id,
-      lat: currentPlace.lat,
-      lng: currentPlace.lng,
-    });
-  }, [currentPlace?.place_id, onActivePlaceChange]);
 
   const hasLikedPlaces = session && session.likedPlaces.length > 0;
 

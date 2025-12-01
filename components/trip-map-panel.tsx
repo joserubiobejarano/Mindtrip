@@ -169,7 +169,7 @@ export function TripMapPanel({
     if (currentZoom !== undefined && currentZoom < 14) {
       mapInstance.setZoom(14);
     }
-  }, [mapInstance, activeTab, activePlace?.placeId, activePlace?.lat, activePlace?.lng]);
+  }, [mapInstance, activeTab, activePlace]);
 
   // Update map center/zoom only when switching tabs (not on every explore state change)
   useEffect(() => {
