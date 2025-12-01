@@ -9,7 +9,6 @@ import { HotelSearchBanner } from "./hotel-search-banner";
 import { useTrip } from "@/hooks/use-trip";
 import { useExploreSession } from "@/hooks/use-explore";
 import { useToast } from "@/components/ui/toast";
-import { Loader2 } from "lucide-react";
 import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
 
 // Error boundary for Explore feature
@@ -139,18 +138,12 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
       {/* Swipe Deck - Fills remaining space with large cards */}
       <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0">
         <ExploreErrorBoundary>
-          {sessionLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <ExploreDeck
-              tripId={tripId}
-              filters={filters}
-              onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
-              hideHeader={true}
-            />
-          )}
+          <ExploreDeck
+            tripId={tripId}
+            filters={filters}
+            onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
+            hideHeader={true}
+          />
         </ExploreErrorBoundary>
       </div>
     </div>

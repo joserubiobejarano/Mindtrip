@@ -26,13 +26,6 @@ const CATEGORIES = [
   { value: 'bars', label: 'Nightlife' },
 ];
 
-const TIME_OF_DAY = [
-  { value: '', label: 'Any time' },
-  { value: 'morning', label: 'Morning' },
-  { value: 'afternoon', label: 'Afternoon' },
-  { value: 'evening', label: 'Evening' },
-];
-
 const BUDGET_OPTIONS = [
   { value: '', label: 'Any budget' },
   { value: '0', label: 'Free' },
@@ -74,13 +67,6 @@ export function ExploreFilters({
     onFiltersChange({
       ...filters,
       category: category || undefined,
-    });
-  };
-
-  const handleTimeOfDayChange = (timeOfDay: string) => {
-    onFiltersChange({
-      ...filters,
-      timeOfDay: (timeOfDay || undefined) as 'morning' | 'afternoon' | 'evening' | undefined,
     });
   };
 
@@ -135,24 +121,6 @@ export function ExploreFilters({
               className="text-xs"
             >
               {cat.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Time of Day Filter */}
-      <div className="flex-shrink-0">
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs font-medium text-muted-foreground mr-1 hidden sm:inline">Time:</span>
-          {TIME_OF_DAY.map((time) => (
-            <Button
-              key={time.value}
-              variant={filters.timeOfDay === time.value ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleTimeOfDayChange(time.value)}
-              className="text-xs"
-            >
-              {time.label}
             </Button>
           ))}
         </div>

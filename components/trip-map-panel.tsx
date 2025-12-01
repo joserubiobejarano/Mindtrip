@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { GoogleMapBase, BaseMarker } from "@/components/google-map-base";
 import { useTrip } from "@/hooks/use-trip";
 import { useActivities } from "@/hooks/use-activities";
@@ -221,8 +221,15 @@ export function TripMapPanel({
   }
 
   // Use initial center/zoom only - map will manage its own state after load
-  const initialCenter = getInitialMapCenter();
-  const initialZoom = getInitialMapZoom();
+  // Memoize to prevent unnecessary re-renders when values haven't changed
+  const initialCenter = useMemo(() => getInitialMapCenter(), [
+    activeTab,
+    exploreCenter?.lat,
+    exploreCenter?.lng,
+    trip?.center_lat,
+    trip?.center_lng,
+  ]);
+  const initialZoom = useMemo(() => getInitialMapZoom(), [activeTab, exploreZoom]);
 
   return (
     <div className="h-full w-full" style={{ pointerEvents: 'auto' }}>

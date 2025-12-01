@@ -265,6 +265,10 @@ export function ExploreDeck({
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             <p className="text-sm text-muted-foreground">Loading places...</p>
           </div>
+        ) : !isLoading && (!places || places.length === 0) ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            <p className="text-sm text-muted-foreground">No places found. Try changing filters.</p>
+          </div>
         ) : isError ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
             <p className="text-lg font-medium mb-2 text-destructive">Unable to load places</p>

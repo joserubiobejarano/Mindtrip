@@ -64,6 +64,11 @@ function GoogleMapBaseComponent({
   // Memoize route path
   const memoizedRoutePath = useMemo(() => routePath, [routePath]);
 
+  // Memoize center to prevent unnecessary re-renders
+  const mapCenter = useMemo(() => {
+    return center || DEFAULT_CENTER;
+  }, [center?.lat, center?.lng]);
+
   if (!isLoaded) {
     return (
       <div className={`w-full h-full flex items-center justify-center ${className}`}>
@@ -71,8 +76,6 @@ function GoogleMapBaseComponent({
       </div>
     );
   }
-
-  const mapCenter = center || DEFAULT_CENTER;
 
   return (
     <div className={`w-full h-full ${className}`} style={{ pointerEvents: 'auto' }}>

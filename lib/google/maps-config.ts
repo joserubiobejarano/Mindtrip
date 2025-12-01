@@ -18,6 +18,8 @@ export const DEFAULT_MAP_OPTIONS: google.maps.MapOptions = {
   zoomControl: true,
   clickableIcons: false,
   gestureHandling: 'greedy',
+  minZoom: 2,
+  maxZoom: 20,
 };
 
 export const DEFAULT_POLYLINE_OPTIONS: google.maps.PolylineOptions = {
