@@ -37,9 +37,8 @@ export function ExploreDeck({
   className,
   hideHeader = false,
 }: ExploreDeckProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(-1);
   const [places, setPlaces] = useState<ExplorePlace[]>([]);
-  const [previousFilters, setPreviousFilters] = useState<ExploreFilters>(filters);
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [selectedPlaceName, setSelectedPlaceName] = useState<string | undefined>(undefined);
@@ -47,6 +46,7 @@ export function ExploreDeck({
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Build filters based on mode - memoized to prevent unnecessary re-renders
+  // Use individual filter properties for stability instead of the whole filters object
   const effectiveFilters: ExploreFilters = useMemo(() => {
     return mode === 'day' && dayId
       ? {
@@ -55,58 +55,76 @@ export function ExploreDeck({
           timeOfDay: slot || filters.timeOfDay,
         }
       : filters;
-  }, [mode, dayId, areaCluster, slot, filters]);
+  }, [
+    mode,
+    dayId,
+    areaCluster,
+    slot,
+    filters.neighborhood,
+    filters.category,
+    filters.timeOfDay,
+    filters.includeItineraryPlaces,
+    filters.budget,
+    filters.maxDistance,
+    // For excludePlaceIds, use a stable reference
+    filters.excludePlaceIds?.join(','),
+  ]);
 
   const { data: session } = useExploreSession(tripId);
   const { data: placesData, isLoading, error: placesError, refetch: refetchPlaces } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot);
   const swipeMutation = useSwipeAction(tripId);
   const { addToast } = useToast();
 
-  // Temporary logging to verify hook is returning data
-  console.log('[ExploreDeck] places', placesData?.places?.length, 'loading', isLoading, 'error', placesError);
-
   // Check if user has seen onboarding (stored in localStorage)
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem('explore-onboarding-seen');
-    if (!hasSeenOnboarding && places.length > 0 && currentIndex === 0) {
+    if (!hasSeenOnboarding && places.length > 0 && currentIndex >= 0) {
       setShowOnboarding(true);
     }
   }, [places.length, currentIndex]);
 
-  // Update local places when data changes
+  // Update local places when data changes - only depend on placesData
   useEffect(() => {
-    if (placesData?.places) {
-      // Check if filters changed (if so, replace places and reset index)
-      const filtersChanged = JSON.stringify(effectiveFilters) !== JSON.stringify(previousFilters);
-      
-      if (filtersChanged) {
-        // Filter changed - replace places
-        setPlaces(placesData.places);
-        // Start from the last card (top of stack)
-        setCurrentIndex(Math.max(0, placesData.places.length - 1));
-        setPreviousFilters(effectiveFilters);
-      } else {
-        // Same filters - append new places (avoid duplicates)
-        setPlaces((prevPlaces) => {
-          // If no previous places, replace with new ones
-          if (prevPlaces.length === 0) {
-            // Set index to last card when first loading
-            setCurrentIndex(Math.max(0, placesData.places.length - 1));
-            return placesData.places;
-          }
-          
-          const existingIds = new Set(prevPlaces.map(p => p.place_id));
-          const newPlaces = placesData.places.filter(p => !existingIds.has(p.place_id));
-          
-          if (newPlaces.length > 0) {
-            return [...prevPlaces, ...newPlaces];
-          }
-          
-          return prevPlaces;
-        });
-      }
+    if (placesData?.places && placesData.places.length > 0) {
+      setPlaces((prevPlaces) => {
+        // If no previous places, replace with new ones
+        if (prevPlaces.length === 0) {
+          // Set index to last card when first loading
+          setCurrentIndex(placesData.places.length - 1);
+          return placesData.places;
+        }
+        
+        // Append new places (avoid duplicates)
+        const existingIds = new Set(prevPlaces.map(p => p.place_id));
+        const newPlaces = placesData.places.filter(p => !existingIds.has(p.place_id));
+        
+        if (newPlaces.length > 0) {
+          return [...prevPlaces, ...newPlaces];
+        }
+        
+        return prevPlaces;
+      });
+    } else if (placesData?.places && placesData.places.length === 0) {
+      // If we get empty results, clear places
+      setPlaces([]);
+      setCurrentIndex(-1);
     }
-  }, [placesData, effectiveFilters, previousFilters]);
+  }, [placesData?.places]);
+
+  // Set currentIndex when places.length changes (for when places are removed via swipe)
+  useEffect(() => {
+    if (places && places.length > 0) {
+      // Only update if current index is out of bounds
+      setCurrentIndex((prevIndex) => {
+        if (prevIndex < 0 || prevIndex >= places.length) {
+          return places.length - 1;
+        }
+        return prevIndex;
+      });
+    } else if (places && places.length === 0) {
+      setCurrentIndex(-1);
+    }
+  }, [places?.length]);
 
   const handleSwipe = async (direction: 'left' | 'right' | 'up') => {
     if (places.length === 0 || currentIndex >= places.length) return;

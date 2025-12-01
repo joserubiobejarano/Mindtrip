@@ -29,8 +29,24 @@ export function useExplorePlaces(
   dayId?: string,
   slot?: 'morning' | 'afternoon' | 'evening'
 ) {
+  // Extract primitive values for query key to prevent re-renders
+  const queryKey = [
+    'explore-places',
+    tripId,
+    filters.neighborhood || null,
+    filters.category || null,
+    filters.timeOfDay || null,
+    filters.includeItineraryPlaces || false,
+    filters.budget ?? null,
+    filters.maxDistance ?? null,
+    // For excludePlaceIds, use a sorted string representation for stability
+    filters.excludePlaceIds?.sort().join(',') || null,
+    dayId || null,
+    slot || null,
+  ];
+
   return useQuery({
-    queryKey: ['explore-places', tripId, filters, dayId, slot],
+    queryKey,
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filters.neighborhood) params.set('neighborhood', filters.neighborhood);
