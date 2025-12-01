@@ -74,14 +74,19 @@ export function ExploreDeck({
       // Check if filters changed (if so, replace places and reset index)
       const filtersChanged = JSON.stringify(effectiveFilters) !== JSON.stringify(previousFilters);
       
-      if (filtersChanged || places.length === 0) {
-        // Filter changed or initial load - replace places
+      if (filtersChanged) {
+        // Filter changed - replace places
         setPlaces(placesData.places);
         setCurrentIndex(0);
         setPreviousFilters(effectiveFilters);
       } else {
         // Same filters - append new places (avoid duplicates)
         setPlaces((prevPlaces) => {
+          // If no previous places, replace with new ones
+          if (prevPlaces.length === 0) {
+            return placesData.places;
+          }
+          
           const existingIds = new Set(prevPlaces.map(p => p.place_id));
           const newPlaces = placesData.places.filter(p => !existingIds.has(p.place_id));
           
@@ -93,12 +98,13 @@ export function ExploreDeck({
         });
       }
     }
-  }, [placesData, effectiveFilters, previousFilters, places.length]);
+  }, [placesData, effectiveFilters, previousFilters]);
 
   const handleSwipe = async (direction: 'left' | 'right' | 'up') => {
     if (places.length === 0 || currentIndex >= places.length) return;
 
     const currentPlace = places[currentIndex];
+    if (!currentPlace) return;
 
     // Handle swipe up (details) - open details drawer
     if (direction === 'up') {

@@ -70,7 +70,7 @@ export function PlaceDetailsDrawer({
       try {
         // We need to use the PlacesService from the map
         // For now, we'll create a temporary service
-        if (typeof window === "undefined" || !window.google) {
+        if (typeof window === "undefined" || !window.google || !window.google.maps || !window.google.maps.places) {
           throw new Error("Google Maps API not loaded");
         }
 

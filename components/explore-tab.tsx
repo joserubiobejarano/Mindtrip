@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Component, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ExploreDeck } from "./explore/ExploreDeck";
 import { ExploreFilters } from "./explore/ExploreFilters";
@@ -10,6 +10,35 @@ import { useExploreSession } from "@/hooks/use-explore";
 import { useToast } from "@/components/ui/toast";
 import { Loader2 } from "lucide-react";
 import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
+
+// Error boundary for Explore feature
+class ExploreErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  state = { hasError: false, error: undefined };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error('ExploreError:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-6 text-center">
+          <p className="text-lg font-medium mb-2 text-destructive">Something went wrong loading Explore.</p>
+          <p className="text-sm text-muted-foreground">Please refresh the page and try again.</p>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 interface ExploreTabProps {
   tripId: string;
@@ -70,9 +99,11 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
   };
 
   // Clear map markers since we're not showing a map in swipe mode
-  if (onMapUpdate) {
-    onMapUpdate([], null, undefined);
-  }
+  useEffect(() => {
+    if (onMapUpdate) {
+      onMapUpdate([], null, undefined);
+    }
+  }, [onMapUpdate]);
 
   if (!trip) {
     return (
@@ -96,17 +127,19 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef }: ExploreTab
 
       {/* Swipe Deck */}
       <div className="flex-1 overflow-hidden min-h-0">
-        {sessionLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : (
-          <ExploreDeck
-            tripId={tripId}
-            filters={filters}
-            onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
-          />
-        )}
+        <ExploreErrorBoundary>
+          {sessionLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <ExploreDeck
+              tripId={tripId}
+              filters={filters}
+              onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
+            />
+          )}
+        </ExploreErrorBoundary>
       </div>
     </div>
   );
