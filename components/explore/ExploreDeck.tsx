@@ -47,6 +47,7 @@ export function ExploreDeck({
 
   // Build filters based on mode - memoized to prevent unnecessary re-renders
   // Use individual filter properties for stability instead of the whole filters object
+  const excludePlaceIdsKey = filters.excludePlaceIds?.join(',') ?? '';
   const effectiveFilters: ExploreFilters = useMemo(() => {
     return mode === 'day' && dayId
       ? {
@@ -55,6 +56,7 @@ export function ExploreDeck({
           timeOfDay: slot || filters.timeOfDay,
         }
       : filters;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     mode,
     dayId,
@@ -66,8 +68,7 @@ export function ExploreDeck({
     filters.includeItineraryPlaces,
     filters.budget,
     filters.maxDistance,
-    // For excludePlaceIds, use a stable reference
-    filters.excludePlaceIds?.join(','),
+    excludePlaceIdsKey,
   ]);
 
   const { data: session } = useExploreSession(tripId);
@@ -112,19 +113,21 @@ export function ExploreDeck({
   }, [placesData?.places]);
 
   // Set currentIndex when places.length changes (for when places are removed via swipe)
+  const placesLength = places?.length ?? 0;
   useEffect(() => {
-    if (places && places.length > 0) {
+    if (places && placesLength > 0) {
       // Only update if current index is out of bounds
       setCurrentIndex((prevIndex) => {
-        if (prevIndex < 0 || prevIndex >= places.length) {
-          return places.length - 1;
+        if (prevIndex < 0 || prevIndex >= placesLength) {
+          return placesLength - 1;
         }
         return prevIndex;
       });
-    } else if (places && places.length === 0) {
+    } else if (places && placesLength === 0) {
       setCurrentIndex(-1);
     }
-  }, [places?.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placesLength]);
 
   const handleSwipe = async (direction: 'left' | 'right' | 'up') => {
     if (places.length === 0 || currentIndex < 0 || currentIndex >= places.length) return;

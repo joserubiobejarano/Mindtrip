@@ -146,7 +146,7 @@ export function TripMapPanel({
       return { lat: trip.center_lat, lng: trip.center_lng };
     }
     return { lat: 0, lng: 0 };
-  }, [activeTab, exploreCenter?.lat, exploreCenter?.lng, trip?.center_lat, trip?.center_lng]);
+  }, [activeTab, exploreCenter, trip?.center_lat, trip?.center_lng]);
   
   const initialZoom = useMemo(() => {
     if (activeTab === "explore" && exploreZoom != null) {

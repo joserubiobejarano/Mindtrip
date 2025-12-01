@@ -29,7 +29,7 @@ export function SwipeableCard({ place, onSwipe, disabled = false }: SwipeableCar
           {place.name ?? 'Unnamed place'}
         </div>
         <div className="text-sm text-muted-foreground mb-4">
-          {place.formatted_address ?? place.vicinity ?? 'No address available'}
+          {place.address ?? 'No address available'}
         </div>
         <div className="text-xs text-muted-foreground mt-auto">
           place_id: {place.place_id}
