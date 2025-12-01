@@ -375,7 +375,7 @@ export function ExploreDeck({
                     disabled={
                       idx !== 0 ||
                       swipeMutation.isPending ||
-                      (session?.remainingSwipes !== null && session.remainingSwipes <= 0)
+                      (session?.remainingSwipes !== null && session?.remainingSwipes <= 0)
                     }
                   />
                 </div>
