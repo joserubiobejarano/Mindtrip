@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Send, Plus } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { format } from "date-fns";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
@@ -14,6 +14,9 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
 import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { ExploreDeck } from "@/components/explore/ExploreDeck";
+import type { ExploreFilters } from "@/lib/google/explore-places";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -70,6 +73,10 @@ export function ItineraryTab({
   const [chatMessage, setChatMessage] = useState("");
   const [isChatting, setIsChatting] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
+  
+  // Day-level Explore state
+  const [dayExploreOpen, setDayExploreOpen] = useState(false);
+  const [selectedDayForExplore, setSelectedDayForExplore] = useState<{ dayId: string; slot?: 'morning' | 'afternoon' | 'evening'; areaCluster?: string } | null>(null);
   
   const router = useRouter();
   const { addToast } = useToast();
@@ -443,14 +450,38 @@ export function ItineraryTab({
                           <p>{day.overview}</p>
                         </div>
                         
+
                         {/* Slots */}
                         <div className="space-y-8 mt-6">
-                            {day.slots.map((slot, slotIdx) => (
+                            {day.slots.map((slot, slotIdx) => {
+                              const slotType = slot.label.toLowerCase() as 'morning' | 'afternoon' | 'evening';
+                              const areaCluster = slot.places[0]?.area || slot.places[0]?.neighborhood || day.areaCluster;
+                              
+                              return (
                                 <div key={slotIdx} className="space-y-4">
-                                    <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                                    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                                      <div className="flex items-center gap-2">
                                         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">{slot.label}</h3>
                                         <span className="text-sm text-slate-400">•</span>
                                         <span className="text-sm text-slate-600 italic">{slot.summary}</span>
+                                      </div>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedDayForExplore({
+                                            dayId: day.id,
+                                            slot: slotType,
+                                            areaCluster,
+                                          });
+                                          setDayExploreOpen(true);
+                                        }}
+                                        className="text-xs min-h-[44px] touch-manipulation"
+                                      >
+                                        <Plus className="h-3 w-3 mr-1" />
+                                        <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
+                                        <span className="sm:hidden">Add</span>
+                                      </Button>
                                     </div>
                                     
                                     <div className="grid gap-4">
@@ -513,7 +544,8 @@ export function ItineraryTab({
                                         ))}
                                     </div>
                                 </div>
-                            ))}
+                              );
+                            })}
                         </div>
 
                         {/* Affiliate Buttons - Moved below activities */}
@@ -639,6 +671,36 @@ export function ItineraryTab({
            )}
         </DialogContent>
       </Dialog>
+
+      {/* Day-Level Explore Drawer */}
+      <Sheet open={dayExploreOpen} onOpenChange={setDayExploreOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col overflow-hidden">
+          <SheetHeader className="p-4 border-b">
+            <SheetTitle>
+              {selectedDayForExplore?.slot 
+                ? `Add activities to ${selectedDayForExplore.slot}`
+                : 'Add activities to this day'}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-hidden">
+            {selectedDayForExplore && (
+              <ExploreDeck
+                tripId={tripId}
+                mode="day"
+                dayId={selectedDayForExplore.dayId}
+                slot={selectedDayForExplore.slot}
+                areaCluster={selectedDayForExplore.areaCluster}
+                onAddToDay={(placeIds) => {
+                  // This will be handled by the ExploreDeck in day mode
+                  setDayExploreOpen(false);
+                  // Reload itinerary to show new places
+                  loadOrGenerate();
+                }}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

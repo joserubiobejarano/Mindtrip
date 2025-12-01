@@ -1,0 +1,459 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Loader2, Heart, Undo2, X, ArrowUp, Info, Sparkles } from 'lucide-react';
+import { SwipeableCard } from './SwipeableCard';
+import { SwipeCounter } from './SwipeCounter';
+import { PlaceDetailsDrawer } from '@/components/place-details-drawer';
+import { useExplorePlaces, useExploreSession, useSwipeAction } from '@/hooks/use-explore';
+import type { ExplorePlace, ExploreFilters } from '@/lib/google/explore-places';
+import { cn } from '@/lib/utils';
+import { useToast } from '@/components/ui/toast';
+
+interface ExploreDeckProps {
+  tripId: string;
+  filters?: ExploreFilters;
+  mode?: 'trip' | 'day';
+  dayId?: string;
+  slot?: 'morning' | 'afternoon' | 'evening';
+  areaCluster?: string;
+  onAddToItinerary?: () => void;
+  onAddToDay?: (placeIds: string[]) => void;
+  className?: string;
+}
+
+export function ExploreDeck({
+  tripId,
+  filters = {},
+  mode = 'trip',
+  dayId,
+  slot,
+  areaCluster,
+  onAddToItinerary,
+  onAddToDay,
+  className,
+}: ExploreDeckProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [places, setPlaces] = useState<ExplorePlace[]>([]);
+  const [previousFilters, setPreviousFilters] = useState<ExploreFilters>(filters);
+  const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const [selectedPlaceName, setSelectedPlaceName] = useState<string | undefined>(undefined);
+  const [swipeHistory, setSwipeHistory] = useState<Array<{ placeId: string; action: 'like' | 'dislike' }>>([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Build filters based on mode
+  const effectiveFilters: ExploreFilters = mode === 'day' && dayId
+    ? {
+        ...filters,
+        neighborhood: areaCluster || filters.neighborhood,
+        timeOfDay: slot || filters.timeOfDay,
+      }
+    : filters;
+
+  const { data: session } = useExploreSession(tripId);
+  const { data: placesData, isLoading, error: placesError, refetch: refetchPlaces } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot);
+  const swipeMutation = useSwipeAction(tripId);
+  const { addToast } = useToast();
+
+  // Check if user has seen onboarding (stored in localStorage)
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('explore-onboarding-seen');
+    if (!hasSeenOnboarding && places.length > 0 && currentIndex === 0) {
+      setShowOnboarding(true);
+    }
+  }, [places.length, currentIndex]);
+
+  // Update local places when data changes
+  useEffect(() => {
+    if (placesData?.places) {
+      // Check if filters changed (if so, replace places and reset index)
+      const filtersChanged = JSON.stringify(effectiveFilters) !== JSON.stringify(previousFilters);
+      
+      if (filtersChanged || places.length === 0) {
+        // Filter changed or initial load - replace places
+        setPlaces(placesData.places);
+        setCurrentIndex(0);
+        setPreviousFilters(effectiveFilters);
+      } else {
+        // Same filters - append new places (avoid duplicates)
+        setPlaces((prevPlaces) => {
+          const existingIds = new Set(prevPlaces.map(p => p.place_id));
+          const newPlaces = placesData.places.filter(p => !existingIds.has(p.place_id));
+          
+          if (newPlaces.length > 0) {
+            return [...prevPlaces, ...newPlaces];
+          }
+          
+          return prevPlaces;
+        });
+      }
+    }
+  }, [placesData, effectiveFilters, previousFilters, places.length]);
+
+  const handleSwipe = async (direction: 'left' | 'right' | 'up') => {
+    if (places.length === 0 || currentIndex >= places.length) return;
+
+    const currentPlace = places[currentIndex];
+
+    // Handle swipe up (details) - open details drawer
+    if (direction === 'up') {
+      setSelectedPlaceId(currentPlace.place_id);
+      setSelectedPlaceName(currentPlace.name);
+      setDetailsDrawerOpen(true);
+      return;
+    }
+
+    // Record swipe action
+    const action = direction === 'right' ? 'like' : 'dislike';
+    
+    try {
+      await swipeMutation.mutateAsync({
+        placeId: currentPlace.place_id,
+        action,
+        source: mode,
+      });
+
+      // Track swipe in history for undo (max 3)
+      setSwipeHistory((prev) => {
+        const newHistory = [{ placeId: currentPlace.place_id, action }, ...prev];
+        return newHistory.slice(0, 3); // Keep only last 3
+      });
+
+      // Remove swiped place from local array immediately for snappy UI
+      setPlaces((prev) => prev.filter(p => p.place_id !== currentPlace.place_id));
+      
+      // Move to next card (index stays same since we removed current card)
+      // Don't increment currentIndex since we removed the current card
+
+      // If we're running low on cards, prefetch more
+      const remainingAfterRemoval = places.length - 1;
+      if (remainingAfterRemoval <= 3 && placesData?.hasMore) {
+        refetchPlaces();
+      }
+    } catch (error) {
+      // Error handling is done in the mutation
+      console.error('Swipe error:', error);
+    }
+  };
+
+  const handleUndo = async () => {
+    if (swipeHistory.length === 0) return;
+
+    const lastSwipe = swipeHistory[0]; // Most recent swipe
+
+    try {
+      await swipeMutation.mutateAsync({
+        placeId: lastSwipe.placeId,
+        action: 'undo',
+        previousAction: lastSwipe.action,
+        source: mode,
+      });
+
+      // Remove from history
+      setSwipeHistory((prev) => prev.slice(1));
+    } catch (error) {
+      // Error handling is done in the mutation
+      console.error('Undo error:', error);
+    }
+  };
+
+  const likedCount = session?.likedPlaces.length || 0;
+  const hasLikedPlaces = likedCount > 0;
+  const hasMoreCards = places.length > 0 && currentIndex < places.length;
+  const isLoadingMore = isLoading && places.length === 0;
+  const isLimitReached = session?.remainingSwipes !== null && session.remainingSwipes === 0;
+  const isError = placesError !== null || (placesData === undefined && !isLoading && places.length === 0);
+
+  const handleAddToDay = async () => {
+    if (!session || session.likedPlaces.length === 0 || !dayId || !slot) return;
+
+    try {
+      const response = await fetch(`/api/trips/${tripId}/days/${dayId}/activities/bulk-add-from-swipes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          place_ids: session.likedPlaces,
+          slot,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to add places to day');
+      }
+
+      const result = await response.json();
+      
+      // Show success toast
+      if (result.addedCount > 0) {
+        addToast({
+          title: 'Places added',
+          description: `${result.addedCount} place${result.addedCount !== 1 ? 's' : ''} added to ${slot}`,
+          variant: 'success',
+        });
+      }
+      
+      // Call the callback
+      if (onAddToDay) {
+        onAddToDay(session.likedPlaces);
+      }
+
+      // Optionally close the drawer (handled by parent)
+    } catch (error: any) {
+      console.error('Error adding places to day:', error);
+      // Error handling can be added here
+    }
+  };
+
+  return (
+    <div className={cn("flex flex-col h-full overflow-hidden", className)}>
+      {/* Header with swipe counter and undo button */}
+      <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
+        <h2 className="text-lg font-semibold">Discover Places</h2>
+        <div className="flex items-center gap-2 sm:gap-4">
+          {swipeHistory.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUndo}
+              disabled={swipeMutation.isPending}
+              className="text-sm min-h-[44px] min-w-[44px] touch-manipulation"
+            >
+              <Undo2 className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Undo</span>
+            </Button>
+          )}
+          <SwipeCounter tripId={tripId} />
+        </div>
+      </div>
+
+      {/* Card Stack */}
+      <div className="flex-1 relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">
+        {isLoadingMore ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Loading places...</p>
+          </div>
+        ) : isError ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            <p className="text-lg font-medium mb-2 text-destructive">Unable to load places</p>
+            <p className="text-sm text-muted-foreground mb-6 max-w-md">
+              We're having trouble loading places right now. Please check your connection and try again.
+            </p>
+            <Button onClick={() => refetchPlaces()} variant="outline" size="lg">
+              Try Again
+            </Button>
+          </div>
+        ) : isLimitReached && !hasMoreCards ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            <p className="text-lg font-medium mb-2">Daily swipe limit reached</p>
+            <p className="text-sm text-muted-foreground mb-6 max-w-md">
+              {hasLikedPlaces
+                ? `You've reached your daily limit of ${session?.dailyLimit || 10} swipes. You've liked ${likedCount} place${likedCount !== 1 ? 's' : ''}. Upgrade to Pro for unlimited swipes!`
+                : `You've reached your daily limit of ${session?.dailyLimit || 10} swipes. Upgrade to Pro for unlimited swipes!`}
+            </p>
+            <div className="flex flex-col gap-3 items-center">
+              {hasLikedPlaces && (
+                mode === 'day' && dayId && slot ? (
+                  <Button onClick={handleAddToDay} size="lg">
+                    <Heart className="mr-2 h-4 w-4" />
+                    Add {likedCount} place{likedCount !== 1 ? 's' : ''} to {slot}
+                  </Button>
+                ) : onAddToItinerary ? (
+                  <Button onClick={onAddToItinerary} size="lg">
+                    <Heart className="mr-2 h-4 w-4" />
+                    Add {likedCount} place{likedCount !== 1 ? 's' : ''} to itinerary
+                  </Button>
+                ) : null
+              )}
+              <Button 
+                onClick={() => window.location.href = '/settings?upgrade=true'} 
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                Upgrade to Pro
+              </Button>
+            </div>
+          </div>
+        ) : !hasMoreCards ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            <p className="text-lg font-medium mb-2">No more places to explore</p>
+            <p className="text-sm text-muted-foreground mb-6 max-w-md">
+              {hasLikedPlaces
+                ? `You've liked ${likedCount} place${likedCount !== 1 ? 's' : ''}. Ready to add them to your itinerary?`
+                : "You've explored everything in this area. Try changing filters or exploring another day."}
+            </p>
+            {hasLikedPlaces && (
+              mode === 'day' && dayId && slot ? (
+                <Button onClick={handleAddToDay} size="lg">
+                  <Heart className="mr-2 h-4 w-4" />
+                  Add {likedCount} place{likedCount !== 1 ? 's' : ''} to {slot}
+                </Button>
+              ) : onAddToItinerary ? (
+                <Button onClick={onAddToItinerary} size="lg">
+                  <Heart className="mr-2 h-4 w-4" />
+                  Add {likedCount} place{likedCount !== 1 ? 's' : ''} to itinerary
+                </Button>
+              ) : null
+            )}
+          </div>
+        ) : (
+          <div className="relative w-full h-full">
+            {/* Onboarding Tooltip */}
+            {showOnboarding && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Info className="h-5 w-5 text-blue-500" />
+                      <h3 className="text-lg font-semibold">How to Explore</h3>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => {
+                        setShowOnboarding(false);
+                        localStorage.setItem('explore-onboarding-seen', 'true');
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700">
+                        <Heart className="h-4 w-4" />
+                      </div>
+                      <span><strong>Swipe right</strong> or click the heart to like a place</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700">
+                        <X className="h-4 w-4" />
+                      </div>
+                      <span><strong>Swipe left</strong> or click X to pass</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700">
+                        <ArrowUp className="h-4 w-4" />
+                      </div>
+                      <span><strong>Swipe up</strong> or click the arrow to view details</span>
+                    </div>
+                  </div>
+                  <Button
+                    className="w-full mt-4"
+                    onClick={() => {
+                      setShowOnboarding(false);
+                      localStorage.setItem('explore-onboarding-seen', 'true');
+                    }}
+                  >
+                    Got it!
+                  </Button>
+                </div>
+              </div>
+            )}
+            <AnimatePresence mode="popLayout">
+              {/* Show next 2 cards as preview */}
+              {places.slice(currentIndex, currentIndex + 3).map((place, idx) => (
+                <div
+                  key={`${place.place_id}-${currentIndex + idx}`}
+                  className="absolute inset-4 md:inset-8 lg:inset-16"
+                  style={{
+                    zIndex: 3 - idx,
+                    transform: idx > 0 ? `scale(${1 - idx * 0.05}) translateY(${idx * 8}px)` : undefined,
+                  }}
+                >
+                  <SwipeableCard
+                    place={place}
+                    onSwipe={idx === 0 ? handleSwipe : () => {}}
+                    disabled={
+                      idx !== 0 ||
+                      swipeMutation.isPending ||
+                      (session?.remainingSwipes !== null && session.remainingSwipes <= 0)
+                    }
+                  />
+                </div>
+              ))}
+            </AnimatePresence>
+
+            {/* Loading indicator when fetching more */}
+            {isLoading && places.length > 0 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Footer with action summary */}
+      {hasLikedPlaces && (
+        <div className="p-4 border-t bg-muted/50 flex-shrink-0">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm text-muted-foreground">
+              {likedCount} place{likedCount !== 1 ? 's' : ''} liked
+            </span>
+            {mode === 'day' && dayId && slot ? (
+              <Button onClick={handleAddToDay} size="sm" className="min-h-[44px] touch-manipulation">
+                <Heart className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Add to {slot}</span>
+                <span className="sm:hidden">Add</span>
+              </Button>
+            ) : onAddToItinerary ? (
+              <Button onClick={onAddToItinerary} size="sm" className="min-h-[44px] touch-manipulation">
+                <Heart className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Add to itinerary</span>
+                <span className="sm:hidden">Add</span>
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* Place Details Drawer */}
+      <PlaceDetailsDrawer
+        open={detailsDrawerOpen}
+        onOpenChange={setDetailsDrawerOpen}
+        placeId={selectedPlaceId}
+        placeName={selectedPlaceName}
+        onAddToPlan={() => {
+          // Handle add to plan (save to saved_places)
+          if (selectedPlaceId) {
+            const place = places.find(p => p.place_id === selectedPlaceId);
+            if (place && onAddToItinerary) {
+              // For now, just like the place and show message
+              // In future, can implement a separate "save to plan" action
+              swipeMutation.mutate(
+                { placeId: selectedPlaceId, action: 'like', source: mode },
+                {
+                  onSuccess: () => {
+                    setDetailsDrawerOpen(false);
+                  },
+                }
+              );
+            }
+          }
+        }}
+        onAddToItinerary={() => {
+          // Like the place when user clicks "Add to itinerary"
+          if (selectedPlaceId) {
+            swipeMutation.mutate(
+              { placeId: selectedPlaceId, action: 'like', source: mode },
+              {
+                onSuccess: () => {
+                  setDetailsDrawerOpen(false);
+                  // Optionally remove from deck or keep it
+                },
+              }
+            );
+          }
+        }}
+      />
+    </div>
+  );
+}
+

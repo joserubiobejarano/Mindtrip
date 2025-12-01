@@ -37,3 +37,48 @@ export async function findPlacePhoto(query: string): Promise<string | null> {
   }
 }
 
+/**
+ * Fetch place details by place_id from Google Places API (Server-side)
+ */
+export async function getPlaceDetails(placeId: string): Promise<{
+  name: string;
+  formatted_address?: string;
+  types?: string[];
+  rating?: number;
+  user_ratings_total?: number;
+  photos?: Array<{ photo_reference: string }>;
+  geometry?: { location: { lat: number; lng: number } };
+} | null> {
+  if (!GOOGLE_MAPS_API_KEY) {
+    console.error("Missing Google Maps API Key");
+    return null;
+  }
+
+  try {
+    const fields = [
+      'name',
+      'formatted_address',
+      'types',
+      'rating',
+      'user_ratings_total',
+      'photos',
+      'geometry',
+    ].join(',');
+
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=${fields}&key=${GOOGLE_MAPS_API_KEY}`;
+    
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status === 'OK' && data.result) {
+      return data.result;
+    }
+
+    console.error('Google Places API error:', data.status, data.error_message);
+    return null;
+  } catch (error) {
+    console.error("Error fetching place details:", error);
+    return null;
+  }
+}
+

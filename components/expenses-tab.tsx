@@ -313,6 +313,41 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         </Button>
       </div>
 
+      {/* Total Spent Summary */}
+      {expenses.length > 0 && (() => {
+        // Calculate totals by currency
+        const totalsByCurrency: Record<string, number> = {};
+        expenses.forEach((expense) => {
+          totalsByCurrency[expense.currency] = (totalsByCurrency[expense.currency] || 0) + expense.amount;
+        });
+
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Spent</CardTitle>
+              <CardDescription>
+                Total expenses for this trip
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {Object.entries(totalsByCurrency).map(([currency, total]) => (
+                  <div
+                    key={currency}
+                    className="flex justify-between items-center p-3 rounded-md bg-muted"
+                  >
+                    <span className="font-medium text-lg">{currency}</span>
+                    <span className="text-2xl font-bold">
+                      {currency} {total.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
+
       {/* Balance Summary */}
       {balances.data && Object.keys(balances.data).length > 0 && (
         <Card>

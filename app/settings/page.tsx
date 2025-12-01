@@ -15,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
+import { Sparkles, Check, Infinity } from "lucide-react";
 
 const CURRENCIES = [
   "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR", "MXN",
@@ -27,6 +28,7 @@ const CURRENCIES = [
 export default function SettingsPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { addToast } = useToast();
   const supabase = createClient();
   const queryClient = useQueryClient();
@@ -34,8 +36,10 @@ export default function SettingsPage() {
   const [displayName, setDisplayName] = useState("");
   const [defaultCurrency, setDefaultCurrency] = useState("USD");
   const [isSaving, setIsSaving] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const showUpgrade = searchParams?.get('upgrade') === 'true';
 
-  // Fetch profile
+  // Fetch profile and subscription status
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
@@ -55,6 +59,16 @@ export default function SettingsPage() {
     },
     enabled: !!user?.id && isLoaded,
   });
+
+  // Fetch subscription status
+  useEffect(() => {
+    if (user?.id) {
+      fetch('/api/user/subscription-status')
+        .then(res => res.json())
+        .then(data => setIsPro(data.isPro || false))
+        .catch(() => setIsPro(false));
+    }
+  }, [user?.id]);
 
   // Update local state when profile loads
   useEffect(() => {
@@ -168,6 +182,91 @@ export default function SettingsPage() {
                 Managed by Clerk
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Subscription / Upgrade Section */}
+        <Card className={`mt-6 ${showUpgrade ? 'ring-2 ring-purple-500' : ''}`}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Subscription</CardTitle>
+                <CardDescription>
+                  {isPro ? 'You have Pro access' : 'Upgrade to unlock unlimited features'}
+                </CardDescription>
+              </div>
+              {isPro && (
+                <div className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
+                  <Sparkles className="h-4 w-4" />
+                  <span className="text-sm font-medium">Pro</span>
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isPro ? (
+              <div className="space-y-4">
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <h3 className="font-semibold mb-3 text-purple-900">Pro Benefits</h3>
+                  <ul className="space-y-2 text-sm text-purple-800">
+                    <li className="flex items-center gap-2 font-semibold text-base">
+                      <Check className="h-5 w-5 text-purple-600" />
+                      <span>Unlimited daily swipes</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-purple-600" />
+                      <span>Advanced filters (budget & distance)</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-purple-600" />
+                      <span>Priority support</span>
+                    </li>
+                  </ul>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Thank you for being a Pro member!
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                  <h3 className="font-semibold mb-3">Upgrade to Pro</h3>
+                  <ul className="space-y-2 text-sm mb-4">
+                    <li className="flex items-center gap-2 font-semibold text-base">
+                      <Check className="h-5 w-5 text-purple-600" />
+                      <span>Unlimited daily swipes</span>
+                      <span className="text-xs text-muted-foreground font-normal">(vs 10/day free)</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-purple-600" />
+                      <span>Advanced filters: budget & distance</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-purple-600" />
+                      <span>Priority support</span>
+                    </li>
+                  </ul>
+                  <Button
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    size="lg"
+                    onClick={() => {
+                      // TODO: Integrate with Stripe checkout
+                      addToast({
+                        variant: 'default',
+                        title: 'Coming soon',
+                        description: 'Stripe integration will be available soon. For now, contact support to upgrade.',
+                      });
+                    }}
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Upgrade to Pro
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Free plan includes 10 swipes per day. Upgrade for unlimited access.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

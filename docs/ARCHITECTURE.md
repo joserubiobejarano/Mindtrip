@@ -1,0 +1,746 @@
+# MindTrip - Architecture Documentation
+
+> **Last Updated:** January 2025  
+> **Focus:** System Architecture & Data Flow
+
+## 📋 Table of Contents
+
+1. [System Overview](#system-overview)
+2. [Architecture Diagram](#architecture-diagram)
+3. [Data Flow](#data-flow)
+4. [Explore Feature Architecture](#explore-feature-architecture)
+5. [Itinerary Generation Flow](#itinerary-generation-flow)
+6. [Database Schema](#database-schema)
+7. [API Architecture](#api-architecture)
+8. [Frontend Architecture](#frontend-architecture)
+9. [Integration Points](#integration-points)
+
+---
+
+## System Overview
+
+MindTrip is a full-stack Next.js application with the following architecture:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Frontend (Next.js 15)                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │   React UI   │  │  Components  │  │    Hooks    │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Next.js API Routes                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │  Trip APIs   │  │  Explore APIs │  │   AI APIs    │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        ▼                   ▼                   ▼
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│   Supabase   │  │   OpenAI     │  │ Google Places│
+│  (Database)  │  │    API       │  │     API      │
+└──────────────┘  └──────────────┘  └──────────────┘
+        │
+        ▼
+┌──────────────┐
+│    Clerk     │
+│ (Auth)       │
+└──────────────┘
+```
+
+---
+
+## Architecture Diagram
+
+### High-Level Architecture
+
+```
+User Browser
+    │
+    ├─► Next.js App Router (Frontend)
+    │   ├─► React Components
+    │   ├─► React Query (State Management)
+    │   └─► Framer Motion (Animations)
+    │
+    ├─► Next.js API Routes (Backend)
+    │   ├─► /api/trips/* (Trip Management)
+    │   ├─► /api/explore/* (Explore Feature)
+    │   ├─► /api/ai/* (AI Features)
+    │   └─► /api/accommodation/* (Hotels)
+    │
+    └─► External Services
+        ├─► Supabase (Database + Realtime)
+        ├─► Clerk (Authentication)
+        ├─► OpenAI (AI Generation)
+        ├─► Google Places API (Places Data)
+        └─► Mapbox (Maps & Directions)
+```
+
+### Data Flow Diagram
+
+```
+┌─────────────┐
+│   User      │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────────────────────────────┐
+│  1. Create Trip / Search City       │
+└──────┬──────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────┐
+│  2. Generate Smart Itinerary        │
+│     (OpenAI + Google Places)        │
+└──────┬──────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────┐
+│  3. Display Itinerary                │
+│     (SmartItinerary format)          │
+└──────┬──────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────┐
+│  4. User Swipes Places in Explore   │
+│     (Tinder-style interface)        │
+└──────┬──────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────┐
+│  5. Store Liked Places              │
+│     (explore_sessions table)         │
+└──────┬──────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────┐
+│  6. Regenerate Itinerary            │
+│     (with liked places)              │
+└──────┬──────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────┐
+│  7. Updated Itinerary Display       │
+└─────────────────────────────────────┘
+```
+
+---
+
+## Data Flow
+
+### New Product Flow (With Explore Feature)
+
+1. **Trip Creation**
+   - User creates trip with city + dates
+   - Trip stored in `trips` table
+   - Days auto-generated in `days` table
+
+2. **Initial Itinerary Generation**
+   - User triggers itinerary generation
+   - API: `POST /api/trips/[tripId]/smart-itinerary`
+   - OpenAI generates SmartItinerary structure
+   - Google Places API enriches with photos
+   - Stored in `smart_itineraries` table
+
+3. **Explore Session Creation**
+   - User opens Explore tab
+   - API: `GET /api/trips/[tripId]/explore/places`
+   - Fetches places from Google Places API
+   - Filters out places already in itinerary
+   - Creates/loads `explore_sessions` record
+
+4. **Swipe Actions**
+   - User swipes on place cards
+   - API: `POST /api/trips/[tripId]/explore/swipe`
+   - Updates `liked_places` or `discarded_places` arrays
+   - Increments `swipe_count`
+   - Checks swipe limits (free tier)
+
+5. **Itinerary Regeneration**
+   - User clicks "Add to itinerary"
+   - API: `POST /api/trips/[tripId]/smart-itinerary`
+   - Body includes `must_include_place_ids`
+   - OpenAI regenerates with new places
+   - Re-clusters by neighborhood
+   - Updates `smart_itineraries` table
+
+6. **Display Updated Itinerary**
+   - Frontend fetches updated SmartItinerary
+   - Displays with new places highlighted
+   - Shows success notification
+
+---
+
+## Explore Feature Architecture
+
+### Component Hierarchy
+
+```
+ExploreTab
+├── ExploreFilters (optional - Pro tier)
+├── ExploreDeck
+│   ├── SwipeableCard (stack of cards)
+│   │   ├── PlaceImage
+│   │   ├── PlaceInfo
+│   │   │   ├── PlaceName
+│   │   │   ├── Category
+│   │   │   ├── Neighborhood
+│   │   │   ├── Rating
+│   │   │   └── Tags
+│   │   └── SwipeActions
+│   └── EmptyState
+├── SwipeCounter
+└── AddToItineraryButton
+```
+
+### State Management
+
+```typescript
+// Explore Tab State
+interface ExploreState {
+  places: ExplorePlace[];
+  currentIndex: number;
+  likedPlaces: string[];  // place_ids
+  discardedPlaces: string[];
+  swipeCount: number;
+  remainingSwipes: number;
+  isLoading: boolean;
+  hasMore: boolean;
+  filters: ExploreFilters;
+}
+```
+
+### API Integration Flow
+
+```
+Frontend Component
+    │
+    ├─► useExplorePlaces() hook
+    │   └─► GET /api/trips/[tripId]/explore/places
+    │       └─► Google Places API
+    │
+    ├─► handleSwipe() function
+    │   └─► POST /api/trips/[tripId]/explore/swipe
+    │       └─► Update explore_sessions table
+    │
+    └─► handleAddToItinerary() function
+        └─► POST /api/trips/[tripId]/smart-itinerary
+            ├─► Get liked places from explore_sessions
+            ├─► Get existing places from smart_itineraries
+            ├─► Call OpenAI with must_include_place_ids
+            └─► Update smart_itineraries table
+```
+
+---
+
+## Itinerary Generation Flow
+
+### Smart Itinerary Generation
+
+```
+User Action: Generate/Regenerate Itinerary
+    │
+    ▼
+POST /api/trips/[tripId]/smart-itinerary
+    │
+    ├─► Load Trip Data
+    │   └─► trips table
+    │
+    ├─► Load Days
+    │   └─► days table
+    │
+    ├─► Load Saved Places (optional)
+    │   └─► saved_places table
+    │
+    ├─► Load Liked Places (if regenerating)
+    │   └─► explore_sessions.liked_places
+    │
+    ├─► Build OpenAI Prompt
+    │   ├─► Trip details
+    │   ├─► Days information
+    │   ├─► Saved places
+    │   └─► Must include places (from Explore)
+    │
+    ├─► Call OpenAI API
+    │   └─► GPT-4o-mini with JSON mode
+    │
+    ├─► Validate Response
+    │   └─► Zod schema validation
+    │
+    ├─► Enrich with Photos
+    │   └─► Google Places API (place photos)
+    │
+    └─► Save to Database
+        └─► smart_itineraries table
+```
+
+### Itinerary Regeneration with Liked Places
+
+```
+User Clicks "Add to Itinerary"
+    │
+    ▼
+1. Get Liked Places
+   └─► explore_sessions.liked_places
+    │
+    ▼
+2. Get Existing Places
+   └─► smart_itineraries.content (extract place_ids)
+    │
+    ▼
+3. Fetch Place Details
+   └─► Google Places API (Place Details)
+    │
+    ▼
+4. Build Regeneration Prompt
+   ├─► Original itinerary structure
+   ├─► Must include: liked places
+   ├─► Already planned: existing places
+   └─► Instructions: re-cluster, preserve structure
+    │
+    ▼
+5. Call OpenAI
+   └─► Generate updated SmartItinerary
+    │
+    ▼
+6. Validate & Enrich
+   ├─► Zod validation
+   └─► Photo enrichment
+    │
+    ▼
+7. Update Database
+   └─► smart_itineraries table
+    │
+    ▼
+8. Clear Explore Session (optional)
+   └─► Reset liked_places array
+```
+
+---
+
+## Database Schema
+
+### Core Tables
+
+**trips**
+- Stores trip information
+- Links to days, activities, members
+
+**days**
+- Auto-generated days for trip date range
+- Links to activities
+
+**activities**
+- Activities/places in itinerary
+- Links to places table
+
+**places**
+- Place information (Google Places data)
+- Can be linked to multiple activities
+
+**smart_itineraries**
+- Cached AI-generated itineraries
+- JSONB column stores SmartItinerary structure
+
+### New Tables for Explore Feature ✅ **IMPLEMENTED**
+
+**explore_sessions** ✅
+- **Location:** Migration file: `database/migrations/supabase-add-explore-sessions-table.sql`
+- **Status:** ✅ Created and ready for use
+- **Schema:**
+  - `id` UUID PRIMARY KEY
+  - `trip_id` UUID REFERENCES trips(id) ON DELETE CASCADE
+  - `user_id` TEXT NOT NULL (Clerk user ID)
+  - `liked_place_ids` TEXT[] DEFAULT '{}' (Google place_ids)
+  - `discarded_place_ids` TEXT[] DEFAULT '{}' (Google place_ids)
+  - `swipe_count` INTEGER DEFAULT 0
+  - `last_swipe_at` TIMESTAMPTZ (for daily reset logic)
+  - `created_at` TIMESTAMPTZ
+  - `updated_at` TIMESTAMPTZ (auto-updated via trigger)
+  - UNIQUE constraint on (trip_id, user_id)
+  - Indexes: `idx_explore_sessions_trip_user`, `idx_explore_sessions_user_id`, `idx_explore_sessions_last_swipe` (from supabase-add-explore-indexes.sql)
+
+**profiles.is_pro** ✅
+- **Location:** Migration file: `database/migrations/add-is-pro-to-profiles.sql`
+- **Status:** ✅ Implemented
+- **Schema:**
+  - `is_pro` BOOLEAN NOT NULL DEFAULT false
+  - Index: `idx_profiles_is_pro` (for faster Pro user lookups)
+  - Used by subscription status API to determine user tier
+
+**user_travel_stats** (Future - Pro tier)
+```sql
+CREATE TABLE user_travel_stats (
+  user_id TEXT PRIMARY KEY,
+  total_places_liked INTEGER,
+  total_places_visited INTEGER,
+  countries_visited TEXT[],
+  categories_explored TEXT[],
+  badges_earned TEXT[],
+  updated_at TIMESTAMP
+);
+```
+
+### Relationships
+
+```
+trips
+  ├─► days (1:N)
+  ├─► activities (1:N)
+  ├─► trip_members (1:N)
+  ├─► smart_itineraries (1:1)
+  └─► explore_sessions (1:N)
+
+explore_sessions
+  └─► trips (N:1)
+  └─► user_id → profiles (N:1)
+
+activities
+  ├─► days (N:1)
+  └─► places (N:1)
+```
+
+---
+
+## API Architecture
+
+### API Route Structure
+
+```
+/app/api/
+├── trips/
+│   └── [tripId]/
+│       ├── chat/                    # Trip Assistant
+│       ├── itinerary-chat/          # Itinerary editing
+│       ├── smart-itinerary/         # Itinerary generation
+│       │   └── place/               # Place updates
+│       └── explore/                 # ✅ IMPLEMENTED: Explore feature
+│           ├── places/              # ✅ GET: Fetch places
+│           ├── swipe/                # ✅ POST: Record swipe (like/dislike/undo)
+│           └── session/              # ✅ GET/DELETE: Session management
+│       └── days/                     # ✅ IMPLEMENTED: Day-level integration (Backend Complete)
+│           └── [dayId]/
+│               └── activities/
+│                   └── bulk-add-from-swipes/  # ✅ POST: Add places to day/slot (morning/afternoon/evening)
+├── user/
+│   └── subscription-status/          # ✅ GET: User subscription status (checks is_pro column)
+├── ai/
+│   └── plan-day/                    # AI day planning
+├── ai-itinerary/                    # Legacy itinerary
+├── accommodation/
+│   └── find/                        # Hotel search
+└── intent/
+    └── travel/                      # Future: Intent detection
+```
+
+### API Response Patterns
+
+**Success Response:**
+```typescript
+{
+  data: T;
+  success: true;
+}
+```
+
+**Error Response:**
+```typescript
+{
+  error: string;
+  details?: any;
+  status: number;
+}
+```
+
+### Authentication
+
+- All API routes use Clerk authentication
+- User ID extracted from Clerk session
+- RLS policies enforce data access
+
+---
+
+## Frontend Architecture
+
+### Component Structure
+
+```
+app/
+├── (auth)/                          # Auth pages
+├── trips/
+│   └── [tripId]/
+│       └── page.tsx                 # Trip detail page
+│           └── TripShell
+│               └── TripTabs
+│                   ├── ItineraryTab
+│                   ├── ExploreTab (updated) ✅
+│                   ├── ExpensesTab
+│                   └── ChecklistsTab
+└── components/
+    ├── explore/                      # ✅ IMPLEMENTED: Explore components
+    │   ├── SwipeableCard.tsx ✅
+    │   ├── ExploreDeck.tsx ✅
+    │   ├── ExploreFilters.tsx ✅
+    │   └── SwipeCounter.tsx ✅
+    └── itinerary/
+        └── AddMoreActivitiesButton.tsx  # Phase 17 (🚧 UI component remaining)
+```
+
+### State Management
+
+**React Query (TanStack Query)**
+- Server state management
+- Caching and refetching
+- Optimistic updates
+
+**Local State (useState)**
+- UI state (modals, drawers)
+- Form state
+- Component-specific state
+
+**Supabase Realtime**
+- Real-time updates for:
+  - Activities
+  - Places
+  - Checklists
+  - Trip members
+
+### Hooks Structure
+
+```
+hooks/
+├── use-trip.ts                      # Trip data
+├── use-activities.ts                # Activities
+├── use-days.ts                      # Days
+├── use-realtime-activities.ts       # Real-time activities
+├── use-realtime-checklists.ts       # Real-time checklists
+└── use-explore.ts                   # ✅ IMPLEMENTED: Explore feature
+    ├── useExplorePlaces() ✅ (supports day-level filtering, Pro tier filters)
+    ├── useExploreSession() ✅
+    └── useSwipeAction() ✅ (supports undo functionality)
+```
+
+---
+
+## Integration Points
+
+### Google Places API
+
+**Endpoints Used:**
+- Text Search (hotel search)
+- Nearby Search (places in destination)
+- Place Details (place information)
+- Place Photos (place images)
+
+**Rate Limits:**
+- Monitor usage
+- Implement caching
+- Batch requests when possible
+
+### OpenAI API
+
+**Usage:**
+- Smart Itinerary generation
+- Day planning
+- Trip Assistant chat
+- Itinerary editing
+
+**Models:**
+- GPT-4o-mini (primary)
+- JSON mode for structured responses
+
+**Caching:**
+- Store generated itineraries in database
+- Regenerate only when needed
+
+### Mapbox
+
+**Services:**
+- Map display (Mapbox GL JS)
+- Geocoding (address search)
+- Directions (route optimization)
+
+### Supabase
+
+**Features:**
+- PostgreSQL database
+- Realtime subscriptions
+- Row Level Security (RLS)
+- Storage (if needed)
+
+### Clerk
+
+**Features:**
+- Authentication
+- User management
+- Session management
+- OAuth providers (Google)
+
+---
+
+## Data Flow: Explore Feature
+
+### Complete Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    User Opens Explore Tab                   │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│  GET /api/trips/[tripId]/explore/places                    │
+│  - Fetch places from Google Places API                     │
+│  - Filter by destination                                    │
+│  - Exclude places in itinerary (if toggle on)               │
+│  - Apply filters (neighborhood, category, etc.)             │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Display Swipeable Cards                                     │
+│  - Show one card at a time                                  │
+│  - Display place info, photo, rating, tags                  │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│  User Swipes (Right = Like, Left = Dislike)                 │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│  POST /api/trips/[tripId]/explore/swipe                     │
+│  - Update explore_sessions table                            │
+│  - Add to liked_places or discarded_places                  │
+│  - Increment swipe_count                                    │
+│  - Check swipe limits                                       │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│  User Clicks "Add to Itinerary"                              │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│  POST /api/trips/[tripId]/smart-itinerary                   │
+│  - Get liked_places from explore_sessions                   │
+│  - Get existing places from smart_itineraries               │
+│  - Regenerate itinerary with must_include_place_ids          │
+│  - Re-cluster by neighborhood                                │
+│  - Update smart_itineraries table                            │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Display Updated Itinerary                                   │
+│  - Show new places highlighted                                │
+│  - Show success notification                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Performance Considerations
+
+### Caching Strategy
+
+1. **Google Places API**
+   - Cache place details
+   - Cache place photos
+   - TTL: 24 hours
+
+2. **OpenAI Responses**
+   - Store in `smart_itineraries` table
+   - Only regenerate when needed
+
+3. **React Query**
+   - Cache API responses
+   - Stale time: 5 minutes
+   - Refetch on window focus
+
+### Optimization
+
+1. **Lazy Loading**
+   - Load place cards on demand
+   - Virtual scrolling for large lists
+
+2. **Image Optimization**
+   - Use Google Places photo API with size limits
+   - Lazy load images
+   - Use Next.js Image component
+
+3. **Database Queries**
+   - Use indexes on foreign keys
+   - Limit result sets
+   - Use pagination
+
+---
+
+## Security Considerations
+
+### Authentication
+- All API routes require authentication
+- Clerk handles session management
+- RLS policies enforce data access
+
+### Data Validation
+- Zod schemas for API inputs
+- TypeScript for type safety
+- Sanitize user inputs
+
+### API Keys
+- Never expose API keys to client
+- Use environment variables
+- Rotate keys regularly
+
+### Rate Limiting
+- Implement swipe limits (free tier)
+- Monitor API usage
+- Handle rate limit errors gracefully
+
+---
+
+## Implementation Status
+
+### ✅ Explore Feature - COMPLETE (Phases 15-16)
+
+**Phase 15: Tinder-Style Place Discovery** ✅
+- Database: `explore_sessions` table created and migrated with indexes
+- API: All endpoints implemented (`/api/trips/[tripId]/explore/*`)
+- Frontend: All components implemented (ExploreDeck, SwipeableCard, ExploreFilters, SwipeCounter)
+- Hooks: use-explore.ts with React Query integration
+- Integration: Google Places API for place discovery (`lib/google/explore-places.ts`)
+- Subscription: User subscription checking (`lib/supabase/user-subscription.ts`)
+- User API: `/api/user/subscription-status` endpoint
+- Features: Undo swipe, day-level filtering, Pro tier filters (budget, maxDistance)
+
+**Phase 16: Itinerary Regeneration** ✅
+- Smart itinerary generator updated to support `must_include_place_ids`
+- Preserve structure option implemented (`preserve_structure` parameter)
+- Re-clustering logic implemented
+- Integration helpers: `lib/supabase/explore-integration.ts`
+- Clear liked places after successful regeneration
+- Day-level bulk add: `/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`
+
+**Phase 17: Day-Level Integration** 🚧 (Backend Complete, UI Remaining)
+- ✅ Day-level bulk add API endpoint implemented (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
+- ✅ Day-level filtering in Explore API (filter by `day_id` parameter)
+- ✅ User subscription system implemented (`is_pro` column, subscription status API)
+- ✅ Advanced filters for Pro tier (budget, maxDistance)
+- ✅ Daily swipe limit logic (50 for free tier, unlimited for Pro)
+- ✅ Undo swipe functionality
+- [ ] UI components for day-level integration ("Add more activities" button - next priority)
+- [ ] Additional advanced filters (vibe, theme, accessibility)
+- [ ] Multi-city Explore support
+- [ ] Travel stats and badges system
+- See NEXT_STEPS.md for remaining implementation plan
+
+---
+
+**Last Updated:** January 2025
+

@@ -64,6 +64,31 @@ npm run dev
 - Place discovery and exploration
 - Add places to itinerary functionality
 
+### Phase 15 - Explore Feature: Tinder-Style Place Discovery ✅
+- Tinder-style swipe UI for place discovery
+- Swipeable card deck component with Framer Motion animations
+- Place cards with photos, ratings, categories, and tags
+- Swipe gestures (right = like, left = dislike, up = details)
+- Undo swipe functionality
+- Daily swipe limits (50 for free tier, unlimited for Pro)
+- Explore session management and persistence
+- Integration with Google Places API for place discovery
+- Automatic exclusion of already swiped/planned places
+- Explore filters (neighborhood, category, time of day)
+- Day-level filtering support (filter by specific day's neighborhood)
+- Advanced filters for Pro tier (budget, maxDistance)
+- User subscription status checking API
+
+### Phase 16 - Explore Feature: Itinerary Regeneration with Liked Places ✅
+- Backend API for itinerary regeneration with liked places
+- Support for must_include_place_ids parameter
+- Support for already_planned_place_ids parameter
+- Re-clustering by neighborhood with new places
+- Preserve day structure when regenerating (preserve_structure parameter)
+- Smart placement of liked places in appropriate time slots
+- Clear liked places after successful regeneration
+- Day-level bulk add functionality (add places to specific day/slot)
+
 ### Phase 5 - Expenses & Checklists ✅
 - Expense tracking with category support
 - Automatic balance calculation per person
@@ -189,12 +214,17 @@ mindtrip/
 
 ## 📝 Documentation
 
-- [COMMANDS.md](./docs/COMMANDS.md) - All commands to run
-- [SETUP.md](./docs/SETUP.md) - Detailed setup instructions
-- [MIGRATION_INSTRUCTIONS.md](./docs/MIGRATION_INSTRUCTIONS.md) - Database migration guide
-- [ROADMAP.md](./docs/ROADMAP.md) - Development roadmap and progress tracking
-- [mobile-roadmap.md](./docs/mobile-roadmap.md) - Mobile app development roadmap
-- [database/supabase-schema.sql](./database/supabase-schema.sql) - Complete database schema
+- **[DEVELOPER_SUMMARY.md](./DEVELOPER_SUMMARY.md)** - ⭐ **Start here!** Comprehensive project overview for developers
+- **[ROADMAP.md](./ROADMAP.md)** - ⚠️ **UPDATED** Development roadmap with new Explore feature phases
+- **[NEXT_STEPS.md](./NEXT_STEPS.md)** - 🆕 **NEW** Explore feature implementation plan
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - 🆕 **NEW** System architecture and data flow
+- **[FEATURES.md](./FEATURES.md)** - 🆕 **NEW** Complete feature list and specifications
+- [mobile-roadmap.md](./mobile-roadmap.md) - Mobile app development roadmap
+- [monetization.md](./monetization.md) - Monetization strategy and revenue plans
+- [COMMANDS.md](./COMMANDS.md) - All commands to run (if exists)
+- [SETUP.md](./SETUP.md) - Detailed setup instructions (if exists)
+- [MIGRATION_INSTRUCTIONS.md](./MIGRATION_INSTRUCTIONS.md) - Database migration guide (if exists)
+- [database/supabase-schema.sql](../database/supabase-schema.sql) - Complete database schema
 
 ## 🎯 Next Steps
 
@@ -210,7 +240,19 @@ mindtrip/
 
 ## 📊 Current Status
 
-**Completed Phases:** 14 out of 20 planned phases (70% complete)
+**Completed Phases:** 16 out of 23 planned phases (~70% complete)
+**Phase 17:** Backend complete, UI components remaining
+
+**Recent Updates (January 2025):**
+- ✅ Phase 15 & 16 fully implemented and functional
+- ✅ Phase 17 backend complete (day-level bulk add API, filtering, Pro tier filters)
+- ✅ Day-level bulk add API endpoint (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
+- ✅ Undo swipe functionality implemented
+- ✅ User subscription system implemented (`is_pro` column, subscription status API)
+- ✅ Advanced filters (budget, maxDistance) for Pro tier
+- ✅ Day-level filtering support in Explore API
+- ✅ Daily swipe limits (50 for free tier, unlimited for Pro)
+- 🚧 Phase 17 UI components remaining ("Add more activities" button, etc.)
 
 **Key Features Implemented:**
 - ✅ Full trip planning and collaboration
@@ -223,10 +265,22 @@ mindtrip/
 - ✅ Google Places integration with photo enrichment
 - ✅ Expense tracking and checklists
 - ✅ Public sharing and PDF export
+- ✅ **Explore Feature (Tinder-style place discovery)** - **COMPLETE** (Phase 15)
+- ✅ **Itinerary regeneration with liked places from Explore** - **COMPLETE** (Phase 16)
+- ✅ **Day-level bulk add API** - Add places to specific day/slot (Phase 17 backend)
+- ✅ **Undo swipe functionality** - Undo last swipe action
+- ✅ **User subscription system** - Pro/free tier with `is_pro` column
+- ✅ **Subscription status API** - Check Pro/free tier status
+- ✅ **Advanced filters for Pro tier** - Budget and maxDistance filters
+- ✅ **Day-level filtering** - Filter Explore by specific day's neighborhood
+- ✅ **Daily swipe limits** - 50/day for free tier, unlimited for Pro
 
 **Next Priorities:**
-- Enhanced user experience features (templates, weather, photos)
-- Advanced collaboration (member chat, voting, comments)
+- Phase 17 UI: "Add more activities" button on each day in itinerary
+- Phase 17: Additional advanced filters (vibe, theme, accessibility)
+- Phase 17: Multi-city Explore support and travel stats/badges
+- Phase 18: Enhanced user experience features (templates, weather, photos)
+- Phase 19: Advanced collaboration (member chat, voting, comments)
 - Mobile app development
 - Web mobile optimization
 

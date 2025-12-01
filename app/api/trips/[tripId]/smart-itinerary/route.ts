@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { getOpenAIClient } from '@/lib/openai';
 import { SmartItinerary } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
-import { findPlacePhoto } from '@/lib/google/places-server';
+import { findPlacePhoto, getPlaceDetails } from '@/lib/google/places-server';
+import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
+import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 
 export const maxDuration = 300;
 
@@ -19,6 +22,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
 
   try {
     const supabase = await createClient();
+    const { userId } = await auth();
+
+    // Parse request body for regeneration parameters
+    let mustIncludePlaceIds: string[] = [];
+    let alreadyPlannedPlaceIds: string[] = [];
+    let preserveStructure = false;
+
+    try {
+      const body = await req.json().catch(() => ({}));
+      mustIncludePlaceIds = body.must_include_place_ids || [];
+      alreadyPlannedPlaceIds = body.already_planned_place_ids || [];
+      preserveStructure = body.preserve_structure || false;
+    } catch {
+      // Body parsing failed, continue with defaults
+    }
 
     // 1. Load Trip Details
     const { data: trip, error: tripError } = await supabase
@@ -31,7 +49,53 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
-    // 2. Load Saved Places
+    // 2. Load existing itinerary if regenerating
+    let existingItinerary: SmartItinerary | null = null;
+    if (preserveStructure || mustIncludePlaceIds.length > 0) {
+      const { data: existingData } = await supabase
+        .from('smart_itineraries')
+        .select('content')
+        .eq('trip_id', tripId)
+        .maybeSingle();
+
+      if (existingData?.content) {
+        try {
+          existingItinerary = existingData.content as SmartItinerary;
+        } catch (err) {
+          console.error('Error parsing existing itinerary:', err);
+        }
+      }
+    }
+
+    // 3. Fetch place details for must_include_place_ids
+    const mustIncludePlaces: Array<{
+      place_id: string;
+      name: string;
+      address?: string;
+      types?: string[];
+      rating?: number;
+    }> = [];
+
+    if (mustIncludePlaceIds.length > 0 && GOOGLE_MAPS_API_KEY) {
+      console.log(`[smart-itinerary] Fetching details for ${mustIncludePlaceIds.length} places`);
+      for (const placeId of mustIncludePlaceIds) {
+        const placeDetails = await getPlaceDetails(placeId);
+        if (placeDetails) {
+          mustIncludePlaces.push({
+            place_id: placeId,
+            name: placeDetails.name,
+            address: placeDetails.formatted_address,
+            types: placeDetails.types,
+            rating: placeDetails.rating,
+          });
+        }
+        // Small delay to avoid rate limits
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      console.log(`[smart-itinerary] Fetched ${mustIncludePlaces.length} place details`);
+    }
+
+    // 4. Load Saved Places
     const { data: savedPlaces } = await supabase
       .from('saved_places')
       .select('name, types')
@@ -41,19 +105,44 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     const tripMeta = {
       destination: trip.destination_name || trip.title,
       dates: `${new Date(trip.start_date).toDateString()} - ${new Date(trip.end_date).toDateString()}`,
-      savedPlaces: savedPlaces?.map(p => p.name) || []
+      savedPlaces: savedPlaces?.map(p => p.name) || [],
+      mustIncludePlaces: mustIncludePlaces.map(p => ({
+        name: p.name,
+        address: p.address,
+        types: p.types,
+        rating: p.rating,
+      })),
+      alreadyPlannedPlaceIds: alreadyPlannedPlaceIds.length > 0 ? alreadyPlannedPlaceIds : undefined,
     };
 
-    const system = `
-      You are an expert travel planner. Generate a multi-day travel itinerary as JSON matching the SmartItinerary schema.
-
-      RULES:
+    // Build system prompt with regeneration instructions
+    let structureInstructions = `
       1. Structure:
          - Split each day into three slots: "morning", "afternoon", "evening".
          - For each slot, pick 2–4 places.
          - Aim for 8–10 total places per day.
          - Ensure places in a slot are geographically close (same area/neighborhood) to reduce backtracking.
-         - Use the "areaCluster" field for the day's main area.
+         - Use the "areaCluster" field for the day's main area.`;
+
+    if (preserveStructure && existingItinerary) {
+      structureInstructions += `
+         - PRESERVE EXISTING DAY STRUCTURE: Keep the same days, themes, and area clusters.
+         - Only reshuffle activities/places within days as needed to accommodate new places.
+         - Maintain the overall flow and day-by-day organization.`;
+    }
+
+    if (mustIncludePlaces.length > 0) {
+      structureInstructions += `
+         - CRITICAL: You MUST place every place from the "mustIncludePlaces" array at least once in the itinerary.
+         - Do not ignore any place from mustIncludePlaces. Every single one must appear in at least one day/slot.
+         - Cluster mustIncludePlaces with other places in the same neighborhood/area when possible.`;
+    }
+
+    const system = `
+      You are an expert travel planner. Generate a multi-day travel itinerary as JSON matching the SmartItinerary schema.
+
+      RULES:
+      ${structureInstructions}
       
       2. Content:
          - In each day's "overview", include practical micro-tips (best time to visit, ticket warnings, busy hours).
@@ -101,7 +190,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       4. OUTPUT ONLY JSON matching the SmartItinerary schema. Do not include any text outside the JSON structure. Reply ONLY with a single JSON object that matches the SmartItinerary schema. Do not include any explanation or markdown. Do not wrap the response in any other object.
     `;
 
-    const userPrompt = `Trip details:\n${JSON.stringify(tripMeta)}\n\nGenerate the full itinerary.`;
+    // Build user prompt with existing itinerary if preserving structure
+    let userPrompt = `Trip details:\n${JSON.stringify(tripMeta)}\n\n`;
+    
+    if (preserveStructure && existingItinerary) {
+      userPrompt += `EXISTING ITINERARY STRUCTURE (preserve this structure):\n${JSON.stringify({
+        days: existingItinerary.days.map(day => ({
+          id: day.id,
+          index: day.index,
+          date: day.date,
+          title: day.title,
+          theme: day.theme,
+          areaCluster: day.areaCluster,
+        }))
+      }, null, 2)}\n\n`;
+      userPrompt += `Preserve the above day structure. Only reshuffle places/activities within days to accommodate the new mustIncludePlaces. Keep the same themes, area clusters, and day-by-day flow.\n\n`;
+    }
+    
+    userPrompt += `Generate the full itinerary.`;
 
     console.log('[smart-itinerary] generating itinerary for trip', tripId);
 
@@ -221,6 +327,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     console.log('[smart-itinerary] saved itinerary row for trip', tripId);
+
+    // Clear liked places after successful regeneration
+    if (mustIncludePlaceIds.length > 0 && userId) {
+      try {
+        await clearLikedPlacesAfterRegeneration(tripId, userId);
+        console.log('[smart-itinerary] cleared liked places after regeneration');
+      } catch (err) {
+        console.error('[smart-itinerary] error clearing liked places:', err);
+        // Don't fail the request if clearing fails
+      }
+    }
 
     // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
     // No wrapping - data.content is the SmartItinerary itself
