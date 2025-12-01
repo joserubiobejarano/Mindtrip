@@ -4,7 +4,7 @@
  * and avoid "LoadScript has been reloaded unintentionally" warnings.
  */
 
-export const GOOGLE_MAPS_LIBRARIES: google.maps.Library[] = ['places'];
+export const GOOGLE_MAPS_LIBRARIES: string[] = ['places'];
 
 export const DEFAULT_MAP_CONTAINER_STYLE: React.CSSProperties = {
   width: '100%',
