@@ -90,47 +90,50 @@ export function ExploreDeck({
     }
   }, [places.length]);
 
-  const handleSwipe = async (direction: 'left' | 'right' | 'up') => {
-    if (places.length === 0 || currentIndex < 0 || currentIndex >= places.length) return;
-
-    const currentPlace = places[currentIndex];
-    if (!currentPlace) return;
-
-    // Handle swipe up (details) - open details drawer
-    if (direction === 'up') {
-      setSelectedPlaceId(currentPlace.place_id);
-      setSelectedPlaceName(currentPlace.name);
-      setDetailsDrawerOpen(true);
-      return;
-    }
-
-    // Record swipe action
-    const action: 'like' | 'dislike' = direction === 'right' ? 'like' : 'dislike';
-    
-    try {
-      const response = await swipeMutation.mutateAsync({
-        placeId: currentPlace.place_id,
-        action,
-        source: mode,
-      });
-
-      // If limit reached, don't decrement index
-      if (response.limitReached) {
-        return;
+  const handleSwipeLeft = () => {
+    const place = places[currentIndex];
+    if (!place) return;
+    swipeMutation.mutate(
+      { placeId: place.place_id, action: 'dislike', source: mode === 'day' ? 'day' : 'trip' },
+      {
+        onSuccess: (res) => {
+          if (res?.limitReached) return;
+          // Track swipe in history for undo (max 3)
+          setSwipeHistory((prev) => {
+            const newHistory = [{ placeId: place.place_id, action: 'dislike' }, ...prev];
+            return newHistory.slice(0, 3);
+          });
+          setCurrentIndex((prev) => prev - 1);
+        },
       }
+    );
+  };
 
-      // Track swipe in history for undo (max 3)
-      setSwipeHistory((prev) => {
-        const newHistory = [{ placeId: currentPlace.place_id, action }, ...prev];
-        return newHistory.slice(0, 3); // Keep only last 3
-      });
+  const handleSwipeRight = () => {
+    const place = places[currentIndex];
+    if (!place) return;
+    swipeMutation.mutate(
+      { placeId: place.place_id, action: 'like', source: mode === 'day' ? 'day' : 'trip' },
+      {
+        onSuccess: (res) => {
+          if (res?.limitReached) return;
+          // Track swipe in history for undo (max 3)
+          setSwipeHistory((prev) => {
+            const newHistory = [{ placeId: place.place_id, action: 'like' }, ...prev];
+            return newHistory.slice(0, 3);
+          });
+          setCurrentIndex((prev) => prev - 1);
+        },
+      }
+    );
+  };
 
-      // Decrement index to show next card (only on successful swipes where limitReached is false)
-      setCurrentIndex((prev) => prev - 1);
-    } catch (error) {
-      // Error handling is done in the mutation
-      console.error('Swipe error:', error);
-    }
+  const handleSwipeUp = () => {
+    const place = places[currentIndex];
+    if (!place) return;
+    setSelectedPlaceId(place.place_id);
+    setSelectedPlaceName(place.name);
+    setDetailsDrawerOpen(true);
   };
 
   const handleUndo = async () => {
@@ -234,9 +237,9 @@ export function ExploreDeck({
         <div className="relative w-full max-w-2xl max-h-[80vh] flex items-center justify-center">
           <SwipeableCard
             place={currentPlace}
-            onSwipeLeft={() => handleSwipe('left')}
-            onSwipeRight={() => handleSwipe('right')}
-            onSwipeUp={() => handleSwipe('up')}
+            onSwipeLeft={handleSwipeLeft}
+            onSwipeRight={handleSwipeRight}
+            onSwipeUp={handleSwipeUp}
             disabled={
               swipeMutation.isPending ||
               (session?.remainingSwipes != null && session.remainingSwipes <= 0)
