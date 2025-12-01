@@ -3,6 +3,11 @@
 import { GoogleMap, Marker, Polyline } from "@react-google-maps/api";
 import { useMemo } from "react";
 import { useGoogleMaps } from "./google-maps-provider";
+import {
+  DEFAULT_MAP_CONTAINER_STYLE,
+  DEFAULT_MAP_OPTIONS,
+  DEFAULT_POLYLINE_OPTIONS,
+} from "@/lib/google/maps-config";
 
 export interface BaseMarker {
   id: string;
@@ -35,12 +40,7 @@ export function GoogleMapBase({
   const { isLoaded } = useGoogleMaps();
 
   const mapOptions = useMemo<google.maps.MapOptions>(
-    () => ({
-      disableDefaultUI: false,
-      zoomControl: true,
-      streetViewControl: false,
-      mapTypeControl: false,
-    }),
+    () => DEFAULT_MAP_OPTIONS,
     []
   );
 
@@ -57,7 +57,7 @@ export function GoogleMapBase({
   return (
     <div className={`w-full h-full ${className}`}>
       <GoogleMap
-        mapContainerStyle={{ width: "100%", height: "100%" }}
+        mapContainerStyle={DEFAULT_MAP_CONTAINER_STYLE}
         center={mapCenter}
         zoom={zoom}
         options={mapOptions}
@@ -81,11 +81,7 @@ export function GoogleMapBase({
         {routePath && routePath.length > 0 && (
           <Polyline
             path={routePath}
-            options={{
-              strokeColor: "#3b82f6",
-              strokeWeight: 3,
-              strokeOpacity: 0.8,
-            }}
+            options={DEFAULT_POLYLINE_OPTIONS}
           />
         )}
       </GoogleMap>
