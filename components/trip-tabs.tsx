@@ -58,26 +58,24 @@ export function TripTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
-      <div className="px-6 pt-6 pb-0">
-        <div className="mb-6 flex items-center justify-start">
-          <div className="inline-flex rounded-[999px] border-[3px] border-black bg-white px-1 py-1 shadow-[6px_6px_0_0_rgba(0,0,0,1)] gap-1">
-            {tabs.map((tab) => {
-              const isActive = tab.slug === activeTab;
-              return (
-                <button
-                  key={tab.slug}
-                  onClick={() => handleTabChange(tab.slug)}
-                  className={`px-4 py-2 text-sm font-semibold rounded-[999px] transition ${
-                    isActive
-                      ? "bg-orange-500 text-white"
-                      : "bg-transparent text-slate-800 hover:bg-slate-100"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+      <div className="flex items-center justify-end px-4 pt-4 pb-2">
+        <div className="inline-flex rounded-[999px] border-[3px] border-black bg-white px-1 py-1 shadow-[6px_6px_0_0_rgba(0,0,0,1)] gap-1">
+          {tabs.map((tab) => {
+            const isActive = tab.slug === activeTab;
+            return (
+              <button
+                key={tab.slug}
+                onClick={() => handleTabChange(tab.slug)}
+                className={`px-4 py-2 text-sm font-semibold rounded-[999px] transition ${
+                  isActive
+                    ? "bg-orange-500 text-white"
+                    : "bg-transparent text-slate-800 hover:bg-slate-100"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
       </div>
       <div className="flex-1 overflow-hidden">

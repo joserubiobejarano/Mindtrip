@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
+import { getUserSubscriptionStatus, FREE_SWIPE_LIMIT_PER_TRIP } from '@/lib/supabase/user-subscription';
 
 export async function GET(
   req: NextRequest,
@@ -63,7 +63,6 @@ export async function GET(
     }
 
     // Get subscription status and trip limit
-    const FREE_SWIPE_LIMIT_PER_TRIP = 10;
     const { isPro } = await getUserSubscriptionStatus(userId);
 
     // Calculate remaining swipes (null for Pro users)

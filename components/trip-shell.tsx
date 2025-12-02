@@ -35,7 +35,7 @@ export function TripShell({
     <div className="h-[calc(100vh-80px)] flex flex-col md:flex-row overflow-hidden bg-gradient-to-br from-purple-50/30 via-white to-orange-50/20">
       {/* Map Panel - Left (Top on Mobile) - Only visible on Explore tab */}
       {showMap && (
-        <div className="hidden lg:block lg:basis-[35%] xl:basis-[35%] h-[40vh] md:h-auto border-r-2 border-black/10 relative order-first">
+        <div className="hidden lg:block lg:basis-[45%] h-[40vh] md:h-auto border-r border-border relative order-first">
           <TripMapPanel
             tripId={tripId}
             selectedDayId={selectedDayId}
@@ -50,8 +50,8 @@ export function TripShell({
         </div>
       )}
 
-      {/* Content Panel - Right (Bottom on Mobile) - 65% width on Explore, 100% on other tabs */}
-      <div className={`flex flex-col bg-white/80 backdrop-blur-sm overflow-hidden ${showMap ? 'flex-1 lg:basis-[65%]' : 'flex-1'} h-[60vh] md:h-auto relative z-10 shadow-lg ${showMap ? 'border-l-2 border-black/10' : ''}`}>
+      {/* Content Panel - Right (Bottom on Mobile) - 55% width on Explore, 100% on other tabs */}
+      <div className={`flex flex-col bg-white/80 backdrop-blur-sm overflow-hidden ${showMap ? 'flex-1 lg:basis-[55%]' : 'flex-1'} h-[60vh] md:h-auto relative z-10 shadow-lg`}>
         {children}
       </div>
     </div>

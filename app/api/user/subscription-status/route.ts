@@ -15,10 +15,9 @@ export async function GET() {
     return NextResponse.json({ isPro });
   } catch (err: any) {
     console.error('GET /user/subscription-status error:', err);
-    return NextResponse.json(
-      { error: 'Internal server error', isPro: false },
-      { status: 500 }
-    );
+    // Return isPro: false instead of 500 error to avoid breaking the UI
+    // This handles cases where the profile doesn't exist or database schema mismatches
+    return NextResponse.json({ isPro: false });
   }
 }
 
