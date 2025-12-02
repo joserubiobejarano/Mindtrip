@@ -72,9 +72,9 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
         NOPE
       </motion.div>
 
-      {/* Image section - top ~2/3 */}
-      <div className="relative w-full flex-[2] overflow-hidden">
-        {place.photo_url ? (
+      {/* Image section - top ~60% */}
+      {place.photo_url ? (
+        <div className="relative w-full h-[60%] overflow-hidden">
           <Image
             src={place.photo_url}
             alt={place.name ?? 'Place photo'}
@@ -82,39 +82,39 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
             className="object-cover"
             unoptimized
           />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-purple-200 via-pink-200 to-orange-200" />
-        )}
-      </div>
-
-      {/* Text overlay - bottom ~1/3 */}
-      <div className="flex-1 p-6 flex flex-col justify-end bg-gradient-to-t from-black/60 via-black/40 to-transparent text-white relative">
-        <div className="relative z-10">
-          <div className="text-2xl font-bold mb-2">
-            {place.name ?? 'Unnamed place'}
-          </div>
-          {place.category && (
-            <div className="text-sm font-medium text-white/90 mb-2">
-              {place.category}
-            </div>
-          )}
-          {place.rating && (
-            <div className="flex items-center gap-2 text-sm text-white/90">
-              <span className="text-yellow-400">⭐</span>
-              <span className="font-semibold">{place.rating.toFixed(1)}</span>
-              {place.user_ratings_total && (
-                <span className="text-white/70">
-                  ({place.user_ratings_total.toLocaleString()} reviews)
-                </span>
-              )}
-            </div>
-          )}
-          {place.address && (
-            <div className="text-xs text-white/80 mt-2 line-clamp-1">
-              {place.address}
-            </div>
-          )}
+          {/* Optional subtle gradient at bottom of image for legibility */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
         </div>
+      ) : (
+        <div className="relative w-full h-[60%] overflow-hidden bg-gradient-to-br from-purple-200 via-pink-200 to-orange-200" />
+      )}
+
+      {/* Solid white info section - bottom ~40% */}
+      <div className="p-4 md:p-5 bg-white flex flex-col gap-1 flex-1">
+        <div className="text-xl md:text-2xl font-bold text-zinc-900 mb-1">
+          {place.name ?? 'Unnamed place'}
+        </div>
+        {place.category && (
+          <div className="text-sm text-zinc-600 mb-2">
+            {place.category}
+          </div>
+        )}
+        {place.rating && (
+          <div className="flex items-center gap-2 text-sm text-zinc-600">
+            <span className="text-yellow-400">⭐</span>
+            <span className="font-semibold">{place.rating.toFixed(1)}</span>
+            {place.user_ratings_total && (
+              <span className="text-zinc-500">
+                ({place.user_ratings_total.toLocaleString()} reviews)
+              </span>
+            )}
+          </div>
+        )}
+        {place.address && (
+          <div className="text-xs text-zinc-500 mt-2 line-clamp-1">
+            {place.address}
+          </div>
+        )}
       </div>
     </motion.div>
   );

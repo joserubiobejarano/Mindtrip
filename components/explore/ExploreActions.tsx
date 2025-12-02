@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from '@/components/ui/button';
 import { Undo2, X, Heart, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,53 +21,45 @@ export function ExploreActions({
   disabled = false,
 }: ExploreActionsProps) {
   return (
-    <div className="flex items-center justify-center gap-4 mt-6">
-      <Button
-        variant="outline"
-        size="icon"
+    <div className="mt-4 flex items-center justify-center gap-4 relative z-20">
+      <button
         className={cn(
-          "h-14 w-14 rounded-full shadow-lg border-2",
-          !canUndo && "opacity-50 cursor-not-allowed"
+          "h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-zinc-200 text-zinc-700 hover:bg-zinc-300 transition-colors",
+          (!canUndo || disabled) && "opacity-50 cursor-not-allowed"
         )}
         onClick={onUndo}
         disabled={!canUndo || disabled}
         aria-label="Undo"
       >
-        <Undo2 className="h-6 w-6" />
-      </Button>
+        <Undo2 className="h-5 w-5" />
+      </button>
 
-      <Button
-        variant="outline"
-        size="icon"
-        className="h-16 w-16 rounded-full shadow-lg border-2 border-rose-500 text-rose-500 hover:bg-rose-50"
+      <button
+        className="h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onDislike}
         disabled={disabled}
         aria-label="Dislike"
       >
-        <X className="h-7 w-7" />
-      </Button>
+        <X className="h-6 w-6" />
+      </button>
 
-      <Button
-        variant="outline"
-        size="icon"
-        className="h-16 w-16 rounded-full shadow-lg border-2 border-emerald-500 text-emerald-500 hover:bg-emerald-50"
+      <button
+        className="h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onLike}
         disabled={disabled}
         aria-label="Like"
       >
-        <Heart className="h-7 w-7" />
-      </Button>
+        <Heart className="h-6 w-6" />
+      </button>
 
-      <Button
-        variant="outline"
-        size="icon"
-        className="h-14 w-14 rounded-full shadow-lg border-2 border-blue-500 text-blue-500 hover:bg-blue-50"
+      <button
+        className="h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onDetails}
         disabled={disabled}
         aria-label="Details"
       >
-        <Info className="h-6 w-6" />
-      </Button>
+        <Info className="h-5 w-5" />
+      </button>
     </div>
   );
 }

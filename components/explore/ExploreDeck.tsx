@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Loader2, Heart, Sparkles } from 'lucide-react';
 import { SwipeableCard } from './SwipeableCard';
@@ -44,6 +44,7 @@ export function ExploreDeck({
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [selectedPlaceName, setSelectedPlaceName] = useState<string | undefined>(undefined);
   const [swipeHistory, setSwipeHistory] = useState<Array<{ placeId: string; action: 'like' | 'dislike' }>>([]);
+  const [lastDirection, setLastDirection] = useState<'left' | 'right' | 'up' | null>(null);
 
   // Build filters based on mode - memoized to prevent unnecessary re-renders
   // Use individual filter properties for stability instead of the whole filters object
@@ -95,20 +96,35 @@ export function ExploreDeck({
   const handleSwipeLeft = () => {
     const place = places[currentIndex];
     if (!place) return;
+    const placeId = place.place_id;
+    setLastDirection('left');
+    setCurrentIndex((prev) => prev - 1);
     swipeMutation.mutate(
-      { placeId: place.place_id, action: 'dislike', source: mode === 'day' ? 'day' : 'trip' },
+      { placeId, action: 'dislike', source: mode === 'day' ? 'day' : 'trip' },
       {
         onSuccess: (res) => {
-          if (res?.limitReached) return;
+          if (res?.limitReached) {
+            // Rollback UI if limit reached
+            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            return;
+          }
           // Track swipe in history for undo (max 3)
           setSwipeHistory((prev) => {
             const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
-              { placeId: place.place_id, action: 'dislike' as const },
+              { placeId, action: 'dislike' as const },
               ...prev,
             ];
             return newHistory.slice(0, 3);
           });
-          setCurrentIndex((prev) => prev - 1);
+        },
+        onError: () => {
+          // Rollback UI on error
+          setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+          addToast({
+            title: 'Error',
+            description: 'Could not save swipe. Please try again.',
+            variant: 'destructive',
+          });
         },
       }
     );
@@ -117,20 +133,35 @@ export function ExploreDeck({
   const handleSwipeRight = () => {
     const place = places[currentIndex];
     if (!place) return;
+    const placeId = place.place_id;
+    setLastDirection('right');
+    setCurrentIndex((prev) => prev - 1);
     swipeMutation.mutate(
-      { placeId: place.place_id, action: 'like', source: mode === 'day' ? 'day' : 'trip' },
+      { placeId, action: 'like', source: mode === 'day' ? 'day' : 'trip' },
       {
         onSuccess: (res) => {
-          if (res?.limitReached) return;
+          if (res?.limitReached) {
+            // Rollback UI if limit reached
+            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            return;
+          }
           // Track swipe in history for undo (max 3)
           setSwipeHistory((prev) => {
             const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
-              { placeId: place.place_id, action: 'like' as const },
+              { placeId, action: 'like' as const },
               ...prev,
             ];
             return newHistory.slice(0, 3);
           });
-          setCurrentIndex((prev) => prev - 1);
+        },
+        onError: () => {
+          // Rollback UI on error
+          setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+          addToast({
+            title: 'Error',
+            description: 'Could not save swipe. Please try again.',
+            variant: 'destructive',
+          });
         },
       }
     );
@@ -139,6 +170,7 @@ export function ExploreDeck({
   const handleSwipeUp = () => {
     const place = places[currentIndex];
     if (!place) return;
+    setLastDirection('up');
     setSelectedPlaceId(place.place_id);
     setSelectedPlaceName(place.name);
     setDetailsDrawerOpen(true);
@@ -258,21 +290,42 @@ export function ExploreDeck({
 
   const hasLikedPlaces = session && session.likedPlaces.length > 0;
 
+  const cardVariants = {
+    enter: { opacity: 0, scale: 0.95, y: 20 },
+    center: { opacity: 1, scale: 1, y: 0 },
+    exitRight: { opacity: 0, x: 200, rotate: 12 },
+    exitLeft: { opacity: 0, x: -200, rotate: -12 },
+    exitUp: { opacity: 0, y: -200 },
+  };
+
   return (
     <>
       <div className="flex flex-col items-center justify-center w-full h-full">
         <div className="flex items-center justify-center w-full h-full">
-          <div className="relative w-full max-w-[420px] lg:max-w-[480px] h-[78vh] flex items-center justify-center">
-            <SwipeableCard
-              place={currentPlace}
-              onSwipeLeft={handleSwipeLeft}
-              onSwipeRight={handleSwipeRight}
-              onSwipeUp={handleSwipeUp}
-              disabled={
-                swipeMutation.isPending ||
-                (session?.remainingSwipes != null && session.remainingSwipes <= 0)
-              }
-            />
+          <div className="relative w-full max-w-[420px] lg:max-w-[480px] h-[78vh] flex items-center justify-center z-10">
+            <AnimatePresence mode="wait">
+              {currentPlace && (
+                <motion.div
+                  key={currentPlace.place_id}
+                  variants={cardVariants}
+                  initial="enter"
+                  animate="center"
+                  exit={lastDirection === 'right' ? 'exitRight' : lastDirection === 'left' ? 'exitLeft' : lastDirection === 'up' ? 'exitUp' : 'exitRight'}
+                  className="w-full h-full flex items-center justify-center"
+                >
+                  <SwipeableCard
+                    place={currentPlace}
+                    onSwipeLeft={handleSwipeLeft}
+                    onSwipeRight={handleSwipeRight}
+                    onSwipeUp={handleSwipeUp}
+                    disabled={
+                      swipeMutation.isPending ||
+                      (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+                    }
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
