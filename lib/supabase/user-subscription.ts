@@ -36,12 +36,12 @@ export async function getUserSubscriptionStatus(userId: string): Promise<{ isPro
       return { isPro: false };
     }
     
-    // Check for UUID-related errors (400 Bad Request or invalid input syntax for type uuid)
+    // Check for UUID-related errors (invalid input syntax for type uuid)
     // This happens when profiles.id is still UUID but we're querying with Clerk user ID strings
     const errorMessage = error.message?.toLowerCase() || '';
-    const isUuidError = error.status === 400 || 
-                       errorMessage.includes('invalid input syntax for type uuid') ||
-                       errorMessage.includes('invalid input');
+    const isUuidError = errorMessage.includes('invalid input syntax for type uuid') ||
+                       errorMessage.includes('invalid input') ||
+                       errorMessage.includes('invalid uuid');
     
     if (isUuidError) {
       // Database schema mismatch - profiles.id is likely still UUID, not TEXT
