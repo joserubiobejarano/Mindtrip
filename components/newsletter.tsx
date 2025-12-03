@@ -1,63 +1,96 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Mail, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Mail, Send } from 'lucide-react';
+import { useState } from 'react';
 
 export function Newsletter() {
+  const [email, setEmail] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Newsletter signup:', email);
+    setEmail('');
+  };
+
   return (
     <section className="py-20 px-4 relative overflow-hidden">
-      {/* Diagonal separator - matching the style from GetTheApp section */}
-      <div className="absolute inset-0 bg-cyan-400" style={{
-        clipPath: 'polygon(0 10%, 100% 0, 100% 90%, 0 100%)'
-      }}></div>
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10"></div>
       
-      <div className="relative max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-white rounded-3xl p-8 md:p-12 border-4 border-black"
-          style={{ boxShadow: '8px 8px 0px rgba(0, 0, 0, 1)' }}
-        >
-          <div className="flex items-start gap-4 mb-6">
-            <div className="bg-orange-500 p-3 rounded-2xl border-2 border-black flex-shrink-0">
-              <Mail className="size-8 text-white" />
+      {/* Decorative elements */}
+      <svg className="absolute top-10 left-10 w-32 h-32 text-primary/20" viewBox="0 0 100 100">
+        <path d="M50,10 L60,40 L90,50 L60,60 L50,90 L40,60 L10,50 L40,40 Z" fill="currentColor" />
+      </svg>
+      <svg className="absolute bottom-10 right-10 w-40 h-40 text-accent/20" viewBox="0 0 100 100">
+        <circle cx="30" cy="30" r="25" fill="currentColor" />
+        <circle cx="70" cy="70" r="20" fill="currentColor" />
+      </svg>
+
+      <div className="container max-w-4xl mx-auto relative z-10">
+        <div className="bg-card border-4 border-border rounded-3xl p-12 shadow-2xl transform hover:scale-105 transition-transform">
+          {/* Sketch border effect */}
+          <div className="absolute inset-0 border-4 border-primary/30 rounded-3xl transform rotate-2 -z-10"></div>
+          
+          <div className="text-center space-y-6">
+            <div className="inline-block relative">
+              <Mail className="w-16 h-16 text-primary mx-auto mb-4 animate-bounce" />
+              <svg className="absolute -inset-4 -z-10" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5" className="text-primary/30" />
+              </svg>
             </div>
+
             <div>
-              <h2 className="text-3xl md:text-4xl mb-3 text-gray-900">
-                Plan smarter, travel better.
+              <h2 className="text-5xl mb-4 relative inline-block">
+                Get Travel Inspiration
+                <svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 400 8" preserveAspectRatio="none">
+                  <path d="M0,4 Q100,1 200,4 T400,4" fill="none" stroke="#ffd93d" strokeWidth="2" />
+                </svg>
               </h2>
-              <p className="text-gray-600 text-sm md:text-base">
-                Get built itineraries, destination ideas and hotel deals straight to your inbox.
-              </p>
-              <p className="text-sm text-sky-900 font-medium mt-1">
-                No spam, just travel inspo.
+              <p className="text-xl text-muted-foreground mt-6">
+                Subscribe to our newsletter for weekly travel tips, destination guides, and exclusive deals!
               </p>
             </div>
-          </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1 relative">
-              <input
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto pt-6">
+              <Input
                 type="email"
-                placeholder="Enter your email"
-                className="w-full px-6 py-4 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-purple-600 focus:bg-white transition-all outline-none"
+                placeholder="your.email@adventure.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 h-14 border-2 border-border bg-input-background rounded-full px-6 focus:border-primary transition-colors"
+                required
               />
-            </div>
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl border-2 border-black h-auto">
-              Subscribe
-              <ArrowRight className="ml-2 size-5" />
-            </Button>
-          </div>
+              <Button
+                type="submit"
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 shadow-lg transform hover:scale-105 hover:rotate-3 transition-all h-14"
+              >
+                <Send className="mr-2 h-5 w-5" />
+                Subscribe
+              </Button>
+            </form>
 
-          {/* Decorative corner dots */}
-          <div className="absolute top-6 right-6 w-3 h-3 bg-black rounded-full"></div>
-          <div className="absolute bottom-6 left-6 w-3 h-3 bg-black rounded-full"></div>
-        </motion.div>
+            <p className="text-sm text-muted-foreground pt-4">
+              Join <span className="text-primary">10,000+</span> travelers already subscribed! 
+              <br />
+              We respect your privacy and never spam 🎉
+            </p>
+
+            {/* Decorative doodles */}
+            <div className="flex justify-center gap-8 pt-8 opacity-50">
+              <svg className="w-8 h-8 text-primary" viewBox="0 0 50 50">
+                <path d="M25,5 L30,20 L45,20 L33,30 L38,45 L25,35 L12,45 L17,30 L5,20 L20,20 Z" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+              <svg className="w-8 h-8 text-accent" viewBox="0 0 50 50">
+                <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+              <svg className="w-8 h-8 text-secondary" viewBox="0 0 50 50">
+                <path d="M10,25 Q10,10 25,10 Q40,10 40,25 Q40,35 25,45 Q10,35 10,25" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-

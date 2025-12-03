@@ -199,34 +199,34 @@ export function HeroSearch({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="bg-white rounded-[32px] border-[3px] border-black px-6 py-8 max-w-7xl w-full mx-auto shadow-[0_8px_0_#000]"
+      className="bg-card rounded-3xl border-2 border-border px-6 py-8 max-w-7xl w-full mx-auto shadow-lg"
     >
       <form onSubmit={onSubmit}>
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-[3] relative w-full">
-            <label className="block text-sm font-medium mb-2 text-gray-700">Where to?</label>
+            <label className="block text-sm font-medium mb-2 text-foreground">Where to?</label>
             <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600 size-5 z-10" />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-primary size-5 z-10" />
               <DestinationAutocomplete
                 value={destination}
                 onChange={onDestinationChange}
                 className="w-full"
-                inputClassName="pl-12 pr-4 py-3 rounded-lg bg-white border border-gray-300 focus:border-purple-600 focus:bg-white transition-all outline-none h-auto"
+                inputClassName="pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-border focus:border-primary focus:bg-card transition-all outline-none h-auto"
                 placeholder="Search destinations..."
               />
             </div>
           </div>
 
           <div className="flex-1 relative w-full">
-            <label className="block text-sm font-medium mb-2 text-gray-700">Check-in</label>
+            <label className="block text-sm font-medium mb-2 text-foreground">Check-in</label>
             <div className="relative">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 size-5 z-10" />
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-chart-3 size-5 z-10" />
               <DateRangePicker
                 startDate={startDate}
                 endDate={endDate}
                 onStartDateChange={onStartDateChange}
                 onEndDateChange={onEndDateChange}
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-white border border-gray-300 focus:border-blue-600 focus:bg-white transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-border focus:border-chart-3 focus:bg-card transition-all"
                 placeholder="Add dates"
                 hideIcon={true}
               />
@@ -234,15 +234,15 @@ export function HeroSearch({
           </div>
 
           <div className="flex-1 relative w-full">
-            <label className="block text-sm font-medium mb-2 text-gray-700">Travelers</label>
+            <label className="block text-sm font-medium mb-2 text-foreground">Travelers</label>
             <div className="relative">
-              <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-green-600 size-5 z-10" />
+              <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-accent size-5 z-10" />
               <Input
                 type="number"
                 min="1"
                 value={travelersCount}
                 onChange={(e) => onTravelersChange(Number(e.target.value))}
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-white border border-gray-300 focus:border-green-600 focus:bg-white transition-all outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-border focus:border-accent focus:bg-card transition-all outline-none"
                 placeholder="Add guests"
               />
             </div>
@@ -252,9 +252,9 @@ export function HeroSearch({
             <Button
               type="submit"
               disabled={loading}
-              className="w-full md:w-auto h-[46px] px-6 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-all border-2 border-orange-600 flex items-center justify-center gap-2"
+              className="w-full md:w-auto h-[46px] px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all flex items-center justify-center gap-2 shadow-lg transform hover:scale-105"
             >
-              <Search className="size-5 text-white" />
+              <Search className="size-5" />
               {loading ? "Searching..." : "Search"}
             </Button>
           </div>
@@ -262,7 +262,7 @@ export function HeroSearch({
       </form>
 
       {/* Divider */}
-      <div className="my-6 border-t border-gray-300" />
+      <div className="my-6 border-t border-border" />
 
       {/* Chat Suggestions */}
       <div className="mt-4 mb-2 flex flex-wrap gap-2">
@@ -271,7 +271,7 @@ export function HeroSearch({
             key={s.id}
             type="button"
             onClick={() => handleSuggestionClick(s.prompt)}
-            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition"
+            className="rounded-full border-2 border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary transition"
           >
             {s.label}
           </button>
@@ -280,9 +280,9 @@ export function HeroSearch({
 
       {/* Chat Input Bar */}
       <form onSubmit={handleChatSubmit} className="relative">
-        <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-50 flex-shrink-0">
-            <MessageCircle className="h-4 w-4 text-purple-600" />
+        <div className="flex items-center gap-3 rounded-full border-2 border-border bg-input-background px-4 py-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
+            <MessageCircle className="h-4 w-4 text-primary" />
           </span>
           <input
             ref={chatInputRef}
@@ -290,13 +290,13 @@ export function HeroSearch({
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             placeholder="Or tell us where to go..."
-            className="flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+            className="flex-1 border-none bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             disabled={parsingIntent}
           />
           <button
             type="submit"
             disabled={parsingIntent || !chatInput.trim()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff7a00] text-white shadow-sm transition hover:translate-y-[1px] hover:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
           >
             {parsingIntent ? (
               <Loader2 size={16} className="animate-spin" />
@@ -306,7 +306,7 @@ export function HeroSearch({
           </button>
         </div>
         {intentError && (
-          <p className="mt-2 text-sm text-red-600 text-center">{intentError}</p>
+          <p className="mt-2 text-sm text-destructive text-center">{intentError}</p>
         )}
       </form>
     </motion.div>

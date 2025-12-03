@@ -7,41 +7,36 @@ interface FeatureCardProps {
   icon: LucideIcon;
   title: string;
   description: string;
-  gradient: string;
+  gradient?: string;
   index: number;
 }
 
-export function FeatureCard({ icon: Icon, title, description, gradient, index }: FeatureCardProps) {
+export function FeatureCard({ icon: Icon, title, description, index }: FeatureCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ scale: 1.05 }}
-      className="relative group"
+      className="relative group h-full"
     >
-      <div 
-        className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-shadow h-full border-4 border-black"
-        style={{
-          boxShadow: '6px 6px 0px rgba(0, 0, 0, 1)',
-          transform: `rotate(${index % 2 === 0 ? -1 : 1}deg)`
-        }}
-      >        
-        {/* Content */}
-        <div className="relative z-10">
-          <div className={`${gradient} w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 border-2 border-black`}>
-            <Icon className="size-8 text-white" />
+      <div className="flex flex-col items-center text-center space-y-4 p-8 bg-card rounded-3xl border-2 border-border hover:border-primary transition-all transform hover:scale-105 hover:-rotate-2 shadow-lg group-hover:shadow-xl h-full">
+        
+        {/* Icon with sketch effect */}
+        <div className="relative mb-4">
+          <div className="p-6 bg-muted/50 rounded-full transform group-hover:rotate-12 transition-transform">
+            <Icon className="size-10 text-primary" strokeWidth={2} />
           </div>
-          <h3 className="text-gray-800 mb-3">{title}</h3>
-          <p className="text-gray-600">{description}</p>
+          <svg className="absolute inset-0 -z-10 w-full h-full" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3,3" className="text-border opacity-50 transform rotate-6" />
+          </svg>
         </div>
 
-        {/* Decorative corner dots */}
-        <div className="absolute top-3 right-3 w-2 h-2 bg-black rounded-full"></div>
-        <div className="absolute bottom-3 left-3 w-2 h-2 bg-black rounded-full"></div>
+        <div>
+          <h3 className="text-2xl mb-3 font-bold">{title}</h3>
+          <p className="text-muted-foreground leading-relaxed">{description}</p>
+        </div>
       </div>
     </motion.div>
   );
 }
-

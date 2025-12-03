@@ -14,7 +14,7 @@ import {
   Calendar,
   Users,
   Sparkles,
-  Plane
+  Compass
 } from "lucide-react";
 import { useCreateTrip, type DestinationOption } from "@/hooks/use-create-trip";
 import { HeroSearch } from "@/components/hero-search";
@@ -24,6 +24,7 @@ import { DestinationCard } from "@/components/destination-card";
 import { FeatureCard } from "@/components/feature-card";
 import { GetTheApp } from "@/components/get-the-app";
 import { Newsletter } from "@/components/newsletter";
+import { Footer } from "@/components/footer";
 
 export default function HomePage() {
   const { isSignedIn } = useAuth();
@@ -162,30 +163,40 @@ export default function HomePage() {
     }
   ];
 
-  const currentYear = new Date().getFullYear();
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
       <motion.nav 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
-        className="sticky top-0 z-50 bg-white border-b-4 border-black"
+        className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b-2 border-border"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24 py-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="bg-purple-500 p-2 rounded-xl border-2 border-black">
-                <Globe2 className="size-6 text-white" />
+          <div className="flex items-center justify-between h-20 py-4">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative">
+                <Compass className="h-10 w-10 text-primary rotate-12" strokeWidth={2.5} />
+                <div className="absolute inset-0 -z-10">
+                  <Compass className="h-10 w-10 text-primary/20 -rotate-6" strokeWidth={2.5} />
+                </div>
               </div>
-              <span className="text-2xl text-gray-800">MindTrip</span>
+              <span className="text-2xl text-primary">MindTrip</span>
             </Link>
 
             <div className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-gray-700 hover:text-purple-600 transition-colors">Travel Planning</Link>
-              <Link href="/hotels" className="text-gray-700 hover:text-purple-600 transition-colors">Hotels</Link>
-              <Link href="/flights" className="text-gray-700 hover:text-purple-600 transition-colors">Flights</Link>
+              <Link href="/" className="text-foreground hover:text-primary transition-colors relative group">
+                Travel Planning
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
+              </Link>
+              <Link href="/hotels" className="text-foreground hover:text-primary transition-colors relative group">
+                Hotels
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
+              </Link>
+              <Link href="/flights" className="text-foreground hover:text-primary transition-colors relative group">
+                Flights
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
+              </Link>
             </div>
 
             <div className="flex items-center gap-4">
@@ -195,7 +206,7 @@ export default function HomePage() {
                 </Link>
                 <Button 
                   onClick={handleCTAClick}
-                  className="bg-orange-500 hover:bg-orange-600 text-white border-2 border-black"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 shadow-lg transform hover:scale-105 transition-transform"
                 >
                   Get Started
                 </Button>
@@ -229,15 +240,21 @@ export default function HomePage() {
         <FloatingShapes />
         
         <div className="relative max-w-7xl mx-auto text-center">
+          {/* Title from Figma */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="mb-8"
           >
-            <div className="inline-block mb-8">
-              <div className="bg-purple-500 text-white px-6 py-2 rounded-full inline-flex items-center gap-2 border-2 border-black">
-                <span className="text-sm">Plan every part of your trip in one place</span>
-              </div>
+            <div className="inline-block relative">
+              <Sparkles className="absolute -top-4 -right-4 w-8 h-8 text-secondary animate-pulse" />
+              <h1 className="text-6xl md:text-7xl text-foreground mb-0 relative inline-block" style={{ fontFamily: "'Caveat', cursive" }}>
+                Your Next Adventure
+                <svg className="absolute -bottom-2 left-0 w-full h-4" viewBox="0 0 300 12" preserveAspectRatio="none">
+                  <path d="M0,6 Q75,2 150,6 T300,6" fill="none" stroke="#ff6b6b" strokeWidth="3" />
+                </svg>
+              </h1>
             </div>
           </motion.div>
 
@@ -258,7 +275,7 @@ export default function HomePage() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-4 text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-lg p-3 max-w-md mx-auto"
+              className="mt-4 text-sm text-destructive bg-destructive/10 border-2 border-destructive/20 rounded-lg p-3 max-w-md mx-auto"
             >
               {searchError}
             </motion.div>
@@ -271,13 +288,15 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="grid grid-cols-2 gap-8 max-w-2xl mx-auto mt-20"
           >
-            <div className="bg-white rounded-2xl p-6 border-4 border-black" style={{ boxShadow: '6px 6px 0px rgba(0, 0, 0, 1)', transform: 'rotate(-2deg)' }}>
-              <div className="text-4xl mb-2 text-purple-600">1M+</div>
-              <div className="text-gray-600">Destinations</div>
+            <div className="bg-card rounded-3xl p-6 border-2 border-border shadow-lg transform hover:scale-105 transition-transform">
+              <div className="text-4xl mb-2 text-primary font-bold">1M+</div>
+              <div className="text-muted-foreground">Destinations</div>
             </div>
-            <div className="bg-white rounded-2xl p-6 border-4 border-black" style={{ boxShadow: '6px 6px 0px rgba(0, 0, 0, 1)', transform: 'rotate(2deg)' }}>
-              <div className="text-4xl mb-2 text-orange-600">4.9★</div>
-              <div className="text-gray-600">User Rating</div>
+            <div className="bg-card rounded-3xl p-6 border-2 border-border shadow-lg transform hover:scale-105 transition-transform">
+              <div className="text-4xl mb-2 text-secondary font-bold flex items-center gap-2 justify-center">
+                4.9<span className="text-2xl">★</span>
+              </div>
+              <div className="text-muted-foreground">User Rating</div>
             </div>
           </motion.div>
         </div>
@@ -286,9 +305,22 @@ export default function HomePage() {
       {/* Why Travelers Love */}
       <WhyTravelersLove />
 
-      {/* Popular Destinations */}
-      <section className="py-20 px-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <div className="max-w-7xl mx-auto">
+      {/* Unique Experiences Section */}
+      <section className="py-20 px-4 bg-muted/30 relative overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="doodle-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                <path d="M40,10 Q50,20 60,10" fill="none" stroke="currentColor" strokeWidth="1" />
+                <path d="M10,60 Q20,50 30,60" fill="none" stroke="currentColor" strokeWidth="1" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#doodle-pattern)" />
+          </svg>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -296,13 +328,16 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl mb-4 text-gray-900">
-              Need ideas?
+            <h2 className="text-5xl mb-4 inline-block relative" style={{ fontFamily: "'Caveat', cursive" }}>
+              Unique Experiences
+              <svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 300 8" preserveAspectRatio="none">
+                <path d="M0,4 Q75,1 150,4 T300,4" fill="none" stroke="#4ecdc4" strokeWidth="2" />
+              </svg>
             </h2>
-            <p className="text-xl text-gray-600">Explore the world&apos;s most breathtaking locations</p>
+            <p className="text-xl text-muted-foreground mt-4">Explore the world&apos;s most breathtaking locations</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {destinations.map((dest, index) => (
               <DestinationCard 
                 key={index} 
@@ -321,7 +356,7 @@ export default function HomePage() {
           >
             <Button 
               onClick={handleCTAClick}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-6 rounded-xl border-2 border-black"
+              className="px-8 py-3 border-2 border-primary text-primary rounded-full hover:bg-primary/10 transform hover:scale-105 transition-all relative group"
             >
               View All Destinations
               <ChevronRight className="ml-2 size-5" />
@@ -330,8 +365,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 px-4 bg-gradient-to-br from-green-50 via-yellow-50 to-orange-50">
+      {/* Why Choose MindTrip */}
+      <section className="py-20 px-4 bg-gradient-to-br from-muted/50 via-background to-muted/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -340,10 +375,10 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl mb-4 text-gray-900">
+            <h2 className="text-5xl mb-4 text-foreground" style={{ fontFamily: "'Caveat', cursive" }}>
               Why Choose MindTrip?
             </h2>
-            <p className="text-xl text-gray-600">Everything you need for the perfect journey</p>
+            <p className="text-xl text-muted-foreground">Everything you need for the perfect journey</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -355,12 +390,12 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-32 px-4 overflow-hidden bg-orange-400">
+      <section className="relative py-32 px-4 overflow-hidden bg-secondary/20">
         <div className="absolute inset-0">
           {/* Decorative elements */}
-          <div className="absolute top-10 left-10 w-20 h-20 border-4 border-black rounded-full" style={{ transform: 'rotate(15deg)' }}></div>
-          <div className="absolute bottom-20 right-20 w-16 h-16 bg-yellow-300 border-4 border-black" style={{ transform: 'rotate(-10deg)' }}></div>
-          <div className="absolute top-1/2 right-1/4 w-12 h-12 bg-pink-400 border-4 border-black rounded-full"></div>
+          <div className="absolute top-10 left-10 w-20 h-20 border-2 border-border rounded-full opacity-30" style={{ transform: 'rotate(15deg)' }}></div>
+          <div className="absolute bottom-20 right-20 w-16 h-16 bg-secondary/30 border-2 border-border rounded-full opacity-30" style={{ transform: 'rotate(-10deg)' }}></div>
+          <div className="absolute top-1/2 right-1/4 w-12 h-12 bg-primary/20 border-2 border-border rounded-full opacity-30"></div>
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
@@ -370,23 +405,23 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl md:text-6xl mb-6 text-gray-900">
+            <h2 className="text-4xl md:text-6xl mb-6 text-foreground" style={{ fontFamily: "'Caveat', cursive" }}>
               Ready to Start Your Adventure?
             </h2>
-            <p className="text-xl mb-10 text-gray-800">
+            <p className="text-xl mb-10 text-muted-foreground">
               Join millions of travelers who trust MindTrip to plan their perfect getaway
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={handleCTAClick}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 rounded-xl text-lg border-2 border-black"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-full text-lg shadow-lg transform hover:scale-105 transition-all"
               >
                 Start Planning Now
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" })}
-                className="border-2 border-black bg-white hover:bg-gray-100 px-8 py-6 rounded-xl text-lg"
+                className="border-2 border-border bg-card hover:bg-muted px-8 py-6 rounded-full text-lg"
               >
                 Learn More
               </Button>
@@ -402,57 +437,7 @@ export default function HomePage() {
       <Newsletter />
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="bg-purple-500 p-2 rounded-xl border-2 border-white">
-                  <Globe2 className="size-6 text-white" />
-                </div>
-                <span className="text-2xl">MindTrip</span>
-              </div>
-              <p className="text-gray-400">
-                Your trusted companion for unforgettable travel experiences around the globe.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="mb-4">Explore</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">Destinations</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Activities</Link></li>
-                <li><Link href="/hotels" className="hover:text-white transition-colors">Hotels</Link></li>
-                <li><Link href="/flights" className="hover:text-white transition-colors">Flights</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="mb-4">Company</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Press</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Blog</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; {currentYear} MindTrip. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

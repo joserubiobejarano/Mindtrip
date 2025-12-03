@@ -2,149 +2,198 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap');
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --font-size: 16px;
+    --background: #fefbf6;
+    --foreground: #2c2416;
+    --card: #ffffff;
+    --card-foreground: #2c2416;
+    --popover: #ffffff;
+    --popover-foreground: #2c2416;
+    --primary: #ff6b6b;
+    --primary-foreground: #fefbf6;
+    --secondary: #ffd93d;
+    --secondary-foreground: #2c2416;
+    --muted: #f8ede3;
+    --muted-foreground: #7d6f5d;
+    --accent: #6bcf7f;
+    --accent-foreground: #2c2416;
+    --destructive: #d4183d;
+    --destructive-foreground: #ffffff;
+    --border: rgba(44, 36, 22, 0.15);
+    --input: transparent;
+    --input-background: #fff9f0;
+    --switch-background: #d4c5b9;
+    --font-weight-medium: 600;
+    --font-weight-normal: 400;
+    --ring: rgba(255, 107, 107, 0.3);
+    --chart-1: #ff6b6b;
+    --chart-2: #6bcf7f;
+    --chart-3: #4ecdc4;
+    --chart-4: #ffd93d;
+    --chart-5: #c792ea;
+    --radius: 1.5rem;
+    --sidebar: #fff9f0;
+    --sidebar-foreground: #2c2416;
+    --sidebar-primary: #ff6b6b;
+    --sidebar-primary-foreground: #fefbf6;
+    --sidebar-accent: #f8ede3;
+    --sidebar-accent-foreground: #2c2416;
+    --sidebar-border: rgba(44, 36, 22, 0.15);
+    --sidebar-ring: rgba(255, 107, 107, 0.3);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --background: #1a1410;
+    --foreground: #fefbf6;
+    --card: #2c2416;
+    --card-foreground: #fefbf6;
+    --popover: #2c2416;
+    --popover-foreground: #fefbf6;
+    --primary: #ff8585;
+    --primary-foreground: #1a1410;
+    --secondary: #ffe066;
+    --secondary-foreground: #1a1410;
+    --muted: #3d3327;
+    --muted-foreground: #b8a892;
+    --accent: #7dde91;
+    --accent-foreground: #1a1410;
+    --destructive: oklch(0.396 0.141 25.723);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: rgba(254, 251, 246, 0.15);
+    --input: rgba(254, 251, 246, 0.15);
+    --ring: rgba(255, 133, 133, 0.4);
+    --font-weight-medium: 600;
+    --font-weight-normal: 400;
+    --chart-1: #ff8585;
+    --chart-2: #7dde91;
+    --chart-3: #5fd9d0;
+    --chart-4: #ffe066;
+    --chart-5: #d4a5f4;
+    --sidebar: #2c2416;
+    --sidebar-foreground: #fefbf6;
+    --sidebar-primary: #ff8585;
+    --sidebar-primary-foreground: #1a1410;
+    --sidebar-accent: #3d3327;
+    --sidebar-accent-foreground: #fefbf6;
+    --sidebar-border: rgba(254, 251, 246, 0.15);
+    --sidebar-ring: rgba(255, 133, 133, 0.4);
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: 'Patrick Hand', 'Indie Flower', cursive;
   }
 }
 
-/* Print styles for PDF export */
-@media print {
-  .no-print {
-    display: none !important;
-  }
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.3;
+      font-family: 'Caveat', cursive;
+    }
 
-  body::after {
-    content: "Planned with Mindtrip";
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    font-size: 10px;
-    opacity: 0.5;
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.3;
+      font-family: 'Caveat', cursive;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.4;
+      font-family: 'Caveat', cursive;
+    }
+
+    h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.4;
+      font-family: 'Caveat', cursive;
+    }
+
+    p {
+      font-size: 1.1rem;
+      font-weight: var(--font-weight-normal);
+      line-height: 1.6;
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    label {
+      font-size: 1rem;
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    button {
+      font-size: 1.1rem;
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    input {
+      font-size: 1rem;
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+      font-family: 'Patrick Hand', cursive;
+    }
   }
 }
 
-/* Custom gradient animations */
-@keyframes gradient-x {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+html {
+  font-size: var(--font-size);
 }
 
-@keyframes gradient-y {
-  0%, 100% {
-    background-position: 50% 0%;
-  }
-  50% {
-    background-position: 50% 100%;
-  }
+/* Custom sketch effects */
+.sketch-border {
+  position: relative;
+  border: 2px solid currentColor;
+  border-radius: var(--radius);
 }
 
-@keyframes gradient-xy {
-  0%, 100% {
-    background-position: 0% 0%;
-  }
-  25% {
-    background-position: 100% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-  75% {
-    background-position: 0% 100%;
-  }
+.sketch-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid currentColor;
+  border-radius: var(--radius);
+  transform: rotate(-0.5deg);
+  opacity: 0.3;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
+.doodle-underline {
+  position: relative;
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(99, 102, 241, 0.8);
-  }
-}
-
-.animate-gradient-x {
-  background-size: 200% 200%;
-  animation: gradient-x 15s ease infinite;
-}
-
-.animate-gradient-y {
-  background-size: 200% 200%;
-  animation: gradient-y 15s ease infinite;
-}
-
-.animate-gradient-xy {
-  background-size: 400% 400%;
-  animation: gradient-xy 15s ease infinite;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+.doodle-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='3' viewBox='0 0 100 3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 2 Q5 0, 10 2 T20 2 T30 2 T40 2 T50 2 T60 2 T70 2 T80 2 T90 2 T100 2' stroke='%23ff6b6b' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 100px 3px;
 }
