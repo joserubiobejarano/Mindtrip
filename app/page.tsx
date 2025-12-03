@@ -236,25 +236,31 @@ export default function HomePage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Background with sketch overlay from Figma */}
-        <div className="absolute inset-0 -z-10">
-          <img
-            src="https://images.unsplash.com/photo-1515159791318-cd51af6830f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbGx1c3RyYXRlZCUyMHRyYXZlbCUyMGFkdmVudHVyZXxlbnwxfHx8fDE3NjQ3MTM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-            alt="Travel adventure background"
-            className="w-full h-full object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-secondary/10 to-primary/20"></div>
+      <section id="hero" className="relative min-h-screen flex items-center overflow-hidden bg-background">
+        {/* Subtle sketchbook-style background with minimal decorative elements */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          {/* Very subtle paper texture */}
+          <div className="absolute inset-0 opacity-[0.02]">
+            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="paper-texture" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                  <circle cx="10" cy="10" r="0.5" fill="currentColor" />
+                  <circle cx="30" cy="25" r="0.5" fill="currentColor" />
+                  <circle cx="50" cy="15" r="0.5" fill="currentColor" />
+                  <circle cx="70" cy="30" r="0.5" fill="currentColor" />
+                  <circle cx="90" cy="20" r="0.5" fill="currentColor" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#paper-texture)" />
+            </svg>
+          </div>
           
-          {/* Hand-drawn decorative elements */}
-          <svg className="absolute top-10 right-10 w-32 h-32 text-primary/30" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5" />
-            <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3,3" transform="rotate(15 50 50)" />
+          {/* Minimal hand-drawn decorative elements - very subtle */}
+          <svg className="absolute top-10 right-10 w-24 h-24 text-border opacity-30" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3,3" />
           </svg>
           
-          <svg className="absolute bottom-20 left-20 w-24 h-24 text-accent/30" viewBox="0 0 100 100">
-            <path d="M20,50 Q30,20 50,30 T80,50 Q70,80 50,70 T20,50" fill="none" stroke="currentColor" strokeWidth="3" />
-          </svg>
+          <div className="absolute bottom-20 left-20 w-16 h-16 border border-border opacity-20 rounded-lg" style={{ transform: 'rotate(-5deg)' }}></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto text-center w-full px-4 py-20">
