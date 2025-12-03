@@ -50,8 +50,23 @@ export function WhyTravelersLove() {
   ];
 
   return (
-    <section className="py-20 px-4 bg-background relative overflow-hidden">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-20 px-4 bg-muted/30 relative overflow-hidden">
+      {/* Background pattern - same as How It Works */}
+      <div className="absolute inset-0 opacity-10">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="doodle-pattern-features" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+              <circle cx="25" cy="25" r="2" fill="currentColor" />
+              <circle cx="75" cy="75" r="2" fill="currentColor" />
+              <path d="M40,10 Q50,20 60,10" fill="none" stroke="currentColor" strokeWidth="1" />
+              <path d="M10,60 Q20,50 30,60" fill="none" stroke="currentColor" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#doodle-pattern-features)" />
+        </svg>
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -59,8 +74,11 @@ export function WhyTravelersLove() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl mb-4 text-foreground font-caveat">
+          <h2 className="text-5xl mb-4 inline-block relative" style={{ fontFamily: "'Caveat', cursive" }}>
             Why travelers love MindTrip
+            <svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 300 8" preserveAspectRatio="none">
+              <path d="M0,4 Q75,7 150,4 T300,4" fill="none" stroke="#ffd93d" strokeWidth="2" />
+            </svg>
           </h2>
         </motion.div>
 
@@ -72,25 +90,33 @@ export function WhyTravelersLove() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ 
-                scale: 1.05, 
-                transition: { duration: 0.3 }
-              }}
-              className="bg-card rounded-3xl p-6 border-2 border-border hover:border-primary transition-all cursor-pointer shadow-lg relative"
+              className="relative group"
             >
-              {/* Decorative corner dots */}
-              <div className="absolute top-3 right-3 w-2 h-2 bg-border rounded-full"></div>
-              <div className="absolute bottom-3 left-3 w-2 h-2 bg-border rounded-full"></div>
+              <div className="flex flex-col items-center text-center space-y-4 p-6 bg-card rounded-3xl border-2 border-border hover:border-primary transition-all transform hover:scale-105 hover:-rotate-2 shadow-lg group-hover:shadow-xl">
+                {/* Icon with sketch effect */}
+                <div className="relative">
+                  <div className={`p-6 ${feature.color} rounded-full transform group-hover:rotate-12 transition-transform`}>
+                    <feature.icon className={`${feature.iconColor} w-12 h-12`} strokeWidth={2} />
+                  </div>
+                  <svg className="absolute inset-0 -z-10 w-full h-full" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3,3" className="text-border opacity-50 transform rotate-6" />
+                  </svg>
+                </div>
 
-              {/* Icon circle */}
-              <div className={`${feature.color} w-20 h-20 rounded-full flex items-center justify-center mb-5 mx-auto transform hover:rotate-12 transition-transform`}>
-                <feature.icon className={`${feature.iconColor} size-10`} strokeWidth={2} />
+                <div>
+                  <h3 className="text-2xl mb-2 font-bold">{feature.title}</h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </div>
               </div>
-
-              <h3 className="text-foreground mb-3 text-center font-bold text-lg">{feature.title}</h3>
-              <p className="text-muted-foreground text-center leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
+        </div>
+
+        {/* Decorative elements */}
+        <div className="flex justify-center gap-4 mt-12">
+          <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+          <div className="w-3 h-3 bg-accent rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+          <div className="w-3 h-3 bg-secondary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
         </div>
       </div>
     </section>

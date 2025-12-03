@@ -236,10 +236,28 @@ export default function HomePage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section id="hero" className="relative overflow-hidden pt-12 pb-32 px-4">
-        <FloatingShapes />
+      <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Background with sketch overlay from Figma */}
+        <div className="absolute inset-0 -z-10">
+          <img
+            src="https://images.unsplash.com/photo-1515159791318-cd51af6830f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbGx1c3RyYXRlZCUyMHRyYXZlbCUyMGFkdmVudHVyZXxlbnwxfHx8fDE3NjQ3MTM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+            alt="Travel adventure background"
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-secondary/10 to-primary/20"></div>
+          
+          {/* Hand-drawn decorative elements */}
+          <svg className="absolute top-10 right-10 w-32 h-32 text-primary/30" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5" />
+            <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3,3" transform="rotate(15 50 50)" />
+          </svg>
+          
+          <svg className="absolute bottom-20 left-20 w-24 h-24 text-accent/30" viewBox="0 0 100 100">
+            <path d="M20,50 Q30,20 50,30 T80,50 Q70,80 50,70 T20,50" fill="none" stroke="currentColor" strokeWidth="3" />
+          </svg>
+        </div>
         
-        <div className="relative max-w-7xl mx-auto text-center">
+        <div className="relative max-w-7xl mx-auto text-center w-full px-4 py-20">
           {/* Title from Figma */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -281,22 +299,22 @@ export default function HomePage() {
             </motion.div>
           )}
 
-          {/* Stats */}
+          {/* Stats - Horizontal layout with solid colors and hover effects */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="grid grid-cols-2 gap-8 max-w-2xl mx-auto mt-20"
+            className="flex flex-row gap-6 max-w-2xl mx-auto mt-12 justify-center"
           >
-            <div className="bg-card rounded-3xl p-6 border-2 border-border shadow-lg transform hover:scale-105 transition-transform">
-              <div className="text-4xl mb-2 text-primary font-bold">1M+</div>
-              <div className="text-muted-foreground">Destinations</div>
+            <div className="bg-gradient-to-br from-secondary/80 to-secondary rounded-3xl p-6 border-2 border-secondary shadow-lg transform hover:scale-110 hover:rotate-2 transition-all cursor-pointer flex-1 max-w-xs">
+              <div className="text-4xl mb-2 text-secondary-foreground font-bold">1M+</div>
+              <div className="text-secondary-foreground/90">Destinations</div>
             </div>
-            <div className="bg-card rounded-3xl p-6 border-2 border-border shadow-lg transform hover:scale-105 transition-transform">
-              <div className="text-4xl mb-2 text-secondary font-bold flex items-center gap-2 justify-center">
+            <div className="bg-gradient-to-br from-accent/80 to-accent rounded-3xl p-6 border-2 border-accent shadow-lg transform hover:scale-110 hover:-rotate-2 transition-all cursor-pointer flex-1 max-w-xs">
+              <div className="text-4xl mb-2 text-accent-foreground font-bold flex items-center gap-2 justify-center">
                 4.9<span className="text-2xl">★</span>
               </div>
-              <div className="text-muted-foreground">User Rating</div>
+              <div className="text-accent-foreground/90">User Rating</div>
             </div>
           </motion.div>
         </div>
@@ -306,21 +324,8 @@ export default function HomePage() {
       <WhyTravelersLove />
 
       {/* Unique Experiences Section */}
-      <section className="py-20 px-4 bg-muted/30 relative overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="doodle-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-                <path d="M40,10 Q50,20 60,10" fill="none" stroke="currentColor" strokeWidth="1" />
-                <path d="M10,60 Q20,50 30,60" fill="none" stroke="currentColor" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#doodle-pattern)" />
-          </svg>
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -334,7 +339,7 @@ export default function HomePage() {
                 <path d="M0,4 Q75,1 150,4 T300,4" fill="none" stroke="#4ecdc4" strokeWidth="2" />
               </svg>
             </h2>
-            <p className="text-xl text-muted-foreground mt-4">Explore the world&apos;s most breathtaking locations</p>
+            <p className="text-xl text-muted-foreground mt-4">Handpicked activities that make your trip unforgettable</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -366,7 +371,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose MindTrip */}
-      <section className="py-20 px-4 bg-gradient-to-br from-muted/50 via-background to-muted/30">
+      <section className="py-20 px-4 bg-background">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -375,10 +380,13 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-5xl mb-4 text-foreground" style={{ fontFamily: "'Caveat', cursive" }}>
+            <h2 className="text-5xl mb-4 text-foreground inline-block relative" style={{ fontFamily: "'Caveat', cursive" }}>
               Why Choose MindTrip?
+              <svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 300 8" preserveAspectRatio="none">
+                <path d="M0,4 Q75,1 150,4 T300,4" fill="none" stroke="#ff6b6b" strokeWidth="2" />
+              </svg>
             </h2>
-            <p className="text-xl text-muted-foreground">Everything you need for the perfect journey</p>
+            <p className="text-xl text-muted-foreground mt-4">Everything you need for the perfect journey</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -390,12 +398,12 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-32 px-4 overflow-hidden bg-secondary/20">
+      <section className="relative py-32 px-4 overflow-hidden bg-background">
         <div className="absolute inset-0">
-          {/* Decorative elements */}
-          <div className="absolute top-10 left-10 w-20 h-20 border-2 border-border rounded-full opacity-30" style={{ transform: 'rotate(15deg)' }}></div>
-          <div className="absolute bottom-20 right-20 w-16 h-16 bg-secondary/30 border-2 border-border rounded-full opacity-30" style={{ transform: 'rotate(-10deg)' }}></div>
-          <div className="absolute top-1/2 right-1/4 w-12 h-12 bg-primary/20 border-2 border-border rounded-full opacity-30"></div>
+          {/* Decorative elements - subtle circles */}
+          <div className="absolute top-10 left-10 w-20 h-20 border-2 border-border rounded-full opacity-20" style={{ transform: 'rotate(15deg)' }}></div>
+          <div className="absolute bottom-20 right-20 w-16 h-16 border-2 border-border rounded-full opacity-20" style={{ transform: 'rotate(-10deg)' }}></div>
+          <div className="absolute top-1/2 right-1/4 w-12 h-12 border-2 border-border rounded-full opacity-20"></div>
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
@@ -405,8 +413,11 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl md:text-6xl mb-6 text-foreground" style={{ fontFamily: "'Caveat', cursive" }}>
+            <h2 className="text-4xl md:text-6xl mb-6 text-foreground inline-block relative" style={{ fontFamily: "'Caveat', cursive" }}>
               Ready to Start Your Adventure?
+              <svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 300 8" preserveAspectRatio="none">
+                <path d="M0,4 Q75,1 150,4 T300,4" fill="none" stroke="#ff6b6b" strokeWidth="2" />
+              </svg>
             </h2>
             <p className="text-xl mb-10 text-muted-foreground">
               Join millions of travelers who trust MindTrip to plan their perfect getaway
