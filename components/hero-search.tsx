@@ -199,19 +199,19 @@ export function HeroSearch({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="bg-card rounded-3xl border-2 border-border px-6 py-8 max-w-7xl w-full mx-auto shadow-lg"
+      className="bg-white rounded-3xl border-2 border-border px-6 py-12 max-w-7xl w-full mx-auto shadow-lg"
     >
       <form onSubmit={onSubmit}>
-        <div className="flex flex-col md:flex-row gap-4 items-end">
+        <div className="flex flex-col md:flex-row gap-6 items-end">
           <div className="flex-[3] relative w-full">
             <label className="block text-sm font-medium mb-2 text-foreground">Where to?</label>
             <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600 size-5 z-10" />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 size-5 z-10" />
               <DestinationAutocomplete
                 value={destination}
                 onChange={onDestinationChange}
                 className="w-full"
-                inputClassName="pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-purple-200 focus:border-purple-600 focus:bg-card transition-all outline-none h-auto"
+                inputClassName="pl-12 pr-4 py-3 rounded-full bg-[#fefbf6] border-2 border-blue-200 focus:border-blue-600 focus:bg-white transition-all outline-none h-auto placeholder:text-muted-foreground"
                 placeholder="Search destinations..."
               />
             </div>
@@ -226,7 +226,7 @@ export function HeroSearch({
                 endDate={endDate}
                 onStartDateChange={onStartDateChange}
                 onEndDateChange={onEndDateChange}
-                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-blue-200 focus:border-blue-600 focus:bg-card transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-[#fefbf6] border-2 border-blue-200 focus:border-blue-600 focus:bg-white transition-all text-muted-foreground"
                 placeholder="Add dates"
                 hideIcon={true}
               />
@@ -242,7 +242,7 @@ export function HeroSearch({
                 min="1"
                 value={travelersCount}
                 onChange={(e) => onTravelersChange(Number(e.target.value))}
-                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-green-200 focus:border-green-600 focus:bg-card transition-all outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-[#fefbf6] border-2 border-green-200 focus:border-green-600 focus:bg-white transition-all outline-none placeholder:text-muted-foreground"
                 placeholder="Add guests"
               />
             </div>
@@ -261,17 +261,14 @@ export function HeroSearch({
         </div>
       </form>
 
-      {/* Divider */}
-      <div className="my-6 border-t border-border" />
-
       {/* Chat Suggestions */}
-      <div className="mt-4 mb-2 flex flex-wrap gap-2">
+      <div className="mt-6 mb-4 flex flex-wrap gap-2">
         {chatSuggestions.map((s) => (
           <button
             key={s.id}
             type="button"
             onClick={() => handleSuggestionClick(s.prompt)}
-            className="rounded-full border-2 border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary transition"
+            className="rounded-full border border-border/30 bg-transparent px-3 py-1 text-xs font-medium text-muted-foreground/70 hover:text-foreground transition"
           >
             {s.label}
           </button>
@@ -280,9 +277,9 @@ export function HeroSearch({
 
       {/* Chat Input Bar */}
       <form onSubmit={handleChatSubmit} className="relative">
-        <div className="flex items-center gap-3 rounded-full border-2 border-purple-200 bg-input-background px-4 py-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 flex-shrink-0">
-            <MessageCircle className="h-4 w-4 text-purple-600" />
+        <div className="flex items-center gap-3 rounded-full border-2 border-blue-200 bg-[#fefbf6] px-4 py-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 flex-shrink-0">
+            <MessageCircle className="h-4 w-4 text-blue-600" />
           </span>
           <input
             ref={chatInputRef}
@@ -290,7 +287,7 @@ export function HeroSearch({
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             placeholder="Or tell us where to go..."
-            className="flex-1 border-none bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            className="flex-1 border-none bg-transparent text-base text-foreground outline-none placeholder:text-foreground/60 font-medium"
             disabled={parsingIntent}
           />
           <button

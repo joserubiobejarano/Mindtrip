@@ -266,7 +266,7 @@ export default function HomePage() {
           <div className="absolute bottom-40 left-40 w-48 h-48 rounded-full bg-green-400/20 blur-2xl"></div>
         </div>
         
-        <div className="relative max-w-7xl mx-auto text-center w-full px-4 pt-32 pb-20">
+        <div className="relative max-w-7xl mx-auto text-center w-full px-4 pt-16 pb-20">
           {/* Title from Figma */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -315,11 +315,11 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-row gap-6 max-w-2xl mx-auto mt-12 justify-center"
           >
-            <div className="bg-white rounded-3xl p-6 border-2 border-black shadow-lg transition-all cursor-pointer flex-1 max-w-xs hover:scale-110" style={{ transform: 'rotate(-2deg)' }}>
+            <div className="bg-[#fefbf6] rounded-3xl p-6 border-2 border-black shadow-lg transition-all cursor-pointer flex-1 max-w-xs hover:scale-110 hover:bg-green-50" style={{ transform: 'rotate(-2deg)' }}>
               <div className="text-4xl mb-2 text-green-600 font-bold">1M+</div>
               <div className="text-gray-700">Destinations</div>
             </div>
-            <div className="bg-white rounded-3xl p-6 border-2 border-black shadow-lg transition-all cursor-pointer flex-1 max-w-xs hover:scale-110" style={{ transform: 'rotate(2deg)' }}>
+            <div className="bg-[#fefbf6] rounded-3xl p-6 border-2 border-black shadow-lg transition-all cursor-pointer flex-1 max-w-xs hover:scale-110 hover:bg-yellow-50" style={{ transform: 'rotate(2deg)' }}>
               <div className="text-4xl mb-2 font-bold flex items-center gap-2 justify-center">
                 <span className="text-yellow-500">4.9</span><span className="text-yellow-500 text-2xl">★</span>
               </div>
