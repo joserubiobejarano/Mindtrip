@@ -333,7 +333,7 @@ export default function HomePage() {
       <WhyTravelersLove />
 
       {/* Unique Experiences Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4" style={{ backgroundColor: '#fefbf6' }}>
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -348,7 +348,7 @@ export default function HomePage() {
                 <path d="M0,4 Q75,1 150,4 T300,4" fill="none" stroke="#4ecdc4" strokeWidth="2" />
               </svg>
             </h2>
-            <p className="text-xl text-muted-foreground mt-4">Handpicked activities that make your trip unforgettable</p>
+            <p className="text-base text-foreground mt-4" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>Handpicked activities that make your trip unforgettable</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

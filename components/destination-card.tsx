@@ -29,10 +29,14 @@ export function DestinationCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
       onClick={onClick}
-      className="group relative overflow-hidden border-2 border-border hover:border-primary transition-all duration-300 transform hover:scale-105 hover:-rotate-1 cursor-pointer bg-card shadow-lg rounded-2xl"
+      className="group relative overflow-hidden cursor-pointer bg-white rounded-2xl shadow-sm"
+      whileHover={{ 
+        rotate: -2,
+        scale: 1.02
+      }}
     >
       {/* Image */}
-      <div className="relative h-64 overflow-hidden">
+      <div className="relative h-48 overflow-hidden rounded-t-2xl">
         <ImageWithFallback
           src={image}
           alt={title}
@@ -51,19 +55,19 @@ export function DestinationCard({
           className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors"
         >
           <Heart 
-            className={`size-5 ${isLiked ? 'fill-primary text-primary' : 'text-gray-400'} transition-colors`}
+            className={`size-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-red-400'} transition-colors`}
           />
         </motion.button>
       </div>
 
-      <div className="p-5 space-y-3 bg-card">
+      <div className="p-5 space-y-3 bg-white rounded-b-2xl">
         <div>
-          <h3 className="text-2xl mb-1 font-bold">{title}</h3>
+          <h3 className="text-2xl mb-1 font-bold text-foreground">{title}</h3>
         </div>
 
         <div className="space-y-2 pt-2 border-t border-dashed border-border">
           <div className="flex items-start gap-2 text-muted-foreground text-sm">
-            <MapPin className="size-4 mt-1 flex-shrink-0 text-primary" />
+            <MapPin className="size-4 mt-1 flex-shrink-0 text-foreground" />
             <p className="line-clamp-2">
               {attractions.join(', ')}
             </p>
@@ -71,8 +75,8 @@ export function DestinationCard({
         </div>
       </div>
 
-      {/* Sketch border effect on hover */}
-      <div className="absolute inset-0 border-2 border-primary opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl transform rotate-1 -z-10 pointer-events-none"></div>
+      {/* Hover border effect */}
+      <div className="absolute inset-0 border-2 border-red-500 opacity-0 group-hover:opacity-100 rounded-2xl pointer-events-none transition-opacity duration-300" />
     </motion.div>
   );
 }
