@@ -164,7 +164,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ backgroundColor: '#fefbf6' }}>
       {/* Navigation */}
       <motion.nav 
         initial={{ y: -100 }}
@@ -206,7 +206,7 @@ export default function HomePage() {
                 </Link>
                 <Button 
                   onClick={handleCTAClick}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 shadow-lg transform hover:scale-105 transition-transform"
+                  className="bg-[#ff6b6b] hover:bg-[#ff6b6b]/90 text-white rounded-full px-6 shadow-lg transform hover:scale-105 transition-transform"
                 >
                   Get Started
                 </Button>
@@ -236,7 +236,7 @@ export default function HomePage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section id="hero" className="relative min-h-screen flex items-center overflow-hidden bg-background">
+      <section id="hero" className="relative min-h-screen flex items-center overflow-hidden" style={{ backgroundColor: '#fefbf6' }}>
         {/* Subtle sketchbook-style background with minimal decorative elements */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           {/* Very subtle paper texture */}
@@ -260,10 +260,13 @@ export default function HomePage() {
             <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3,3" />
           </svg>
           
-          <div className="absolute bottom-20 left-20 w-16 h-16 border border-border opacity-20 rounded-lg" style={{ transform: 'rotate(-5deg)' }}></div>
+          {/* Green blurred circles in bottom left */}
+          <div className="absolute bottom-20 left-20 w-32 h-32 rounded-full bg-green-200/40 blur-2xl"></div>
+          <div className="absolute bottom-32 left-32 w-40 h-40 rounded-full bg-green-300/30 blur-2xl"></div>
+          <div className="absolute bottom-40 left-40 w-48 h-48 rounded-full bg-green-400/20 blur-2xl"></div>
         </div>
         
-        <div className="relative max-w-7xl mx-auto text-center w-full px-4 py-20">
+        <div className="relative max-w-7xl mx-auto text-center w-full px-4 pt-32 pb-20">
           {/* Title from Figma */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -272,11 +275,11 @@ export default function HomePage() {
             className="mb-8"
           >
             <div className="inline-block relative">
-              <Sparkles className="absolute -top-4 -right-4 w-8 h-8 text-secondary animate-pulse" />
+              <Sparkles className="absolute -top-4 -right-4 w-8 h-8 text-yellow-500 animate-pulse" />
               <h1 className="text-6xl md:text-7xl text-foreground mb-0 relative inline-block" style={{ fontFamily: "'Caveat', cursive" }}>
-                Your Next Adventure
-                <svg className="absolute -bottom-2 left-0 w-full h-4" viewBox="0 0 300 12" preserveAspectRatio="none">
-                  <path d="M0,6 Q75,2 150,6 T300,6" fill="none" stroke="#ff6b6b" strokeWidth="3" />
+                your next Adventure awaits
+                <svg className="absolute -bottom-2 left-0 w-full h-4" viewBox="0 0 400 12" preserveAspectRatio="none">
+                  <path d="M0,6 Q100,2 200,6 T400,6" fill="none" stroke="#ff6b6b" strokeWidth="3" />
                 </svg>
               </h1>
             </div>
@@ -312,15 +315,15 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-row gap-6 max-w-2xl mx-auto mt-12 justify-center"
           >
-            <div className="bg-gradient-to-br from-secondary/80 to-secondary rounded-3xl p-6 border-2 border-secondary shadow-lg transform hover:scale-110 hover:rotate-2 transition-all cursor-pointer flex-1 max-w-xs">
-              <div className="text-4xl mb-2 text-secondary-foreground font-bold">1M+</div>
-              <div className="text-secondary-foreground/90">Destinations</div>
+            <div className="bg-white rounded-3xl p-6 border-2 border-black shadow-lg transition-all cursor-pointer flex-1 max-w-xs hover:scale-110" style={{ transform: 'rotate(-2deg)' }}>
+              <div className="text-4xl mb-2 text-green-600 font-bold">1M+</div>
+              <div className="text-gray-700">Destinations</div>
             </div>
-            <div className="bg-gradient-to-br from-accent/80 to-accent rounded-3xl p-6 border-2 border-accent shadow-lg transform hover:scale-110 hover:-rotate-2 transition-all cursor-pointer flex-1 max-w-xs">
-              <div className="text-4xl mb-2 text-accent-foreground font-bold flex items-center gap-2 justify-center">
-                4.9<span className="text-2xl">★</span>
+            <div className="bg-white rounded-3xl p-6 border-2 border-black shadow-lg transition-all cursor-pointer flex-1 max-w-xs hover:scale-110" style={{ transform: 'rotate(2deg)' }}>
+              <div className="text-4xl mb-2 font-bold flex items-center gap-2 justify-center">
+                <span className="text-yellow-500">4.9</span><span className="text-yellow-500 text-2xl">★</span>
               </div>
-              <div className="text-accent-foreground/90">User Rating</div>
+              <div className="text-gray-700">User Rating</div>
             </div>
           </motion.div>
         </div>

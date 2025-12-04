@@ -206,12 +206,12 @@ export function HeroSearch({
           <div className="flex-[3] relative w-full">
             <label className="block text-sm font-medium mb-2 text-foreground">Where to?</label>
             <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-primary size-5 z-10" />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600 size-5 z-10" />
               <DestinationAutocomplete
                 value={destination}
                 onChange={onDestinationChange}
                 className="w-full"
-                inputClassName="pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-border focus:border-primary focus:bg-card transition-all outline-none h-auto"
+                inputClassName="pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-purple-200 focus:border-purple-600 focus:bg-card transition-all outline-none h-auto"
                 placeholder="Search destinations..."
               />
             </div>
@@ -220,13 +220,13 @@ export function HeroSearch({
           <div className="flex-1 relative w-full">
             <label className="block text-sm font-medium mb-2 text-foreground">Check-in</label>
             <div className="relative">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-chart-3 size-5 z-10" />
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 size-5 z-10" />
               <DateRangePicker
                 startDate={startDate}
                 endDate={endDate}
                 onStartDateChange={onStartDateChange}
                 onEndDateChange={onEndDateChange}
-                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-border focus:border-chart-3 focus:bg-card transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-blue-200 focus:border-blue-600 focus:bg-card transition-all"
                 placeholder="Add dates"
                 hideIcon={true}
               />
@@ -236,13 +236,13 @@ export function HeroSearch({
           <div className="flex-1 relative w-full">
             <label className="block text-sm font-medium mb-2 text-foreground">Travelers</label>
             <div className="relative">
-              <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-accent size-5 z-10" />
+              <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-green-600 size-5 z-10" />
               <Input
                 type="number"
                 min="1"
                 value={travelersCount}
                 onChange={(e) => onTravelersChange(Number(e.target.value))}
-                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-border focus:border-accent focus:bg-card transition-all outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-input-background border-2 border-green-200 focus:border-green-600 focus:bg-card transition-all outline-none"
                 placeholder="Add guests"
               />
             </div>
@@ -252,7 +252,7 @@ export function HeroSearch({
             <Button
               type="submit"
               disabled={loading}
-              className="w-full md:w-auto h-[46px] px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all flex items-center justify-center gap-2 shadow-lg transform hover:scale-105"
+              className="w-full md:w-auto h-[46px] px-6 rounded-full bg-[#ff6b6b] hover:bg-[#ff6b6b]/90 text-white font-semibold transition-all flex items-center justify-center gap-2 shadow-lg transform hover:scale-105"
             >
               <Search className="size-5" />
               {loading ? "Searching..." : "Search"}
@@ -280,9 +280,9 @@ export function HeroSearch({
 
       {/* Chat Input Bar */}
       <form onSubmit={handleChatSubmit} className="relative">
-        <div className="flex items-center gap-3 rounded-full border-2 border-border bg-input-background px-4 py-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
-            <MessageCircle className="h-4 w-4 text-primary" />
+        <div className="flex items-center gap-3 rounded-full border-2 border-purple-200 bg-input-background px-4 py-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 flex-shrink-0">
+            <MessageCircle className="h-4 w-4 text-purple-600" />
           </span>
           <input
             ref={chatInputRef}
@@ -296,7 +296,7 @@ export function HeroSearch({
           <button
             type="submit"
             disabled={parsingIntent || !chatInput.trim()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff6b6b] text-white shadow-sm transition hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
           >
             {parsingIntent ? (
               <Loader2 size={16} className="animate-spin" />
