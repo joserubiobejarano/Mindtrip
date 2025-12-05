@@ -44,7 +44,7 @@ export function NewFeaturesSection() {
             Why travelers love <span className="wavy-underline">MindTrip</span>
           </h2>
           <p className="font-mono text-sm text-muted-foreground max-w-xl mx-auto">
-            Built by explorers, for explorers. We've thought of everything so you don't have to.
+            Built by explorers, for explorers. We&apos;ve thought of everything so you don&apos;t have to.
           </p>
         </div>
 

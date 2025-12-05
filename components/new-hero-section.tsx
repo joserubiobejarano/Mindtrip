@@ -352,7 +352,7 @@ export function NewHeroSection() {
 
         {/* Testimonial - positioned below search box */}
         <div className="mt-20 bg-card shadow-lg rounded-lg p-3 transform -rotate-6 animate-float hidden md:block mx-auto w-fit">
-          <p className="font-display text-sm italic">"Best trip ever!"</p>
+          <p className="font-display text-sm italic">&quot;Best trip ever!&quot;</p>
           <p className="text-xs text-muted-foreground mt-1">- Sarah</p>
         </div>
       </div>

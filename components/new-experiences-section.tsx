@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { MapPin } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 const getCategoryColor = (category: string) => {
   const colors: Record<string, { bg: string; text: string; border: string; hoverColor: string }> = {
@@ -76,10 +77,12 @@ function CityCard({ city }: { city: typeof cities[0] }) {
       className="bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group relative flex flex-col h-full cursor-pointer"
     >
       <div className="relative h-48 overflow-hidden">
-        <img
+        <Image
           src={city.image}
           alt={city.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
       <div className="p-5 flex flex-col">
