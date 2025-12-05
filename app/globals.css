@@ -3,84 +3,94 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import '@fontsource/playfair-display/400.css';
+@import '@fontsource/playfair-display/500.css';
+@import '@fontsource/playfair-display/600.css';
+@import '@fontsource/playfair-display/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
 
 @layer base {
   :root {
-    --font-size: 16px;
-    --background: #fefbf6;
-    --foreground: #2c2416;
-    --card: #ffffff;
-    --card-foreground: #2c2416;
-    --popover: #ffffff;
-    --popover-foreground: #2c2416;
-    --primary: #ff6b6b;
-    --primary-foreground: #fefbf6;
-    --secondary: #ffd93d;
-    --secondary-foreground: #2c2416;
-    --muted: #f8ede3;
-    --muted-foreground: #7d6f5d;
-    --accent: #6bcf7f;
-    --accent-foreground: #2c2416;
-    --destructive: #d4183d;
-    --destructive-foreground: #ffffff;
-    --border: rgba(44, 36, 22, 0.15);
-    --input: transparent;
-    --input-background: #fff9f0;
-    --switch-background: #d4c5b9;
-    --font-weight-medium: 600;
-    --font-weight-normal: 400;
-    --ring: rgba(255, 107, 107, 0.3);
-    --chart-1: #ff6b6b;
-    --chart-2: #6bcf7f;
-    --chart-3: #4ecdc4;
-    --chart-4: #ffd93d;
-    --chart-5: #c792ea;
-    --radius: 1.5rem;
-    --sidebar: #fff9f0;
-    --sidebar-foreground: #2c2416;
-    --sidebar-primary: #ff6b6b;
-    --sidebar-primary-foreground: #fefbf6;
-    --sidebar-accent: #f8ede3;
-    --sidebar-accent-foreground: #2c2416;
-    --sidebar-border: rgba(44, 36, 22, 0.15);
-    --sidebar-ring: rgba(255, 107, 107, 0.3);
+    --background: 30 50% 96%;
+    --foreground: 220 20% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 25%;
+
+    --primary: 6 85% 67%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 30 40% 92%;
+    --secondary-foreground: 220 20% 25%;
+
+    --muted: 30 30% 90%;
+    --muted-foreground: 220 10% 50%;
+
+    --accent: 200 60% 94%;
+    --accent-foreground: 220 20% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 20% 85%;
+    --input: 30 20% 88%;
+    --ring: 6 85% 67%;
+
+    --radius: 1rem;
+
+    --hero-bg: 30 50% 94%;
+    --coral: 6 85% 67%;
+    --coral-light: 6 85% 72%;
+    --peach: 30 60% 95%;
+    --cream: 40 40% 97%;
+    --sage: 150 20% 45%;
+
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --font-body: system-ui, -apple-system, sans-serif;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: #1a1410;
-    --foreground: #fefbf6;
-    --card: #2c2416;
-    --card-foreground: #fefbf6;
-    --popover: #2c2416;
-    --popover-foreground: #fefbf6;
-    --primary: #ff8585;
-    --primary-foreground: #1a1410;
-    --secondary: #ffe066;
-    --secondary-foreground: #1a1410;
-    --muted: #3d3327;
-    --muted-foreground: #b8a892;
-    --accent: #7dde91;
-    --accent-foreground: #1a1410;
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: rgba(254, 251, 246, 0.15);
-    --input: rgba(254, 251, 246, 0.15);
-    --ring: rgba(255, 133, 133, 0.4);
-    --font-weight-medium: 600;
-    --font-weight-normal: 400;
-    --chart-1: #ff8585;
-    --chart-2: #7dde91;
-    --chart-3: #5fd9d0;
-    --chart-4: #ffe066;
-    --chart-5: #d4a5f4;
-    --sidebar: #2c2416;
-    --sidebar-foreground: #fefbf6;
-    --sidebar-primary: #ff8585;
-    --sidebar-primary-foreground: #1a1410;
-    --sidebar-accent: #3d3327;
-    --sidebar-accent-foreground: #fefbf6;
-    --sidebar-border: rgba(254, 251, 246, 0.15);
-    --sidebar-ring: rgba(255, 133, 133, 0.4);
+    --background: 220 20% 10%;
+    --foreground: 30 50% 96%;
+    --card: 220 20% 14%;
+    --card-foreground: 30 50% 96%;
+    --popover: 220 20% 14%;
+    --popover-foreground: 30 50% 96%;
+    --primary: 6 85% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 30 50% 96%;
+    --muted: 220 20% 20%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 220 20% 18%;
+    --accent-foreground: 30 50% 96%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 6 85% 67%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -91,7 +101,11 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Patrick Hand', 'Indie Flower', cursive;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
   }
 }
 
@@ -196,4 +210,37 @@ html {
   background-image: url("data:image/svg+xml,%3Csvg width='100' height='3' viewBox='0 0 100 3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 2 Q5 0, 10 2 T20 2 T30 2 T40 2 T50 2 T60 2 T70 2 T80 2 T90 2 T100 2' stroke='%23ff6b6b' stroke-width='2' fill='none'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   background-size: 100px 3px;
+}
+
+.dashed-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10'%3E%3Cpath d='M0 5 Q 25 0, 50 5 T 100 5' stroke='%23f87171' fill='none' stroke-width='2' stroke-dasharray='4 4'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  background-size: 80px 10px;
+  padding-bottom: 12px;
+}
+
+.wavy-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10'%3E%3Cpath d='M0 5 Q 25 0, 50 5 T 100 5' stroke='%23f87171' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  background-size: 40px 8px;
+  padding-bottom: 8px;
+}
+
+.solid-underline {
+  position: relative;
+}
+
+.solid-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: -1%;
+  right: -1%;
+  height: 5px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 5'%3E%3Cpath d='M0 2.5 Q 20 1, 40 2.5 T 80 2.5 T 120 2.5 T 160 2.5 T 200 2.5' stroke='hsl(6, 85%, 67%)' fill='none' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  background-size: 200px 5px;
 }
