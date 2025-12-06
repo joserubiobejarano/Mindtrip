@@ -130,41 +130,109 @@ export function ExploreDeck({
     );
   };
 
-  const handleSwipeRight = () => {
+  const handleSwipeRight = async () => {
     const place = places[currentIndex];
     if (!place) return;
     const placeId = place.place_id;
     setLastDirection('right');
     setCurrentIndex((prev) => prev - 1);
-    swipeMutation.mutate(
-      { placeId, action: 'like', source: mode === 'day' ? 'day' : 'trip' },
-      {
-        onSuccess: (res) => {
-          if (res?.limitReached) {
-            // Rollback UI if limit reached
-            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
-            return;
-          }
-          // Track swipe in history for undo (max 3)
-          setSwipeHistory((prev) => {
-            const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
-              { placeId, action: 'like' as const },
-              ...prev,
-            ];
-            return newHistory.slice(0, 3);
-          });
-        },
-        onError: () => {
-          // Rollback UI on error
-          setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+    
+    // In day mode, immediately add to day instead of just liking
+    if (mode === 'day' && dayId && slot) {
+      try {
+        const response = await fetch(`/api/trips/${tripId}/days/${dayId}/activities/bulk-add-from-swipes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            place_ids: [placeId],
+            slot,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to add place to day');
+        }
+
+        const result = await response.json();
+        
+        // Show success toast
+        if (result.addedCount > 0) {
           addToast({
-            title: 'Error',
-            description: 'Could not save swipe. Please try again.',
-            variant: 'destructive',
+            title: 'Place added',
+            description: `Added to ${slot}`,
+            variant: 'success',
           });
-        },
+        }
+        
+        // Also like the place for session tracking
+        swipeMutation.mutate(
+          { placeId, action: 'like', source: 'day' },
+          {
+            onSuccess: (res) => {
+              if (res?.limitReached) {
+                return;
+              }
+              // Track swipe in history for undo (max 3)
+              setSwipeHistory((prev) => {
+                const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
+                  { placeId, action: 'like' as const },
+                  ...prev,
+                ];
+                return newHistory.slice(0, 3);
+              });
+              
+              // Call callback to refresh itinerary
+              if (onAddToDay) {
+                onAddToDay([placeId]);
+              }
+            },
+            onError: () => {
+              // Don't rollback UI since we already added to day
+            },
+          }
+        );
+      } catch (error: any) {
+        // Rollback UI on error
+        setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+        addToast({
+          title: 'Error',
+          description: error.message || 'Could not add place to day. Please try again.',
+          variant: 'destructive',
+        });
       }
-    );
+    } else {
+      // Trip mode: just like the place
+      swipeMutation.mutate(
+        { placeId, action: 'like', source: mode === 'day' ? 'day' : 'trip' },
+        {
+          onSuccess: (res) => {
+            if (res?.limitReached) {
+              // Rollback UI if limit reached
+              setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+              return;
+            }
+            // Track swipe in history for undo (max 3)
+            setSwipeHistory((prev) => {
+              const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
+                { placeId, action: 'like' as const },
+                ...prev,
+              ];
+              return newHistory.slice(0, 3);
+            });
+          },
+          onError: () => {
+            // Rollback UI on error
+            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            addToast({
+              title: 'Error',
+              description: 'Could not save swipe. Please try again.',
+              variant: 'destructive',
+            });
+          },
+        }
+      );
+    }
   };
 
   const handleSwipeUp = () => {

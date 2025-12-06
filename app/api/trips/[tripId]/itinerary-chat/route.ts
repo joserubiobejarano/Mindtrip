@@ -80,44 +80,71 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     // 3) Call OpenAI
     const system = `
 You are an assistant that edits a JSON itinerary object.
-ALWAYS reply with ONLY valid JSON matching this TypeScript type, nothing else:
+ALWAYS reply with a JSON object containing an "itinerary" key with the updated itinerary.
+
+The itinerary must match this TypeScript type:
 
 ${SMART_ITINERARY_SCHEMA_TEXT}
 
 You are given the current itinerary JSON and a user request.
 Modify ONLY the necessary parts (days, places, tips), keep ids stable when possible.
 Do NOT change the overall structure (keys, arrays).
+
+Return your response in this exact format:
+{
+  "itinerary": {
+    "title": "...",
+    "summary": "...",
+    "days": [...],
+    "tripTips": [...]
+  }
+}
 `;
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // or 'gpt-4o' if preferred/available
-      temperature: 0.4,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: `Current itinerary JSON:\n${JSON.stringify(currentItinerary)}` },
-        { role: 'user', content: `User request:\n${message}` },
-      ],
-      response_format: { type: 'json_object' }
-    });
-
-    const raw = response.choices[0]?.message?.content ?? '';
-
-    // 4) Strip code fences and parse safely
-    function extractJson(raw: string) {
-      const cleaned = raw
-        .replace(/```json/gi, '')
-        .replace(/```/g, '')
-        .trim();
-      return JSON.parse(cleaned);
-    }
-
+    
     let updated: SmartItinerary;
     try {
-      updated = extractJson(raw);
-    } catch (err) {
-      console.error('[itinerary-chat] JSON parse error', raw, err);
-      return NextResponse.json({ error: 'bad-json' }, { status: 500 });
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        temperature: 0.4,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: `Current itinerary JSON:\n${JSON.stringify(currentItinerary)}` },
+          { role: 'user', content: `User request:\n${message}` },
+        ],
+        response_format: { type: 'json_object' }
+      });
+
+      const raw = response.choices[0]?.message?.content ?? '';
+      
+      if (!raw) {
+        console.error('[itinerary-chat] Empty response from OpenAI');
+        return NextResponse.json({ error: 'empty-response' }, { status: 500 });
+      }
+
+      // 4) Parse JSON response
+      let parsed: any;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (parseErr) {
+        console.error('[itinerary-chat] JSON parse error', raw, parseErr);
+        return NextResponse.json({ error: 'bad-json' }, { status: 500 });
+      }
+
+      // Extract itinerary from response (handle both wrapped and direct formats)
+      if (parsed.itinerary) {
+        updated = parsed.itinerary as SmartItinerary;
+      } else if (parsed.title && parsed.days) {
+        // Direct SmartItinerary format (fallback)
+        updated = parsed as SmartItinerary;
+      } else {
+        console.error('[itinerary-chat] Invalid response structure', parsed);
+        return NextResponse.json({ error: 'invalid-structure' }, { status: 500 });
+      }
+    } catch (err: any) {
+      console.error('[itinerary-chat] OpenAI API error', err);
+      return NextResponse.json({ error: 'openai-error', details: err.message }, { status: 500 });
     }
 
     // 5) Save back to Supabase

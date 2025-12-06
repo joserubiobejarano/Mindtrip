@@ -1,8 +1,6 @@
 "use client";
 
-import { TripLayout } from "@/components/trip-layout";
 import { PublicItineraryPanel } from "@/components/public-itinerary-panel";
-import { MapPanel } from "@/components/map-panel";
 import { useState, useEffect } from "react";
 import { useDays } from "@/hooks/use-days";
 import { useTrip } from "@/hooks/use-trip";
@@ -35,23 +33,14 @@ export function PublicTripView({ tripId, slug }: PublicTripViewProps) {
 
   return (
     <div className="relative">
-      <TripLayout
-        leftPanel={
-          <PublicItineraryPanel
-            tripId={tripId}
-            selectedDayId={selectedDayId}
-            onSelectDay={setSelectedDayId}
-            onActivitySelect={setSelectedActivityId}
-          />
-        }
-        rightPanel={
-          <MapPanel
-            tripId={tripId}
-            selectedDayId={selectedDayId}
-            selectedActivityId={selectedActivityId}
-          />
-        }
-      />
+      <div className="h-screen overflow-y-auto">
+        <PublicItineraryPanel
+          tripId={tripId}
+          selectedDayId={selectedDayId}
+          onSelectDay={setSelectedDayId}
+          onActivitySelect={setSelectedActivityId}
+        />
+      </div>
       {/* Watermark */}
       <div className="fixed bottom-4 right-4 z-50 text-xs text-muted-foreground opacity-50 pointer-events-none">
         Planned with Mindtrip

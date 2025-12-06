@@ -16,7 +16,8 @@ import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/t
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ExploreDeck } from "@/components/explore/ExploreDeck";
-import type { ExploreFilters } from "@/lib/google/explore-places";
+import { ExploreFilters } from "@/components/explore/ExploreFilters";
+import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -77,6 +78,7 @@ export function ItineraryTab({
   // Day-level Explore state
   const [dayExploreOpen, setDayExploreOpen] = useState(false);
   const [selectedDayForExplore, setSelectedDayForExplore] = useState<{ dayId: string; slot?: 'morning' | 'afternoon' | 'evening'; areaCluster?: string } | null>(null);
+  const [dayExploreFilters, setDayExploreFilters] = useState<ExploreFiltersType>({});
   
   const router = useRouter();
   const { addToast } = useToast();
@@ -530,13 +532,27 @@ export function ItineraryTab({
                 <div className="space-y-8 pb-10">
                   {/* Trip Summary */}
                   {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
-                    <div className="text-left space-y-4 mb-10 max-w-4xl mx-auto">
+                    <div className="space-y-4 mb-10 max-w-4xl mx-auto">
                       {smartItinerary.title && (
-                        <h2 className="text-3xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
+                        <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
                       )}
                       {smartItinerary.summary && (
-                        <div className="prose prose-neutral max-w-none text-slate-900">
-                          <p className="text-lg leading-relaxed font-normal">{smartItinerary.summary}</p>
+                        <div className="prose prose-neutral max-w-none text-slate-900 text-left">
+                          <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
+                            {smartItinerary.summary
+                              .split(/[.!?]+/)
+                              .filter(s => s.trim().length > 10)
+                              .map((point, idx) => {
+                                const trimmed = point.trim();
+                                if (!trimmed) return null;
+                                return (
+                                  <li key={idx} className="font-normal">
+                                    {trimmed}{!trimmed.match(/[.!?]$/) ? '.' : ''}
+                                  </li>
+                                );
+                              })
+                              .filter(Boolean)}
+                          </ul>
                         </div>
                       )}
                       {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
@@ -855,14 +871,21 @@ export function ItineraryTab({
       {/* Day-Level Explore Drawer */}
       <Sheet open={dayExploreOpen} onOpenChange={setDayExploreOpen}>
         <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col overflow-hidden">
-          <SheetHeader className="p-4 border-b">
+          <SheetHeader className="p-4 border-b flex-shrink-0">
             <SheetTitle>
               {selectedDayForExplore?.slot 
                 ? `Add activities to ${selectedDayForExplore.slot}`
                 : 'Add activities to this day'}
             </SheetTitle>
           </SheetHeader>
-          <div className="flex-1 overflow-hidden">
+          
+          {/* Filters Section */}
+          <div className="px-6 py-4 border-b border-sage/20 flex-shrink-0">
+            <ExploreFilters filters={dayExploreFilters} onFiltersChange={setDayExploreFilters} />
+          </div>
+          
+          {/* Explore Deck */}
+          <div className="flex-1 overflow-hidden flex flex-col">
             {selectedDayForExplore && (
               <ExploreDeck
                 tripId={tripId}
@@ -870,6 +893,7 @@ export function ItineraryTab({
                 dayId={selectedDayForExplore.dayId}
                 slot={selectedDayForExplore.slot}
                 areaCluster={selectedDayForExplore.areaCluster}
+                filters={dayExploreFilters}
                 onAddToDay={(placeIds) => {
                   // This will be handled by the ExploreDeck in day mode
                   setDayExploreOpen(false);
