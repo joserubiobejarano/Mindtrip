@@ -108,12 +108,148 @@ export function ItineraryTab({
         throw new Error(body?.error || `Generation failed with status ${res.status}`);
       }
 
-      const json = await res.json();
-      console.log('[itinerary-tab] generateSmartItinerary: received itinerary from POST', json);
+      // Check if response is streaming (SSE)
+      const contentType = res.headers.get('content-type');
+      if (contentType?.includes('text/event-stream')) {
+        // Handle streaming response
+        const reader = res.body?.getReader();
+        const decoder = new TextDecoder();
+        
+        if (!reader) {
+          throw new Error('No response body');
+        }
 
-      // POST now returns bare SmartItinerary directly
-      setSmartItinerary(json);
-      setStatus('loaded');
+        // Initialize partial itinerary
+        let partialItinerary: Partial<SmartItinerary> = {
+          title: '',
+          summary: '',
+          days: [],
+          tripTips: [],
+        };
+        
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Process complete SSE messages (lines ending with \n\n)
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop() || ''; // Keep incomplete line in buffer
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.substring(6));
+                console.log('[itinerary-tab] received SSE message:', data.type);
+                
+                switch (data.type) {
+                  case 'title':
+                    partialItinerary.title = data.data;
+                    setSmartItinerary(prev => prev ? { ...prev, title: data.data } : { ...partialItinerary } as SmartItinerary);
+                    break;
+                    
+                  case 'summary':
+                    partialItinerary.summary = data.data;
+                    setSmartItinerary(prev => prev ? { ...prev, summary: data.data } : { ...partialItinerary } as SmartItinerary);
+                    break;
+                    
+                  case 'day':
+                    // Add or update day
+                    const dayIndex = partialItinerary.days?.findIndex(d => d.id === data.data.id) ?? -1;
+                    if (dayIndex >= 0) {
+                      partialItinerary.days![dayIndex] = data.data;
+                    } else {
+                      partialItinerary.days = [...(partialItinerary.days || []), data.data];
+                    }
+                    setSmartItinerary(prev => {
+                      const base = prev || {
+                        title: partialItinerary.title || '',
+                        summary: partialItinerary.summary || '',
+                        days: [],
+                        tripTips: partialItinerary.tripTips || [],
+                      };
+                      const existingDayIndex = base.days.findIndex(d => d.id === data.data.id);
+                      if (existingDayIndex >= 0) {
+                        const newDays = [...base.days];
+                        newDays[existingDayIndex] = data.data;
+                        return { ...base, days: newDays };
+                      }
+                      return { ...base, days: [...base.days, data.data] };
+                    });
+                    break;
+                    
+                  case 'day-updated':
+                    // Update day with photos
+                    setSmartItinerary(prev => {
+                      if (!prev) return null;
+                      const dayIndex = prev.days.findIndex(d => d.id === data.data.id);
+                      if (dayIndex >= 0) {
+                        const newDays = [...prev.days];
+                        newDays[dayIndex] = data.data;
+                        return { ...prev, days: newDays };
+                      }
+                      return prev;
+                    });
+                    break;
+                    
+                  case 'tripTips':
+                    partialItinerary.tripTips = data.data;
+                    setSmartItinerary(prev => prev ? { ...prev, tripTips: data.data } : { ...partialItinerary } as SmartItinerary);
+                    break;
+                    
+                  case 'complete':
+                    // Final complete itinerary
+                    setSmartItinerary(data.data);
+                    setStatus('loaded');
+                    break;
+                    
+                  case 'error':
+                    console.error('[itinerary-tab] SSE error:', data.data);
+                    // If we have partial data, show it but also show the error
+                    setSmartItinerary(prev => {
+                      if (prev && prev.days && prev.days.length > 0) {
+                        setError(data.data.message || 'An error occurred while generating. Some days may be incomplete.');
+                        setStatus('loaded'); // Show partial data
+                        return prev;
+                      } else {
+                        setError(data.data.message || 'An error occurred');
+                        setStatus('error');
+                        return null;
+                      }
+                    });
+                    break;
+                }
+              } catch (err) {
+                console.error('[itinerary-tab] Error parsing SSE message:', err, line);
+              }
+            }
+          }
+        }
+        
+        // If we completed without error, mark as loaded
+        // Check if we have partial data
+        setSmartItinerary(prev => {
+          if (prev && prev.days && prev.days.length > 0) {
+            setStatus('loaded');
+            return prev;
+          } else {
+            // No data received, treat as error
+            setError('No itinerary data was received');
+            setStatus('error');
+            return null;
+          }
+        });
+      } else {
+        // Fallback: non-streaming response (for backwards compatibility)
+        const json = await res.json();
+        console.log('[itinerary-tab] generateSmartItinerary: received itinerary from POST', json);
+        setSmartItinerary(json);
+        setStatus('loaded');
+      }
     } catch (err) {
       console.error('[itinerary-tab] generateSmartItinerary error', err);
       setError('Failed to generate itinerary. Please try again.');
@@ -365,8 +501,8 @@ export function ItineraryTab({
             />
           )}
 
-          {/* Generating State */}
-          {status === 'generating' && (
+          {/* Generating State - only show if we have no partial data */}
+          {status === 'generating' && (!smartItinerary || !smartItinerary.days || smartItinerary.days.length === 0) && (
             <LoadingCard
               title="We're crafting your itinerary…"
               subtitle="Designing your days and finding great spots…"
@@ -381,8 +517,8 @@ export function ItineraryTab({
             />
           )}
 
-          {/* Loaded Itinerary */}
-          {status === 'loaded' && smartItinerary && (
+          {/* Itinerary (loaded or generating with partial data) */}
+          {(status === 'loaded' || (status === 'generating' && smartItinerary)) && smartItinerary && (
             <>
               {/* Safety guard: check if days is a valid array */}
               {!Array.isArray(smartItinerary.days) ? (
@@ -393,16 +529,23 @@ export function ItineraryTab({
               ) : (
                 <div className="space-y-8 pb-10">
                   {/* Trip Summary */}
-                  <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
-                    <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
-                       <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
+                  {(smartItinerary.title || smartItinerary.summary) && (
+                    <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
+                      {smartItinerary.title && (
+                        <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
+                      )}
+                      {smartItinerary.summary && (
+                        <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
+                          <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
 
                   {/* Days */}
                   <div className="space-y-12">
-                    {smartItinerary.days.map((day) => {
+                    {smartItinerary.days && smartItinerary.days.length > 0 ? (
+                      smartItinerary.days.map((day) => {
                   // Gather all photos from slots for the gallery
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
@@ -559,9 +702,27 @@ export function ItineraryTab({
 
                       </CardContent>
                     </Card>
-                  );
-                })}
-              </div>
+                      );
+                    })
+                    ) : null}
+                    
+                    {/* Loading placeholder for days still being generated */}
+                    {status === 'generating' && (
+                      <Card className="bg-gray-50 border-gray-200">
+                        <CardHeader className="bg-gray-50 border-b pb-4">
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                            <CardTitle className="text-lg font-medium text-gray-500">
+                              Generating more days...
+                            </CardTitle>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                          <p className="text-sm text-gray-500">We're crafting the rest of your itinerary...</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
 
                   {/* Tips & Notes */}
                   {smartItinerary.tripTips?.length ? (

@@ -1,14 +1,106 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
-import { getOpenAIClient } from '@/lib/openai';
 import { SmartItinerary } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
 import { findPlacePhoto, getPlaceDetails } from '@/lib/google/places-server';
 import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 export const maxDuration = 300;
+
+/**
+ * Helper to extract complete JSON objects from streaming text
+ * Uses bracket/brace counting to find complete objects
+ */
+function extractCompleteObjects(text: string): {
+  title?: string;
+  summary?: string;
+  days: any[];
+  tripTips?: string[];
+  isComplete: boolean;
+} {
+  const result = { days: [] as any[], isComplete: false };
+  
+  try {
+    // Try to parse as complete JSON first
+    const parsed = JSON.parse(text);
+    if (parsed.title) result.title = parsed.title;
+    if (parsed.summary) result.summary = parsed.summary;
+    if (parsed.days && Array.isArray(parsed.days)) {
+      result.days = parsed.days;
+    }
+    if (parsed.tripTips) result.tripTips = parsed.tripTips;
+    result.isComplete = true;
+    return result;
+  } catch {
+    // Partial JSON - try to extract complete day objects from the days array
+    // Find the days array start
+    const daysArrayStart = text.indexOf('"days"');
+    if (daysArrayStart === -1) return result;
+    
+    const afterDaysLabel = text.substring(daysArrayStart);
+    const arrayStart = afterDaysLabel.indexOf('[');
+    if (arrayStart === -1) return result;
+    
+    // Extract the days array content
+    let braceCount = 0;
+    let bracketCount = 1; // We're inside the array
+    let currentDayStart = -1;
+    let i = arrayStart + 1;
+    
+    while (i < afterDaysLabel.length && bracketCount > 0) {
+      const char = afterDaysLabel[i];
+      
+      if (char === '{') {
+        if (braceCount === 0) {
+          currentDayStart = i;
+        }
+        braceCount++;
+      } else if (char === '}') {
+        braceCount--;
+        if (braceCount === 0 && currentDayStart !== -1) {
+          // Found a complete day object
+          try {
+            const dayJson = afterDaysLabel.substring(currentDayStart, i + 1);
+            const day = JSON.parse(dayJson);
+            if (day.id && day.index !== undefined && day.slots && Array.isArray(day.slots)) {
+              result.days.push(day);
+            }
+          } catch {
+            // Skip invalid day JSON
+          }
+          currentDayStart = -1;
+        }
+      } else if (char === '[') {
+        bracketCount++;
+      } else if (char === ']') {
+        bracketCount--;
+      }
+      
+      i++;
+    }
+    
+    // Try to extract title and summary using regex (simpler approach)
+    const titleMatch = text.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (titleMatch) result.title = titleMatch[1];
+    
+    const summaryMatch = text.match(/"summary"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (summaryMatch) result.summary = summaryMatch[1];
+  }
+  
+  return result;
+}
+
+/**
+ * Send SSE message
+ */
+function sendSSE(controller: ReadableStreamDefaultController, type: string, data: any) {
+  const message = JSON.stringify({ type, data });
+  controller.enqueue(new TextEncoder().encode(`data: ${message}\n\n`));
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
   const { tripId } = await params;
@@ -211,140 +303,235 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
 
     console.log('[smart-itinerary] generating itinerary for trip', tripId);
 
-    const openai = getOpenAIClient();
-
-    // Use JSON mode so we don't get non-JSON text
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: system,
-        },
-        {
-          role: 'user',
-          content: userPrompt,
-        },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
-    });
-
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      console.error('[smart-itinerary] empty completion', completion);
-      return NextResponse.json(
-        { error: 'Empty completion from OpenAI' },
-        { status: 500 },
-      );
-    }
-
-    let itinerary: unknown;
-    try {
-      itinerary = JSON.parse(content);
-    } catch (err) {
-      console.error('[smart-itinerary] JSON parse error', err, 'raw content:', content);
-      return NextResponse.json(
-        { error: 'Failed to parse itinerary JSON' },
-        { status: 500 },
-      );
-    }
-
-    // Log raw object from model for debugging
-    console.log('[smart-itinerary] SMART_ITINERARY_RAW_MODEL_OUTPUT:', JSON.stringify(itinerary, null, 2));
-
-    // Validate the itinerary structure using Zod schema
-    let validatedItinerary: SmartItinerary;
-    try {
-      validatedItinerary = smartItinerarySchema.parse(itinerary) as SmartItinerary;
-    } catch (validationError: any) {
-      // Serialize error without circular refs
-      const errorDetails = {
-        name: validationError?.name,
-        message: validationError?.message,
-        issues: validationError?.issues || validationError?.errors || [],
-        stack: validationError?.stack?.split('\n').slice(0, 5), // First 5 lines of stack
-      };
-      
-      console.error('[smart-itinerary] SMART_ITINERARY_SCHEMA_ERROR:', JSON.stringify(errorDetails, null, 2));
-      console.error('[smart-itinerary] SMART_ITINERARY_RAW_MODEL_OUTPUT:', JSON.stringify(itinerary, null, 2));
-      
-      return NextResponse.json(
-        { 
-          error: 'Invalid itinerary payload', 
-          details: errorDetails 
-        },
-        { status: 500 },
-      );
-    }
-
-    console.log('[smart-itinerary] validated itinerary for trip', tripId, 'days:', validatedItinerary.days.length);
-
-    // Enrich places with photos from Google Places API
     const destination = trip.destination_name || trip.title;
     const cityOrArea = destination;
-    
-    // Enrich all days in parallel, but places sequentially within each day to avoid rate limits
-    await Promise.all(validatedItinerary.days.map(async (day) => {
-      // Enrich each place's photos sequentially
-      for (const slot of day.slots) {
-        for (const place of slot.places) {
-          // Only enrich if photos array is empty or missing
-          if (!place.photos || place.photos.length === 0) {
-            const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
-            place.photos = photoUrl ? [photoUrl] : [];
+
+    // Create a streaming response using Server-Sent Events
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          let accumulatedText = '';
+          let lastSentDayIndex = -1;
+          let validatedItinerary: SmartItinerary | null = null;
+          let titleSent = false;
+          let summarySent = false;
+
+          // Stream the text from OpenAI
+          // Note: response_format: 'json_object' doesn't work with streaming in the same way
+          // We'll stream the text and parse JSON incrementally
+          const result = await streamText({
+            model: openai('gpt-4o-mini'),
+            system: system,
+            prompt: userPrompt,
+            temperature: 0.7,
+            // Don't use response_format with streaming - we'll parse JSON manually
+          });
+
+          // Process the stream
+          for await (const chunk of result.textStream) {
+            accumulatedText += chunk;
+            
+            // Try to parse what we have so far
+            const partial = extractCompleteObjects(accumulatedText);
+            
+            // Send title if we have it and haven't sent it
+            if (partial.title && !titleSent) {
+              sendSSE(controller, 'title', partial.title);
+              titleSent = true;
+            }
+            
+            // Send summary if we have it and haven't sent it
+            if (partial.summary && !summarySent) {
+              sendSSE(controller, 'summary', partial.summary);
+              summarySent = true;
+            }
+            
+            // Send days as they become complete
+            for (let i = lastSentDayIndex + 1; i < partial.days.length; i++) {
+              const day = partial.days[i];
+              // Check if day looks complete (has all required fields)
+              if (day.id && day.index !== undefined && day.slots && Array.isArray(day.slots) && day.slots.length > 0) {
+                // Validate the day structure
+                try {
+                  // Send the day immediately (without photos for now)
+                  sendSSE(controller, 'day', day);
+                  lastSentDayIndex = i;
+                  
+                  // Start fetching photos asynchronously in background
+                  // Don't await - let it happen in parallel
+                  (async () => {
+                    try {
+                      const enrichedDay = { ...day };
+                      for (const slot of enrichedDay.slots) {
+                        for (const place of slot.places) {
+                          if (!place.photos || place.photos.length === 0) {
+                            const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                            place.photos = photoUrl ? [photoUrl] : [];
+                          }
+                        }
+                      }
+                      
+                      // Set day photos
+                      const allPlacePhotos = enrichedDay.slots.flatMap(slot => 
+                        slot.places.flatMap(place => place.photos || [])
+                      );
+                      enrichedDay.photos = allPlacePhotos.slice(0, 4);
+                      
+                      // Send updated day with photos
+                      sendSSE(controller, 'day-updated', enrichedDay);
+                    } catch (err) {
+                      console.error('[smart-itinerary] Error enriching day photos:', err);
+                    }
+                  })();
+                } catch (err) {
+                  console.error('[smart-itinerary] Error validating day:', err);
+                }
+              }
+            }
+            
+            // If we have complete JSON, validate and save
+            if (partial.isComplete) {
+              try {
+                const parsed = JSON.parse(accumulatedText);
+                validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
+                
+                // Ensure all days were sent
+                for (let i = lastSentDayIndex + 1; i < validatedItinerary.days.length; i++) {
+                  sendSSE(controller, 'day', validatedItinerary.days[i]);
+                }
+                
+                // Send tripTips if we have them
+                if (validatedItinerary.tripTips && validatedItinerary.tripTips.length > 0) {
+                  sendSSE(controller, 'tripTips', validatedItinerary.tripTips);
+                }
+                
+                // Final enrichment pass for any remaining photos
+                await Promise.all(validatedItinerary.days.map(async (day) => {
+                  for (const slot of day.slots) {
+                    for (const place of slot.places) {
+                      if (!place.photos || place.photos.length === 0) {
+                        const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                        place.photos = photoUrl ? [photoUrl] : [];
+                      }
+                    }
+                  }
+                  
+                  const allPlacePhotos = day.slots.flatMap(slot => 
+                    slot.places.flatMap(place => place.photos || [])
+                  );
+                  day.photos = allPlacePhotos.slice(0, 4);
+                }));
+                
+                // Save to Supabase
+                const { error: saveError } = await supabase
+                  .from('smart_itineraries')
+                  .upsert(
+                    {
+                      trip_id: tripId,
+                      content: validatedItinerary,
+                      updated_at: new Date().toISOString()
+                    },
+                    { onConflict: 'trip_id' },
+                  );
+                
+                if (saveError) {
+                  console.error('[smart-itinerary] Supabase upsert error', saveError);
+                  sendSSE(controller, 'error', { message: 'Failed to save itinerary' });
+                } else {
+                  console.log('[smart-itinerary] saved itinerary row for trip', tripId);
+                  
+                  // Clear liked places after successful regeneration
+                  if (mustIncludePlaceIds.length > 0 && userId) {
+                    try {
+                      await clearLikedPlacesAfterRegeneration(tripId, userId);
+                      console.log('[smart-itinerary] cleared liked places after regeneration');
+                    } catch (err) {
+                      console.error('[smart-itinerary] error clearing liked places:', err);
+                    }
+                  }
+                  
+                  // Send final complete message
+                  sendSSE(controller, 'complete', validatedItinerary);
+                }
+              } catch (parseError: any) {
+                console.error('[smart-itinerary] Error parsing/validating final JSON:', parseError);
+                sendSSE(controller, 'error', { 
+                  message: 'Failed to parse itinerary',
+                  details: parseError.message 
+                });
+              }
+            }
           }
+          
+          // If we didn't get complete JSON, try to parse what we have
+          if (!validatedItinerary && accumulatedText) {
+            try {
+              const parsed = JSON.parse(accumulatedText);
+              validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
+              
+              // Enrich photos
+              await Promise.all(validatedItinerary.days.map(async (day) => {
+                for (const slot of day.slots) {
+                  for (const place of slot.places) {
+                    if (!place.photos || place.photos.length === 0) {
+                      const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                      place.photos = photoUrl ? [photoUrl] : [];
+                    }
+                  }
+                }
+                
+                const allPlacePhotos = day.slots.flatMap(slot => 
+                  slot.places.flatMap(place => place.photos || [])
+                );
+                day.photos = allPlacePhotos.slice(0, 4);
+              }));
+              
+              // Save
+              const { error: saveError } = await supabase
+                .from('smart_itineraries')
+                .upsert(
+                  {
+                    trip_id: tripId,
+                    content: validatedItinerary,
+                    updated_at: new Date().toISOString()
+                  },
+                  { onConflict: 'trip_id' },
+                );
+              
+              if (!saveError) {
+                sendSSE(controller, 'complete', validatedItinerary);
+              } else {
+                sendSSE(controller, 'error', { message: 'Failed to save itinerary' });
+              }
+            } catch (err: any) {
+              console.error('[smart-itinerary] Final parse error:', err);
+              sendSSE(controller, 'error', { 
+                message: 'Failed to parse itinerary',
+                details: err.message 
+              });
+            }
+          }
+          
+          controller.close();
+        } catch (err: any) {
+          console.error('[smart-itinerary] Stream error:', err);
+          sendSSE(controller, 'error', { 
+            message: 'Streaming error',
+            details: err.message 
+          });
+          controller.close();
         }
-      }
-      
-      // Set day.photos from place photos (first 4 photos from all places in the day)
-      const allPlacePhotos = day.slots.flatMap(slot => 
-        slot.places.flatMap(place => place.photos || [])
-      );
-      day.photos = allPlacePhotos.slice(0, 4);
-    }));
+      },
+    });
 
-    // Save to Supabase - content is the SmartItinerary object directly, not wrapped
-    const { data, error } = await supabase
-      .from('smart_itineraries')
-      .upsert(
-        {
-          trip_id: tripId,
-          content: validatedItinerary, // content column should be jsonb, storing SmartItinerary directly
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'trip_id' },
-      )
-      .select('content')
-      .single();
-
-    if (error) {
-      console.error('[smart-itinerary] Supabase upsert error', error);
-      return NextResponse.json(
-        { error: 'Failed to save itinerary', details: error.message },
-        { status: 500 },
-      );
-    }
-
-    console.log('[smart-itinerary] saved itinerary row for trip', tripId);
-
-    // Clear liked places after successful regeneration
-    if (mustIncludePlaceIds.length > 0 && userId) {
-      try {
-        await clearLikedPlacesAfterRegeneration(tripId, userId);
-        console.log('[smart-itinerary] cleared liked places after regeneration');
-      } catch (err) {
-        console.error('[smart-itinerary] error clearing liked places:', err);
-        // Don't fail the request if clearing fails
-      }
-    }
-
-    // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
-    // No wrapping - data.content is the SmartItinerary itself
-    return NextResponse.json(
-      data.content as SmartItinerary,
-      { status: 200 },
-    );
+    // Return streaming response with SSE headers
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
   } catch (err: any) {
     console.error('[smart-itinerary] POST fatal error', err);
     return NextResponse.json(

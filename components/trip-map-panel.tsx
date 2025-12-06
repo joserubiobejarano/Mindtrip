@@ -154,7 +154,8 @@ export function TripMapPanel({
     if (activeTab === "explore" && exploreZoom != null) {
       return exploreZoom;
     }
-    return 12;
+    // Closer zoom for city center view
+    return 13;
   }, [activeTab, exploreZoom]);
   
   // Note: Removed automatic map focusing to prevent lag when zooming
@@ -181,7 +182,7 @@ export function TripMapPanel({
           }
         } else if (trip?.center_lat != null && trip?.center_lng != null) {
           mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
-          mapInstance.setZoom(12);
+          mapInstance.setZoom(13);
         }
       } else if (activeTab === "itinerary" && activities && activities.length > 0) {
         const activitiesWithPlaces = activities.filter(
@@ -205,7 +206,7 @@ export function TripMapPanel({
         }
       } else if (trip?.center_lat != null && trip?.center_lng != null) {
         mapInstance.panTo({ lat: trip.center_lat, lng: trip.center_lng });
-        mapInstance.setZoom(12);
+        mapInstance.setZoom(13);
       }
     }
   }, [activeTab, mapInstance, activities, trip, userLocation, exploreCenter, exploreZoom]);
