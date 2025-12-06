@@ -625,109 +625,110 @@ export function ItineraryTab({
 
                         {/* Slots */}
                         <div className="space-y-8 mt-6">
-                            {day.slots.map((slot, slotIdx) => {
-                              const slotType = slot.label.toLowerCase() as 'morning' | 'afternoon' | 'evening';
-                              const areaCluster = slot.places[0]?.area || slot.places[0]?.neighborhood || day.areaCluster;
-                              
-                              return (
-                                <div key={slotIdx} className="space-y-4">
-                                    <div className="pt-4 border-t border-gray-200">
-                                      <div className="flex items-center justify-between pb-2">
-                                        <div className="flex items-center gap-2">
-                                          <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
-                                          <span className="text-base text-slate-400">•</span>
-                                          <span className="text-base text-slate-900 italic">{slot.summary}</span>
-                                        </div>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedDayForExplore({
-                                            dayId: day.id,
-                                            slot: slotType,
-                                            areaCluster,
-                                          });
-                                          setDayExploreOpen(true);
+                          {day.slots.map((slot, slotIdx) => {
+                            const slotType = slot.label.toLowerCase() as 'morning' | 'afternoon' | 'evening';
+                            const areaCluster = slot.places[0]?.area || slot.places[0]?.neighborhood || day.areaCluster;
+                            
+                            return (
+                              <div key={slotIdx} className="space-y-4">
+                                <div className="pt-4 border-t border-gray-200">
+                                  <div className="flex items-center justify-between pb-2">
+                                    <div className="flex items-center gap-2">
+                                      <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
+                                      <span className="text-base text-slate-400">•</span>
+                                      <span className="text-base text-slate-900 italic">{slot.summary}</span>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedDayForExplore({
+                                          dayId: day.id,
+                                          slot: slotType,
+                                          areaCluster,
+                                        });
+                                        setDayExploreOpen(true);
+                                      }}
+                                      className="text-xs min-h-[44px] touch-manipulation"
+                                    >
+                                      <Plus className="h-3 w-3 mr-1" />
+                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
+                                      <span className="sm:hidden">Add</span>
+                                    </Button>
+                                  </div>
+                                  
+                                  <div className="grid gap-4">
+                                    {slot.places.map((place) => (
+                                      <div 
+                                        key={place.id} 
+                                        className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                                        onClick={(e) => {
+                                          onActivitySelect?.(place.id);
                                         }}
-                                        className="text-xs min-h-[44px] touch-manipulation"
                                       >
-                                        <Plus className="h-3 w-3 mr-1" />
-                                        <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
-                                        <span className="sm:hidden">Add</span>
-                                      </Button>
-                                    </div>
-                                    
-                                    <div className="grid gap-4">
-                                        {slot.places.map((place) => (
-                                            <div 
-                                              key={place.id} 
-                                              className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
-                                              onClick={(e) => {
-                                                onActivitySelect?.(place.id);
-                                              }}
-                                            >
-                                               <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                                 {place.photos && place.photos[0] ? (
-                                                   <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
-                                                 ) : (
-                                                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                     <MapPin className="h-8 w-8" />
-                                                   </div>
-                                                 )}
-                                               </div>
-                                               <div className="flex-1 min-w-0">
-                                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                                   <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
-                                                   <div className="flex gap-2 self-start">
-                                                     <button
-                                                       onClick={(e) => {
-                                                         e.stopPropagation();
-                                                         handleUpdatePlace(day.id, place.id, { visited: !place.visited });
-                                                       }}
-                                                       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 gap-1.5 ${
-                                                         place.visited
-                                                           ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                                           : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
-                                                       }`}
-                                                     >
-                                                       {place.visited && <Check className="h-3 w-3" />}
-                                                       {place.visited ? "Visited" : "Mark as visited"}
-                                                     </button>
-                                                     <button
-                                                       onClick={(e) => {
-                                                         e.stopPropagation();
-                                                         handleUpdatePlace(day.id, place.id, { remove: true });
-                                                       }}
-                                                       className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition h-7"
-                                                     >
-                                                       Remove
-                                                     </button>
-                                                   </div>
-                                                 </div>
-                                                 <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
-                                                   {place.description}
-                                                 </p>
-                                                 {place.area && (
-                                                   <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                                                     {place.area}
-                                                   </span>
-                                                 )}
-                                               </div>
+                                        <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
+                                          {place.photos && place.photos[0] ? (
+                                            <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
+                                          ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                              <MapPin className="h-8 w-8" />
                                             </div>
-                                        ))}
-                                    </div>
+                                          )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                                            <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
+                                            <div className="flex gap-2 self-start">
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleUpdatePlace(day.id, place.id, { visited: !place.visited });
+                                                }}
+                                                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 gap-1.5 ${
+                                                  place.visited
+                                                    ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                                    : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                                                }`}
+                                              >
+                                                {place.visited && <Check className="h-3 w-3" />}
+                                                {place.visited ? "Visited" : "Mark as visited"}
+                                              </button>
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleUpdatePlace(day.id, place.id, { remove: true });
+                                                }}
+                                                className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition h-7"
+                                              >
+                                                Remove
+                                              </button>
+                                            </div>
+                                          </div>
+                                          <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
+                                            {place.description}
+                                          </p>
+                                          {place.area && (
+                                            <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                                              {place.area}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                              );
-                            })}
+                              </div>
+                            );
+                          })}
                         </div>
 
                         {/* Affiliate Buttons - Moved below activities */}
                         <div className="mt-8 pt-6 border-t border-gray-100">
-                             <div className="flex flex-wrap gap-3">
-                                <AffiliateButton kind="hotel" day={day} />
-                                <AffiliateButton kind="tour" day={day} />
-                                <AffiliateButton kind="sim" day={day} />
-                             </div>
+                          <div className="flex flex-wrap gap-3">
+                            <AffiliateButton kind="hotel" day={day} />
+                            <AffiliateButton kind="tour" day={day} />
+                            <AffiliateButton kind="sim" day={day} />
+                          </div>
                         </div>
 
                       </CardContent>
