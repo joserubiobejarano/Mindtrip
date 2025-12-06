@@ -302,7 +302,8 @@ export function ExploreDeck({
     <>
       <div className="flex flex-col items-center justify-center w-full h-full">
         <div className="flex items-center justify-center w-full h-full">
-          <div className="relative w-full max-w-[420px] lg:max-w-[480px] h-[78vh] flex items-center justify-center z-10">
+          {/* Full screen on mobile, constrained on desktop */}
+          <div className="relative w-full h-full lg:max-w-[480px] lg:h-[78vh] flex items-center justify-center z-10">
             <AnimatePresence mode="wait">
               {currentPlace && (
                 <motion.div
@@ -329,22 +330,24 @@ export function ExploreDeck({
           </div>
         </div>
 
-        {/* Action buttons */}
-        <ExploreActions
-          onUndo={handleUndo}
-          onDislike={handleSwipeLeft}
-          onLike={handleSwipeRight}
-          onDetails={handleSwipeUp}
-          canUndo={swipeHistory.length > 0}
-          disabled={
-            swipeMutation.isPending ||
-            (session?.remainingSwipes != null && session.remainingSwipes <= 0)
-          }
-        />
+        {/* Action buttons - Fixed at bottom on mobile, below card on desktop */}
+        <div className="lg:relative fixed bottom-6 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-auto z-20">
+          <ExploreActions
+            onUndo={handleUndo}
+            onDislike={handleSwipeLeft}
+            onLike={handleSwipeRight}
+            onDetails={handleSwipeUp}
+            canUndo={swipeHistory.length > 0}
+            disabled={
+              swipeMutation.isPending ||
+              (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+            }
+          />
+        </div>
 
-        {/* Trip-level "Add liked places to itinerary" CTA */}
+        {/* Trip-level "Add liked places to itinerary" CTA - Hidden on mobile */}
         {mode === 'trip' && hasLikedPlaces && onAddToItinerary && (
-          <div className="mt-6 px-4 w-full max-w-[420px] lg:max-w-[480px]">
+          <div className="hidden lg:block mt-6 px-4 w-full max-w-[480px]">
             <Button
               onClick={onAddToItinerary}
               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"

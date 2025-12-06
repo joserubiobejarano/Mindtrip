@@ -49,9 +49,9 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
   };
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full flex items-center justify-center lg:p-4">
       <motion.div
-        className="h-full w-full max-w-sm bg-white rounded-3xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl relative"
+        className="w-full h-full lg:max-w-sm lg:h-auto bg-white rounded-[2rem] lg:rounded-[2rem] shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl relative flex flex-col"
         style={{ x, y, rotate }}
         drag={!disabled}
         dragElastic={0.3}
@@ -74,8 +74,8 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           NOPE
         </motion.div>
 
-        {/* Image section */}
-        <div className="relative h-72 overflow-hidden">
+        {/* Image section - Takes more space on mobile for full-screen effect */}
+        <div className="relative w-full flex-1 lg:flex-none lg:aspect-[4/3] overflow-hidden">
           {place.photo_url ? (
             <>
               <Image
@@ -92,18 +92,17 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           )}
         </div>
 
-        {/* Content section */}
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-display text-2xl font-semibold text-foreground">
-              {place.name ?? 'Unnamed place'}
-            </h2>
-            {place.category && (
-              <span className="inline-block font-mono text-xs uppercase tracking-wider text-sage bg-sage/10 px-3 py-1 rounded-full">
-                {place.category}
-              </span>
-            )}
-          </div>
+        {/* Content section - Compact on mobile, more padding on desktop */}
+        <div className="p-4 lg:p-6 flex-shrink-0">
+          <h2 className="font-display text-2xl font-semibold text-foreground mb-1">
+            {place.name ?? 'Unnamed place'}
+          </h2>
+          
+          {place.category && (
+            <span className="inline-block font-mono text-xs uppercase tracking-wider text-sage bg-sage/10 px-3 py-1 rounded-full mb-4">
+              {place.category}
+            </span>
+          )}
 
           {place.rating && (
             <div className="flex items-center gap-2 mb-3">
