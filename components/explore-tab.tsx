@@ -58,6 +58,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   const { addToast } = useToast();
   const [filters, setFilters] = useState<ExploreFiltersType>({});
   const [isAddingToItinerary, setIsAddingToItinerary] = useState(false);
+  const [activePlace, setActivePlace] = useState<{ placeId: string; lat: number; lng: number } | null>(null);
   
   // Gate for showing affiliate promo boxes (currently disabled)
   const showAffiliates = false;
@@ -102,12 +103,23 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     }
   };
 
-  // Clear map markers since we're not showing a map in swipe mode
+  // Update map with active place marker
   useEffect(() => {
-    if (onMapUpdate) {
+    if (onMapUpdate && activePlace) {
+      onMapUpdate(
+        [{
+          id: activePlace.placeId,
+          lat: activePlace.lat,
+          lng: activePlace.lng,
+        }],
+        { lat: activePlace.lat, lng: activePlace.lng },
+        14
+      );
+    } else if (onMapUpdate && !activePlace) {
+      // Clear markers when no active place
       onMapUpdate([], null, undefined);
     }
-  }, [onMapUpdate]);
+  }, [onMapUpdate, activePlace]);
 
   if (!trip) {
     return (
@@ -142,7 +154,10 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
             filters={filters}
             mode="trip"
             onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
-            onActivePlaceChange={onActivePlaceChange}
+            onActivePlaceChange={(place) => {
+              setActivePlace(place);
+              onActivePlaceChange?.(place);
+            }}
             hideHeader={true}
           />
         </ExploreErrorBoundary>

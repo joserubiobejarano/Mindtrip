@@ -301,9 +301,9 @@ export function ExploreDeck({
   return (
     <>
       <div className="flex flex-col items-center justify-center w-full h-full">
-        <div className="flex items-center justify-center w-full h-full">
+        <div className="flex items-center justify-center w-full flex-1 min-h-0">
           {/* Full screen on mobile, constrained on desktop */}
-          <div className="relative w-full h-full lg:max-w-[480px] lg:h-[78vh] flex items-center justify-center z-10">
+          <div className="relative w-full h-full lg:max-w-[480px] lg:h-auto flex items-center justify-center z-10">
             <AnimatePresence mode="wait">
               {currentPlace && (
                 <motion.div
@@ -330,8 +330,8 @@ export function ExploreDeck({
           </div>
         </div>
 
-        {/* Action buttons - Fixed at bottom on mobile, below card on desktop */}
-        <div className="lg:relative fixed bottom-6 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-auto z-20">
+        {/* Action buttons - Just below the card */}
+        <div className="flex-shrink-0 mt-4 lg:mt-6 z-20">
           <ExploreActions
             onUndo={handleUndo}
             onDislike={handleSwipeLeft}

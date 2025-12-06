@@ -92,9 +92,12 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           )}
         </div>
 
-        {/* Content section - Compact on mobile, more padding on desktop */}
-        <div className="p-4 lg:p-6 flex-shrink-0">
-          <h2 className="font-display text-2xl font-semibold text-foreground mb-1">
+        {/* Content section - Slightly larger with more padding */}
+        <div className="p-5 lg:p-7 flex-shrink-0">
+          <h2 
+            className="text-2xl lg:text-3xl font-semibold text-foreground mb-2"
+            style={{ fontFamily: "'Patrick Hand', cursive" }}
+          >
             {place.name ?? 'Unnamed place'}
           </h2>
           

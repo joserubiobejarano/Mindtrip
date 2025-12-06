@@ -35,7 +35,7 @@ export function TripShell({
     <div className="h-screen bg-background flex overflow-hidden">
       {/* Map Panel - Left (Hidden on Mobile for Explore tab) - Only visible on Explore tab */}
       {showMap && (
-        <div className="hidden lg:flex lg:w-[45%] bg-sage/20 items-center justify-center overflow-hidden">
+        <div className="hidden lg:flex lg:w-[50%] bg-sage/20 items-center justify-center overflow-hidden">
           <TripMapPanel
             tripId={tripId}
             selectedDayId={selectedDayId}
@@ -50,8 +50,8 @@ export function TripShell({
         </div>
       )}
 
-      {/* Content Panel - Right (Full screen on Mobile for Explore, 55% on Desktop) - 100% on other tabs */}
-      <div className={`flex flex-col overflow-hidden ${showMap ? 'flex-1 lg:w-[55%] bg-cream' : 'flex-1 bg-background'}`}>
+      {/* Content Panel - Right (Full screen on Mobile for Explore, 50% on Desktop) - 100% on other tabs */}
+      <div className={`flex flex-col overflow-hidden ${showMap ? 'flex-1 lg:w-[50%] bg-cream' : 'flex-1 bg-background'}`}>
         {children}
       </div>
     </div>
