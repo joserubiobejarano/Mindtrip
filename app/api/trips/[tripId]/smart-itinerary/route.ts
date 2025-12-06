@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
-import { SmartItinerary } from '@/types/itinerary';
+import { SmartItinerary, ItinerarySlot, ItineraryPlace } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
 import { findPlacePhoto, getPlaceDetails } from '@/lib/google/places-server';
 import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
@@ -378,8 +378,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       }
                       
                       // Set day photos
-                      const allPlacePhotos = enrichedDay.slots.flatMap(slot => 
-                        slot.places.flatMap(place => place.photos || [])
+                      const allPlacePhotos = enrichedDay.slots.flatMap((slot: ItinerarySlot) => 
+                        slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
                       );
                       enrichedDay.photos = allPlacePhotos.slice(0, 4);
                       
@@ -422,8 +422,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                     }
                   }
                   
-                  const allPlacePhotos = day.slots.flatMap(slot => 
-                    slot.places.flatMap(place => place.photos || [])
+                  const allPlacePhotos = day.slots.flatMap((slot: ItinerarySlot) => 
+                    slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
                   );
                   day.photos = allPlacePhotos.slice(0, 4);
                 }));
@@ -486,8 +486,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   }
                 }
                 
-                const allPlacePhotos = day.slots.flatMap(slot => 
-                  slot.places.flatMap(place => place.photos || [])
+                const allPlacePhotos = day.slots.flatMap((slot: ItinerarySlot) => 
+                  slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
                 );
                 day.photos = allPlacePhotos.slice(0, 4);
               }));
