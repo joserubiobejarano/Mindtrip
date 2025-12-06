@@ -22,7 +22,13 @@ function extractCompleteObjects(text: string): {
   tripTips?: string[];
   isComplete: boolean;
 } {
-  const result = { days: [] as any[], isComplete: false };
+  const result: {
+    title?: string;
+    summary?: string;
+    days: any[];
+    tripTips?: string[];
+    isComplete: boolean;
+  } = { days: [] as any[], isComplete: false };
   
   try {
     // Try to parse as complete JSON first
