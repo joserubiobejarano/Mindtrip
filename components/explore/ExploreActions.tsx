@@ -21,44 +21,44 @@ export function ExploreActions({
   disabled = false,
 }: ExploreActionsProps) {
   return (
-    <div className="mt-4 flex items-center justify-center gap-4 relative z-20">
+    <div className="flex items-center gap-4 mt-8">
       <button
         className={cn(
-          "h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-zinc-200 text-zinc-700 hover:bg-zinc-300 transition-colors",
+          "w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center text-muted-foreground hover:text-sage transition-colors duration-300 hover:shadow-lg",
           (!canUndo || disabled) && "opacity-50 cursor-not-allowed"
         )}
         onClick={onUndo}
         disabled={!canUndo || disabled}
         aria-label="Undo"
       >
-        <Undo2 className="h-5 w-5" />
+        <Undo2 className="w-5 h-5" />
       </button>
-
+      
       <button
-        className="h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-red-500 shadow-lg flex items-center justify-center text-white hover:scale-105 transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onDislike}
         disabled={disabled}
         aria-label="Dislike"
       >
-        <X className="h-6 w-6" />
+        <X className="w-7 h-7" />
       </button>
-
+      
       <button
-        className="h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-16 h-16 rounded-full bg-gradient-to-br from-coral to-coral/80 shadow-lg flex items-center justify-center text-white hover:scale-105 transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onLike}
         disabled={disabled}
         aria-label="Like"
       >
-        <Heart className="h-6 w-6" />
+        <Heart className="w-7 h-7" />
       </button>
-
+      
       <button
-        className="h-12 w-12 rounded-full flex items-center justify-center shadow-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center text-muted-foreground hover:text-coral transition-colors duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onDetails}
         disabled={disabled}
         aria-label="Details"
       >
-        <Info className="h-5 w-5" />
+        <Info className="w-5 h-5" />
       </button>
     </div>
   );

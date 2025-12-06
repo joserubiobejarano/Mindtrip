@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -92,87 +89,87 @@ export function ExploreFilters({
   };
 
   return (
-    <div className={cn("flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center flex-wrap", className)}>
+    <div className={cn("flex flex-col gap-4", className)}>
       {/* Toggle: Show places already in itinerary */}
-      <div className="flex items-center space-x-2 flex-shrink-0">
-        <Checkbox
-          id="include-itinerary-places"
-          checked={filters.includeItineraryPlaces || false}
-          onCheckedChange={handleIncludeItineraryPlacesChange}
-        />
-        <Label
-          htmlFor="include-itinerary-places"
-          className="text-sm font-normal cursor-pointer whitespace-nowrap"
-        >
-          Show places already in itinerary
-        </Label>
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-2 cursor-pointer group">
+          <div 
+            onClick={() => handleIncludeItineraryPlacesChange(!filters.includeItineraryPlaces)}
+            className={cn(
+              "w-5 h-5 rounded-full border-2 transition-all duration-300 flex items-center justify-center",
+              filters.includeItineraryPlaces 
+                ? "border-coral bg-coral" 
+                : "border-sage/40 group-hover:border-coral"
+            )}
+          >
+            {filters.includeItineraryPlaces && <div className="w-2 h-2 rounded-full bg-white" />}
+          </div>
+          <span className="text-sm text-foreground">Show places already in itinerary</span>
+        </label>
       </div>
 
       {/* Category Filter */}
-      <div className="flex-shrink-0">
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs font-medium text-muted-foreground mr-1 hidden sm:inline">Category:</span>
-          {CATEGORIES.map((cat) => (
-            <Button
-              key={cat.value}
-              variant={filters.category === cat.value ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleCategoryChange(cat.value)}
-              className="text-xs"
-            >
-              {cat.label}
-            </Button>
-          ))}
-        </div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="font-mono text-xs text-sage uppercase tracking-wider">Category:</span>
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat.value}
+            onClick={() => handleCategoryChange(cat.value)}
+            className={cn(
+              "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border",
+              filters.category === cat.value
+                ? "bg-foreground text-white border-foreground"
+                : "bg-white text-foreground border-sage/30 hover:border-coral hover:text-coral"
+            )}
+          >
+            {cat.label}
+          </button>
+        ))}
       </div>
 
       {/* Pro Tier Filters */}
       {effectiveIsPro && (
-        <>
+        <div className="flex items-center gap-3 flex-wrap">
           {/* Budget Filter (Pro only) */}
-          <div className="flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-medium text-muted-foreground hidden sm:inline">Budget:</label>
-              <Select
-                value={filters.budget?.toString() || ''}
-                onValueChange={handleBudgetChange}
-              >
-                <SelectTrigger className="w-[120px] h-8 text-xs">
-                  <SelectValue placeholder="Any budget" />
-                </SelectTrigger>
-                <SelectContent>
-                  {BUDGET_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex items-center gap-2">
+            <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
+            <Select
+              value={filters.budget?.toString() || ''}
+              onValueChange={handleBudgetChange}
+            >
+              <SelectTrigger className="w-[120px] h-8 text-xs bg-white border-sage/30">
+                <SelectValue placeholder="Any budget" />
+              </SelectTrigger>
+              <SelectContent>
+                {BUDGET_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Distance Filter (Pro only) */}
-          <div className="flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-medium text-muted-foreground hidden sm:inline">Distance:</label>
-              <Select
-                value={filters.maxDistance?.toString() || ''}
-                onValueChange={handleDistanceChange}
-              >
-                <SelectTrigger className="w-[120px] h-8 text-xs">
-                  <SelectValue placeholder="Any distance" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DISTANCE_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex items-center gap-2">
+            <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
+            <Select
+              value={filters.maxDistance?.toString() || ''}
+              onValueChange={handleDistanceChange}
+            >
+              <SelectTrigger className="w-[120px] h-8 text-xs bg-white border-sage/30">
+                <SelectValue placeholder="Any distance" />
+              </SelectTrigger>
+              <SelectContent>
+                {DISTANCE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

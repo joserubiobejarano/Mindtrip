@@ -58,18 +58,18 @@ export function TripTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
-      <div className="flex items-center justify-end px-4 pt-4 pb-2">
-        <div className="inline-flex rounded-[999px] border-[3px] border-black bg-white px-1 py-1 shadow-[6px_6px_0_0_rgba(0,0,0,1)] gap-1">
+      <div className="flex items-center justify-end p-4">
+        <div className="bg-white rounded-full p-1.5 shadow-lg flex gap-1">
           {tabs.map((tab) => {
             const isActive = tab.slug === activeTab;
             return (
               <button
                 key={tab.slug}
                 onClick={() => handleTabChange(tab.slug)}
-                className={`px-4 py-2 text-sm font-semibold rounded-[999px] transition ${
+                className={`px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-300 ${
                   isActive
-                    ? "bg-orange-500 text-white"
-                    : "bg-transparent text-slate-800 hover:bg-slate-100"
+                    ? "bg-coral text-white shadow-md"
+                    : "text-foreground hover:bg-peach/50"
                 }`}
               >
                 {tab.label}

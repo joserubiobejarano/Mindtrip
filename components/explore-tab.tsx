@@ -124,18 +124,18 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
         <HotelSearchBanner tripId={tripId} className="p-4 border-b flex-shrink-0" />
       )}
 
-      {/* Filters Row - Compact at top */}
-      <div className="p-4 border-b flex-shrink-0">
+      {/* Filters Section */}
+      <div className="px-6 py-4 border-b border-sage/20 flex-shrink-0">
         <ExploreFilters filters={filters} onFiltersChange={setFilters} />
       </div>
 
       {/* Swipe limit message - only shown when limit is reached */}
-      <div className="px-4 pt-4 flex-shrink-0">
+      <div className="px-6 pt-4 flex-shrink-0">
         <SwipeCounter tripId={tripId} />
       </div>
 
       {/* Swipe Deck - Fills remaining space with large cards */}
-      <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0">
+      <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0 p-6">
         <ExploreErrorBoundary>
           <ExploreDeck
             tripId={tripId}

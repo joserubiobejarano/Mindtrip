@@ -32,10 +32,10 @@ export function TripShell({
   const showMap = activeTab === "explore";
   
   return (
-    <div className="h-[calc(100vh-80px)] flex flex-col md:flex-row overflow-hidden bg-gradient-to-br from-purple-50/30 via-white to-orange-50/20">
+    <div className="h-screen bg-background flex overflow-hidden">
       {/* Map Panel - Left (Top on Mobile) - Only visible on Explore tab */}
       {showMap && (
-        <div className="hidden lg:block lg:basis-[45%] h-[40vh] md:h-auto border-r border-border relative order-first">
+        <div className="flex-1 bg-sage/20 flex items-center justify-center overflow-hidden">
           <TripMapPanel
             tripId={tripId}
             selectedDayId={selectedDayId}
@@ -50,8 +50,8 @@ export function TripShell({
         </div>
       )}
 
-      {/* Content Panel - Right (Bottom on Mobile) - 55% width on Explore, 100% on other tabs */}
-      <div className={`flex flex-col bg-white/80 backdrop-blur-sm overflow-hidden ${showMap ? 'flex-1 lg:basis-[55%]' : 'flex-1'} h-[60vh] md:h-auto relative z-10 shadow-lg`}>
+      {/* Content Panel - Right (Bottom on Mobile) - Fixed width on Explore, 100% on other tabs */}
+      <div className={`flex flex-col overflow-hidden ${showMap ? 'w-[500px] bg-cream' : 'flex-1 bg-background'}`}>
         {children}
       </div>
     </div>
