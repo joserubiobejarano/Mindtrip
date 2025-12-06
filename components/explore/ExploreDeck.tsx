@@ -350,7 +350,7 @@ export function ExploreDeck({
           <div className="hidden lg:block mt-6 px-4 w-full max-w-[480px]">
             <Button
               onClick={onAddToItinerary}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
+              className="w-full bg-coral hover:bg-coral/90 text-white shadow-lg"
               size="lg"
             >
               <Heart className="h-4 w-4 mr-2" />

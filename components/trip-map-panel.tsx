@@ -157,19 +157,8 @@ export function TripMapPanel({
     return 12;
   }, [activeTab, exploreZoom]);
   
-  // Focus map on active place when it changes (Explore tab only)
-  useEffect(() => {
-    if (!mapInstance || activeTab !== "explore" || !activePlace) return;
-
-    const { lat, lng } = activePlace;
-    if (!lat || !lng || isNaN(lat) || isNaN(lng)) return;
-
-    mapInstance.panTo({ lat, lng });
-    const currentZoom = mapInstance.getZoom();
-    if (currentZoom !== undefined && currentZoom < 14) {
-      mapInstance.setZoom(14);
-    }
-  }, [mapInstance, activeTab, activePlace]);
+  // Note: Removed automatic map focusing to prevent lag when zooming
+  // The marker is still shown, but we don't force pan/zoom to avoid performance issues
 
   // Update map center/zoom only when switching tabs (not on every explore state change)
   useEffect(() => {

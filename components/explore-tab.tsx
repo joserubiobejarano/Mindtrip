@@ -103,17 +103,18 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     }
   };
 
-  // Update map with active place marker
+  // Update map with active place marker (without forcing pan/zoom to avoid lag)
   useEffect(() => {
     if (onMapUpdate && activePlace) {
+      // Only update markers, don't force center/zoom to avoid lag
       onMapUpdate(
         [{
           id: activePlace.placeId,
           lat: activePlace.lat,
           lng: activePlace.lng,
         }],
-        { lat: activePlace.lat, lng: activePlace.lng },
-        14
+        null, // Don't force center
+        undefined // Don't force zoom
       );
     } else if (onMapUpdate && !activePlace) {
       // Clear markers when no active place
