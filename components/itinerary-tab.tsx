@@ -718,7 +718,7 @@ export function ItineraryTab({
                           </div>
                         </CardHeader>
                         <CardContent className="p-6">
-                          <p className="text-sm text-gray-500">We're crafting the rest of your itinerary...</p>
+                          <p className="text-sm text-gray-500">We&apos;re crafting the rest of your itinerary...</p>
                         </CardContent>
                       </Card>
                     )}
