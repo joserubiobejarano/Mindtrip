@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getOpenAIClient } from "@/lib/openai";
+import { moderateMessage, getRedirectMessage } from "@/lib/chat-moderation";
 
 export async function POST(
   request: NextRequest,
@@ -61,6 +62,34 @@ export async function POST(
       // Continue anyway
     }
 
+    // Pre-process: Check message safety and topic relevance
+    const moderationResult = await moderateMessage(message);
+    
+    if (moderationResult.shouldBlock) {
+      // Return redirect message without calling main AI
+      const redirectMessage = getRedirectMessage();
+      
+      // Save redirect response to chat history
+      const { error: saveRedirectError } = await supabase
+        .from("trip_chat_messages")
+        .insert({
+          trip_id: tripId,
+          role: "assistant",
+          content: redirectMessage,
+        });
+
+      if (saveRedirectError) {
+        console.error("Error saving redirect message:", saveRedirectError);
+      }
+
+      // Log the moderation reason for monitoring
+      if (moderationResult.reason) {
+        console.log(`Message blocked: ${moderationResult.reason}`);
+      }
+
+      return NextResponse.json({ message: redirectMessage });
+    }
+
     // Build context for GPT
     const destination = trip.destination_name || trip.title;
     const startDate = new Date(trip.start_date);
@@ -88,7 +117,13 @@ Respond in a friendly, conversational tone.`;
       messages: [
         {
           role: "system",
-          content: "You are a helpful travel planning assistant. Be concise and practical.",
+          content: `You are a travel planning assistant for MindTrip. You ONLY help with trip planning, itinerary adjustments, destination information, activity suggestions, and travel-related questions.
+
+If asked about anything unrelated to travel or trip planning, politely redirect: "I can't help you with that, but I can help with planning your trip activities, suggesting places to visit, or adjusting your itinerary."
+
+Do not engage in personal conversations, flirting, or discussions unrelated to travel. Maintain a professional, helpful tone focused on travel planning.
+
+Be concise and practical in your responses.`,
         },
         {
           role: "user",

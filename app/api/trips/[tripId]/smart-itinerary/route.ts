@@ -217,10 +217,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     let structureInstructions = `
       1. Structure:
          - Split each day into three slots: "morning", "afternoon", "evening".
-         - For each slot, pick 2–4 places.
-         - Aim for 8–10 total places per day.
-         - Ensure places in a slot are geographically close (same area/neighborhood) to reduce backtracking.
-         - Use the "areaCluster" field for the day's main area.`;
+         - For each slot, pick 2–4 places (aim for approximately 3 morning, 3 afternoon, 2 evening).
+         - Aim for approximately 8 total places per day (can be 7-9 depending on the day).
+         - CRITICAL: Ensure places within the same time slot are geographically close (same neighborhood/area, within walking distance) to minimize backtracking and maximize time efficiency. Group places by proximity.
+         - If a place is exceptional for both day and night experiences (e.g., a plaza that's beautiful during the day and has great lighting at night), you may recommend it twice - once for day and once for evening.
+         - Use the "areaCluster" field for the day's main area/neighborhood.`;
 
     if (preserveStructure && existingItinerary) {
       structureInstructions += `
@@ -242,9 +243,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       RULES:
       ${structureInstructions}
       
-      2. Content:
-         - In each day's "overview", include practical micro-tips (best time to visit, ticket warnings, busy hours).
+      2. Content & Writing Style:
+         - Write in a warm, friendly, personal tone - like a knowledgeable friend giving recommendations, not a generic travel guide.
+         - In each day's "overview" (4-7 sentences): Write detailed, evocative descriptions that paint a picture of the experience. Include:
+           * Practical micro-tips (best time to visit, ticket warnings, busy hours, what to bring)
+           * Date-specific context (e.g., "During December, Christmas markets around Plaza Mayor create a magical atmosphere")
+           * Seasonal considerations (weather, local events, holidays happening during the trip dates)
+           * Personal recommendations and insider tips
+           * What makes this day special and what travelers will see, feel, and experience
+         - In each slot's "summary" (3-6 sentences): Provide detailed, personal descriptions of what to do during this time. Be specific about:
+           * The atmosphere and what makes this time special
+           * Practical tips for navigating between places in this slot
+           * Transportation recommendations between places (e.g., "Take subway line 10 to X station", "These places are all within walking distance", "Best to walk from Place A to Place B")
+           * What travelers will experience and why it's worth doing
+         - For the first day, include airport-to-city-center transportation recommendations in the overview (e.g., "The best way to get to the city center from the airport is by taking the express train...").
          - In "tripTips", include season- and date-based advice (weather, holidays, opening hours, local events) specific to the trip dates.
+         - In each place's "description" (2-4 sentences): Be specific and helpful with practical info, what makes it special, opening hours, tips, and what to expect.
          - Use "visited" = false for all places.
          - Fill "tags" with relevant keywords.
       
@@ -255,7 +269,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
         "days": [
           {
             "id": string (UUID),
-            "index": number (0-based),
+            "index": number (1-based, starting at 1 for the first day),
             "date": string (ISO date),
             "title": string,
             "theme": string,

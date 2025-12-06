@@ -491,7 +491,7 @@ export function ItineraryTab({
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-[1267px] mx-auto px-4 py-8">
           
           {/* Loading State */}
           {status === 'loading' && (
@@ -604,9 +604,9 @@ export function ItineraryTab({
                                 <div key={slotIdx} className="space-y-4">
                                     <div className="flex items-center justify-between pb-2 border-b border-gray-100">
                                       <div className="flex items-center gap-2">
-                                        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">{slot.label}</h3>
-                                        <span className="text-sm text-slate-400">•</span>
-                                        <span className="text-sm text-slate-600 italic">{slot.summary}</span>
+                                        <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
+                                        <span className="text-base text-slate-400">•</span>
+                                        <span className="text-base text-slate-600 italic">{slot.summary}</span>
                                       </div>
                                       <Button
                                         variant="ghost"
