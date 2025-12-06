@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import OpenAI from 'openai';
 import { SmartItinerary } from '@/types/itinerary';
@@ -55,12 +56,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     // 1) Auth + Supabase
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (!user || authError) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
     }
+    
+    const supabase = await createClient();
 
     // 2) Load existing itinerary
     const { data: row, error: fetchError } = await supabase

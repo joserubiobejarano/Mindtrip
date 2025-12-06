@@ -245,12 +245,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       
       2. Content & Writing Style:
          - Write in a warm, friendly, personal tone - like a knowledgeable friend giving recommendations, not a generic travel guide.
-         - In each day's "overview" (4-7 sentences): Write detailed, evocative descriptions that paint a picture of the experience. Include:
+         - In each day's "overview": Write as a series of bullet points (3-5 points), each as a complete sentence ending with a period. Each bullet point should be detailed and evocative. Include:
            * Practical micro-tips (best time to visit, ticket warnings, busy hours, what to bring)
            * Date-specific context (e.g., "During December, Christmas markets around Plaza Mayor create a magical atmosphere")
            * Seasonal considerations (weather, local events, holidays happening during the trip dates)
            * Personal recommendations and insider tips
            * What makes this day special and what travelers will see, feel, and experience
+           Format: Each sentence should be a separate bullet point. The overview should be a string with sentences separated by periods, which will be displayed as bullet points.
          - In each slot's "summary" (3-6 sentences): Provide detailed, personal descriptions of what to do during this time. Be specific about:
            * The atmosphere and what makes this time special
            * Practical tips for navigating between places in this slot

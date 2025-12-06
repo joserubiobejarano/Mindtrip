@@ -529,7 +529,7 @@ export function ItineraryTab({
               ) : (
                 <div className="space-y-8 pb-10">
                   {/* Trip Summary */}
-                  {(smartItinerary.title || smartItinerary.summary) && (
+                  {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
                     <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
                       {smartItinerary.title && (
                         <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
@@ -537,6 +537,16 @@ export function ItineraryTab({
                       {smartItinerary.summary && (
                         <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
                           <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
+                        </div>
+                      )}
+                      {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
+                        <div className="mt-6 text-left max-w-3xl mx-auto">
+                          <h3 className="text-lg font-bold text-slate-900 mb-3">Trip Tips &amp; Notes</h3>
+                          <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
+                            {smartItinerary.tripTips.map((tip, i) => (
+                              <li key={i}>{tip}</li>
+                            ))}
+                          </ul>
                         </div>
                       )}
                     </div>
@@ -557,7 +567,7 @@ export function ItineraryTab({
                     <Card 
                       key={day.id} 
                       id={`day-${day.id}`}
-                      className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-purple-500' : ''}`}
+                      className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
                       onClick={() => onSelectDay?.(day.id)}
                     >
                       <CardHeader className="bg-gray-50 border-b pb-4">
@@ -589,9 +599,28 @@ export function ItineraryTab({
                       )}
 
                       <CardContent className="p-6 space-y-6">
-                        <div className="prose prose-neutral max-w-none text-slate-900">
-                          <p>{day.overview}</p>
-                        </div>
+                        {/* Day Overview as Bullet Points */}
+                        {day.overview && (
+                          <div className="prose prose-neutral max-w-none text-slate-900">
+                            <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
+                              {day.overview
+                                .split(/[.!?]+/)
+                                .filter(s => s.trim().length > 10) // Filter out very short fragments
+                                .map((point, idx, arr) => {
+                                  const trimmed = point.trim();
+                                  if (!trimmed) return null;
+                                  // Add period if it doesn't end with punctuation and it's not the last item
+                                  const needsPeriod = !trimmed.match(/[.!?]$/) && idx < arr.length - 1;
+                                  return (
+                                    <li key={idx} className="font-normal">
+                                      {trimmed}{needsPeriod ? '.' : ''}
+                                    </li>
+                                  );
+                                })
+                                .filter(Boolean)}
+                            </ul>
+                          </div>
+                        )}
                         
 
                         {/* Slots */}
@@ -602,12 +631,13 @@ export function ItineraryTab({
                               
                               return (
                                 <div key={slotIdx} className="space-y-4">
-                                    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                                      <div className="flex items-center gap-2">
-                                        <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
-                                        <span className="text-base text-slate-400">•</span>
-                                        <span className="text-base text-slate-600 italic">{slot.summary}</span>
-                                      </div>
+                                    <div className="pt-4 border-t border-gray-200">
+                                      <div className="flex items-center justify-between pb-2">
+                                        <div className="flex items-center gap-2">
+                                          <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
+                                          <span className="text-base text-slate-400">•</span>
+                                          <span className="text-base text-slate-900 italic">{slot.summary}</span>
+                                        </div>
                                       <Button
                                         variant="ghost"
                                         size="sm"
@@ -724,18 +754,6 @@ export function ItineraryTab({
                     )}
                   </div>
 
-                  {/* Tips & Notes */}
-                  {smartItinerary.tripTips?.length ? (
-                    <section className="mt-10 rounded-2xl border bg-white/80 p-6 shadow-sm max-w-4xl mx-auto">
-                      <h2 className="text-lg font-semibold mb-3 text-slate-900">Trip Tips &amp; Notes</h2>
-                      <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                        {smartItinerary.tripTips.map((tip, i) => (
-                          <li key={i}>{tip}</li>
-                        ))}
-                      </ul>
-                    </section>
-                  ) : null}
-
                    {/* Global Affiliates */}
                    <div className="max-w-4xl mx-auto mt-12 mb-8 text-center p-8 bg-slate-50 rounded-2xl border border-slate-100">
                         <h3 className="text-lg font-semibold text-slate-800 mb-4">You&apos;ll probably need...</h3>
@@ -758,14 +776,14 @@ export function ItineraryTab({
                             value={chatMessage}
                             onChange={(e) => setChatMessage(e.target.value)}
                             placeholder="e.g. 'Add a lunch spot on Day 1', 'Move Sagrada Familia to Day 2'"
-                            className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
+                            className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
                             disabled={isChatting}
                             />
                         </div>
                         <Button 
                             type="submit" 
                             disabled={isChatting || !chatMessage.trim()} 
-                            className="rounded-xl px-6 bg-purple-600 hover:bg-purple-700 h-auto"
+                            className="rounded-xl px-6 bg-primary hover:bg-primary/90 h-auto"
                         >
                             {isChatting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                         </Button>
