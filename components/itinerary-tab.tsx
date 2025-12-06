@@ -530,18 +530,18 @@ export function ItineraryTab({
                 <div className="space-y-8 pb-10">
                   {/* Trip Summary */}
                   {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
-                    <div className="text-center space-y-4 mb-10 max-w-4xl mx-auto">
+                    <div className="text-left space-y-4 mb-10 max-w-4xl mx-auto">
                       {smartItinerary.title && (
-                        <h2 className="text-3xl font-bold text-slate-900">{smartItinerary.title}</h2>
+                        <h2 className="text-3xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
                       )}
                       {smartItinerary.summary && (
-                        <div className="prose prose-neutral max-w-none text-slate-900 mx-auto">
-                          <p className="text-lg leading-relaxed">{smartItinerary.summary}</p>
+                        <div className="prose prose-neutral max-w-none text-slate-900">
+                          <p className="text-lg leading-relaxed font-normal">{smartItinerary.summary}</p>
                         </div>
                       )}
                       {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
                         <div className="mt-6 text-left max-w-3xl mx-auto">
-                          <h3 className="text-lg font-bold text-slate-900 mb-3">Trip Tips &amp; Notes</h3>
+                          <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>Trip Tips &amp; Notes</h3>
                           <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
                             {smartItinerary.tripTips.map((tip, i) => (
                               <li key={i}>{tip}</li>
@@ -573,7 +573,7 @@ export function ItineraryTab({
                       <CardHeader className="bg-gray-50 border-b pb-4">
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="text-xl font-bold text-slate-900">
+                            <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                               Day {day.index} – {day.title}
                             </CardTitle>
                             <CardDescription className="text-base font-medium text-slate-600 mt-1">
@@ -634,7 +634,7 @@ export function ItineraryTab({
                                 <div className="pt-4 border-t border-gray-200">
                                   <div className="flex items-center justify-between pb-2">
                                     <div className="flex items-center gap-2">
-                                      <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
+                                      <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{slot.label}</h3>
                                       <span className="text-base text-slate-400">•</span>
                                       <span className="text-base text-slate-900 italic">{slot.summary}</span>
                                     </div>
@@ -677,7 +677,7 @@ export function ItineraryTab({
                                         </div>
                                         <div className="flex-1 min-w-0">
                                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                            <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
+                                            <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
                                             <div className="flex gap-2 self-start">
                                               <button
                                                 onClick={(e) => {

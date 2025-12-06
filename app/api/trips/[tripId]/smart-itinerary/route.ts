@@ -245,6 +245,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       
       2. Content & Writing Style:
          - Write in a warm, friendly, personal tone - like a knowledgeable friend giving recommendations, not a generic travel guide.
+         - CRITICAL: The "summary" field is the most important briefing text. It must include ALL of the following information in a comprehensive, detailed paragraph (not bullet points):
+           * Airport-to-city transportation: Provide EXACT details including the specific train/bus line name or number, departure station name and location, destination station name, duration, frequency, and approximate cost. Example: "From Madrid-Barajas Airport (Terminal 4), take the Cercanías C1 train (departs every 20 minutes) to Atocha Station in the city center. The journey takes approximately 30 minutes and costs around €2.60. Tickets can be purchased at the airport station or via the Renfe app."
+           * Weather conditions and clothing recommendations: Describe the typical weather during the trip dates (temperature ranges, precipitation, sunshine hours) and what clothing/accessories travelers should pack. Example: "During December in Madrid, expect daytime temperatures of 8-15°C (46-59°F) with occasional rain. Pack warm layers, a waterproof jacket, comfortable walking shoes, and a scarf for the cooler evenings."
+           * Seasonal activities and events: List specific events, festivals, markets, or seasonal activities happening during the trip dates. Example: "December in Madrid brings Christmas markets throughout the city, especially at Plaza Mayor and Plaza de España. The city is beautifully decorated with holiday lights, and you'll find special seasonal treats like turrón and churros con chocolate at local cafés."
+           * Local holidays and festivals: Mention any public holidays, cultural celebrations, or special events during the trip dates that might affect opening hours or availability.
+           * Practical city-specific tips: Include information about local customs, tipping culture, best times to visit attractions, common scams to avoid, useful apps, currency, and any other practical information that would help a first-time visitor.
+           The summary should be comprehensive and provide maximum value to travelers who don't know the city.
          - In each day's "overview": Write as a series of bullet points (3-5 points), each as a complete sentence ending with a period. Each bullet point should be detailed and evocative. Include:
            * Practical micro-tips (best time to visit, ticket warnings, busy hours, what to bring)
            * Date-specific context (e.g., "During December, Christmas markets around Plaza Mayor create a magical atmosphere")
@@ -257,8 +264,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
            * Practical tips for navigating between places in this slot
            * Transportation recommendations between places (e.g., "Take subway line 10 to X station", "These places are all within walking distance", "Best to walk from Place A to Place B")
            * What travelers will experience and why it's worth doing
-         - For the first day, include airport-to-city-center transportation recommendations in the overview (e.g., "The best way to get to the city center from the airport is by taking the express train...").
-         - In "tripTips", include season- and date-based advice (weather, holidays, opening hours, local events) specific to the trip dates.
+         - Day trip prioritization: CRITICAL - Prioritize attractions and places within the main destination city before suggesting day trips. Only suggest day trips if:
+           * The trip is 4+ days long, OR
+           * The main destination is very small and doesn't have enough attractions for the full trip duration
+           * For any day trip suggested, you MUST include in the day's overview EXACT transportation details:
+             - Exact train/bus line number or name (e.g., "Renfe Cercanías line C3", "Bus 401")
+             - Departure station name and location (e.g., "From Atocha Station in central Madrid")
+             - Destination station name (e.g., "to Toledo Station")
+             - Duration (e.g., "approximately 35 minutes")
+             - Frequency (e.g., "departs every 30 minutes")
+             - Approximate cost (e.g., "around €10-15 round trip")
+             Example: "Take a day trip to Toledo by catching the Renfe Cercanías C3 train from Atocha Station in central Madrid. The train departs every 30 minutes, takes approximately 35 minutes, and costs around €10-15 for a round trip ticket. Purchase tickets at Atocha Station or via the Renfe app."
+         - In "tripTips", include any additional helpful tips that don't fit in the summary (optional, can be empty if all information is in summary).
          - In each place's "description" (2-4 sentences): Be specific and helpful with practical info, what makes it special, opening hours, tips, and what to expect.
          - Use "visited" = false for all places.
          - Fill "tags" with relevant keywords.
@@ -386,7 +403,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       for (const slot of enrichedDay.slots) {
                         for (const place of slot.places) {
                           if (!place.photos || place.photos.length === 0) {
-                            const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                            let photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                            // Fallback: try generic city photo if place-specific photo fails
+                            if (!photoUrl) {
+                              photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
+                            }
+                            // Fallback: try just the city name
+                            if (!photoUrl) {
+                              photoUrl = await findPlacePhoto(`${cityOrArea} city`);
+                            }
                             place.photos = photoUrl ? [photoUrl] : [];
                           }
                         }
@@ -396,7 +421,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       const allPlacePhotos = enrichedDay.slots.flatMap((slot: ItinerarySlot) => 
                         slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
                       );
-                      enrichedDay.photos = allPlacePhotos.slice(0, 4);
+                      
+                      // Ensure day has at least 1-2 photos even if place photos failed
+                      if (allPlacePhotos.length === 0) {
+                        const cityPhoto = await findPlacePhoto(`${cityOrArea} city`);
+                        if (cityPhoto) {
+                          enrichedDay.photos = [cityPhoto];
+                        } else {
+                          // Last resort: try landmark photo
+                          const landmarkPhoto = await findPlacePhoto(`${cityOrArea} landmark`);
+                          enrichedDay.photos = landmarkPhoto ? [landmarkPhoto] : [];
+                        }
+                      } else {
+                        enrichedDay.photos = allPlacePhotos.slice(0, 4);
+                      }
                       
                       // Send updated day with photos
                       sendSSE(controller, 'day-updated', enrichedDay);
@@ -431,7 +469,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   for (const slot of day.slots) {
                     for (const place of slot.places) {
                       if (!place.photos || place.photos.length === 0) {
-                        const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                        let photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                        // Fallback: try generic city photo if place-specific photo fails
+                        if (!photoUrl) {
+                          photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
+                        }
+                        // Fallback: try just the city name
+                        if (!photoUrl) {
+                          photoUrl = await findPlacePhoto(`${cityOrArea} city`);
+                        }
                         place.photos = photoUrl ? [photoUrl] : [];
                       }
                     }
@@ -440,7 +486,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   const allPlacePhotos = day.slots.flatMap((slot: ItinerarySlot) => 
                     slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
                   );
-                  day.photos = allPlacePhotos.slice(0, 4);
+                  
+                  // Ensure day has at least 1-2 photos even if place photos failed
+                  if (allPlacePhotos.length === 0) {
+                    const cityPhoto = await findPlacePhoto(`${cityOrArea} city`);
+                    if (cityPhoto) {
+                      day.photos = [cityPhoto];
+                    } else {
+                      // Last resort: try landmark photo
+                      const landmarkPhoto = await findPlacePhoto(`${cityOrArea} landmark`);
+                      day.photos = landmarkPhoto ? [landmarkPhoto] : [];
+                    }
+                  } else {
+                    day.photos = allPlacePhotos.slice(0, 4);
+                  }
                 }));
                 
                 // Save to Supabase
@@ -495,7 +554,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 for (const slot of day.slots) {
                   for (const place of slot.places) {
                     if (!place.photos || place.photos.length === 0) {
-                      const photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                      let photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                      // Fallback: try generic city photo if place-specific photo fails
+                      if (!photoUrl) {
+                        photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
+                      }
+                      // Fallback: try just the city name
+                      if (!photoUrl) {
+                        photoUrl = await findPlacePhoto(`${cityOrArea} city`);
+                      }
                       place.photos = photoUrl ? [photoUrl] : [];
                     }
                   }
@@ -504,7 +571,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 const allPlacePhotos = day.slots.flatMap((slot: ItinerarySlot) => 
                   slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
                 );
-                day.photos = allPlacePhotos.slice(0, 4);
+                
+                // Ensure day has at least 1-2 photos even if place photos failed
+                if (allPlacePhotos.length === 0) {
+                  const cityPhoto = await findPlacePhoto(`${cityOrArea} city`);
+                  if (cityPhoto) {
+                    day.photos = [cityPhoto];
+                  } else {
+                    // Last resort: try landmark photo
+                    const landmarkPhoto = await findPlacePhoto(`${cityOrArea} landmark`);
+                    day.photos = landmarkPhoto ? [landmarkPhoto] : [];
+                  }
+                } else {
+                  day.photos = allPlacePhotos.slice(0, 4);
+                }
               }));
               
               // Save
