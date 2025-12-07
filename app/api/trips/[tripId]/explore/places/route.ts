@@ -22,6 +22,9 @@ export async function GET(
 
     const supabase = await createClient();
 
+    // Get URL for query parameters
+    const url = new URL(req.url);
+
     // Get trip_segment_id from query params (optional)
     const tripSegmentId = url.searchParams.get('trip_segment_id') || null;
 
@@ -36,7 +39,6 @@ export async function GET(
       .maybeSingle();
 
     // Get query parameter for including itinerary places
-    const url = new URL(req.url);
     const includeItineraryPlaces = url.searchParams.get('includeItineraryPlaces') === 'true';
 
     // Get places already in itinerary (from SmartItinerary, segment-scoped if trip_segment_id provided)
