@@ -1045,8 +1045,7 @@ export function ItineraryTab({
                           </>
                         );
                       }
-                    })()
-                    ) : null}
+                    })() : null}
                     
                     {/* Loading placeholder for days still being generated */}
                     {status === 'generating' && (
