@@ -842,10 +842,9 @@ export function ItineraryTab({
                       </CardContent>
                     </Card>
                             );
-                          });
-                        }));
-
-                        return groupedDays;
+                          })}
+                          </div>
+                        ))
                       } else {
                         // Single-city trip: render days normally (show city name once at top if single segment)
                         const singleSegment = segments.length === 1 ? segments[0] : null;
@@ -987,12 +986,11 @@ export function ItineraryTab({
                                                   e.stopPropagation();
                                                   handleUpdatePlace(day.id, place.id, { visited: !place.visited });
                                                 }}
-                                                className={clsx(
-                                                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                                   place.visited
                                                     ? "bg-green-100 text-green-700 hover:bg-green-200"
                                                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                                )}
+                                                }`}
                                               >
                                                 {place.visited ? (
                                                   <>
