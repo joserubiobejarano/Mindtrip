@@ -123,11 +123,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ itinerary: existingItinerary, fromCache: true })
     }
 
-    if (itineraryError) {
-      console.error('Error checking smart itinerary:', itineraryError)
-      // Continue to generate new itinerary if check fails
-    }
-
     // Load trip data
     const { data: trip, error: tripError } = await supabase
       .from('trips')
