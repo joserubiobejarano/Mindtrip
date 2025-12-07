@@ -21,6 +21,7 @@ This document tracks the development progress of the MindTrip travel planning ap
 - [x] Auto-generation of days for trip date ranges
 - [x] Trip member invitations and collaboration
 - [x] Database migrations for schema updates
+- [x] Trip invitation linking (link email invitations to user accounts after signup)
 
 ### Phase 3 - Itinerary Builder & Map Integration
 - [x] Day selector with date display
@@ -165,12 +166,17 @@ This document tracks the development progress of the MindTrip travel planning ap
 
 ## 🚧 In Progress
 
-**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** (Backend Complete, UI Remaining)
-- Backend API endpoints fully implemented
-- Day-level filtering and bulk add working
-- Pro tier filters (budget, maxDistance) implemented
-- User subscription system implemented
-- UI components for day-level integration still needed
+**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** ✅ **COMPLETE**
+- ✅ Backend API endpoints fully implemented
+- ✅ Day-level filtering and bulk add working
+- ✅ Pro tier filters (budget, maxDistance) implemented
+- ✅ User subscription system implemented
+- ✅ UI components for day-level integration implemented
+  - ✅ "Add activities" button on each day/slot in itinerary view
+  - ✅ Day-level Explore drawer/sheet with pre-filtered places
+  - ✅ Pre-filters by day's neighborhood and time slot
+  - ✅ Immediate add-to-day on swipe right in day mode
+  - ✅ Full integration with ExploreDeck in day mode
 
 ## ✅ Recently Completed (January 2025)
 
@@ -242,7 +248,7 @@ _See "Recently Completed" section above for full details. All features have been
 ### Phase 16 - Explore Feature: Itinerary Regeneration with Liked Places ✅ **COMPLETE**
 _See "Recently Completed" section above for full details. All features have been implemented._
 
-### Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters (🚧 Partially Complete)
+### Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters ✅ **COMPLETE**
 **Backend Complete ✅:**
 - [x] Day-level bulk add API endpoint (add places to specific day/slot) ✅
 - [x] Day-level filtering support (filter by day_id in Explore API) ✅
@@ -252,9 +258,14 @@ _See "Recently Completed" section above for full details. All features have been
 - [x] Daily swipe limit logic (50 for free tier, unlimited for Pro) ✅
 - [x] Undo swipe functionality ✅
 
-**Frontend/UI Remaining 🚧:**
-- [ ] "Add more activities" button on each day in itinerary UI
-- [ ] Pre-filter Explore by day's neighborhood/time of day (UI integration)
+**Frontend/UI Complete ✅:**
+- [x] "Add activities" button on each day/slot in itinerary UI ✅
+- [x] Pre-filter Explore by day's neighborhood/time of day (UI integration) ✅
+- [x] Day-level Explore drawer/sheet with filtered places ✅
+- [x] Immediate add-to-day on swipe right in day mode ✅
+- [x] Full integration with ExploreDeck component in day mode ✅
+
+**Future Enhancements (Not in Phase 17):**
 - [ ] AI suggestions for specific day/time slot
 - [ ] Additional advanced filters for Explore (Pro tier):
   - Vibe filters (romantic, family-friendly, adventurous, etc.)
@@ -434,10 +445,31 @@ For later implementation phases:
   - Uses `is_pro` column in `profiles` table
   - Migration file: `database/migrations/add-is-pro-to-profiles.sql`
 
+- `POST /api/user/link-trip-invitations` - Link trip invitations to user account
+  - Links trip_members entries with matching email to current user's account
+  - Returns: `{ success: boolean, linkedCount: number }`
+  - Called automatically when trips list loads to sync invitations
+  - Allows invited users to see trips after signing up
+
 ### Travel Intent (Future)
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates
+
+- **2025-01-XX**: Phase 17 Complete - Day-Level Integration & Trip Invitations ✅
+  - **Phase 17 UI Complete**: Day-level Explore integration fully implemented
+    - ✅ "Add activities" button on each day/slot in itinerary view
+    - ✅ Day-level Explore drawer/sheet that opens when clicking "Add activities"
+    - ✅ Pre-filters places by day's neighborhood (areaCluster) and time slot (morning/afternoon/evening)
+    - ✅ Immediate add-to-day functionality: swiping right in day mode adds place directly to that day/slot
+    - ✅ Full integration between itinerary-tab.tsx and ExploreDeck component
+    - ✅ ExploreDeck supports both 'trip' mode (traditional) and 'day' mode (filtered by day/slot)
+    - ✅ Day-level bulk add API integration in UI
+  - **Trip Invitation Linking**: New feature to link email invitations to user accounts
+    - ✅ New API endpoint: `/api/user/link-trip-invitations`
+    - ✅ Automatically links trip_members entries with matching email when user signs up
+    - ✅ Integrated into trips-list.tsx to auto-link invitations on page load
+    - ✅ Allows invited users to see trips in their "My Trips" section after signing up
 
 - **2025-01-XX**: Phase 15 & 16 Complete - Explore Feature Implementation ✅
   - **Phase 15 Complete**: Full Tinder-style swipe UI implemented
@@ -459,17 +491,19 @@ For later implementation phases:
     - Day-level bulk add: `/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes` endpoint
     - Add places directly to specific day and time slot (morning/afternoon/evening)
     - See implementation details in "Recently Completed" section above
-  - **Phase 17 Partial Complete**: Day-Level Integration & Advanced Filters (Backend Complete)
+  - **Phase 17 Complete**: Day-Level Integration & Advanced Filters ✅
     - ✅ Day-level bulk add API endpoint implemented (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
     - ✅ Day-level filtering support in Explore API (filter by `day_id` parameter)
     - ✅ Advanced filters for Pro tier implemented (budget, maxDistance)
     - ✅ User subscription system implemented (`is_pro` column in profiles table)
     - ✅ Subscription status API endpoint (`/api/user/subscription-status`)
     - ✅ Daily swipe limit logic (50 for free tier, unlimited for Pro)
-    - 🚧 Remaining: UI components for day-level integration ("Add more activities" button)
-    - 🚧 Remaining: Additional advanced filters (vibe, theme, accessibility)
-    - 🚧 Remaining: Multi-city Explore support
-    - 🚧 Remaining: Travel stats and badges system
+    - ✅ UI components for day-level integration ("Add activities" button) - **COMPLETE**
+    - ✅ Day-level Explore drawer/sheet with pre-filtering - **COMPLETE**
+    - ✅ Immediate add-to-day on swipe right in day mode - **COMPLETE**
+    - 🚧 Future: Additional advanced filters (vibe, theme, accessibility)
+    - 🚧 Future: Multi-city Explore support
+    - 🚧 Future: Travel stats and badges system
 
 - **2025-01-XX**: Product Direction Change - Explore Feature
   - New product flow: Generate itinerary → Explore places (Tinder-style) → Regenerate with liked places

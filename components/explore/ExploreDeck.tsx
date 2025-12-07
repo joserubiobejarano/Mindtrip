@@ -19,6 +19,7 @@ interface ExploreDeckProps {
   dayId?: string;
   slot?: 'morning' | 'afternoon' | 'evening';
   areaCluster?: string;
+  tripSegmentId?: string;
   onAddToItinerary?: () => void;
   onAddToDay?: (placeIds: string[]) => void;
   onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
@@ -33,6 +34,7 @@ export function ExploreDeck({
   dayId,
   slot,
   areaCluster,
+  tripSegmentId,
   onAddToItinerary,
   onAddToDay,
   onActivePlaceChange,
@@ -72,9 +74,9 @@ export function ExploreDeck({
     excludePlaceIdsKey,
   ]);
 
-  const { data: session } = useExploreSession(tripId);
-  const { data, isLoading, error: placesError } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot);
-  const swipeMutation = useSwipeAction(tripId);
+  const { data: session } = useExploreSession(tripId, true, tripSegmentId);
+  const { data, isLoading, error: placesError } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot, tripSegmentId);
+  const swipeMutation = useSwipeAction(tripId, tripSegmentId);
   const { addToast } = useToast();
 
   // Derive places directly from hook result
@@ -399,7 +401,7 @@ export function ExploreDeck({
         </div>
 
         {/* Action buttons - Just below the card */}
-        <div className="flex-shrink-0 mt-4 lg:mt-6 z-20">
+        <div className="flex-shrink-0 mt-2 lg:mt-6 z-20">
           <ExploreActions
             onUndo={handleUndo}
             onDislike={handleSwipeLeft}
@@ -413,9 +415,9 @@ export function ExploreDeck({
           />
         </div>
 
-        {/* Trip-level "Add liked places to itinerary" CTA - Hidden on mobile */}
+        {/* Trip-level "Add liked places to itinerary" CTA */}
         {mode === 'trip' && hasLikedPlaces && onAddToItinerary && (
-          <div className="hidden lg:block mt-6 px-4 w-full max-w-[480px]">
+          <div className="mt-4 lg:mt-6 px-4 w-full max-w-[480px]">
             <Button
               onClick={onAddToItinerary}
               className="w-full bg-coral hover:bg-coral/90 text-white shadow-lg"

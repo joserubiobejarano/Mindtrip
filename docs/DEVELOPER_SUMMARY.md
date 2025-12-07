@@ -287,7 +287,7 @@ mindtrip/
 
 ## What Has Been Done
 
-### ✅ Completed Phases (16 of 23)
+### ✅ Completed Phases (17 of 23)
 
 **Phase 1 - Project Setup & Foundation** ✅
 - Next.js 15 with App Router
@@ -394,7 +394,7 @@ mindtrip/
 - Full integration with Explore tab workflow
 - Day-level bulk add: `/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes` endpoint
 
-**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** 🚧 **Backend Complete**
+**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** ✅ **COMPLETE**
 - ✅ Day-level bulk add API endpoint implemented
 - ✅ Day-level filtering in Explore API (filter by `day_id`)
 - ✅ User subscription system (`is_pro` column in profiles table)
@@ -402,15 +402,17 @@ mindtrip/
 - ✅ Advanced filters for Pro tier (budget, maxDistance)
 - ✅ Daily swipe limit logic (50 for free tier, unlimited for Pro)
 - ✅ Undo swipe functionality
-- 🚧 UI components remaining ("Add more activities" button, etc.)
+- ✅ UI components implemented ("Add activities" button, day-level Explore drawer)
+- ✅ Immediate add-to-day on swipe right in day mode
+- ✅ Full integration with itinerary-tab.tsx and ExploreDeck component
 
 ### 📊 Progress Summary
 
-- **Completed**: 16 phases (Phases 1-16)
-- **In Progress**: Phase 17 (Backend Complete, UI Remaining)
-- **Planned**: 6 phases remaining (Phase 17 UI + Phases 18-23)
-- **Completion**: ~70%
-- **Next Priority**: Phase 17 UI - "Add more activities" button and day-level integration components
+- **Completed**: 17 phases (Phases 1-17)
+- **In Progress**: None
+- **Planned**: 6 phases remaining (Phases 18-23)
+- **Completion**: ~74%
+- **Next Priority**: Phase 18 - Enhanced User Experience (templates, weather, photos)
 
 ---
 
@@ -426,17 +428,18 @@ _See completed phases section above for details._
 **Phase 16 - Explore Feature: Itinerary Regeneration with Liked Places** ✅ **COMPLETE**
 _See completed phases section above for details._
 
-**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** (Backend Complete ✅, UI Remaining 🚧)
+**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** ✅ **COMPLETE**
 - ✅ Day-level bulk add API endpoint
 - ✅ Day-level filtering in Explore API
 - ✅ User subscription system (is_pro column)
-- ✅ Advanced filters for Pro tier (budget, maxDistance) - **IMPLEMENTED**
+- ✅ Advanced filters for Pro tier (budget, maxDistance)
 - ✅ Daily swipe limit logic
-- 🚧 "Add more activities" button on each day (UI component - NEXT PRIORITY)
-- 🚧 Pre-filter Explore by day's neighborhood/time of day (UI integration)
-- 🚧 Additional advanced filters (vibe, theme, accessibility)
-- 🚧 Multi-city Explore support (Pro tier)
-- 🚧 Travel stats and badges (Pro tier)
+- ✅ "Add activities" button on each time slot (UI component)
+- ✅ Pre-filter Explore by day's neighborhood/time of day (UI integration)
+- ✅ Day-level Explore drawer/sheet with filtered places
+- ✅ Immediate add-to-day on swipe right in day mode
+- ✅ Full ExploreDeck day mode integration
+- ✅ Trip invitation linking feature (new API endpoint)
 
 ### Other Planned Features (6 phases remaining)
 
@@ -487,12 +490,12 @@ _See completed phases section above for details._
 
 ### Immediate Priorities (Next 1-2 Months)
 
-1. **🚀 Phase 17 UI: Day-Level Integration Components**
-   - "Add more activities" button on each day in itinerary (UI component)
-   - Pre-filter Explore by day's neighborhood/time of day (UI integration)
-   - Additional advanced filters for Pro tier (vibe, theme, accessibility)
-   - Multi-city Explore support
-   - Travel stats and badges tracking
+1. **🚀 Phase 18: Enhanced User Experience**
+   - Weather integration for trip dates
+   - Trip templates and presets
+   - User photo uploads
+   - Notes and journaling features
+   - Trip statistics and analytics
 
 2. **Phase 18: Enhanced User Experience**
    - Weather integration for trip dates
@@ -500,10 +503,11 @@ _See completed phases section above for details._
    - User photo uploads
    - Notes and journaling features
 
-3. **Day-Level Integration (Backend Complete)**
-   - Phase 17 UI: "Add more activities" button (remaining)
-   - Pre-filtering by day/time (UI integration remaining)
-   - Additional advanced filters (vibe, theme, accessibility - remaining)
+3. **Phase 18: Enhanced User Experience**
+   - Weather integration for trip dates
+   - Trip templates and presets
+   - User photo uploads
+   - Notes and journaling features
 
 4. **Polish & Bug Fixes**
    - Fix any existing bugs
@@ -513,10 +517,13 @@ _See completed phases section above for details._
 
 ### Short-term Goals (3-6 Months)
 
-1. **Complete Phase 17 UI** (Day-Level Integration)
-   - Day-level "Add more activities" button (UI component)
-   - Additional advanced filters for Pro tier (vibe, theme, accessibility)
-   - Travel stats and badges
+1. **Phase 18: Enhanced User Experience**
+   - Weather integration for trip dates
+   - Trip templates and presets
+   - User photo uploads
+   - Notes and journaling features
+   - Additional advanced filters for Pro tier (vibe, theme, accessibility) - Future
+   - Travel stats and badges - Future
 
 2. **Phase 18 - Enhanced User Experience** (Updated numbering)
    - Weather integration
@@ -747,6 +754,12 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 - Add places to specific day and time slot
 - Body: `{ place_ids: string[], slot: 'morning' | 'afternoon' | 'evening' }`
 - Returns: `{ success: boolean, count: number, message: string }`
+
+**`POST /api/user/link-trip-invitations`**
+- Link trip invitations to user account
+- Links trip_members entries with matching email to current user
+- Returns: `{ success: boolean, linkedCount: number }`
+- Called automatically when trips list loads
 
 **`GET /api/user/subscription-status`**
 - Get user subscription status
@@ -1051,7 +1064,7 @@ For questions or issues:
 
 ## Summary
 
-**MindTrip** is a feature-rich, AI-powered travel planning application that's approximately **70% complete**. The core functionality is working, including:
+**MindTrip** is a feature-rich, AI-powered travel planning application that's approximately **74% complete**. The core functionality is working, including:
 
 - ✅ Trip management and collaboration
 - ✅ AI-powered itinerary generation
@@ -1084,15 +1097,14 @@ For questions or issues:
 - **NEW**: Explore feature requires new database table and API endpoints
 
 **Next Steps:**
-1. **🚀 Complete Phase 17 UI** - Day-Level Integration Components ("Add more activities" button)
-2. Continue with remaining Phase 17 features (additional filters, travel stats)
-3. Continue with remaining phases (18-23)
-4. Polish and bug fixes
-5. User testing and feedback
-6. Mobile app development
-7. Monetization implementation
+1. **🚀 Phase 18: Enhanced User Experience** - Weather integration, trip templates, photo uploads
+2. Continue with remaining phases (19-23)
+3. Polish and bug fixes
+4. User testing and feedback
+5. Mobile app development
+6. Monetization implementation
 
-The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phase 17 backend is complete - UI components are the current development priority.**
+The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phase 17 is complete - Day-level Explore integration and trip invitation linking are fully functional.**
 
 ---
 

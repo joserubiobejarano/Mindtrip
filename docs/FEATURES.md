@@ -156,22 +156,23 @@ The Explore feature is a Tinder-style swipe experience for discovering places in
 - Navigate to itinerary tab
 - Show "X new places added" notification
 
-### Day-Level Integration
+### Day-Level Integration ✅ **IMPLEMENTED**
 
-**"Add More Activities" Button:**
-- Button on each day in itinerary view
-- Opens Explore modal/drawer
-- Pre-filters by:
+**"Add Activities" Button:**
+- ✅ Button on each time slot (morning/afternoon/evening) in itinerary view
+- ✅ Opens Explore drawer/sheet with filtered places
+- ✅ Pre-filters by:
   - Day's neighborhood (from areaCluster)
   - Time of day (morning/afternoon/evening)
-  - Nearby to existing places
+  - Area cluster information from existing places
 
 **Flow:**
-1. User clicks "Add more activities" on a day
-2. Explore opens with pre-filters applied
-3. User swipes on places
-4. Clicks "Add to this day"
-5. Places added to specific day/time slot
+1. ✅ User clicks "Add activities" button on a time slot in itinerary
+2. ✅ Explore drawer opens with pre-filters applied (neighborhood + time slot)
+3. ✅ User swipes on places (filtered by day's location and time)
+4. ✅ Swiping right immediately adds place to that day/time slot
+5. ✅ Alternative: User can swipe on multiple places, then all liked places are added when clicking "Add to this day"
+6. ✅ Places automatically added to specific day and time slot
 
 ### Swipe Limits
 
@@ -613,23 +614,30 @@ The Explore feature is a Tinder-style swipe experience for discovering places in
 - ✅ Swipe limit logic (50/day free tier, unlimited Pro)
 - ✅ Undo swipe functionality
 
-**Phase 17: Day-Level Integration (Backend Complete)**
+**Phase 17: Day-Level Integration (COMPLETE)**
 - ✅ Day-level bulk add API endpoint (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
 - ✅ Day-level filtering support (filter by `day_id` in Explore API)
 - ✅ User subscription system (`is_pro` column in profiles table)
 - ✅ Subscription status API (`/api/user/subscription-status`)
 - ✅ Advanced filters for Pro tier (budget, maxDistance)
 - ✅ Daily swipe limit logic (50 for free tier, unlimited for Pro)
-- 🚧 UI components for day-level integration (remaining)
+- ✅ UI components for day-level integration - **COMPLETE**
+  - ✅ "Add activities" button on each time slot
+  - ✅ Day-level Explore drawer/sheet
+  - ✅ Pre-filtering by day's neighborhood and time slot
+  - ✅ Immediate add-to-day on swipe right
+  - ✅ Full ExploreDeck day mode integration
+- ✅ Trip invitation linking feature
+  - ✅ API endpoint: `/api/user/link-trip-invitations`
+  - ✅ Auto-links email invitations to user accounts after signup
 
 ### 🚧 In Development
 
-**Phase 17 UI Components (Backend Complete)**
-- Day-level "Add more activities" button (UI component)
-- Pre-filter Explore by day's neighborhood/time of day (UI integration)
+**Future Enhancements (Post-Phase 17)**
 - Additional advanced filters (vibe, theme, accessibility) for Pro tier
 - Multi-city Explore support
 - Travel stats and badges system
+- AI suggestions for specific day/time slot
 
 ### 📋 Planned Features
 

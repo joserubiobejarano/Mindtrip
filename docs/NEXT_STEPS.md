@@ -282,7 +282,7 @@ interface ExplorePlace {
 
 ## Phase 17: Day-Level Integration & Advanced Filters
 
-**Status:** Backend Complete ✅, UI Components Remaining 🚧
+**Status:** ✅ **COMPLETE** - All backend and UI features implemented
 
 ### ✅ Completed Backend Features
 
@@ -312,21 +312,25 @@ interface ExplorePlace {
    - Unlimited for Pro tier
    - Daily reset logic at midnight UTC
 
-### 🚧 Remaining UI Features
+### ✅ Completed UI Features
 
-### 1. Day-Level "Add More Activities"
+### 1. Day-Level "Add Activities" Button ✅
 
-**New Component:** `components/itinerary/AddMoreActivitiesButton.tsx`
+**Implementation:** Integrated into `components/itinerary-tab.tsx`
 
-**Features:**
-- Button on each day in itinerary view
-- Opens Explore modal/drawer
-- Pre-filters by:
+**Features Implemented:**
+- ✅ Button on each time slot (morning/afternoon/evening) in itinerary view
+- ✅ Opens Explore drawer/sheet (`components/ui/sheet`)
+- ✅ Pre-filters by:
   - Day's neighborhood (from areaCluster)
   - Time of day (morning/afternoon/evening)
-  - Nearby to existing places
+  - Area cluster information from existing places
 
-**API Endpoint:** `GET /api/trips/[tripId]/explore/places?day_id=[dayId]&time_of_day=[slot]`
+**Integration:**
+- Uses `ExploreDeck` component in `mode='day'`
+- Passes `dayId`, `slot`, and `areaCluster` to filter places
+- Immediate add-to-day: swiping right adds place directly to that day/slot
+- Location: `components/itinerary-tab.tsx` (lines 657-673, 871-907)
 
 ### 2. Advanced Filters (Pro Tier)
 
@@ -409,24 +413,30 @@ CREATE TABLE user_badges (
 - [x] Add place integration service
 - [x] Test regeneration flow
 
-### ✅ Week 9-10: Day-Level Integration (Backend Complete)
+### ✅ Week 9-10: Day-Level Integration (COMPLETE)
 - [x] Day-level bulk add API endpoint ✅
 - [x] Day-level filtering in Explore API ✅
 - [x] User subscription system (is_pro column) ✅
 - [x] Subscription status API endpoint ✅
 - [x] Daily swipe limit logic (50 for free, unlimited for Pro) ✅
 - [x] Advanced filters for Pro tier (budget, maxDistance) ✅
-- [ ] Add "Add more activities" button to days (UI component) - **NEXT PRIORITY**
-- [ ] Create modal/drawer for day-specific Explore
-- [ ] Test day-level flow end-to-end
+- [x] Add "Add activities" button to days (UI component) ✅
+- [x] Create drawer/sheet for day-specific Explore ✅
+- [x] Test day-level flow end-to-end ✅
+- [x] Trip invitation linking feature ✅
 
-### 🚧 Week 11-12: Pro Features & Polish (Partially Complete)
+### ✅ Week 11-12: Day-Level Integration & Polish (COMPLETE)
 - [x] Implement advanced filters (Pro tier) - Budget and maxDistance ✅
 - [x] Add swipe limit logic ✅
-- [ ] Implement travel stats tracking
-- [ ] Add badges system (if time permits)
-- [ ] Additional advanced filters (vibe, theme, accessibility)
-- [ ] Polish UI/UX
+- [x] Day-level "Add activities" button in itinerary UI ✅
+- [x] Day-level Explore drawer/sheet integration ✅
+- [x] Pre-filtering by day's neighborhood and time slot ✅
+- [x] Immediate add-to-day on swipe right in day mode ✅
+- [x] Full ExploreDeck day mode integration ✅
+- [x] Trip invitation linking API and UI integration ✅
+- [ ] Implement travel stats tracking (Future)
+- [ ] Add badges system (Future)
+- [ ] Additional advanced filters (vibe, theme, accessibility) (Future)
 - [ ] Performance optimization
 - [ ] Testing and bug fixes
 

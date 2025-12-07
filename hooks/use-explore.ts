@@ -27,7 +27,8 @@ export function useExplorePlaces(
   filters: ExploreFilters = {},
   enabled: boolean = true,
   dayId?: string,
-  slot?: 'morning' | 'afternoon' | 'evening'
+  slot?: 'morning' | 'afternoon' | 'evening',
+  tripSegmentId?: string
 ) {
   // Extract primitive values for query key to prevent re-renders
   const queryKey = [
@@ -43,6 +44,7 @@ export function useExplorePlaces(
     filters.excludePlaceIds?.sort().join(',') || null,
     dayId || null,
     slot || null,
+    tripSegmentId || null,
   ];
 
   return useQuery({
@@ -60,6 +62,7 @@ export function useExplorePlaces(
       }
       if (dayId) params.set('day_id', dayId);
       if (slot) params.set('time_of_day', slot);
+      if (tripSegmentId) params.set('trip_segment_id', tripSegmentId);
       if (filters.budget !== undefined) params.set('budget', filters.budget.toString());
       if (filters.maxDistance !== undefined) params.set('maxDistance', filters.maxDistance.toString());
 
@@ -83,11 +86,14 @@ export function useExplorePlaces(
  * Hook to fetch explore session state
  * Source of truth for liked/discarded lists
  */
-export function useExploreSession(tripId: string, enabled: boolean = true) {
+export function useExploreSession(tripId: string, enabled: boolean = true, tripSegmentId?: string) {
   return useQuery({
-    queryKey: ['explore-session', tripId],
+    queryKey: ['explore-session', tripId, tripSegmentId || null],
     queryFn: async () => {
-      const response = await fetch(`/api/trips/${tripId}/explore/session`);
+      const params = new URLSearchParams();
+      if (tripSegmentId) params.set('trip_segment_id', tripSegmentId);
+      const url = `/api/trips/${tripId}/explore/session${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error('Failed to fetch session');
@@ -104,7 +110,7 @@ export function useExploreSession(tripId: string, enabled: boolean = true) {
 /**
  * Hook to handle swipe actions with optimistic updates
  */
-export function useSwipeAction(tripId: string) {
+export function useSwipeAction(tripId: string, tripSegmentId?: string) {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -128,6 +134,7 @@ export function useSwipeAction(tripId: string) {
           action,
           previous_action: previousAction,
           source: source || 'trip',
+          trip_segment_id: tripSegmentId,
         }),
       });
 

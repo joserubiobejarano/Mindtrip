@@ -107,7 +107,7 @@ export function PublicItineraryPanel({
         {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
           <div className="space-y-4 mb-10 max-w-4xl mx-auto">
             {smartItinerary.title && (
-              <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
+              <h2 className="text-3xl font-bold text-slate-900 text-center">{smartItinerary.title}</h2>
             )}
             {smartItinerary.summary && (
               <div className="prose prose-neutral max-w-none text-slate-900 text-left">
@@ -130,7 +130,7 @@ export function PublicItineraryPanel({
             )}
             {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
               <div className="mt-6 text-left max-w-3xl mx-auto">
-                <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>Trip Tips &amp; Notes</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-3">Trip Tips &amp; Notes</h3>
                 <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
                   {smartItinerary.tripTips.map((tip, i) => (
                     <li key={i}>{tip}</li>
@@ -158,7 +158,7 @@ export function PublicItineraryPanel({
                 onClick={() => onSelectDay?.(day.id)}
               >
                 <CardHeader className="bg-gray-50 border-b pb-4">
-                  <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                  <CardTitle className="text-xl font-bold text-slate-900">
                     Day {day.index} – {day.title}
                   </CardTitle>
                   <CardDescription className="text-base font-medium text-slate-600 mt-1">
@@ -205,9 +205,9 @@ export function PublicItineraryPanel({
                     {day.slots.map((slot, slotIdx) => (
                       <div key={slotIdx} className="space-y-4">
                         <div className="pt-4 border-t border-gray-200">
-                          <div className="flex items-center gap-2 pb-2">
-                            <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{slot.label}</h3>
-                            <span className="text-base text-slate-400">•</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 pb-2">
+                            <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
+                            <span className="hidden sm:inline text-base text-slate-400">•</span>
                             <span className="text-base text-slate-900 italic">{slot.summary}</span>
                           </div>
                         </div>
@@ -232,7 +232,7 @@ export function PublicItineraryPanel({
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
                                 <p className="text-slate-700 text-sm mt-2 leading-relaxed">
                                   {place.description}
                                 </p>

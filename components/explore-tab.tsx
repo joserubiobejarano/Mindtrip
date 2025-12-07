@@ -7,9 +7,11 @@ import { ExploreFilters } from "./explore/ExploreFilters";
 import { SwipeCounter } from "./explore/SwipeCounter";
 import { HotelSearchBanner } from "./hotel-search-banner";
 import { useTrip } from "@/hooks/use-trip";
-import { useExploreSession } from "@/hooks/use-explore";
+import { useTripSegments } from "@/hooks/use-trip-segments";
+import { useExploreSession, useExplorePlaces } from "@/hooks/use-explore";
 import { useToast } from "@/components/ui/toast";
 import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Error boundary for Explore feature
 class ExploreErrorBoundary extends Component<
@@ -54,7 +56,9 @@ interface ExploreTabProps {
 export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlaceChange }: ExploreTabProps) {
   const router = useRouter();
   const { data: trip } = useTrip(tripId);
-  const { data: session, isLoading: sessionLoading } = useExploreSession(tripId);
+  const { data: segments = [] } = useTripSegments(tripId);
+  const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
+  const { data: session, isLoading: sessionLoading } = useExploreSession(tripId, true, activeSegmentId || undefined);
   const { addToast } = useToast();
   const [filters, setFilters] = useState<ExploreFiltersType>({});
   const [isAddingToItinerary, setIsAddingToItinerary] = useState(false);
@@ -62,6 +66,15 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   
   // Gate for showing affiliate promo boxes (currently disabled)
   const showAffiliates = false;
+
+  // Set initial segment if multi-city
+  useEffect(() => {
+    if (segments.length > 1 && !activeSegmentId) {
+      setActiveSegmentId(segments[0].id);
+    } else if (segments.length <= 1) {
+      setActiveSegmentId(null);
+    }
+  }, [segments, activeSegmentId]);
 
   const handleAddToItinerary = async () => {
     if (!session || session.likedPlaces.length === 0 || isAddingToItinerary) return;
@@ -137,6 +150,21 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
         <HotelSearchBanner tripId={tripId} className="p-4 border-b flex-shrink-0" />
       )}
 
+      {/* Segment Selector - Only show if multi-city */}
+      {segments.length > 1 && (
+        <div className="px-6 py-3 border-b border-sage/20 flex-shrink-0">
+          <Tabs value={activeSegmentId || undefined} onValueChange={setActiveSegmentId}>
+            <TabsList className="w-full justify-start">
+              {segments.map((segment) => (
+                <TabsTrigger key={segment.id} value={segment.id} className="text-sm">
+                  {segment.city_name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+      )}
+
       {/* Filters Section - Hidden on mobile for full-screen card experience */}
       <div className="hidden lg:block px-6 py-4 border-b border-sage/20 flex-shrink-0">
         <ExploreFilters filters={filters} onFiltersChange={setFilters} />
@@ -154,6 +182,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
             tripId={tripId}
             filters={filters}
             mode="trip"
+            tripSegmentId={activeSegmentId || undefined}
             onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
             onActivePlaceChange={(place) => {
               setActivePlace(place);

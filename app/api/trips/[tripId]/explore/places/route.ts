@@ -22,24 +22,37 @@ export async function GET(
 
     const supabase = await createClient();
 
-    // Get explore session to exclude already swiped places
+    // Get trip_segment_id from query params (optional)
+    const tripSegmentId = url.searchParams.get('trip_segment_id') || null;
+
+    // Get explore session to exclude already swiped places (segment-scoped if trip_segment_id provided)
+    const segmentIdForQuery = tripSegmentId || '00000000-0000-0000-0000-000000000000';
     const { data: session } = await supabase
       .from('explore_sessions')
       .select('liked_place_ids, discarded_place_ids')
       .eq('trip_id', tripId)
       .eq('user_id', userId)
+      .eq('trip_segment_id', segmentIdForQuery)
       .maybeSingle();
 
     // Get query parameter for including itinerary places
     const url = new URL(req.url);
     const includeItineraryPlaces = url.searchParams.get('includeItineraryPlaces') === 'true';
 
-    // Get places already in itinerary (from SmartItinerary)
-    const { data: itineraryData } = await supabase
+    // Get places already in itinerary (from SmartItinerary, segment-scoped if trip_segment_id provided)
+    let itineraryQuery = supabase
       .from('smart_itineraries')
       .select('content')
-      .eq('trip_id', tripId)
-      .maybeSingle();
+      .eq('trip_id', tripId);
+    
+    if (tripSegmentId) {
+      itineraryQuery = itineraryQuery.eq('trip_segment_id', tripSegmentId);
+    } else {
+      // For trip-level, get itinerary without segment_id (legacy single-city trips)
+      itineraryQuery = itineraryQuery.is('trip_segment_id', null);
+    }
+    
+    const { data: itineraryData } = await itineraryQuery.maybeSingle();
 
     // Extract place_ids from SmartItinerary
     const alreadyPlannedPlaceIds: string[] = [];

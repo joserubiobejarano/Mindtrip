@@ -93,7 +93,7 @@ export type AiItinerary = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { tripId } = body
+    const { tripId, trip_segment_id } = body
 
     if (!tripId) {
       return NextResponse.json(
@@ -104,10 +104,22 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
 
-    // Check if smart itinerary already exists
-    const { data: existingItinerary, error: itineraryError } = await getSmartItinerary(tripId)
+    // Check if smart itinerary already exists (segment-scoped if trip_segment_id provided)
+    let existingItinerary = null;
+    if (trip_segment_id) {
+      const { data: segmentItinerary } = await supabase
+        .from('smart_itineraries')
+        .select('content')
+        .eq('trip_id', tripId)
+        .eq('trip_segment_id', trip_segment_id)
+        .maybeSingle();
+      existingItinerary = segmentItinerary?.content as AiItinerary | null;
+    } else {
+      const { data: tripItinerary } = await getSmartItinerary(tripId);
+      existingItinerary = tripItinerary;
+    }
     
-    if (existingItinerary && !itineraryError) {
+    if (existingItinerary) {
       return NextResponse.json({ itinerary: existingItinerary, fromCache: true })
     }
 
@@ -130,12 +142,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Load days for the trip
-    const { data: days, error: daysError } = await supabase
+    // Load segment data if trip_segment_id provided
+    let segment = null;
+    if (trip_segment_id) {
+      const { data: segmentData } = await supabase
+        .from('trip_segments')
+        .select('*')
+        .eq('id', trip_segment_id)
+        .eq('trip_id', tripId)
+        .single();
+      segment = segmentData;
+    }
+
+    // Load days for the trip (filtered by segment if provided)
+    let daysQuery = supabase
       .from('days')
       .select('id, date, day_number')
-      .eq('trip_id', tripId)
-      .order('date', { ascending: true })
+      .eq('trip_id', tripId);
+    
+    if (trip_segment_id) {
+      daysQuery = daysQuery.eq('trip_segment_id', trip_segment_id);
+    } else {
+      // For trip-level, get days without segment (legacy single-city trips)
+      daysQuery = daysQuery.is('trip_segment_id', null);
+    }
+    
+    const { data: days, error: daysError } = await daysQuery.order('date', { ascending: true })
 
     if (daysError) {
       console.error('Error loading days:', daysError)
@@ -158,11 +190,11 @@ export async function POST(request: NextRequest) {
       // Don't fail if places can't be loaded, just continue without them
     }
 
-    // Build the prompt
-    const destination = trip.destination_name || trip.title
+    // Build the prompt (use segment data if available)
+    const destination = segment?.city_name || trip.destination_name || trip.title
     const country = trip.destination_country || ""
-    const startDate = new Date(trip.start_date)
-    const endDate = new Date(trip.end_date)
+    const startDate = segment ? new Date(segment.start_date) : new Date(trip.start_date)
+    const endDate = segment ? new Date(segment.end_date) : new Date(trip.end_date)
     
     // Format saved places for the prompt
     let savedPlacesText = ''
@@ -404,7 +436,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with 4-6 act
     };
 
     // Save enriched itinerary JSON to smart_itineraries table
-    const { error: saveError } = await upsertSmartItinerary(tripId, enrichedItinerary);
+    const { error: saveError } = await upsertSmartItinerary(tripId, enrichedItinerary, trip_segment_id);
     if (saveError) {
       console.error('Error saving smart itinerary:', saveError);
       // Continue even if save fails - we still return the itinerary

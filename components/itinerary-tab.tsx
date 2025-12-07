@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Send, Plus } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
-import { format } from "date-fns";
+import { useTripSegments } from "@/hooks/use-trip-segments";
+import { format, addDays, differenceInDays } from "date-fns";
+import { createClient } from "@/lib/supabase/client";
 import { ShareTripDialog } from "@/components/share-trip-dialog";
 import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
@@ -84,6 +86,8 @@ export function ItineraryTab({
   const { addToast } = useToast();
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
+  const { data: segments = [], isLoading: segmentsLoading } = useTripSegments(tripId);
+  const [daysWithSegments, setDaysWithSegments] = useState<Map<string, string>>(new Map()); // day date -> segment_id
 
   const generateSmartItinerary = useCallback(async () => {
     if (!tripId) {
@@ -298,6 +302,28 @@ export function ItineraryTab({
       setStatus('error');
     }
   }, [tripId, generateSmartItinerary]);
+
+  // Load days with segment info
+  useEffect(() => {
+    if (tripId && segments.length > 0) {
+      const supabase = createClient();
+      supabase
+        .from('days')
+        .select('id, date, trip_segment_id')
+        .eq('trip_id', tripId)
+        .then(({ data: days }) => {
+          if (days) {
+            const daySegmentMap = new Map<string, string>();
+            days.forEach(day => {
+              if (day.trip_segment_id) {
+                daySegmentMap.set(day.date, day.trip_segment_id);
+              }
+            });
+            setDaysWithSegments(daySegmentMap);
+          }
+        });
+    }
+  }, [tripId, segments]);
 
   // 1. Load existing or start generation
   useEffect(() => {
@@ -534,7 +560,7 @@ export function ItineraryTab({
                   {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
                     <div className="space-y-4 mb-10 max-w-4xl mx-auto">
                       {smartItinerary.title && (
-                        <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
+                        <h2 className="text-3xl font-bold text-slate-900 text-center">{smartItinerary.title}</h2>
                       )}
                       {smartItinerary.summary && (
                         <div className="prose prose-neutral max-w-none text-slate-900 text-left">
@@ -557,7 +583,7 @@ export function ItineraryTab({
                       )}
                       {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
                         <div className="mt-6 text-left max-w-3xl mx-auto">
-                          <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>Trip Tips &amp; Notes</h3>
+                          <h3 className="text-lg font-bold text-slate-900 mb-3">Trip Tips &amp; Notes</h3>
                           <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
                             {smartItinerary.tripTips.map((tip, i) => (
                               <li key={i}>{tip}</li>
@@ -568,10 +594,76 @@ export function ItineraryTab({
                     </div>
                   )}
 
-                  {/* Days */}
+                  {/* Days - Grouped by segments if multi-city */}
                   <div className="space-y-12">
-                    {smartItinerary.days && smartItinerary.days.length > 0 ? (
-                      smartItinerary.days.map((day) => {
+                    {smartItinerary.days && smartItinerary.days.length > 0 ? (() => {
+                      // Group days by segment if multi-city
+                      if (segments.length > 1) {
+                        const groupedDays: Array<{ segment: typeof segments[0] | null; days: ItineraryDay[] }> = [];
+                        let currentSegment: typeof segments[0] | null = null;
+                        let currentDays: ItineraryDay[] = [];
+
+                        smartItinerary.days.forEach((day, index) => {
+                          const daySegmentId = daysWithSegments.get(day.date);
+                          const segment = daySegmentId ? segments.find(s => s.id === daySegmentId) : null;
+
+                          // If segment changed, save previous group and start new one
+                          if (segment && segment.id !== currentSegment?.id) {
+                            if (currentSegment && currentDays.length > 0) {
+                              groupedDays.push({ segment: currentSegment, days: currentDays });
+                            }
+                            currentSegment = segment;
+                            currentDays = [day];
+
+                            // Check if we need a travel day
+                            if (groupedDays.length > 0 && currentSegment) {
+                              const prevSegment = groupedDays[groupedDays.length - 1].segment;
+                              if (prevSegment) {
+                                const prevEnd = new Date(prevSegment.end_date);
+                                const currentStart = new Date(currentSegment.start_date);
+                                const daysBetween = differenceInDays(currentStart, prevEnd);
+                                if (daysBetween === 1) {
+                                  // Insert travel day
+                                  const travelDay: ItineraryDay = {
+                                    id: `travel-${prevSegment.id}-${currentSegment.id}`,
+                                    index: day.index - 0.5,
+                                    date: format(prevEnd, 'yyyy-MM-dd'),
+                                    title: `Travel: ${prevSegment.city_name} → ${currentSegment.city_name}`,
+                                    theme: 'Travel',
+                                    areaCluster: '',
+                                    photos: [],
+                                    overview: `Travel day from ${prevSegment.city_name} to ${currentSegment.city_name}`,
+                                    slots: [],
+                                  };
+                                  currentDays = [travelDay, day];
+                                }
+                              }
+                            }
+                          } else {
+                            currentDays.push(day);
+                          }
+                        });
+
+                        // Add last group
+                        if (currentSegment && currentDays.length > 0) {
+                          groupedDays.push({ segment: currentSegment, days: currentDays });
+                        }
+
+                        // Render grouped days
+                        return groupedDays.map((group, groupIdx) => (
+                          <div key={group.segment?.id || `no-segment-${groupIdx}`} className="space-y-8">
+                            {group.segment && (
+                              <div className="border-b-2 border-slate-200 pb-2">
+                                <h3 className="text-2xl font-bold text-slate-900">
+                                  {group.segment.city_name}
+                                </h3>
+                                <p className="text-sm text-slate-600 mt-1">
+                                  {format(new Date(group.segment.start_date), "MMM d")} – {format(new Date(group.segment.end_date), "MMM d")} 
+                                  {' '}({differenceInDays(new Date(group.segment.end_date), new Date(group.segment.start_date)) + 1} nights)
+                                </p>
+                              </div>
+                            )}
+                            {group.days.map((day) => {
                   // Gather all photos from slots for the gallery
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
@@ -589,7 +681,7 @@ export function ItineraryTab({
                       <CardHeader className="bg-gray-50 border-b pb-4">
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                            <CardTitle className="text-xl font-bold text-slate-900">
                               Day {day.index} – {day.title}
                             </CardTitle>
                             <CardDescription className="text-base font-medium text-slate-600 mt-1">
@@ -648,10 +740,10 @@ export function ItineraryTab({
                             return (
                               <div key={slotIdx} className="space-y-4">
                                 <div className="pt-4 border-t border-gray-200">
-                                  <div className="flex items-center justify-between pb-2">
-                                    <div className="flex items-center gap-2">
-                                      <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{slot.label}</h3>
-                                      <span className="text-base text-slate-400">•</span>
+                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                      <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
+                                      <span className="hidden sm:inline text-base text-slate-400">•</span>
                                       <span className="text-base text-slate-900 italic">{slot.summary}</span>
                                     </div>
                                     <Button
@@ -693,7 +785,7 @@ export function ItineraryTab({
                                         </div>
                                         <div className="flex-1 min-w-0">
                                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                            <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                            <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
                                             <div className="flex gap-2 self-start">
                                               <button
                                                 onClick={(e) => {
@@ -749,8 +841,213 @@ export function ItineraryTab({
 
                       </CardContent>
                     </Card>
+                            );
+                          });
+                        }));
+
+                        return groupedDays;
+                      } else {
+                        // Single-city trip: render days normally (show city name once at top if single segment)
+                        const singleSegment = segments.length === 1 ? segments[0] : null;
+                        return (
+                          <>
+                            {singleSegment && (
+                              <div className="border-b-2 border-slate-200 pb-2 mb-8">
+                                <h3 className="text-2xl font-bold text-slate-900">
+                                  {singleSegment.city_name}
+                                </h3>
+                              </div>
+                            )}
+                            {smartItinerary.days.map((day) => {
+                  // Gather all photos from slots for the gallery
+                  const dayImages = (day.photos && day.photos.length > 0) 
+                    ? day.photos 
+                    : day.slots.flatMap(s => s.places.flatMap(p => p.photos || []));
+                  
+                  const bannerImages = dayImages.slice(0, 4);
+
+                  return (
+                    <Card 
+                      key={day.id} 
+                      id={`day-${day.id}`}
+                      className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
+                      onClick={() => onSelectDay?.(day.id)}
+                    >
+                      <CardHeader className="bg-gray-50 border-b pb-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-xl font-bold text-slate-900">
+                              Day {day.index} – {day.title}
+                            </CardTitle>
+                            <CardDescription className="text-base font-medium text-slate-600 mt-1">
+                              {day.theme} • {format(new Date(day.date), "EEEE, MMMM d")}
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      
+                      {/* Image Gallery */}
+                      {bannerImages.length > 0 && (
+                        <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
+                          {bannerImages.map((img, idx) => (
+                            <div 
+                              key={idx} 
+                              className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity"
+                              onClick={() => openLightbox(img, dayImages)}
+                            >
+                              <Image src={img} alt={`Day ${day.index} - ${idx + 1}`} fill className="object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <CardContent className="p-6 space-y-6">
+                        {/* Day Overview as Bullet Points */}
+                        {day.overview && (
+                          <div className="prose prose-neutral max-w-none text-slate-900">
+                            <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
+                              {day.overview
+                                .split(/[.!?]+/)
+                                .filter(s => s.trim().length > 10) // Filter out very short fragments
+                                .map((point, idx, arr) => {
+                                  const trimmed = point.trim();
+                                  if (!trimmed) return null;
+                                  // Add period if it doesn't end with punctuation and it's not the last item
+                                  const needsPeriod = !trimmed.match(/[.!?]$/) && idx < arr.length - 1;
+                                  return (
+                                    <li key={idx} className="font-normal">
+                                      {trimmed}{needsPeriod ? '.' : ''}
+                                    </li>
+                                  );
+                                })
+                                .filter(Boolean)}
+                            </ul>
+                          </div>
+                        )}
+                        
+
+                        {/* Slots */}
+                        <div className="space-y-8 mt-6">
+                          {day.slots.map((slot, slotIdx) => {
+                            const slotType = slot.label.toLowerCase() as 'morning' | 'afternoon' | 'evening';
+                            const areaCluster = slot.places[0]?.area || slot.places[0]?.neighborhood || day.areaCluster;
+                            
+                            return (
+                              <div key={slotIdx} className="space-y-4">
+                                <div className="pt-4 border-t border-gray-200">
+                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                      <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
+                                      <span className="hidden sm:inline text-base text-slate-400">•</span>
+                                      <span className="text-base text-slate-900 italic">{slot.summary}</span>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedDayForExplore({
+                                          dayId: day.id,
+                                          slot: slotType,
+                                          areaCluster,
+                                        });
+                                        setDayExploreOpen(true);
+                                      }}
+                                      className="text-xs min-h-[44px] touch-manipulation"
+                                    >
+                                      <Plus className="h-3 w-3 mr-1" />
+                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
+                                      <span className="sm:hidden">Add</span>
+                                    </Button>
+                                  </div>
+                                  
+                                  <div className="grid gap-4">
+                                    {slot.places.map((place) => (
+                                      <div 
+                                        key={place.id} 
+                                        className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                                        onClick={(e) => {
+                                          onActivitySelect?.(place.id);
+                                        }}
+                                      >
+                                        <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
+                                          {place.photos && place.photos[0] ? (
+                                            <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
+                                          ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                              <MapPin className="h-8 w-8" />
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                                            <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
+                                            <div className="flex gap-2 self-start">
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleUpdatePlace(day.id, place.id, { visited: !place.visited });
+                                                }}
+                                                className={clsx(
+                                                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                                                  place.visited
+                                                    ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                                )}
+                                              >
+                                                {place.visited ? (
+                                                  <>
+                                                    <Check className="h-3 w-3 inline mr-1" />
+                                                    Visited
+                                                  </>
+                                                ) : (
+                                                  "Mark visited"
+                                                )}
+                                              </button>
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleUpdatePlace(day.id, place.id, { remove: true });
+                                                }}
+                                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                                              >
+                                                <X className="h-3 w-3 inline mr-1" />
+                                                Remove
+                                              </button>
+                                            </div>
+                                          </div>
+                                          <p className="text-sm text-slate-600 mt-1">{place.description}</p>
+                                          {place.area && (
+                                            <span className="inline-block mt-2 px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
+                                              {place.area}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Affiliate Buttons - Moved below activities */}
+                        <div className="mt-8 pt-6 border-t border-gray-100">
+                          <div className="flex flex-wrap gap-3">
+                            <AffiliateButton kind="hotel" day={day} />
+                            <AffiliateButton kind="tour" day={day} />
+                            <AffiliateButton kind="sim" day={day} />
+                          </div>
+                        </div>
+
+                      </CardContent>
+                    </Card>
                       );
-                    })
+                    })}
+                          </>
+                        );
+                      }
+                    })()
                     ) : null}
                     
                     {/* Loading placeholder for days still being generated */}

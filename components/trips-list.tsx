@@ -35,10 +35,24 @@ export function TripsList() {
 
   useEffect(() => {
     if (userId) {
-      fetchTrips();
+      // Link trip invitations first, then fetch trips
+      linkTripInvitations().then(() => {
+        fetchTrips();
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  const linkTripInvitations = async () => {
+    try {
+      await fetch("/api/user/link-trip-invitations", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Error linking trip invitations:", error);
+      // Don't block trip fetching if this fails
+    }
+  };
 
   const fetchTrips = async () => {
     if (!userId) return;

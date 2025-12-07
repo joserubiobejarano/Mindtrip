@@ -171,6 +171,13 @@ export async function getPlacesToExplore(
 
   let places: any[] = searchData.results || [];
 
+  // Filter out places without ratings (must have rating > 0 OR user_ratings_total > 0)
+  places = places.filter(p => {
+    const rating = p.rating || 0;
+    const userRatingsTotal = p.user_ratings_total || 0;
+    return rating > 0 || userRatingsTotal > 0;
+  });
+
   // Filter out excluded place IDs
   if (filters.excludePlaceIds && filters.excludePlaceIds.length > 0) {
     const excludeSet = new Set(filters.excludePlaceIds);

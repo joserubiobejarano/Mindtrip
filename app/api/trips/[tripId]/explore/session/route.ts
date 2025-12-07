@@ -21,12 +21,17 @@ export async function GET(
 
     const supabase = await createClient();
 
-    // Get or create explore session
+    // Get trip_segment_id from query params (optional)
+    const url = new URL(req.url);
+    const tripSegmentId = url.searchParams.get('trip_segment_id') || null;
+
+    // Get or create explore session (segment-scoped if trip_segment_id provided)
     let { data: session, error: sessionError } = await supabase
       .from('explore_sessions')
       .select('*')
       .eq('trip_id', tripId)
       .eq('user_id', userId)
+      .eq('trip_segment_id', tripSegmentId || '00000000-0000-0000-0000-000000000000')
       .maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
@@ -44,6 +49,7 @@ export async function GET(
         .insert({
           trip_id: tripId,
           user_id: userId,
+          trip_segment_id: tripSegmentId,
           liked_place_ids: [],
           discarded_place_ids: [],
           swipe_count: 0,
@@ -103,6 +109,10 @@ export async function DELETE(
 
     const supabase = await createClient();
 
+    // Get trip_segment_id from query params (optional)
+    const url = new URL(req.url);
+    const tripSegmentId = url.searchParams.get('trip_segment_id') || null;
+
     // Reset session: clear liked/discarded arrays and reset swipe_count
     // Keep last_swipe_at unchanged (for daily reset logic)
     const { error: updateError } = await supabase
@@ -114,7 +124,8 @@ export async function DELETE(
         updated_at: new Date().toISOString(),
       })
       .eq('trip_id', tripId)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('trip_segment_id', tripSegmentId || '00000000-0000-0000-0000-000000000000');
 
     if (updateError) {
       // If no session exists, that's fine - return success

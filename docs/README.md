@@ -240,19 +240,24 @@ mindtrip/
 
 ## 📊 Current Status
 
-**Completed Phases:** 16 out of 23 planned phases (~70% complete)
-**Phase 17:** Backend complete, UI components remaining
+**Completed Phases:** 17 out of 23 planned phases (~74% complete)
+**Phase 17:** ✅ Complete - Day-level Explore integration fully implemented
 
 **Recent Updates (January 2025):**
 - ✅ Phase 15 & 16 fully implemented and functional
-- ✅ Phase 17 backend complete (day-level bulk add API, filtering, Pro tier filters)
+- ✅ Phase 17 complete - Day-level Explore integration fully implemented
 - ✅ Day-level bulk add API endpoint (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
+- ✅ "Add activities" button on each time slot in itinerary view
+- ✅ Day-level Explore drawer/sheet with pre-filtered places
+- ✅ Immediate add-to-day: swiping right in day mode adds place directly to that day/slot
+- ✅ Pre-filtering by day's neighborhood and time slot
+- ✅ Full ExploreDeck day mode integration
 - ✅ Undo swipe functionality implemented
 - ✅ User subscription system implemented (`is_pro` column, subscription status API)
 - ✅ Advanced filters (budget, maxDistance) for Pro tier
 - ✅ Day-level filtering support in Explore API
 - ✅ Daily swipe limits (50 for free tier, unlimited for Pro)
-- 🚧 Phase 17 UI components remaining ("Add more activities" button, etc.)
+- ✅ Trip invitation linking feature (auto-links email invitations to user accounts after signup)
 
 **Key Features Implemented:**
 - ✅ Full trip planning and collaboration
@@ -267,20 +272,24 @@ mindtrip/
 - ✅ Public sharing and PDF export
 - ✅ **Explore Feature (Tinder-style place discovery)** - **COMPLETE** (Phase 15)
 - ✅ **Itinerary regeneration with liked places from Explore** - **COMPLETE** (Phase 16)
-- ✅ **Day-level bulk add API** - Add places to specific day/slot (Phase 17 backend)
+- ✅ **Day-level bulk add API** - Add places to specific day/slot
+- ✅ **Day-level Explore integration** - "Add activities" button on each time slot
+- ✅ **Day-level Explore drawer** - Pre-filtered by day's neighborhood and time slot
+- ✅ **Immediate add-to-day** - Swiping right in day mode adds place directly to that day/slot
 - ✅ **Undo swipe functionality** - Undo last swipe action
 - ✅ **User subscription system** - Pro/free tier with `is_pro` column
 - ✅ **Subscription status API** - Check Pro/free tier status
 - ✅ **Advanced filters for Pro tier** - Budget and maxDistance filters
 - ✅ **Day-level filtering** - Filter Explore by specific day's neighborhood
 - ✅ **Daily swipe limits** - 50/day for free tier, unlimited for Pro
+- ✅ **Trip invitation linking** - Auto-links email invitations to user accounts after signup
 
 **Next Priorities:**
-- Phase 17 UI: "Add more activities" button on each day in itinerary
-- Phase 17: Additional advanced filters (vibe, theme, accessibility)
-- Phase 17: Multi-city Explore support and travel stats/badges
 - Phase 18: Enhanced user experience features (templates, weather, photos)
+- Phase 18: Notes and journaling features
 - Phase 19: Advanced collaboration (member chat, voting, comments)
+- Future: Additional advanced filters (vibe, theme, accessibility)
+- Future: Multi-city Explore support and travel stats/badges
 - Mobile app development
 - Web mobile optimization
 

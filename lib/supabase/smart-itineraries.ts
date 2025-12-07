@@ -4,18 +4,27 @@ import { getOpenAIClient } from "@/lib/openai";
 import { findPlacePhoto } from "@/lib/google/places-server";
 
 /**
- * Get the smart itinerary for a trip
+ * Get the smart itinerary for a trip (optionally scoped to a segment)
  */
 export async function getSmartItinerary(
-  tripId: string
+  tripId: string,
+  tripSegmentId?: string | null
 ): Promise<{ data: AiItinerary | null; error: Error | null }> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from("smart_itineraries")
       .select("content")
-      .eq("trip_id", tripId)
-      .maybeSingle();
+      .eq("trip_id", tripId);
+
+    if (tripSegmentId) {
+      query = query.eq("trip_segment_id", tripSegmentId);
+    } else {
+      // For trip-level, get itinerary without segment (legacy single-city trips)
+      query = query.is("trip_segment_id", null);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error) {
       return { data: null, error: error as Error };
@@ -35,22 +44,29 @@ export async function getSmartItinerary(
  */
 export async function upsertSmartItinerary(
   tripId: string,
-  content: AiItinerary
+  content: AiItinerary,
+  tripSegmentId?: string | null
 ): Promise<{ error: Error | null }> {
   try {
     const supabase = await createClient();
+    const upsertData: any = {
+      trip_id: tripId,
+      content: content as any,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (tripSegmentId) {
+      upsertData.trip_segment_id = tripSegmentId;
+    }
+
+    // Determine conflict key based on whether segment_id is provided
+    const conflictKey = tripSegmentId ? "trip_id,trip_segment_id" : "trip_id";
+
     const { error } = await supabase
       .from("smart_itineraries")
-      .upsert(
-        {
-          trip_id: tripId,
-          content: content as any,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "trip_id",
-        }
-      );
+      .upsert(upsertData, {
+        onConflict: conflictKey,
+      });
 
     if (error) {
       return { error: error as Error };
@@ -122,7 +138,8 @@ function matchSuggestionToSavedPlace(
  */
 export async function generateSmartItineraryWithOpenAI(
   tripId: string,
-  supabase: Awaited<ReturnType<typeof createClient>>
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  tripSegmentId?: string | null
 ): Promise<AiItinerary> {
   // Load trip data
   const { data: trip, error: tripError } = await supabase
@@ -135,12 +152,32 @@ export async function generateSmartItineraryWithOpenAI(
     throw new Error('Trip not found');
   }
 
-  // Load days for the trip
-  const { data: days, error: daysError } = await supabase
+  // Load segment data if trip_segment_id provided
+  let segment = null;
+  if (tripSegmentId) {
+    const { data: segmentData } = await supabase
+      .from('trip_segments')
+      .select('*')
+      .eq('id', tripSegmentId)
+      .eq('trip_id', tripId)
+      .single();
+    segment = segmentData;
+  }
+
+  // Load days for the trip (filtered by segment if provided)
+  let daysQuery = supabase
     .from('days')
     .select('id, date, day_number')
-    .eq('trip_id', tripId)
-    .order('date', { ascending: true });
+    .eq('trip_id', tripId);
+  
+  if (tripSegmentId) {
+    daysQuery = daysQuery.eq('trip_segment_id', tripSegmentId);
+  } else {
+    // For trip-level, get days without segment (legacy single-city trips)
+    daysQuery = daysQuery.is('trip_segment_id', null);
+  }
+  
+  const { data: days, error: daysError } = await daysQuery.order('date', { ascending: true });
 
   if (daysError) {
     throw new Error('Failed to load trip days');
@@ -159,11 +196,11 @@ export async function generateSmartItineraryWithOpenAI(
     // Don't fail if places can't be loaded, just continue without them
   }
 
-  // Build the prompt
-  const destination = trip.destination_name || trip.title;
+  // Build the prompt (use segment data if available)
+  const destination = segment?.city_name || trip.destination_name || trip.title;
   const country = trip.destination_country || "";
-  const startDate = new Date(trip.start_date);
-  const endDate = new Date(trip.end_date);
+  const startDate = segment ? new Date(segment.start_date) : new Date(trip.start_date);
+  const endDate = segment ? new Date(segment.end_date) : new Date(trip.end_date);
   
   // Format saved places for the prompt
   let savedPlacesText = '';
@@ -465,23 +502,31 @@ Make sure each day has sections for Morning, Afternoon, and Evening with 4-6 act
 }
 
 /**
- * Get or create a smart itinerary for a trip
+ * Get or create a smart itinerary for a trip (optionally scoped to a segment)
  * Returns existing itinerary if found, otherwise generates a new one
  */
 export async function getOrCreateSmartItinerary(
   tripId: string,
-  options?: { forceRegenerate?: boolean }
+  options?: { forceRegenerate?: boolean; tripSegmentId?: string | null }
 ): Promise<{ itinerary: AiItinerary; fromCache: boolean }> {
   const supabase = await createClient();
   const forceRegenerate = options?.forceRegenerate ?? false;
+  const tripSegmentId = options?.tripSegmentId;
 
   // 1) If not forcing regenerate, try to fetch existing itinerary
   if (!forceRegenerate) {
-    const { data: existing, error: existingError } = await supabase
+    let query = supabase
       .from("smart_itineraries")
       .select("id, content")
-      .eq("trip_id", tripId)
-      .maybeSingle();
+      .eq("trip_id", tripId);
+
+    if (tripSegmentId) {
+      query = query.eq("trip_segment_id", tripSegmentId);
+    } else {
+      query = query.is("trip_segment_id", null);
+    }
+
+    const { data: existing, error: existingError } = await query.maybeSingle();
 
     // if we got something, just return it
     if (existing && !existingError) {
@@ -490,21 +535,26 @@ export async function getOrCreateSmartItinerary(
   }
 
   // 2) No itinerary yet or forceRegenerate === true -> generate a new one with OpenAI
-  const itineraryJson = await generateSmartItineraryWithOpenAI(tripId, supabase);
+  const itineraryJson = await generateSmartItineraryWithOpenAI(tripId, supabase, tripSegmentId);
 
-  // 3) Upsert into smart_itineraries (one per trip)
+  // 3) Upsert into smart_itineraries
+  const upsertData: any = {
+    trip_id: tripId,
+    content: itineraryJson as any,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (tripSegmentId) {
+    upsertData.trip_segment_id = tripSegmentId;
+  }
+
+  const conflictKey = tripSegmentId ? "trip_id,trip_segment_id" : "trip_id";
+
   const { data: upserted, error: upsertError } = await supabase
     .from("smart_itineraries")
-    .upsert(
-      {
-        trip_id: tripId,
-        content: itineraryJson as any,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: "trip_id",
-      }
-    )
+    .upsert(upsertData, {
+      onConflict: conflictKey,
+    })
     .select("content")
     .single();
 

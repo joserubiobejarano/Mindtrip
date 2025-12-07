@@ -20,7 +20,7 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { place_id, action, previous_action, source } = body;
+    const { place_id, action, previous_action, source, trip_segment_id } = body;
 
     if (!action) {
       return NextResponse.json(
@@ -65,12 +65,14 @@ export async function POST(
 
     const supabase = await createClient();
 
-    // Get or create explore session
+    // Get or create explore session (segment-scoped if trip_segment_id provided)
+    const segmentIdForQuery = trip_segment_id || '00000000-0000-0000-0000-000000000000';
     let { data: session, error: sessionError } = await supabase
       .from('explore_sessions')
       .select('*')
       .eq('trip_id', tripId)
       .eq('user_id', userId)
+      .eq('trip_segment_id', segmentIdForQuery)
       .maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
@@ -152,13 +154,14 @@ export async function POST(
           {
             trip_id: tripId,
             user_id: userId,
+            trip_segment_id: trip_segment_id || null,
             liked_place_ids: currentLiked,
             discarded_place_ids: currentDiscarded,
             swipe_count: newSwipeCount,
             last_swipe_at: session.last_swipe_at, // Keep timestamp for reference (not used in limit logic)
           },
           {
-            onConflict: 'trip_id,user_id',
+            onConflict: 'trip_id,user_id,trip_segment_id',
           }
         )
         .select()
@@ -224,13 +227,14 @@ export async function POST(
         {
           trip_id: tripId,
           user_id: userId,
+          trip_segment_id: trip_segment_id || null,
           liked_place_ids: updatedLiked,
           discarded_place_ids: updatedDiscarded,
           swipe_count: newSwipeCount,
           last_swipe_at: now.toISOString(), // Keep for reference (not used in limit logic)
         },
         {
-          onConflict: 'trip_id,user_id',
+          onConflict: 'trip_id,user_id,trip_segment_id',
         }
       )
       .select()

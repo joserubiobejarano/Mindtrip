@@ -75,7 +75,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
         </motion.div>
 
         {/* Image section - Takes more space on mobile for full-screen effect */}
-        <div className="relative w-full flex-1 lg:flex-none lg:aspect-[4/3] overflow-hidden">
+        <div className="relative w-full flex-1 lg:flex-none lg:aspect-[4/3] overflow-hidden min-h-[200px]">
           {place.photo_url ? (
             <>
               <Image
@@ -96,7 +96,6 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
         <div className="p-5 lg:p-7 flex-shrink-0">
           <h2 
             className="text-2xl lg:text-3xl font-semibold text-foreground mb-2"
-            style={{ fontFamily: "'Patrick Hand', cursive" }}
           >
             {place.name ?? 'Unnamed place'}
           </h2>
