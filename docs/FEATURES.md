@@ -1,4 +1,4 @@
-# MindTrip - Features Documentation
+# Kruno - Features Documentation
 
 > **Last Updated:** January 2025  
 > **Focus:** Complete Feature List & Specifications
@@ -25,6 +25,17 @@
 - Trip name and description
 - Auto-generate days based on date range
 - Set trip preferences (budget, interests, currency)
+- **Multi-city trips (Pro tier)** ✅ **NEW**
+  - Add multiple cities to a single trip
+  - Each city is a "segment" with its own date range
+  - Auto-generate days for each segment
+  - Order-based segment management
+- **Trip Personalization** ✅ **NEW**
+  - Specify number of travelers
+  - Origin city selection
+  - Accommodation details (has accommodation, place ID, name, address)
+  - Arrival information (transport mode, arrival time)
+  - Interests array (user preferences)
 
 **Trip List**
 - View all trips user is a member of
@@ -38,6 +49,11 @@
 - Delete trip
 - Invite members
 - View trip members
+- **Manage trip segments (Pro tier)** ✅ **NEW**
+  - Add/remove cities from multi-city trips
+  - Edit segment dates and details
+  - View segment information
+  - Switch between segments in itinerary view
 
 ### Day Management
 
@@ -235,6 +251,50 @@ The Explore feature is a Tinder-style swipe experience for discovering places in
 - Chat history persistence
 - Natural language trip planning assistance
 - Answers questions about destinations, activities, etc.
+- **Enhanced Assistant** ✅ **NEW**
+  - Chat moderation (blocks non-travel topics)
+  - Multi-city trip context support
+  - Segment-aware responses (responds based on active segment)
+  - Day-aware responses (considers current day context)
+  - Automatic topic redirection for off-topic queries
+  - Improved system prompts for focused travel assistance
+
+### Travel Advisor (Pre-Trip Planning) ✅ **NEW**
+
+**Overview:**
+The Travel Advisor is a pre-trip planning assistant that helps users explore destinations, get trip ideas, and plan trips before creating them. It's separate from the Trip Assistant (which works with existing trips).
+
+**Features:**
+- Pre-trip planning chat interface (`/advisor` page)
+- Suggest destinations, regions, and cities
+- Propose realistic trip structures (e.g., 7 days → 2 cities)
+- Give approximate high-level suggestions (what to see, areas to base in, vibes)
+- Ask clarifying questions (budget, vibe, time of year, length of stay)
+- **Transport guidance** for multi-city and regional trips
+  - High-speed trains (e.g., AVE in Spain) for major cities
+  - Car rentals for smaller towns in regions like Tuscany
+  - Bus and flight options with pros/cons
+- **Daily message limits:**
+  - Free tier: 3 messages per day
+  - Pro tier: 15 messages per day
+- **Chat moderation:** Blocks non-travel topics
+- **Onboarding flow:** Creates trips directly from advisor conversation
+- **Integration with homepage:** Routes travel queries to advisor
+- **Starter prompts:** Common travel questions to get started
+- **Trip creation suggestions:** Proposes creating a trip after helpful exchanges
+
+**Use Cases:**
+- "1 week in Tuscany, but not sure where to base myself"
+- "Ideas for a 3-day city break in Europe in March"
+- "Spain road trip for 10 days"
+- "Best destinations for a solo trip in spring"
+
+**Technical Details:**
+- API endpoint: `/api/advisor` (GET and POST)
+- Database table: `advisor_messages` for chat history
+- React hook: `use-advisor-chat.ts` for integration
+- Helper functions: `lib/supabase/advisor-messages.ts`
+- Migration file: `database/migrations/supabase-add-advisor-messages.sql`
 
 ### Itinerary Chat Editing
 
@@ -604,6 +664,24 @@ The Explore feature is a Tinder-style swipe experience for discovering places in
 
 ### ✅ Recently Completed (January 2025)
 
+**Phase 21: Travel Advisor (Pre-Trip Planning) - COMPLETE** ✅
+- ✅ Travel Advisor page (`/advisor`) with chat interface
+- ✅ API endpoint (`/api/advisor`) with GET and POST methods
+- ✅ Database table `advisor_messages` for chat history
+- ✅ Daily message limits (3 for free tier, 15 for Pro tier)
+- ✅ Chat moderation system (blocks non-travel topics)
+- ✅ Onboarding flow that creates trips directly from advisor
+- ✅ Integration with homepage search (routes to advisor for travel queries)
+- ✅ Transport guidance for multi-city and regional trips
+- ✅ Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+
+**Phase 18-20: Multi-City Trips, Personalization & Enhanced Assistant - COMPLETE** ✅
+- ✅ Multi-city trip support with trip segments (Pro tier)
+- ✅ Trip personalization (travelers, origin, accommodation, arrival info, interests)
+- ✅ Enhanced Trip Assistant with chat moderation and multi-city context
+- ✅ Segment-aware days, itineraries, and explore sessions
+- ✅ All migration files and API endpoints implemented
+
 **Phase 15-16: Explore Feature - COMPLETE**
 - ✅ Explore feature (Tinder-style swipe) - **COMPLETE**
 - ✅ Itinerary regeneration with liked places - **COMPLETE**
@@ -615,6 +693,21 @@ The Explore feature is a Tinder-style swipe experience for discovering places in
 - ✅ Undo swipe functionality
 
 **Phase 17: Day-Level Integration (COMPLETE)**
+- ✅ Day-level bulk add API endpoint (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
+- ✅ Day-level filtering support (filter by `day_id` in Explore API)
+- ✅ User subscription system (`is_pro` column in profiles table)
+- ✅ Subscription status API (`/api/user/subscription-status`)
+- ✅ Advanced filters for Pro tier (budget, maxDistance)
+- ✅ Daily swipe limit logic (50 for free tier, unlimited for Pro)
+- ✅ UI components for day-level integration - **COMPLETE**
+  - ✅ "Add activities" button on each time slot
+  - ✅ Day-level Explore drawer/sheet
+  - ✅ Pre-filtering by day's neighborhood and time slot
+  - ✅ Immediate add-to-day on swipe right
+  - ✅ Full ExploreDeck day mode integration
+- ✅ Trip invitation linking feature
+  - ✅ API endpoint: `/api/user/link-trip-invitations`
+  - ✅ Auto-links email invitations to user accounts after signup
 - ✅ Day-level bulk add API endpoint (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
 - ✅ Day-level filtering support (filter by `day_id` in Explore API)
 - ✅ User subscription system (`is_pro` column in profiles table)

@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
             .join('\n')}`
         : ''
 
-    const prompt = `You are helping plan a day for MindTrip, a travel planning application.
+    const prompt = `You are helping plan a day for Kruno, a travel planning application.
 
 Trip Details:
 - Destination: ${city}${country ? `, ${country}` : ''}

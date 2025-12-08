@@ -224,7 +224,7 @@ export async function generateSmartItineraryWithOpenAI(
     };
   });
 
-  const systemPrompt = `You are MindTrip, an expert travel planner.
+  const systemPrompt = `You are Kruno, an expert travel planner.
 
 Goal:
 - Generate a rich, story-like itinerary stored as JSON.

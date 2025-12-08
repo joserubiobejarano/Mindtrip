@@ -19,7 +19,7 @@ export function NewFooter() {
                 className="text-xl font-bold"
                 style={{ fontFamily: "'Patrick Hand', cursive" }}
               >
-                MindTrip
+                Kruno
               </span>
             </Link>
             <p className="text-sm text-muted-foreground">
@@ -123,7 +123,7 @@ export function NewFooter() {
             Made with ❤️ by travelers, for travelers
           </p>
           <p className="text-sm text-muted-foreground">
-            ©2025 MindTrip. All rights reserved.
+            ©2025 Kruno. All rights reserved.
           </p>
         </div>
       </div>

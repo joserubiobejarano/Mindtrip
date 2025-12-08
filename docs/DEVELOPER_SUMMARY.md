@@ -1,11 +1,11 @@
-# MindTrip - Developer Summary & Project Overview
+# Kruno - Developer Summary & Project Overview
 
 > **Last Updated:** January 2025  
 > **Project Status:** Active Development - 14 of 20 phases completed (70%)
 
 ## 📋 Table of Contents
 
-1. [What is MindTrip?](#what-is-mindtrip)
+1. [What is Kruno?](#what-is-kruno)
 2. [Product Vision & Value Proposition](#product-vision--value-proposition)
 3. [What Does It Do?](#what-does-it-do)
 4. [Technology Stack](#technology-stack)
@@ -21,9 +21,9 @@
 
 ---
 
-## What is MindTrip?
+## What is Kruno?
 
-**MindTrip** is a collaborative, AI-powered travel planning application that helps users create, organize, and manage their trips. Think of it as "Notion + ChatGPT for trips" - combining the collaborative editing capabilities of Notion with AI-powered itinerary generation and assistance.
+**Kruno** is a collaborative, AI-powered travel planning application that helps users create, organize, and manage their trips. Think of it as "Notion + ChatGPT for trips" - combining the collaborative editing capabilities of Notion with AI-powered itinerary generation and assistance.
 
 ### 🎯 NEW PRODUCT DIRECTION (January 2025)
 
@@ -153,12 +153,21 @@ See [FEATURES.md](./FEATURES.md) for complete Explore feature specifications.
    - Chat history persistence
    - Natural language trip planning assistance
 
-9. **Sharing & Export**
+9. **Travel Advisor (Pre-Trip Planning)** ⚠️ **NEW**
+   - Pre-trip planning assistant for exploring destinations and trip ideas
+   - Chat interface at `/advisor` page
+   - Daily message limits (3 for free tier, 15 for Pro tier)
+   - Chat moderation (blocks non-travel topics)
+   - Transport guidance for multi-city and regional trips
+   - Onboarding flow that creates trips directly from advisor
+   - Integration with homepage search (routes to advisor for travel queries)
+
+10. **Sharing & Export**
    - Public trip sharing with unique slugs
    - Read-only public view with watermark
    - PDF export functionality
 
-10. **Maps & Routes**
+11. **Maps & Routes**
     - Interactive map with Mapbox GL JS
     - Activity markers and popups
     - Route optimization using Mapbox Directions API
@@ -205,7 +214,7 @@ See [FEATURES.md](./FEATURES.md) for complete Explore feature specifications.
 ## Project Structure
 
 ```
-mindtrip/
+kruno/
 ├── app/                          # Next.js 15 App Router
 │   ├── api/                      # API routes
 │   │   ├── accommodation/        # Accommodation search API
@@ -287,7 +296,7 @@ mindtrip/
 
 ## What Has Been Done
 
-### ✅ Completed Phases (17 of 23)
+### ✅ Completed Phases (21 of 27)
 
 **Phase 1 - Project Setup & Foundation** ✅
 - Next.js 15 with App Router
@@ -406,21 +415,34 @@ mindtrip/
 - ✅ Immediate add-to-day on swipe right in day mode
 - ✅ Full integration with itinerary-tab.tsx and ExploreDeck component
 
+**Phase 21 - Travel Advisor (Pre-Trip Planning)** ✅ **COMPLETE**
+- ✅ Travel Advisor page (`/advisor`) with chat interface
+- ✅ API endpoint (`/api/advisor`) with GET and POST methods
+- ✅ Database table `advisor_messages` for chat history
+- ✅ Daily message limits (3 for free tier, 15 for Pro tier)
+- ✅ Chat moderation system (blocks non-travel topics)
+- ✅ Onboarding flow that creates trips directly from advisor
+- ✅ Integration with homepage search (routes to advisor for travel queries)
+- ✅ Transport guidance for multi-city and regional trips
+- ✅ React hook `use-advisor-chat.ts` for integration
+- ✅ Helper functions in `lib/supabase/advisor-messages.ts`
+- ✅ Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+
 ### 📊 Progress Summary
 
-- **Completed**: 17 phases (Phases 1-17)
+- **Completed**: 21 phases (Phases 1-17, 18-21)
 - **In Progress**: None
-- **Planned**: 6 phases remaining (Phases 18-23)
-- **Completion**: ~74%
-- **Next Priority**: Phase 18 - Enhanced User Experience (templates, weather, photos)
+- **Planned**: 6 phases remaining (Phases 22-27)
+- **Completion**: ~78%
+- **Next Priority**: Phase 22 - Enhanced User Experience (templates, weather, photos)
 
 ---
 
 ## What's Left To Do
 
-### 🚧 Planned Features (7 phases remaining)
+### 🚧 Planned Features (6 phases remaining)
 
-### 🆕 NEXT PRIORITY: Explore Feature - Phase 17
+### 🆕 NEXT PRIORITY: Enhanced User Experience - Phase 22
 
 **Phase 15 - Explore Feature: Tinder-Style Place Discovery** ✅ **COMPLETE**
 _See completed phases section above for details._
@@ -443,7 +465,7 @@ _See completed phases section above for details._
 
 ### Other Planned Features (6 phases remaining)
 
-**Phase 18 - Enhanced User Experience**
+**Phase 21 - Enhanced User Experience**
 - [ ] Trip templates and presets
 - [ ] Weather integration for trip dates
 - [ ] Photo uploads and galleries (user-uploaded photos)
@@ -451,34 +473,34 @@ _See completed phases section above for details._
 - [ ] Trip statistics and analytics
 - [ ] Activity photo uploads
 
-**Phase 19 - Advanced Collaboration**
+**Phase 23 - Advanced Collaboration**
 - [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-**Phase 20 - Mobile App Development**
+**Phase 24 - Mobile App Development**
 - [ ] Native iOS and Android app (Expo + React Native)
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 - See [mobile-roadmap.md](./mobile-roadmap.md) for detailed plan
 
-**Phase 21 - Web Mobile Optimization**
+**Phase 25 - Web Mobile Optimization**
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-**Phase 22 - Advanced Features**
+**Phase 26 - Advanced Features**
 - [ ] Budget tracking and alerts
 - [ ] Enhanced booking service integrations
 - [ ] Calendar sync (Google Calendar, iCal)
 - [ ] Export to various formats (CSV, JSON)
 - [ ] Flight search and booking (placeholder page exists)
 
-**Phase 23 - Performance & Scalability**
+**Phase 27 - Performance & Scalability**
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -490,20 +512,20 @@ _See completed phases section above for details._
 
 ### Immediate Priorities (Next 1-2 Months)
 
-1. **🚀 Phase 18: Enhanced User Experience**
+1. **🚀 Phase 21: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
    - Notes and journaling features
    - Trip statistics and analytics
 
-2. **Phase 18: Enhanced User Experience**
+2. **Phase 21: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
    - Notes and journaling features
 
-3. **Phase 18: Enhanced User Experience**
+3. **Phase 21: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
@@ -517,7 +539,7 @@ _See completed phases section above for details._
 
 ### Short-term Goals (3-6 Months)
 
-1. **Phase 18: Enhanced User Experience**
+1. **Phase 21: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
@@ -525,12 +547,12 @@ _See completed phases section above for details._
    - Additional advanced filters for Pro tier (vibe, theme, accessibility) - Future
    - Travel stats and badges - Future
 
-2. **Phase 18 - Enhanced User Experience** (Updated numbering)
+2. **Phase 21 - Enhanced User Experience**
    - Weather integration
    - Trip templates
    - User photo uploads
 
-3. **Phase 19 - Advanced Collaboration** (Updated numbering)
+3. **Phase 22 - Advanced Collaboration**
    - Member-to-member chat
    - Activity voting
    - Email invitations
@@ -653,7 +675,13 @@ All migration files are in `database/migrations/`. **Run these manually in order
 9. `supabase-add-trip-id-to-places.sql` (adds trip_id to places)
 10. `add-itinerary-column.sql` (adds itinerary column if needed)
 11. `add-default-currency-to-profiles.sql` (adds default currency)
-12. `add-is-pro-to-profiles.sql` - ✅ **NEW** Adds `is_pro` column for subscription status
+12. `add-is-pro-to-profiles.sql` - ✅ Adds `is_pro` column for subscription status
+13. `supabase-add-trip-segments.sql` - ✅ **NEW** Creates `trip_segments` table for multi-city trips
+14. `supabase-add-segment-id-to-days.sql` - ✅ **NEW** Links days to segments
+15. `supabase-add-trip-segment-to-itineraries.sql` - ✅ **NEW** Links itineraries to segments
+16. `supabase-add-segment-id-to-explore-sessions.sql` - ✅ **NEW** Links explore sessions to segments
+17. `supabase-add-trip-personalization.sql` - ✅ **NEW** Adds personalization fields to trips table
+18. `supabase-add-trip-messages.sql` - ✅ Creates `trip_chat_messages` table (may already exist)
 
 **⚠️ Important**: Run migrations in the Supabase SQL Editor:
 1. Go to Supabase Dashboard > SQL Editor
@@ -691,6 +719,13 @@ If migrations fail or are incomplete, these tables may need manual creation:
 - `saved_places` - For saved/bookmarked places
 - **`explore_sessions`** - ✅ **IMPLEMENTED** For Explore feature (Tinder-style swipe) - Migration file: `database/migrations/supabase-add-explore-sessions-table.sql`
 - **`profiles.is_pro`** - ✅ **IMPLEMENTED** For user subscription status - Migration file: `database/migrations/add-is-pro-to-profiles.sql`
+- **`trip_segments`** - ✅ **NEW** For multi-city trips (Pro tier) - Migration file: `database/migrations/supabase-add-trip-segments.sql`
+  - **`advisor_messages`** - ✅ **NEW** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+  - **Segment support columns** - ✅ **NEW**:
+  - `days.trip_segment_id` - Migration: `supabase-add-segment-id-to-days.sql`
+  - `smart_itineraries.trip_segment_id` - Migration: `supabase-add-trip-segment-to-itineraries.sql`
+  - `explore_sessions.trip_segment_id` - Migration: `supabase-add-segment-id-to-explore-sessions.sql`
+- **Trip personalization fields** - ✅ **NEW** - Migration: `supabase-add-trip-personalization.sql`
 
 Check `database/migrations/` for SQL scripts. All migrations listed above are available and should be run manually in the Supabase SQL Editor.
 
@@ -770,10 +805,35 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 ### Trip Assistant
 
 **`POST /api/trips/[tripId]/chat`**
-- Send message to Trip Assistant
+- Send message to Trip Assistant (legacy endpoint)
 - Body: `{ message: string }`
 - Returns: `{ message: string }` (assistant response)
 - Persists conversation in `trip_chat_messages` table
+
+**`POST /api/trips/[tripId]/assistant`** ✅ **NEW**
+- Enhanced Trip Assistant with moderation and context
+- Body: `{ message: string, activeSegmentId?: string, activeDayId?: string }`
+- Returns: `{ reply: string, meta: { usedSegments: string[], suggestions: [] } }`
+- Features: Chat moderation, multi-city context, segment-aware responses
+- Persists conversation in `trip_chat_messages` table
+
+### Travel Advisor (Pre-Trip Planning) ✅ **NEW**
+**`GET /api/advisor`** - Get advisor chat history
+- Query params: `limit`, `offset` (for pagination)
+- Returns: `{ messages: AdvisorMessage[] }`
+- Fetches chat history from `advisor_messages` table
+
+**`POST /api/advisor`** - Send message to Travel Advisor
+- Body: `{ message: string }`
+- Returns: `{ ok: boolean, reply?: string, suggestedAction?: { type: "offer_create_trip" }, error?: string, maxMessagesPerDay?: number, isPro?: boolean, message?: string }`
+- Features:
+  - Pre-trip planning assistance (destinations, regions, trip ideas)
+  - Daily message limits (3 for free tier, 15 for Pro tier)
+  - Chat moderation (blocks non-travel topics)
+  - Conversation history (last 15-20 messages)
+  - Transport guidance for multi-city and regional trips
+  - Trip creation suggestions after helpful exchanges
+  - Persists conversation history in `advisor_messages` table
 
 ### Accommodation
 
@@ -782,6 +842,28 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 - Body: `{ tripId: string }`
 - Returns: `{ accommodation: AccommodationResult }`
 - Automatically saves to trip's `auto_accommodation` field
+
+### Trip Segments (Multi-City Trips) ✅ **NEW**
+
+**`GET /api/trips/[tripId]/segments`**
+- Fetch all segments for a trip
+- Returns: `{ segments: TripSegment[] }`
+- Pro tier feature
+
+**`POST /api/trips/[tripId]/segments`**
+- Create new segment (Pro-only)
+- Body: `{ cityPlaceId: string, cityName: string, nights: number, transportType?: string, notes?: string }`
+- Returns: `{ segment: TripSegment }`
+- Auto-generates days for segment
+
+**`PATCH /api/trips/[tripId]/segments`**
+- Update segment (Pro-only)
+- Body: `{ segmentId: string, ...updates }`
+- Returns: `{ segment: TripSegment }`
+
+**`DELETE /api/trips/[tripId]/segments?segmentId=<id>`**
+- Delete segment (Pro-only)
+- Returns: `{ success: boolean }`
 
 ### Travel Intent (Future)
 
@@ -941,7 +1023,7 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 
 ```bash
 git clone <repository-url>
-cd MindTrip
+cd Kruno
 ```
 
 ### 2. Install Dependencies
@@ -1064,7 +1146,7 @@ For questions or issues:
 
 ## Summary
 
-**MindTrip** is a feature-rich, AI-powered travel planning application that's approximately **74% complete**. The core functionality is working, including:
+**Kruno** is a feature-rich, AI-powered travel planning application that's approximately **77% complete**. The core functionality is working, including:
 
 - ✅ Trip management and collaboration
 - ✅ AI-powered itinerary generation
@@ -1073,21 +1155,27 @@ For questions or issues:
 - ✅ Real-time collaboration
 - ✅ Public sharing and export
 
-### 🎯 NEW PRODUCT DIRECTION (January 2025)
+### 🎯 RECENT MAJOR FEATURES (January 2025)
 
-**Major Product Shift:**
-- **NEW PRIORITY**: Tinder-style Explore feature for place discovery
-- Swipe-based place discovery replaces traditional explore tab
+**Explore Feature (Phases 15-17):** ✅ **COMPLETE**
+- Tinder-style swipe-based place discovery
 - Itinerary regeneration with user-selected places
-- Makes place discovery a core, engaging experience
-- Monetization: Free tier (30-50 swipes/day), Pro tier (unlimited)
+- Day-level integration with Explore
+- Monetization: Free tier (50 swipes/day), Pro tier (unlimited)
 
-**Implementation Status:**
-- Phase 15-17 planned for Explore feature
-- Database schema designed (explore_sessions table)
-- API endpoints specified
-- Component architecture planned
-- See [NEXT_STEPS.md](./NEXT_STEPS.md) for implementation plan
+**Multi-City Trips (Phase 18):** ✅ **COMPLETE**
+- Trip segments for multi-city trip support
+- Pro tier feature
+- Segment-aware days, itineraries, and explore sessions
+
+**Trip Personalization (Phase 19):** ✅ **COMPLETE**
+- Enhanced trip creation with personalization dialog
+- Origin city, travelers, accommodation, arrival info, interests
+
+**Enhanced Trip Assistant (Phase 20):** ✅ **COMPLETE**
+- Chat moderation system
+- Multi-city trip context support
+- Segment-aware and day-aware responses
 
 **Key Technical Points:**
 - Manual database setup required (no Supabase CLI)
@@ -1097,14 +1185,14 @@ For questions or issues:
 - **NEW**: Explore feature requires new database table and API endpoints
 
 **Next Steps:**
-1. **🚀 Phase 18: Enhanced User Experience** - Weather integration, trip templates, photo uploads
-2. Continue with remaining phases (19-23)
+1. **🚀 Phase 22: Enhanced User Experience** - Weather integration, trip templates, photo uploads
+2. Continue with remaining phases (23-27)
 3. Polish and bug fixes
 4. User testing and feedback
 5. Mobile app development
 6. Monetization implementation
 
-The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phase 17 is complete - Day-level Explore integration and trip invitation linking are fully functional.**
+The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phases 17-21 are complete - Day-level Explore integration, multi-city trips, trip personalization, enhanced assistant, and Travel Advisor are fully functional.**
 
 ---
 

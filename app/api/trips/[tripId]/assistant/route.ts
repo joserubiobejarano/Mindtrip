@@ -168,7 +168,7 @@ export async function POST(
       .limit(10);
 
     // 4. Build OpenAI request
-    const systemPrompt = `You are the MindTrip Travel Assistant for a single trip.
+    const systemPrompt = `You are the Kruno Travel Assistant for a single trip.
 
 You can ONLY talk about travel, this specific trip, its cities, activities, food, logistics, and budgeting.
 

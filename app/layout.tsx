@@ -7,7 +7,7 @@ import { Providers } from "@/lib/providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Mindtrip - Travel Planner",
+  title: "Kruno - Travel Planner",
   description: "Plan your trips collaboratively",
 };
 

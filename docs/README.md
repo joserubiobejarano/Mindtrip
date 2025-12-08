@@ -1,4 +1,4 @@
-# Mindtrip - Travel Planner App
+# Kruno - Travel Planner App
 
 A collaborative travel planning application built with Next.js 15, TypeScript, Tailwind CSS, and Supabase.
 
@@ -164,14 +164,45 @@ npm run dev
 - Place details with photos
 - Place type filtering
 - Place photo fetching for activities and itineraries
+
+### Phase 18 - Multi-City Trip Support (Trip Segments) ✅
+- Trip segments table for multi-city trips (Pro tier)
+- Segment management API endpoints
+- Multi-city trip creation UI
+- Segment-aware days, itineraries, and explore sessions
+- Auto-generation of days for each segment
+- Order-based segment management
+
+### Phase 19 - Trip Personalization ✅
+- Enhanced trip creation with personalization dialog
+- Additional trip fields: travelers, origin city, accommodation details
+- Arrival information (transport mode, arrival time)
+- Interests array (user preferences)
+
+### Phase 20 - Enhanced Trip Assistant & Chat Moderation ✅
+- New Trip Assistant API endpoint with enhanced context
+- Chat moderation system (blocks non-travel topics)
+- Multi-city trip context support
+- Segment-aware and day-aware responses
 - Server-side place photo API
+
+### Phase 21 - Travel Advisor (Pre-Trip Planning) ✅
+- Travel Advisor page (`/advisor`) for pre-trip planning questions
+- Chat interface for exploring destinations and trip ideas
+- Daily message limits (3 for free tier, 15 for Pro tier)
+- Chat moderation system (blocks non-travel topics)
+- Transport guidance for multi-city and regional trips
+- Onboarding flow that creates trips directly from advisor
+- Integration with homepage search (routes to advisor for travel queries)
+- Database table `advisor_messages` for chat history
 
 ## 📁 Project Structure
 
 ```
-mindtrip/
+kruno/
 ├── app/                    # Next.js 15 App Router
 │   ├── auth/              # Authentication pages
+│   ├── advisor/            # ✅ NEW: Travel Advisor page
 │   ├── trips/             # Trip management pages
 │   └── p/                 # Public sharing pages
 ├── components/            # React components
@@ -182,6 +213,7 @@ mindtrip/
 ├── hooks/                 # Custom React hooks
 │   ├── use-trip.ts
 │   ├── use-activities.ts
+│   ├── use-advisor-chat.ts  # ✅ NEW: Travel Advisor chat hook
 │   └── use-realtime-*.ts  # Realtime hooks
 ├── lib/                   # Utilities
 │   ├── supabase/          # Supabase clients
@@ -240,10 +272,18 @@ mindtrip/
 
 ## 📊 Current Status
 
-**Completed Phases:** 17 out of 23 planned phases (~74% complete)
-**Phase 17:** ✅ Complete - Day-level Explore integration fully implemented
+**Completed Phases:** 21 out of 27 planned phases (~78% complete)
+**Phase 21:** ✅ Complete - Travel Advisor (Pre-Trip Planning) fully implemented
 
 **Recent Updates (January 2025):**
+- ✅ Phase 21 complete - Travel Advisor (Pre-Trip Planning) fully implemented
+  - ✅ Travel Advisor page (`/advisor`) with chat interface
+  - ✅ API endpoint (`/api/advisor`) with GET and POST methods
+  - ✅ Database table `advisor_messages` for chat history
+  - ✅ Daily message limits (3 for free tier, 15 for Pro tier)
+  - ✅ Chat moderation system (blocks non-travel topics)
+  - ✅ Onboarding flow that creates trips directly from advisor
+  - ✅ Integration with homepage search (routes to advisor for travel queries)
 - ✅ Phase 15 & 16 fully implemented and functional
 - ✅ Phase 17 complete - Day-level Explore integration fully implemented
 - ✅ Day-level bulk add API endpoint (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
@@ -285,9 +325,9 @@ mindtrip/
 - ✅ **Trip invitation linking** - Auto-links email invitations to user accounts after signup
 
 **Next Priorities:**
-- Phase 18: Enhanced user experience features (templates, weather, photos)
-- Phase 18: Notes and journaling features
-- Phase 19: Advanced collaboration (member chat, voting, comments)
+- Phase 22: Enhanced user experience features (templates, weather, photos)
+- Phase 22: Notes and journaling features
+- Phase 23: Advanced collaboration (member chat, voting, comments)
 - Future: Additional advanced filters (vibe, theme, accessibility)
 - Future: Multi-city Explore support and travel stats/badges
 - Mobile app development

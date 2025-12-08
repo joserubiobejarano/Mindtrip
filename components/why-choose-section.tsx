@@ -42,7 +42,7 @@ export function WhyChooseSection() {
             className="text-4xl md:text-5xl mb-4" 
             style={{ fontFamily: "'Patrick Hand', cursive" }}
           >
-            Why Choose <span className="solid-underline inline-block relative">MindTrip</span>?
+            Why Choose <span className="solid-underline inline-block relative">Kruno</span>?
           </h2>
           <p className="text-muted-foreground mt-6">Everything you need for the perfect journey</p>
         </div>

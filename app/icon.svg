@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded square background (orange/terracotta) -->
+  <rect x="0" y="0" width="512" height="512" rx="85" ry="85" fill="#D97757"/>
+  
+  <!-- K letter with integrated map pin (cream/beige) -->
+  <g fill="#F5E6D3">
+    <!-- Left vertical stroke of K -->
+    <rect x="130" y="90" width="42" height="332" rx="5"/>
+    
+    <!-- Top diagonal stroke of K (upper right arm) -->
+    <path d="M 172 90 L 172 170 L 240 90 L 285 90 L 217 170 L 285 250 L 240 250 L 172 170 L 172 90 Z"/>
+    
+    <!-- Bottom diagonal stroke of K (lower right arm) - transitions into map pin -->
+    <path d="M 172 250 L 172 330 L 217 330 L 217 310 L 200 290 L 217 270 L 217 250 L 172 250 Z"/>
+    
+    <!-- Map pin base (diamond shape where K's lower diagonal meets the pin) -->
+    <path d="M 217 310 L 240 350 L 255 365 L 240 380 L 225 365 L 217 310 Z"/>
+    
+    <!-- Map pin stem (curving upward and slightly to the right) -->
+    <path d="M 247 350 Q 275 330 310 310 Q 345 290 365 270" stroke="#F5E6D3" stroke-width="28" fill="none" stroke-linecap="round"/>
+    
+    <!-- Map pin head (small circular head at the top) -->
+    <circle cx="365" cy="270" r="20" fill="#F5E6D3"/>
+  </g>
+</svg>

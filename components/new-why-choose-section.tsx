@@ -56,7 +56,7 @@ export function NewWhyChooseSection() {
             className="text-4xl md:text-5xl mb-4" 
             style={{ fontFamily: "'Patrick Hand', cursive" }}
           >
-            Why travelers love <span className="solid-underline inline-block relative">MindTrip</span>
+            Why travelers love <span className="solid-underline inline-block relative">Kruno</span>
           </h2>
           <p className="text-muted-foreground mt-6">
             Built by explorers, for explorers. We&apos;ve thought of <span className="wavy-underline inline-block">everything</span> so you don&apos;t have to.

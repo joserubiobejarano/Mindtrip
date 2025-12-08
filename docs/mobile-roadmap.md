@@ -1,12 +1,12 @@
-# MindTrip Mobile App Roadmap
+# Kruno Mobile App Roadmap
 
-This document outlines the complete plan for building a native mobile application for MindTrip using Expo and React Native. This roadmap is designed to guide development from initial planning through App Store and Google Play Store launch.
+This document outlines the complete plan for building a native mobile application for Kruno using Expo and React Native. This roadmap is designed to guide development from initial planning through App Store and Google Play Store launch.
 
 > **Note:** This is a planning document for the mobile app. For the web app roadmap and completed features, see [ROADMAP.md](./ROADMAP.md).
 
 ## Overview
 
-The MindTrip mobile app will bring the full travel planning experience to iOS and Android devices. Users will be able to create trips, build itineraries, explore destinations, track expenses, manage checklists, and collaborate with trip members—all from their phones. The app will share the same Supabase backend as the web application, ensuring data consistency across platforms.
+The Kruno mobile app will bring the full travel planning experience to iOS and Android devices. Users will be able to create trips, build itineraries, explore destinations, track expenses, manage checklists, and collaborate with trip members—all from their phones. The app will share the same Supabase backend as the web application, ensuring data consistency across platforms.
 
 The mobile app is not just a responsive version of the website; it's designed to take advantage of native mobile features like push notifications, location services, offline capabilities, and deep linking. This allows users to access their trip information even when they're traveling in areas with poor connectivity.
 
@@ -460,9 +460,9 @@ For reminders and alerts that don't require server:
 ### URL Scheme
 
 We'll configure deep links so users can:
-- Open specific trips: `mindtrip://trip/123`
-- Open activities: `mindtrip://trip/123/activity/456`
-- Share trip links that open in app: `mindtrip://trip/123` or `https://mindtrip.app/trip/123`
+- Open specific trips: `kruno://trip/123`
+- Open activities: `kruno://trip/123/activity/456`
+- Share trip links that open in app: `kruno://trip/123` or `https://kruno.app/trip/123`
 
 ### Implementation
 
@@ -472,8 +472,8 @@ Using Expo's linking API:
 // app.json
 {
   "expo": {
-    "scheme": "mindtrip",
-    "associatedDomains": ["applinks:mindtrip.app"]
+    "scheme": "kruno",
+    "associatedDomains": ["applinks:kruno.app"]
   }
 }
 ```
@@ -539,11 +539,11 @@ export default {
 
 ### App Identifiers
 
-- [ ] **iOS Bundle ID**: `com.mindtrip.app` (or your chosen identifier)
+- [ ] **iOS Bundle ID**: `com.kruno.app` (or your chosen identifier)
   - Must be unique and registered in Apple Developer portal
   - Cannot be changed after first release
   
-- [ ] **Android Package Name**: `com.mindtrip.app` (must match iOS if possible)
+- [ ] **Android Package Name**: `com.kruno.app` (must match iOS if possible)
   - Defined in `app.json` or `app.config.js`
   - Cannot be changed after first release
 
@@ -588,12 +588,12 @@ export default {
 ### Privacy Policy and Terms of Service
 
 - [ ] **Privacy Policy URL**: Must be publicly accessible
-  - Host on your website (e.g., `https://mindtrip.app/privacy`)
+  - Host on your website (e.g., `https://kruno.app/privacy`)
   - Must cover: data collection, usage, storage, third-party services (Supabase, Clerk, Mapbox)
   - Required for both iOS and Android
   
 - [ ] **Terms of Service URL**: Must be publicly accessible
-  - Host on your website (e.g., `https://mindtrip.app/terms`)
+  - Host on your website (e.g., `https://kruno.app/terms`)
   - Required for iOS, recommended for Android
 
 ### Data Collection Description
@@ -612,7 +612,7 @@ export default {
 
 ### App Store Listing
 
-- [ ] **App Name**: "MindTrip" (or chosen name, 30 char limit)
+- [ ] **App Name**: "Kruno" (or chosen name, 30 char limit)
 - [ ] **Subtitle** (iOS): Short tagline, 30 char limit
 - [ ] **Description**: 4000 char limit, explain features and benefits
 - [ ] **Keywords** (iOS): Comma-separated, 100 char limit

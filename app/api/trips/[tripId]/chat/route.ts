@@ -100,7 +100,7 @@ export async function POST(
       ? recentMessages.reverse().map((m) => `${m.role}: ${m.content}`).join("\n")
       : "";
 
-    const prompt = `You are a helpful travel planning assistant for MindTrip. The user is planning a trip to ${destination} from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}.
+    const prompt = `You are a helpful travel planning assistant for Kruno. The user is planning a trip to ${destination} from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}.
 
 ${conversationHistory ? `Recent conversation:\n${conversationHistory}\n` : ""}
 
@@ -117,7 +117,7 @@ Respond in a friendly, conversational tone.`;
       messages: [
         {
           role: "system",
-          content: `You are a travel planning assistant for MindTrip. You ONLY help with trip planning, itinerary adjustments, destination information, activity suggestions, and travel-related questions.
+          content: `You are a travel planning assistant for Kruno. You ONLY help with trip planning, itinerary adjustments, destination information, activity suggestions, and travel-related questions.
 
 If asked about anything unrelated to travel or trip planning, politely redirect: "I can't help you with that, but I can help with planning your trip activities, suggesting places to visit, or adjusting your itinerary."
 

@@ -41,7 +41,7 @@ export function NewFeaturesSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-display text-4xl md:text-5xl mb-4">
-            Why travelers love <span className="wavy-underline">MindTrip</span>
+            Why travelers love <span className="wavy-underline">Kruno</span>
           </h2>
           <p className="font-mono text-sm text-muted-foreground max-w-xl mx-auto">
             Built by explorers, for explorers. We&apos;ve thought of everything so you don&apos;t have to.

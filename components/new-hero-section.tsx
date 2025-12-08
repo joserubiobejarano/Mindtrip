@@ -122,6 +122,19 @@ export function NewHeroSection() {
     setParsingIntent(true);
 
     try {
+      // Check for travel keywords (simple heuristic)
+      const travelKeywords = ["travel", "trip", "vacation", "visit", "go", "destination", "city", "country", "weekend", "days", "week"];
+      const messageLower = message.toLowerCase();
+      const hasTravelKeywords = travelKeywords.some((keyword) => messageLower.includes(keyword));
+
+      // If message is clearly non-travel, show error
+      if (!hasTravelKeywords && message.split(" ").length < 5) {
+        setIntentError("I can help you plan trips and itineraries, but not other topics. Try describing the kind of trip you want.");
+        setParsingIntent(false);
+        return;
+      }
+
+      // Try to parse intent
       const response = await fetch("/api/intent/travel", {
         method: "POST",
         headers: {
@@ -133,23 +146,63 @@ export function NewHeroSection() {
       const result = await response.json();
 
       if (!result.success) {
+        // If parsing failed but has travel keywords, route to advisor
+        if (hasTravelKeywords) {
+          router.push(`/advisor?q=${encodeURIComponent(message)}`);
+          return;
+        }
         setIntentError(result.error || "Could not understand your request. Please try again.");
+        setParsingIntent(false);
         return;
       }
 
       const { data } = result;
 
-      // Auto-fill destination
-      if (data.destination) {
+      // Classify intent
+      const hasDestination = !!data.destination;
+      const hasDates = !!(data.startDate && data.endDate);
+      const wordCount = message.split(" ").length;
+
+      // direct_itinerary: destination + dates, short message
+      if (hasDestination && hasDates && wordCount <= 15) {
+        // Auto-fill destination
         const foundDestination = await searchDestinationByName(data.destination);
         if (foundDestination) {
           setDestination(foundDestination);
         } else {
           setIntentError(`Could not find destination "${data.destination}". Please select it manually.`);
+          setParsingIntent(false);
+          return;
+        }
+
+        // Auto-fill dates
+        if (data.startDate) {
+          setStartDate(data.startDate);
+        }
+        if (data.endDate) {
+          setEndDate(data.endDate);
+        }
+
+        // Note: travelers will be collected in personalization dialog
+        setParsingIntent(false);
+        return;
+      }
+
+      // exploratory_travel: destination but no dates, or longer message, or open-ended
+      if (hasDestination || hasTravelKeywords || wordCount > 12) {
+        router.push(`/advisor?q=${encodeURIComponent(message)}`);
+        return;
+      }
+
+      // Fallback: if we have destination but parsing failed, try to use it
+      if (hasDestination) {
+        const foundDestination = await searchDestinationByName(data.destination);
+        if (foundDestination) {
+          setDestination(foundDestination);
         }
       }
 
-      // Auto-fill dates
+      // If we have dates, use them
       if (data.startDate) {
         setStartDate(data.startDate);
       }
@@ -157,12 +210,18 @@ export function NewHeroSection() {
         setEndDate(data.endDate);
       }
 
-      // Note: travelers will be collected in personalization dialog
+      setParsingIntent(false);
     } catch (error) {
       console.error("Error parsing travel intent:", error);
-      setIntentError("Failed to process your request. Please try again.");
-    } finally {
-      setParsingIntent(false);
+      // On error, if it looks like travel, route to advisor
+      const travelKeywords = ["travel", "trip", "vacation", "visit", "go", "destination"];
+      const messageLower = message.toLowerCase();
+      if (travelKeywords.some((keyword) => messageLower.includes(keyword))) {
+        router.push(`/advisor?q=${encodeURIComponent(message)}`);
+      } else {
+        setIntentError("Failed to process your request. Please try again.");
+        setParsingIntent(false);
+      }
     }
   };
 

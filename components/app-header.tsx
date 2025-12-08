@@ -10,7 +10,7 @@ export function AppHeader() {
     <header className="border-b border-border bg-background">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/trips" className="text-xl font-bold">
-          MindTrip
+          Kruno
         </Link>
         <div className="flex items-center gap-4">
           <SignedOut>

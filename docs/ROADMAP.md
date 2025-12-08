@@ -1,6 +1,6 @@
-# MindTrip Development Roadmap
+# Kruno Development Roadmap
 
-This document tracks the development progress of the MindTrip travel planning application.
+This document tracks the development progress of the Kruno travel planning application.
 
 ## ✅ Completed Features
 
@@ -265,6 +265,65 @@ _See "Recently Completed" section above for full details. All features have been
 - [x] Immediate add-to-day on swipe right in day mode ✅
 - [x] Full integration with ExploreDeck component in day mode ✅
 
+### Phase 18 - Multi-City Trip Support (Trip Segments) ✅
+- [x] Trip segments table (trip_segments) for multi-city trips
+- [x] Each segment represents a city/portion of trip with its own date range
+- [x] Segment management API endpoints (GET/POST/PATCH/DELETE `/api/trips/[tripId]/segments`)
+- [x] Pro tier restriction for multi-city trips
+- [x] Segment-aware days (days linked to trip_segment_id)
+- [x] Segment-aware smart itineraries (itineraries per segment)
+- [x] Segment-aware explore sessions (explore sessions per segment)
+- [x] Multi-city trip creation UI (TripPersonalizationDialog)
+- [x] Auto-generation of days for each segment
+- [x] Order-based segment management (order_index)
+- [x] Migration files for segment support:
+  - `supabase-add-trip-segments.sql` - Creates trip_segments table
+  - `supabase-add-segment-id-to-days.sql` - Links days to segments
+  - `supabase-add-trip-segment-to-itineraries.sql` - Links itineraries to segments
+  - `supabase-add-segment-id-to-explore-sessions.sql` - Links explore sessions to segments
+
+### Phase 19 - Trip Personalization ✅
+- [x] Enhanced trip creation with personalization fields
+- [x] Trip personalization dialog (TripPersonalizationDialog component)
+- [x] Additional trip fields:
+  - Travelers count
+  - Origin city (origin_city_place_id, origin_city_name)
+  - Accommodation details (has_accommodation, accommodation_place_id, accommodation_name, accommodation_address)
+  - Arrival information (arrival_transport_mode, arrival_time_local)
+  - Interests array (user preferences/interests)
+- [x] Migration file: `supabase-add-trip-personalization.sql`
+- [x] Integration with trip creation flow
+- [x] Personalization payload type (TripPersonalizationPayload)
+
+### Phase 20 - Enhanced Trip Assistant & Chat Moderation ✅
+- [x] New Trip Assistant API endpoint (`/api/trips/[tripId]/assistant`)
+- [x] Enhanced context awareness with segment and day support
+- [x] Active segment context (activeSegmentId parameter)
+- [x] Active day context (activeDayId parameter)
+- [x] Multi-city trip context support
+- [x] Segment-aware itinerary loading
+- [x] Chat moderation system (`lib/chat-moderation.ts`)
+- [x] Topic relevance checking (blocks non-travel topics)
+- [x] Automatic redirect messages for off-topic queries
+- [x] Improved system prompts for focused travel assistance
+- [x] Integration with trip segments for multi-city responses
+
+### Phase 21 - Travel Advisor (Pre-Trip Planning) ✅
+- [x] Travel Advisor page (`/advisor`) for pre-trip planning questions
+- [x] Travel Advisor API endpoint (`/api/advisor`) with GET and POST methods
+- [x] Database table `advisor_messages` for chat history (migration file created)
+- [x] Chat message persistence and history
+- [x] Daily message limits (3 for free tier, 15 for Pro tier)
+- [x] Chat moderation system (blocks non-travel topics)
+- [x] Topic relevance checking for advisor conversations
+- [x] React hook `use-advisor-chat.ts` for advisor chat integration
+- [x] Helper functions in `lib/supabase/advisor-messages.ts`
+- [x] Onboarding flow that creates trips directly from advisor
+- [x] Integration with homepage search (routes to advisor for travel queries)
+- [x] Starter prompts for common travel questions
+- [x] Transport guidance for multi-city and regional trips
+- [x] Trip creation suggestion after helpful exchanges
+
 **Future Enhancements (Not in Phase 17):**
 - [ ] AI suggestions for specific day/time slot
 - [ ] Additional advanced filters for Explore (Pro tier):
@@ -277,7 +336,7 @@ _See "Recently Completed" section above for full details. All features have been
 - [ ] Offline mode for Explore (Pro tier)
 - [ ] Priority itinerary generation (Pro tier)
 
-### Phase 18 - Enhanced User Experience
+### Phase 22 - Enhanced User Experience
 - [ ] Trip templates and presets
 - [ ] Weather integration for trip dates
 - [ ] Photo uploads and galleries (user-uploaded photos)
@@ -285,34 +344,34 @@ _See "Recently Completed" section above for full details. All features have been
 - [ ] Trip statistics and analytics
 - [ ] Activity photo uploads
 
-### Phase 19 - Advanced Collaboration
+### Phase 23 - Advanced Collaboration
 - [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-### Phase 20 - Mobile App Development
+### Phase 24 - Mobile App Development
 - [ ] Native iOS and Android app (see [mobile-roadmap.md](./mobile-roadmap.md))
 - [ ] Expo React Native implementation
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 
-### Phase 21 - Web Mobile Optimization
+### Phase 25 - Web Mobile Optimization
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-### Phase 22 - Advanced Features
+### Phase 26 - Advanced Features
 - [ ] Budget tracking and alerts
 - [ ] Enhanced booking service integrations (beyond Booking.com links)
 - [ ] Calendar sync (Google Calendar, iCal)
 - [ ] Export to various formats (CSV, JSON - PDF already implemented)
 - [ ] Flight search and booking (placeholder page exists)
 
-### Phase 23 - Performance & Scalability
+### Phase 27 - Performance & Scalability
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -367,6 +426,17 @@ For later implementation phases:
   - `saved_places` - migration file exists in `database/migrations/supabase-add-saved-places-table.sql`
   - **`explore_sessions`** - ✅ **IMPLEMENTED** For Explore feature (Tinder-style swipe) - Migration file: `database/migrations/supabase-add-explore-sessions-table.sql`
   - **`profiles.is_pro`** - ✅ **IMPLEMENTED** For user subscription status - Migration file: `database/migrations/add-is-pro-to-profiles.sql`
+  - **`trip_segments`** - ✅ **IMPLEMENTED** For multi-city trips (Pro tier) - Migration file: `database/migrations/supabase-add-trip-segments.sql`
+  - **`advisor_messages`** - ✅ **IMPLEMENTED** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+  - **Segment support columns** - ✅ **IMPLEMENTED**:
+    - `days.trip_segment_id` - Links days to segments (`supabase-add-segment-id-to-days.sql`)
+    - `smart_itineraries.trip_segment_id` - Links itineraries to segments (`supabase-add-trip-segment-to-itineraries.sql`)
+    - `explore_sessions.trip_segment_id` - Links explore sessions to segments (`supabase-add-segment-id-to-explore-sessions.sql`)
+  - **Trip personalization fields** - ✅ **IMPLEMENTED**:
+    - Added to `trips` table via `supabase-add-trip-personalization.sql`:
+      - `travelers`, `origin_city_place_id`, `origin_city_name`
+      - `has_accommodation`, `accommodation_place_id`, `accommodation_name`, `accommodation_address`
+      - `arrival_transport_mode`, `arrival_time_local`, `interests`
 - Two itinerary systems are supported:
   - Legacy: `/api/ai-itinerary` - returns AiItinerary format (simpler structure)
   - New: `/api/trips/[tripId]/smart-itinerary` - returns SmartItinerary format (structured with slots, area clusters, trip tips)
@@ -399,10 +469,39 @@ For later implementation phases:
   - Returns: `{ success: boolean }`
 
 ### Trip Assistant
-- `POST /api/trips/[tripId]/chat` - Send message to Trip Assistant
+- `POST /api/trips/[tripId]/chat` - Send message to Trip Assistant (legacy endpoint)
   - Body: `{ message: string }`
   - Returns: `{ message: string }` (assistant response)
   - Persists conversation history in `trip_chat_messages` table
+
+- `POST /api/trips/[tripId]/assistant` - Enhanced Trip Assistant (NEW) ✅
+  - Body: `{ message: string, activeSegmentId?: string, activeDayId?: string }`
+  - Returns: `{ reply: string, meta: { usedSegments: string[], suggestions: [] } }`
+  - Features:
+    - Chat moderation (blocks non-travel topics)
+    - Multi-city trip context support
+    - Segment-aware responses
+    - Day-aware responses
+    - Enhanced context loading (segments, itineraries, days, activities)
+    - Persists conversation history in `trip_chat_messages` table
+
+### Travel Advisor (Pre-Trip Planning) ✅ NEW
+- `GET /api/advisor` - Get advisor chat history
+  - Query params: `limit`, `offset` (for pagination)
+  - Returns: `{ messages: AdvisorMessage[] }`
+  - Fetches chat history from `advisor_messages` table
+
+- `POST /api/advisor` - Send message to Travel Advisor ✅
+  - Body: `{ message: string }`
+  - Returns: `{ ok: boolean, reply?: string, suggestedAction?: { type: "offer_create_trip" }, error?: string, maxMessagesPerDay?: number, isPro?: boolean, message?: string }`
+  - Features:
+    - Pre-trip planning assistance (destinations, regions, trip ideas)
+    - Daily message limits (3 for free tier, 15 for Pro tier)
+    - Chat moderation (blocks non-travel topics)
+    - Conversation history (last 15-20 messages)
+    - Transport guidance for multi-city and regional trips
+    - Trip creation suggestions after helpful exchanges
+    - Persists conversation history in `advisor_messages` table
 
 ### Accommodation
 - `POST /api/accommodation/find` - Find best accommodation for a trip
@@ -438,6 +537,24 @@ For later implementation phases:
   - Returns: `{ success: boolean, count: number, message: string }`
   - Adds places directly to specified day and time slot in SmartItinerary
 
+### Trip Segments (Multi-City Trips) ✅ NEW
+- `GET /api/trips/[tripId]/segments` - Fetch all segments for a trip
+  - Returns: `{ segments: TripSegment[] }`
+  - Pro tier feature - only Pro users can create multi-city trips
+
+- `POST /api/trips/[tripId]/segments` - Create new segment (Pro-only)
+  - Body: `{ cityPlaceId: string, cityName: string, nights: number, transportType?: string, notes?: string }`
+  - Returns: `{ segment: TripSegment }`
+  - Auto-generates days for the segment
+  - Requires Pro subscription
+
+- `PATCH /api/trips/[tripId]/segments` - Update segment (Pro-only)
+  - Body: `{ segmentId: string, ...updates }`
+  - Returns: `{ segment: TripSegment }`
+
+- `DELETE /api/trips/[tripId]/segments?segmentId=<id>` - Delete segment (Pro-only)
+  - Returns: `{ success: boolean }`
+
 ### User Management
 - `GET /api/user/subscription-status` - Get user subscription status
   - Returns: `{ isPro: boolean }`
@@ -455,6 +572,38 @@ For later implementation phases:
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates
+
+- **2025-01-XX**: Phase 21 Complete - Travel Advisor (Pre-Trip Planning) ✅
+  - **Phase 21 Complete**: Travel Advisor feature for pre-trip planning
+    - ✅ Travel Advisor page (`/advisor`) with chat interface
+    - ✅ API endpoint (`/api/advisor`) with GET and POST methods
+    - ✅ Database table `advisor_messages` for chat history
+    - ✅ Daily message limits (3 for free tier, 15 for Pro tier)
+    - ✅ Chat moderation system (blocks non-travel topics)
+    - ✅ Onboarding flow that creates trips directly from advisor
+    - ✅ Integration with homepage search (routes to advisor for travel queries)
+    - ✅ Transport guidance for multi-city and regional trips
+    - ✅ Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+
+- **2025-01-XX**: Phase 18-20 Complete - Multi-City Trips, Personalization & Enhanced Assistant ✅
+  - **Phase 18 Complete**: Multi-city trip support with trip segments
+    - ✅ Trip segments table and API endpoints (GET/POST/PATCH/DELETE)
+    - ✅ Pro tier restriction for multi-city trips
+    - ✅ Segment-aware days, itineraries, and explore sessions
+    - ✅ Multi-city trip creation UI (TripPersonalizationDialog)
+    - ✅ Auto-generation of days for each segment
+    - ✅ All migration files created and tested
+  - **Phase 19 Complete**: Trip personalization feature
+    - ✅ Enhanced trip creation with personalization dialog
+    - ✅ Additional trip fields: travelers, origin city, accommodation, arrival info, interests
+    - ✅ Migration file for personalization fields
+    - ✅ Integration with trip creation flow
+  - **Phase 20 Complete**: Enhanced Trip Assistant & Chat Moderation
+    - ✅ New assistant endpoint with segment and day context support
+    - ✅ Chat moderation system (blocks non-travel topics)
+    - ✅ Multi-city trip context awareness
+    - ✅ Segment-aware and day-aware responses
+    - ✅ Improved system prompts for focused travel assistance
 
 - **2025-01-XX**: Phase 17 Complete - Day-Level Integration & Trip Invitations ✅
   - **Phase 17 UI Complete**: Day-level Explore integration fully implemented

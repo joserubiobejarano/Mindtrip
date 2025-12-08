@@ -1,4 +1,4 @@
-# MindTrip - Architecture Documentation
+# Kruno - Architecture Documentation
 
 > **Last Updated:** January 2025  
 > **Focus:** System Architecture & Data Flow
@@ -19,7 +19,7 @@
 
 ## System Overview
 
-MindTrip is a full-stack Next.js application with the following architecture:
+Kruno is a full-stack Next.js application with the following architecture:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -344,6 +344,20 @@ User Clicks "Add to Itinerary"
 **smart_itineraries**
 - Cached AI-generated itineraries
 - JSONB column stores SmartItinerary structure
+- `trip_segment_id` column for multi-city trips (NULL for single-city trips)
+
+**advisor_messages** ✅ **NEW**
+- Travel Advisor chat history (pre-trip planning)
+- Schema: `id`, `user_id`, `role` ('user' | 'assistant'), `content`, `created_at`
+- Indexes: `idx_advisor_messages_user_created`, `idx_advisor_messages_user_id`
+- RLS policies for user access
+- Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+
+**trip_segments** ✅ **NEW**
+- Multi-city trip segments
+- Each segment represents a city/portion of trip with date range
+- Pro tier feature
+- Schema: `id`, `trip_id`, `order_index`, `city_place_id`, `city_name`, `start_date`, `end_date`, `transport_type`, `notes`
 
 ### New Tables for Explore Feature ✅ **IMPLEMENTED**
 
@@ -391,16 +405,32 @@ trips
   ├─► days (1:N)
   ├─► activities (1:N)
   ├─► trip_members (1:N)
+  ├─► smart_itineraries (1:1 or 1:N with segments)
+  ├─► explore_sessions (1:N)
+  └─► trip_segments (1:N) ✅ NEW
+
+trip_segments ✅ NEW
+  ├─► trips (N:1)
+  ├─► days (1:N)
   ├─► smart_itineraries (1:1)
   └─► explore_sessions (1:N)
 
 explore_sessions
   └─► trips (N:1)
+  └─► trip_segments (N:1) ✅ NEW
   └─► user_id → profiles (N:1)
 
 activities
   ├─► days (N:1)
   └─► places (N:1)
+
+days
+  ├─► trips (N:1)
+  └─► trip_segments (N:1) ✅ NEW (NULL for single-city trips)
+
+smart_itineraries
+  ├─► trips (N:1)
+  └─► trip_segments (N:1) ✅ NEW (NULL for single-city trips)
 ```
 
 ---
@@ -413,12 +443,14 @@ activities
 /app/api/
 ├── trips/
 │   └── [tripId]/
-│       ├── chat/                    # Trip Assistant
-│       ├── itinerary-chat/          # Itinerary editing
-│       ├── smart-itinerary/         # Itinerary generation
-│       │   └── place/               # Place updates
-│       └── explore/                 # ✅ IMPLEMENTED: Explore feature
-│           ├── places/              # ✅ GET: Fetch places
+│       ├── assistant/                # ✅ NEW: Enhanced Trip Assistant (with moderation)
+│       ├── chat/                     # Trip Assistant (legacy)
+│       ├── segments/                 # ✅ NEW: Trip segments API (multi-city trips, Pro tier)
+│       ├── itinerary-chat/           # Itinerary editing
+│       ├── smart-itinerary/          # Itinerary generation
+│       │   └── place/                # Place updates
+│       └── explore/                  # ✅ IMPLEMENTED: Explore feature
+│           ├── places/               # ✅ GET: Fetch places
 │           ├── swipe/                # ✅ POST: Record swipe (like/dislike/undo)
 │           └── session/              # ✅ GET/DELETE: Session management
 │       └── days/                     # ✅ IMPLEMENTED: Day-level integration (Backend Complete)
@@ -427,6 +459,8 @@ activities
 │                   └── bulk-add-from-swipes/  # ✅ POST: Add places to day/slot (morning/afternoon/evening)
 ├── user/
 │   └── subscription-status/          # ✅ GET: User subscription status (checks is_pro column)
+├── advisor/                          # ✅ NEW: Travel Advisor (pre-trip planning)
+│   └── route.ts                      # ✅ GET/POST: Advisor chat history and messages
 ├── ai/
 │   └── plan-day/                    # AI day planning
 ├── ai-itinerary/                    # Legacy itinerary
@@ -727,18 +761,33 @@ hooks/
 - Clear liked places after successful regeneration
 - Day-level bulk add: `/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`
 
-**Phase 17: Day-Level Integration** 🚧 (Backend Complete, UI Remaining)
-- ✅ Day-level bulk add API endpoint implemented (`/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes`)
-- ✅ Day-level filtering in Explore API (filter by `day_id` parameter)
-- ✅ User subscription system implemented (`is_pro` column, subscription status API)
-- ✅ Advanced filters for Pro tier (budget, maxDistance)
-- ✅ Daily swipe limit logic (50 for free tier, unlimited for Pro)
-- ✅ Undo swipe functionality
-- [ ] UI components for day-level integration ("Add more activities" button - next priority)
-- [ ] Additional advanced filters (vibe, theme, accessibility)
-- [ ] Multi-city Explore support
-- [ ] Travel stats and badges system
-- See NEXT_STEPS.md for remaining implementation plan
+**Phase 17: Day-Level Integration** ✅ **COMPLETE**
+
+**Phase 18: Multi-City Trip Support** ✅ **COMPLETE**
+- Database: `trip_segments` table created
+- API: All segment endpoints implemented (`/api/trips/[tripId]/segments`)
+- Frontend: Multi-city trip creation in TripPersonalizationDialog
+- Integration: Days, itineraries, and explore sessions support segments
+- Pro tier restriction implemented
+
+**Phase 19: Trip Personalization** ✅ **COMPLETE**
+- Database: Trip personalization fields added to `trips` table
+- Frontend: TripPersonalizationDialog component
+- Features: Origin city, travelers, accommodation, arrival info, interests
+
+**Phase 20: Enhanced Trip Assistant** ✅ **COMPLETE**
+- API: New `/api/trips/[tripId]/assistant` endpoint
+- Features: Chat moderation, segment-aware responses, day-aware responses
+- Multi-city trip context support
+
+**Phase 21: Travel Advisor (Pre-Trip Planning)** ✅ **COMPLETE**
+- API: `/api/advisor` endpoint (GET and POST)
+- Database: `advisor_messages` table for chat history
+- Features: Pre-trip planning, daily message limits, chat moderation
+- Onboarding flow that creates trips directly from advisor
+- Integration with homepage search
+- Transport guidance for multi-city and regional trips
+- Migration file: `database/migrations/supabase-add-advisor-messages.sql`
 
 ---
 

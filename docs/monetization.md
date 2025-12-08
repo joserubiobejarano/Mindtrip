@@ -1,4 +1,4 @@
-# MindTrip – Monetization Strategy
+# Kruno – Monetization Strategy
 
 ## Positioning
 
@@ -50,7 +50,7 @@ Examples of in-app prompts:
 
 ## Free vs Pro – Product Strategy
 
-MindTrip should be fully useful on the free plan, but clearly better with Pro. Free is for casual / one-off users. Pro is for frequent travelers, planners, and group trips.
+Kruno should be fully useful on the free plan, but clearly better with Pro. Free is for casual / one-off users. Pro is for frequent travelers, planners, and group trips.
 
 ### Free Plan (baseline)
 
@@ -76,7 +76,7 @@ MindTrip should be fully useful on the free plan, but clearly better with Pro. F
 
   - Uses current trip context but without power features (no advanced routing or deep personalization).
 
-### Pro Plan (MindTrip Pro)
+### Pro Plan (Kruno Pro)
 
 Pricing ideas:
 
@@ -204,7 +204,7 @@ Pricing ideas:
 
 ## Future Ideas (Backlog)
 
-- Co-branded deals with specific providers (e.g., "MindTrip x XYZ food tours").
+- Co-branded deals with specific providers (e.g., "Kruno x XYZ food tours").
 
 - Creator / influencer itineraries with revenue shares.
 

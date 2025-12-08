@@ -1,4 +1,4 @@
-# MindTrip - Next Steps & Implementation Plan
+# Kruno - Next Steps & Implementation Plan
 
 > **Last Updated:** January 2025  
 > **Focus:** Explore Feature Implementation

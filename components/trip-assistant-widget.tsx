@@ -281,7 +281,7 @@ export function TripAssistantWidget({ tripId }: TripAssistantWidgetProps) {
       )}
       {/* Disclaimer */}
       <p className="mt-2 text-xs text-slate-500 text-center">
-        MindTrip Assistant can make mistakes. Always double-check opening hours, bookings,
+        Kruno Assistant can make mistakes. Always double-check opening hours, bookings,
         and important details.
       </p>
     </div>

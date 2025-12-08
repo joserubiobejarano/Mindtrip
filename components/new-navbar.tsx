@@ -24,7 +24,7 @@ export function NewNavbar() {
           <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
             <span className="text-background text-sm font-mono">@</span>
           </div>
-          <span className="font-display text-xl font-semibold">MindTrip</span>
+          <span className="font-display text-xl font-semibold">Kruno</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
