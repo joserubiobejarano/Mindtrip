@@ -200,6 +200,11 @@ export function NewHeroSection() {
   };
 
   const handlePersonalizationComplete = async (personalization: any) => {
+    if (!destination) {
+      setSearchError("Please select a destination");
+      return;
+    }
+
     try {
       await createTrip({
         destination,
