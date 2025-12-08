@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,7 @@ const INTEREST_KEYWORDS: Record<string, string[]> = {
   landmarks: ["landmark", "monument", "sight", "attraction", "must-see", "famous"],
 };
 
-export default function AdvisorPage() {
+function AdvisorPageContent() {
   const { isSignedIn, userId } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -73,6 +73,12 @@ export default function AdvisorPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Use refs for functions to avoid dependency issues
+  const onboardingHandlersRef = useRef<{
+    handleOnboardingResponse?: (message: string) => void;
+    startOnboarding?: () => void;
+  }>({});
 
   // Fetch Pro status
   useEffect(() => {
@@ -89,22 +95,7 @@ export default function AdvisorPage() {
     setLocalMessages(messages);
   }, [messages]);
 
-  // Handle initial query param
-  const [hasHandledInitial, setHasHandledInitial] = useState(false);
-  useEffect(() => {
-    const initialMessage = searchParams?.get("q");
-    if (initialMessage && localMessages.length === 0 && !sending && !hasHandledInitial) {
-      setHasHandledInitial(true);
-      handleSendMessage(initialMessage, true);
-    }
-  }, [searchParams, localMessages.length, sending, hasHandledInitial]);
-
-  // Scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [localMessages]);
-
-  const handleSendMessage = async (messageText?: string, isInitial = false) => {
+  const handleSendMessage = useCallback(async (messageText?: string, isInitial = false) => {
     const message = messageText || input.trim();
     if (!message || sending || limitReached) return;
 
@@ -114,13 +105,13 @@ export default function AdvisorPage() {
 
     // If in onboarding mode, handle onboarding steps
     if (mode === "onboarding") {
-      handleOnboardingResponse(message);
+      onboardingHandlersRef.current.handleOnboardingResponse?.(message);
       return;
     }
 
     // Check if user wants to start onboarding
     if (message.toLowerCase().includes("let's create") || message.toLowerCase().includes("create this trip")) {
-      startOnboarding();
+      onboardingHandlersRef.current.startOnboarding?.();
       return;
     }
 
@@ -215,7 +206,22 @@ export default function AdvisorPage() {
     } finally {
       setSending(false);
     }
-  };
+  }, [input, sending, limitReached, mode, sendMessage]);
+
+  // Handle initial query param
+  const [hasHandledInitial, setHasHandledInitial] = useState(false);
+  useEffect(() => {
+    const initialMessage = searchParams?.get("q");
+    if (initialMessage && localMessages.length === 0 && !sending && !hasHandledInitial) {
+      setHasHandledInitial(true);
+      handleSendMessage(initialMessage, true);
+    }
+  }, [searchParams, localMessages.length, sending, hasHandledInitial, handleSendMessage]);
+
+  // Scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [localMessages]);
 
   const startOnboarding = () => {
     setMode("onboarding");
@@ -367,6 +373,12 @@ export default function AdvisorPage() {
         break;
     }
   };
+  
+  // Update ref with latest functions after they're defined
+  useEffect(() => {
+    onboardingHandlersRef.current.startOnboarding = startOnboarding;
+    onboardingHandlersRef.current.handleOnboardingResponse = handleOnboardingResponse;
+  });
 
   const parseDates = (text: string) => {
     // Simple date parsing - can be improved
@@ -643,6 +655,18 @@ export default function AdvisorPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AdvisorPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    }>
+      <AdvisorPageContent />
+    </Suspense>
   );
 }
 
