@@ -216,7 +216,7 @@ export function TripPersonalizationDialog({
                     }}
                   />
                   <Label htmlFor="has-accommodation" className="cursor-pointer">
-                    I don't have accommodation yet
+                    I don&apos;t have accommodation yet
                   </Label>
                 </div>
                 {!hasAccommodation && (
