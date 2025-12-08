@@ -136,10 +136,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       // Body parsing failed, continue with defaults
     }
 
-    // 1. Load Trip Details
+    // 1. Load Trip Details (including personalization fields)
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('id, title, start_date, end_date, destination_name, destination_country')
+      .select('id, title, start_date, end_date, destination_name, destination_country, travelers, origin_city_name, has_accommodation, accommodation_name, accommodation_address, arrival_transport_mode, arrival_time_local, interests')
       .eq('id', tripId)
       .single();
 
@@ -200,9 +200,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       .eq('trip_id', tripId)
       .limit(10);
 
+    // Build personalization context string
+    const personalizationContext = [
+      `Number of travelers: ${trip.travelers || 1}`,
+      trip.origin_city_name ? `Origin city: ${trip.origin_city_name}` : 'Origin city: unknown',
+      trip.has_accommodation && trip.accommodation_name
+        ? `Accommodation: ${trip.accommodation_name}${trip.accommodation_address ? ` (${trip.accommodation_address})` : ''}`
+        : 'Accommodation: not booked yet',
+      trip.arrival_transport_mode
+        ? `Arrival: ${trip.arrival_transport_mode}${trip.arrival_time_local ? ` around ${trip.arrival_time_local}` : ''} on the first day`
+        : 'Arrival: unspecified',
+      trip.interests && trip.interests.length > 0
+        ? `Interests: ${trip.interests.join(', ')}`
+        : 'Interests: not specified',
+    ].join('\n');
+
     const tripMeta = {
       destination: trip.destination_name || trip.title,
       dates: `${new Date(trip.start_date).toDateString()} - ${new Date(trip.end_date).toDateString()}`,
+      personalization: personalizationContext,
       savedPlaces: savedPlaces?.map(p => p.name) || [],
       mustIncludePlaces: mustIncludePlaces.map(p => ({
         name: p.name,
@@ -243,7 +259,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       RULES:
       ${structureInstructions}
       
-      2. Content & Writing Style:
+      2. Trip Context & Personalization:
+         - Use the following personalization information to tailor the itinerary:
+           ${personalizationContext}
+         - IMPORTANT: Make Day 1 realistic given the arrival time. If arrival is late (after 17:00), plan fewer activities for Day 1, focusing on evening activities and nearby places.
+         - If accommodation is provided and has_accommodation is true, prioritize activities near the accommodation location, especially for the first and last day.
+         - Prioritize activities that match the user's selected interests throughout the itinerary.
+         - If accommodation is not booked yet, avoid specific hotel-based assumptions but you may suggest good neighborhoods to stay in.
+         - Consider the number of travelers when suggesting group-friendly activities and restaurant reservations.
+      
+      3. Content & Writing Style:
          - Write in a warm, friendly, personal tone - like a knowledgeable friend giving recommendations, not a generic travel guide.
          - CRITICAL: The "summary" field is the most important briefing text. It must include ALL of the following information in a comprehensive, detailed paragraph (not bullet points):
            * Airport-to-city transportation: Provide EXACT details including the specific train/bus line name or number, departure station name and location, destination station name, duration, frequency, and approximate cost. Example: "From Madrid-Barajas Airport (Terminal 4), take the Cercanías C1 train (departs every 20 minutes) to Atocha Station in the city center. The journey takes approximately 30 minutes and costs around €2.60. Tickets can be purchased at the airport station or via the Renfe app."

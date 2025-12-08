@@ -5,6 +5,7 @@ import { getUserSubscriptionStatus } from "@/lib/supabase/user-subscription";
 import { createTripSegment } from "@/lib/supabase/trip-segments";
 import { getPlaceDetails } from "@/lib/google/places-server";
 import { eachDayOfInterval, format, addDays } from "date-fns";
+import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 
 interface NewTripPayload {
   destinationPlaceId: string;
@@ -16,6 +17,7 @@ interface NewTripPayload {
     cityName: string;
     nights: number;
   }>;
+  personalization?: TripPersonalizationPayload;
 }
 
 export async function POST(request: NextRequest) {
@@ -30,7 +32,21 @@ export async function POST(request: NextRequest) {
     }
 
     const body: NewTripPayload = await request.json();
-    const { destinationPlaceId, startDate, endDate, segments } = body;
+    const { destinationPlaceId, startDate, endDate, segments, personalization } = body;
+
+    // Extract personalization data with defaults
+    const {
+      travelers = 1,
+      originCityPlaceId,
+      originCityName,
+      hasAccommodation = false,
+      accommodationPlaceId,
+      accommodationName,
+      accommodationAddress,
+      arrivalTransportMode,
+      arrivalTimeLocal,
+      interests = [],
+    } = personalization ?? {};
 
     if (!destinationPlaceId || !startDate || !endDate) {
       return NextResponse.json(
@@ -120,6 +136,17 @@ export async function POST(request: NextRequest) {
         center_lat: primaryPlaceDetails?.geometry?.location?.lat || null,
         center_lng: primaryPlaceDetails?.geometry?.location?.lng || null,
         owner_id: userId,
+        // Personalization fields
+        travelers,
+        origin_city_place_id: originCityPlaceId || null,
+        origin_city_name: originCityName || null,
+        has_accommodation: hasAccommodation,
+        accommodation_place_id: accommodationPlaceId || null,
+        accommodation_name: accommodationName || null,
+        accommodation_address: accommodationAddress || null,
+        arrival_transport_mode: arrivalTransportMode || null,
+        arrival_time_local: arrivalTimeLocal || null,
+        interests: interests.length > 0 ? interests : [],
       })
       .select()
       .single();

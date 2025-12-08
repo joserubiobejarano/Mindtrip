@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Search, MapPin, Calendar, Users, MessageSquare, Send, Loader2 } from "lucide-react";
+import { Search, MapPin, Calendar, MessageSquare, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DestinationAutocomplete } from "@/components/destination-autocomplete";
 import { DateRangePicker } from "@/components/date-range-picker";
+import { TripPersonalizationDialog } from "@/components/trips/TripPersonalizationDialog";
 import { type DestinationOption } from "@/hooks/use-create-trip";
 import { useCreateTrip } from "@/hooks/use-create-trip";
 import { useAuth } from "@clerk/nextjs";
@@ -36,8 +37,8 @@ export function NewHeroSection() {
   const [destination, setDestination] = useState<DestinationOption | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [travelersCount, setTravelersCount] = useState(2);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [personalizationOpen, setPersonalizationOpen] = useState(false);
 
   // Chat input state
   const [chatInput, setChatInput] = useState("");
@@ -156,10 +157,7 @@ export function NewHeroSection() {
         setEndDate(data.endDate);
       }
 
-      // Auto-fill travelers
-      if (data.travelers && data.travelers > 0) {
-        setTravelersCount(data.travelers);
-      }
+      // Note: travelers will be collected in personalization dialog
     } catch (error) {
       console.error("Error parsing travel intent:", error);
       setIntentError("Failed to process your request. Please try again.");
@@ -197,12 +195,17 @@ export function NewHeroSection() {
       return;
     }
 
+    // Open personalization dialog instead of immediately creating trip
+    setPersonalizationOpen(true);
+  };
+
+  const handlePersonalizationComplete = async (personalization: any) => {
     try {
       await createTrip({
         destination,
         startDate,
         endDate,
-        travelersCount,
+        personalization,
       });
     } catch (error: any) {
       setSearchError(error.message || "Failed to create trip. Please try again.");
@@ -271,29 +274,12 @@ export function NewHeroSection() {
                 </div>
               </div>
 
-              {/* Travelers */}
-              <div className="flex flex-col items-start md:col-span-2">
-                <label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold mb-2">
-                  Travelers
-                </label>
-                <div className="relative w-full">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    min="1"
-                    value={travelersCount}
-                    onChange={(e) => setTravelersCount(Number(e.target.value))}
-                    className="pl-10 bg-secondary border-0 rounded-xl h-12 font-body"
-                  />
-                </div>
-              </div>
-
               {/* Search Button */}
-              <div className="flex flex-col justify-end md:col-span-1">
+              <div className="flex flex-col justify-end md:col-span-3">
                 <Button
                   type="submit"
                   disabled={creatingTrip}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs tracking-wider uppercase rounded-xl h-12 gap-2 w-full"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs tracking-wider uppercase rounded-xl h-12 gap-2 w-full px-6"
                 >
                   <Search className="w-4 h-4" />
                   {creatingTrip ? "Searching..." : "Search"}
@@ -349,6 +335,19 @@ export function NewHeroSection() {
           )}
           </div>
         </div>
+
+        {/* Personalization Dialog */}
+        {destination && startDate && endDate && (
+          <TripPersonalizationDialog
+            isOpen={personalizationOpen}
+            onClose={() => setPersonalizationOpen(false)}
+            onComplete={handlePersonalizationComplete}
+            destinationPlaceId={destination.id}
+            destinationName={destination.placeName}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        )}
 
         {/* Testimonial - positioned below search box */}
         <div className="mt-20 bg-card shadow-lg rounded-lg p-3 transform -rotate-6 animate-float hidden md:block mx-auto w-fit">

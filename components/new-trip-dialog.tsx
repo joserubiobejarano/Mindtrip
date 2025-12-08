@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { DestinationAutocomplete } from "@/components/destination-autocomplete";
-import { X } from "lucide-react";
+import { X, Lock, Check, Sparkles } from "lucide-react";
+import { DialogDescription } from "@/components/ui/dialog";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -52,6 +53,7 @@ export function NewTripDialog({
   const [segments, setSegments] = useState<CitySegment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     destination?: string;
     startDate?: string;
@@ -86,6 +88,7 @@ export function NewTripDialog({
       setSegments([]);
       setError(null);
       setFieldErrors({});
+      setUpgradeModalOpen(false);
     }
   }, [open]);
 
@@ -97,18 +100,12 @@ export function NewTripDialog({
     const errors: typeof fieldErrors = {};
     let isValid = true;
 
+    // For multi-city (Pro users with segments), validate segments
+    // For single-city (Free users or Pro users without segments), validate destination
     if (isPro && segments.length > 0) {
       // Multi-city: validate segments
       if (segments.length === 0) {
         errors.destination = "At least one city is required";
-        isValid = false;
-      }
-      if (!startDate) {
-        errors.startDate = "Start date is required";
-        isValid = false;
-      }
-      if (!endDate) {
-        errors.endDate = "End date is required";
         isValid = false;
       }
     } else {
@@ -117,14 +114,15 @@ export function NewTripDialog({
         errors.destination = "Destination is required";
         isValid = false;
       }
-      if (!startDate) {
-        errors.startDate = "Start date is required";
-        isValid = false;
-      }
-      if (!endDate) {
-        errors.endDate = "End date is required";
-        isValid = false;
-      }
+    }
+
+    if (!startDate) {
+      errors.startDate = "Start date is required";
+      isValid = false;
+    }
+    if (!endDate) {
+      errors.endDate = "End date is required";
+      isValid = false;
     }
 
     if (startDate && endDate) {
@@ -146,6 +144,13 @@ export function NewTripDialog({
       return;
     }
 
+    // If user is not Pro, show upgrade modal instead of adding a segment
+    if (!isPro) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
+    // Pro users: add segment normally
     const newSegment: CitySegment = {
       id: `segment-${Date.now()}`,
       cityPlaceId: destination.id,
@@ -237,208 +242,153 @@ export function NewTripDialog({
             Create New Trip
           </DialogTitle>
           <p className="text-sm text-gray-600 mt-1">
-            {isPro
-              ? "Plan a single or multi-city trip. Add multiple cities for Pro users."
-              : "Tell us where and when. We'll use this to plan your itinerary."}
+            Plan a single or multi-city trip. Add multiple cities with Pro.
           </p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="px-6 py-6 space-y-4 overflow-y-auto flex-1">
-            {isPro ? (
-              // Multi-city UI for Pro users
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="primary-city" className="text-base font-medium">
-                    Primary City
-                  </Label>
-                  <DestinationAutocomplete
-                    value={destination}
-                    onChange={(value) => {
-                      setDestination(value);
-                      if (value) {
-                        setFieldErrors((prev) => ({ ...prev, destination: undefined }));
-                      }
-                    }}
-                  />
-                  {fieldErrors.destination && (
-                    <p className="text-sm text-destructive">{fieldErrors.destination}</p>
-                  )}
-                </div>
+            {/* Always show multi-city UI structure */}
+            <div className="space-y-2">
+              <Label htmlFor="primary-city" className="text-base font-medium">
+                {segments.length > 0 ? "Primary City" : "Destination"}
+              </Label>
+              <DestinationAutocomplete
+                value={destination}
+                onChange={(value) => {
+                  setDestination(value);
+                  if (value) {
+                    setFieldErrors((prev) => ({ ...prev, destination: undefined }));
+                  }
+                }}
+              />
+              {fieldErrors.destination && (
+                <p className="text-sm text-destructive">{fieldErrors.destination}</p>
+              )}
+            </div>
 
-                {segments.length > 0 && (
-                  <div className="space-y-3 border-t pt-4">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-base font-medium">Cities</Label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleAddCity}
-                        disabled={!destination}
-                        className="text-xs"
-                      >
-                        + Add City
-                        <span className="ml-1 px-1.5 py-0.5 bg-orange-500 text-white text-xs rounded-full">
-                          Pro
-                        </span>
-                      </Button>
-                    </div>
-                    {segments.map((segment, index) => (
-                      <div
-                        key={segment.id}
-                        className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"
-                      >
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{segment.cityName}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Label htmlFor={`nights-${segment.id}`} className="text-xs text-gray-600">
-                              Nights:
-                            </Label>
-                            <Input
-                              id={`nights-${segment.id}`}
-                              type="number"
-                              min="1"
-                              value={segment.nights}
-                              onChange={(e) =>
-                                handleUpdateSegmentNights(segment.id, parseInt(e.target.value) || 1)
-                              }
-                              className="w-16 h-8 text-xs"
-                            />
-                          </div>
-                        </div>
-                        {segments.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveCity(segment.id)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+            {/* Always show "+ Add city" button with PRO/lock badge */}
+            {segments.length === 0 && destination && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddCity}
+                className="w-full"
+              >
+                + Add City
+                {!isPro && (
+                  <Lock className="ml-2 h-3 w-3" />
                 )}
+                <span className={`ml-2 px-2 py-0.5 text-white text-xs rounded-full ${
+                  isPro ? "bg-orange-500" : "bg-gray-400"
+                }`}>
+                  {isPro ? "Pro" : "Pro"}
+                </span>
+              </Button>
+            )}
 
-                {segments.length === 0 && destination && (
+            {/* Show segments if any exist */}
+            {segments.length > 0 && (
+              <div className="space-y-3 border-t pt-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-medium">Cities</Label>
                   <Button
                     type="button"
                     variant="outline"
+                    size="sm"
                     onClick={handleAddCity}
-                    className="w-full"
+                    disabled={!destination}
+                    className="text-xs"
                   >
                     + Add City
-                    <span className="ml-2 px-2 py-0.5 bg-orange-500 text-white text-xs rounded-full">
+                    {!isPro && (
+                      <Lock className="ml-1 h-3 w-3" />
+                    )}
+                    <span className={`ml-1 px-1.5 py-0.5 text-white text-xs rounded-full ${
+                      isPro ? "bg-orange-500" : "bg-gray-400"
+                    }`}>
                       Pro
                     </span>
                   </Button>
-                )}
-
-                <div className="border-t pt-4 space-y-4">
-                  <h3 className="text-base font-medium">Travel Dates</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="start_date">Start Date</Label>
-                      <Input
-                        id="start_date"
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => {
-                          setStartDate(e.target.value);
-                          setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
-                        }}
-                        required
-                        className="rounded-lg"
-                      />
-                      {fieldErrors.startDate && (
-                        <p className="text-sm text-destructive">{fieldErrors.startDate}</p>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="end_date">End Date</Label>
-                      <Input
-                        id="end_date"
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => {
-                          setEndDate(e.target.value);
-                          setFieldErrors((prev) => ({ ...prev, endDate: undefined }));
-                        }}
-                        required
-                        className="rounded-lg"
-                      />
-                      {fieldErrors.endDate && (
-                        <p className="text-sm text-destructive">{fieldErrors.endDate}</p>
-                      )}
-                    </div>
-                  </div>
                 </div>
-              </>
-            ) : (
-              // Single-city UI for free users
-              <>
+                {segments.map((segment, index) => (
+                  <div
+                    key={segment.id}
+                    className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{segment.cityName}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Label htmlFor={`nights-${segment.id}`} className="text-xs text-gray-600">
+                          Nights:
+                        </Label>
+                        <Input
+                          id={`nights-${segment.id}`}
+                          type="number"
+                          min="1"
+                          value={segment.nights}
+                          onChange={(e) =>
+                            handleUpdateSegmentNights(segment.id, parseInt(e.target.value) || 1)
+                          }
+                          className="w-16 h-8 text-xs"
+                        />
+                      </div>
+                    </div>
+                    {segments.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveCity(segment.id)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t pt-4 space-y-4">
+              <h3 className="text-base font-medium">Travel Dates</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="destination" className="text-base font-medium">
-                    Destination
-                  </Label>
-                  <DestinationAutocomplete
-                    value={destination}
-                    onChange={(value) => {
-                      setDestination(value);
-                      if (value) {
-                        setFieldErrors((prev) => ({ ...prev, destination: undefined }));
-                      }
+                  <Label htmlFor="start_date">Start Date</Label>
+                  <Input
+                    id="start_date"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
                     }}
+                    required
+                    className="rounded-lg"
                   />
-                  {fieldErrors.destination && (
-                    <p className="text-sm text-destructive">{fieldErrors.destination}</p>
+                  {fieldErrors.startDate && (
+                    <p className="text-sm text-destructive">{fieldErrors.startDate}</p>
                   )}
                 </div>
-
-                <div className="border-t pt-4 space-y-4">
-                  <h3 className="text-base font-medium">Travel Dates</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="start_date">Start Date</Label>
-                      <Input
-                        id="start_date"
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => {
-                          setStartDate(e.target.value);
-                          setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
-                        }}
-                        required
-                        className="rounded-lg"
-                      />
-                      {fieldErrors.startDate && (
-                        <p className="text-sm text-destructive">{fieldErrors.startDate}</p>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="end_date">End Date</Label>
-                      <Input
-                        id="end_date"
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => {
-                          setEndDate(e.target.value);
-                          setFieldErrors((prev) => ({ ...prev, endDate: undefined }));
-                        }}
-                        required
-                        className="rounded-lg"
-                      />
-                      {fieldErrors.endDate && (
-                        <p className="text-sm text-destructive">{fieldErrors.endDate}</p>
-                      )}
-                    </div>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end_date">End Date</Label>
+                  <Input
+                    id="end_date"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      setFieldErrors((prev) => ({ ...prev, endDate: undefined }));
+                    }}
+                    required
+                    className="rounded-lg"
+                  />
+                  {fieldErrors.endDate && (
+                    <p className="text-sm text-destructive">{fieldErrors.endDate}</p>
+                  )}
                 </div>
-              </>
-            )}
+              </div>
+            </div>
 
             {error && (
               <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg border border-destructive/20">
@@ -463,6 +413,62 @@ export function NewTripDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+
+      {/* Upgrade Modal */}
+      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Upgrade to Pro</DialogTitle>
+            <DialogDescription>
+              Unlock multi-city trips and other premium features
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+              <h3 className="font-semibold mb-3">Pro Benefits</h3>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2 font-semibold text-base">
+                  <Check className="h-5 w-5 text-purple-600" />
+                  <span>Multi-city trips</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-purple-600" />
+                  <span>Unlimited daily swipes</span>
+                  <span className="text-xs text-muted-foreground font-normal">(vs 10/day free)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-purple-600" />
+                  <span>Advanced filters: budget & distance</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-purple-600" />
+                  <span>Priority support</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setUpgradeModalOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Maybe Later
+            </Button>
+            <Button
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              onClick={() => {
+                setUpgradeModalOpen(false);
+                onOpenChange(false);
+                router.push('/settings?upgrade=true');
+              }}
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              Upgrade to Pro
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
