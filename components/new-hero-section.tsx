@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Search, MapPin, Calendar, MessageSquare, Send, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search, MapPin, Calendar, MessageSquare, Send, Loader2, Plus, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DestinationAutocomplete } from "@/components/destination-autocomplete";
@@ -39,12 +39,24 @@ export function NewHeroSection() {
   const [endDate, setEndDate] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
   const [personalizationOpen, setPersonalizationOpen] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [showMultiCity, setShowMultiCity] = useState(false);
 
   // Chat input state
   const [chatInput, setChatInput] = useState("");
   const [parsingIntent, setParsingIntent] = useState(false);
   const [intentError, setIntentError] = useState<string | null>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch Pro status
+  useEffect(() => {
+    if (isSignedIn && userId) {
+      fetch("/api/user/subscription-status")
+        .then((res) => res.json())
+        .then((data) => setIsPro(data.isPro || false))
+        .catch(() => setIsPro(false));
+    }
+  }, [isSignedIn, userId]);
 
   const handleSuggestionClick = (tag: string) => {
     const prompt = suggestionPrompts[tag] || tag;
@@ -300,9 +312,30 @@ export function NewHeroSection() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-10">
               {/* Where to */}
               <div className="flex flex-col items-start md:col-span-5">
-                <label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold mb-2">
-                  Where to?
-                </label>
+                <div className="flex items-center justify-between w-full mb-2">
+                  <label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold">
+                    Where to?
+                  </label>
+                  {destination && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (!isPro) {
+                          router.push("/settings?upgrade=true");
+                        } else {
+                          setShowMultiCity(!showMultiCity);
+                        }
+                      }}
+                      className="h-6 px-2 text-xs font-mono"
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Multi-city
+                      {!isPro && <Lock className="h-3 w-3 ml-1" />}
+                    </Button>
+                  )}
+                </div>
                 <div className="relative w-full">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
                     <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">

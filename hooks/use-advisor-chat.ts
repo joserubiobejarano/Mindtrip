@@ -48,9 +48,9 @@ export function useAdvisorChat() {
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 
-  // Send message mutation
+  // Send message mutation with streaming support
   const sendMessage = useMutation({
-    mutationFn: async (message: string): Promise<AdvisorResponse> => {
+    mutationFn: async (message: string): Promise<AdvisorResponse & { stream?: ReadableStream }> => {
       const response = await fetch("/api/advisor", {
         method: "POST",
         headers: {
@@ -64,6 +64,16 @@ export function useAdvisorChat() {
         throw new Error(error.error || "Failed to send message");
       }
 
+      // Check if response is streaming (SSE)
+      const contentType = response.headers.get("content-type");
+      if (contentType?.includes("text/event-stream")) {
+        return {
+          ok: true,
+          stream: response.body,
+        } as any;
+      }
+
+      // Fallback: non-streaming response
       const data = await response.json();
       return data;
     },

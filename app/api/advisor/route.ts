@@ -4,12 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 import { getOpenAIClient } from "@/lib/openai";
 import { moderateMessage, getRedirectMessage } from "@/lib/chat-moderation";
 import { getUserSubscriptionStatus } from "@/lib/supabase/user-subscription";
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 interface AdvisorRequest {
   message: string;
 }
 
-const ADVISOR_SYSTEM_PROMPT = `You are the Kruno Travel Advisor, a high-level travel advisor for pre-itinerary questions.
+const ADVISOR_SYSTEM_PROMPT = `You are the Kruno Advisor, a high-level travel advisor for pre-itinerary questions.
 
 Your role:
 - Suggest destinations, regions, and cities
@@ -184,60 +186,90 @@ export async function POST(request: NextRequest) {
       ? `${conversationHistory}\n\nUser: ${message}`
       : `User: ${message}`;
 
-    // 6. Call OpenAI
-    const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: ADVISOR_SYSTEM_PROMPT,
-        },
-        {
-          role: "user",
-          content: userPrompt,
-        },
-      ],
-      temperature: 0.7,
-    });
-
-    const assistantReply =
-      completion.choices[0]?.message?.content ||
-      "I'm sorry, I couldn't generate a response. Please try again.";
-
-    // 7. Store chat history
-    // Save user message
+    // 6. Save user message first
     await supabase.from("advisor_messages").insert({
       user_id: userId,
       role: "user",
       content: message,
     });
 
-    // Save assistant reply
-    await supabase.from("advisor_messages").insert({
-      user_id: userId,
-      role: "assistant",
-      content: assistantReply,
+    // 7. Create streaming response using Server-Sent Events
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          let accumulatedText = '';
+          let assistantReply = '';
+
+          // Stream the text from OpenAI
+          const result = await streamText({
+            model: openai('gpt-4o-mini'),
+            system: ADVISOR_SYSTEM_PROMPT,
+            prompt: userPrompt,
+            temperature: 0.7,
+          });
+
+          // Process the stream
+          for await (const chunk of result.textStream) {
+            accumulatedText += chunk;
+            assistantReply = accumulatedText;
+            
+            // Send chunk as SSE
+            const encoder = new TextEncoder();
+            const message = JSON.stringify({ type: 'chunk', data: chunk });
+            controller.enqueue(encoder.encode(`data: ${message}\n\n`));
+          }
+
+          // Save complete assistant reply
+          await supabase.from("advisor_messages").insert({
+            user_id: userId,
+            role: "assistant",
+            content: assistantReply,
+          });
+
+          // Check if we should suggest creating a trip
+          const shouldSuggestTrip =
+            assistantReply.toLowerCase().includes("let's create") ||
+            assistantReply.toLowerCase().includes("set up") ||
+            assistantReply.toLowerCase().includes("create this trip") ||
+            (recentMessages && recentMessages.length >= 4);
+
+          // Send complete message
+          const encoder = new TextEncoder();
+          const completeMessage = JSON.stringify({
+            type: 'complete',
+            data: {
+              reply: assistantReply,
+              ...(shouldSuggestTrip && {
+                suggestedAction: {
+                  type: "offer_create_trip",
+                  summary: "Ready to create your trip? I can help you set it up.",
+                },
+              }),
+            },
+          });
+          controller.enqueue(encoder.encode(`data: ${completeMessage}\n\n`));
+          
+          controller.close();
+        } catch (err: any) {
+          console.error('[advisor] Stream error:', err);
+          const encoder = new TextEncoder();
+          const errorMessage = JSON.stringify({
+            type: 'error',
+            data: { message: err.message || 'An error occurred' },
+          });
+          controller.enqueue(encoder.encode(`data: ${errorMessage}\n\n`));
+          controller.close();
+        }
+      },
     });
 
-    // 8. Check if we should suggest creating a trip
-    // Simple heuristic: if the reply mentions creating a trip or the user seems ready
-    const shouldSuggestTrip =
-      assistantReply.toLowerCase().includes("let's create") ||
-      assistantReply.toLowerCase().includes("set up") ||
-      assistantReply.toLowerCase().includes("create this trip") ||
-      (recentMessages && recentMessages.length >= 4); // After a few exchanges
-
-    // 9. Return response
-    return NextResponse.json({
-      ok: true,
-      reply: assistantReply,
-      ...(shouldSuggestTrip && {
-        suggestedAction: {
-          type: "offer_create_trip",
-          summary: "Ready to create your trip? I can help you set it up.",
-        },
-      }),
+    // Return streaming response with SSE headers
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
     });
   } catch (error) {
     console.error("Error in /api/advisor:", error);

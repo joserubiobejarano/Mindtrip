@@ -64,6 +64,8 @@ export function useCreateTrip() {
       // Use API route instead of direct Supabase call
       const payload: any = {
         destinationPlaceId: destination.id,
+        destinationName: destination.placeName,
+        destinationCenter: destination.center,
         startDate,
         endDate,
       };

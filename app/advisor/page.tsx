@@ -110,7 +110,16 @@ function AdvisorPageContent() {
     }
 
     // Check if user wants to start onboarding
-    if (message.toLowerCase().includes("let's create") || message.toLowerCase().includes("create this trip")) {
+    const messageLower = message.toLowerCase().trim();
+    if (
+      messageLower.includes("let's create") || 
+      messageLower.includes("create this trip") ||
+      messageLower === "yes please" ||
+      messageLower === "yes" ||
+      messageLower === "yeah" ||
+      messageLower === "sure" ||
+      (messageLower.includes("yes") && messageLower.includes("please"))
+    ) {
       onboardingHandlersRef.current.startOnboarding?.();
       return;
     }
@@ -129,8 +138,105 @@ function AdvisorPageContent() {
     try {
       const response = await sendMessage(message);
 
-      if (response.ok && response.reply) {
-        // Add assistant reply
+      // Handle streaming response
+      if (response.ok && (response as any).stream) {
+        const stream = (response as any).stream;
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let accumulatedReply = '';
+        const assistantMessageId = `temp-assistant-${Date.now()}`;
+        
+        // Create initial assistant message
+        const assistantMessage: AdvisorMessage = {
+          id: assistantMessageId,
+          role: "assistant",
+          content: '',
+          created_at: new Date().toISOString(),
+        };
+        setLocalMessages((prev) => {
+          const withoutTemp = prev.filter((m) => !m.id.startsWith("temp-"));
+          return [...withoutTemp, assistantMessage];
+        });
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(6));
+                  
+                  if (data.type === 'chunk') {
+                    accumulatedReply += data.data;
+                    // Update message with accumulated text
+                    setLocalMessages((prev) => {
+                      return prev.map((m) =>
+                        m.id === assistantMessageId
+                          ? { ...m, content: accumulatedReply }
+                          : m
+                      );
+                    });
+                  } else if (data.type === 'complete') {
+                    const completeData = data.data;
+                    accumulatedReply = completeData.reply || accumulatedReply;
+                    
+                    // Update final message
+                    setLocalMessages((prev) => {
+                      const withoutTemp = prev.filter((m) => !m.id.startsWith("temp-"));
+                      return [...withoutTemp, {
+                        id: assistantMessageId,
+                        role: "assistant",
+                        content: accumulatedReply,
+                        created_at: new Date().toISOString(),
+                      }];
+                    });
+
+                    // Check for suggested action
+                    if (completeData.suggestedAction?.type === "offer_create_trip") {
+                      setTimeout(() => {
+                        setLocalMessages((prev) => [
+                          ...prev,
+                          {
+                            id: `action-${Date.now()}`,
+                            role: "assistant",
+                            content: "Would you like to create this trip now?",
+                            created_at: new Date().toISOString(),
+                          },
+                        ]);
+                      }, 500);
+                    }
+                  } else if (data.type === 'error') {
+                    throw new Error(data.data.message || 'An error occurred');
+                  }
+                } catch (err) {
+                  console.error('[advisor] Error parsing SSE message:', err, line);
+                }
+              }
+            }
+          }
+        } catch (streamError: any) {
+          console.error('[advisor] Stream error:', streamError);
+          setLocalMessages((prev) => {
+            const withoutTemp = prev.filter((m) => !m.id.startsWith("temp-"));
+            return [...withoutTemp, {
+              id: `error-${Date.now()}`,
+              role: "assistant",
+              content: streamError.message || "Failed to get response. Please try again.",
+              created_at: new Date().toISOString(),
+            }];
+          });
+        } finally {
+          reader.releaseLock();
+        }
+      } else if (response.ok && response.reply) {
+        // Fallback: non-streaming response
         const assistantMessage: AdvisorMessage = {
           id: `temp-assistant-${Date.now()}`,
           role: "assistant",
@@ -144,7 +250,6 @@ function AdvisorPageContent() {
 
         // Check for suggested action
         if (response.suggestedAction?.type === "offer_create_trip") {
-          // Add a button message
           setTimeout(() => {
             setLocalMessages((prev) => [
               ...prev,
@@ -509,16 +614,20 @@ function AdvisorPageContent() {
         personalization.arrivalTimeLocal = onboardingData.arrivalTimeLocal;
       }
 
-      // Create trip
+      // Create trip with destination name
       await createTrip({
-        destination,
+        destination: {
+          ...destination,
+          placeName: placeName, // Ensure placeName is set
+        },
         startDate: onboardingData.startDate,
         endDate: onboardingData.endDate,
         personalization,
       });
 
-      addOnboardingMessage("All set! I've created your trip. I'm taking you to your Smart Itinerary now 🎒");
+      addOnboardingMessage("All set! I've created your trip. I'm taking you to your trip now 🎒");
       setTimeout(() => {
+        // Navigate to the trips page - the itinerary will be generated there
         router.push("/trips");
       }, 2000);
     } catch (error: any) {
@@ -537,7 +646,7 @@ function AdvisorPageContent() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Sign in required</h1>
-          <p className="text-muted-foreground mb-4">Please sign in to use the Travel Advisor.</p>
+          <p className="text-muted-foreground mb-4">Please sign in to use the Kruno Advisor.</p>
           <Link href="/sign-in">
             <Button>Sign In</Button>
           </Link>
@@ -556,50 +665,59 @@ function AdvisorPageContent() {
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-lg font-semibold">Travel Advisor</h1>
+          <h1 className="text-lg font-semibold">Kruno Advisor</h1>
           <p className="text-xs text-muted-foreground">Ask for ideas before creating your itinerary</p>
         </div>
         <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">Beta</span>
       </header>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-        {localMessages.length === 0 && !sending && (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="text-center space-y-2">
-              <Sparkles className="h-12 w-12 mx-auto text-primary/50" />
-              <h2 className="text-xl font-semibold">How can I help you plan your trip?</h2>
-              <p className="text-sm text-muted-foreground">Ask me about destinations, regions, or trip ideas</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {STARTER_PROMPTS.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleStarterPrompt(prompt)}
-                  className="text-left p-4 border border-border rounded-lg hover:bg-muted transition-colors text-sm"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {localMessages.map((msg) => {
-          const isUser = msg.role === "user";
-          return (
-            <div key={msg.id} className={clsx("flex", isUser ? "justify-end" : "justify-start")}>
-              <div
-                className={clsx(
-                  "max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-2",
-                  isUser ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-                )}
-              >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+      <div className="flex-1 overflow-y-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {localMessages.length === 0 && !sending && (
+            <div className="space-y-6">
+              <div className="text-center space-y-2">
+                <Sparkles className="h-12 w-12 mx-auto text-primary/50" />
+                <h2 className="text-xl font-semibold">How can I help you plan your trip?</h2>
+                <p className="text-sm text-muted-foreground">Ask me about destinations, regions, or trip ideas</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {STARTER_PROMPTS.map((prompt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleStarterPrompt(prompt)}
+                    className="text-left p-4 border border-border rounded-lg hover:bg-muted transition-colors text-sm"
+                  >
+                    {prompt}
+                  </button>
+                ))}
               </div>
             </div>
-          );
-        })}
+          )}
+
+          {localMessages.map((msg) => {
+            const isUser = msg.role === "user";
+            // Clean markdown - remove leading _ and * characters
+            let cleanedContent = msg.content;
+            // Remove leading underscores and asterisks that are markdown artifacts
+            cleanedContent = cleanedContent.replace(/^[\s_*]+/gm, '');
+            // Replace markdown bold with proper rendering
+            cleanedContent = cleanedContent.replace(/\*\*(.+?)\*\*/g, '**$1**');
+            
+            return (
+              <div key={msg.id} className={clsx("flex", isUser ? "justify-end" : "justify-start")}>
+                <div
+                  className={clsx(
+                    "max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-3",
+                    isUser ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                  )}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{cleanedContent}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
         {sending && (
           <div className="flex justify-start">

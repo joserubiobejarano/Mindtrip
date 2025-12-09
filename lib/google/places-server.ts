@@ -38,6 +38,34 @@ export async function findPlacePhoto(query: string): Promise<string | null> {
 }
 
 /**
+ * Find Google Places ID from place name and coordinates
+ */
+export async function findGooglePlaceId(placeName: string, lat?: number, lng?: number): Promise<string | null> {
+  if (!GOOGLE_MAPS_API_KEY) {
+    console.error("Missing Google Maps API Key");
+    return null;
+  }
+
+  try {
+    // Use Find Place API with text input
+    let url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(placeName)}&inputtype=textquery&fields=place_id${lat && lng ? `&locationbias=point:${lat},${lng}` : ''}&key=${GOOGLE_MAPS_API_KEY}`;
+    
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status === 'OK' && data.candidates && data.candidates.length > 0) {
+      return data.candidates[0].place_id;
+    }
+
+    console.error('Google Places Find API error:', data.status, data.error_message);
+    return null;
+  } catch (error) {
+    console.error("Error finding Google Place ID:", error);
+    return null;
+  }
+}
+
+/**
  * Fetch place details by place_id from Google Places API (Server-side)
  */
 export async function getPlaceDetails(placeId: string): Promise<{

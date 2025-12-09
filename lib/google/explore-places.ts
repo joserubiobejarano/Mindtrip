@@ -134,12 +134,33 @@ export async function getPlacesToExplore(
   }
 
   // Get coordinates for search
-  if (!trip.center_lat || !trip.center_lng) {
-    throw new Error('Trip location is required for searching places');
+  // If center_lat/lng are missing, try to get from segments
+  let centerLat = trip.center_lat;
+  let centerLng = trip.center_lng;
+  let destinationName = trip.destination_name || trip.title;
+
+  if (!centerLat || !centerLng) {
+    // Try to get from first segment
+    const { data: segments } = await supabase
+      .from('trip_segments')
+      .select('city_name, city_place_id')
+      .eq('trip_id', tripId)
+      .order('order_index', { ascending: true })
+      .limit(1);
+
+    if (segments && segments.length > 0) {
+      const segment = segments[0];
+      destinationName = segment.city_name || destinationName;
+      // Note: We'd need to fetch coordinates from Google Places API using city_place_id
+      // For now, we'll throw an error to prompt fixing the trip data
+    }
+
+    if (!centerLat || !centerLng) {
+      throw new Error('Trip location is required for searching places. Please ensure your trip has a valid destination.');
+    }
   }
 
-  const location = `${trip.center_lat},${trip.center_lng}`;
-  const destinationName = trip.destination_name || trip.title;
+  const location = `${centerLat},${centerLng}`;
 
   // Build search query based on filters
   let query: string;

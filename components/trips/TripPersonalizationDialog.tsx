@@ -141,21 +141,24 @@ export function TripPersonalizationDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {step === 1 && "Let's personalize your trip"}
-            {step === 2 && "How and when are you arriving?"}
-            {step === 3 && "What are you most interested in?"}
-          </DialogTitle>
-          <DialogDescription>
-            {step === 1 && "These details help us build a better itinerary."}
-            {step === 2 && "Help us plan your first day more effectively."}
-            {step === 3 && "We'll prioritize these when building your plan."}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 relative">
+        {/* Colored top border matching homepage */}
+        <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-lg"></div>
+        <div className="pt-[60px] px-6 pb-6">
+          <DialogHeader>
+            <DialogTitle>
+              {step === 1 && "Let's personalize your trip"}
+              {step === 2 && "How and when are you arriving?"}
+              {step === 3 && "What are you most interested in?"}
+            </DialogTitle>
+            <DialogDescription>
+              {step === 1 && "These details help us build a better itinerary."}
+              {step === 2 && "Help us plan your first day more effectively."}
+              {step === 3 && "We'll prioritize these when building your plan."}
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="py-6 space-y-6">
+          <div className="py-6 space-y-6">
           {/* Step 1: Trip Basics */}
           {step === 1 && (
             <div className="space-y-6">
@@ -198,6 +201,7 @@ export function TripPersonalizationDialog({
                   value={originCity}
                   onChange={setOriginCity}
                   placeholder="City of departure (e.g. Malaga)"
+                  inputClassName="placeholder:text-muted-foreground/60"
                 />
                 <p className="text-xs text-muted-foreground">Optional, but helps us provide better recommendations</p>
               </div>
@@ -228,6 +232,7 @@ export function TripPersonalizationDialog({
                       value={accommodation}
                       onChange={setAccommodation}
                       placeholder="Search hotels or addresses..."
+                      inputClassName="placeholder:text-muted-foreground/60"
                     />
                   </div>
                 )}
@@ -265,6 +270,7 @@ export function TripPersonalizationDialog({
                   value={arrivalTimeLocal}
                   onChange={(e) => setArrivalTimeLocal(e.target.value)}
                   placeholder="e.g. 20:30"
+                  className="placeholder:text-muted-foreground/60"
                 />
                 <p className="text-xs text-muted-foreground">Optional - local time at destination</p>
               </div>
@@ -294,34 +300,35 @@ export function TripPersonalizationDialog({
           )}
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2 sm:justify-between">
-          <div className="flex gap-2">
-            {step > 1 && (
-              <Button type="button" variant="outline" onClick={handleBack}>
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Back
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:justify-between">
+            <div className="flex gap-2">
+              {step > 1 && (
+                <Button type="button" variant="outline" onClick={handleBack}>
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleSkip}
+                className="text-muted-foreground"
+              >
+                Skip personalization
               </Button>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleSkip}
-              className="text-muted-foreground"
-            >
-              Skip personalization
-            </Button>
-            <Button
-              type="button"
-              onClick={handleNext}
-              disabled={!canProceed()}
-            >
-              {step === 3 ? "Generate my itinerary" : "Next"}
-              {step < 3 && <ChevronRight className="ml-2 h-4 w-4" />}
-            </Button>
-          </div>
-        </DialogFooter>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={!canProceed()}
+              >
+                {step === 3 ? "Generate my itinerary" : "Next"}
+                {step < 3 && <ChevronRight className="ml-2 h-4 w-4" />}
+              </Button>
+            </div>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

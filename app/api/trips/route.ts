@@ -3,12 +3,14 @@ import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUserSubscriptionStatus } from "@/lib/supabase/user-subscription";
 import { createTripSegment } from "@/lib/supabase/trip-segments";
-import { getPlaceDetails } from "@/lib/google/places-server";
+import { getPlaceDetails, findGooglePlaceId } from "@/lib/google/places-server";
 import { eachDayOfInterval, format, addDays } from "date-fns";
 import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 
 interface NewTripPayload {
   destinationPlaceId: string;
+  destinationName?: string;
+  destinationCenter?: [number, number];
   startDate: string;
   endDate: string;
   travelers?: number;
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: NewTripPayload = await request.json();
-    const { destinationPlaceId, startDate, endDate, segments, personalization } = body;
+    const { destinationPlaceId, destinationName, destinationCenter, startDate, endDate, segments, personalization } = body;
 
     // Extract personalization data with defaults
     const {
@@ -90,13 +92,36 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Single-city trip: use destinationPlaceId and full date range
-      // Get city name from Places API
-      const placeDetails = await getPlaceDetails(destinationPlaceId);
-      const cityName = placeDetails?.name || "Unknown City";
+      // destinationPlaceId is a Mapbox ID, we need to convert it to Google Place ID
+      let googlePlaceId: string | null = null;
+      let cityName = destinationName || "Unknown City";
+      let placeDetails: any = null;
+      
+      // Use the place name to find Google Place ID
+      if (destinationName) {
+        // Use coordinates if available for better accuracy
+        if (destinationCenter && destinationCenter.length === 2) {
+          googlePlaceId = await findGooglePlaceId(destinationName, destinationCenter[1], destinationCenter[0]);
+        } else {
+          googlePlaceId = await findGooglePlaceId(destinationName);
+        }
+        
+        if (googlePlaceId) {
+          placeDetails = await getPlaceDetails(googlePlaceId);
+          cityName = placeDetails?.name || destinationName;
+        }
+      } else {
+        // Fallback: try to use destinationPlaceId as Google Place ID (in case it's already a Google ID)
+        placeDetails = await getPlaceDetails(destinationPlaceId);
+        if (placeDetails) {
+          cityName = placeDetails.name;
+          googlePlaceId = destinationPlaceId;
+        }
+      }
 
       segmentsToCreate = [
         {
-          cityPlaceId: destinationPlaceId,
+          cityPlaceId: googlePlaceId || destinationPlaceId,
           cityName,
           startDate,
           endDate,
@@ -105,9 +130,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Get primary city details for trip title
-    const primaryPlaceDetails = await getPlaceDetails(
-      segmentsToCreate[0].cityPlaceId
-    );
+    const primaryPlaceId = segmentsToCreate[0].cityPlaceId;
+    let primaryPlaceDetails: any = null;
+    
+    // Check if it's a Google Place ID (starts with specific pattern) or Mapbox ID
+    if (primaryPlaceId && !primaryPlaceId.startsWith('place.')) {
+      // Likely a Google Place ID
+      primaryPlaceDetails = await getPlaceDetails(primaryPlaceId);
+    } else if (segmentsToCreate[0].cityName && segmentsToCreate[0].cityName !== "Unknown City") {
+      // Try to find Google Place ID from city name
+      const googlePlaceId = await findGooglePlaceId(segmentsToCreate[0].cityName);
+      if (googlePlaceId) {
+        primaryPlaceDetails = await getPlaceDetails(googlePlaceId);
+      }
+    }
+    
     const primaryCityName = primaryPlaceDetails?.name || segmentsToCreate[0].cityName;
     const primaryCountry = primaryPlaceDetails?.formatted_address
       ?.split(",")

@@ -23,17 +23,27 @@ export function TripLayout({ leftPanel, rightPanel }: TripLayoutProps) {
       
       {/* Right Panel - Fixed width, scrollable */}
       <div className={`${rightPanel ? 'md:w-[400px]' : 'md:w-full'} border-t md:border-t-0 ${rightPanel ? 'md:border-l' : ''} border-border overflow-y-auto bg-background flex flex-col`}>
-        {/* Header with Back button */}
+        {/* Header with Back buttons */}
         <div className="p-6 pb-0 border-b border-border">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/trips")}
-            className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to trips
-          </Button>
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/trips")}
+              className="-ml-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to trips
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/")}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Homepage
+            </Button>
+          </div>
         </div>
         {/* Panel content */}
         <div className="flex-1 overflow-y-auto">
