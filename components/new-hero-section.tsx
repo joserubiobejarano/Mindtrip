@@ -28,13 +28,17 @@ const suggestionPrompts: Record<string, string> = {
   "Workation ideas": "Recommend 3 workation destinations with good Wi-Fi, cafes to work from, and mild weather in winter, flying from Madrid.",
 };
 
-export function NewHeroSection() {
+interface NewHeroSectionProps {
+  destination: DestinationOption | null;
+  setDestination: (destination: DestinationOption | null) => void;
+}
+
+export function NewHeroSection({ destination, setDestination }: NewHeroSectionProps) {
   const { isSignedIn, userId } = useAuth();
   const router = useRouter();
   const { createTrip, loading: creatingTrip } = useCreateTrip();
 
   // Form state
-  const [destination, setDestination] = useState<DestinationOption | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -283,8 +287,12 @@ export function NewHeroSection() {
         endDate,
         personalization,
       });
+      // Close dialog after successful trip creation
+      setPersonalizationOpen(false);
     } catch (error: any) {
       setSearchError(error.message || "Failed to create trip. Please try again.");
+      // Close dialog even on error so user can try again
+      setPersonalizationOpen(false);
     }
   };
 

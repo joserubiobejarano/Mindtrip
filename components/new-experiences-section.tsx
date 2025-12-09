@@ -65,15 +65,20 @@ const cities = [
   },
 ];
 
-function CityCard({ city }: { city: typeof cities[0] }) {
+function CityCard({ city, onCityClick }: { city: typeof cities[0]; onCityClick: (cityName: string) => void }) {
   const [isHovered, setIsHovered] = useState(false);
   const primaryCategory = city.categories[0];
   const primaryCategoryColors = getCategoryColor(primaryCategory);
+
+  const handleClick = () => {
+    onCityClick(city.title);
+  };
 
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
       className="bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group relative flex flex-col h-full cursor-pointer"
     >
       <div className="relative h-48 overflow-hidden">
@@ -121,7 +126,11 @@ function CityCard({ city }: { city: typeof cities[0] }) {
   );
 }
 
-export function NewExperiencesSection() {
+interface NewExperiencesSectionProps {
+  onCityClick: (cityName: string) => void;
+}
+
+export function NewExperiencesSection({ onCityClick }: NewExperiencesSectionProps) {
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -153,6 +162,7 @@ export function NewExperiencesSection() {
             <CityCard 
               key={city.title}
               city={city}
+              onCityClick={onCityClick}
             />
           ))}
         </div>
