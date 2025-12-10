@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -139,22 +139,29 @@ export function TripPersonalizationDialog({
     return true; // Steps 2 and 3 are optional
   };
 
+  // Reset step when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setStep(1);
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 relative">
         {/* Colored top border matching homepage */}
-        <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-lg"></div>
-        <div className="pt-[60px] px-6 pb-6">
+        <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-lg z-10"></div>
+        <div className="pt-[60px] px-6 pb-6 relative z-10">
           <DialogHeader>
             <DialogTitle>
-              {step === 1 && "Let's personalize your trip"}
-              {step === 2 && "How and when are you arriving?"}
-              {step === 3 && "What are you most interested in?"}
+              {step === 1 ? "Let's personalize your trip" : 
+               step === 2 ? "How and when are you arriving?" : 
+               "What are you most interested in?"}
             </DialogTitle>
             <DialogDescription>
-              {step === 1 && "These details help us build a better itinerary."}
-              {step === 2 && "Help us plan your first day more effectively."}
-              {step === 3 && "We'll prioritize these when building your plan."}
+              {step === 1 ? "These details help us build a better itinerary." : 
+               step === 2 ? "Help us plan your first day more effectively." : 
+               "We'll prioritize these when building your plan."}
             </DialogDescription>
           </DialogHeader>
 
