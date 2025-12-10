@@ -26,13 +26,20 @@ export async function GET(
     const tripSegmentId = url.searchParams.get('trip_segment_id') || null;
 
     // Get or create explore session (segment-scoped if trip_segment_id provided)
-    let { data: session, error: sessionError } = await supabase
+    let query = supabase
       .from('explore_sessions')
       .select('*')
       .eq('trip_id', tripId)
-      .eq('user_id', userId)
-      .eq('trip_segment_id', tripSegmentId || '00000000-0000-0000-0000-000000000000')
-      .maybeSingle();
+      .eq('user_id', userId);
+
+    // Handle NULL trip_segment_id properly - use .is() for null, .eq() for values
+    if (tripSegmentId === null) {
+      query = query.is('trip_segment_id', null);
+    } else {
+      query = query.eq('trip_segment_id', tripSegmentId);
+    }
+
+    const { data: session, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
       console.error('Error fetching explore session:', sessionError);
@@ -115,7 +122,7 @@ export async function DELETE(
 
     // Reset session: clear liked/discarded arrays and reset swipe_count
     // Keep last_swipe_at unchanged (for daily reset logic)
-    const { error: updateError } = await supabase
+    let updateQuery = supabase
       .from('explore_sessions')
       .update({
         liked_place_ids: [],
@@ -124,8 +131,16 @@ export async function DELETE(
         updated_at: new Date().toISOString(),
       })
       .eq('trip_id', tripId)
-      .eq('user_id', userId)
-      .eq('trip_segment_id', tripSegmentId || '00000000-0000-0000-0000-000000000000');
+      .eq('user_id', userId);
+
+    // Handle NULL trip_segment_id properly
+    if (tripSegmentId === null) {
+      updateQuery = updateQuery.is('trip_segment_id', null);
+    } else {
+      updateQuery = updateQuery.eq('trip_segment_id', tripSegmentId);
+    }
+
+    const { error: updateError } = await updateQuery;
 
     if (updateError) {
       // If no session exists, that's fine - return success

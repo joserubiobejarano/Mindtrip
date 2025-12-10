@@ -66,14 +66,20 @@ export async function POST(
     const supabase = await createClient();
 
     // Get or create explore session (segment-scoped if trip_segment_id provided)
-    const segmentIdForQuery = trip_segment_id || '00000000-0000-0000-0000-000000000000';
-    let { data: session, error: sessionError } = await supabase
+    let query = supabase
       .from('explore_sessions')
       .select('*')
       .eq('trip_id', tripId)
-      .eq('user_id', userId)
-      .eq('trip_segment_id', segmentIdForQuery)
-      .maybeSingle();
+      .eq('user_id', userId);
+
+    // Handle NULL trip_segment_id properly - use .is() for null, .eq() for values
+    if (trip_segment_id === null || trip_segment_id === undefined) {
+      query = query.is('trip_segment_id', null);
+    } else {
+      query = query.eq('trip_segment_id', trip_segment_id);
+    }
+
+    const { data: session, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
       console.error('Error fetching explore session:', sessionError);

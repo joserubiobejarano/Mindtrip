@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Send, Plus } from "lucide-react";
+import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Send, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useTripSegments } from "@/hooks/use-trip-segments";
 import { format, addDays, differenceInDays } from "date-fns";
@@ -29,6 +29,22 @@ interface ItineraryTabProps {
   selectedDayId?: string | null;
   onSelectDay?: (dayId: string) => void;
   onActivitySelect?: (activityId: string) => void;
+}
+
+// Helper function to convert text to bullet points, avoiding splits on decimals
+function textToBulletPoints(text: string): string[] {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (!normalized) return [];
+  // Split on periods that likely end sentences, NOT decimals
+  // Pattern: period preceded by non-digit, followed by space and uppercase letter
+  const rawSentences = normalized.split(/(?<=[^\d])\.(?=\s+[A-ZÀ-ÖØ-Þ])/g);
+  return rawSentences
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => {
+      // Ensure each bullet ends with a period
+      return s.endsWith('.') ? s : s + '.';
+    });
 }
 
 // Simple affiliate button component
@@ -71,6 +87,8 @@ export function ItineraryTab({
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   
   // Chat state
   const [chatMessage, setChatMessage] = useState("");
@@ -331,6 +349,13 @@ export function ItineraryTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId]);
 
+  // Initialize expanded days with first day expanded
+  useEffect(() => {
+    if (smartItinerary?.days && smartItinerary.days.length > 0 && expandedDays.size === 0) {
+      setExpandedDays(new Set([smartItinerary.days[0].id]));
+    }
+  }, [smartItinerary, expandedDays.size]);
+
   // Handle manual updates (visited, remove)
   // Since we have slots now, finding the place is a bit deeper.
   const handleUpdatePlace = async (dayId: string, placeId: string, updates: { visited?: boolean, remove?: boolean }) => {
@@ -484,7 +509,7 @@ export function ItineraryTab({
       {/* Header */}
       <div className="px-6 py-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
         <div>
-          <h1 className="text-xl font-bold">{trip.title}</h1>
+          <h1 className="text-xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>{trip.title}</h1>
           <p className="text-sm text-gray-500">
             {format(new Date(trip.start_date), "MMM d")} - {format(new Date(trip.end_date), "MMM d, yyyy")}
           </p>
@@ -565,25 +590,17 @@ export function ItineraryTab({
                       {smartItinerary.summary && (
                         <div className="prose prose-neutral max-w-none text-slate-900 text-left">
                           <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
-                            {smartItinerary.summary
-                              .split(/[.!?]+/)
-                              .filter(s => s.trim().length > 10)
-                              .map((point, idx) => {
-                                const trimmed = point.trim();
-                                if (!trimmed) return null;
-                                return (
-                                  <li key={idx} className="font-normal">
-                                    {trimmed}{!trimmed.match(/[.!?]$/) ? '.' : ''}
-                                  </li>
-                                );
-                              })
-                              .filter(Boolean)}
+                            {textToBulletPoints(smartItinerary.summary).map((point, idx) => (
+                              <li key={idx} className="font-normal">
+                                {point}
+                              </li>
+                            ))}
                           </ul>
                         </div>
                       )}
                       {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
                         <div className="mt-6 text-left max-w-3xl mx-auto">
-                          <h3 className="text-lg font-bold text-slate-900 mb-3">Trip Tips &amp; Notes</h3>
+                          <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>Trip Tips &amp; Notes</h3>
                           <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
                             {smartItinerary.tripTips.map((tip, i) => (
                               <li key={i}>{tip}</li>
@@ -654,7 +671,7 @@ export function ItineraryTab({
                           <div key={group.segment?.id || `no-segment-${groupIdx}`} className="space-y-8">
                             {group.segment && (
                               <div className="border-b-2 border-slate-200 pb-2">
-                                <h3 className="text-2xl font-bold text-slate-900">
+                                <h3 className="text-2xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                                   {group.segment.city_name}
                                 </h3>
                                 <p className="text-sm text-slate-600 mt-1">
@@ -670,62 +687,104 @@ export function ItineraryTab({
                     : day.slots.flatMap(s => s.places.flatMap(p => p.photos || []));
                   
                   const bannerImages = dayImages.slice(0, 4);
+                  const isExpanded = expandedDays.has(day.id);
 
                   return (
                     <Card 
                       key={day.id} 
                       id={`day-${day.id}`}
                       className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
-                      onClick={() => onSelectDay?.(day.id)}
                     >
-                      <CardHeader className="bg-gray-50 border-b pb-4">
+                      <CardHeader 
+                        className="bg-gray-50 border-b pb-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedDays(prev => {
+                            const newSet = new Set(prev);
+                            if (newSet.has(day.id)) {
+                              newSet.delete(day.id);
+                            } else {
+                              newSet.add(day.id);
+                            }
+                            return newSet;
+                          });
+                          onSelectDay?.(day.id);
+                        }}
+                      >
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="text-xl font-bold text-slate-900">
+                            <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                               Day {day.index} – {day.title}
                             </CardTitle>
                             <CardDescription className="text-base font-medium text-slate-600 mt-1">
                               {day.theme} • {format(new Date(day.date), "EEEE, MMMM d")}
                             </CardDescription>
                           </div>
+                          <div className="flex items-center">
+                            {isExpanded ? (
+                              <ChevronUp className="h-5 w-5 text-slate-600" />
+                            ) : (
+                              <ChevronDown className="h-5 w-5 text-slate-600" />
+                            )}
+                          </div>
                         </div>
                       </CardHeader>
                       
-                      {/* Image Gallery */}
-                      {bannerImages.length > 0 && (
-                        <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
-                          {bannerImages.map((img, idx) => (
-                            <div 
-                              key={idx} 
-                              className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity"
-                              onClick={() => openLightbox(img, dayImages)}
-                            >
-                              <Image src={img} alt={`Day ${day.index} - ${idx + 1}`} fill className="object-cover" />
+                      {isExpanded && (
+                        <>
+                          {/* Image Gallery */}
+                          {bannerImages.length > 0 ? (
+                            <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
+                              {bannerImages.map((img, idx) => {
+                                const imageKey = `${day.id}-banner-${idx}`;
+                                const hasFailed = failedImages.has(imageKey);
+                                return (
+                                  <div 
+                                    key={imageKey} 
+                                    className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (!hasFailed) openLightbox(img, dayImages);
+                                    }}
+                                  >
+                                    {!hasFailed ? (
+                                      <Image 
+                                        src={img} 
+                                        alt={`Day ${day.index} - ${idx + 1}`} 
+                                        fill 
+                                        className="object-cover"
+                                        onError={() => {
+                                          setFailedImages(prev => new Set(prev).add(imageKey));
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                        <MapPin className="h-8 w-8" />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
-                          ))}
-                        </div>
-                      )}
+                          ) : (
+                            <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                              <div className="text-gray-400 flex flex-col items-center gap-2">
+                                <MapPin className="h-12 w-12" />
+                                <span className="text-sm">Photo placeholder for {day.title}</span>
+                              </div>
+                            </div>
+                          )}
 
-                      <CardContent className="p-6 space-y-6">
+                          <CardContent className="p-6 space-y-6">
                         {/* Day Overview as Bullet Points */}
                         {day.overview && (
                           <div className="prose prose-neutral max-w-none text-slate-900">
                             <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
-                              {day.overview
-                                .split(/[.!?]+/)
-                                .filter(s => s.trim().length > 10) // Filter out very short fragments
-                                .map((point, idx, arr) => {
-                                  const trimmed = point.trim();
-                                  if (!trimmed) return null;
-                                  // Add period if it doesn't end with punctuation and it's not the last item
-                                  const needsPeriod = !trimmed.match(/[.!?]$/) && idx < arr.length - 1;
-                                  return (
-                                    <li key={idx} className="font-normal">
-                                      {trimmed}{needsPeriod ? '.' : ''}
-                                    </li>
-                                  );
-                                })
-                                .filter(Boolean)}
+                              {textToBulletPoints(day.overview).map((point, idx) => (
+                                <li key={idx} className="font-normal">
+                                  {point}
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         )}
@@ -740,29 +799,34 @@ export function ItineraryTab({
                             return (
                               <div key={slotIdx} className="space-y-4">
                                 <div className="pt-4 border-t border-gray-200">
-                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                                      <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
-                                      <span className="hidden sm:inline text-base text-slate-400">•</span>
-                                      <span className="text-base text-slate-900 italic">{slot.summary}</span>
+                                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between pb-2">
+                                    <div className="flex flex-col md:w-1/4">
+                                      <span className="text-sm uppercase tracking-wide text-slate-600" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                        {slot.label}
+                                      </span>
                                     </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => {
-                                        setSelectedDayForExplore({
-                                          dayId: day.id,
-                                          slot: slotType,
-                                          areaCluster,
-                                        });
-                                        setDayExploreOpen(true);
-                                      }}
-                                      className="text-xs min-h-[44px] touch-manipulation"
-                                    >
-                                      <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
-                                      <span className="sm:hidden">Add</span>
-                                    </Button>
+                                    <div className="md:w-3/4 space-y-2">
+                                      <p className="text-sm md:text-base text-slate-800 leading-relaxed">
+                                        {slot.summary}
+                                      </p>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedDayForExplore({
+                                            dayId: day.id,
+                                            slot: slotType,
+                                            areaCluster,
+                                          });
+                                          setDayExploreOpen(true);
+                                        }}
+                                        className="text-xs min-h-[44px] touch-manipulation self-start"
+                                      >
+                                        <Plus className="h-3 w-3 mr-1" />
+                                        <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
+                                        <span className="sm:hidden">Add</span>
+                                      </Button>
+                                    </div>
                                   </div>
                                   
                                   <div className="grid gap-4">
@@ -775,8 +839,17 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {place.photos && place.photos[0] ? (
-                                            <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
+                                          {place.photos && place.photos[0] && !failedImages.has(`${place.id}-photo`) ? (
+                                            <Image 
+                                              src={place.photos[0]} 
+                                              alt={`Photo for ${place.name}`}
+                                              fill 
+                                              className="object-cover"
+                                              key={`${place.id}-photo`}
+                                              onError={() => {
+                                                setFailedImages(prev => new Set(prev).add(`${place.id}-photo`));
+                                              }}
+                                            />
                                           ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                                               <MapPin className="h-8 w-8" />
@@ -839,7 +912,9 @@ export function ItineraryTab({
                           </div>
                         </div>
 
-                      </CardContent>
+                          </CardContent>
+                        </>
+                      )}
                     </Card>
                             );
                           })}
@@ -852,7 +927,7 @@ export function ItineraryTab({
                           <>
                             {singleSegment && (
                               <div className="border-b-2 border-slate-200 pb-2 mb-8">
-                                <h3 className="text-2xl font-bold text-slate-900">
+                                <h3 className="text-2xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                                   {singleSegment.city_name}
                                 </h3>
                               </div>
@@ -864,62 +939,104 @@ export function ItineraryTab({
                     : day.slots.flatMap(s => s.places.flatMap(p => p.photos || []));
                   
                   const bannerImages = dayImages.slice(0, 4);
+                  const isExpanded = expandedDays.has(day.id);
 
                   return (
                     <Card 
                       key={day.id} 
                       id={`day-${day.id}`}
                       className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
-                      onClick={() => onSelectDay?.(day.id)}
                     >
-                      <CardHeader className="bg-gray-50 border-b pb-4">
+                      <CardHeader 
+                        className="bg-gray-50 border-b pb-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedDays(prev => {
+                            const newSet = new Set(prev);
+                            if (newSet.has(day.id)) {
+                              newSet.delete(day.id);
+                            } else {
+                              newSet.add(day.id);
+                            }
+                            return newSet;
+                          });
+                          onSelectDay?.(day.id);
+                        }}
+                      >
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="text-xl font-bold text-slate-900">
+                            <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                               Day {day.index} – {day.title}
                             </CardTitle>
                             <CardDescription className="text-base font-medium text-slate-600 mt-1">
                               {day.theme} • {format(new Date(day.date), "EEEE, MMMM d")}
                             </CardDescription>
                           </div>
+                          <div className="flex items-center">
+                            {isExpanded ? (
+                              <ChevronUp className="h-5 w-5 text-slate-600" />
+                            ) : (
+                              <ChevronDown className="h-5 w-5 text-slate-600" />
+                            )}
+                          </div>
                         </div>
                       </CardHeader>
                       
-                      {/* Image Gallery */}
-                      {bannerImages.length > 0 && (
-                        <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
-                          {bannerImages.map((img, idx) => (
-                            <div 
-                              key={idx} 
-                              className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity"
-                              onClick={() => openLightbox(img, dayImages)}
-                            >
-                              <Image src={img} alt={`Day ${day.index} - ${idx + 1}`} fill className="object-cover" />
+                      {isExpanded && (
+                        <>
+                          {/* Image Gallery */}
+                          {bannerImages.length > 0 ? (
+                            <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
+                              {bannerImages.map((img, idx) => {
+                                const imageKey = `${day.id}-banner-${idx}`;
+                                const hasFailed = failedImages.has(imageKey);
+                                return (
+                                  <div 
+                                    key={imageKey} 
+                                    className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (!hasFailed) openLightbox(img, dayImages);
+                                    }}
+                                  >
+                                    {!hasFailed ? (
+                                      <Image 
+                                        src={img} 
+                                        alt={`Day ${day.index} - ${idx + 1}`} 
+                                        fill 
+                                        className="object-cover"
+                                        onError={() => {
+                                          setFailedImages(prev => new Set(prev).add(imageKey));
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                        <MapPin className="h-8 w-8" />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
-                          ))}
-                        </div>
-                      )}
+                          ) : (
+                            <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                              <div className="text-gray-400 flex flex-col items-center gap-2">
+                                <MapPin className="h-12 w-12" />
+                                <span className="text-sm">Photo placeholder for {day.title}</span>
+                              </div>
+                            </div>
+                          )}
 
-                      <CardContent className="p-6 space-y-6">
+                          <CardContent className="p-6 space-y-6">
                         {/* Day Overview as Bullet Points */}
                         {day.overview && (
                           <div className="prose prose-neutral max-w-none text-slate-900">
                             <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
-                              {day.overview
-                                .split(/[.!?]+/)
-                                .filter(s => s.trim().length > 10) // Filter out very short fragments
-                                .map((point, idx, arr) => {
-                                  const trimmed = point.trim();
-                                  if (!trimmed) return null;
-                                  // Add period if it doesn't end with punctuation and it's not the last item
-                                  const needsPeriod = !trimmed.match(/[.!?]$/) && idx < arr.length - 1;
-                                  return (
-                                    <li key={idx} className="font-normal">
-                                      {trimmed}{needsPeriod ? '.' : ''}
-                                    </li>
-                                  );
-                                })
-                                .filter(Boolean)}
+                              {textToBulletPoints(day.overview).map((point, idx) => (
+                                <li key={idx} className="font-normal">
+                                  {point}
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         )}
@@ -934,29 +1051,34 @@ export function ItineraryTab({
                             return (
                               <div key={slotIdx} className="space-y-4">
                                 <div className="pt-4 border-t border-gray-200">
-                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                                      <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
-                                      <span className="hidden sm:inline text-base text-slate-400">•</span>
-                                      <span className="text-base text-slate-900 italic">{slot.summary}</span>
+                                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between pb-2">
+                                    <div className="flex flex-col md:w-1/4">
+                                      <span className="text-sm uppercase tracking-wide text-slate-600" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                        {slot.label}
+                                      </span>
                                     </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => {
-                                        setSelectedDayForExplore({
-                                          dayId: day.id,
-                                          slot: slotType,
-                                          areaCluster,
-                                        });
-                                        setDayExploreOpen(true);
-                                      }}
-                                      className="text-xs min-h-[44px] touch-manipulation"
-                                    >
-                                      <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
-                                      <span className="sm:hidden">Add</span>
-                                    </Button>
+                                    <div className="md:w-3/4 space-y-2">
+                                      <p className="text-sm md:text-base text-slate-800 leading-relaxed">
+                                        {slot.summary}
+                                      </p>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedDayForExplore({
+                                            dayId: day.id,
+                                            slot: slotType,
+                                            areaCluster,
+                                          });
+                                          setDayExploreOpen(true);
+                                        }}
+                                        className="text-xs min-h-[44px] touch-manipulation self-start"
+                                      >
+                                        <Plus className="h-3 w-3 mr-1" />
+                                        <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
+                                        <span className="sm:hidden">Add</span>
+                                      </Button>
+                                    </div>
                                   </div>
                                   
                                   <div className="grid gap-4">
@@ -969,8 +1091,17 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {place.photos && place.photos[0] ? (
-                                            <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
+                                          {place.photos && place.photos[0] && !failedImages.has(`${place.id}-photo`) ? (
+                                            <Image 
+                                              src={place.photos[0]} 
+                                              alt={`Photo for ${place.name}`}
+                                              fill 
+                                              className="object-cover"
+                                              key={`${place.id}-photo`}
+                                              onError={() => {
+                                                setFailedImages(prev => new Set(prev).add(`${place.id}-photo`));
+                                              }}
+                                            />
                                           ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                                               <MapPin className="h-8 w-8" />
@@ -1038,7 +1169,9 @@ export function ItineraryTab({
                           </div>
                         </div>
 
-                      </CardContent>
+                          </CardContent>
+                        </>
+                      )}
                     </Card>
                       );
                     })}
