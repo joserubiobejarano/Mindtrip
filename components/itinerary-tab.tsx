@@ -20,6 +20,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { ExploreDeck } from "@/components/explore/ExploreDeck";
 import { ExploreFilters } from "@/components/explore/ExploreFilters";
 import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
+import { isPastDay } from "@/lib/utils/date-helpers";
+import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from "@/lib/supabase/smart-itineraries";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -129,6 +131,19 @@ export function ItineraryTab({
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         console.error('[itinerary-tab] generateSmartItinerary: POST error body', body);
+        
+        // Handle regeneration limit reached error
+        if (body?.error === 'regeneration_limit_reached') {
+          addToast({
+            title: 'Too many changes today',
+            description: body.message || 'You\'ve tweaked this itinerary a lot already 😅 Take some time to enjoy your trip, and try changes again tomorrow.',
+            variant: 'destructive',
+          });
+          setStatus('error');
+          setError('Regeneration limit reached');
+          return;
+        }
+        
         throw new Error(body?.error || `Generation failed with status ${res.status}`);
       }
 
@@ -386,7 +401,7 @@ export function ItineraryTab({
 
     // API Call
     try {
-      await fetch(`/api/trips/${tripId}/smart-itinerary/place`, {
+      const response = await fetch(`/api/trips/${tripId}/smart-itinerary/place`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -395,9 +410,90 @@ export function ItineraryTab({
           ...updates
         })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        // Handle past-day locked error
+        if (errorData.error === 'past_day_locked') {
+          // Rollback optimistic update
+          setSmartItinerary(smartItinerary);
+          addToast({
+            variant: 'destructive',
+            title: 'Cannot modify past day',
+            description: errorData.message || 'You cannot modify days that are already in the past.',
+          });
+          return;
+        }
+
+        throw new Error(errorData.error || 'Failed to update');
+      }
     } catch (error) {
       console.error("Failed to sync place update", error);
+      // Rollback optimistic update
+      setSmartItinerary(smartItinerary);
       addToast({ variant: "destructive", title: "Failed to save change" });
+    }
+  };
+
+  // Handle replacing an activity with a similar one
+  const handleReplaceActivity = async (dayId: string, placeId: string) => {
+    if (!smartItinerary) return;
+
+    // Show loading state
+    addToast({
+      title: 'Finding replacement...',
+      description: 'Looking for a similar place nearby',
+      variant: 'default',
+    });
+
+    try {
+      const response = await fetch(`/api/trips/${tripId}/activities/${placeId}/replace`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        if (errorData.error === 'past_day_locked') {
+          addToast({
+            variant: 'destructive',
+            title: 'Cannot modify past day',
+            description: errorData.message || 'You cannot modify days that are already in the past.',
+          });
+          return;
+        }
+
+        if (errorData.error === 'no_replacement_found') {
+          addToast({
+            variant: 'destructive',
+            title: 'No replacement found',
+            description: errorData.message || 'We couldn\'t find a good alternative nearby. Try Explore to discover more places.',
+          });
+          return;
+        }
+
+        throw new Error(errorData.error || 'Failed to replace activity');
+      }
+
+      const result = await response.json();
+
+      // Reload itinerary to show the updated place
+      await loadOrGenerate();
+
+      addToast({
+        title: 'Activity replaced',
+        description: `Changed to ${result.activity.name}`,
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error("Failed to replace activity", error);
+      addToast({
+        variant: 'destructive',
+        title: 'Failed to replace activity',
+        description: error instanceof Error ? error.message : 'Please try again.',
+      });
     }
   };
 
@@ -793,6 +889,9 @@ export function ItineraryTab({
                           {day.slots.map((slot, slotIdx) => {
                             const slotType = slot.label.toLowerCase() as 'morning' | 'afternoon' | 'evening';
                             const areaCluster = slot.places[0]?.area || slot.places[0]?.neighborhood || day.areaCluster;
+                            const dayIsPast = isPastDay(day.date);
+                            const dayActivityCount = smartItinerary ? getDayActivityCount(smartItinerary, day.id) : 0;
+                            const dayIsAtCapacity = dayActivityCount >= MAX_ACTIVITIES_PER_DAY;
                             
                             return (
                               <div key={slotIdx} className="space-y-4">
@@ -858,9 +957,38 @@ export function ItineraryTab({
                                               <button
                                                 onClick={(e) => {
                                                   e.stopPropagation();
+                                                  if (dayIsPast || dayIsAtCapacity) return;
+                                                  handleReplaceActivity(day.id, place.id);
+                                                }}
+                                                disabled={dayIsPast || dayIsAtCapacity}
+                                                title={
+                                                  dayIsPast
+                                                    ? "This day has already passed, so you can't modify it anymore."
+                                                    : dayIsAtCapacity
+                                                    ? "This day is already at capacity."
+                                                    : undefined
+                                                }
+                                                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 ${
+                                                  dayIsPast || dayIsAtCapacity
+                                                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                                                    : "border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
+                                                }`}
+                                              >
+                                                Change
+                                              </button>
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  if (dayIsPast) return;
                                                   handleUpdatePlace(day.id, place.id, { remove: true });
                                                 }}
-                                                className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition h-7"
+                                                disabled={dayIsPast}
+                                                title={dayIsPast ? "This day has already passed, so you can't modify it anymore." : undefined}
+                                                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 ${
+                                                  dayIsPast
+                                                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                                                    : "border-red-200 text-red-700 bg-red-50 hover:bg-red-100"
+                                                }`}
                                               >
                                                 Remove
                                               </button>
@@ -885,6 +1013,7 @@ export function ItineraryTab({
                                       variant="default"
                                       size="sm"
                                       onClick={() => {
+                                        if (dayIsPast || dayIsAtCapacity) return;
                                         setSelectedDayForExplore({
                                           dayId: day.id,
                                           slot: slotType,
@@ -892,7 +1021,19 @@ export function ItineraryTab({
                                         });
                                         setDayExploreOpen(true);
                                       }}
-                                      className="text-xs min-h-[44px] touch-manipulation bg-primary hover:bg-primary/90 text-white"
+                                      disabled={dayIsPast || dayIsAtCapacity}
+                                      title={
+                                        dayIsPast
+                                          ? "This day has already passed, so you can't modify it anymore."
+                                          : dayIsAtCapacity
+                                          ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
+                                          : undefined
+                                      }
+                                      className={`text-xs min-h-[44px] touch-manipulation ${
+                                        dayIsPast || dayIsAtCapacity
+                                          ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
+                                          : "bg-primary hover:bg-primary/90 text-white"
+                                      }`}
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
@@ -1047,6 +1188,9 @@ export function ItineraryTab({
                           {day.slots.map((slot, slotIdx) => {
                             const slotType = slot.label.toLowerCase() as 'morning' | 'afternoon' | 'evening';
                             const areaCluster = slot.places[0]?.area || slot.places[0]?.neighborhood || day.areaCluster;
+                            const dayIsPast = isPastDay(day.date);
+                            const dayActivityCount = smartItinerary ? getDayActivityCount(smartItinerary, day.id) : 0;
+                            const dayIsAtCapacity = dayActivityCount >= MAX_ACTIVITIES_PER_DAY;
                             
                             return (
                               <div key={slotIdx} className="space-y-4">
@@ -1118,9 +1262,38 @@ export function ItineraryTab({
                                               <button
                                                 onClick={(e) => {
                                                   e.stopPropagation();
+                                                  if (dayIsPast || dayIsAtCapacity) return;
+                                                  handleReplaceActivity(day.id, place.id);
+                                                }}
+                                                disabled={dayIsPast || dayIsAtCapacity}
+                                                title={
+                                                  dayIsPast
+                                                    ? "This day has already passed, so you can't modify it anymore."
+                                                    : dayIsAtCapacity
+                                                    ? "This day is already at capacity."
+                                                    : undefined
+                                                }
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                                  dayIsPast || dayIsAtCapacity
+                                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                    : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                                                }`}
+                                              >
+                                                Change
+                                              </button>
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  if (dayIsPast) return;
                                                   handleUpdatePlace(day.id, place.id, { remove: true });
                                                 }}
-                                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                                                disabled={dayIsPast}
+                                                title={dayIsPast ? "This day has already passed, so you can't modify it anymore." : undefined}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                                  dayIsPast
+                                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                    : "bg-red-100 text-red-700 hover:bg-red-200"
+                                                }`}
                                               >
                                                 <X className="h-3 w-3 inline mr-1" />
                                                 Remove
@@ -1144,6 +1317,7 @@ export function ItineraryTab({
                                       variant="default"
                                       size="sm"
                                       onClick={() => {
+                                        if (dayIsPast || dayIsAtCapacity) return;
                                         setSelectedDayForExplore({
                                           dayId: day.id,
                                           slot: slotType,
@@ -1151,7 +1325,19 @@ export function ItineraryTab({
                                         });
                                         setDayExploreOpen(true);
                                       }}
-                                      className="text-xs min-h-[44px] touch-manipulation bg-primary hover:bg-primary/90 text-white"
+                                      disabled={dayIsPast || dayIsAtCapacity}
+                                      title={
+                                        dayIsPast
+                                          ? "This day has already passed, so you can't modify it anymore."
+                                          : dayIsAtCapacity
+                                          ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
+                                          : undefined
+                                      }
+                                      className={`text-xs min-h-[44px] touch-manipulation ${
+                                        dayIsPast || dayIsAtCapacity
+                                          ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
+                                          : "bg-primary hover:bg-primary/90 text-white"
+                                      }`}
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
@@ -1303,7 +1489,7 @@ export function ItineraryTab({
       <Sheet open={dayExploreOpen} onOpenChange={setDayExploreOpen}>
         <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col overflow-hidden">
           <SheetHeader className="p-4 border-b flex-shrink-0">
-            <SheetTitle>
+            <SheetTitle className="text-xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
               {selectedDayForExplore?.slot 
                 ? `Add activities to ${selectedDayForExplore.slot}`
                 : 'Add activities to this day'}

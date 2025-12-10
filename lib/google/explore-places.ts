@@ -258,6 +258,13 @@ export async function getPlacesToExplore(
   // Limit to top 50 places
   places = places.slice(0, 50);
 
+  // Shuffle results to prevent same place appearing first every time
+  // Fisher-Yates shuffle algorithm
+  for (let i = places.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [places[i], places[j]] = [places[j], places[i]];
+  }
+
   // Transform to ExplorePlace format
   const explorePlaces: ExplorePlace[] = await Promise.all(
     places.map(async (place) => {

@@ -1,568 +1,61 @@
-import { createClient } from "@/lib/supabase/server";
-import type { AiItinerary, ActivitySuggestion } from "@/app/api/ai-itinerary/route";
-import { getOpenAIClient } from "@/lib/openai";
-import { findPlacePhoto } from "@/lib/google/places-server";
+import { createClient } from '@/lib/supabase/server';
+import type { SmartItinerary } from '@/types/itinerary';
 
 /**
- * Get the smart itinerary for a trip (optionally scoped to a segment)
+ * Maximum number of activities allowed per day (across all slots)
  */
-export async function getSmartItinerary(
-  tripId: string,
-  tripSegmentId?: string | null
-): Promise<{ data: AiItinerary | null; error: Error | null }> {
-  try {
-    const supabase = await createClient();
-    let query = supabase
-      .from("smart_itineraries")
-      .select("content")
-      .eq("trip_id", tripId);
+export const MAX_ACTIVITIES_PER_DAY = 12;
 
-    if (tripSegmentId) {
-      query = query.eq("trip_segment_id", tripSegmentId);
-    } else {
-      // For trip-level, get itinerary without segment (legacy single-city trips)
-      query = query.is("trip_segment_id", null);
-    }
-
-    const { data, error } = await query.maybeSingle();
-
-    if (error) {
-      return { data: null, error: error as Error };
-    }
-
-    return { data: data?.content as AiItinerary | null, error: null };
-  } catch (err) {
-    return {
-      data: null,
-      error: err instanceof Error ? err : new Error("Unknown error"),
-    };
+/**
+ * Count the total number of activities (places) in a day across all slots
+ */
+export function getDayActivityCount(itinerary: SmartItinerary, dayId: string): number {
+  const day = itinerary.days?.find(d => d.id === dayId);
+  if (!day || !day.slots) {
+    return 0;
   }
+
+  // Count all places across all slots
+  return day.slots.reduce((count, slot) => {
+    return count + (slot.places?.length || 0);
+  }, 0);
 }
 
 /**
- * Upsert (insert or update) the smart itinerary for a trip
+ * Find an available slot in a day with the fewest activities
+ * Prefers slots in order: morning → afternoon → evening
  */
-export async function upsertSmartItinerary(
-  tripId: string,
-  content: AiItinerary,
-  tripSegmentId?: string | null
-): Promise<{ error: Error | null }> {
-  try {
-    const supabase = await createClient();
-    const upsertData: any = {
-      trip_id: tripId,
-      content: content as any,
-      updated_at: new Date().toISOString(),
-    };
-
-    if (tripSegmentId) {
-      upsertData.trip_segment_id = tripSegmentId;
-    }
-
-    // Determine conflict key based on whether segment_id is provided
-    const conflictKey = tripSegmentId ? "trip_id,trip_segment_id" : "trip_id";
-
-    const { error } = await supabase
-      .from("smart_itineraries")
-      .upsert(upsertData, {
-        onConflict: conflictKey,
-      });
-
-    if (error) {
-      return { error: error as Error };
-    }
-
-    return { error: null };
-  } catch (err) {
-    return {
-      error: err instanceof Error ? err : new Error("Unknown error"),
-    };
-  }
-}
-
-/**
- * Get a human-readable "good for" label based on place types
- */
-function getGoodForLabel(types: string[] | null | undefined): string | null {
-  if (!types || types.length === 0) return null;
-
-  const t = types;
-
-  if (t.includes("park") || t.includes("tourist_attraction")) {
-    return "Ideal if you like parks and nature";
-  }
-  if (t.includes("museum") || t.includes("art_gallery")) {
-    return "Ideal if you enjoy art and museums";
-  }
-  if (t.includes("restaurant") || t.includes("cafe")) {
-    return "Great if you love food spots";
-  }
-  if (t.includes("bar") || t.includes("night_club")) {
-    return "Nice if you like nightlife";
-  }
-  if (t.includes("shopping_mall") || t.includes("store")) {
-    return "Perfect if you like shopping";
+export function findAvailableSlot(day: SmartItinerary['days'][0]): 'morning' | 'afternoon' | 'evening' | null {
+  if (!day.slots || day.slots.length === 0) {
+    return null;
   }
 
-  return null;
-}
-
-/**
- * Match a suggestion string to a saved place by name (case-insensitive)
- */
-function matchSuggestionToSavedPlace(
-  suggestion: string,
-  savedPlaces: Array<{ name: string; photo_url: string | null; types: string[] | null }>
-): { photoUrl: string | null; goodFor: string | null } | null {
-  if (!savedPlaces || savedPlaces.length === 0) return null;
-
-  const suggestionLower = suggestion.toLowerCase().trim();
-  
-  // Try to find a match by name (case-insensitive)
-  const matchedPlace = savedPlaces.find(place => {
-    const placeNameLower = place.name.toLowerCase().trim();
-    // Check if suggestion contains the place name or vice versa
-    return suggestionLower.includes(placeNameLower) || placeNameLower.includes(suggestionLower);
+  // Sort slots by preference: morning, afternoon, evening
+  const slotOrder: Array<'morning' | 'afternoon' | 'evening'> = ['morning', 'afternoon', 'evening'];
+  const sortedSlots = [...day.slots].sort((a, b) => {
+    const aIndex = slotOrder.indexOf(a.label.toLowerCase() as 'morning' | 'afternoon' | 'evening');
+    const bIndex = slotOrder.indexOf(b.label.toLowerCase() as 'morning' | 'afternoon' | 'evening');
+    // Handle unknown slots (put them at the end)
+    if (aIndex === -1 && bIndex === -1) return 0;
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
   });
 
-  if (!matchedPlace) return null;
+  // Find the slot with the fewest activities
+  let minCount = Infinity;
+  let selectedSlot: 'morning' | 'afternoon' | 'evening' | null = null;
 
-  return {
-    photoUrl: matchedPlace.photo_url,
-    goodFor: getGoodForLabel(matchedPlace.types),
-  };
-}
-
-/**
- * Generate a smart itinerary using OpenAI
- */
-export async function generateSmartItineraryWithOpenAI(
-  tripId: string,
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  tripSegmentId?: string | null
-): Promise<AiItinerary> {
-  // Load trip data
-  const { data: trip, error: tripError } = await supabase
-    .from('trips')
-    .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country')
-    .eq('id', tripId)
-    .single();
-
-  if (tripError || !trip) {
-    throw new Error('Trip not found');
-  }
-
-  // Load segment data if trip_segment_id provided
-  let segment = null;
-  if (tripSegmentId) {
-    const { data: segmentData } = await supabase
-      .from('trip_segments')
-      .select('*')
-      .eq('id', tripSegmentId)
-      .eq('trip_id', tripId)
-      .single();
-    segment = segmentData;
-  }
-
-  // Load days for the trip (filtered by segment if provided)
-  let daysQuery = supabase
-    .from('days')
-    .select('id, date, day_number')
-    .eq('trip_id', tripId);
-  
-  if (tripSegmentId) {
-    daysQuery = daysQuery.eq('trip_segment_id', tripSegmentId);
-  } else {
-    // For trip-level, get days without segment (legacy single-city trips)
-    daysQuery = daysQuery.is('trip_segment_id', null);
-  }
-  
-  const { data: days, error: daysError } = await daysQuery.order('date', { ascending: true });
-
-  if (daysError) {
-    throw new Error('Failed to load trip days');
-  }
-
-  // Load saved places for the trip (from saved_places table)
-  const { data: savedPlaces, error: placesError } = await supabase
-    .from('saved_places')
-    .select('name, address, lat, lng, types, photo_url')
-    .eq('trip_id', tripId)
-    .order('created_at', { ascending: false })
-    .limit(20); // Limit to avoid too much context
-
-  if (placesError) {
-    console.error('Error loading saved places:', placesError);
-    // Don't fail if places can't be loaded, just continue without them
-  }
-
-  // Build the prompt (use segment data if available)
-  const destination = segment?.city_name || trip.destination_name || trip.title;
-  const country = trip.destination_country || "";
-  const startDate = segment ? new Date(segment.start_date) : new Date(trip.start_date);
-  const endDate = segment ? new Date(segment.end_date) : new Date(trip.end_date);
-  
-  // Format saved places for the prompt
-  let savedPlacesText = '';
-  if (savedPlaces && savedPlaces.length > 0) {
-    const placesList = savedPlaces.map(p => {
-      const typesStr = p.types && p.types.length > 0 ? ` (${p.types.slice(0, 2).join(', ')})` : '';
-      return `- ${p.name}${p.address ? ` - ${p.address}` : ''}${typesStr}`;
-    }).join('\n');
-    savedPlacesText = `\n\nSaved places of interest (prioritize including these in the itinerary):\n${placesList}`;
-  }
-
-  const daysInfo = (days || []).map(day => {
-    const date = new Date(day.date);
-    return {
-      date: date.toISOString().split('T')[0],
-      dayNumber: day.day_number,
-      dayOfWeek: date.toLocaleDateString('en-US', { weekday: 'long' }),
-      month: date.toLocaleDateString('en-US', { month: 'long' }),
-      day: date.getDate(),
-      year: date.getFullYear(),
-    };
-  });
-
-  const systemPrompt = `You are Kruno, an expert travel planner.
-
-Goal:
-- Generate a rich, story-like itinerary stored as JSON.
-- The frontend will show a big intro paragraph for the whole trip,
-  then per-day sections with Morning / Afternoon / Evening blocks,
-  each block containing 2–4 activities.
-
-Style:
-- Use warm, descriptive but concise language.
-- For the trip intro and each time-of-day description, write
-  3–6 full sentences (not just one short line).
-- Give concrete details: what the traveler sees, feels, eats, and does.
-- Mention practical hints when useful (e.g. "arrive a bit earlier to avoid queues",
-  "perfect place for photos", "great spot to warm up in winter").
-
-JSON structure:
-{
-  "title": string,
-  "summary": string, // 4–7 sentences about the overall trip
-  "days": [
-    {
-      "date": "YYYY-MM-DD",
-      "title": string,
-      "subtitle": string,
-      "sections": [
-        {
-          "timeOfDay": "Morning" | "Afternoon" | "Evening",
-          "description": string, // 3–6 sentences
-          "activities": [
-            {
-              "name": string,
-              "description": string, // 2–4 sentences
-              "placeId": string | null,
-              "photoUrl": string | null
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-
-- Always return valid JSON only, no markdown or explanations.`;
-
-  const prompt = `You are an expert travel planner. Create a detailed, story-like itinerary in JSON format.
-
-Trip Details:
-- Destination: ${destination}
-- Trip dates: ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} to ${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-- Number of days: ${days?.length || 0}${savedPlacesText}
-
-Days to plan:
-${daysInfo.map(d => `- Day ${d.dayNumber}: ${d.dayOfWeek}, ${d.month} ${d.day}, ${d.year} (${d.date})`).join('\n')}
-
-Requirements:
-- 1 entry per day of the trip.
-- Each day has:
-    - "title": short name for the day.
-    - "date": ISO date string (YYYY-MM-DD).
-    - "theme": short label like "Cultural Immersion" or "Food & Markets".
-    - "summary": 4-7 sentences describing the day in depth (tone: friendly, vivid, like a travel blog). Be descriptive and paint a picture of the experience.
-    - "heroImages": 4-6 photo search terms for that day (for a horizontal gallery), e.g. ["Madrid Royal Palace", "Retiro Park Madrid", "Tapas bar Madrid"].
-    - "sections": morning / afternoon / evening. Each section has:
-         - "label": "Morning", "Afternoon", or "Evening"
-         - "description": 3-6 sentences describing what to do during this part of the day. Be detailed and evocative - describe the atmosphere, what travelers will see, feel, and experience. Include practical tips like arrival times, what to bring, or seasonal considerations.
-         - "activities": array of activities. Each activity has:
-              - "name": activity name
-              - "description": 2-4 sentences with practical info (opening hours, tips, what to expect, what makes it special). Be specific and helpful.
-              - "placeId": null (always null for now)
-              - "alreadyVisited": false (always false for now)
-- Take into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
-- Use the destination city "${destination}" to anchor recommendations
-- Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing
-- Avoid booking links or specific booking recommendations - just give ideas and context
-- Provide realistic timing and themes for each day
-- Include seasonal considerations (weather, local events, etc.)
-- Make the text rich, descriptive, and engaging - like a travel blog post
-- Write longer, more detailed descriptions for the trip summary, day summaries, and section descriptions (aim for 3-6 sentences each, not just 1-2)
-
-Return ONLY valid JSON with this exact structure:
-{
-  "tripTitle": "A descriptive title for this trip",
-  "summary": "A 4-7 sentence overview of the trip - be descriptive and paint a vivid picture",
-  "days": [
-    {
-      "date": "YYYY-MM-DD",
-      "title": "Day title (e.g., 'Arrival and City Exploration')",
-      "theme": "Theme for the day (e.g., 'Cultural Immersion', 'Nature & Relaxation')",
-      "summary": "4-7 sentences describing the day in depth, friendly and vivid tone - be descriptive",
-      "heroImages": ["Photo search term 1", "Photo search term 2", "Photo search term 3", "Photo search term 4"],
-      "sections": [
-        {
-          "label": "Morning",
-          "description": "3-6 sentences describing what to do during this part of the day - be detailed and evocative",
-          "activities": [
-            {
-              "name": "Activity name",
-              "description": "2-4 sentences with practical info - be specific and helpful",
-              "placeId": null,
-              "alreadyVisited": false
-            }
-          ],
-          "seasonalNotes": "Optional note about seasonal considerations"
-        }
-      ]
-    }
-  ]
-}
-
-Make sure each day has sections for Morning, Afternoon, and Evening with 4-6 activities total per day. Be creative but realistic.`;
-
-  // Call OpenAI
-  const openai = getOpenAIClient();
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [
-      {
-        role: 'system',
-        content: systemPrompt,
-      },
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ],
-    temperature: 0.7,
-    response_format: { type: 'json_object' },
-  });
-
-  const responseContent = completion.choices[0]?.message?.content;
-  if (!responseContent) {
-    throw new Error('No response from OpenAI');
-  }
-
-  // Parse the JSON response
-  type RawActivity = {
-    name: string;
-    description: string;
-    placeId: string | null;
-    alreadyVisited: boolean;
-  };
-
-  type RawAiItinerary = {
-    tripTitle: string;
-    summary: string;
-    days: {
-      date: string;
-      title: string;
-      theme: string;
-      summary: string;
-      heroImages: string[];
-      sections: {
-        label: string;
-        description: string;
-        activities: RawActivity[];
-        seasonalNotes?: string;
-      }[];
-    }[];
-  };
-
-  let parsedResponse: RawAiItinerary;
-  try {
-    const parsed = JSON.parse(responseContent);
-    // Handle case where response might be wrapped in an object
-    parsedResponse = parsed.itinerary || parsed;
-  } catch (parseError) {
-    console.error('Error parsing OpenAI response:', parseError);
-    console.error('Response content:', responseContent);
-    throw new Error('Failed to parse OpenAI response as JSON');
-  }
-
-  // Validate structure
-  if (!parsedResponse.tripTitle || !parsedResponse.summary || !Array.isArray(parsedResponse.days)) {
-    throw new Error('Invalid itinerary structure from OpenAI');
-  }
-
-  // Process itinerary: Fetch photos and prepare activities for insertion
-  const activitiesToInsert: any[] = [];
-  let globalOrderCounter = 0;
-  
-  const enrichedDays = await Promise.all(parsedResponse.days.map(async (day, index) => {
-    // Find matching DB day
-    const dbDay = days?.find(d => d.date === day.date) || days?.[index];
-    
-    // Fetch photos for hero images
-    const heroPhotoUrls = await Promise.all(
-      (day.heroImages || []).slice(0, 6).map(async (searchTerm) => {
-        const query = `${searchTerm} in ${destination}${country ? `, ${country}` : ''}`;
-        return await findPlacePhoto(query);
-      })
-    );
-
-    const enrichedSections = await Promise.all(day.sections.map(async (section) => {
-      const partOfDay = section.label as "Morning" | "Afternoon" | "Evening";
-      
-      const enrichedActivities = await Promise.all(section.activities.map(async (activity, aIndex) => {
-        // Try to match with saved place first
-        let match = matchSuggestionToSavedPlace(activity.name, savedPlaces || []);
-        let photoUrl = match?.photoUrl;
-        
-        // If no photo from saved place, try Google Places
-        if (!photoUrl) {
-           const query = `${activity.name} in ${destination}${country ? `, ${country}` : ''}`;
-           photoUrl = await findPlacePhoto(query);
-        }
-
-        // Prepare activity record
-        if (dbDay) {
-          let startTime = "09:00";
-          let endTime = "12:00";
-          
-          if (partOfDay === "Afternoon") {
-            startTime = "13:00";
-            endTime = "17:00";
-          } else if (partOfDay === "Evening") {
-            startTime = "18:00";
-            endTime = "21:00";
-          }
-
-          activitiesToInsert.push({
-            trip_id: tripId,
-            day_id: dbDay.id,
-            title: activity.name,
-            start_time: startTime,
-            end_time: endTime,
-            photo_url: photoUrl,
-            order_number: globalOrderCounter++,
-          });
-        }
-
-        return {
-          title: activity.name,
-          description: activity.description,
-          photoUrl: photoUrl,
-          goodFor: match?.goodFor,
-          placeId: activity.placeId,
-          alreadyVisited: activity.alreadyVisited || false,
-        } as ActivitySuggestion;
-      }));
-
-      return {
-        partOfDay: partOfDay,
-        label: section.label,
-        description: section.description,
-        activities: enrichedActivities,
-        seasonalNotes: section.seasonalNotes,
-      };
-    }));
-
-    return {
-      ...day,
-      heroImages: heroPhotoUrls.filter(url => url !== null) as string[],
-      sections: enrichedSections,
-    };
-  }));
-
-  const enrichedItinerary: AiItinerary = {
-    ...parsedResponse,
-    days: enrichedDays,
-  };
-
-  // Insert activities into DB (only if no activities exist)
-  if (activitiesToInsert.length > 0) {
-    const { error: insertError } = await supabase
-      .from('activities')
-      .insert(activitiesToInsert);
-    
-    if (insertError) {
-      console.error("Error inserting generated activities:", insertError);
-      // Don't throw - we still want to return the itinerary
+  for (const slot of sortedSlots) {
+    const count = slot.places?.length || 0;
+    if (count < minCount) {
+      minCount = count;
+      const slotLabel = slot.label.toLowerCase() as 'morning' | 'afternoon' | 'evening';
+      if (slotOrder.includes(slotLabel)) {
+        selectedSlot = slotLabel;
+      }
     }
   }
 
-  return enrichedItinerary;
+  return selectedSlot;
 }
-
-/**
- * Get or create a smart itinerary for a trip (optionally scoped to a segment)
- * Returns existing itinerary if found, otherwise generates a new one
- */
-export async function getOrCreateSmartItinerary(
-  tripId: string,
-  options?: { forceRegenerate?: boolean; tripSegmentId?: string | null }
-): Promise<{ itinerary: AiItinerary; fromCache: boolean }> {
-  const supabase = await createClient();
-  const forceRegenerate = options?.forceRegenerate ?? false;
-  const tripSegmentId = options?.tripSegmentId;
-
-  // 1) If not forcing regenerate, try to fetch existing itinerary
-  if (!forceRegenerate) {
-    let query = supabase
-      .from("smart_itineraries")
-      .select("id, content")
-      .eq("trip_id", tripId);
-
-    if (tripSegmentId) {
-      query = query.eq("trip_segment_id", tripSegmentId);
-    } else {
-      query = query.is("trip_segment_id", null);
-    }
-
-    const { data: existing, error: existingError } = await query.maybeSingle();
-
-    // if we got something, just return it
-    if (existing && !existingError) {
-      return { itinerary: existing.content as AiItinerary, fromCache: true };
-    }
-  }
-
-  // 2) No itinerary yet or forceRegenerate === true -> generate a new one with OpenAI
-  const itineraryJson = await generateSmartItineraryWithOpenAI(tripId, supabase, tripSegmentId);
-
-  // 3) Upsert into smart_itineraries
-  const upsertData: any = {
-    trip_id: tripId,
-    content: itineraryJson as any,
-    updated_at: new Date().toISOString(),
-  };
-
-  if (tripSegmentId) {
-    upsertData.trip_segment_id = tripSegmentId;
-  }
-
-  const conflictKey = tripSegmentId ? "trip_id,trip_segment_id" : "trip_id";
-
-  const { data: upserted, error: upsertError } = await supabase
-    .from("smart_itineraries")
-    .upsert(upsertData, {
-      onConflict: conflictKey,
-    })
-    .select("content")
-    .single();
-
-  if (upsertError) {
-    console.error("Error saving smart itinerary", upsertError);
-    throw upsertError;
-  }
-
-  return { itinerary: upserted.content as AiItinerary, fromCache: false };
-}
-

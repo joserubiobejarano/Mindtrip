@@ -351,6 +351,32 @@ export interface Database {
           created_at?: string
         }
       }
+      trip_regeneration_stats: {
+        Row: {
+          id: string
+          trip_id: string
+          date: string
+          count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          trip_id: string
+          date: string
+          count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          trip_id?: string
+          date?: string
+          count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

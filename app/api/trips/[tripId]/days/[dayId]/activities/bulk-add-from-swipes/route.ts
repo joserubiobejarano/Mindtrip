@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getPlaceDetails } from '@/lib/google/places-server';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import type { SmartItinerary } from '@/types/itinerary';
+import { isPastDay } from '@/lib/utils/date-helpers';
+import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from '@/lib/supabase/smart-itineraries';
 
 export async function POST(
   req: NextRequest,
@@ -67,6 +69,32 @@ export async function POST(
     const day = itinerary.days?.find(d => d.id === dayId);
     if (!day) {
       return NextResponse.json({ error: 'Day not found in itinerary' }, { status: 404 });
+    }
+
+    // Check if day is in the past (past-day lock)
+    if (isPastDay(day.date)) {
+      return NextResponse.json(
+        {
+          error: 'past_day_locked',
+          message: 'You cannot modify days that are already in the past.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check activity limit before adding
+    const currentActivityCount = getDayActivityCount(itinerary, dayId);
+    const placesToAdd = place_ids.filter(id => !targetSlot.places.some(p => p.id === id)).length;
+    
+    if (currentActivityCount + placesToAdd > MAX_ACTIVITIES_PER_DAY) {
+      return NextResponse.json(
+        {
+          error: 'day_activity_limit',
+          maxActivitiesPerDay: MAX_ACTIVITIES_PER_DAY,
+          message: 'We recommend planning no more than 12 activities per day so you have time to enjoy each place.',
+        },
+        { status: 400 }
+      );
     }
 
     // Find the slot

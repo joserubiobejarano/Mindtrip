@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { SmartItinerary } from '@/types/itinerary';
+import { isPastDay } from '@/lib/utils/date-helpers';
 
 export async function PATCH(
   request: NextRequest,
@@ -34,7 +35,22 @@ export async function PATCH(
 
     // 2. Find and update place in slots
     const day = itinerary.days.find(d => d.id === dayId);
-    if (day && day.slots) {
+    if (!day) {
+      return NextResponse.json({ error: 'Day not found' }, { status: 404 });
+    }
+
+    // Check past-day lock: Only block remove operations, allow marking visited
+    if (remove && isPastDay(day.date)) {
+      return NextResponse.json(
+        {
+          error: 'past_day_locked',
+          message: 'You cannot modify days that are already in the past.',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (day.slots) {
       for (const slot of day.slots) {
         if (remove) {
            const initialLen = slot.places.length;

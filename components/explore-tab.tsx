@@ -82,26 +82,36 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     setIsAddingToItinerary(true);
 
     try {
-      // Call itinerary regeneration API with liked places
-      const response = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
+      // Call distribution endpoint instead of regeneration
+      const response = await fetch(`/api/trips/${tripId}/activities/distribute-liked-places`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          must_include_place_ids: session.likedPlaces,
-          preserve_structure: true, // Preserve existing day structure when regenerating
+          likedPlaceIds: session.likedPlaces,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to regenerate itinerary');
+        throw new Error(error.error || 'Failed to add places to itinerary');
       }
 
-      addToast({
-        title: 'Success!',
-        description: `Added ${session.likedPlaces.length} place${session.likedPlaces.length !== 1 ? 's' : ''} to your itinerary`,
-        variant: 'success',
-      });
+      const result = await response.json();
+
+      // Show appropriate toast based on distribution result
+      if (result.addedToLastDayOnly) {
+        addToast({
+          title: 'Places added',
+          description: `We added ${result.distributed} place${result.distributed !== 1 ? 's' : ''} to your last day. Consider removing some activities if it feels too packed.`,
+          variant: 'default',
+        });
+      } else {
+        addToast({
+          title: 'Success!',
+          description: `Added ${result.distributed} place${result.distributed !== 1 ? 's' : ''} to your itinerary`,
+          variant: 'success',
+        });
+      }
 
       // Navigate to itinerary tab
       router.push(`/trips/${tripId}?tab=itinerary`);

@@ -282,6 +282,26 @@ export function ExploreDeck({
 
       if (!response.ok) {
         const error = await response.json();
+        
+        // Handle specific error types
+        if (error.error === 'day_activity_limit') {
+          addToast({
+            title: 'Day is full',
+            description: error.message || 'We recommend planning no more than 12 activities per day so you have time to enjoy each place.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (error.error === 'past_day_locked') {
+          addToast({
+            title: 'Cannot modify past day',
+            description: error.message || 'You cannot modify days that are already in the past.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
         throw new Error(error.error || 'Failed to add places to day');
       }
 
@@ -302,6 +322,11 @@ export function ExploreDeck({
       }
     } catch (error: any) {
       console.error('Error adding places to day:', error);
+      addToast({
+        title: 'Error',
+        description: error.message || 'Failed to add places to day. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 

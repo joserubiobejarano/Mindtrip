@@ -8,6 +8,7 @@ import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integr
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
+import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 
 export const maxDuration = 300;
 
@@ -122,6 +123,41 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     const supabase = await createClient();
     const { userId } = await auth();
 
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check regeneration limits before proceeding
+    const today = new Date();
+    const todayDateString = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Get current regeneration count for today
+    const { data: statsData } = await supabase
+      .from('trip_regeneration_stats')
+      .select('count')
+      .eq('trip_id', tripId)
+      .eq('date', todayDateString)
+      .maybeSingle();
+    
+    const currentCount = statsData?.count || 0;
+    
+    // Check user subscription status to determine limit
+    const { isPro } = await getUserSubscriptionStatus(userId);
+    const maxRegenerationsPerDay = isPro ? 5 : 2;
+    
+    // Enforce limit
+    if (currentCount >= maxRegenerationsPerDay) {
+      return NextResponse.json(
+        {
+          error: 'regeneration_limit_reached',
+          maxPerDay: maxRegenerationsPerDay,
+          isPro,
+          message: 'You\'ve changed this itinerary many times already today. Take a break and enjoy your trip, then try more changes tomorrow.',
+        },
+        { status: 429 }
+      );
+    }
+
     // Parse request body for regeneration parameters
     let mustIncludePlaceIds: string[] = [];
     let alreadyPlannedPlaceIds: string[] = [];
@@ -235,6 +271,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
          - Split each day into three slots: "morning", "afternoon", "evening".
          - For each slot, pick 2–4 places (aim for approximately 3 morning, 3 afternoon, 2 evening).
          - Aim for approximately 8 total places per day (can be 7-9 depending on the day).
+         - MAXIMUM: Never exceed 12 places per day (across all slots). This is a hard limit.
          - CRITICAL: Ensure places within the same time slot are geographically close (same neighborhood/area, within walking distance) to minimize backtracking and maximize time efficiency. Group places by proximity.
          - If a place is exceptional for both day and night experiences (e.g., a plaza that's beautiful during the day and has great lighting at night), you may recommend it twice - once for day and once for evening.
          - Use the "areaCluster" field for the day's main area/neighborhood.`;
@@ -545,6 +582,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 } else {
                   console.log('[smart-itinerary] saved itinerary row for trip', tripId);
                   
+                  // Increment regeneration counter (only after successful save)
+                  await supabase
+                    .from('trip_regeneration_stats')
+                    .upsert(
+                      {
+                        trip_id: tripId,
+                        date: todayDateString,
+                        count: currentCount + 1,
+                      },
+                      { onConflict: 'trip_id,date' }
+                    );
+                  
                   // Clear liked places after successful regeneration
                   if (mustIncludePlaceIds.length > 0 && userId) {
                     try {
@@ -625,6 +674,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 );
               
               if (!saveError) {
+                // Increment regeneration counter (only after successful save)
+                await supabase
+                  .from('trip_regeneration_stats')
+                  .upsert(
+                    {
+                      trip_id: tripId,
+                      date: todayDateString,
+                      count: currentCount + 1,
+                    },
+                    { onConflict: 'trip_id,date' }
+                  );
+                
                 sendSSE(controller, 'complete', validatedItinerary);
               } else {
                 sendSSE(controller, 'error', { message: 'Failed to save itinerary' });
