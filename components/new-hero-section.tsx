@@ -162,11 +162,6 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       const result = await response.json();
 
       if (!result.success) {
-        // If parsing failed but has travel keywords, route to advisor
-        if (hasTravelKeywords) {
-          router.push(`/advisor?q=${encodeURIComponent(message)}`);
-          return;
-        }
         setIntentError(result.error || "Could not understand your request. Please try again.");
         setParsingIntent(false);
         return;
@@ -174,14 +169,12 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
       const { data } = result;
 
-      // Classify intent
+      // Try to fill form fields with parsed data
       const hasDestination = !!data.destination;
       const hasDates = !!(data.startDate && data.endDate);
-      const wordCount = message.split(" ").length;
 
-      // direct_itinerary: destination + dates, short message
-      if (hasDestination && hasDates && wordCount <= 15) {
-        // Auto-fill destination
+      // Auto-fill destination if available
+      if (hasDestination) {
         const foundDestination = await searchDestinationByName(data.destination);
         if (foundDestination) {
           setDestination(foundDestination);
@@ -190,35 +183,13 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
           setParsingIntent(false);
           return;
         }
-
-        // Auto-fill dates
-        if (data.startDate) {
-          setStartDate(data.startDate);
-        }
-        if (data.endDate) {
-          setEndDate(data.endDate);
-        }
-
-        // Note: travelers will be collected in personalization dialog
+      } else {
+        setIntentError("Could not extract a destination from your message. Please try again or select a destination manually.");
         setParsingIntent(false);
         return;
       }
 
-      // exploratory_travel: destination but no dates, or longer message, or open-ended
-      if (hasDestination || hasTravelKeywords || wordCount > 12) {
-        router.push(`/advisor?q=${encodeURIComponent(message)}`);
-        return;
-      }
-
-      // Fallback: if we have destination but parsing failed, try to use it
-      if (hasDestination) {
-        const foundDestination = await searchDestinationByName(data.destination);
-        if (foundDestination) {
-          setDestination(foundDestination);
-        }
-      }
-
-      // If we have dates, use them
+      // Auto-fill dates if available
       if (data.startDate) {
         setStartDate(data.startDate);
       }
@@ -226,18 +197,13 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
         setEndDate(data.endDate);
       }
 
+      // If we have destination but no dates, still allow user to proceed
+      // They can fill dates manually or we'll prompt in the personalization dialog
       setParsingIntent(false);
     } catch (error) {
       console.error("Error parsing travel intent:", error);
-      // On error, if it looks like travel, route to advisor
-      const travelKeywords = ["travel", "trip", "vacation", "visit", "go", "destination"];
-      const messageLower = message.toLowerCase();
-      if (travelKeywords.some((keyword) => messageLower.includes(keyword))) {
-        router.push(`/advisor?q=${encodeURIComponent(message)}`);
-      } else {
-        setIntentError("Failed to process your request. Please try again.");
-        setParsingIntent(false);
-      }
+      setIntentError("Failed to process your request. Please try again.");
+      setParsingIntent(false);
     }
   };
 

@@ -1,3 +1,4 @@
+-- NOTE: advisor_messages table has been dropped; this migration is legacy and should not be reapplied in new environments.
 -- Create advisor_messages table for Travel Advisor chat history
 -- This table stores chat messages between users and the advisor (pre-trip planning)
 CREATE TABLE IF NOT EXISTS advisor_messages (
