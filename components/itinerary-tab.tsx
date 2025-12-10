@@ -294,7 +294,7 @@ export function ItineraryTab({
       setError('Failed to generate itinerary. Please try again.');
       setStatus('error');
     }
-  }, [tripId]);
+  }, [tripId, addToast]);
 
   const loadOrGenerate = useCallback(async () => {
     if (!tripId) {
