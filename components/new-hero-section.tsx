@@ -408,17 +408,15 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
         </div>
 
         {/* Personalization Dialog */}
-        {destination && startDate && endDate && (
-          <TripPersonalizationDialog
-            isOpen={personalizationOpen}
-            onClose={() => setPersonalizationOpen(false)}
-            onComplete={handlePersonalizationComplete}
-            destinationPlaceId={destination.id}
-            destinationName={destination.placeName}
-            startDate={startDate}
-            endDate={endDate}
-          />
-        )}
+        <TripPersonalizationDialog
+          isOpen={personalizationOpen}
+          onClose={() => setPersonalizationOpen(false)}
+          onComplete={handlePersonalizationComplete}
+          destinationPlaceId={destination?.id || ""}
+          destinationName={destination?.placeName || ""}
+          startDate={startDate || ""}
+          endDate={endDate || ""}
+        />
 
         {/* Testimonial - positioned below search box */}
         <div className="mt-20 bg-card shadow-lg rounded-lg p-3 transform -rotate-6 animate-float hidden md:block mx-auto w-fit">

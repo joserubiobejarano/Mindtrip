@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { DestinationAutocomplete } from "@/components/destination-autocomplete";
-import { X, Lock, Check, Sparkles } from "lucide-react";
+import { DateRangePicker } from "@/components/date-range-picker";
+import { X, Lock, Check, Sparkles, Calendar, MapPin } from "lucide-react";
 import { DialogDescription } from "@/components/ui/dialog";
 
 interface NewTripDialogProps {
@@ -236,12 +237,14 @@ export function NewTripDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden flex flex-col">
-        <DialogHeader className="bg-gradient-to-r from-sky-50 to-emerald-50 px-6 py-5 border-b flex-shrink-0">
-          <DialogTitle className="text-2xl font-bold text-gray-900">
+      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden flex flex-col relative">
+        {/* Blue top border matching search box */}
+        <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl"></div>
+        <DialogHeader className="pt-[60px] px-6 py-5 flex-shrink-0">
+          <DialogTitle className="text-2xl font-bold text-foreground">
             Create New Trip
           </DialogTitle>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Plan a single or multi-city trip. Add multiple cities with Pro.
           </p>
         </DialogHeader>
@@ -249,21 +252,31 @@ export function NewTripDialog({
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="px-6 py-6 space-y-4 overflow-y-auto flex-1">
             {/* Always show multi-city UI structure */}
-            <div className="space-y-2">
-              <Label htmlFor="primary-city" className="text-base font-medium">
-                {segments.length > 0 ? "Primary City" : "Destination"}
+            <div className="flex flex-col items-start">
+              <Label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold mb-2">
+                {segments.length > 0 ? "Primary City" : "Where to?"}
               </Label>
-              <DestinationAutocomplete
-                value={destination}
-                onChange={(value) => {
-                  setDestination(value);
-                  if (value) {
-                    setFieldErrors((prev) => ({ ...prev, destination: undefined }));
-                  }
-                }}
-              />
+              <div className="relative w-full">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                  <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+                    <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
+                  </div>
+                </div>
+                <DestinationAutocomplete
+                  value={destination}
+                  onChange={(value) => {
+                    setDestination(value);
+                    if (value) {
+                      setFieldErrors((prev) => ({ ...prev, destination: undefined }));
+                    }
+                  }}
+                  className="w-full"
+                  inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
+                  placeholder="Search destinations..."
+                />
+              </div>
               {fieldErrors.destination && (
-                <p className="text-sm text-destructive">{fieldErrors.destination}</p>
+                <p className="text-sm text-destructive mt-1">{fieldErrors.destination}</p>
               )}
             </div>
 
@@ -351,42 +364,33 @@ export function NewTripDialog({
             )}
 
             <div className="border-t pt-4 space-y-4">
-              <h3 className="text-base font-medium">Travel Dates</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="start_date">Start Date</Label>
-                  <Input
-                    id="start_date"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => {
-                      setStartDate(e.target.value);
+              <div className="flex flex-col items-start">
+                <Label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold mb-2">
+                  Check-in
+                </Label>
+                <div className="relative w-full">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <DateRangePicker
+                    startDate={startDate}
+                    endDate={endDate}
+                    onStartDateChange={(date) => {
+                      setStartDate(date);
                       setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
                     }}
-                    required
-                    className="rounded-lg"
-                  />
-                  {fieldErrors.startDate && (
-                    <p className="text-sm text-destructive">{fieldErrors.startDate}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="end_date">End Date</Label>
-                  <Input
-                    id="end_date"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => {
-                      setEndDate(e.target.value);
+                    onEndDateChange={(date) => {
+                      setEndDate(date);
                       setFieldErrors((prev) => ({ ...prev, endDate: undefined }));
                     }}
-                    required
-                    className="rounded-lg"
+                    className="w-full pl-10 bg-secondary border-0 rounded-xl h-12 font-body text-left justify-start hover:bg-secondary"
+                    placeholder="Add dates"
+                    hideIcon={true}
                   />
-                  {fieldErrors.endDate && (
-                    <p className="text-sm text-destructive">{fieldErrors.endDate}</p>
-                  )}
                 </div>
+                {(fieldErrors.startDate || fieldErrors.endDate) && (
+                  <p className="text-sm text-destructive mt-1">
+                    {fieldErrors.startDate || fieldErrors.endDate}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -397,17 +401,17 @@ export function NewTripDialog({
             )}
           </div>
 
-          <DialogFooter className="px-6 py-4 bg-gray-50 border-t justify-center gap-3 flex-shrink-0">
+          <DialogFooter className="px-6 py-4 border-t justify-center gap-3 flex-shrink-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
-              className="rounded-lg w-28"
+              className="rounded-xl"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="rounded-lg w-28">
+            <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
               {loading ? "Creating..." : "Create Trip"}
             </Button>
           </DialogFooter>

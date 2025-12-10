@@ -226,7 +226,7 @@ export function TripPersonalizationDialog({
                 {!hasAccommodation && (
                   <div className="space-y-2">
                     <Label htmlFor="accommodation">
-                      Accommodation in {destinationName}
+                      Accommodation{destinationName ? ` in ${destinationName}` : ""}
                     </Label>
                     <AccommodationAutocomplete
                       value={accommodation}
