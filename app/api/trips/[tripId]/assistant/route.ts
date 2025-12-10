@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@/lib/supabase/server";
 import { getOpenAIClient } from "@/lib/openai";
 import { moderateMessage, getRedirectMessage } from "@/lib/chat-moderation";
-import { getSmartItinerary } from "@/lib/supabase/smart-itineraries";
+import { getSmartItinerary } from "@/lib/supabase/smart-itineraries-server";
 import { getTripSegments } from "@/lib/supabase/trip-segments";
 
 interface AssistantRequest {

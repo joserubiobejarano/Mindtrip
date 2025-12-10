@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getOpenAIClient } from '@/lib/openai'
 import { findPlacePhoto } from '@/lib/google/places-server'
-import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries'
+import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries-server'
 
 /**
  * Get a human-readable "good for" label based on place types
