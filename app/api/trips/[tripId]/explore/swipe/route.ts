@@ -153,23 +153,26 @@ export async function POST(
       // Decrement swipe count (but don't go below 0) - Option B: undo gives swipe back
       const newSwipeCount = Math.max(0, swipeCount - 1);
 
-      // Upsert session with undone swipe
-      const { data: updatedSession, error: updateError } = await supabase
+      // Update session with undone swipe
+      let undoUpdateQuery = supabase
         .from('explore_sessions')
-        .upsert(
-          {
-            trip_id: tripId,
-            user_id: userId,
-            trip_segment_id: trip_segment_id || null,
-            liked_place_ids: currentLiked,
-            discarded_place_ids: currentDiscarded,
-            swipe_count: newSwipeCount,
-            last_swipe_at: session.last_swipe_at, // Keep timestamp for reference (not used in limit logic)
-          },
-          {
-            onConflict: 'trip_id,user_id,trip_segment_id',
-          }
-        )
+        .update({
+          liked_place_ids: currentLiked,
+          discarded_place_ids: currentDiscarded,
+          swipe_count: newSwipeCount,
+          last_swipe_at: session.last_swipe_at, // Keep timestamp for reference (not used in limit logic)
+        })
+        .eq('trip_id', tripId)
+        .eq('user_id', userId);
+
+      // Handle NULL trip_segment_id properly
+      if (trip_segment_id === null || trip_segment_id === undefined) {
+        undoUpdateQuery = undoUpdateQuery.is('trip_segment_id', null);
+      } else {
+        undoUpdateQuery = undoUpdateQuery.eq('trip_segment_id', trip_segment_id);
+      }
+
+      const { data: updatedSession, error: updateError } = await undoUpdateQuery
         .select()
         .single();
 
@@ -225,26 +228,31 @@ export async function POST(
     // Note: We already checked limitReached above, so this should be safe
     const newSwipeCount = swipeCount + 1;
 
-    // Upsert session
+    // Update or create session
     const now = new Date();
-    const { data: updatedSession, error: updateError } = await supabase
+    
+    // First, try to update existing session
+    let updateQuery = supabase
       .from('explore_sessions')
-      .upsert(
-        {
-          trip_id: tripId,
-          user_id: userId,
-          trip_segment_id: trip_segment_id || null,
-          liked_place_ids: updatedLiked,
-          discarded_place_ids: updatedDiscarded,
-          swipe_count: newSwipeCount,
-          last_swipe_at: now.toISOString(), // Keep for reference (not used in limit logic)
-        },
-        {
-          onConflict: 'trip_id,user_id,trip_segment_id',
-        }
-      )
+      .update({
+        liked_place_ids: updatedLiked,
+        discarded_place_ids: updatedDiscarded,
+        swipe_count: newSwipeCount,
+        last_swipe_at: now.toISOString(),
+      })
+      .eq('trip_id', tripId)
+      .eq('user_id', userId);
+
+    // Handle NULL trip_segment_id properly
+    if (trip_segment_id === null || trip_segment_id === undefined) {
+      updateQuery = updateQuery.is('trip_segment_id', null);
+    } else {
+      updateQuery = updateQuery.eq('trip_segment_id', trip_segment_id);
+    }
+
+    const { data: updatedSession, error: updateError } = await updateQuery
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error('Error updating explore session:', updateError);
@@ -252,6 +260,43 @@ export async function POST(
         { error: 'Failed to update session' },
         { status: 500 }
       );
+    }
+
+    // If no session exists, create it
+    if (!updatedSession) {
+      const { data: newSession, error: createError } = await supabase
+        .from('explore_sessions')
+        .insert({
+          trip_id: tripId,
+          user_id: userId,
+          trip_segment_id: trip_segment_id || null,
+          liked_place_ids: updatedLiked,
+          discarded_place_ids: updatedDiscarded,
+          swipe_count: newSwipeCount,
+          last_swipe_at: now.toISOString(),
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating explore session:', createError);
+        return NextResponse.json(
+          { error: 'Failed to create session' },
+          { status: 500 }
+        );
+      }
+
+      // Use the newly created session
+      const remainingSwipes = isPro
+        ? null
+        : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - newSwipeCount);
+
+      return NextResponse.json({
+        success: true,
+        swipeCount: newSwipeCount,
+        remainingSwipes,
+        limitReached: !isPro && newSwipeCount >= FREE_SWIPE_LIMIT_PER_TRIP,
+      });
     }
 
     // Calculate remaining swipes

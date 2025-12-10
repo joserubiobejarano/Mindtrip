@@ -585,7 +585,7 @@ export function ItineraryTab({
                   {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
                     <div className="space-y-4 mb-10 max-w-4xl mx-auto">
                       {smartItinerary.title && (
-                        <h2 className="text-3xl font-bold text-slate-900 text-center">{smartItinerary.title}</h2>
+                        <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
                       )}
                       {smartItinerary.summary && (
                         <div className="prose prose-neutral max-w-none text-slate-900 text-left">
@@ -733,47 +733,45 @@ export function ItineraryTab({
                       {isExpanded && (
                         <>
                           {/* Image Gallery */}
-                          {bannerImages.length > 0 ? (
-                            <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
-                              {bannerImages.map((img, idx) => {
-                                const imageKey = `${day.id}-banner-${idx}`;
-                                const hasFailed = failedImages.has(imageKey);
-                                return (
-                                  <div 
-                                    key={imageKey} 
-                                    className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (!hasFailed) openLightbox(img, dayImages);
-                                    }}
-                                  >
-                                    {!hasFailed ? (
+                          {(() => {
+                            // Filter out failed images and only show valid ones
+                            const validImages = bannerImages.filter((img, idx) => {
+                              const imageKey = `${day.id}-banner-${idx}`;
+                              return !failedImages.has(imageKey) && img;
+                            });
+
+                            if (validImages.length === 0) {
+                              return null; // Don't render empty gallery
+                            }
+
+                            return (
+                              <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
+                                {validImages.map((img, idx) => {
+                                  const imageKey = `${day.id}-banner-${idx}`;
+                                  return (
+                                    <div 
+                                      key={imageKey} 
+                                      className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openLightbox(img, dayImages);
+                                      }}
+                                    >
                                       <Image 
                                         src={img} 
-                                        alt={`Day ${day.index} - ${idx + 1}`} 
+                                        alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
                                         fill 
                                         className="object-cover"
                                         onError={() => {
                                           setFailedImages(prev => new Set(prev).add(imageKey));
                                         }}
                                       />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                        <MapPin className="h-8 w-8" />
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                              <div className="text-gray-400 flex flex-col items-center gap-2">
-                                <MapPin className="h-12 w-12" />
-                                <span className="text-sm">Photo placeholder for {day.title}</span>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                            </div>
-                          )}
+                            );
+                          })()}
 
                           <CardContent className="p-6 space-y-6">
                         {/* Day Overview as Bullet Points */}
@@ -799,36 +797,19 @@ export function ItineraryTab({
                             return (
                               <div key={slotIdx} className="space-y-4">
                                 <div className="pt-4 border-t border-gray-200">
-                                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between pb-2">
-                                    <div className="flex flex-col md:w-1/4">
-                                      <span className="text-sm uppercase tracking-wide text-slate-600" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                  {/* Moment of day label and summary */}
+                                  <div className="flex flex-col gap-2 pb-4">
+                                    <div className="flex justify-center md:justify-center">
+                                      <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                                         {slot.label}
                                       </span>
                                     </div>
-                                    <div className="md:w-3/4 space-y-2">
-                                      <p className="text-sm md:text-base text-slate-800 leading-relaxed">
-                                        {slot.summary}
-                                      </p>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedDayForExplore({
-                                            dayId: day.id,
-                                            slot: slotType,
-                                            areaCluster,
-                                          });
-                                          setDayExploreOpen(true);
-                                        }}
-                                        className="text-xs min-h-[44px] touch-manipulation self-start"
-                                      >
-                                        <Plus className="h-3 w-3 mr-1" />
-                                        <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
-                                        <span className="sm:hidden">Add</span>
-                                      </Button>
-                                    </div>
+                                    <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
+                                      {slot.summary}
+                                    </p>
                                   </div>
                                   
+                                  {/* Activities */}
                                   <div className="grid gap-4">
                                     {slot.places.map((place) => (
                                       <div 
@@ -858,7 +839,7 @@ export function ItineraryTab({
                                         </div>
                                         <div className="flex-1 min-w-0">
                                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                            <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
+                                            <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
                                             <div className="flex gap-2 self-start">
                                               <button
                                                 onClick={(e) => {
@@ -896,6 +877,27 @@ export function ItineraryTab({
                                         </div>
                                       </div>
                                     ))}
+                                  </div>
+                                  
+                                  {/* Add activities button - moved below activities */}
+                                  <div className="mt-4 flex justify-center md:justify-start">
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedDayForExplore({
+                                          dayId: day.id,
+                                          slot: slotType,
+                                          areaCluster,
+                                        });
+                                        setDayExploreOpen(true);
+                                      }}
+                                      className="text-xs min-h-[44px] touch-manipulation bg-primary hover:bg-primary/90 text-white"
+                                    >
+                                      <Plus className="h-3 w-3 mr-1" />
+                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
+                                      <span className="sm:hidden">Add</span>
+                                    </Button>
                                   </div>
                                 </div>
                               </div>
@@ -985,47 +987,45 @@ export function ItineraryTab({
                       {isExpanded && (
                         <>
                           {/* Image Gallery */}
-                          {bannerImages.length > 0 ? (
-                            <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
-                              {bannerImages.map((img, idx) => {
-                                const imageKey = `${day.id}-banner-${idx}`;
-                                const hasFailed = failedImages.has(imageKey);
-                                return (
-                                  <div 
-                                    key={imageKey} 
-                                    className="relative aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (!hasFailed) openLightbox(img, dayImages);
-                                    }}
-                                  >
-                                    {!hasFailed ? (
+                          {(() => {
+                            // Filter out failed images and only show valid ones
+                            const validImages = bannerImages.filter((img, idx) => {
+                              const imageKey = `${day.id}-banner-${idx}`;
+                              return !failedImages.has(imageKey) && img;
+                            });
+
+                            if (validImages.length === 0) {
+                              return null; // Don't render empty gallery
+                            }
+
+                            return (
+                              <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
+                                {validImages.map((img, idx) => {
+                                  const imageKey = `${day.id}-banner-${idx}`;
+                                  return (
+                                    <div 
+                                      key={imageKey} 
+                                      className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openLightbox(img, dayImages);
+                                      }}
+                                    >
                                       <Image 
                                         src={img} 
-                                        alt={`Day ${day.index} - ${idx + 1}`} 
+                                        alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
                                         fill 
                                         className="object-cover"
                                         onError={() => {
                                           setFailedImages(prev => new Set(prev).add(imageKey));
                                         }}
                                       />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                        <MapPin className="h-8 w-8" />
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                              <div className="text-gray-400 flex flex-col items-center gap-2">
-                                <MapPin className="h-12 w-12" />
-                                <span className="text-sm">Photo placeholder for {day.title}</span>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                            </div>
-                          )}
+                            );
+                          })()}
 
                           <CardContent className="p-6 space-y-6">
                         {/* Day Overview as Bullet Points */}
@@ -1051,36 +1051,19 @@ export function ItineraryTab({
                             return (
                               <div key={slotIdx} className="space-y-4">
                                 <div className="pt-4 border-t border-gray-200">
-                                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between pb-2">
-                                    <div className="flex flex-col md:w-1/4">
-                                      <span className="text-sm uppercase tracking-wide text-slate-600" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                  {/* Moment of day label and summary */}
+                                  <div className="flex flex-col gap-2 pb-4">
+                                    <div className="flex justify-center md:justify-center">
+                                      <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                                         {slot.label}
                                       </span>
                                     </div>
-                                    <div className="md:w-3/4 space-y-2">
-                                      <p className="text-sm md:text-base text-slate-800 leading-relaxed">
-                                        {slot.summary}
-                                      </p>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedDayForExplore({
-                                            dayId: day.id,
-                                            slot: slotType,
-                                            areaCluster,
-                                          });
-                                          setDayExploreOpen(true);
-                                        }}
-                                        className="text-xs min-h-[44px] touch-manipulation self-start"
-                                      >
-                                        <Plus className="h-3 w-3 mr-1" />
-                                        <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
-                                        <span className="sm:hidden">Add</span>
-                                      </Button>
-                                    </div>
+                                    <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
+                                      {slot.summary}
+                                    </p>
                                   </div>
                                   
+                                  {/* Activities */}
                                   <div className="grid gap-4">
                                     {slot.places.map((place) => (
                                       <div 
@@ -1110,7 +1093,7 @@ export function ItineraryTab({
                                         </div>
                                         <div className="flex-1 min-w-0">
                                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                            <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
+                                            <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
                                             <div className="flex gap-2 self-start">
                                               <button
                                                 onClick={(e) => {
@@ -1153,6 +1136,27 @@ export function ItineraryTab({
                                         </div>
                                       </div>
                                     ))}
+                                  </div>
+                                  
+                                  {/* Add activities button - moved below activities */}
+                                  <div className="mt-4 flex justify-center md:justify-start">
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedDayForExplore({
+                                          dayId: day.id,
+                                          slot: slotType,
+                                          areaCluster,
+                                        });
+                                        setDayExploreOpen(true);
+                                      }}
+                                      className="text-xs min-h-[44px] touch-manipulation bg-primary hover:bg-primary/90 text-white"
+                                    >
+                                      <Plus className="h-3 w-3 mr-1" />
+                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
+                                      <span className="sm:hidden">Add</span>
+                                    </Button>
                                   </div>
                                 </div>
                               </div>

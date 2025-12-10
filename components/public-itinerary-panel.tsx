@@ -16,6 +16,22 @@ interface PublicItineraryPanelProps {
   onActivitySelect?: (activityId: string) => void;
 }
 
+// Helper function to convert text to bullet points, avoiding splits on decimals
+function textToBulletPoints(text: string): string[] {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (!normalized) return [];
+  // Split on periods that likely end sentences, NOT decimals
+  // Pattern: period preceded by non-digit, followed by space and uppercase letter
+  const rawSentences = normalized.split(/(?<=[^\d])\.(?=\s+[A-ZÀ-ÖØ-Þ])/g);
+  return rawSentences
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => {
+      // Ensure each bullet ends with a period
+      return s.endsWith('.') ? s : s + '.';
+    });
+}
+
 export function PublicItineraryPanel({
   tripId,
   selectedDayId,
@@ -87,8 +103,8 @@ export function PublicItineraryPanel({
         {/* Header */}
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{trip.title}</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>{trip.title}</h1>
+            <p className="text-sm text-gray-500">
               {format(new Date(trip.start_date), "MMM d")} -{" "}
               {format(new Date(trip.end_date), "MMM d, yyyy")}
             </p>
@@ -107,30 +123,22 @@ export function PublicItineraryPanel({
         {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
           <div className="space-y-4 mb-10 max-w-4xl mx-auto">
             {smartItinerary.title && (
-              <h2 className="text-3xl font-bold text-slate-900 text-center">{smartItinerary.title}</h2>
+              <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
             )}
             {smartItinerary.summary && (
               <div className="prose prose-neutral max-w-none text-slate-900 text-left">
                 <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
-                  {smartItinerary.summary
-                    .split(/[.!?]+/)
-                    .filter(s => s.trim().length > 10)
-                    .map((point, idx) => {
-                      const trimmed = point.trim();
-                      if (!trimmed) return null;
-                      return (
-                        <li key={idx} className="font-normal">
-                          {trimmed}{!trimmed.match(/[.!?]$/) ? '.' : ''}
-                        </li>
-                      );
-                    })
-                    .filter(Boolean)}
+                  {textToBulletPoints(smartItinerary.summary).map((point, idx) => (
+                    <li key={idx} className="font-normal">
+                      {point}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
             {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
               <div className="mt-6 text-left max-w-3xl mx-auto">
-                <h3 className="text-lg font-bold text-slate-900 mb-3">Trip Tips &amp; Notes</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>Trip Tips &amp; Notes</h3>
                 <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
                   {smartItinerary.tripTips.map((tip, i) => (
                     <li key={i}>{tip}</li>
@@ -158,7 +166,7 @@ export function PublicItineraryPanel({
                 onClick={() => onSelectDay?.(day.id)}
               >
                 <CardHeader className="bg-gray-50 border-b pb-4">
-                  <CardTitle className="text-xl font-bold text-slate-900">
+                  <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                     Day {day.index} – {day.title}
                   </CardTitle>
                   <CardDescription className="text-base font-medium text-slate-600 mt-1">
@@ -166,37 +174,42 @@ export function PublicItineraryPanel({
                   </CardDescription>
                 </CardHeader>
                 
-                {bannerImages.length > 0 && (
-                  <div className="w-full grid grid-cols-4 gap-0.5 bg-gray-100">
-                    {bannerImages.map((img, idx) => (
-                      <div 
-                        key={idx} 
-                        className="relative aspect-[4/3]"
-                      >
-                        <Image src={img} alt={`Day ${day.index} - ${idx + 1}`} fill className="object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {(() => {
+                  // Filter out invalid/empty images
+                  const validImages = bannerImages.filter(Boolean);
+                  
+                  if (validImages.length === 0) {
+                    return null; // Don't render empty gallery
+                  }
+
+                  return (
+                    <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
+                      {validImages.map((img, idx) => (
+                        <div 
+                          key={idx} 
+                          className="relative flex-1 min-w-0 aspect-[4/3] overflow-hidden"
+                        >
+                          <Image 
+                            src={img} 
+                            alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
+                            fill 
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
 
                 <CardContent className="p-6 space-y-6">
                   {day.overview && (
                     <div className="prose prose-neutral max-w-none text-slate-900">
                       <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
-                        {day.overview
-                          .split(/[.!?]+/)
-                          .filter(s => s.trim().length > 10)
-                          .map((point, idx, arr) => {
-                            const trimmed = point.trim();
-                            if (!trimmed) return null;
-                            const needsPeriod = !trimmed.match(/[.!?]$/) && idx < arr.length - 1;
-                            return (
-                              <li key={idx} className="font-normal">
-                                {trimmed}{needsPeriod ? '.' : ''}
-                              </li>
-                            );
-                          })
-                          .filter(Boolean)}
+                        {textToBulletPoints(day.overview).map((point, idx) => (
+                          <li key={idx} className="font-normal">
+                            {point}
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   )}
@@ -205,45 +218,52 @@ export function PublicItineraryPanel({
                     {day.slots.map((slot, slotIdx) => (
                       <div key={slotIdx} className="space-y-4">
                         <div className="pt-4 border-t border-gray-200">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 pb-2">
-                            <h3 className="text-xl font-bold text-slate-900">{slot.label}</h3>
-                            <span className="hidden sm:inline text-base text-slate-400">•</span>
-                            <span className="text-base text-slate-900 italic">{slot.summary}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="grid gap-4">
-                          {slot.places.map((place) => (
-                            <div 
-                              key={place.id} 
-                              className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border bg-white"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onActivitySelect?.(place.id);
-                              }}
-                            >
-                              <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                {place.photos && place.photos[0] ? (
-                                  <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                    <span className="text-xs">No image</span>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-lg text-slate-900">{place.name}</h4>
-                                <p className="text-slate-700 text-sm mt-2 leading-relaxed">
-                                  {place.description}
-                                </p>
-                                {place.area && (
-                                  <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                                    {place.area}
-                                  </span>
-                                )}
-                              </div>
+                          {/* Moment of day label and summary */}
+                          <div className="flex flex-col gap-2 pb-4">
+                            <div className="flex justify-center md:justify-center">
+                              <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                {slot.label}
+                              </span>
                             </div>
-                          ))}
+                            <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
+                              {slot.summary}
+                            </p>
+                          </div>
+                          
+                          {/* Activities */}
+                          <div className="grid gap-4">
+                            {slot.places.map((place) => (
+                              <div 
+                                key={place.id} 
+                                className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border bg-white"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onActivitySelect?.(place.id);
+                                }}
+                              >
+                                <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
+                                  {place.photos && place.photos[0] ? (
+                                    <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                      <span className="text-xs">No image</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                  <p className="text-slate-700 text-sm mt-2 leading-relaxed">
+                                    {place.description}
+                                  </p>
+                                  {place.area && (
+                                    <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                                      {place.area}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -252,6 +272,27 @@ export function PublicItineraryPanel({
               </Card>
             );
           })}
+        </div>
+
+        {/* CTA Section */}
+        <div className="max-w-4xl mx-auto mt-16 mb-12 p-8 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20 text-center">
+          <h3 className="text-2xl font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+            Planned with Kruno
+          </h3>
+          <p className="text-base text-slate-700 mb-6">
+            Create your own personalized travel itinerary in minutes. Try the app now!
+          </p>
+          <Button
+            size="lg"
+            className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-base font-semibold"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.location.href = '/sign-up';
+              }
+            }}
+          >
+            Try Kruno Now
+          </Button>
         </div>
       </div>
     </div>

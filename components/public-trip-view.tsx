@@ -41,10 +41,6 @@ export function PublicTripView({ tripId, slug }: PublicTripViewProps) {
           onActivitySelect={setSelectedActivityId}
         />
       </div>
-      {/* Watermark */}
-      <div className="fixed bottom-4 right-4 z-50 text-xs text-muted-foreground opacity-50 pointer-events-none">
-        Planned with Kruno
-      </div>
     </div>
   );
 }
