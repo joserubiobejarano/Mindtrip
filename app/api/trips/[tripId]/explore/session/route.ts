@@ -39,7 +39,7 @@ export async function GET(
       query = query.eq('trip_segment_id', tripSegmentId);
     }
 
-    const { data: session, error: sessionError } = await query.maybeSingle();
+    let { data: session, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
       console.error('Error fetching explore session:', sessionError);
