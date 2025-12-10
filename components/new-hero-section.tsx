@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DestinationAutocomplete } from "@/components/destination-autocomplete";
 import { DateRangePicker } from "@/components/date-range-picker";
-import { TripPersonalizationDialog } from "@/components/trips/TripPersonalizationDialog";
 import { type DestinationOption } from "@/hooks/use-create-trip";
 import { useCreateTrip } from "@/hooks/use-create-trip";
 import { useAuth } from "@clerk/nextjs";
@@ -42,7 +41,6 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [personalizationOpen, setPersonalizationOpen] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [showMultiCity, setShowMultiCity] = useState(false);
 
@@ -198,7 +196,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       }
 
       // If we have destination but no dates, still allow user to proceed
-      // They can fill dates manually or we'll prompt in the personalization dialog
+      // They can fill dates manually before clicking Search
       setParsingIntent(false);
     } catch (error) {
       console.error("Error parsing travel intent:", error);
@@ -236,29 +234,15 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       return;
     }
 
-    // Open personalization dialog instead of immediately creating trip
-    setPersonalizationOpen(true);
-  };
-
-  const handlePersonalizationComplete = async (personalization: any) => {
-    if (!destination) {
-      setSearchError("Please select a destination");
-      return;
-    }
-
+    // Create trip directly without personalization dialog
     try {
       await createTrip({
         destination,
         startDate,
         endDate,
-        personalization,
       });
-      // Close dialog after successful trip creation
-      setPersonalizationOpen(false);
     } catch (error: any) {
       setSearchError(error.message || "Failed to create trip. Please try again.");
-      // Close dialog even on error so user can try again
-      setPersonalizationOpen(false);
     }
   };
 
@@ -406,17 +390,6 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
           )}
           </div>
         </div>
-
-        {/* Personalization Dialog */}
-        <TripPersonalizationDialog
-          isOpen={personalizationOpen}
-          onClose={() => setPersonalizationOpen(false)}
-          onComplete={handlePersonalizationComplete}
-          destinationPlaceId={destination?.id || ""}
-          destinationName={destination?.placeName || ""}
-          startDate={startDate || ""}
-          endDate={endDate || ""}
-        />
 
         {/* Testimonial - positioned below search box */}
         <div className="mt-20 bg-card shadow-lg rounded-lg p-3 transform -rotate-6 animate-float hidden md:block mx-auto w-fit">
