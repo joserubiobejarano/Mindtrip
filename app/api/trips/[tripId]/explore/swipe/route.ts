@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserSubscriptionStatus, FREE_SWIPE_LIMIT_PER_TRIP } from '@/lib/supabase/user-subscription';
+import { getTripProStatus } from '@/lib/supabase/pro-status';
+import { FREE_SWIPE_LIMIT_PER_TRIP, PRO_SWIPE_LIMIT_PER_TRIP } from '@/lib/supabase/user-subscription';
 
 export async function POST(
   req: NextRequest,
@@ -89,21 +90,26 @@ export async function POST(
       );
     }
 
-    // Get subscription status and trip limit
-    const { isPro } = await getUserSubscriptionStatus(userId);
-    const limit = isPro ? Infinity : FREE_SWIPE_LIMIT_PER_TRIP;
+    // Get trip Pro status (account Pro OR trip Pro) and determine limit
+    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    const limit = isProForThisTrip ? PRO_SWIPE_LIMIT_PER_TRIP : FREE_SWIPE_LIMIT_PER_TRIP;
 
     // Get current swipe count from session (per trip, no daily reset)
     const swipeCount = session?.swipe_count || 0;
 
     // Check limit before mutating
-    const limitReached = !isPro && swipeCount >= FREE_SWIPE_LIMIT_PER_TRIP;
+    const limitReached = swipeCount >= limit;
     if (limitReached) {
+      const errorMessage = isProForThisTrip
+        ? "You've reached the swipe limit for this trip today. Try saving your favorites or adjusting your filters."
+        : "You've reached the swipe limit for this trip. Unlock Kruno Pro or this trip to see more places.";
+      
       return NextResponse.json({
         success: false,
         swipeCount,
         remainingSwipes: 0,
         limitReached: true,
+        error: errorMessage,
       });
     }
 
@@ -114,7 +120,7 @@ export async function POST(
           success: false,
           error: 'No session found',
           swipeCount,
-          remainingSwipes: isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount),
+          remainingSwipes: Math.max(0, limit - swipeCount),
           limitReached: false,
         });
       }
@@ -145,7 +151,7 @@ export async function POST(
           success: false,
           error: 'Place not found in session or cannot be undone',
           swipeCount,
-          remainingSwipes: isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount),
+          remainingSwipes: Math.max(0, limit - swipeCount),
           limitReached: false,
         });
       }
@@ -184,9 +190,7 @@ export async function POST(
         );
       }
 
-      const remainingSwipes = isPro
-        ? null
-        : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - newSwipeCount);
+      const remainingSwipes = Math.max(0, limit - newSwipeCount);
 
       return NextResponse.json({
         success: true,
@@ -207,7 +211,7 @@ export async function POST(
         success: false,
         error: 'Place already swiped',
         swipeCount,
-        remainingSwipes: isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount),
+        remainingSwipes: Math.max(0, limit - swipeCount),
         limitReached: false,
       });
     }
@@ -287,28 +291,24 @@ export async function POST(
       }
 
       // Use the newly created session
-      const remainingSwipes = isPro
-        ? null
-        : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - newSwipeCount);
+      const remainingSwipes = Math.max(0, limit - newSwipeCount);
 
       return NextResponse.json({
         success: true,
         swipeCount: newSwipeCount,
         remainingSwipes,
-        limitReached: !isPro && newSwipeCount >= FREE_SWIPE_LIMIT_PER_TRIP,
+        limitReached: newSwipeCount >= limit,
       });
     }
 
     // Calculate remaining swipes
-    const remainingSwipes = isPro
-      ? null
-      : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - newSwipeCount);
+    const remainingSwipes = Math.max(0, limit - newSwipeCount);
 
     return NextResponse.json({
       success: true,
       swipeCount: newSwipeCount,
       remainingSwipes,
-      limitReached: !isPro && newSwipeCount >= FREE_SWIPE_LIMIT_PER_TRIP,
+      limitReached: newSwipeCount >= limit,
     });
   } catch (err) {
     console.error('POST /explore/swipe error:', err);

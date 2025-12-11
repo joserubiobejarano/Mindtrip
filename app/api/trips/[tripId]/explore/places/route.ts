@@ -99,21 +99,19 @@ export async function GET(
     const limit = parseInt(url.searchParams.get('limit') || '20', 10);
     const offset = parseInt(url.searchParams.get('offset') || '0', 10);
 
-    // Check if user is Pro (for Pro-only filters)
-    const { getUserSubscriptionStatus } = await import('@/lib/supabase/user-subscription');
-    const { isPro } = await getUserSubscriptionStatus(userId);
+    // Check trip Pro status (account Pro OR trip Pro) for Pro-only filters
+    const { getTripProStatus } = await import('@/lib/supabase/pro-status');
+    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
 
-    // Server-side enforcement: Pro filters are only available to Pro users
-    // If Free user tries to use Pro filters, either downgrade or return error
-    if (!isPro && (budget !== undefined || maxDistance !== undefined)) {
-      // Option: downgrade filters (ignore them)
-      // Alternative: return error - we'll use downgrade for better UX
-      // return NextResponse.json({ error: 'PRO_FILTERS_FORBIDDEN' }, { status: 403 });
+    // Server-side enforcement: Pro filters are only available to Pro users (account or trip)
+    // If Free user tries to use Pro filters, downgrade them (ignore) for better UX
+    if (!isProForThisTrip && (budget !== undefined || maxDistance !== undefined)) {
+      // Downgrade filters (ignore them) - better UX than error
     }
 
-    // Only apply Pro filters if user is Pro (server-side enforcement)
-    const effectiveBudget = isPro ? budget : undefined;
-    const effectiveMaxDistance = isPro ? maxDistance : undefined;
+    // Only apply Pro filters if user has Pro for this trip (server-side enforcement)
+    const effectiveBudget = isProForThisTrip ? budget : undefined;
+    const effectiveMaxDistance = isProForThisTrip ? maxDistance : undefined;
 
     // Get excluded place IDs from query params (if passed from client)
     const excludePlaceIdsFromParams = url.searchParams.getAll('excludePlaceId');

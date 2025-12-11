@@ -209,7 +209,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                   <ul className="space-y-2 text-sm text-purple-800">
                     <li className="flex items-center gap-2 font-semibold text-base">
                       <Check className="h-5 w-5 text-purple-600" />
-                      <span>Unlimited daily swipes</span>
+                      <span>Higher swipe limits (100 per trip)</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-purple-600" />
@@ -220,6 +220,37 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                       <span>Priority support</span>
                     </li>
                   </ul>
+                </div>
+                <div className="pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/billing/portal", {
+                          method: "POST",
+                        });
+
+                        if (!response.ok) {
+                          const error = await response.json();
+                          throw new Error(error.error || "Failed to open billing portal");
+                        }
+
+                        const { url } = await response.json();
+                        if (url) {
+                          window.location.href = url;
+                        }
+                      } catch (error) {
+                        console.error("Error opening billing portal:", error);
+                        addToast({
+                          variant: "destructive",
+                          title: "Failed to open billing portal",
+                          description: "Please try again.",
+                        });
+                      }
+                    }}
+                  >
+                    Manage Subscription
+                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Thank you for being a Pro member!
@@ -232,8 +263,8 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                   <ul className="space-y-2 text-sm mb-4">
                     <li className="flex items-center gap-2 font-semibold text-base">
                       <Check className="h-5 w-5 text-purple-600" />
-                      <span>Unlimited daily swipes</span>
-                      <span className="text-xs text-muted-foreground font-normal">(vs 10/day free)</span>
+                      <span>Higher swipe limits (100 per trip)</span>
+                      <span className="text-xs text-muted-foreground font-normal">(vs 10 free)</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-purple-600" />
@@ -247,13 +278,29 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                   <Button
                     className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                     size="lg"
-                    onClick={() => {
-                      // TODO: Integrate with Stripe checkout
-                      addToast({
-                        variant: 'default',
-                        title: 'Coming soon',
-                        description: 'Stripe integration will be available soon. For now, contact support to upgrade.',
-                      });
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/billing/checkout/subscription", {
+                          method: "POST",
+                        });
+
+                        if (!response.ok) {
+                          const error = await response.json();
+                          throw new Error(error.error || "Failed to create checkout session");
+                        }
+
+                        const { url } = await response.json();
+                        if (url) {
+                          window.location.href = url;
+                        }
+                      } catch (error) {
+                        console.error("Error creating checkout:", error);
+                        addToast({
+                          variant: "destructive",
+                          title: "Failed to start checkout",
+                          description: "Please try again.",
+                        });
+                      }
                     }}
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
@@ -261,7 +308,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Free plan includes 10 swipes per day. Upgrade for unlimited access.
+                  Free plan includes 10 swipes per trip. Upgrade for higher limits (100 per trip).
                 </p>
               </div>
             )}

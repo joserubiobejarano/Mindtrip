@@ -141,9 +141,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     
     const currentCount = statsData?.count || 0;
     
-    // Check user subscription status to determine limit
-    const { isPro } = await getUserSubscriptionStatus(userId);
-    const maxRegenerationsPerDay = isPro ? 5 : 2;
+    // Check trip Pro status (account Pro OR trip Pro) to determine limit
+    const { getTripProStatus } = await import('@/lib/supabase/pro-status');
+    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    const maxRegenerationsPerDay = isProForThisTrip ? 5 : 2;
     
     // Enforce limit
     if (currentCount >= maxRegenerationsPerDay) {
@@ -151,7 +152,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
         {
           error: 'regeneration_limit_reached',
           maxPerDay: maxRegenerationsPerDay,
-          isPro,
+          isPro: isProForThisTrip,
           message: 'You\'ve changed this itinerary many times already today. Take a break and enjoy your trip, then try more changes tomorrow.',
         },
         { status: 429 }

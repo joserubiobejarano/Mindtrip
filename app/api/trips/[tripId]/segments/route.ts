@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@/lib/supabase/server";
-import { getUserSubscriptionStatus } from "@/lib/supabase/user-subscription";
+import { getTripProStatus } from "@/lib/supabase/pro-status";
 import {
   getTripSegments,
   createTripSegment,
@@ -85,16 +85,7 @@ export async function POST(
     const body: CreateSegmentPayload = await request.json();
     const supabase = await createClient();
 
-    // Check subscription status
-    const { isPro } = await getUserSubscriptionStatus(userId);
-    if (!isPro) {
-      return NextResponse.json(
-        { error: "Pro subscription required for multi-city trips" },
-        { status: 403 }
-      );
-    }
-
-    // Verify user owns trip
+    // Verify user owns trip first (needed for Pro status check)
     const { data: trip, error: tripError } = await supabase
       .from("trips")
       .select("id, owner_id, start_date, end_date")
@@ -107,6 +98,18 @@ export async function POST(
 
     if (trip.owner_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Check trip Pro status (account Pro OR trip Pro)
+    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    if (!isProForThisTrip) {
+      return NextResponse.json(
+        { 
+          error: "Pro subscription or trip unlock required for multi-city trips",
+          plan_required: 'pro_or_trip_unlock'
+        },
+        { status: 403 }
+      );
     }
 
     // Get existing segments to determine order_index
@@ -206,16 +209,7 @@ export async function PATCH(
     const { segmentId, ...updates } = body;
     const supabase = await createClient();
 
-    // Check subscription status
-    const { isPro } = await getUserSubscriptionStatus(userId);
-    if (!isPro) {
-      return NextResponse.json(
-        { error: "Pro subscription required" },
-        { status: 403 }
-      );
-    }
-
-    // Verify user owns trip
+    // Verify user owns trip first
     const { data: trip } = await supabase
       .from("trips")
       .select("owner_id")
@@ -224,6 +218,18 @@ export async function PATCH(
 
     if (!trip || trip.owner_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Check trip Pro status (account Pro OR trip Pro)
+    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    if (!isProForThisTrip) {
+      return NextResponse.json(
+        { 
+          error: "Pro subscription or trip unlock required",
+          plan_required: 'pro_or_trip_unlock'
+        },
+        { status: 403 }
+      );
     }
 
     // Verify segment belongs to trip
@@ -287,16 +293,7 @@ export async function DELETE(
 
     const supabase = await createClient();
 
-    // Check subscription status
-    const { isPro } = await getUserSubscriptionStatus(userId);
-    if (!isPro) {
-      return NextResponse.json(
-        { error: "Pro subscription required" },
-        { status: 403 }
-      );
-    }
-
-    // Verify user owns trip
+    // Verify user owns trip first
     const { data: trip } = await supabase
       .from("trips")
       .select("owner_id")
@@ -305,6 +302,18 @@ export async function DELETE(
 
     if (!trip || trip.owner_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Check trip Pro status (account Pro OR trip Pro)
+    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    if (!isProForThisTrip) {
+      return NextResponse.json(
+        { 
+          error: "Pro subscription or trip unlock required",
+          plan_required: 'pro_or_trip_unlock'
+        },
+        { status: 403 }
+      );
     }
 
     // Verify segment belongs to trip

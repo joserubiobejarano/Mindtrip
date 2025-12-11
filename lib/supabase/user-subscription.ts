@@ -64,17 +64,7 @@ export async function getUserSubscriptionStatus(userId: string): Promise<{ isPro
   return { isPro: profile.is_pro === true };
 }
 
-// TEMP: increased for internal testing. IMPORTANT: set back to 10 before launch.
-export const FREE_SWIPE_LIMIT_PER_TRIP = 50;
-
-/**
- * Gets the daily swipe limit for a user based on their subscription tier.
- * 
- * @param userId - The Clerk user ID
- * @returns Promise resolving to daily swipe limit (Infinity for Pro, 50 for Free)
- */
-export async function getUserDailySwipeLimit(userId: string): Promise<number> {
-  const { isPro } = await getUserSubscriptionStatus(userId);
-  return isPro ? Infinity : FREE_SWIPE_LIMIT_PER_TRIP;
-}
+// Swipe limits per trip (not per day)
+export const FREE_SWIPE_LIMIT_PER_TRIP = 10;
+export const PRO_SWIPE_LIMIT_PER_TRIP = 100;
 
