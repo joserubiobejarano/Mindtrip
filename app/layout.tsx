@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,9 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <Providers>{children}</Providers>
+          <CookieConsentBanner />
+          {/* TODO: Load analytics scripts only if consent === 'all' */}
+          {/* Example: {hasFullConsent() && <Script src="..." />} */}
         </body>
       </html>
     );
@@ -34,6 +38,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ClerkProvider publishableKey={publishableKey}>
           <Providers>{children}</Providers>
+          <CookieConsentBanner />
+          {/* TODO: Load analytics scripts only if consent === 'all' */}
+          {/* Example: {hasFullConsent() && <Script src="..." />} */}
         </ClerkProvider>
       </body>
     </html>

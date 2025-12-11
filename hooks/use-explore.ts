@@ -119,12 +119,16 @@ export function useSwipeAction(tripId: string, tripSegmentId?: string) {
       placeId, 
       action, 
       previousAction, 
-      source 
+      source,
+      dayId,
+      slot
     }: { 
       placeId?: string; 
       action: 'like' | 'dislike' | 'undo';
       previousAction?: 'like' | 'dislike';
       source?: 'trip' | 'day';
+      dayId?: string;
+      slot?: 'morning' | 'afternoon' | 'evening';
     }) => {
       const response = await fetch(`/api/trips/${tripId}/explore/swipe`, {
         method: 'POST',
@@ -135,6 +139,8 @@ export function useSwipeAction(tripId: string, tripSegmentId?: string) {
           previous_action: previousAction,
           source: source || 'trip',
           trip_segment_id: tripSegmentId,
+          day_id: dayId,
+          slot: slot,
         }),
       });
 

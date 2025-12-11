@@ -102,7 +102,13 @@ export function ExploreDeck({
     setLastDirection('left');
     setCurrentIndex((prev) => prev - 1);
     swipeMutation.mutate(
-      { placeId, action: 'dislike', source: mode === 'day' ? 'day' : 'trip' },
+      { 
+        placeId, 
+        action: 'dislike', 
+        source: mode === 'day' ? 'day' : 'trip',
+        dayId: mode === 'day' ? dayId : undefined,
+        slot: mode === 'day' ? slot : undefined,
+      },
       {
         onSuccess: (res) => {
           if (res?.limitReached) {
@@ -169,7 +175,13 @@ export function ExploreDeck({
         
         // Also like the place for session tracking
         swipeMutation.mutate(
-          { placeId, action: 'like', source: 'day' },
+          { 
+            placeId, 
+            action: 'like', 
+            source: 'day',
+            dayId: dayId,
+            slot: slot,
+          },
           {
             onSuccess: (res) => {
               if (res?.limitReached) {
@@ -206,7 +218,13 @@ export function ExploreDeck({
     } else {
       // Trip mode: just like the place
       swipeMutation.mutate(
-        { placeId, action: 'like', source: mode === 'day' ? 'day' : 'trip' },
+        { 
+          placeId, 
+          action: 'like', 
+          source: mode === 'day' ? 'day' : 'trip',
+          dayId: mode === 'day' ? dayId : undefined,
+          slot: mode === 'day' ? slot : undefined,
+        },
         {
           onSuccess: (res) => {
             if (res?.limitReached) {
@@ -257,6 +275,8 @@ export function ExploreDeck({
         action: 'undo',
         previousAction: lastSwipe.action,
         source: mode,
+        dayId: mode === 'day' ? dayId : undefined,
+        slot: mode === 'day' ? slot : undefined,
       });
 
       // Remove from history
@@ -469,7 +489,13 @@ export function ExploreDeck({
               // For now, just like the place and show message
               // In future, can implement a separate "save to plan" action
               swipeMutation.mutate(
-                { placeId: selectedPlaceId, action: 'like', source: mode },
+                { 
+                  placeId: selectedPlaceId, 
+                  action: 'like', 
+                  source: mode,
+                  dayId: mode === 'day' ? dayId : undefined,
+                  slot: mode === 'day' ? slot : undefined,
+                },
                 {
                   onSuccess: () => {
                     setDetailsDrawerOpen(false);
@@ -483,7 +509,13 @@ export function ExploreDeck({
           // Like the place when user clicks "Add to itinerary"
           if (selectedPlaceId) {
             swipeMutation.mutate(
-              { placeId: selectedPlaceId, action: 'like', source: mode },
+              { 
+                placeId: selectedPlaceId, 
+                action: 'like', 
+                source: mode,
+                dayId: mode === 'day' ? dayId : undefined,
+                slot: mode === 'day' ? slot : undefined,
+              },
               {
                 onSuccess: () => {
                   setDetailsDrawerOpen(false);

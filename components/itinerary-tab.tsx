@@ -13,6 +13,7 @@ import { ShareTripDialog } from "@/components/share-trip-dialog";
 import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
 import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -604,11 +605,22 @@ export function ItineraryTab({
     <div className="flex flex-col h-full bg-white relative">
       {/* Header */}
       <div className="px-6 py-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
-        <div>
-          <h1 className="text-xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>{trip.title}</h1>
-          <p className="text-sm text-gray-500">
-            {format(new Date(trip.start_date), "MMM d")} - {format(new Date(trip.end_date), "MMM d, yyyy")}
-          </p>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex-shrink-0">
+            <Image 
+              src="/icon.svg" 
+              alt="Kruno" 
+              width={32} 
+              height={32} 
+              className="hover:opacity-80 transition-opacity"
+            />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>{trip.title}</h1>
+            <p className="text-sm text-gray-500">
+              {format(new Date(trip.start_date), "MMM d")} - {format(new Date(trip.end_date), "MMM d, yyyy")}
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setMembersDialogOpen(true)}>
@@ -948,7 +960,7 @@ export function ItineraryTab({
                                                 className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 gap-1.5 ${
                                                   place.visited
                                                     ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                                    : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                                                    : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                                                 }`}
                                               >
                                                 {place.visited && <Check className="h-3 w-3" />}
@@ -971,7 +983,7 @@ export function ItineraryTab({
                                                 className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 ${
                                                   dayIsPast || dayIsAtCapacity
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
-                                                    : "border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
+                                                    : "border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"
                                                 }`}
                                               >
                                                 Change
@@ -1247,7 +1259,7 @@ export function ItineraryTab({
                                                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                                   place.visited
                                                     ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                                    : "bg-green-100 text-green-700 hover:bg-green-200"
                                                 }`}
                                               >
                                                 {place.visited ? (
@@ -1276,7 +1288,7 @@ export function ItineraryTab({
                                                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                                   dayIsPast || dayIsAtCapacity
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                    : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                                                    : "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                                                 }`}
                                               >
                                                 Change

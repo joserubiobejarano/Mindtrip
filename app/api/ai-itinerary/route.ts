@@ -239,6 +239,8 @@ Requirements:
               - "description": 2-3 sentences with practical info (opening hours, tips, what to expect)
               - "placeId": null (always null for now)
               - "alreadyVisited": false (always false for now)
+- For each time slot (Morning, Afternoon, Evening), target at least 4 activities where feasible. This can include major sights, short stops, viewpoints, small walks, etc. Still respect realistic travel time and opening hours.
+- At most 1 eating place per slot. Define "eating place" as restaurant, café, bar focused primarily on food/drinks. If needed for user preferences (e.g. foodie), keep other items nearby but do not exceed one eating place per slot.
 - Take into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
 - Use the destination city "${destination}" to anchor recommendations
 - Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing
@@ -277,7 +279,7 @@ Return ONLY valid JSON with this exact structure:
   ]
 }
 
-Make sure each day has sections for Morning, Afternoon, and Evening with 4-6 activities total per day. Be creative but realistic.`
+Make sure each day has sections for Morning, Afternoon, and Evening with approximately 4 activities per slot (12+ activities per day). Be creative but realistic.`
 
     // Call OpenAI
     const openai = getOpenAIClient()
@@ -344,6 +346,36 @@ Make sure each day has sections for Morning, Afternoon, and Evening with 4-6 act
     if (!parsedResponse.tripTitle || !parsedResponse.summary || !Array.isArray(parsedResponse.days)) {
       throw new Error('Invalid itinerary structure from OpenAI')
     }
+
+    // Post-process: Enforce food place cap (max 1 per slot)
+    const foodKeywords = ['restaurant', 'cafe', 'café', 'bar', 'brunch', 'dining', 'bistro', 'eatery', 'food', 'meal', 'lunch', 'dinner', 'breakfast', 'tavern', 'pub', 'bakery', 'pizzeria', 'trattoria', 'tapas'];
+    
+    const isEatingPlace = (activity: RawActivity): boolean => {
+      const nameLower = activity.name.toLowerCase();
+      const descLower = activity.description.toLowerCase();
+      return foodKeywords.some(keyword => nameLower.includes(keyword) || descLower.includes(keyword));
+    };
+
+    parsedResponse.days.forEach(day => {
+      day.sections.forEach(section => {
+        const activities = section.activities || [];
+        const eatingPlaces = activities.filter(isEatingPlace);
+        
+        if (eatingPlaces.length > 1) {
+          // Keep the first eating place
+          const firstEatingPlace = eatingPlaces[0];
+          const firstEatingIndex = activities.indexOf(firstEatingPlace);
+          
+          // Remove other eating places from this slot
+          const filteredActivities = activities.filter((activity, index) => {
+            if (index === firstEatingIndex) return true; // Keep first
+            return !isEatingPlace(activity); // Remove other eating places
+          });
+          
+          section.activities = filteredActivities;
+        }
+      });
+    });
 
     // Process itinerary: Fetch photos and prepare activities for insertion
     const activitiesToInsert: any[] = [];

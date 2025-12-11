@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useUser, UserProfile } from "@clerk/nextjs";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,9 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
-import { Sparkles, Check, Infinity } from "lucide-react";
+import { Sparkles, Check } from "lucide-react";
 
 const CURRENCIES = [
   "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR", "MXN",
@@ -140,229 +141,260 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     return null;
   }
 
+  const [activeTab, setActiveTab] = useState("account");
+
+  // Auto-switch to billing tab if upgrade param is present
+  useEffect(() => {
+    if (showUpgrade) {
+      setActiveTab("billing");
+    }
+  }, [showUpgrade]);
+
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-background p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Account Settings</h1>
+          <h1 className="text-3xl font-bold mb-2">Settings</h1>
           <p className="text-muted-foreground">
-            Manage your account preferences and settings.
+            Manage your account preferences and billing.
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Your account information from Clerk
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Name</Label>
-              <Input
-                value={user.fullName || ""}
-                disabled
-                className="bg-muted"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Managed by Clerk
-              </p>
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input
-                value={user.primaryEmailAddress?.emailAddress || ""}
-                disabled
-                className="bg-muted"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Managed by Clerk
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Mobile: Horizontal tabs */}
+          <div className="block md:hidden mb-6">
+            <TabsList className="w-full grid grid-cols-2">
+              <TabsTrigger value="account">Account</TabsTrigger>
+              <TabsTrigger value="billing">Billing</TabsTrigger>
+            </TabsList>
+          </div>
 
-        {/* Subscription / Upgrade Section */}
-        <Card className={`mt-6 ${showUpgrade ? 'ring-2 ring-purple-500' : ''}`}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Subscription</CardTitle>
-                <CardDescription>
-                  {isPro ? 'You have Pro access' : 'Upgrade to unlock unlimited features'}
-                </CardDescription>
-              </div>
-              {isPro && (
-                <div className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
-                  <Sparkles className="h-4 w-4" />
-                  <span className="text-sm font-medium">Pro</span>
-                </div>
-              )}
+          {/* Desktop: Side navigation or horizontal tabs */}
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="hidden md:block md:w-48 flex-shrink-0">
+              <TabsList className="flex flex-col h-auto w-full bg-transparent p-0">
+                <TabsTrigger 
+                  value="account" 
+                  className="w-full justify-start data-[state=active]:bg-muted"
+                >
+                  Account
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="billing"
+                  className="w-full justify-start data-[state=active]:bg-muted"
+                >
+                  Billing
+                </TabsTrigger>
+              </TabsList>
             </div>
-          </CardHeader>
-          <CardContent>
-            {isPro ? (
-              <div className="space-y-4">
-                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <h3 className="font-semibold mb-3 text-purple-900">Pro Benefits</h3>
-                  <ul className="space-y-2 text-sm text-purple-800">
-                    <li className="flex items-center gap-2 font-semibold text-base">
-                      <Check className="h-5 w-5 text-purple-600" />
-                      <span>Higher swipe limits (100 per trip)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-purple-600" />
-                      <span>Advanced filters (budget & distance)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-purple-600" />
-                      <span>Priority support</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      try {
-                        const response = await fetch("/api/billing/portal", {
-                          method: "POST",
-                        });
 
-                        if (!response.ok) {
-                          const error = await response.json();
-                          throw new Error(error.error || "Failed to open billing portal");
-                        }
+            <div className="flex-1">
+              <TabsContent value="account" className="space-y-6 mt-0">
+                {/* Clerk UserProfile Component */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Account</CardTitle>
+                    <CardDescription>
+                      Manage your account information, security, and profile settings
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <UserProfile />
+                  </CardContent>
+                </Card>
 
-                        const { url } = await response.json();
-                        if (url) {
-                          window.location.href = url;
-                        }
-                      } catch (error) {
-                        console.error("Error opening billing portal:", error);
-                        addToast({
-                          variant: "destructive",
-                          title: "Failed to open billing portal",
-                          description: "Please try again.",
-                        });
-                      }
-                    }}
-                  >
-                    Manage Subscription
-                  </Button>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Thank you for being a Pro member!
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-                  <h3 className="font-semibold mb-3">Upgrade to Pro</h3>
-                  <ul className="space-y-2 text-sm mb-4">
-                    <li className="flex items-center gap-2 font-semibold text-base">
-                      <Check className="h-5 w-5 text-purple-600" />
-                      <span>Higher swipe limits (100 per trip)</span>
-                      <span className="text-xs text-muted-foreground font-normal">(vs 10 free)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-purple-600" />
-                      <span>Advanced filters: budget & distance</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-purple-600" />
-                      <span>Priority support</span>
-                    </li>
-                  </ul>
-                  <Button
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                    size="lg"
-                    onClick={async () => {
-                      try {
-                        const response = await fetch("/api/billing/checkout/subscription", {
-                          method: "POST",
-                        });
+                {/* Preferences Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Preferences</CardTitle>
+                    <CardDescription>
+                      Customize your display name and default currency
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="displayName">Display Name</Label>
+                      <Input
+                        id="displayName"
+                        placeholder="Enter your display name"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        This name will be shown to other trip members
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="defaultCurrency">Default Currency</Label>
+                      <Select value={defaultCurrency} onValueChange={setDefaultCurrency}>
+                        <SelectTrigger id="defaultCurrency">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CURRENCIES.map((currency) => (
+                            <SelectItem key={currency} value={currency}>
+                              {currency}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        Default currency for new trips
+                      </p>
+                    </div>
+                    <div className="pt-4">
+                      <Button
+                        onClick={handleSave}
+                        disabled={isSaving || saveProfile.isPending}
+                      >
+                        {isSaving || saveProfile.isPending ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-                        if (!response.ok) {
-                          const error = await response.json();
-                          throw new Error(error.error || "Failed to create checkout session");
-                        }
+              <TabsContent value="billing" className="space-y-6 mt-0">
+                <Card className={showUpgrade ? 'ring-2 ring-purple-500' : ''}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Billing</CardTitle>
+                        <CardDescription className="mt-2">
+                          {isPro ? (
+                            <span className="inline-flex items-center gap-2">
+                              <span>Current plan: Kruno Pro (Yearly)</span>
+                            </span>
+                          ) : (
+                            <span>Current plan: Free</span>
+                          )}
+                        </CardDescription>
+                      </div>
+                      {isPro && (
+                        <div className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
+                          <Sparkles className="h-4 w-4" />
+                          <span className="text-sm font-medium">Pro</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {isPro ? (
+                      <div className="space-y-4">
+                        <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                          <h3 className="font-semibold mb-3 text-purple-900">Pro Benefits</h3>
+                          <ul className="space-y-2 text-sm text-purple-800">
+                            <li className="flex items-center gap-2 font-semibold text-base">
+                              <Check className="h-5 w-5 text-purple-600" />
+                              <span>Higher swipe limits (100 per trip)</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 text-purple-600" />
+                              <span>Advanced filters (budget & distance)</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 text-purple-600" />
+                              <span>Priority support</span>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className="pt-4">
+                          <Button
+                            variant="outline"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch("/api/billing/portal", {
+                                  method: "POST",
+                                });
 
-                        const { url } = await response.json();
-                        if (url) {
-                          window.location.href = url;
-                        }
-                      } catch (error) {
-                        console.error("Error creating checkout:", error);
-                        addToast({
-                          variant: "destructive",
-                          title: "Failed to start checkout",
-                          description: "Please try again.",
-                        });
-                      }
-                    }}
-                  >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Upgrade to Pro
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Free plan includes 10 swipes per trip. Upgrade for higher limits (100 per trip).
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                                if (!response.ok) {
+                                  const error = await response.json();
+                                  throw new Error(error.error || "Failed to open billing portal");
+                                }
 
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Preferences</CardTitle>
-            <CardDescription>
-              Customize your display name and default currency
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="displayName">Display Name</Label>
-              <Input
-                id="displayName"
-                placeholder="Enter your display name"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                This name will be shown to other trip members
-              </p>
+                                const { url } = await response.json();
+                                if (url) {
+                                  window.location.href = url;
+                                }
+                              } catch (error) {
+                                console.error("Error opening billing portal:", error);
+                                addToast({
+                                  variant: "destructive",
+                                  title: "Failed to open billing portal",
+                                  description: "Please try again.",
+                                });
+                              }
+                            }}
+                          >
+                            Manage Subscription
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          You can change or cancel your subscription at any time in the Stripe billing portal.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                          <h3 className="font-semibold mb-3">Upgrade to Pro</h3>
+                          <ul className="space-y-2 text-sm mb-4">
+                            <li className="flex items-center gap-2 font-semibold text-base">
+                              <Check className="h-5 w-5 text-purple-600" />
+                              <span>Higher swipe limits (100 per trip)</span>
+                              <span className="text-xs text-muted-foreground font-normal">(vs 10 free)</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 text-purple-600" />
+                              <span>Advanced filters: budget & distance</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 text-purple-600" />
+                              <span>Priority support</span>
+                            </li>
+                          </ul>
+                          <Button
+                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                            size="lg"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch("/api/billing/checkout/subscription", {
+                                  method: "POST",
+                                });
+
+                                if (!response.ok) {
+                                  const error = await response.json();
+                                  throw new Error(error.error || "Failed to create checkout session");
+                                }
+
+                                const { url } = await response.json();
+                                if (url) {
+                                  window.location.href = url;
+                                }
+                              } catch (error) {
+                                console.error("Error creating checkout:", error);
+                                addToast({
+                                  variant: "destructive",
+                                  title: "Failed to start checkout",
+                                  description: "Please try again.",
+                                });
+                              }
+                            }}
+                          >
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Upgrade to Kruno Pro
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Kruno Pro gives you longer trips, higher swipe limits, multi-city itineraries, and more.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="defaultCurrency">Default Currency</Label>
-              <Select value={defaultCurrency} onValueChange={setDefaultCurrency}>
-                <SelectTrigger id="defaultCurrency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((currency) => (
-                    <SelectItem key={currency} value={currency}>
-                      {currency}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Default currency for new trips
-              </p>
-            </div>
-            <div className="pt-4">
-              <Button
-                onClick={handleSave}
-                disabled={isSaving || saveProfile.isPending}
-              >
-                {isSaving || saveProfile.isPending ? "Saving..." : "Save Changes"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </Tabs>
       </div>
     </div>
   );

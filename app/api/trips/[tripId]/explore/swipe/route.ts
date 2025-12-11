@@ -21,7 +21,7 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { place_id, action, previous_action, source, trip_segment_id } = body;
+    const { place_id, action, previous_action, source, trip_segment_id, day_id, slot } = body;
 
     if (!action) {
       return NextResponse.json(
@@ -63,6 +63,16 @@ export async function POST(
 
     // Source defaults to 'trip' for backward compatibility
     const swipeSource = source || 'trip';
+
+    // Validate day-level swipes require dayId
+    if (swipeSource === 'day') {
+      if (!day_id) {
+        return NextResponse.json(
+          { error: 'Missing dayId for day-level swipe' },
+          { status: 400 }
+        );
+      }
+    }
 
     const supabase = await createClient();
 

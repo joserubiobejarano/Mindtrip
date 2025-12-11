@@ -59,7 +59,7 @@ export function NewWhyChooseSection() {
             Why travelers love <span className="solid-underline inline-block relative">Kruno</span>
           </h2>
           <p className="text-muted-foreground mt-6">
-            Built by explorers, for explorers. We&apos;ve thought of <span className="wavy-underline inline-block">everything</span> so you don&apos;t have to.
+            Built by explorers, for explorers. We&apos;ve thought of everything so you don&apos;t have to.
           </p>
         </div>
 
