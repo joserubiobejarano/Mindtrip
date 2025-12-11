@@ -38,7 +38,7 @@ export default function ContactPage() {
         
         <div className="prose prose-lg max-w-none">
           <p className="text-lg text-muted-foreground mb-8">
-            Have a question, feedback, or need support? We'd love to hear from you!
+            Have a question, feedback, or need support? We&apos;d love to hear from you!
           </p>
           
           <section className="mb-8">
@@ -61,7 +61,7 @@ export default function ContactPage() {
             <h2 className="text-2xl font-semibold mb-4">Response Time</h2>
             <p className="text-muted-foreground">
               We typically respond within 24-48 hours during business days. For urgent matters, 
-              please include "URGENT" in your subject line.
+              please include &quot;URGENT&quot; in your subject line.
             </p>
           </section>
 

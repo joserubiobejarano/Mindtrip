@@ -44,8 +44,8 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
             <p className="text-muted-foreground">
-              Welcome to Kruno. These Terms of Service ("Terms") govern your access to and use of Kruno's 
-              website, mobile applications, and services (collectively, the "Service"). By accessing or 
+              Welcome to Kruno. These Terms of Service (&quot;Terms&quot;) govern your access to and use of Kruno&apos;s 
+              website, mobile applications, and services (collectively, the &quot;Service&quot;). By accessing or 
               using our Service, you agree to be bound by these Terms.
             </p>
           </section>
@@ -87,7 +87,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Liability</h2>
             <p className="text-muted-foreground">
-              Kruno provides the Service "as is" without warranties of any kind. We are not responsible 
+              Kruno provides the Service &quot;as is&quot; without warranties of any kind. We are not responsible 
               for the accuracy, completeness, or usefulness of any information provided through the Service. 
               We shall not be liable for any indirect, incidental, special, or consequential damages arising 
               from your use of the Service.
@@ -108,7 +108,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-semibold mb-4">Changes to Terms</h2>
             <p className="text-muted-foreground">
               We reserve the right to modify these Terms at any time. We will notify users of any material 
-              changes by posting the updated Terms on this page and updating the "Last updated" date. 
+              changes by posting the updated Terms on this page and updating the &quot;Last updated&quot; date. 
               Your continued use of the Service after such changes constitutes acceptance of the updated Terms.
             </p>
           </section>

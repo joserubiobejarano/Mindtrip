@@ -37,6 +37,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
   const [defaultCurrency, setDefaultCurrency] = useState("USD");
   const [isSaving, setIsSaving] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [activeTab, setActiveTab] = useState("account");
 
   // Fetch profile and subscription status
   const { data: profile, isLoading } = useQuery({
@@ -81,6 +82,13 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
       setDisplayName(user.fullName || "");
     }
   }, [profile, user]);
+
+  // Auto-switch to billing tab if upgrade param is present
+  useEffect(() => {
+    if (showUpgrade) {
+      setActiveTab("billing");
+    }
+  }, [showUpgrade]);
 
   const saveProfile = useMutation({
     mutationFn: async () => {
@@ -140,15 +148,6 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     router.push("/sign-in");
     return null;
   }
-
-  const [activeTab, setActiveTab] = useState("account");
-
-  // Auto-switch to billing tab if upgrade param is present
-  useEffect(() => {
-    if (showUpgrade) {
-      setActiveTab("billing");
-    }
-  }, [showUpgrade]);
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">

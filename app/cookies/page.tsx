@@ -69,7 +69,7 @@ export default function CookiesPage() {
             <p className="text-muted-foreground">
               When you first visit Kruno, we ask for your consent to use non-essential cookies. You can 
               choose to accept all cookies or only essential cookies. You can change your cookie preferences 
-              at any time through your browser settings or by clearing your browser's stored preferences.
+              at any time through your browser settings or by clearing your browser&apos;s stored preferences.
             </p>
           </section>
 

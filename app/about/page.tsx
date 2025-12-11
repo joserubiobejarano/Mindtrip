@@ -45,7 +45,7 @@ export default function AboutPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
             <p className="text-muted-foreground">
-              We're on a mission to transform how people plan their travels. By combining artificial intelligence 
+              We&apos;re on a mission to transform how people plan their travels. By combining artificial intelligence 
               with intuitive design, Kruno helps you discover amazing places, create personalized itineraries, 
               and collaborate seamlessly with friends and family.
             </p>
