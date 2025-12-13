@@ -21,9 +21,11 @@ export function NewNavbar() {
     <header className="sticky top-0 z-50 w-full py-4 px-6 md:px-12 bg-background/80 backdrop-blur-sm border-b border-border/40">
       <nav className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
-            <span className="text-background text-sm font-mono">@</span>
-          </div>
+          <img 
+            src="/icon.svg" 
+            alt="Kruno" 
+            className="w-8 h-8"
+          />
           <span className="font-display text-xl font-semibold">Kruno</span>
         </Link>
 

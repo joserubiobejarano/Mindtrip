@@ -177,7 +177,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
 
       {/* Filters Section - Hidden on mobile for full-screen card experience */}
       <div className="hidden lg:block px-6 py-4 border-b border-sage/20 flex-shrink-0">
-        <ExploreFilters filters={filters} onFiltersChange={setFilters} />
+        <ExploreFilters filters={filters} onFiltersChange={setFilters} tripId={tripId} />
       </div>
 
       {/* Swipe limit message - only shown when limit is reached - Hidden on mobile */}

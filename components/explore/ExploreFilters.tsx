@@ -3,15 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ExploreFilters as ExploreFiltersType } from '@/lib/google/explore-places';
+import { ProPaywallModal } from '@/components/pro/ProPaywallModal';
 
 interface ExploreFiltersProps {
   filters: ExploreFiltersType;
   onFiltersChange: (filters: ExploreFiltersType) => void;
   className?: string;
   isPro?: boolean; // Pass from parent or fetch
+  tripId?: string; // For paywall modal
 }
 
 const CATEGORIES = [
@@ -45,9 +47,11 @@ export function ExploreFilters({
   onFiltersChange,
   className,
   isPro = false, // Default to false, should be passed from parent
+  tripId,
 }: ExploreFiltersProps) {
   const { user } = useUser();
   const [clientIsPro, setClientIsPro] = useState(isPro);
+  const [showProPaywall, setShowProPaywall] = useState(false);
 
   // Check Pro status on mount
   useEffect(() => {
@@ -75,6 +79,10 @@ export function ExploreFilters({
   };
 
   const handleBudgetChange = (value: string) => {
+    if (!effectiveIsPro) {
+      setShowProPaywall(true);
+      return;
+    }
     onFiltersChange({
       ...filters,
       budget: value ? parseInt(value, 10) : undefined,
@@ -82,6 +90,10 @@ export function ExploreFilters({
   };
 
   const handleDistanceChange = (value: string) => {
+    if (!effectiveIsPro) {
+      setShowProPaywall(true);
+      return;
+    }
     onFiltersChange({
       ...filters,
       maxDistance: value ? parseInt(value, 10) : undefined,
@@ -127,17 +139,21 @@ export function ExploreFilters({
         ))}
       </div>
 
-      {/* Pro Tier Filters */}
-      {effectiveIsPro && (
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Budget Filter (Pro only) */}
-          <div className="flex items-center gap-2">
-            <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
+      {/* Pro Tier Filters - Show for all users but locked for non-Pro */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Budget Filter (Pro only) */}
+        <div className="flex items-center gap-2">
+          <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
+          <div className="relative">
             <Select
               value={filters.budget?.toString() || ''}
               onValueChange={handleBudgetChange}
+              disabled={!effectiveIsPro}
             >
-              <SelectTrigger className="w-[120px] h-8 text-xs bg-white border-sage/30">
+              <SelectTrigger className={cn(
+                "w-[120px] h-8 text-xs bg-white border-sage/30",
+                !effectiveIsPro && "opacity-60 cursor-not-allowed"
+              )}>
                 <SelectValue placeholder="Any budget" />
               </SelectTrigger>
               <SelectContent>
@@ -148,16 +164,32 @@ export function ExploreFilters({
                 ))}
               </SelectContent>
             </Select>
+            {!effectiveIsPro && (
+              <div 
+                className="absolute inset-0 cursor-pointer z-10"
+                onClick={() => setShowProPaywall(true)}
+                title="Upgrade to Pro to use budget filter"
+              />
+            )}
+            {!effectiveIsPro && (
+              <Lock className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+            )}
           </div>
+        </div>
 
-          {/* Distance Filter (Pro only) */}
-          <div className="flex items-center gap-2">
-            <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
+        {/* Distance Filter (Pro only) */}
+        <div className="flex items-center gap-2">
+          <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
+          <div className="relative">
             <Select
               value={filters.maxDistance?.toString() || ''}
               onValueChange={handleDistanceChange}
+              disabled={!effectiveIsPro}
             >
-              <SelectTrigger className="w-[120px] h-8 text-xs bg-white border-sage/30">
+              <SelectTrigger className={cn(
+                "w-[120px] h-8 text-xs bg-white border-sage/30",
+                !effectiveIsPro && "opacity-60 cursor-not-allowed"
+              )}>
                 <SelectValue placeholder="Any distance" />
               </SelectTrigger>
               <SelectContent>
@@ -168,9 +200,26 @@ export function ExploreFilters({
                 ))}
               </SelectContent>
             </Select>
+            {!effectiveIsPro && (
+              <div 
+                className="absolute inset-0 cursor-pointer z-10"
+                onClick={() => setShowProPaywall(true)}
+                title="Upgrade to Pro to use distance filter"
+              />
+            )}
+            {!effectiveIsPro && (
+              <Lock className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+            )}
           </div>
         </div>
-      )}
+      </div>
+
+      <ProPaywallModal
+        open={showProPaywall}
+        onClose={() => setShowProPaywall(false)}
+        tripId={tripId}
+        context="filters"
+      />
     </div>
   );
 }

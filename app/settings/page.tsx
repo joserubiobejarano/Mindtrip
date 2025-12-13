@@ -36,7 +36,6 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
   const [displayName, setDisplayName] = useState("");
   const [defaultCurrency, setDefaultCurrency] = useState("USD");
   const [isSaving, setIsSaving] = useState(false);
-  const [isPro, setIsPro] = useState(false);
   const [activeTab, setActiveTab] = useState("account");
 
   // Fetch profile and subscription status
@@ -60,15 +59,22 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     enabled: !!user?.id && isLoaded,
   });
 
-  // Fetch subscription status
-  useEffect(() => {
-    if (user?.id) {
-      fetch('/api/user/subscription-status')
-        .then(res => res.json())
-        .then(data => setIsPro(data.isPro || false))
-        .catch(() => setIsPro(false));
-    }
-  }, [user?.id]);
+  // Fetch subscription status using React Query
+  const { data: subscriptionStatus, isLoading: isLoadingSubscription, error: subscriptionError } = useQuery({
+    queryKey: ["subscription-status", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return { isPro: false };
+      const response = await fetch('/api/user/subscription-status');
+      if (!response.ok) {
+        throw new Error('Failed to fetch subscription status');
+      }
+      return response.json();
+    },
+    enabled: !!user?.id && isLoaded,
+    retry: 1,
+  });
+
+  const isPro = subscriptionStatus?.isPro || false;
 
   // Update local state when profile loads
   useEffect(() => {
@@ -143,6 +149,8 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
       </div>
     );
   }
+
+  const isLoadingBilling = isLoadingSubscription;
 
   if (!user) {
     router.push("/sign-in");
@@ -254,23 +262,25 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
               </TabsContent>
 
               <TabsContent value="billing" className="space-y-6 mt-0">
-                <Card className={showUpgrade ? 'ring-2 ring-purple-500' : ''}>
+                <Card className={showUpgrade ? 'ring-2 ring-primary' : ''}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle>Billing</CardTitle>
                         <CardDescription className="mt-2">
-                          {isPro ? (
-                            <span className="inline-flex items-center gap-2">
-                              <span>Current plan: Kruno Pro (Yearly)</span>
-                            </span>
+                          {isLoadingBilling ? (
+                            <span className="text-muted-foreground">Loading billing status...</span>
+                          ) : subscriptionError ? (
+                            <span className="text-destructive">Failed to load billing status</span>
+                          ) : isPro ? (
+                            <span>Current plan: Kruno Pro (Yearly)</span>
                           ) : (
                             <span>Current plan: Free</span>
                           )}
                         </CardDescription>
                       </div>
-                      {isPro && (
-                        <div className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
+                      {isPro && !isLoadingBilling && (
+                        <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full">
                           <Sparkles className="h-4 w-4" />
                           <span className="text-sm font-medium">Pro</span>
                         </div>
@@ -278,28 +288,36 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {isPro ? (
+                    {isLoadingBilling ? (
+                      <div className="p-4 text-center text-muted-foreground">
+                        Loading billing information...
+                      </div>
+                    ) : subscriptionError ? (
+                      <div className="p-4 text-center">
+                        <p className="text-sm text-destructive mb-2">
+                          Failed to load billing status. Please refresh the page.
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            queryClient.invalidateQueries({ queryKey: ["subscription-status", user?.id] });
+                          }}
+                        >
+                          Retry
+                        </Button>
+                      </div>
+                    ) : isPro ? (
                       <div className="space-y-4">
-                        <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                          <h3 className="font-semibold mb-3 text-purple-900">Pro Benefits</h3>
-                          <ul className="space-y-2 text-sm text-purple-800">
-                            <li className="flex items-center gap-2 font-semibold text-base">
-                              <Check className="h-5 w-5 text-purple-600" />
-                              <span>Higher swipe limits (100 per trip)</span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              <span>Advanced filters (budget & distance)</span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              <span>Priority support</span>
-                            </li>
-                          </ul>
+                        <div className="p-4 bg-muted rounded-lg border">
+                          <p className="text-sm font-medium mb-2">You&apos;re on Kruno Pro (Yearly)</p>
+                          <p className="text-sm text-muted-foreground">
+                            Your subscription is active.
+                          </p>
                         </div>
                         <div className="pt-4">
                           <Button
-                            variant="outline"
+                            variant="default"
                             onClick={async () => {
                               try {
                                 const response = await fetch("/api/billing/portal", {
@@ -334,58 +352,71 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-                          <h3 className="font-semibold mb-3">Upgrade to Pro</h3>
+                        <div>
+                          <h3 className="font-semibold mb-3">Upgrade to Kruno Pro</h3>
                           <ul className="space-y-2 text-sm mb-4">
-                            <li className="flex items-center gap-2 font-semibold text-base">
-                              <Check className="h-5 w-5 text-purple-600" />
-                              <span>Higher swipe limits (100 per trip)</span>
-                              <span className="text-xs text-muted-foreground font-normal">(vs 10 free)</span>
+                            <li className="flex items-start gap-2">
+                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>Longer trips (more than 14 days)</span>
                             </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              <span>Advanced filters: budget & distance</span>
+                            <li className="flex items-start gap-2">
+                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>Higher swipe limits (100 per trip vs 10 free)</span>
                             </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              <span>Priority support</span>
+                            <li className="flex items-start gap-2">
+                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>Multi-city itineraries</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>Advanced Explore filters (budget & distance)</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>Higher itinerary regeneration limits</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>Unlimited active trips</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>Future collaboration tools (polls, comments, shared editing)</span>
                             </li>
                           </ul>
-                          <Button
-                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                            size="lg"
-                            onClick={async () => {
-                              try {
-                                const response = await fetch("/api/billing/checkout/subscription", {
-                                  method: "POST",
-                                });
-
-                                if (!response.ok) {
-                                  const error = await response.json();
-                                  throw new Error(error.error || "Failed to create checkout session");
-                                }
-
-                                const { url } = await response.json();
-                                if (url) {
-                                  window.location.href = url;
-                                }
-                              } catch (error) {
-                                console.error("Error creating checkout:", error);
-                                addToast({
-                                  variant: "destructive",
-                                  title: "Failed to start checkout",
-                                  description: "Please try again.",
-                                });
-                              }
-                            }}
-                          >
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            Upgrade to Kruno Pro
-                          </Button>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          Kruno Pro gives you longer trips, higher swipe limits, multi-city itineraries, and more.
-                        </p>
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="w-full"
+                          onClick={async () => {
+                            try {
+                              const response = await fetch("/api/billing/checkout/subscription", {
+                                method: "POST",
+                              });
+
+                              if (!response.ok) {
+                                const error = await response.json();
+                                throw new Error(error.error || "Failed to create checkout session");
+                              }
+
+                              const { url } = await response.json();
+                              if (url) {
+                                window.location.href = url;
+                              }
+                            } catch (error) {
+                              console.error("Error creating checkout:", error);
+                              addToast({
+                                variant: "destructive",
+                                title: "Failed to start checkout",
+                                description: "Please try again.",
+                              });
+                            }
+                          }}
+                        >
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          Upgrade to Kruno Pro
+                        </Button>
                       </div>
                     )}
                   </CardContent>

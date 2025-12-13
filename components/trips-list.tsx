@@ -157,7 +157,7 @@ export function TripsList() {
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-10">
         <Button onClick={() => setOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           New Trip
@@ -165,31 +165,31 @@ export function TripsList() {
       </div>
 
       {trips.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
+        <Card className="rounded-2xl shadow-md border-0 bg-card/50">
+          <CardContent className="pt-8 pb-8">
+            <p className="text-center text-muted-foreground text-base">
               No trips yet. Create your first trip to get started!
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-12">
           {/* Upcoming Trips */}
           {upcomingTrips.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Upcoming trips</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <h2 className="text-2xl font-semibold mb-8 tracking-tight">Upcoming trips</h2>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {upcomingTrips.map((trip) => (
                   <Card
                     key={trip.id}
-                    className="relative group cursor-pointer hover:shadow-lg transition-shadow"
+                    className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm"
                     onClick={() => router.push(`/trips/${trip.id}`)}
                   >
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle>{trip.title}</CardTitle>
-                          <CardDescription>
+                    <CardHeader className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
+                          <CardDescription className="text-sm mt-1">
                             {format(new Date(trip.start_date), "MMM d")} -{" "}
                             {format(new Date(trip.end_date), "MMM d, yyyy")}
                           </CardDescription>
@@ -198,7 +198,7 @@ export function TripsList() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                             onClick={(e) => handleDeleteClick(trip, e)}
                             title="Delete trip"
                           >
@@ -216,8 +216,8 @@ export function TripsList() {
           {/* Past Trips */}
           {pastTrips.length > 0 && (
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Past trips</h2>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-semibold tracking-tight">Past trips</h2>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -238,18 +238,18 @@ export function TripsList() {
                 </Button>
               </div>
               {showPastTrips && (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {pastTrips.map((trip) => (
                     <Card
                       key={trip.id}
-                      className="relative group cursor-pointer hover:shadow-lg transition-shadow"
+                      className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm"
                       onClick={() => router.push(`/trips/${trip.id}`)}
                     >
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <CardTitle>{trip.title}</CardTitle>
-                            <CardDescription>
+                      <CardHeader className="p-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
+                            <CardDescription className="text-sm mt-1">
                               {format(new Date(trip.start_date), "MMM d")} -{" "}
                               {format(new Date(trip.end_date), "MMM d, yyyy")}
                             </CardDescription>
@@ -258,7 +258,7 @@ export function TripsList() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                               onClick={(e) => handleDeleteClick(trip, e)}
                               title="Delete trip"
                             >

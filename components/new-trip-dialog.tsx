@@ -12,11 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
 import { DestinationAutocomplete } from "@/components/destination-autocomplete";
 import { DateRangePicker } from "@/components/date-range-picker";
-import { X, Lock, Check, Sparkles, Calendar, MapPin } from "lucide-react";
+import { X, Lock, Calendar, MapPin } from "lucide-react";
 import { DialogDescription } from "@/components/ui/dialog";
+import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -54,7 +54,7 @@ export function NewTripDialog({
   const [segments, setSegments] = useState<CitySegment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [showProPaywall, setShowProPaywall] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     destination?: string;
     startDate?: string;
@@ -89,7 +89,7 @@ export function NewTripDialog({
       setSegments([]);
       setError(null);
       setFieldErrors({});
-      setUpgradeModalOpen(false);
+      setShowProPaywall(false);
     }
   }, [open]);
 
@@ -145,9 +145,9 @@ export function NewTripDialog({
       return;
     }
 
-    // If user is not Pro, show upgrade modal instead of adding a segment
+    // If user is not Pro, show paywall modal instead of adding a segment
     if (!isPro) {
-      setUpgradeModalOpen(true);
+      setShowProPaywall(true);
       return;
     }
 
@@ -237,9 +237,19 @@ export function NewTripDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden flex flex-col relative">
+      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden flex flex-col relative [&>button]:hidden">
         {/* Blue top border matching search box */}
         <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl"></div>
+        {/* Close button positioned above the colored header */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-4 top-4 z-50 h-8 w-8 text-white hover:bg-white/20 hover:text-white rounded-full"
+          onClick={() => onOpenChange(false)}
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </Button>
         <DialogHeader className="pt-[60px] px-6 py-5 flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-foreground">
             Create New Trip
@@ -418,61 +428,11 @@ export function NewTripDialog({
         </form>
       </DialogContent>
 
-      {/* Upgrade Modal */}
-      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Upgrade to Pro</DialogTitle>
-            <DialogDescription>
-              Unlock multi-city trips and other premium features
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-              <h3 className="font-semibold mb-3">Pro Benefits</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2 font-semibold text-base">
-                  <Check className="h-5 w-5 text-purple-600" />
-                  <span>Multi-city trips</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-purple-600" />
-                  <span>Unlimited daily swipes</span>
-                  <span className="text-xs text-muted-foreground font-normal">(vs 10/day free)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-purple-600" />
-                  <span>Advanced filters: budget & distance</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-purple-600" />
-                  <span>Priority support</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setUpgradeModalOpen(false)}
-              className="w-full sm:w-auto"
-            >
-              Maybe Later
-            </Button>
-            <Button
-              className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-              onClick={() => {
-                setUpgradeModalOpen(false);
-                onOpenChange(false);
-                router.push('/settings?upgrade=true');
-              }}
-            >
-              <Sparkles className="mr-2 h-4 w-4" />
-              Upgrade to Pro
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ProPaywallModal
+        open={showProPaywall}
+        onClose={() => setShowProPaywall(false)}
+        context="multi-city"
+      />
     </Dialog>
   );
 }
