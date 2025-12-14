@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
+import { assertStripeEnv } from '@/lib/billing/stripe-env';
+import { randomUUID } from 'crypto';
 
 type ProfileQueryResult = {
+  id?: string
   stripe_customer_id: string | null
 }
 
@@ -30,8 +33,8 @@ export async function POST(req: NextRequest) {
     // Fetch or create profile
     let { data: profileData, error: profileError } = await supabase
       .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', userId)
+      .select('id, stripe_customer_id')
+      .eq('clerk_user_id', userId)
       .maybeSingle();
 
     if (profileError && profileError.code !== 'PGRST116') {
@@ -44,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     // Create Stripe customer if doesn't exist
     if (!stripeCustomerId) {
-      console.log(`Creating Stripe customer for user ${userId}`);
+      console.log(`Creating Stripe customer for user ${userId.substring(0, 10)}...`);
       const customer = await stripe.customers.create({
         email,
         metadata: { kruno_user_id: userId },
@@ -52,29 +55,36 @@ export async function POST(req: NextRequest) {
 
       stripeCustomerId = customer.id;
 
+      // Generate UUID for new profiles, use existing id for updates
+      const profileId = profile?.id || randomUUID();
+
       // Update profile with Stripe customer ID
       const { error: updateError } = await supabase
         .from('profiles')
         .upsert({
-          id: userId,
+          id: profileId,
+          clerk_user_id: userId,
           email,
           stripe_customer_id: stripeCustomerId,
         } as any, {
-          onConflict: 'id',
+          onConflict: 'clerk_user_id',
         });
 
       if (updateError) {
         console.error('Error updating profile with Stripe customer ID:', updateError);
         return NextResponse.json({ error: 'Failed to save customer ID' }, { status: 500 });
       }
-      console.log(`Stripe customer ${stripeCustomerId} created and saved for user ${userId}`);
+      console.log(`Stripe customer ${stripeCustomerId.substring(0, 10)}... created and saved for user ${userId.substring(0, 10)}...`);
     }
+
+    // Validate Stripe environment variables
+    assertStripeEnv();
 
     // Create portal session
     const appUrl = process.env.APP_URL ?? 'https://kruno.app';
     const returnUrl = `${appUrl}/settings/billing`;
 
-    console.log(`Creating billing portal session for customer ${stripeCustomerId}`);
+    console.log(`Creating billing portal session for customer ${stripeCustomerId.substring(0, 10)}...`);
     const portal = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
       return_url: returnUrl,

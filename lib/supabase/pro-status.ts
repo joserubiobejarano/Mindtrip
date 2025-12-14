@@ -31,7 +31,7 @@ export async function getTripProStatus(
   const { data: profile, error: profileError } = await supabaseClient
     .from('profiles')
     .select('is_pro')
-    .eq('id', userId)
+    .eq('clerk_user_id', userId)
     .maybeSingle();
 
   // Handle errors gracefully (profile might not exist yet)

@@ -29,7 +29,7 @@ export function useTripProStatus(tripId: string) {
         supabase
           .from("profiles")
           .select("is_pro")
-          .eq("id", userId)
+          .eq("clerk_user_id", userId)
           .maybeSingle(),
         supabase
           .from("trips")

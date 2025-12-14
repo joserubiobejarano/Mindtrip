@@ -30,6 +30,7 @@ interface ClerkWebhookPayload {
     }>;
     first_name: string | null;
     last_name: string | null;
+    image_url: string | null;
   };
   object: string;
 }
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
       const firstName = evt.data.first_name || '';
       const lastName = evt.data.last_name || '';
       const fullName = [firstName, lastName].filter(Boolean).join(' ') || null;
+      const avatarUrl = evt.data.image_url || null;
 
       console.log(`[Clerk Webhook] Processing user.created for clerk_user_id: ${clerkUserId}`);
 
@@ -111,19 +113,30 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true, sent: false }, { status: 200 });
       }
 
-      // Check if profile exists and if email was already sent (using clerk_user_id)
-      const { data: profileData, error: profileError } = await supabase
+      // Three-step profile resolution strategy
+      type ProfileQueryResult = {
+        id: string;
+        welcome_email_sent_at: string | null;
+        full_name: string | null;
+        avatar_url: string | null;
+      }
+
+      let profile: ProfileQueryResult | null = null;
+      let resolutionPath: 'found_by_clerk_user_id' | 'claimed_by_email' | 'created_new' = 'found_by_clerk_user_id';
+
+      // Step 1: Try to find profile by clerk_user_id
+      const { data: profileByClerkId, error: profileByClerkIdError } = await supabase
         .from('profiles')
-        .select('id, welcome_email_sent_at')
+        .select('id, welcome_email_sent_at, full_name, avatar_url')
         .eq('clerk_user_id', clerkUserId)
         .maybeSingle();
 
-      if (profileError) {
-        console.error('[Clerk Webhook] Error fetching profile:', {
-          message: profileError.message,
-          code: profileError.code,
-          details: profileError.details,
-          hint: profileError.hint,
+      if (profileByClerkIdError) {
+        console.error('[Clerk Webhook] Error fetching profile by clerk_user_id:', {
+          message: profileByClerkIdError.message,
+          code: profileByClerkIdError.code,
+          details: profileByClerkIdError.details,
+          hint: profileByClerkIdError.hint,
         });
         return NextResponse.json(
           { error: 'Failed to fetch profile' },
@@ -131,15 +144,107 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      type ProfileQueryResult = {
-        id: string
-        welcome_email_sent_at: string | null
+      if (profileByClerkId) {
+        profile = profileByClerkId;
+        resolutionPath = 'found_by_clerk_user_id';
+      } else {
+        // Step 2: Try to find legacy profile by email where clerk_user_id IS NULL
+        const { data: profileByEmail, error: profileByEmailError } = await supabase
+          .from('profiles')
+          .select('id, welcome_email_sent_at, full_name, avatar_url')
+          .eq('email', primaryEmail)
+          .is('clerk_user_id', null)
+          .maybeSingle();
+
+        if (profileByEmailError) {
+          console.error('[Clerk Webhook] Error fetching profile by email:', {
+            message: profileByEmailError.message,
+            code: profileByEmailError.code,
+            details: profileByEmailError.details,
+            hint: profileByEmailError.hint,
+          });
+          return NextResponse.json(
+            { error: 'Failed to fetch profile' },
+            { status: 500 }
+          );
+        }
+
+        if (profileByEmail) {
+          // Claim the legacy profile
+          const updateData: any = {
+            clerk_user_id: clerkUserId,
+          };
+
+          // Only update full_name and avatar_url if they are currently NULL/empty
+          if (!profileByEmail.full_name && fullName) {
+            updateData.full_name = fullName;
+          }
+          if (!profileByEmail.avatar_url && avatarUrl) {
+            updateData.avatar_url = avatarUrl;
+          }
+
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update(updateData)
+            .eq('id', profileByEmail.id);
+
+          if (updateError) {
+            console.error('[Clerk Webhook] Error claiming profile:', {
+              message: updateError.message,
+              code: updateError.code,
+              details: updateError.details,
+              hint: updateError.hint,
+            });
+            return NextResponse.json(
+              { error: 'Failed to claim profile' },
+              { status: 500 }
+            );
+          }
+
+          profile = {
+            ...profileByEmail,
+            ...updateData,
+          };
+          resolutionPath = 'claimed_by_email';
+        } else {
+          // Step 3: Create new profile
+          const newProfileId = randomUUID();
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: newProfileId,
+              clerk_user_id: clerkUserId,
+              email: primaryEmail,
+              full_name: fullName,
+              avatar_url: avatarUrl,
+              is_pro: false,
+            })
+            .select('id, welcome_email_sent_at, full_name, avatar_url')
+            .single();
+
+          if (createError) {
+            console.error('[Clerk Webhook] Error creating profile:', {
+              message: createError.message,
+              code: createError.code,
+              details: createError.details,
+              hint: createError.hint,
+            });
+            return NextResponse.json(
+              { error: 'Failed to create profile' },
+              { status: 500 }
+            );
+          }
+
+          profile = newProfile;
+          resolutionPath = 'created_new';
+        }
       }
 
-      const profile = profileData as ProfileQueryResult | null;
+      // Log the resolution path taken
+      console.log(`[Clerk Webhook] Profile resolution: ${resolutionPath} for clerk_user_id: ${clerkUserId}, profile_id: ${profile.id}`);
 
       // Idempotency check: if email was already sent, skip
-      if (profile?.welcome_email_sent_at) {
+      if (profile.welcome_email_sent_at) {
         console.log(
           `[Clerk Webhook] Welcome email already sent for clerk_user_id ${clerkUserId} at ${profile.welcome_email_sent_at}. Skipping.`
         );
@@ -156,59 +261,25 @@ export async function POST(req: NextRequest) {
 
         const now = new Date().toISOString();
 
-        // Update or create profile with clerk_user_id and welcome_email_sent_at
-        if (profile) {
-          // Profile exists, update it with clerk_user_id and welcome_email_sent_at
-          const { error: updateError } = await (supabase
-            .from('profiles') as any)
-            .update({ 
-              clerk_user_id: clerkUserId,
-              welcome_email_sent_at: now,
-            })
-            .eq('id', profile.id);
+        // Update profile with welcome_email_sent_at
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ welcome_email_sent_at: now })
+          .eq('id', profile.id);
 
-          if (updateError) {
-            console.error('[Clerk Webhook] Error updating profile:', {
-              message: updateError.message,
-              code: updateError.code,
-              details: updateError.details,
-              hint: updateError.hint,
-              stack: updateError.stack,
-            });
-            // Email was sent but update failed - log for manual check
-            return NextResponse.json(
-              { error: 'Email sent but failed to update profile' },
-              { status: 500 }
-            );
-          }
-        } else {
-          // Profile doesn't exist, create it with clerk_user_id
-          // Generate a UUID for the profile id (since profiles.id is still the primary key)
-          const profileId = randomUUID();
-          
-          const { error: insertError } = await (supabase.from('profiles') as any).insert({
-            id: profileId,
-            clerk_user_id: clerkUserId,
-            email: primaryEmail,
-            full_name: fullName,
-            is_pro: false,
-            welcome_email_sent_at: now,
+        if (updateError) {
+          console.error('[Clerk Webhook] Error updating welcome_email_sent_at:', {
+            message: updateError.message,
+            code: updateError.code,
+            details: updateError.details,
+            hint: updateError.hint,
+            stack: updateError.stack,
           });
-
-          if (insertError) {
-            console.error('[Clerk Webhook] Error creating profile:', {
-              message: insertError.message,
-              code: insertError.code,
-              details: insertError.details,
-              hint: insertError.hint,
-              stack: insertError.stack,
-            });
-            // Email was sent but insert failed - log for manual check
-            return NextResponse.json(
-              { error: 'Email sent but failed to create profile' },
-              { status: 500 }
-            );
-          }
+          // Email was sent but update failed - log for manual check
+          return NextResponse.json(
+            { error: 'Email sent but failed to update profile' },
+            { status: 500 }
+          );
         }
 
         console.log(`[Clerk Webhook] Welcome email sent successfully to ${primaryEmail} for clerk_user_id: ${clerkUserId}`);

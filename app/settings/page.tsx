@@ -46,7 +46,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("clerk_user_id", user.id)
         .single();
 
       if (error && error.code !== "PGRST116") {
@@ -78,6 +78,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     },
     enabled: !!user?.id && isLoaded,
     retry: 1,
+    staleTime: 60000, // Cache for 1 minute to prevent flicker
   });
 
   const isPro = subscriptionStatus?.isPro || false;
@@ -106,15 +107,31 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not authenticated");
 
+      // Check if profile exists to get its id (UUID)
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("clerk_user_id", user.id)
+        .maybeSingle();
+
+      // Generate UUID for new profiles, use existing id for updates
+      // Use browser's crypto.randomUUID() for client-side generation
+      const profileId = existingProfile?.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : '');
+      
+      if (!profileId) {
+        throw new Error('Unable to generate profile ID');
+      }
+
       const { error } = await (supabase
         .from("profiles") as any)
         .upsert({
-          id: user.id,
+          id: profileId,
+          clerk_user_id: user.id,
           email: user.primaryEmailAddress?.emailAddress || "",
           full_name: displayName || null,
           default_currency: defaultCurrency,
         }, {
-          onConflict: "id",
+          onConflict: "clerk_user_id",
         });
 
       if (error) throw error;
@@ -314,7 +331,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                           )}
                         </CardDescription>
                       </div>
-                      {isPro && !isLoadingBilling && (
+                      {isPro && !isLoadingBilling && !subscriptionError && (
                         <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full">
                           <Sparkles className="h-4 w-4" />
                           <span className="text-sm font-medium">Pro</span>
@@ -325,7 +342,10 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                   <CardContent>
                     {isLoadingBilling ? (
                       <div className="p-4 text-center text-muted-foreground">
-                        Loading billing information...
+                        <div className="animate-pulse space-y-2">
+                          <div className="h-4 bg-muted rounded w-3/4 mx-auto"></div>
+                          <div className="h-4 bg-muted rounded w-1/2 mx-auto"></div>
+                        </div>
                       </div>
                     ) : subscriptionError ? (
                       <div className="p-4 text-center">

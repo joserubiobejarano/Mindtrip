@@ -26,7 +26,6 @@ const CATEGORIES = [
 ];
 
 const BUDGET_OPTIONS = [
-  { value: '', label: 'Any budget' },
   { value: '0', label: 'Free' },
   { value: '1', label: '$' },
   { value: '2', label: '$$' },
@@ -35,7 +34,6 @@ const BUDGET_OPTIONS = [
 ];
 
 const DISTANCE_OPTIONS = [
-  { value: '', label: 'Any distance' },
   { value: '1000', label: 'Within 1 km' },
   { value: '2000', label: 'Within 2 km' },
   { value: '5000', label: 'Within 5 km' },
@@ -146,7 +144,7 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
           <div className="relative">
             <Select
-              value={filters.budget?.toString() || ''}
+              value={filters.budget?.toString() || undefined}
               onValueChange={handleBudgetChange}
               disabled={!effectiveIsPro}
             >
@@ -157,7 +155,7 @@ export function ExploreFilters({
                 <SelectValue placeholder="Any budget" />
               </SelectTrigger>
               <SelectContent>
-                {BUDGET_OPTIONS.map((option) => (
+                {BUDGET_OPTIONS.filter(opt => opt.value).map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -182,7 +180,7 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
           <div className="relative">
             <Select
-              value={filters.maxDistance?.toString() || ''}
+              value={filters.maxDistance?.toString() || undefined}
               onValueChange={handleDistanceChange}
               disabled={!effectiveIsPro}
             >
@@ -193,7 +191,7 @@ export function ExploreFilters({
                 <SelectValue placeholder="Any distance" />
               </SelectTrigger>
               <SelectContent>
-                {DISTANCE_OPTIONS.map((option) => (
+                {DISTANCE_OPTIONS.filter(opt => opt.value).map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

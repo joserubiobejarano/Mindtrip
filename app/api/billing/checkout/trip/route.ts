@@ -3,6 +3,8 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
 import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
+import { assertStripeEnv, getStripePriceIds } from '@/lib/billing/stripe-env';
+import { randomUUID } from 'crypto';
 
 type TripQueryResult = {
   id: string
@@ -89,8 +91,8 @@ export async function POST(req: NextRequest) {
     // Fetch or create profile
     let { data: profileData, error: profileError } = await supabase
       .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', userId)
+      .select('id, stripe_customer_id')
+      .eq('clerk_user_id', userId)
       .maybeSingle();
 
     if (profileError && profileError.code !== 'PGRST116') {
@@ -98,7 +100,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
 
-    const profile = profileData as ProfileQueryResult | null;
+    const profile = profileData as (ProfileQueryResult & { id?: string }) | null;
     let stripeCustomerId = profile?.stripe_customer_id;
 
     // Create Stripe customer if doesn't exist
@@ -110,15 +112,19 @@ export async function POST(req: NextRequest) {
 
       stripeCustomerId = customer.id;
 
+      // Generate UUID for new profiles, use existing id for updates
+      const profileId = profile?.id || randomUUID();
+
       // Update profile with Stripe customer ID
       const { error: updateError } = await supabase
         .from('profiles')
         .upsert({
-          id: userId,
+          id: profileId,
+          clerk_user_id: userId,
           email,
           stripe_customer_id: stripeCustomerId,
         } as any, {
-          onConflict: 'id',
+          onConflict: 'clerk_user_id',
         });
 
       if (updateError) {
@@ -127,17 +133,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Create checkout session
-    if (!process.env.STRIPE_PRICE_ID_PER_TRIP) {
-      return NextResponse.json({ error: 'Stripe price ID not configured' }, { status: 500 });
-    }
+    // Validate Stripe environment variables
+    assertStripeEnv();
+    const { perTrip: priceId } = getStripePriceIds();
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer: stripeCustomerId,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID_PER_TRIP,
+          price: priceId,
           quantity: 1,
         },
       ],
