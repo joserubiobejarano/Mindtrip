@@ -129,7 +129,15 @@ export async function POST(request: NextRequest) {
       .from('trips')
       .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country')
       .eq('id', tripId)
-      .single()
+      .single<{
+        title: string;
+        start_date: string;
+        end_date: string;
+        center_lat: number | null;
+        center_lng: number | null;
+        destination_name: string | null;
+        destination_country: string | null;
+      }>()
 
     if (tripError || !trip) {
       return NextResponse.json(
