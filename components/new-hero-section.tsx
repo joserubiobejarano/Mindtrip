@@ -10,6 +10,7 @@ import { type DestinationOption } from "@/hooks/use-create-trip";
 import { useCreateTrip } from "@/hooks/use-create-trip";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { usePaywall } from "@/hooks/usePaywall";
 
 const suggestionTags = [
   "Plan a weekend in Madrid",
@@ -36,6 +37,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
   const { isSignedIn, userId } = useAuth();
   const router = useRouter();
   const { createTrip, loading: creatingTrip } = useCreateTrip();
+  const { openPaywall } = usePaywall();
 
   // Form state
   const [startDate, setStartDate] = useState("");
@@ -281,7 +283,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                       size="sm"
                       onClick={() => {
                         if (!isPro) {
-                          router.push("/settings?upgrade=true");
+                          openPaywall({ reason: "pro_feature", source: "multi_city_toggle" });
                         } else {
                           setShowMultiCity(!showMultiCity);
                         }

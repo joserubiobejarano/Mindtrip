@@ -25,7 +25,7 @@ export default async function TripsPage() {
             />
             <span className="font-display text-xl font-semibold">Kruno</span>
           </Link>
-          <h1 className="text-3xl font-bold">My Trips</h1>
+          <h1 className="font-display text-4xl font-semibold tracking-tight">My Trips</h1>
         </div>
         <TripsList />
       </div>

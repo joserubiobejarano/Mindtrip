@@ -1,6 +1,11 @@
 import type { SmartItinerary } from '@/types/itinerary';
 
 /**
+ * Number of activities (places) to include per time slot (morning/afternoon/evening)
+ */
+export const ACTIVITIES_PER_BLOCK = 4;
+
+/**
  * Maximum number of activities allowed per day (across all slots)
  */
 export const MAX_ACTIVITIES_PER_DAY = 12;

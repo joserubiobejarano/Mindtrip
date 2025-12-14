@@ -25,27 +25,37 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
 
   if (!place) return null;
 
+  const handleDragStart = () => {
+    if (disabled) return;
+    console.log('[itinerary-swipe] drag started');
+  };
+
   const handleDragEnd = (_: any, info: { offset: { x: number; y: number } }) => {
     if (disabled) return;
 
     const { x: offsetX, y: offsetY } = info.offset;
+    console.log(`[itinerary-swipe] drag ended: offsetX=${offsetX}, offsetY=${offsetY}`);
 
     if (offsetX > 120) {
+      console.log('[itinerary-swipe] swipe right triggered');
       onSwipeRight?.();
       return;
     }
 
     if (offsetX < -120) {
+      console.log('[itinerary-swipe] swipe left triggered');
       onSwipeLeft?.();
       return;
     }
 
     if (offsetY < -120) {
+      console.log('[itinerary-swipe] swipe up triggered');
       onSwipeUp?.();
       return;
     }
 
     // If threshold not reached, let Framer Motion animate back to center
+    console.log('[itinerary-swipe] threshold not reached, animating back to center');
   };
 
   return (
@@ -55,7 +65,8 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
         style={{ x, y, rotate }}
         drag={!disabled}
         dragElastic={0.3}
-        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+        dragConstraints={{ left: -300, right: 300, top: -300, bottom: 300 }}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
         {/* LIKE overlay */}

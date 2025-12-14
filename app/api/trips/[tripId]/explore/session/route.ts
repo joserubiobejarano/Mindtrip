@@ -42,7 +42,17 @@ export async function GET(
     let { data: sessionData, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
-      console.error('Error fetching explore session:', sessionError);
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'GET',
+        error: sessionError.message || 'Failed to fetch session',
+        stack: sessionError.stack,
+        tripId,
+        userId,
+        tripSegmentId,
+        errorCode: sessionError.code,
+        errorDetails: sessionError,
+      });
       return NextResponse.json(
         { error: 'Failed to fetch session' },
         { status: 500 }
@@ -74,9 +84,19 @@ export async function GET(
         .single();
 
       if (createError) {
-        console.error('Error creating explore session:', createError);
+        console.error('[Explore API]', {
+          path: '/api/trips/[tripId]/explore/session',
+          method: 'GET',
+          error: createError.message || 'Failed to create session',
+          stack: createError.stack,
+          tripId,
+          userId,
+          tripSegmentId,
+          errorCode: createError.code,
+          errorDetails: createError,
+        });
         return NextResponse.json(
-          { error: 'Failed to create session' },
+          { error: 'Internal server error' },
           { status: 500 }
         );
       }
@@ -85,7 +105,22 @@ export async function GET(
     }
 
     // Get subscription status and trip limit
-    const { isPro } = await getUserSubscriptionStatus(userId);
+    let isPro = false;
+    try {
+      const subscriptionStatus = await getUserSubscriptionStatus(userId);
+      isPro = subscriptionStatus.isPro;
+    } catch (subscriptionError: any) {
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'GET',
+        error: subscriptionError?.message || 'Failed to get subscription status',
+        stack: subscriptionError?.stack,
+        tripId,
+        userId,
+        tripSegmentId,
+      });
+      // Continue with default isPro = false
+    }
 
     // Calculate remaining swipes (null for Pro users)
     const swipeCount = (session?.swipe_count || 0);
@@ -98,8 +133,15 @@ export async function GET(
       remainingSwipes,
       dailyLimit: isPro ? null : FREE_SWIPE_LIMIT_PER_TRIP, // Keep field name for backward compatibility
     });
-  } catch (err) {
-    console.error('GET /explore/session error:', err);
+  } catch (err: any) {
+    console.error('[Explore API]', {
+      path: '/api/trips/[tripId]/explore/session',
+      method: 'GET',
+      error: err?.message || 'Internal server error',
+      stack: err?.stack,
+      tripId: (await params).tripId || 'unknown',
+      userId: (await auth()).userId || 'unknown',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -157,16 +199,33 @@ export async function DELETE(
         return NextResponse.json({ success: true });
       }
 
-      console.error('Error clearing explore session:', updateError);
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'DELETE',
+        error: updateError.message || 'Failed to clear session',
+        stack: updateError.stack,
+        tripId,
+        userId,
+        tripSegmentId,
+        errorCode: updateError.code,
+        errorDetails: updateError,
+      });
       return NextResponse.json(
-        { error: 'Failed to clear session' },
+        { error: 'Internal server error' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error('DELETE /explore/session error:', err);
+  } catch (err: any) {
+    console.error('[Explore API]', {
+      path: '/api/trips/[tripId]/explore/session',
+      method: 'DELETE',
+      error: err?.message || 'Internal server error',
+      stack: err?.stack,
+      tripId: (await params).tripId || 'unknown',
+      userId: (await auth()).userId || 'unknown',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

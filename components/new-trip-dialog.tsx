@@ -18,6 +18,8 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import { X, Lock, Calendar, MapPin } from "lucide-react";
 import { DialogDescription } from "@/components/ui/dialog";
 import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
+import { TripPersonalizationDialog } from "@/components/trips/TripPersonalizationDialog";
+import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -61,6 +63,19 @@ export function NewTripDialog({
     startDate?: string;
     endDate?: string;
   }>({});
+  const [showPersonalization, setShowPersonalization] = useState(false);
+  const [baseTripPayload, setBaseTripPayload] = useState<{
+    destinationPlaceId: string;
+    destinationName: string;
+    destinationCenter: [number, number];
+    startDate: string;
+    endDate: string;
+    segments?: Array<{
+      cityPlaceId: string;
+      cityName: string;
+      nights: number;
+    }>;
+  } | null>(null);
 
   const router = useRouter();
   const { user } = useUser();
@@ -91,8 +106,20 @@ export function NewTripDialog({
       setError(null);
       setFieldErrors({});
       setShowProPaywall(false);
+      setShowPersonalization(false);
+      setBaseTripPayload(null);
     }
   }, [open]);
+
+  // Safety guard: Reset state on unmount to prevent stuck overlay
+  useEffect(() => {
+    return () => {
+      if (open) {
+        onOpenChange(false);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!userId) {
     return null;
@@ -176,31 +203,87 @@ export function NewTripDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setFieldErrors({});
 
     if (!validateForm()) {
-      setLoading(false);
       return;
     }
 
-    try {
-      const payload: any = {
-        destinationPlaceId: isPro && segments.length > 0
-          ? segments[0].cityPlaceId
-          : destination!.id,
-        startDate,
-        endDate,
-      };
+    // Determine primary destination (first segment for multi-city, or main destination for single-city)
+    const primaryDestination = isPro && segments.length > 0
+      ? {
+          placeId: segments[0].cityPlaceId,
+          name: segments[0].cityName,
+          center: destination?.center || [0, 0] as [number, number],
+        }
+      : destination
+        ? {
+            placeId: destination.id,
+            name: destination.placeName,
+            center: destination.center,
+          }
+        : null;
 
-      if (isPro && segments.length > 0) {
-        payload.segments = segments.map(s => ({
+    if (!primaryDestination) {
+      setError("Destination is required");
+      return;
+    }
+
+    // Store base payload
+    const basePayload = {
+      destinationPlaceId: primaryDestination.placeId,
+      destinationName: primaryDestination.name,
+      destinationCenter: primaryDestination.center,
+      startDate,
+      endDate,
+      ...(isPro && segments.length > 0 && {
+        segments: segments.map(s => ({
           cityPlaceId: s.cityPlaceId,
           cityName: s.cityName,
           nights: s.nights,
-        }));
-      }
+        })),
+      }),
+    };
+
+    setBaseTripPayload(basePayload);
+    setShowPersonalization(true);
+    console.log('[trip-create] opened_personalization from=trips');
+  };
+
+  const handlePersonalizationComplete = async (personalization: TripPersonalizationPayload) => {
+    if (!baseTripPayload) {
+      setError("Trip data is missing");
+      return;
+    }
+
+    // Check if this is the default skip payload (only travelers=1, hasAccommodation=false, no other fields)
+    const isSkipPayload = 
+      personalization.travelers === 1 &&
+      personalization.hasAccommodation === false &&
+      !personalization.originCityPlaceId &&
+      !personalization.originCityName &&
+      !personalization.accommodationPlaceId &&
+      !personalization.accommodationName &&
+      !personalization.accommodationAddress &&
+      !personalization.arrivalTransportMode &&
+      !personalization.arrivalTimeLocal &&
+      (!personalization.interests || personalization.interests.length === 0);
+
+    if (isSkipPayload) {
+      console.log('[trip-create] skipped_personalization from=trips');
+    } else {
+      console.log('[trip-create] completed_personalization from=trips');
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const payload: any = {
+        ...baseTripPayload,
+        personalization,
+      };
 
       const response = await fetch('/api/trips', {
         method: 'POST',
@@ -216,11 +299,13 @@ export function NewTripDialog({
       }
 
       const data = await response.json();
+      setShowPersonalization(false);
       onOpenChange(false);
       onSuccess();
       router.push(`/trips/${data.trip.id}?tab=itinerary`);
     } catch (err: any) {
       setError(err.message || "An error occurred");
+      setShowPersonalization(false);
     } finally {
       setLoading(false);
     }
@@ -230,28 +315,36 @@ export function NewTripDialog({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Loading...</DialogTitle>
+          </DialogHeader>
           <div className="p-6 text-center">Loading...</div>
         </DialogContent>
       </Dialog>
     );
   }
 
+  // Determine if we should show the base dialog (hide when personalization is showing)
+  const showBaseDialog = open && !showPersonalization;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden flex flex-col relative [&>button]:hidden">
+    <>
+      <Dialog open={showBaseDialog} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden flex flex-col relative max-h-[90vh] [&>button]:hidden">
         {/* Blue top border matching search box */}
-        <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl"></div>
+        <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl z-10 pointer-events-none"></div>
         {/* Close button positioned above the colored header */}
         <Button
           variant="ghost"
           size="icon"
           className="absolute right-4 top-4 z-50 h-8 w-8 text-white hover:bg-white/20 hover:text-white rounded-full"
           onClick={() => onOpenChange(false)}
+          type="button"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </Button>
-        <DialogHeader className="pt-[60px] px-6 py-5 flex-shrink-0">
+        <DialogHeader className="pt-[60px] px-6 py-5 flex-shrink-0 relative z-20 bg-background rounded-t-2xl">
           <DialogTitle className="text-2xl font-bold text-foreground">
             Create New Trip
           </DialogTitle>
@@ -260,7 +353,7 @@ export function NewTripDialog({
           </p>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 relative z-20 bg-background">
           <div className="px-6 py-6 space-y-4 overflow-y-auto flex-1">
             {/* Always show multi-city UI structure */}
             <div className="flex flex-col items-start">
@@ -412,7 +505,7 @@ export function NewTripDialog({
             )}
           </div>
 
-          <DialogFooter className="px-6 py-4 border-t justify-center gap-3 flex-shrink-0">
+          <DialogFooter className="px-6 py-4 border-t justify-center gap-3 flex-shrink-0 bg-background rounded-b-2xl">
             <Button
               type="button"
               variant="outline"
@@ -423,7 +516,7 @@ export function NewTripDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
-              {loading ? "Creating..." : "Create Trip"}
+              Continue
             </Button>
           </DialogFooter>
         </form>
@@ -434,6 +527,23 @@ export function NewTripDialog({
         onClose={() => setShowProPaywall(false)}
         context="multi-city"
       />
-    </Dialog>
+      </Dialog>
+
+      {baseTripPayload && (
+        <TripPersonalizationDialog
+          isOpen={showPersonalization}
+          onClose={() => {
+            setShowPersonalization(false);
+            // Keep baseTripPayload so user can reopen personalization if needed
+            // It will be cleared when the main dialog closes
+          }}
+          onComplete={handlePersonalizationComplete}
+          destinationPlaceId={baseTripPayload.destinationPlaceId}
+          destinationName={baseTripPayload.destinationName}
+          startDate={baseTripPayload.startDate}
+          endDate={baseTripPayload.endDate}
+        />
+      )}
+    </>
   );
 }

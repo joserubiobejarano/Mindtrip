@@ -11,6 +11,7 @@ import { useExplorePlaces, useExploreSession, useSwipeAction } from '@/hooks/use
 import type { ExplorePlace, ExploreFilters } from '@/lib/google/explore-places';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/toast';
+import { usePaywall } from '@/hooks/usePaywall';
 
 interface ExploreDeckProps {
   tripId: string;
@@ -76,7 +77,10 @@ export function ExploreDeck({
 
   const { data: session } = useExploreSession(tripId, true, tripSegmentId);
   const { data, isLoading, error: placesError } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot, tripSegmentId);
-  const swipeMutation = useSwipeAction(tripId, tripSegmentId);
+  const { openPaywall } = usePaywall();
+  const swipeMutation = useSwipeAction(tripId, tripSegmentId, (tripId) => {
+    openPaywall({ reason: "pro_feature", source: "explore_swipe_limit", tripId });
+  });
   const { addToast } = useToast();
 
   // Derive places directly from hook result
@@ -87,20 +91,34 @@ export function ExploreDeck({
     if (places.length > 0) {
       setCurrentIndex((prev) => {
         // if index is uninitialized or out of range, go to last card
-        if (prev === -1 || prev >= places.length) return places.length - 1;
+        if (prev === -1 || prev >= places.length) {
+          const newIndex = places.length - 1;
+          console.log(`[itinerary-swipe] initializing index to ${newIndex} (places.length: ${places.length})`);
+          return newIndex;
+        }
         return prev;
       });
     } else {
       setCurrentIndex(-1);
+      console.log('[itinerary-swipe] no places available, resetting index to -1');
     }
   }, [places.length]);
 
   const handleSwipeLeft = () => {
     const place = places[currentIndex];
-    if (!place) return;
+    if (!place) {
+      console.log('[itinerary-swipe] handleSwipeLeft: no place at currentIndex', currentIndex);
+      return;
+    }
     const placeId = place.place_id;
+    console.log(`[itinerary-swipe] swipe left triggered for place ${placeId} (${place.name})`);
     setLastDirection('left');
-    setCurrentIndex((prev) => prev - 1);
+    setCurrentIndex((prev) => {
+      const newIndex = prev - 1;
+      console.log(`[itinerary-swipe] advancing index from ${prev} to ${newIndex}`);
+      return newIndex;
+    });
+    console.log(`[itinerary-swipe] API call: dislike for place ${placeId}`);
     swipeMutation.mutate(
       { 
         placeId, 
@@ -112,10 +130,12 @@ export function ExploreDeck({
       {
         onSuccess: (res) => {
           if (res?.limitReached) {
+            console.log('[itinerary-swipe] limit reached, rolling back index');
             // Rollback UI if limit reached
             setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
             return;
           }
+          console.log('[itinerary-swipe] dislike API call successful');
           // Track swipe in history for undo (max 3)
           setSwipeHistory((prev) => {
             const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
@@ -125,7 +145,8 @@ export function ExploreDeck({
             return newHistory.slice(0, 3);
           });
         },
-        onError: () => {
+        onError: (error) => {
+          console.error('[itinerary-swipe] dislike API call failed:', error);
           // Rollback UI on error
           setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
           addToast({
@@ -140,13 +161,22 @@ export function ExploreDeck({
 
   const handleSwipeRight = async () => {
     const place = places[currentIndex];
-    if (!place) return;
+    if (!place) {
+      console.log('[itinerary-swipe] handleSwipeRight: no place at currentIndex', currentIndex);
+      return;
+    }
     const placeId = place.place_id;
+    console.log(`[itinerary-swipe] swipe right triggered for place ${placeId} (${place.name})`);
     setLastDirection('right');
-    setCurrentIndex((prev) => prev - 1);
+    setCurrentIndex((prev) => {
+      const newIndex = prev - 1;
+      console.log(`[itinerary-swipe] advancing index from ${prev} to ${newIndex}`);
+      return newIndex;
+    });
     
     // In day mode, immediately add to day instead of just liking
     if (mode === 'day' && dayId && slot) {
+      console.log(`[itinerary-swipe] day mode: adding place ${placeId} to day ${dayId}, slot ${slot}`);
       try {
         const response = await fetch(`/api/trips/${tripId}/days/${dayId}/activities/bulk-add-from-swipes`, {
           method: 'POST',
@@ -163,6 +193,7 @@ export function ExploreDeck({
         }
 
         const result = await response.json();
+        console.log(`[itinerary-swipe] place added to day: ${result.addedCount} place(s) added`);
         
         // Show success toast
         if (result.addedCount > 0) {
@@ -174,6 +205,7 @@ export function ExploreDeck({
         }
         
         // Also like the place for session tracking
+        console.log(`[itinerary-swipe] API call: like for place ${placeId} (day mode)`);
         swipeMutation.mutate(
           { 
             placeId, 
@@ -185,8 +217,10 @@ export function ExploreDeck({
           {
             onSuccess: (res) => {
               if (res?.limitReached) {
+                console.log('[itinerary-swipe] limit reached (day mode)');
                 return;
               }
+              console.log('[itinerary-swipe] like API call successful (day mode)');
               // Track swipe in history for undo (max 3)
               setSwipeHistory((prev) => {
                 const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
@@ -201,12 +235,14 @@ export function ExploreDeck({
                 onAddToDay([placeId]);
               }
             },
-            onError: () => {
+            onError: (error) => {
+              console.error('[itinerary-swipe] like API call failed (day mode):', error);
               // Don't rollback UI since we already added to day
             },
           }
         );
       } catch (error: any) {
+        console.error('[itinerary-swipe] error adding place to day:', error);
         // Rollback UI on error
         setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
         addToast({
@@ -217,6 +253,7 @@ export function ExploreDeck({
       }
     } else {
       // Trip mode: just like the place
+      console.log(`[itinerary-swipe] trip mode: API call: like for place ${placeId}`);
       swipeMutation.mutate(
         { 
           placeId, 
@@ -228,10 +265,12 @@ export function ExploreDeck({
         {
           onSuccess: (res) => {
             if (res?.limitReached) {
+              console.log('[itinerary-swipe] limit reached, rolling back index');
               // Rollback UI if limit reached
               setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
               return;
             }
+            console.log('[itinerary-swipe] like API call successful (trip mode)');
             // Track swipe in history for undo (max 3)
             setSwipeHistory((prev) => {
               const newHistory: Array<{ placeId: string; action: 'like' | 'dislike' }> = [
@@ -241,7 +280,8 @@ export function ExploreDeck({
               return newHistory.slice(0, 3);
             });
           },
-          onError: () => {
+          onError: (error) => {
+            console.error('[itinerary-swipe] like API call failed (trip mode):', error);
             // Rollback UI on error
             setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
             addToast({
@@ -257,7 +297,11 @@ export function ExploreDeck({
 
   const handleSwipeUp = () => {
     const place = places[currentIndex];
-    if (!place) return;
+    if (!place) {
+      console.log('[itinerary-swipe] handleSwipeUp: no place at currentIndex', currentIndex);
+      return;
+    }
+    console.log(`[itinerary-swipe] swipe up triggered for place ${place.place_id} (${place.name})`);
     setLastDirection('up');
     setSelectedPlaceId(place.place_id);
     setSelectedPlaceName(place.name);
@@ -620,7 +664,7 @@ export function ExploreDeck({
                 ) : null
               )}
               <Button 
-                onClick={() => window.location.href = '/settings?upgrade=true'} 
+                onClick={() => openPaywall({ reason: "pro_feature", source: "explore_deck_upgrade", tripId })} 
                 size="lg"
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
               >

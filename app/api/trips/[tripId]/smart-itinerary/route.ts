@@ -307,8 +307,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     let structureInstructions = `
       1. Structure:
          - Split each day into three slots: "morning", "afternoon", "evening".
-         - For each slot, pick 2–4 places (aim for approximately 3 morning, 3 afternoon, 2 evening).
-         - Aim for approximately 8 total places per day (can be 7-9 depending on the day).
+         - For each slot, include exactly 4 places (4 morning, 4 afternoon, 4 evening).
+         - Aim for 12 total places per day (4 per slot × 3 slots).
          - MAXIMUM: Never exceed 12 places per day (across all slots). This is a hard limit.
          - CRITICAL: Ensure places within the same time slot are geographically close (same neighborhood/area, within walking distance) to minimize backtracking and maximize time efficiency. Group places by proximity.
          - If a place is exceptional for both day and night experiences (e.g., a plaza that's beautiful during the day and has great lighting at night), you may recommend it twice - once for day and once for evening.

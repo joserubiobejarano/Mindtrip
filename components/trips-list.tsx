@@ -177,7 +177,7 @@ export function TripsList() {
           {/* Upcoming Trips */}
           {upcomingTrips.length > 0 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-8 tracking-tight">Upcoming trips</h2>
+              <h2 className="font-display text-3xl font-semibold mb-8 tracking-tight">Upcoming trips</h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {upcomingTrips.map((trip) => (
                   <Card
@@ -217,7 +217,7 @@ export function TripsList() {
           {pastTrips.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-semibold tracking-tight">Past trips</h2>
+                <h2 className="font-display text-3xl font-semibold tracking-tight">Past trips</h2>
                 <Button
                   variant="ghost"
                   size="sm"

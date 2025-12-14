@@ -93,9 +93,21 @@ export async function POST(
     const { data: sessionData, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
-      console.error('Error fetching explore session:', sessionError);
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/swipe',
+        method: 'POST',
+        error: sessionError.message || 'Failed to fetch session',
+        stack: sessionError.stack,
+        tripId,
+        userId,
+        trip_segment_id,
+        action,
+        place_id,
+        errorCode: sessionError.code,
+        errorDetails: sessionError,
+      });
       return NextResponse.json(
-        { error: 'Failed to fetch session' },
+        { error: 'Internal server error' },
         { status: 500 }
       );
     }
@@ -110,7 +122,25 @@ export async function POST(
     const session = sessionData as SessionQueryResult | null;
 
     // Get trip Pro status (account Pro OR trip Pro) and determine limit
-    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    let isProForThisTrip = false;
+    try {
+      const proStatus = await getTripProStatus(supabase, userId, tripId);
+      isProForThisTrip = proStatus.isProForThisTrip;
+    } catch (proStatusError: any) {
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/swipe',
+        method: 'POST',
+        error: proStatusError?.message || 'Failed to get trip pro status',
+        stack: proStatusError?.stack,
+        tripId,
+        userId,
+        trip_segment_id,
+        action,
+        place_id,
+        context: 'pro_status_check',
+      });
+      // Continue with default isProForThisTrip = false
+    }
     const limit = isProForThisTrip ? PRO_SWIPE_LIMIT_PER_TRIP : FREE_SWIPE_LIMIT_PER_TRIP;
 
     // Get current swipe count from session (per trip, no daily reset)
@@ -202,9 +232,23 @@ export async function POST(
         .single();
 
       if (updateError) {
-        console.error('Error undoing swipe:', updateError);
+        console.error('[Explore API]', {
+          path: '/api/trips/[tripId]/explore/swipe',
+          method: 'POST',
+          error: updateError.message || 'Failed to undo swipe',
+          stack: updateError.stack,
+          tripId,
+          userId,
+          trip_segment_id,
+          action,
+          place_id,
+          previous_action,
+          errorCode: updateError.code,
+          errorDetails: updateError,
+          context: 'undo_swipe',
+        });
         return NextResponse.json(
-          { error: 'Failed to undo swipe' },
+          { error: 'Internal server error' },
           { status: 500 }
         );
       }
@@ -278,9 +322,23 @@ export async function POST(
       .maybeSingle();
 
     if (updateError) {
-      console.error('Error updating explore session:', updateError);
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/swipe',
+        method: 'POST',
+        error: updateError.message || 'Failed to update session',
+        stack: updateError.stack,
+        tripId,
+        userId,
+        trip_segment_id,
+        action,
+        place_id,
+        source: swipeSource,
+        errorCode: updateError.code,
+        errorDetails: updateError,
+        context: 'update_session',
+      });
       return NextResponse.json(
-        { error: 'Failed to update session' },
+        { error: 'Internal server error' },
         { status: 500 }
       );
     }
@@ -302,9 +360,23 @@ export async function POST(
         .single();
 
       if (createError) {
-        console.error('Error creating explore session:', createError);
+        console.error('[Explore API]', {
+          path: '/api/trips/[tripId]/explore/swipe',
+          method: 'POST',
+          error: createError.message || 'Failed to create session',
+          stack: createError.stack,
+          tripId,
+          userId,
+          trip_segment_id,
+          action,
+          place_id,
+          source: swipeSource,
+          errorCode: createError.code,
+          errorDetails: createError,
+          context: 'create_session',
+        });
         return NextResponse.json(
-          { error: 'Failed to create session' },
+          { error: 'Internal server error' },
           { status: 500 }
         );
       }
@@ -329,8 +401,15 @@ export async function POST(
       remainingSwipes,
       limitReached: newSwipeCount >= limit,
     });
-  } catch (err) {
-    console.error('POST /explore/swipe error:', err);
+  } catch (err: any) {
+    console.error('[Explore API]', {
+      path: '/api/trips/[tripId]/explore/swipe',
+      method: 'POST',
+      error: err?.message || 'Internal server error',
+      stack: err?.stack,
+      tripId: (await params).tripId || 'unknown',
+      userId: (await auth()).userId || 'unknown',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

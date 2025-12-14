@@ -86,8 +86,17 @@ export async function GET(
             });
           });
         });
-      } catch (err) {
-        console.error('Error parsing itinerary:', err);
+      } catch (err: any) {
+        console.error('[Explore API]', {
+          path: '/api/trips/[tripId]/explore/places',
+          method: 'GET',
+          error: err?.message || 'Error parsing itinerary',
+          stack: err?.stack,
+          tripId,
+          userId,
+          tripSegmentId,
+          context: 'parsing_itinerary',
+        });
       }
     }
 
@@ -114,8 +123,24 @@ export async function GET(
     const offset = parseInt(url.searchParams.get('offset') || '0', 10);
 
     // Check trip Pro status (account Pro OR trip Pro) for Pro-only filters
-    const { getTripProStatus } = await import('@/lib/supabase/pro-status');
-    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    let isProForThisTrip = false;
+    try {
+      const { getTripProStatus } = await import('@/lib/supabase/pro-status');
+      const proStatus = await getTripProStatus(supabase, userId, tripId);
+      isProForThisTrip = proStatus.isProForThisTrip;
+    } catch (proStatusError: any) {
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/places',
+        method: 'GET',
+        error: proStatusError?.message || 'Failed to get trip pro status',
+        stack: proStatusError?.stack,
+        tripId,
+        userId,
+        tripSegmentId,
+        context: 'pro_status_check',
+      });
+      // Continue with default isProForThisTrip = false
+    }
 
     // Server-side enforcement: Pro filters are only available to Pro users (account or trip)
     // If Free user tries to use Pro filters, downgrade them (ignore) for better UX
@@ -155,8 +180,18 @@ export async function GET(
             const firstPlace = day.slots?.[0]?.places?.[0];
             dayNeighborhood = firstPlace?.area || firstPlace?.neighborhood || day.areaCluster;
           }
-        } catch (err) {
-          console.error('Error parsing itinerary for day filter:', err);
+        } catch (err: any) {
+          console.error('[Explore API]', {
+            path: '/api/trips/[tripId]/explore/places',
+            method: 'GET',
+            error: err?.message || 'Error parsing itinerary for day filter',
+            stack: err?.stack,
+            tripId,
+            userId,
+            tripSegmentId,
+            dayId,
+            context: 'day_filter_parsing',
+          });
         }
       }
     }
@@ -173,7 +208,34 @@ export async function GET(
     };
 
     // Fetch places
-    const { places, totalCount } = await getPlacesToExplore(tripId, filters);
+    let places: any[] = [];
+    let totalCount = 0;
+    try {
+      const result = await getPlacesToExplore(tripId, filters);
+      places = result.places;
+      totalCount = result.totalCount;
+    } catch (placesError: any) {
+      console.error('[Explore API]', {
+        path: '/api/trips/[tripId]/explore/places',
+        method: 'GET',
+        error: placesError?.message || 'Failed to fetch places',
+        stack: placesError?.stack,
+        tripId,
+        userId,
+        tripSegmentId,
+        filters: {
+          neighborhood,
+          category,
+          timeOfDay,
+          budget: effectiveBudget,
+          maxDistance: effectiveMaxDistance,
+          includeItineraryPlaces,
+          excludePlaceIdsCount: uniqueExcludedIds.length,
+        },
+        context: 'getPlacesToExplore',
+      });
+      throw placesError; // Re-throw to be caught by outer catch
+    }
 
     // Apply pagination
     const paginatedPlaces = places.slice(offset, offset + limit);
@@ -185,11 +247,17 @@ export async function GET(
       totalCount,
     });
   } catch (err: any) {
-    console.error('GET /explore/places error:', err);
+    console.error('[Explore API]', {
+      path: '/api/trips/[tripId]/explore/places',
+      method: 'GET',
+      error: err?.message || 'Internal server error',
+      stack: err?.stack,
+      tripId: (await params).tripId || 'unknown',
+      userId: (await auth()).userId || 'unknown',
+    });
     return NextResponse.json(
       {
-        error: 'Failed to fetch places',
-        details: err?.message || 'Unknown error',
+        error: 'Internal server error',
       },
       { status: 500 }
     );

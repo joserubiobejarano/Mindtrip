@@ -110,7 +110,11 @@ export function useExploreSession(tripId: string, enabled: boolean = true, tripS
 /**
  * Hook to handle swipe actions with optimistic updates
  */
-export function useSwipeAction(tripId: string, tripSegmentId?: string) {
+export function useSwipeAction(
+  tripId: string, 
+  tripSegmentId?: string,
+  onLimitReached?: (tripId: string) => void
+) {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -239,17 +243,19 @@ export function useSwipeAction(tripId: string, tripSegmentId?: string) {
       // Invalidate places query so newly swiped places are excluded from future fetches
       queryClient.invalidateQueries({ queryKey: ['explore-places', tripId] });
 
-      // Show limit reached message and redirect to upgrade
+      // Show limit reached message and open paywall
       if (data.limitReached) {
         addToast({
           title: 'Trip limit reached',
           description: 'You\'ve reached your trip swipe limit. Upgrade to Pro for unlimited swipes!',
           variant: 'default',
         });
-        // Redirect to upgrade page
-        setTimeout(() => {
-          window.location.href = '/settings?upgrade=true';
-        }, 1500); // Small delay to let user see the toast
+        // Open paywall modal
+        if (onLimitReached) {
+          setTimeout(() => {
+            onLimitReached(tripId);
+          }, 1500); // Small delay to let user see the toast
+        }
       }
     },
   });

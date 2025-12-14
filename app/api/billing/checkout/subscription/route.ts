@@ -18,6 +18,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const body = await req.json().catch(() => ({}));
+    const { returnUrl } = body;
+
     const user = await currentUser();
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -79,6 +82,11 @@ export async function POST(req: NextRequest) {
     assertStripeEnv();
     const { proYearly: priceId } = getStripePriceIds();
 
+    // Determine return URL - use provided returnUrl or default to /settings
+    const baseReturnUrl = returnUrl || `${req.nextUrl.origin}/settings`;
+    const successUrl = `${process.env.STRIPE_SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}&return_url=${encodeURIComponent(baseReturnUrl)}`;
+    const cancelUrl = baseReturnUrl;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: stripeCustomerId,
@@ -88,8 +96,8 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.STRIPE_SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: process.env.STRIPE_CANCEL_URL || `${req.nextUrl.origin}/settings`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       allow_promotion_codes: true,
     });
 

@@ -12,28 +12,66 @@ import { useExploreSession, useExplorePlaces } from "@/hooks/use-explore";
 import { useToast } from "@/components/ui/toast";
 import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 // Error boundary for Explore feature
 class ExploreErrorBoundary extends Component<
   { children: ReactNode },
-  { hasError: boolean; error?: Error }
+  { hasError: boolean; error?: Error; errorInfo?: any }
 > {
-  state = { hasError: false, error: undefined };
+  state = { hasError: false, error: undefined, errorInfo: undefined };
 
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('ExploreError:', error, errorInfo);
+    // Comprehensive server-side logging for Vercel
+    console.error('[Explore Error Boundary]', {
+      error: {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      },
+      errorInfo: {
+        componentStack: errorInfo.componentStack,
+      },
+      timestamp: new Date().toISOString(),
+    });
+    
+    this.setState({ errorInfo });
   }
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+  };
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-6 text-center">
-          <p className="text-lg font-medium mb-2 text-destructive">Something went wrong loading Explore.</p>
-          <p className="text-sm text-muted-foreground">Please refresh the page and try again.</p>
+        <div className="flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
+          <div className="max-w-md space-y-4">
+            <h2 className="text-lg font-semibold text-destructive">Something went wrong</h2>
+            <p className="text-sm text-muted-foreground">
+              We encountered an error while loading Explore. This has been logged and we'll look into it.
+            </p>
+            {this.state.error && (
+              <details className="text-left mt-4 p-3 bg-muted rounded-md text-xs">
+                <summary className="cursor-pointer text-muted-foreground mb-2">Error details</summary>
+                <pre className="whitespace-pre-wrap break-words text-muted-foreground">
+                  {this.state.error.message}
+                  {this.state.error.stack && `\n\n${this.state.error.stack}`}
+                </pre>
+              </details>
+            )}
+            <Button
+              onClick={this.handleReset}
+              className="mt-6"
+              variant="default"
+            >
+              Try again
+            </Button>
+          </div>
         </div>
       );
     }
@@ -58,7 +96,11 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   const { data: trip } = useTrip(tripId);
   const { data: segments = [] } = useTripSegments(tripId);
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
-  const { data: session, isLoading: sessionLoading } = useExploreSession(tripId, true, activeSegmentId || undefined);
+  const { 
+    data: session, 
+    isLoading: sessionLoading, 
+    error: sessionError 
+  } = useExploreSession(tripId, true, activeSegmentId || undefined);
   const { addToast } = useToast();
   const [filters, setFilters] = useState<ExploreFiltersType>({});
   const [isAddingToItinerary, setIsAddingToItinerary] = useState(false);
@@ -66,6 +108,15 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   
   // Gate for showing affiliate promo boxes (currently disabled)
   const showAffiliates = false;
+  
+  // Safe default for session - never throw in render
+  const safeSession = session || {
+    likedPlaces: [],
+    discardedPlaces: [],
+    swipeCount: 0,
+    remainingSwipes: null,
+    dailyLimit: null,
+  };
 
   // Set initial segment if multi-city
   useEffect(() => {
@@ -77,7 +128,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   }, [segments, activeSegmentId]);
 
   const handleAddToItinerary = async () => {
-    if (!session || session.likedPlaces.length === 0 || isAddingToItinerary) return;
+    if (!safeSession || safeSession.likedPlaces.length === 0 || isAddingToItinerary) return;
 
     setIsAddingToItinerary(true);
 
@@ -87,7 +138,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          likedPlaceIds: session.likedPlaces,
+          likedPlaceIds: safeSession.likedPlaces,
         }),
       });
 
@@ -149,6 +200,23 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     return (
       <div className="p-6">
         <div className="text-muted-foreground">Loading trip...</div>
+      </div>
+    );
+  }
+
+  // Handle session error gracefully - don't crash, show fallback
+  if (sessionError && !sessionLoading) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-sm text-muted-foreground mb-4">
+          Unable to load explore session. Please refresh the page.
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          variant="outline"
+        >
+          Refresh
+        </Button>
       </div>
     );
   }

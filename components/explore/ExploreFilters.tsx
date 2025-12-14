@@ -17,7 +17,7 @@ interface ExploreFiltersProps {
 }
 
 const CATEGORIES = [
-  { value: '', label: 'All' },
+  { value: 'all', label: 'All' },
   { value: 'tourist attractions', label: 'Attractions' },
   { value: 'museums', label: 'Museums' },
   { value: 'restaurants', label: 'Restaurants' },
@@ -51,21 +51,36 @@ export function ExploreFilters({
   const [clientIsPro, setClientIsPro] = useState(isPro);
   const [showProPaywall, setShowProPaywall] = useState(false);
 
-  // Check Pro status on mount
+  // Check Pro status on mount - never throw, always use safe defaults
   useEffect(() => {
     if (user?.id) {
       fetch(`/api/user/subscription-status`)
-        .then(res => res.json())
-        .then(data => setClientIsPro(data.isPro || false))
-        .catch(() => setClientIsPro(false));
+        .then(res => {
+          if (!res.ok) {
+            return { isPro: false };
+          }
+          return res.json();
+        })
+        .then(data => {
+          setClientIsPro(data?.isPro || false);
+        })
+        .catch((error) => {
+          // Log error but don't throw - use safe default
+          console.error('[ExploreFilters] Error fetching pro status:', error);
+          setClientIsPro(false);
+        });
+    } else {
+      // No user ID - default to false
+      setClientIsPro(false);
     }
   }, [user?.id]);
 
-  const effectiveIsPro = isPro || clientIsPro;
+  // Safe default - never throw, always boolean
+  const effectiveIsPro = Boolean(isPro || clientIsPro);
   const handleCategoryChange = (category: string) => {
     onFiltersChange({
       ...filters,
-      category: category || undefined,
+      category: category === 'all' || !category ? undefined : category,
     });
   };
 
@@ -121,20 +136,26 @@ export function ExploreFilters({
       {/* Category Filter */}
       <div className="flex items-center gap-3 flex-wrap">
         <span className="font-mono text-xs text-sage uppercase tracking-wider">Category:</span>
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.value}
-            onClick={() => handleCategoryChange(cat.value)}
-            className={cn(
-              "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border",
-              filters.category === cat.value
-                ? "bg-foreground text-white border-foreground"
-                : "bg-white text-foreground border-sage/30 hover:border-coral hover:text-coral"
-            )}
-          >
-            {cat.label}
-          </button>
-        ))}
+        {CATEGORIES.map((cat) => {
+          // Handle "all" category - show as active when no category filter is set
+          const isActive = cat.value === 'all' 
+            ? !filters.category 
+            : filters.category === cat.value;
+          return (
+            <button
+              key={cat.value}
+              onClick={() => handleCategoryChange(cat.value)}
+              className={cn(
+                "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border",
+                isActive
+                  ? "bg-foreground text-white border-foreground"
+                  : "bg-white text-foreground border-sage/30 hover:border-coral hover:text-coral"
+              )}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Pro Tier Filters - Show for all users but locked for non-Pro */}
@@ -144,7 +165,9 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
           <div className="relative">
             <Select
-              value={filters.budget?.toString() || undefined}
+              value={filters.budget !== undefined && filters.budget !== null 
+                ? filters.budget.toString() 
+                : undefined}
               onValueChange={handleBudgetChange}
               disabled={!effectiveIsPro}
             >
@@ -155,7 +178,7 @@ export function ExploreFilters({
                 <SelectValue placeholder="Any budget" />
               </SelectTrigger>
               <SelectContent>
-                {BUDGET_OPTIONS.filter(opt => opt.value).map((option) => (
+                {BUDGET_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -180,7 +203,9 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
           <div className="relative">
             <Select
-              value={filters.maxDistance?.toString() || undefined}
+              value={filters.maxDistance !== undefined && filters.maxDistance !== null 
+                ? filters.maxDistance.toString() 
+                : undefined}
               onValueChange={handleDistanceChange}
               disabled={!effectiveIsPro}
             >
@@ -191,7 +216,7 @@ export function ExploreFilters({
                 <SelectValue placeholder="Any distance" />
               </SelectTrigger>
               <SelectContent>
-                {DISTANCE_OPTIONS.filter(opt => opt.value).map((option) => (
+                {DISTANCE_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
