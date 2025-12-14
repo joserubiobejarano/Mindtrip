@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { findBestAccommodation } from "@/lib/google/accommodation";
-import type { Json } from "@/types/database";
+import type { Database, Json } from "@/types/database";
+
+type TripUpdate = Database["public"]["Tables"]["trips"]["Update"];
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,12 +65,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save to trip
+    // Save to trip - use type assertion to fix TypeScript inference issue
+    const updatePayload: TripUpdate = {
+      auto_accommodation: accommodation as Json,
+    };
     const { error: updateError } = await supabase
       .from("trips")
-      .update({
-        auto_accommodation: accommodation as Json,
-      })
+      .update(updatePayload)
       .eq("id", tripId);
 
     if (updateError) {
