@@ -29,18 +29,25 @@ export async function DELETE(
     }
 
     // Fetch trip to verify ownership
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from("trips")
       .select("id, owner_id")
       .eq("id", tripId)
       .single();
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json(
         { error: "Trip not found" },
         { status: 404 }
       );
     }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
 
     // Verify ownership
     if (trip.owner_id !== profileId) {
