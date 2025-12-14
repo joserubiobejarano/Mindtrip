@@ -253,7 +253,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
       return (
         <div className="p-6 text-center">
           <p className="text-sm text-muted-foreground mb-4">
-            Couldn't load places, please refresh
+            Couldn&apos;t load places, please refresh
           </p>
           <Button
             onClick={() => window.location.reload()}
@@ -271,7 +271,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     return (
       <div className="p-6 text-center">
         <p className="text-sm text-muted-foreground mb-4">
-          Couldn't load places, please refresh
+          Couldn&apos;t load places, please refresh
         </p>
         <Button
           onClick={() => window.location.reload()}

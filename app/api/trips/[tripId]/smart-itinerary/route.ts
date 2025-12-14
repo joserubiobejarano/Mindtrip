@@ -245,17 +245,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     // 1. Load Trip Details (including personalization fields)
-    const { data: tripData, error: tripError } = await supabase
+    const { data: tripDetailsData, error: tripDetailsError } = await supabase
       .from('trips')
       .select('id, title, start_date, end_date, destination_name, destination_country, travelers, origin_city_name, has_accommodation, accommodation_name, accommodation_address, arrival_transport_mode, arrival_time_local, interests')
       .eq('id', tripId)
       .single();
 
-    if (tripError || !tripData) {
+    if (tripDetailsError || !tripDetailsData) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
-    type TripQueryResult = {
+    type TripDetailsQueryResult = {
       id: string
       title: string
       start_date: string
@@ -272,7 +272,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       interests: string[] | null
     }
 
-    const trip = tripData as TripQueryResult;
+    const tripDetails = tripDetailsData as TripDetailsQueryResult;
 
     // 2. Load existing itinerary if regenerating
     let existingItinerary: SmartItinerary | null = null;
@@ -342,22 +342,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
 
     // Build personalization context string
     const personalizationContext = [
-      `Number of travelers: ${trip.travelers || 1}`,
-      trip.origin_city_name ? `Origin city: ${trip.origin_city_name}` : 'Origin city: unknown',
-      trip.has_accommodation && trip.accommodation_name
-        ? `Accommodation: ${trip.accommodation_name}${trip.accommodation_address ? ` (${trip.accommodation_address})` : ''}`
+      `Number of travelers: ${tripDetails.travelers || 1}`,
+      tripDetails.origin_city_name ? `Origin city: ${tripDetails.origin_city_name}` : 'Origin city: unknown',
+      tripDetails.has_accommodation && tripDetails.accommodation_name
+        ? `Accommodation: ${tripDetails.accommodation_name}${tripDetails.accommodation_address ? ` (${tripDetails.accommodation_address})` : ''}`
         : 'Accommodation: not booked yet',
-      trip.arrival_transport_mode
-        ? `Arrival: ${trip.arrival_transport_mode}${trip.arrival_time_local ? ` around ${trip.arrival_time_local}` : ''} on the first day`
+      tripDetails.arrival_transport_mode
+        ? `Arrival: ${tripDetails.arrival_transport_mode}${tripDetails.arrival_time_local ? ` around ${tripDetails.arrival_time_local}` : ''} on the first day`
         : 'Arrival: unspecified',
-      trip.interests && trip.interests.length > 0
-        ? `Interests: ${trip.interests.join(', ')}`
+      tripDetails.interests && tripDetails.interests.length > 0
+        ? `Interests: ${tripDetails.interests.join(', ')}`
         : 'Interests: not specified',
     ].join('\n');
 
     const tripMeta = {
-      destination: trip.destination_name || trip.title,
-      dates: `${new Date(trip.start_date).toDateString()} - ${new Date(trip.end_date).toDateString()}`,
+      destination: tripDetails.destination_name || tripDetails.title,
+      dates: `${new Date(tripDetails.start_date).toDateString()} - ${new Date(tripDetails.end_date).toDateString()}`,
       personalization: personalizationContext,
       savedPlaces: savedPlaces?.map(p => p.name) || [],
       mustIncludePlaces: mustIncludePlaces.map(p => ({
@@ -507,7 +507,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
 
     console.log('[smart-itinerary] generating itinerary for trip', tripId);
 
-    const destination = trip.destination_name || trip.title;
+    const destination = tripDetails.destination_name || tripDetails.title;
     const cityOrArea = destination;
 
     // Create a streaming response using Server-Sent Events
@@ -699,9 +699,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                     );
                   
                   // Clear liked places after successful regeneration
-                  if (mustIncludePlaceIds.length > 0 && profileId) {
+                  if (mustIncludePlaceIds.length > 0 && profileId && tripId) {
                     try {
-                      await clearLikedPlacesAfterRegeneration(tripId, profileId);
+                      await clearLikedPlacesAfterRegeneration(tripId as string, profileId as string);
                       console.log('[smart-itinerary] cleared liked places after regeneration');
                     } catch (err) {
                       console.error('[smart-itinerary] error clearing liked places:', err);
