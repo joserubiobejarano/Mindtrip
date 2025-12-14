@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Save to trip - use type assertion to fix TypeScript inference issue
     const updatePayload: TripUpdate = {
-      auto_accommodation: accommodation as Json,
+      auto_accommodation: accommodation as unknown as Json,
     };
     const { error: updateError } = await supabase
       .from("trips")
