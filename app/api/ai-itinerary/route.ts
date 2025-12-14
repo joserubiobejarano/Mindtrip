@@ -171,7 +171,13 @@ export async function POST(request: NextRequest) {
       daysQuery = daysQuery.is('trip_segment_id', null);
     }
     
-    const { data: days, error: daysError } = await daysQuery.order('date', { ascending: true })
+    const { data: days, error: daysError } = await daysQuery
+      .order('date', { ascending: true })
+      .returns<Array<{
+        id: string;
+        date: string;
+        day_number: number;
+      }>>();
 
     if (daysError) {
       console.error('Error loading days:', daysError)
