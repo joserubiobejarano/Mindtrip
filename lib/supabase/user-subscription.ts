@@ -60,8 +60,15 @@ export async function getUserSubscriptionStatus(userId: string): Promise<{ isPro
     return { isPro: false };
   }
 
+  type ProfileQueryResult = {
+    is_pro: boolean | null
+    [key: string]: any
+  }
+
+  const profileTyped = profile as ProfileQueryResult | null;
+
   // Return Pro status (is_pro defaults to false if column doesn't exist yet)
-  return { isPro: profile.is_pro === true };
+  return { isPro: profileTyped?.is_pro === true };
 }
 
 // Swipe limits per trip (not per day)

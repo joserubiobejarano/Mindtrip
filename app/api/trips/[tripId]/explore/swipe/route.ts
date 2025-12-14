@@ -90,7 +90,7 @@ export async function POST(
       query = query.eq('trip_segment_id', trip_segment_id);
     }
 
-    const { data: session, error: sessionError } = await query.maybeSingle();
+    const { data: sessionData, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
       console.error('Error fetching explore session:', sessionError);
@@ -99,6 +99,15 @@ export async function POST(
         { status: 500 }
       );
     }
+
+    type SessionQueryResult = {
+      swipe_count: number | null
+      liked_place_ids: string[] | null
+      discarded_place_ids: string[] | null
+      [key: string]: any
+    }
+
+    const session = sessionData as SessionQueryResult | null;
 
     // Get trip Pro status (account Pro OR trip Pro) and determine limit
     const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
@@ -170,8 +179,8 @@ export async function POST(
       const newSwipeCount = Math.max(0, swipeCount - 1);
 
       // Update session with undone swipe
-      let undoUpdateQuery = supabase
-        .from('explore_sessions')
+      let undoUpdateQuery = (supabase
+        .from('explore_sessions') as any)
         .update({
           liked_place_ids: currentLiked,
           discarded_place_ids: currentDiscarded,
@@ -246,8 +255,8 @@ export async function POST(
     const now = new Date();
     
     // First, try to update existing session
-    let updateQuery = supabase
-      .from('explore_sessions')
+    let updateQuery = (supabase
+      .from('explore_sessions') as any)
       .update({
         liked_place_ids: updatedLiked,
         discarded_place_ids: updatedDiscarded,
@@ -278,8 +287,8 @@ export async function POST(
 
     // If no session exists, create it
     if (!updatedSession) {
-      const { data: newSession, error: createError } = await supabase
-        .from('explore_sessions')
+      const { data: newSession, error: createError } = await (supabase
+        .from('explore_sessions') as any)
         .insert({
           trip_id: tripId,
           user_id: userId,

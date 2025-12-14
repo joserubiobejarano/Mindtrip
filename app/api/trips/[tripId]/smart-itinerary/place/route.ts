@@ -30,7 +30,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Itinerary not found' }, { status: 404 });
     }
 
-    const itinerary = row.content as unknown as SmartItinerary;
+    type ItineraryRowResult = {
+      content: any
+    }
+
+    const rowTyped = row as ItineraryRowResult;
+    const itinerary = rowTyped.content as unknown as SmartItinerary;
     let updated = false;
 
     // 2. Find and update place in slots
@@ -75,8 +80,8 @@ export async function PATCH(
     }
 
     // 3. Save back
-    const { error: saveError } = await supabase
-      .from('smart_itineraries')
+    const { error: saveError } = await (supabase
+      .from('smart_itineraries') as any)
       .update({
         content: itinerary as any,
         updated_at: new Date().toISOString()

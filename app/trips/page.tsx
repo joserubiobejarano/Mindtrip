@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { TripsList } from "@/components/trips-list";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function TripsPage() {
   const { userId } = await auth();
@@ -15,9 +16,11 @@ export default async function TripsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img 
+            <Image 
               src="/icon.svg" 
               alt="Kruno" 
+              width={32}
+              height={32}
               className="w-8 h-8"
             />
             <span className="font-display text-xl font-semibold">Kruno</span>

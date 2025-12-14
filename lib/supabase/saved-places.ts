@@ -51,7 +51,7 @@ export async function savePlaceForTrip({
   }
 
   // Insert new saved place
-  const { error } = await supabase.from("saved_places").insert({
+  const { error } = await (supabase.from("saved_places") as any).insert({
     trip_id: tripId,
     place_id: place.id,
     name: place.name,
@@ -123,7 +123,13 @@ export async function getSavedPlaceIdsForTrip(
     return { data: null, error: new Error(error.message) };
   }
 
-  const placeIds = new Set(data?.map((item) => item.place_id) || []);
+  type SavedPlaceQueryResult = {
+    place_id: string
+    [key: string]: any
+  }
+
+  const dataTyped = (data || []) as SavedPlaceQueryResult[];
+  const placeIds = new Set(dataTyped.map((item) => item.place_id));
   return { data: placeIds, error: null };
 }
 

@@ -3,6 +3,30 @@ import { createClient } from '@/lib/supabase/server'
 import { getOpenAIClient } from '@/lib/openai'
 import type { PlannedActivity } from '@/types/ai'
 
+type TripQueryResult = {
+  title: string
+  start_date: string
+  end_date: string
+  budget_level: string | null
+  daily_budget: number | null
+  default_currency: string
+  interests: string[] | null
+  destination_name: string | null
+  destination_country: string | null
+}
+
+type DayQueryResult = {
+  date: string
+  day_number: number
+}
+
+type ActivityQueryResult = {
+  title: string
+  start_time: string | null
+  end_time: string | null
+  notes: string | null
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -18,39 +42,41 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
 
     // Load trip data
-    // Note: destination_name and destination_country may not exist in all schemas
-    // If they don't exist, we'll use title as the city name
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from('trips')
       .select(
-        'title, start_date, end_date, budget_level, daily_budget, default_currency, interests'
+        'title, start_date, end_date, budget_level, daily_budget, default_currency, interests, destination_name, destination_country'
       )
       .eq('id', tripId)
       .single()
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json(
         { error: 'Trip not found' },
         { status: 404 }
       )
     }
 
+    const trip = tripData as TripQueryResult
+
     // Load day data to get the date
-    const { data: day, error: dayError } = await supabase
+    const { data: dayData, error: dayError } = await supabase
       .from('days')
       .select('date, day_number')
       .eq('id', dayId)
       .single()
 
-    if (dayError || !day) {
+    if (dayError || !dayData) {
       return NextResponse.json(
         { error: 'Day not found' },
         { status: 404 }
       )
     }
 
+    const day = dayData as DayQueryResult
+
     // Load existing activities for this day
-    const { data: existingActivities, error: activitiesError } = await supabase
+    const { data: existingActivitiesData, error: activitiesError } = await supabase
       .from('activities')
       .select('title, start_time, end_time, notes')
       .eq('day_id', dayId)
@@ -60,10 +86,12 @@ export async function POST(request: NextRequest) {
       console.error('Error loading activities:', activitiesError)
     }
 
+    const existingActivities = (existingActivitiesData || []) as ActivityQueryResult[]
+
     // Build the prompt
-    // Use title as destination name (destination_name field may not exist in schema)
-    const city = (trip as any).destination_name || trip.title
-    const country = (trip as any).destination_country || null
+    // Use destination_name if available, otherwise fall back to title
+    const city = trip.destination_name || trip.title
+    const country = trip.destination_country || null
     const interestsText = trip.interests?.length
       ? `Interests: ${trip.interests.join(', ')}`
       : ''

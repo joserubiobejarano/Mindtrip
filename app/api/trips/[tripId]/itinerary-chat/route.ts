@@ -75,7 +75,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       return NextResponse.json({ error: 'no-itinerary' }, { status: 400 });
     }
 
-    const currentItinerary = row.content as unknown as SmartItinerary;
+    type ItineraryRowResult = {
+      content: any
+    }
+
+    const rowTyped = row as ItineraryRowResult;
+    const currentItinerary = rowTyped.content as unknown as SmartItinerary;
 
     // 3) Call OpenAI
     const system = `
@@ -148,8 +153,8 @@ Return your response in this exact format:
     }
 
     // 5) Save back to Supabase
-    const { data: updatedRow, error: updateError } = await supabase
-      .from('smart_itineraries')
+    const { data: updatedRow, error: updateError } = await (supabase
+      .from('smart_itineraries') as any)
       .update({ content: updated as any })
       .eq('trip_id', tripId)
       .select()

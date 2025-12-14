@@ -158,8 +158,8 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
 
   const createChecklist = useMutation({
     mutationFn: async (title: string) => {
-      const { data, error } = await supabase
-        .from("checklists")
+      const { data, error } = await (supabase
+        .from("checklists") as any)
         .insert({
           trip_id: tripId,
           title,
@@ -200,8 +200,8 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
         ...(checklist?.items.map((i) => i.order_number) || [])
       );
 
-      const { data, error } = await supabase
-        .from("checklist_items")
+      const { data, error } = await (supabase
+        .from("checklist_items") as any)
         .insert({
           checklist_id: checklistId,
           title,
@@ -224,8 +224,8 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
 
   const toggleItem = useMutation({
     mutationFn: async ({ itemId, checked }: { itemId: string; checked: boolean }) => {
-      const { error } = await supabase
-        .from("checklist_items")
+      const { error } = await (supabase
+        .from("checklist_items") as any)
         .update({ checked: !checked })
         .eq("id", itemId);
 
@@ -273,8 +273,8 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
         title: template.title,
       }));
 
-      const { data: insertedChecklists, error: checklistError } = await supabase
-        .from("checklists")
+      const { data: insertedChecklists, error: checklistError } = await (supabase
+        .from("checklists") as any)
         .insert(checklistInserts)
         .select();
 
@@ -295,7 +295,12 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
         order_number: number;
       }> = [];
 
-      insertedChecklists.forEach((checklist, checklistIndex) => {
+      type ChecklistResult = {
+        id: string
+        [key: string]: any
+      }
+
+      (insertedChecklists || []).forEach((checklist: ChecklistResult, checklistIndex: number) => {
         if (!checklist || !checklist.id) {
           console.error("Invalid checklist at index", checklistIndex);
           return;
@@ -318,8 +323,8 @@ export function ChecklistsTab({ tripId }: ChecklistsTabProps) {
       });
 
       if (itemInserts.length > 0) {
-        const { error: itemError } = await supabase
-          .from("checklist_items")
+        const { error: itemError } = await (supabase
+          .from("checklist_items") as any)
           .insert(itemInserts);
 
         if (itemError) {

@@ -58,8 +58,8 @@ export function useActivities(dayId: string) {
       notes?: string | null;
       order_number: number;
     }) => {
-      const { data, error } = await supabase
-        .from("activities")
+      const { data, error } = await (supabase
+        .from("activities") as any)
         .insert(activity)
         .select()
         .single();
@@ -85,8 +85,8 @@ export function useActivities(dayId: string) {
       notes?: string | null;
       order_number?: number;
     }) => {
-      const { data, error } = await supabase
-        .from("activities")
+      const { data, error } = await (supabase
+        .from("activities") as any)
         .update(updates)
         .eq("id", id)
         .select()

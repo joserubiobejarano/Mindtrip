@@ -113,13 +113,20 @@ export function AddToItineraryDialog({
 
       let placeId: string;
 
-      if (existingPlace) {
+      type PlaceQueryResult = {
+        id: string
+        [key: string]: any
+      }
+
+      const existingPlaceTyped = existingPlace as PlaceQueryResult | null;
+
+      if (existingPlaceTyped) {
         // Reuse existing place
-        placeId = existingPlace.id;
+        placeId = existingPlaceTyped.id;
       } else {
         // Create new place with trip_id
-        const { data: newPlace, error: placeError } = await supabase
-          .from("places")
+        const { data: newPlace, error: placeError } = await (supabase
+          .from("places") as any)
           .insert({
             trip_id: tripId,
             external_id: place.id,
@@ -152,14 +159,21 @@ export function AddToItineraryDialog({
         .order("order_number", { ascending: false })
         .limit(1);
 
+      type ActivityQueryResult = {
+        order_number: number | null
+        [key: string]: any
+      }
+
+      const existingActivitiesTyped = (existingActivities || []) as ActivityQueryResult[];
+
       const maxOrder =
-        existingActivities && existingActivities.length > 0
-          ? existingActivities[0].order_number
+        existingActivitiesTyped && existingActivitiesTyped.length > 0
+          ? existingActivitiesTyped[0].order_number || 0
           : 0;
 
       // Create the activity
-      const { error: activityError } = await supabase
-        .from("activities")
+      const { error: activityError } = await (supabase
+        .from("activities") as any)
         .insert({
           day_id: selectedDayId,
           place_id: placeId,

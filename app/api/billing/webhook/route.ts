@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
           }
 
           // Update trip with Pro status
-          const { error: updateError } = await supabase
-            .from('trips')
+          const { error: updateError } = await (supabase
+            .from('trips') as any)
             .update({
               has_trip_pro: true,
               stripe_trip_payment_id: paymentIntentId,
@@ -99,8 +99,8 @@ export async function POST(req: NextRequest) {
         const isPro = status === 'active' || status === 'trialing';
 
         // Update profile
-        const { error: updateError } = await supabase
-          .from('profiles')
+        const { error: updateError } = await (supabase
+          .from('profiles') as any)
           .update({ is_pro: isPro })
           .eq('stripe_customer_id', customerId);
 
@@ -118,8 +118,8 @@ export async function POST(req: NextRequest) {
         const customerId = subscription.customer as string;
 
         // Set is_pro to false
-        const { error: updateError } = await supabase
-          .from('profiles')
+        const { error: updateError } = await (supabase
+          .from('profiles') as any)
           .update({ is_pro: false })
           .eq('stripe_customer_id', customerId);
 

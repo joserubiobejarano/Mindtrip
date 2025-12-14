@@ -19,15 +19,22 @@ export default async function TripDetailPage({
   const supabase = await createClient();
 
   // Check if user has access to this trip
-  const { data: trip, error } = await supabase
+  const { data: tripData, error } = await supabase
     .from("trips")
     .select("*")
     .eq("id", tripId)
     .single();
 
-  if (error || !trip) {
+  if (error || !tripData) {
     redirect("/trips");
   }
+
+  type TripQueryResult = {
+    owner_id: string
+    [key: string]: any
+  }
+
+  const trip = tripData as TripQueryResult;
 
   const { data: isMember } = await supabase
     .from("trip_members")
@@ -46,8 +53,8 @@ export default async function TripDetailPage({
 
     if (!existingMembers || existingMembers.length === 0) {
       // Create owner member entry
-      await supabase
-        .from("trip_members")
+      await (supabase
+        .from("trip_members") as any)
         .insert({
           trip_id: tripId,
           user_id: userId,

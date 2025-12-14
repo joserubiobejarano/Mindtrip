@@ -3,6 +3,10 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
 
+type ProfileQueryResult = {
+  stripe_customer_id: string | null
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -24,7 +28,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient();
 
     // Fetch or create profile
-    let { data: profile, error: profileError } = await supabase
+    let { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
@@ -35,6 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
 
+    const profile = profileData as ProfileQueryResult | null
     let stripeCustomerId = profile?.stripe_customer_id;
 
     // Create Stripe customer if doesn't exist
@@ -53,7 +58,7 @@ export async function POST(req: NextRequest) {
           id: userId,
           email,
           stripe_customer_id: stripeCustomerId,
-        }, {
+        } as any, {
           onConflict: 'id',
         });
 

@@ -22,21 +22,30 @@ export async function POST(
     const supabase = await createClient();
 
     // Load trip data
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from("trips")
       .select("title, start_date, end_date, destination_name")
       .eq("id", tripId)
       .single();
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json(
         { error: "Trip not found" },
         { status: 404 }
       );
     }
 
+    type TripQueryResult = {
+      title: string
+      start_date: string
+      end_date: string
+      destination_name: string | null
+    }
+
+    const trip = tripData as TripQueryResult;
+
     // Load recent chat messages (last 10)
-    const { data: recentMessages, error: messagesError } = await supabase
+    const { data: recentMessagesData, error: messagesError } = await supabase
       .from("trip_chat_messages")
       .select("role, content")
       .eq("trip_id", tripId)
@@ -48,9 +57,16 @@ export async function POST(
       // Continue without previous messages
     }
 
+    type MessageQueryResult = {
+      role: string
+      content: string
+    }
+
+    const recentMessages = (recentMessagesData || []) as MessageQueryResult[];
+
     // Save user message
-    const { error: saveUserError } = await supabase
-      .from("trip_chat_messages")
+    const { error: saveUserError } = await (supabase
+      .from("trip_chat_messages") as any)
       .insert({
         trip_id: tripId,
         role: "user",
@@ -70,8 +86,8 @@ export async function POST(
       const redirectMessage = getRedirectMessage();
       
       // Save redirect response to chat history
-      const { error: saveRedirectError } = await supabase
-        .from("trip_chat_messages")
+      const { error: saveRedirectError } = await (supabase
+        .from("trip_chat_messages") as any)
         .insert({
           trip_id: tripId,
           role: "assistant",
@@ -136,8 +152,8 @@ Be concise and practical in your responses.`,
     const assistantMessage = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
 
     // Save assistant message
-    const { error: saveAssistantError } = await supabase
-      .from("trip_chat_messages")
+    const { error: saveAssistantError } = await (supabase
+      .from("trip_chat_messages") as any)
       .insert({
         trip_id: tripId,
         role: "assistant",

@@ -119,8 +119,8 @@ export function TripMembersDialog({
 
   const inviteMember = useMutation({
     mutationFn: async (data: { email: string; role: "editor" | "viewer" }) => {
-      const { data: member, error } = await supabase
-        .from("trip_members")
+      const { data: member, error } = await (supabase
+        .from("trip_members") as any)
         .insert({
           trip_id: tripId,
           user_id: null, // Will be set when user signs up

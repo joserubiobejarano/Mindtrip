@@ -18,15 +18,22 @@ export default async function StayPage({
   const supabase = await createClient();
 
   // Check if user has access to this trip
-  const { data: trip, error } = await supabase
+  const { data: tripData, error } = await supabase
     .from("trips")
     .select("*")
     .eq("id", tripId)
     .single();
 
-  if (error || !trip) {
+  if (error || !tripData) {
     redirect("/trips");
   }
+
+  type TripQueryResult = {
+    owner_id: string
+    [key: string]: any
+  }
+
+  const trip = tripData as TripQueryResult;
 
   const { data: isMember } = await supabase
     .from("trip_members")

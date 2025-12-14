@@ -15,7 +15,13 @@ export async function addActivitiesForDay(
     .order('order_number', { ascending: false })
     .limit(1)
 
-  const maxOrder = existingActivities?.[0]?.order_number ?? 0
+  type ActivityQueryResult = {
+    order_number: number | null
+    [key: string]: any
+  }
+
+  const existingActivitiesTyped = (existingActivities || []) as ActivityQueryResult[];
+  const maxOrder = existingActivitiesTyped?.[0]?.order_number ?? 0
 
   // Map PlannedActivity to activities table schema
   // Note: category is not in the activities table schema, so we'll include it in notes
@@ -36,8 +42,8 @@ export async function addActivitiesForDay(
     }
   })
 
-  const { data, error } = await supabase
-    .from('activities')
+  const { data, error } = await (supabase
+    .from('activities') as any)
     .insert(activitiesToInsert)
     .select()
 

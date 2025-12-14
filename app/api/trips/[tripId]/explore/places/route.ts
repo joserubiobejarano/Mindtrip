@@ -30,13 +30,20 @@ export async function GET(
 
     // Get explore session to exclude already swiped places (segment-scoped if trip_segment_id provided)
     const segmentIdForQuery = tripSegmentId || '00000000-0000-0000-0000-000000000000';
-    const { data: session } = await supabase
+    const { data: sessionData } = await supabase
       .from('explore_sessions')
       .select('liked_place_ids, discarded_place_ids')
       .eq('trip_id', tripId)
       .eq('user_id', userId)
       .eq('trip_segment_id', segmentIdForQuery)
       .maybeSingle();
+
+    type SessionQueryResult = {
+      liked_place_ids: string[] | null
+      discarded_place_ids: string[] | null
+    }
+
+    const session = sessionData as SessionQueryResult | null;
 
     // Get query parameter for including itinerary places
     const includeItineraryPlaces = url.searchParams.get('includeItineraryPlaces') === 'true';
@@ -58,9 +65,16 @@ export async function GET(
 
     // Extract place_ids from SmartItinerary
     const alreadyPlannedPlaceIds: string[] = [];
-    if (itineraryData?.content && !includeItineraryPlaces) {
+    
+    type ItineraryQueryResult = {
+      content: any
+    }
+
+    const itineraryDataTyped = itineraryData as ItineraryQueryResult | null;
+
+    if (itineraryDataTyped?.content && !includeItineraryPlaces) {
       try {
-        const itinerary = itineraryData.content as SmartItinerary;
+        const itinerary = itineraryDataTyped.content as SmartItinerary;
         itinerary.days?.forEach((day) => {
           day.slots?.forEach((slot) => {
             slot.places?.forEach((place) => {
@@ -132,9 +146,9 @@ export async function GET(
         .eq('trip_id', tripId)
         .maybeSingle();
 
-      if (itineraryData?.content) {
+      if (itineraryDataTyped?.content) {
         try {
-          const itinerary = itineraryData.content as SmartItinerary;
+          const itinerary = itineraryDataTyped.content as SmartItinerary;
           const day = itinerary.days?.find(d => d.id === dayId);
           if (day) {
             // Get neighborhood from first place in first slot, or use day's areaCluster

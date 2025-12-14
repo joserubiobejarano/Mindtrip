@@ -345,7 +345,15 @@ export function ItineraryTab({
         .from('days')
         .select('id, date, trip_segment_id')
         .eq('trip_id', tripId)
-        .then(({ data: days }) => {
+        .then(({ data: daysData }) => {
+          type DayQueryResult = {
+            id: string
+            date: string
+            trip_segment_id: string | null
+          }
+
+          const days = (daysData || []) as DayQueryResult[];
+
           if (days) {
             const daySegmentMap = new Map<string, string>();
             days.forEach(day => {

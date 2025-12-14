@@ -26,15 +26,22 @@ export async function GET(
     const supabase = await createClient();
 
     // Verify user has access to trip
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from("trips")
       .select("id, owner_id")
       .eq("id", tripId)
       .single();
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
 
     // Check if user is owner or member
     const { data: member } = await supabase
@@ -86,15 +93,24 @@ export async function POST(
     const supabase = await createClient();
 
     // Verify user owns trip first (needed for Pro status check)
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from("trips")
       .select("id, owner_id, start_date, end_date")
       .eq("id", tripId)
       .single();
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+      start_date: string
+      end_date: string
+    }
+
+    const trip = tripData as TripQueryResult;
 
     if (trip.owner_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -169,7 +185,7 @@ export async function POST(
       currentDate = addDays(currentDate, 1);
     }
 
-    const { error: daysError } = await supabase.from("days").insert(days);
+    const { error: daysError } = await (supabase.from("days") as any).insert(days);
 
     if (daysError) {
       // Rollback: delete segment
@@ -210,11 +226,17 @@ export async function PATCH(
     const supabase = await createClient();
 
     // Verify user owns trip first
-    const { data: trip } = await supabase
+    const { data: tripData } = await supabase
       .from("trips")
       .select("owner_id")
       .eq("id", tripId)
       .single();
+
+    type TripQueryResult = {
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult | null;
 
     if (!trip || trip.owner_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -294,11 +316,17 @@ export async function DELETE(
     const supabase = await createClient();
 
     // Verify user owns trip first
-    const { data: trip } = await supabase
+    const { data: tripData } = await supabase
       .from("trips")
       .select("owner_id")
       .eq("id", tripId)
       .single();
+
+    type TripQueryResult = {
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult | null;
 
     if (!trip || trip.owner_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

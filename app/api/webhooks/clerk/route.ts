@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Check if profile exists and if email was already sent
-      const { data: profile, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id, welcome_email_sent_at')
         .eq('id', userId)
@@ -108,6 +108,13 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
+
+      type ProfileQueryResult = {
+        id: string
+        welcome_email_sent_at: string | null
+      }
+
+      const profile = profileData as ProfileQueryResult | null;
 
       // Idempotency check: if email was already sent, skip
       if (profile?.welcome_email_sent_at) {
@@ -129,8 +136,8 @@ export async function POST(req: NextRequest) {
         // Update or create profile with welcome_email_sent_at
         if (profile) {
           // Profile exists, update it
-          const { error: updateError } = await supabase
-            .from('profiles')
+          const { error: updateError } = await (supabase
+            .from('profiles') as any)
             .update({ welcome_email_sent_at: now })
             .eq('id', userId);
 
@@ -144,7 +151,7 @@ export async function POST(req: NextRequest) {
           }
         } else {
           // Profile doesn't exist, create it
-          const { error: insertError } = await supabase.from('profiles').insert({
+          const { error: insertError } = await (supabase.from('profiles') as any).insert({
             id: userId,
             email: primaryEmail,
             full_name: firstName || null,

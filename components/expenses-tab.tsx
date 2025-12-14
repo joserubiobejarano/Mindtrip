@@ -153,8 +153,16 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         console.error("Error fetching trip members:", error.message);
         throw error;
       }
+      type TripMemberQueryResult = {
+        display_name: string | null
+        email: string | null
+        [key: string]: any
+      }
+
+      const dataTyped = (data || []) as TripMemberQueryResult[];
+
       // Sort by display_name if available, otherwise by email
-      const sorted = (data || []).sort((a, b) => {
+      const sorted = dataTyped.sort((a, b) => {
         const aName = a.display_name || a.email || "";
         const bName = b.display_name || b.email || "";
         return aName.localeCompare(bName);
@@ -231,8 +239,8 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
       }
 
       // Create expense
-      const { data: expense, error: expenseError } = await supabase
-        .from("expenses")
+      const { data: expense, error: expenseError } = await (supabase
+        .from("expenses") as any)
         .insert({
           trip_id: tripId,
           description,
@@ -261,8 +269,8 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         amount: shareAmount,
       }));
 
-      const { error: sharesError } = await supabase
-        .from("expense_shares")
+      const { error: sharesError } = await (supabase
+        .from("expense_shares") as any)
         .insert(shares);
 
       if (sharesError) {

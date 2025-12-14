@@ -38,8 +38,8 @@ export async function createTripSegment(
 ): Promise<{ data: TripSegment | null; error: Error | null }> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("trip_segments")
+    const { data, error } = await (supabase
+      .from("trip_segments") as any)
       .insert({
         trip_id: tripId,
         order_index: orderIndex,
@@ -85,8 +85,8 @@ export async function updateTripSegment(
     if (updates.notes !== undefined) updateData.notes = updates.notes;
     if (updates.orderIndex !== undefined) updateData.order_index = updates.orderIndex;
 
-    const { data, error } = await supabase
-      .from("trip_segments")
+    const { data, error } = await (supabase
+      .from("trip_segments") as any)
       .update(updateData)
       .eq("id", segmentId)
       .select()

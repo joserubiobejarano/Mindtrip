@@ -57,7 +57,7 @@ export async function saveChatMessage({
 }): Promise<{ error: Error | null }> {
   const supabase = createClient();
 
-  const { error } = await supabase.from("trip_chat_messages").insert({
+  const { error } = await (supabase.from("trip_chat_messages") as any).insert({
     trip_id: tripId,
     role,
     content,

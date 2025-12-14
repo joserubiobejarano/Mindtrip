@@ -3,6 +3,10 @@ import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
 
+type ProfileQueryResult = {
+  stripe_customer_id: string | null
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -14,7 +18,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient();
 
     // Fetch profile
-    const { data: profile, error: profileError } = await supabase
+    const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
@@ -24,6 +28,8 @@ export async function POST(req: NextRequest) {
       console.error('Error fetching profile:', profileError);
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
+
+    const profile = profileData as ProfileQueryResult | null;
 
     if (!profile?.stripe_customer_id) {
       return NextResponse.json(

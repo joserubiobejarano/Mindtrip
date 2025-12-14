@@ -160,8 +160,8 @@ export async function POST(request: NextRequest) {
         : `${primaryCityName} Trip`;
 
     // Create trip
-    const { data: trip, error: tripError } = await supabase
-      .from("trips")
+    const { data: trip, error: tripError } = await (supabase
+      .from("trips") as any)
       .insert({
         title,
         start_date: startDate,
@@ -196,13 +196,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Create segments and days
-    const createdSegments = [];
+    const createdSegments: any[] = [];
     for (let i = 0; i < segmentsToCreate.length; i++) {
       const segmentData = segmentsToCreate[i];
 
       // Create segment
-      const { data: segment, error: segmentError } = await supabase
-        .from("trip_segments")
+      const { data: segment, error: segmentError } = await (supabase
+        .from("trip_segments") as any)
         .insert({
           trip_id: trip.id,
           order_index: i,
@@ -244,8 +244,8 @@ export async function POST(request: NextRequest) {
         };
       });
 
-      const { error: daysError } = await supabase
-        .from("days")
+      const { error: daysError } = await (supabase
+        .from("days") as any)
         .insert(dayRecords);
 
       if (daysError) {
@@ -260,8 +260,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create trip member (owner)
-    const { error: memberError } = await supabase
-      .from("trip_members")
+    const { error: memberError } = await (supabase
+      .from("trip_members") as any)
       .insert({
         trip_id: trip.id,
         user_id: userId,

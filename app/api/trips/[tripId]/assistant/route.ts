@@ -37,18 +37,29 @@ export async function POST(
     const supabase = await createClient();
 
     // 1. Auth & trip access check
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from("trips")
       .select("id, title, start_date, end_date, destination_name, owner_id")
       .eq("id", tripId)
       .single();
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json(
         { error: "Trip not found" },
         { status: 404 }
       );
     }
+
+    type TripQueryResult = {
+      id: string
+      title: string
+      start_date: string
+      end_date: string
+      destination_name: string | null
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
 
     // Check if user has access to trip
     const { data: member } = await supabase
@@ -69,7 +80,7 @@ export async function POST(
       const redirectMessage = getRedirectMessage();
 
       // Save redirect response
-      await supabase.from("trip_chat_messages").insert({
+      await (supabase.from("trip_chat_messages") as any).insert({
         trip_id: tripId,
         user_id: userId,
         role: "assistant",
@@ -99,12 +110,18 @@ export async function POST(
     let itineraryContext = "";
     if (activeSegmentId) {
       // Load itinerary for specific segment
-      const { data: segmentItinerary } = await supabase
+      const { data: segmentItineraryRaw } = await supabase
         .from("smart_itineraries")
         .select("content")
         .eq("trip_id", tripId)
         .eq("trip_segment_id", activeSegmentId)
         .maybeSingle();
+
+      type SegmentItineraryQueryResult = {
+        content: any
+      }
+
+      const segmentItinerary = segmentItineraryRaw as SegmentItineraryQueryResult | null;
 
       if (segmentItinerary?.content) {
         itineraryContext = JSON.stringify(segmentItinerary.content, null, 2);
@@ -120,18 +137,36 @@ export async function POST(
     // Load days and activities for context
     let daysContext = "";
     if (activeDayId) {
-      const { data: day, error: dayError } = await supabase
+      const { data: dayData, error: dayError } = await supabase
         .from("days")
         .select("id, date, day_number, trip_segment_id")
         .eq("id", activeDayId)
         .single();
 
+      type DayQueryResult = {
+        id: string
+        date: string
+        day_number: number
+        trip_segment_id: string | null
+      }
+
+      const day = dayData as DayQueryResult | null;
+
       if (!dayError && day) {
-        const { data: activities } = await supabase
+        const { data: activitiesData } = await supabase
           .from("activities")
           .select("title, start_time, end_time, notes")
           .eq("day_id", activeDayId)
           .order("start_time", { ascending: true });
+
+        type ActivityQueryResult = {
+          title: string
+          start_time: string | null
+          end_time: string | null
+          notes: string | null
+        }
+
+        const activities = (activitiesData || []) as ActivityQueryResult[];
 
         daysContext = `Current day: ${day.date} (Day ${day.day_number})\n`;
         if (activities && activities.length > 0) {
@@ -145,12 +180,20 @@ export async function POST(
       }
     } else {
       // Load recent days for context
-      const { data: recentDays } = await supabase
+      const { data: recentDaysData } = await supabase
         .from("days")
         .select("id, date, day_number")
         .eq("trip_id", tripId)
         .order("date", { ascending: true })
         .limit(5);
+
+      type RecentDayQueryResult = {
+        id: string
+        date: string
+        day_number: number
+      }
+
+      const recentDays = (recentDaysData || []) as RecentDayQueryResult[];
 
       if (recentDays && recentDays.length > 0) {
         daysContext = `Upcoming days:\n${recentDays
@@ -160,12 +203,19 @@ export async function POST(
     }
 
     // Load recent chat messages (3-5 most recent pairs)
-    const { data: recentMessages } = await supabase
+    const { data: recentMessagesData } = await supabase
       .from("trip_chat_messages")
       .select("role, content")
       .eq("trip_id", tripId)
       .order("created_at", { ascending: false })
       .limit(10);
+
+    type MessageQueryResult = {
+      role: string
+      content: string
+    }
+
+    const recentMessages = (recentMessagesData || []) as MessageQueryResult[];
 
     // 4. Build OpenAI request
     const systemPrompt = `You are the Kruno Travel Assistant for a single trip.
@@ -237,7 +287,7 @@ Provide a helpful, concise response. Reference specific days and places from the
 
     // 6. Store chat history
     // Save user message
-    await supabase.from("trip_chat_messages").insert({
+    await (supabase.from("trip_chat_messages") as any).insert({
       trip_id: tripId,
       user_id: userId,
       role: "user",
@@ -245,7 +295,7 @@ Provide a helpful, concise response. Reference specific days and places from the
     });
 
     // Save assistant reply
-    await supabase.from("trip_chat_messages").insert({
+    await (supabase.from("trip_chat_messages") as any).insert({
       trip_id: tripId,
       user_id: "assistant",
       role: "assistant",

@@ -38,7 +38,16 @@ export function useTripAssistant(
         return [];
       }
 
-      return (data || []).map(msg => ({
+      type MessageQueryResult = {
+        id: string
+        role: string
+        content: string
+        created_at: string
+      }
+
+      const dataTyped = (data || []) as MessageQueryResult[];
+
+      return dataTyped.map(msg => ({
         id: msg.id,
         role: msg.role as 'user' | 'assistant',
         content: msg.content,

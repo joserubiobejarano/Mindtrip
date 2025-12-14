@@ -17,7 +17,13 @@ export async function getLikedPlacesForTrip(
     .eq('user_id', userId)
     .maybeSingle();
 
-  return session?.liked_place_ids || [];
+  type SessionQueryResult = {
+    liked_place_ids: string[] | null
+    [key: string]: any
+  }
+
+  const sessionTyped = session as SessionQueryResult | null;
+  return sessionTyped?.liked_place_ids || [];
 }
 
 /**
@@ -36,12 +42,18 @@ export async function getPlacesInItinerary(
     .eq('trip_id', tripId)
     .maybeSingle();
 
-  if (!itineraryData?.content) {
+  type ItineraryQueryResult = {
+    content: any
+  }
+
+  const itineraryDataTyped = itineraryData as ItineraryQueryResult | null;
+
+  if (!itineraryDataTyped?.content) {
     return [];
   }
 
   try {
-    const itinerary = itineraryData.content as SmartItinerary;
+    const itinerary = itineraryDataTyped.content as SmartItinerary;
     const placeNames: string[] = [];
 
     itinerary.days?.forEach((day) => {
@@ -83,7 +95,19 @@ export async function clearLikedPlacesAfterRegeneration(
     return;
   }
 
-  const likedPlaceIds = session.liked_place_ids || [];
+  type SessionQueryResult = {
+    liked_place_ids: string[] | null
+    discarded_place_ids: string[] | null
+    [key: string]: any
+  }
+
+  const sessionTyped = session as SessionQueryResult | null;
+
+  if (!sessionTyped) {
+    return;
+  }
+
+  const likedPlaceIds = sessionTyped.liked_place_ids || [];
   
   if (likedPlaceIds.length === 0) {
     return;
@@ -92,12 +116,12 @@ export async function clearLikedPlacesAfterRegeneration(
   // Move liked places to discarded (to avoid showing them again)
   // and clear liked_place_ids
   const updatedDiscarded = [
-    ...(session.discarded_place_ids || []),
+    ...(sessionTyped.discarded_place_ids || []),
     ...likedPlaceIds,
   ];
 
-  const { error } = await supabase
-    .from('explore_sessions')
+  const { error } = await (supabase
+    .from('explore_sessions') as any)
     .update({
       liked_place_ids: [],
       discarded_place_ids: updatedDiscarded,

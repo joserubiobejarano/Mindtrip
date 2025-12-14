@@ -139,7 +139,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       .eq('date', todayDateString)
       .maybeSingle();
     
-    const currentCount = statsData?.count || 0;
+    type StatsQueryResult = {
+      count: number | null
+    }
+
+    const statsDataTyped = statsData as StatsQueryResult | null;
+    const currentCount = statsDataTyped?.count || 0;
     
     // Check trip Pro status (account Pro OR trip Pro) to determine limit
     const { getTripProStatus } = await import('@/lib/supabase/pro-status');
@@ -174,15 +179,34 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     // 1. Load Trip Details (including personalization fields)
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from('trips')
       .select('id, title, start_date, end_date, destination_name, destination_country, travelers, origin_city_name, has_accommodation, accommodation_name, accommodation_address, arrival_transport_mode, arrival_time_local, interests')
       .eq('id', tripId)
       .single();
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
+
+    type TripQueryResult = {
+      id: string
+      title: string
+      start_date: string
+      end_date: string
+      destination_name: string | null
+      destination_country: string | null
+      travelers: number | null
+      origin_city_name: string | null
+      has_accommodation: boolean | null
+      accommodation_name: string | null
+      accommodation_address: string | null
+      arrival_transport_mode: string | null
+      arrival_time_local: string | null
+      interests: string[] | null
+    }
+
+    const trip = tripData as TripQueryResult;
 
     // 2. Load existing itinerary if regenerating
     let existingItinerary: SmartItinerary | null = null;
@@ -193,9 +217,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
         .eq('trip_id', tripId)
         .maybeSingle();
 
-      if (existingData?.content) {
+      type ExistingItineraryQueryResult = {
+        content: any
+      }
+
+      const existingDataTyped = existingData as ExistingItineraryQueryResult | null;
+
+      if (existingDataTyped?.content) {
         try {
-          existingItinerary = existingData.content as SmartItinerary;
+          existingItinerary = existingDataTyped.content as SmartItinerary;
         } catch (err) {
           console.error('Error parsing existing itinerary:', err);
         }
@@ -231,11 +261,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     // 4. Load Saved Places
-    const { data: savedPlaces } = await supabase
+    const { data: savedPlacesData } = await supabase
       .from('saved_places')
       .select('name, types')
       .eq('trip_id', tripId)
       .limit(10);
+
+    type SavedPlaceQueryResult = {
+      name: string
+      types: string[] | null
+    }
+
+    const savedPlaces = (savedPlacesData || []) as SavedPlaceQueryResult[];
 
     // Build personalization context string
     const personalizationContext = [
@@ -566,8 +603,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 }));
                 
                 // Save to Supabase
-                const { error: saveError } = await supabase
-                  .from('smart_itineraries')
+                const { error: saveError } = await (supabase
+                  .from('smart_itineraries') as any)
                   .upsert(
                     {
                       trip_id: tripId,
@@ -584,8 +621,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   console.log('[smart-itinerary] saved itinerary row for trip', tripId);
                   
                   // Increment regeneration counter (only after successful save)
-                  await supabase
-                    .from('trip_regeneration_stats')
+                  await (supabase
+                    .from('trip_regeneration_stats') as any)
                     .upsert(
                       {
                         trip_id: tripId,
@@ -663,8 +700,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               }));
               
               // Save
-              const { error: saveError } = await supabase
-                .from('smart_itineraries')
+              const { error: saveError } = await (supabase
+                .from('smart_itineraries') as any)
                 .upsert(
                   {
                     trip_id: tripId,
@@ -676,8 +713,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               
               if (!saveError) {
                 // Increment regeneration counter (only after successful save)
-                await supabase
-                  .from('trip_regeneration_stats')
+                await (supabase
+                  .from('trip_regeneration_stats') as any)
                   .upsert(
                     {
                       trip_id: tripId,
@@ -759,15 +796,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
       return NextResponse.json({ error: 'db-error' }, { status: 500 });
     }
 
-    if (!data?.content) {
+    type ItineraryQueryResult = {
+      content: any
+    }
+
+    const dataTyped = data as ItineraryQueryResult | null;
+
+    if (!dataTyped?.content) {
       return NextResponse.json({ error: 'not-found' }, { status: 404 });
     }
 
-    console.log('[smart-itinerary] loaded from DB:', JSON.stringify(data.content, null, 2));
+    console.log('[smart-itinerary] loaded from DB:', JSON.stringify(dataTyped.content, null, 2));
 
     // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
     return NextResponse.json(
-      data.content,
+      dataTyped.content,
       { status: 200 }
     );
   } catch (err) {

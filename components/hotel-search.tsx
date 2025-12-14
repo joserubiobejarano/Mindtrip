@@ -168,8 +168,8 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
         // Ignore if columns don't exist
       }
 
-      const { error } = await supabase
-        .from("trips")
+      const { error } = await (supabase
+        .from("trips") as any)
         .update(updateData)
         .eq("id", tripId);
 

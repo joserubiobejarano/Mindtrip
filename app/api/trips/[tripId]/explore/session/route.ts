@@ -39,7 +39,7 @@ export async function GET(
       query = query.eq('trip_segment_id', tripSegmentId);
     }
 
-    let { data: session, error: sessionError } = await query.maybeSingle();
+    let { data: sessionData, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
       console.error('Error fetching explore session:', sessionError);
@@ -49,10 +49,19 @@ export async function GET(
       );
     }
 
+    type SessionQueryResult = {
+      swipe_count: number | null
+      liked_place_ids: string[] | null
+      discarded_place_ids: string[] | null
+      [key: string]: any
+    }
+
+    let session = sessionData as SessionQueryResult | null;
+
     // Create session if it doesn't exist
     if (!session) {
-      const { data: newSession, error: createError } = await supabase
-        .from('explore_sessions')
+      const { data: newSession, error: createError } = await (supabase
+        .from('explore_sessions') as any)
         .insert({
           trip_id: tripId,
           user_id: userId,
@@ -72,14 +81,14 @@ export async function GET(
         );
       }
 
-      session = newSession;
+      session = newSession as SessionQueryResult;
     }
 
     // Get subscription status and trip limit
     const { isPro } = await getUserSubscriptionStatus(userId);
 
     // Calculate remaining swipes (null for Pro users)
-    const swipeCount = session.swipe_count || 0;
+    const swipeCount = (session?.swipe_count || 0);
     const remainingSwipes = isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount);
 
     return NextResponse.json({
@@ -122,8 +131,8 @@ export async function DELETE(
 
     // Reset session: clear liked/discarded arrays and reset swipe_count
     // Keep last_swipe_at unchanged (for daily reset logic)
-    let updateQuery = supabase
-      .from('explore_sessions')
+    let updateQuery = (supabase
+      .from('explore_sessions') as any)
       .update({
         liked_place_ids: [],
         discarded_place_ids: [],

@@ -4,6 +4,19 @@ import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
 import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 
+type TripQueryResult = {
+  id: string
+  owner_id: string
+}
+
+type TripProQueryResult = {
+  has_trip_pro: boolean | null
+}
+
+type ProfileQueryResult = {
+  stripe_customer_id: string | null
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -22,15 +35,17 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient();
 
     // Validate trip exists and belongs to user
-    const { data: trip, error: tripError } = await supabase
+    const { data: tripData, error: tripError } = await supabase
       .from('trips')
       .select('id, owner_id')
       .eq('id', tripId)
       .single();
 
-    if (tripError || !trip) {
+    if (tripError || !tripData) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
+
+    const trip = tripData as TripQueryResult;
 
     if (trip.owner_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -46,13 +61,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if trip already has Pro
-    const { data: tripData } = await supabase
+    const { data: tripProData } = await supabase
       .from('trips')
       .select('has_trip_pro')
       .eq('id', tripId)
       .single();
 
-    if (tripData?.has_trip_pro) {
+    const tripPro = tripProData as TripProQueryResult | null;
+
+    if (tripPro?.has_trip_pro) {
       return NextResponse.json(
         { error: 'This trip is already unlocked' },
         { status: 400 }
@@ -70,7 +87,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch or create profile
-    let { data: profile, error: profileError } = await supabase
+    let { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
@@ -81,6 +98,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
 
+    const profile = profileData as ProfileQueryResult | null;
     let stripeCustomerId = profile?.stripe_customer_id;
 
     // Create Stripe customer if doesn't exist
@@ -99,7 +117,7 @@ export async function POST(req: NextRequest) {
           id: userId,
           email,
           stripe_customer_id: stripeCustomerId,
-        }, {
+        } as any, {
           onConflict: 'id',
         });
 

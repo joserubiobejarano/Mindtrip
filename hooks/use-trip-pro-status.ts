@@ -39,8 +39,21 @@ export function useTripProStatus(tripId: string) {
           .maybeSingle(),
       ]);
 
-      const isAccountPro = !!profileResult.data?.is_pro;
-      const isTripPro = !!tripResult.data?.has_trip_pro;
+      type ProfileQueryResult = {
+        is_pro: boolean | null
+        [key: string]: any
+      }
+
+      type TripQueryResult = {
+        has_trip_pro: boolean | null
+        [key: string]: any
+      }
+
+      const profileData = profileResult.data as ProfileQueryResult | null;
+      const tripData = tripResult.data as TripQueryResult | null;
+
+      const isAccountPro = !!profileData?.is_pro;
+      const isTripPro = !!tripData?.has_trip_pro;
 
       return {
         isAccountPro,

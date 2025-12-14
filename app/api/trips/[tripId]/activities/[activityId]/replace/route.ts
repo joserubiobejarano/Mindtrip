@@ -38,7 +38,7 @@ export async function POST(
     }
 
     // Load existing SmartItinerary
-    const { data: itineraryData, error: itineraryError } = await supabase
+    const { data: itineraryDataRaw, error: itineraryError } = await supabase
       .from('smart_itineraries')
       .select('content')
       .eq('trip_id', tripId)
@@ -48,6 +48,12 @@ export async function POST(
       console.error('Error loading itinerary:', itineraryError);
       return NextResponse.json({ error: 'Failed to load itinerary' }, { status: 500 });
     }
+
+    type ItineraryQueryResult = {
+      content: any
+    }
+
+    const itineraryData = itineraryDataRaw as ItineraryQueryResult | null;
 
     if (!itineraryData?.content) {
       return NextResponse.json({ error: 'No itinerary found' }, { status: 404 });
@@ -191,8 +197,8 @@ export async function POST(
     }
 
     // Save updated itinerary
-    const { error: updateError } = await supabase
-      .from('smart_itineraries')
+    const { error: updateError } = await (supabase
+      .from('smart_itineraries') as any)
       .update({
         content: itinerary,
         updated_at: new Date().toISOString(),

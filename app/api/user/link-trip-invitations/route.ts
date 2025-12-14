@@ -28,8 +28,8 @@ export async function POST() {
     const supabase = await createClient();
 
     // Update trip_members entries where email matches and user_id is null
-    const { data, error } = await supabase
-      .from("trip_members")
+    const { data, error } = await (supabase
+      .from("trip_members") as any)
       .update({ user_id: userId })
       .eq("email", userEmail.toLowerCase())
       .is("user_id", null)

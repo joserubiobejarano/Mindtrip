@@ -54,7 +54,13 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
         throw error;
       }
 
-      return data;
+      type ProfileQueryResult = {
+        full_name: string | null
+        default_currency?: string | null
+        [key: string]: any
+      }
+
+      return data as ProfileQueryResult | null;
     },
     enabled: !!user?.id && isLoaded,
   });
@@ -100,8 +106,8 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not authenticated");
 
-      const { error } = await supabase
-        .from("profiles")
+      const { error } = await (supabase
+        .from("profiles") as any)
         .upsert({
           id: user.id,
           email: user.primaryEmailAddress?.emailAddress || "",

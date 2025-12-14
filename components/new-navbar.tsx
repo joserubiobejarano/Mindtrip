@@ -3,6 +3,7 @@
 import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 export function NewNavbar() {
@@ -21,9 +22,11 @@ export function NewNavbar() {
     <header className="sticky top-0 z-50 w-full py-4 px-6 md:px-12 bg-background/80 backdrop-blur-sm border-b border-border/40">
       <nav className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <img 
+          <Image 
             src="/icon.svg" 
             alt="Kruno" 
+            width={32}
+            height={32}
             className="w-8 h-8"
           />
           <span className="font-display text-xl font-semibold">Kruno</span>

@@ -37,8 +37,8 @@ export async function ensureOwnerMember(
   const displayName = user.fullName || user.firstName || null;
 
   // Insert owner as member
-  const { error } = await supabase
-    .from("trip_members")
+  const { error } = await (supabase
+    .from("trip_members") as any)
     .insert({
       trip_id: tripId,
       user_id: user.id,

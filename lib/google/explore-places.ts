@@ -123,15 +123,25 @@ export async function getPlacesToExplore(
   const supabase = await createClient();
 
   // Read trip destination from database
-  const { data: trip, error: tripError } = await supabase
+  const { data: tripData, error: tripError } = await supabase
     .from('trips')
     .select('destination_name, destination_country, center_lat, center_lng, title')
     .eq('id', tripId)
     .single();
 
-  if (tripError || !trip) {
+  if (tripError || !tripData) {
     throw new Error('Trip not found');
   }
+
+  type TripQueryResult = {
+    destination_name: string | null
+    destination_country: string | null
+    center_lat: number | null
+    center_lng: number | null
+    title: string
+  }
+
+  const trip = tripData as TripQueryResult;
 
   // Get coordinates for search
   // If center_lat/lng are missing, try to get from segments
@@ -141,12 +151,19 @@ export async function getPlacesToExplore(
 
   if (!centerLat || !centerLng) {
     // Try to get from first segment
-    const { data: segments } = await supabase
+    const { data: segmentsData } = await supabase
       .from('trip_segments')
       .select('city_name, city_place_id')
       .eq('trip_id', tripId)
       .order('order_index', { ascending: true })
       .limit(1);
+
+    type SegmentQueryResult = {
+      city_name: string
+      city_place_id: string
+    }
+
+    const segments = (segmentsData || []) as SegmentQueryResult[];
 
     if (segments && segments.length > 0) {
       const segment = segments[0];

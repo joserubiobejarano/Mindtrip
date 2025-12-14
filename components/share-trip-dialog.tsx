@@ -46,12 +46,19 @@ export function ShareTripDialog({
         .eq("trip_id", tripId)
         .single();
 
-      if (existing) {
-        setPublicSlug(existing.public_slug);
+      type TripShareQueryResult = {
+        public_slug: string
+        [key: string]: any
+      }
+
+      const existingTyped = existing as TripShareQueryResult | null;
+
+      if (existingTyped) {
+        setPublicSlug(existingTyped.public_slug);
       } else {
         const slug = generateSlug();
-        const { data, error } = await supabase
-          .from("trip_shares")
+        const { data, error } = await (supabase
+          .from("trip_shares") as any)
           .insert({
             trip_id: tripId,
             public_slug: slug,

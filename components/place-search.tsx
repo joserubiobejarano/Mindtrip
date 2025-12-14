@@ -110,14 +110,21 @@ export function PlaceSearch({ onSelectPlace, selectedPlaceId }: PlaceSearchProps
         .eq("external_id", place.id)
         .single();
 
-      if (existingPlace) {
-        setSelectedPlace(existingPlace);
-        onSelectPlace(existingPlace.id);
+      type PlaceQueryResult = {
+        id: string
+        [key: string]: any
+      }
+
+      const existingPlaceTyped = existingPlace as PlaceQueryResult | null;
+
+      if (existingPlaceTyped) {
+        setSelectedPlace(existingPlaceTyped);
+        onSelectPlace(existingPlaceTyped.id);
       } else {
         // Create new place in database
         const [lng, lat] = place.center;
-        const { data: newPlace, error } = await supabase
-          .from("places")
+        const { data: newPlace, error } = await (supabase
+          .from("places") as any)
           .insert({
             name: place.place_name,
             address: address || null,

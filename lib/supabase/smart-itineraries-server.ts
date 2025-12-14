@@ -20,7 +20,12 @@ export async function getSmartItinerary(
     return { data: null, error: new Error(error.message) };
   }
 
-  return { data: data?.content || null, error: null };
+  type ItineraryQueryResult = {
+    content: any
+  }
+
+  const dataTyped = data as ItineraryQueryResult | null;
+  return { data: dataTyped?.content || null, error: null };
 }
 
 /**
@@ -62,18 +67,25 @@ export async function upsertSmartItinerary(
     payload.trip_segment_id = trip_segment_id || null;
   }
 
+  type ExistingQueryResult = {
+    id: string
+    [key: string]: any
+  }
+
+  const existingTyped = existing as ExistingQueryResult | null;
+
   let error;
-  if (existing) {
+  if (existingTyped) {
     // Update existing record
-    const { error: updateError } = await supabase
-      .from('smart_itineraries')
+    const { error: updateError } = await (supabase
+      .from('smart_itineraries') as any)
       .update({ content: itinerary })
-      .eq('id', existing.id);
+      .eq('id', existingTyped.id);
     error = updateError;
   } else {
     // Insert new record
-    const { error: insertError } = await supabase
-      .from('smart_itineraries')
+    const { error: insertError } = await (supabase
+      .from('smart_itineraries') as any)
       .insert(payload);
     error = insertError;
   }

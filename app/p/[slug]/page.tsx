@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { PublicTripView } from "@/components/public-trip-view";
 
 export default async function PublicTripPage({
@@ -21,6 +21,16 @@ export default async function PublicTripPage({
     redirect("/");
   }
 
-  return <PublicTripView tripId={tripShare.trip_id} slug={slug} />;
+  type TripShareQueryResult = {
+    trip_id: string
+  }
+
+  const tripShareTyped = tripShare as TripShareQueryResult | null;
+
+  if (!tripShareTyped) {
+    notFound();
+  }
+
+  return <PublicTripView tripId={tripShareTyped.trip_id} slug={slug} />;
 }
 

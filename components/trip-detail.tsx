@@ -54,8 +54,8 @@ export function TripDetail({ tripId }: { tripId: string }) {
         const displayName = user?.fullName || user?.firstName || null;
         
         // Insert owner as member
-        await supabase
-          .from("trip_members")
+        await (supabase
+          .from("trip_members") as any)
           .insert({
             trip_id: tripId,
             user_id: userId,
