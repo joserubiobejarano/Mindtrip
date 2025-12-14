@@ -17,6 +17,9 @@ export interface Database {
           avatar_url: string | null
           created_at: string
           welcome_email_sent_at: string | null
+          clerk_user_id: string | null
+          is_pro: boolean
+          default_currency: string
         }
         Insert: {
           id: string
@@ -25,6 +28,9 @@ export interface Database {
           avatar_url?: string | null
           created_at?: string
           welcome_email_sent_at?: string | null
+          clerk_user_id?: string | null
+          is_pro?: boolean
+          default_currency?: string
         }
         Update: {
           id?: string
@@ -33,6 +39,9 @@ export interface Database {
           avatar_url?: string | null
           created_at?: string
           welcome_email_sent_at?: string | null
+          clerk_user_id?: string | null
+          is_pro?: boolean
+          default_currency?: string
         }
       }
       trips: {
