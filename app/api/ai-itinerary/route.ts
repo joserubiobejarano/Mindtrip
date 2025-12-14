@@ -187,7 +187,15 @@ export async function POST(request: NextRequest) {
       .select('name, address, lat, lng, types, photo_url')
       .eq('trip_id', tripId)
       .order('created_at', { ascending: false })
-      .limit(20) // Limit to avoid too much context
+      .limit(20)
+      .returns<Array<{
+        name: string;
+        address: string | null;
+        lat: number | null;
+        lng: number | null;
+        types: string[] | null;
+        photo_url: string | null;
+      }>>();
 
     if (placesError) {
       console.error('Error loading saved places:', placesError)
