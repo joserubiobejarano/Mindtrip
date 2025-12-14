@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
         .select('content')
         .eq('trip_id', tripId)
         .eq('trip_segment_id', trip_segment_id)
-        .maybeSingle();
+        .maybeSingle<{ content: any }>();
       existingItinerary = segmentItinerary?.content as AiItinerary | null;
     } else {
       const { data: tripItinerary } = await getSmartItinerary(tripId);
