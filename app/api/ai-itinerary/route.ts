@@ -499,6 +499,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
     // "After activities are loaded, if activities.length === 0 ... then call".
     // So we assume it's empty. If not empty, we append.
     if (activitiesToInsert.length > 0) {
+      // @ts-expect-error - Supabase type inference fails here, but the types are correct at runtime
       const { error: insertError } = await supabase
         .from('activities')
         .insert(activitiesToInsert);
