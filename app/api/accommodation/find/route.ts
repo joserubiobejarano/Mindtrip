@@ -69,9 +69,10 @@ export async function POST(request: NextRequest) {
     const updateSupabase = await createClient();
     const { error: updateError } = await updateSupabase
       .from("trips")
+      // @ts-expect-error - Supabase type inference fails here, but the types are correct at runtime
       .update({
-        auto_accommodation: accommodation as any,
-      } as any)
+        auto_accommodation: accommodation,
+      })
       .eq("id", tripId);
 
     if (updateError) {
