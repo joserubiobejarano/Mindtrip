@@ -32,7 +32,7 @@ Welcome to Kruno! We're excited to help you plan your next adventure with less s
 
 With Kruno, you can focus on what matters most: enjoying your trip. We handle the planning, so you can experience the journey.
 
-Get started by visiting:
+Get started by creating your first itinerary at:
 ${appUrl}
 
 Happy travels!
@@ -45,5 +45,9 @@ Founder, Kruno`;
     to: params.to,
     subject,
     text: body,
+    reply_to: "hello@kruno.app",
+    headers: {
+      "List-Unsubscribe": "<mailto:unsubscribe@kruno.app>",
+    },
   });
 }
