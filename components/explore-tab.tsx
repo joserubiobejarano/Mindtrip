@@ -53,14 +53,14 @@ class ExploreErrorBoundary extends Component<
           <div className="max-w-md space-y-4">
             <h2 className="text-lg font-semibold text-destructive">Something went wrong</h2>
             <p className="text-sm text-muted-foreground">
-              We encountered an error while loading Explore. This has been logged and we'll look into it.
+              We encountered an error while loading Explore. This has been logged and we&apos;ll look into it.
             </p>
             {this.state.error && (
               <details className="text-left mt-4 p-3 bg-muted rounded-md text-xs">
                 <summary className="cursor-pointer text-muted-foreground mb-2">Error details</summary>
                 <pre className="whitespace-pre-wrap break-words text-muted-foreground">
-                  {this.state.error.message}
-                  {this.state.error.stack && `\n\n${this.state.error.stack}`}
+                  {(this.state.error as Error).message}
+                  {(this.state.error as Error).stack && `\n\n${(this.state.error as Error).stack}`}
                 </pre>
               </details>
             )}
