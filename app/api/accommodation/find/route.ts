@@ -29,7 +29,11 @@ export async function POST(request: NextRequest) {
       .from("trips")
       .select("destination_name, center_lat, center_lng")
       .eq("id", tripId)
-      .single();
+      .single<{
+        destination_name: string | null;
+        center_lat: number | null;
+        center_lng: number | null;
+      }>();
 
     if (tripError || !trip) {
       return NextResponse.json(
