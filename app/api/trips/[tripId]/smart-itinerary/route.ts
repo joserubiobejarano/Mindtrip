@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
+import { getProfileId } from '@/lib/auth/getProfileId';
 import { SmartItinerary, ItinerarySlot, ItineraryPlace } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
 import { findPlacePhoto, getPlaceDetails } from '@/lib/google/places-server';
@@ -110,21 +110,86 @@ function sendSSE(controller: ReadableStreamDefaultController, type: string, data
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
-  const { tripId } = await params;
-
-  if (!tripId) {
-    return NextResponse.json(
-      { error: 'Missing trip id' },
-      { status: 400 },
-    );
-  }
+  let profileId: string | undefined;
+  let tripId: string | undefined;
 
   try {
-    const supabase = await createClient();
-    const { userId } = await auth();
+    tripId = (await params).tripId;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!tripId) {
+      return NextResponse.json(
+        { error: 'Missing trip id' },
+        { status: 400 },
+      );
+    }
+
+    const supabase = await createClient();
+
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Smart Itinerary API]', {
+        path: '/api/trips/[tripId]/smart-itinerary',
+        method: 'POST',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Verify user has access to trip
+    const { data: tripData, error: tripError } = await supabase
+      .from("trips")
+      .select("id, owner_id")
+      .eq("id", tripId)
+      .single();
+
+    if (tripError || !tripData) {
+      console.error('[Smart Itinerary API]', {
+        path: '/api/trips/[tripId]/smart-itinerary',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
+
+    // Check if user is owner or member
+    const { data: member } = await supabase
+      .from("trip_members")
+      .select("id")
+      .eq("trip_id", tripId)
+      .eq("user_id", profileId)
+      .single();
+
+    if (trip.owner_id !== profileId && !member) {
+      console.error('[Smart Itinerary API]', {
+        path: '/api/trips/[tripId]/smart-itinerary',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: trip.owner_id,
+        is_member: !!member,
+        context: 'authorization_check',
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Check regeneration limits before proceeding
@@ -148,7 +213,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     
     // Check trip Pro status (account Pro OR trip Pro) to determine limit
     const { getTripProStatus } = await import('@/lib/supabase/pro-status');
-    const { isProForThisTrip } = await getTripProStatus(supabase, userId, tripId);
+    const authResult = await getProfileId(supabase);
+    const { isProForThisTrip } = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
     const maxRegenerationsPerDay = isProForThisTrip ? 5 : 2;
     
     // Enforce limit
@@ -633,9 +699,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                     );
                   
                   // Clear liked places after successful regeneration
-                  if (mustIncludePlaceIds.length > 0 && userId) {
+                  if (mustIncludePlaceIds.length > 0 && profileId) {
                     try {
-                      await clearLikedPlacesAfterRegeneration(tripId, userId);
+                      await clearLikedPlacesAfterRegeneration(tripId, profileId);
                       console.log('[smart-itinerary] cleared liked places after regeneration');
                     } catch (err) {
                       console.error('[smart-itinerary] error clearing liked places:', err);
@@ -768,8 +834,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
 
 // GET handler for loading existing itinerary
 export async function GET(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+
   try {
-    const { tripId } = await params;
+    tripId = (await params).tripId;
     const url = new URL(req.url);
     const mode = url.searchParams.get('mode') ?? 'load';
     
@@ -779,6 +848,73 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
     }
 
     const supabase = await createClient();
+
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Smart Itinerary API]', {
+        path: '/api/trips/[tripId]/smart-itinerary',
+        method: 'GET',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Verify user has access to trip
+    const { data: tripData, error: tripError } = await supabase
+      .from("trips")
+      .select("id, owner_id")
+      .eq("id", tripId)
+      .single();
+
+    if (tripError || !tripData) {
+      console.error('[Smart Itinerary API]', {
+        path: '/api/trips/[tripId]/smart-itinerary',
+        method: 'GET',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
+
+    // Check if user is owner or member
+    const { data: member } = await supabase
+      .from("trip_members")
+      .select("id")
+      .eq("trip_id", tripId)
+      .eq("user_id", profileId)
+      .single();
+
+    if (trip.owner_id !== profileId && !member) {
+      console.error('[Smart Itinerary API]', {
+        path: '/api/trips/[tripId]/smart-itinerary',
+        method: 'GET',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: trip.owner_id,
+        is_member: !!member,
+        context: 'authorization_check',
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Load itinerary from database
     const { data, error } = await supabase

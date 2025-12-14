@@ -82,6 +82,9 @@ export async function GET(
         tripId,
         profileId,
         error: 'Forbidden: User does not have access to this trip',
+        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: trip.owner_id,
+        is_member: !!member,
         context: 'authorization_check',
       });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -181,6 +184,8 @@ export async function POST(
         tripId,
         profileId,
         error: 'Forbidden: User does not own this trip',
+        check_failed: 'not_owner',
+        trip_owner_id: trip.owner_id,
         context: 'authorization_check',
       });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -338,6 +343,8 @@ export async function PATCH(
         tripId,
         profileId,
         error: 'Forbidden: User does not own this trip',
+        check_failed: !trip ? 'trip_not_found' : 'not_owner',
+        trip_owner_id: trip?.owner_id,
         context: 'authorization_check',
       });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -459,6 +466,8 @@ export async function DELETE(
         tripId,
         profileId,
         error: 'Forbidden: User does not own this trip',
+        check_failed: !trip ? 'trip_not_found' : 'not_owner',
+        trip_owner_id: trip?.owner_id,
         context: 'authorization_check',
       });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

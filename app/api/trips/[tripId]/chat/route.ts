@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getProfileId } from "@/lib/auth/getProfileId";
 import { getOpenAIClient } from "@/lib/openai";
 import { moderateMessage, getRedirectMessage } from "@/lib/chat-moderation";
 
@@ -7,8 +8,11 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+
   try {
-    const { tripId } = await params;
+    tripId = (await params).tripId;
     const body = await request.json();
     const { message } = body;
 
@@ -21,14 +25,40 @@ export async function POST(
 
     const supabase = await createClient();
 
-    // Load trip data
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Chat API]', {
+        path: '/api/trips/[tripId]/chat',
+        method: 'POST',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Verify user has access to trip
     const { data: tripData, error: tripError } = await supabase
       .from("trips")
-      .select("title, start_date, end_date, destination_name")
+      .select("id, title, start_date, end_date, destination_name, owner_id")
       .eq("id", tripId)
       .single();
 
     if (tripError || !tripData) {
+      console.error('[Chat API]', {
+        path: '/api/trips/[tripId]/chat',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
       return NextResponse.json(
         { error: "Trip not found" },
         { status: 404 }
@@ -36,13 +66,39 @@ export async function POST(
     }
 
     type TripQueryResult = {
+      id: string
       title: string
       start_date: string
       end_date: string
       destination_name: string | null
+      owner_id: string
     }
 
     const trip = tripData as TripQueryResult;
+
+    // Check if user is owner or member
+    const { data: member } = await supabase
+      .from("trip_members")
+      .select("id")
+      .eq("trip_id", tripId)
+      .eq("user_id", profileId)
+      .single();
+
+    if (trip.owner_id !== profileId && !member) {
+      console.error('[Chat API]', {
+        path: '/api/trips/[tripId]/chat',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: trip.owner_id,
+        is_member: !!member,
+        context: 'authorization_check',
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
 
     // Load recent chat messages (last 10)
     const { data: recentMessagesData, error: messagesError } = await supabase
@@ -69,6 +125,7 @@ export async function POST(
       .from("trip_chat_messages") as any)
       .insert({
         trip_id: tripId,
+        user_id: profileId,
         role: "user",
         content: message,
       });
@@ -90,6 +147,7 @@ export async function POST(
         .from("trip_chat_messages") as any)
         .insert({
           trip_id: tripId,
+          user_id: profileId,
           role: "assistant",
           content: redirectMessage,
         });
@@ -156,6 +214,7 @@ Be concise and practical in your responses.`,
       .from("trip_chat_messages") as any)
       .insert({
         trip_id: tripId,
+        user_id: profileId,
         role: "assistant",
         content: assistantMessage,
       });

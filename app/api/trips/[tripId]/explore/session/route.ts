@@ -36,6 +36,56 @@ export async function GET(
       );
     }
 
+    // Verify user has access to trip
+    const { data: tripData, error: tripError } = await supabase
+      .from("trips")
+      .select("id, owner_id")
+      .eq("id", tripId)
+      .single();
+
+    if (tripError || !tripData) {
+      console.error('[Explore Session API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'GET',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
+
+    // Check if user is owner or member
+    const { data: member } = await supabase
+      .from("trip_members")
+      .select("id")
+      .eq("trip_id", tripId)
+      .eq("user_id", profileId)
+      .single();
+
+    if (trip.owner_id !== profileId && !member) {
+      console.error('[Explore Session API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'GET',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: trip.owner_id,
+        is_member: !!member,
+        context: 'authorization_check',
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Get trip_segment_id from query params (optional)
     const url = new URL(req.url);
     const tripSegmentId = url.searchParams.get('trip_segment_id') || null;
@@ -196,6 +246,56 @@ export async function DELETE(
         { error: authError?.message || 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify user has access to trip
+    const { data: tripData, error: tripError } = await supabase
+      .from("trips")
+      .select("id, owner_id")
+      .eq("id", tripId)
+      .single();
+
+    if (tripError || !tripData) {
+      console.error('[Explore Session API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'DELETE',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
+
+    // Check if user is owner or member
+    const { data: member } = await supabase
+      .from("trip_members")
+      .select("id")
+      .eq("trip_id", tripId)
+      .eq("user_id", profileId)
+      .single();
+
+    if (trip.owner_id !== profileId && !member) {
+      console.error('[Explore Session API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'DELETE',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: trip.owner_id,
+        is_member: !!member,
+        context: 'authorization_check',
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Get trip_segment_id from query params (optional)

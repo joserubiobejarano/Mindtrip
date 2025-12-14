@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
+import { getProfileId } from '@/lib/auth/getProfileId';
 import type { SmartItinerary } from '@/types/itinerary';
 import { getPlaceDetails } from '@/lib/google/places-server';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
@@ -12,13 +12,14 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string; activityId: string }> }
 ) {
-  try {
-    const { tripId, activityId } = await params;
-    const { userId } = await auth();
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+  let activityId: string | undefined;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  try {
+    const resolvedParams = await params;
+    tripId = resolvedParams.tripId;
+    activityId = resolvedParams.activityId;
 
     if (!tripId || !activityId) {
       return NextResponse.json({ error: 'Missing trip id or activity id' }, { status: 400 });
@@ -26,15 +27,72 @@ export async function POST(
 
     const supabase = await createClient();
 
-    // Verify trip exists and user has access
-    const { data: trip, error: tripError } = await supabase
-      .from('trips')
-      .select('id')
-      .eq('id', tripId)
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Replace Activity API]', {
+        path: '/api/trips/[tripId]/activities/[activityId]/replace',
+        method: 'POST',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+        activityId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Verify user has access to trip
+    const { data: tripData, error: tripError } = await supabase
+      .from("trips")
+      .select("id, owner_id")
+      .eq("id", tripId)
       .single();
 
-    if (tripError || !trip) {
-      return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
+    if (tripError || !tripData) {
+      console.error('[Replace Activity API]', {
+        path: '/api/trips/[tripId]/activities/[activityId]/replace',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
+
+    type TripQueryResult = {
+      id: string
+      owner_id: string
+    }
+
+    const trip = tripData as TripQueryResult;
+
+    // Check if user is owner or member
+    const { data: member } = await supabase
+      .from("trip_members")
+      .select("id")
+      .eq("trip_id", tripId)
+      .eq("user_id", profileId)
+      .single();
+
+    if (trip.owner_id !== profileId && !member) {
+      console.error('[Replace Activity API]', {
+        path: '/api/trips/[tripId]/activities/[activityId]/replace',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: trip.owner_id,
+        is_member: !!member,
+        context: 'authorization_check',
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Load existing SmartItinerary

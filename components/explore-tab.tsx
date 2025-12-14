@@ -93,8 +93,8 @@ interface ExploreTabProps {
 
 export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlaceChange }: ExploreTabProps) {
   const router = useRouter();
-  const { data: trip } = useTrip(tripId);
-  const { data: segments = [] } = useTripSegments(tripId);
+  const { data: trip, isLoading: tripLoading, error: tripError } = useTrip(tripId);
+  const { data: segments = [], isLoading: segmentsLoading, error: segmentsError } = useTripSegments(tripId);
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
   const { 
     data: session, 
@@ -117,6 +117,37 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     remainingSwipes: null,
     dailyLimit: null,
   };
+
+  // Handle errors from trip and segments hooks
+  useEffect(() => {
+    if (tripError || segmentsError) {
+      const error = tripError || segmentsError;
+      // Check if it's a 403 or 500 error
+      const isForbidden = error && (
+        (error as any)?.message?.includes('Forbidden') ||
+        (error as any)?.status === 403 ||
+        (error as any)?.code === '403'
+      );
+      const isServerError = error && (
+        (error as any)?.status === 500 ||
+        (error as any)?.code === '500'
+      );
+
+      if (isForbidden || isServerError) {
+        addToast({
+          title: 'Error loading trip',
+          description: 'Couldn\'t load places, please refresh',
+          variant: 'destructive',
+        });
+      } else {
+        addToast({
+          title: 'Error loading trip',
+          description: error?.message || 'Failed to load trip data',
+          variant: 'destructive',
+        });
+      }
+    }
+  }, [tripError, segmentsError, addToast]);
 
   // Set initial segment if multi-city
   useEffect(() => {
@@ -196,10 +227,58 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     }
   }, [onMapUpdate, activePlace]);
 
-  if (!trip) {
+  // Show loading state
+  if ((tripLoading || segmentsLoading) && !trip) {
     return (
       <div className="p-6">
         <div className="text-muted-foreground">Loading trip...</div>
+      </div>
+    );
+  }
+
+  // Show error state for trip or segments errors (403/500)
+  if (tripError || segmentsError) {
+    const error = tripError || segmentsError;
+    const isForbidden = error && (
+      (error as any)?.message?.includes('Forbidden') ||
+      (error as any)?.status === 403 ||
+      (error as any)?.code === '403'
+    );
+    const isServerError = error && (
+      (error as any)?.status === 500 ||
+      (error as any)?.code === '500'
+    );
+
+    if (isForbidden || isServerError) {
+      return (
+        <div className="p-6 text-center">
+          <p className="text-sm text-muted-foreground mb-4">
+            Couldn't load places, please refresh
+          </p>
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
+          >
+            Refresh
+          </Button>
+        </div>
+      );
+    }
+  }
+
+  // Ensure trip exists before rendering
+  if (!trip) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-sm text-muted-foreground mb-4">
+          Couldn't load places, please refresh
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          variant="outline"
+        >
+          Refresh
+        </Button>
       </div>
     );
   }

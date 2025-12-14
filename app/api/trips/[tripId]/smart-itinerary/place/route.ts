@@ -82,6 +82,9 @@ export async function PATCH(
         tripId,
         profileId,
         error: 'Forbidden: User does not have access to this trip',
+        check_failed: tripTyped.owner_id !== profileId ? 'not_owner' : 'not_member',
+        trip_owner_id: tripTyped.owner_id,
+        is_member: !!member,
         context: 'authorization_check',
       });
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

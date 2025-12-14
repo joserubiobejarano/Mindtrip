@@ -176,42 +176,37 @@ export function TripsList() {
         <div className="space-y-12">
           {/* Upcoming Trips */}
           {upcomingTrips.length > 0 && (
-            <div>
-              <h2 className="text-5xl md:text-7xl lg:text-8xl font-normal inline-block text-foreground mb-8" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                Upcoming trips
-              </h2>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {upcomingTrips.map((trip) => (
-                  <Card
-                    key={trip.id}
-                    className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm"
-                    onClick={() => router.push(`/trips/${trip.id}`)}
-                  >
-                    <CardHeader className="p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
-                          <CardDescription className="text-sm mt-1">
-                            {format(new Date(trip.start_date), "MMM d")} -{" "}
-                            {format(new Date(trip.end_date), "MMM d, yyyy")}
-                          </CardDescription>
-                        </div>
-                        {trip.owner_id === userId && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                            onClick={(e) => handleDeleteClick(trip, e)}
-                            title="Delete trip"
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        )}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {upcomingTrips.map((trip) => (
+                <Card
+                  key={trip.id}
+                  className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm"
+                  onClick={() => router.push(`/trips/${trip.id}`)}
+                >
+                  <CardHeader className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
+                        <CardDescription className="text-sm mt-1">
+                          {format(new Date(trip.start_date), "MMM d")} -{" "}
+                          {format(new Date(trip.end_date), "MMM d, yyyy")}
+                        </CardDescription>
                       </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
+                      {trip.owner_id === userId && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                          onClick={(e) => handleDeleteClick(trip, e)}
+                          title="Delete trip"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
             </div>
           )}
 
@@ -219,9 +214,7 @@ export function TripsList() {
           {pastTrips.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-5xl md:text-7xl lg:text-8xl font-normal inline-block text-foreground" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                  Past trips
-                </h2>
+                <h2 className="font-display text-3xl font-semibold tracking-tight">Past trips</h2>
                 <Button
                   variant="ghost"
                   size="sm"
