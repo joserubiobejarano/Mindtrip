@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getOpenAIClient } from '@/lib/openai'
 import { findPlacePhoto } from '@/lib/google/places-server'
 import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries-server'
+import type { TripSegment } from '@/types/trip-segments'
 
 /**
  * Get a human-readable "good for" label based on place types
@@ -138,14 +139,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Load segment data if trip_segment_id provided
-    let segment = null;
+    let segment: TripSegment | null = null;
     if (trip_segment_id) {
       const { data: segmentData } = await supabase
         .from('trip_segments')
         .select('*')
         .eq('id', trip_segment_id)
         .eq('trip_id', tripId)
-        .single();
+        .single<TripSegment>();
       segment = segmentData;
     }
 
