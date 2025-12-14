@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { findBestAccommodation } from "@/lib/google/accommodation";
+import type { Json } from "@/types/database";
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from("trips")
       .update({
-        auto_accommodation: accommodation,
+        auto_accommodation: accommodation as Json,
       })
       .eq("id", tripId);
 
