@@ -65,13 +65,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save to trip - use type assertion to fix TypeScript inference issue
-    const updatePayload: TripUpdate = {
-      auto_accommodation: accommodation as unknown as Json,
-    };
-    const { error: updateError } = await supabase
+    // Save to trip - create a fresh client to avoid type inference issues
+    const updateSupabase = await createClient();
+    const { error: updateError } = await updateSupabase
       .from("trips")
-      .update(updatePayload)
+      .update({
+        auto_accommodation: accommodation as unknown as Json,
+      })
       .eq("id", tripId);
 
     if (updateError) {
