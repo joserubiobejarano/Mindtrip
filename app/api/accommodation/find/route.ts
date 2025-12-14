@@ -65,13 +65,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save to trip - create a fresh client to avoid type inference issues
+    // Save to trip - use type assertion to work around Supabase type inference issue
     const updateSupabase = await createClient();
     const { error: updateError } = await updateSupabase
       .from("trips")
       .update({
-        auto_accommodation: accommodation as unknown as Json,
-      })
+        auto_accommodation: accommodation as any,
+      } as any)
       .eq("id", tripId);
 
     if (updateError) {
