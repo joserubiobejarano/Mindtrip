@@ -188,8 +188,55 @@ export function ExploreDeck({
         });
 
         if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to add place to day');
+          const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+          
+          // Handle specific error types
+          if (error.error === 'day_activity_limit') {
+            addToast({
+              title: 'Day is full',
+              description: error.message || 'We recommend planning no more than 12 activities per day so you have time to enjoy each place.',
+              variant: 'destructive',
+            });
+            // Rollback UI
+            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            return;
+          }
+          
+          if (error.error === 'past_day_locked') {
+            addToast({
+              title: 'Cannot modify past day',
+              description: error.message || 'You cannot modify days that are already in the past.',
+              variant: 'destructive',
+            });
+            // Rollback UI
+            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            return;
+          }
+          
+          // Handle other error status codes
+          if (response.status === 401 || response.status === 403) {
+            addToast({
+              title: 'Access denied',
+              description: error.error || 'You do not have permission to perform this action.',
+              variant: 'destructive',
+            });
+          } else if (response.status === 404) {
+            addToast({
+              title: 'Not found',
+              description: error.error || 'The requested resource was not found.',
+              variant: 'destructive',
+            });
+          } else {
+            addToast({
+              title: 'Error',
+              description: error.error || 'Could not add place to day. Please try again.',
+              variant: 'destructive',
+            });
+          }
+          
+          // Rollback UI on error
+          setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+          return;
         }
 
         const result = await response.json();
@@ -245,11 +292,14 @@ export function ExploreDeck({
         console.error('[itinerary-swipe] error adding place to day:', error);
         // Rollback UI on error
         setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
-        addToast({
-          title: 'Error',
-          description: error.message || 'Could not add place to day. Please try again.',
-          variant: 'destructive',
-        });
+        // Only show toast if we haven't already shown one
+        if (!error.toastShown) {
+          addToast({
+            title: 'Error',
+            description: error.message || 'Could not add place to day. Please try again.',
+            variant: 'destructive',
+          });
+        }
       }
     } else {
       // Trip mode: just like the place
@@ -345,7 +395,7 @@ export function ExploreDeck({
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
         
         // Handle specific error types
         if (error.error === 'day_activity_limit') {
@@ -366,7 +416,28 @@ export function ExploreDeck({
           return;
         }
         
-        throw new Error(error.error || 'Failed to add places to day');
+        // Handle other error status codes
+        if (response.status === 401 || response.status === 403) {
+          addToast({
+            title: 'Access denied',
+            description: error.error || 'You do not have permission to perform this action.',
+            variant: 'destructive',
+          });
+        } else if (response.status === 404) {
+          addToast({
+            title: 'Not found',
+            description: error.error || 'The requested resource was not found.',
+            variant: 'destructive',
+          });
+        } else {
+          addToast({
+            title: 'Error',
+            description: error.error || 'Could not add places to day. Please try again.',
+            variant: 'destructive',
+          });
+        }
+        
+        return;
       }
 
       const result = await response.json();

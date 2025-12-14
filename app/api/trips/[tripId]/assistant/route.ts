@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@/lib/supabase/server";
+import { getProfileId } from "@/lib/auth/getProfileId";
 import { getOpenAIClient } from "@/lib/openai";
 import { moderateMessage, getRedirectMessage } from "@/lib/chat-moderation";
 import { getSmartItinerary } from "@/lib/supabase/smart-itineraries-server";
@@ -16,14 +16,11 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+  
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { tripId } = await params;
+    tripId = (await params).tripId;
     const body: AssistantRequest = await request.json();
     const { message, activeSegmentId, activeDayId } = body;
 
@@ -36,6 +33,23 @@ export async function POST(
 
     const supabase = await createClient();
 
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Assistant API]', {
+        path: '/api/trips/[tripId]/assistant',
+        method: 'POST',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     // 1. Auth & trip access check
     const { data: tripData, error: tripError } = await supabase
       .from("trips")
@@ -44,6 +58,15 @@ export async function POST(
       .single();
 
     if (tripError || !tripData) {
+      console.error('[Assistant API]', {
+        path: '/api/trips/[tripId]/assistant',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
       return NextResponse.json(
         { error: "Trip not found" },
         { status: 404 }
@@ -66,10 +89,18 @@ export async function POST(
       .from("trip_members")
       .select("id")
       .eq("trip_id", tripId)
-      .eq("user_id", userId)
+      .eq("user_id", profileId)
       .single();
 
-    if (trip.owner_id !== userId && !member) {
+    if (trip.owner_id !== profileId && !member) {
+      console.error('[Assistant API]', {
+        path: '/api/trips/[tripId]/assistant',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        context: 'authorization_check',
+      });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -82,7 +113,7 @@ export async function POST(
       // Save redirect response
       await (supabase.from("trip_chat_messages") as any).insert({
         trip_id: tripId,
-        user_id: userId,
+        user_id: profileId,
         role: "assistant",
         content: redirectMessage,
       });
@@ -289,7 +320,7 @@ Provide a helpful, concise response. Reference specific days and places from the
     // Save user message
     await (supabase.from("trip_chat_messages") as any).insert({
       trip_id: tripId,
-      user_id: userId,
+      user_id: profileId,
       role: "user",
       content: message,
     });
@@ -314,8 +345,15 @@ Provide a helpful, concise response. Reference specific days and places from the
         suggestions: [], // For future tool actions
       },
     });
-  } catch (error) {
-    console.error("Error in /api/trips/[tripId]/assistant:", error);
+  } catch (error: any) {
+    console.error('[Assistant API]', {
+      path: '/api/trips/[tripId]/assistant',
+      method: 'POST',
+      tripId: tripId || 'unknown',
+      profileId: profileId || 'unknown',
+      error: error?.message || 'Internal server error',
+      errorCode: error?.code,
+    });
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(

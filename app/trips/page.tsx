@@ -12,7 +12,7 @@ export default async function TripsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">

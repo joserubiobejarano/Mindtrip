@@ -1,25 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
+import { getProfileId } from '@/lib/auth/getProfileId';
 import { getUserSubscriptionStatus, FREE_SWIPE_LIMIT_PER_TRIP } from '@/lib/supabase/user-subscription';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+  
   try {
-    const { tripId } = await params;
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    tripId = (await params).tripId;
 
     if (!tripId) {
       return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
     }
 
     const supabase = await createClient();
+
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Explore Session API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'GET',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
     // Get trip_segment_id from query params (optional)
     const url = new URL(req.url);
@@ -30,7 +45,7 @@ export async function GET(
       .from('explore_sessions')
       .select('*')
       .eq('trip_id', tripId)
-      .eq('user_id', userId);
+      .eq('user_id', profileId);
 
     // Handle NULL trip_segment_id properly - use .is() for null, .eq() for values
     if (tripSegmentId === null) {
@@ -42,16 +57,15 @@ export async function GET(
     let { data: sessionData, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
-      console.error('[Explore API]', {
+      console.error('[Explore Session API]', {
         path: '/api/trips/[tripId]/explore/session',
         method: 'GET',
-        error: sessionError.message || 'Failed to fetch session',
-        stack: sessionError.stack,
         tripId,
-        userId,
-        tripSegmentId,
+        profileId,
+        error: sessionError.message || 'Failed to fetch session',
         errorCode: sessionError.code,
-        errorDetails: sessionError,
+        tripSegmentId,
+        context: 'fetch_session',
       });
       return NextResponse.json(
         { error: 'Failed to fetch session' },
@@ -74,7 +88,7 @@ export async function GET(
         .from('explore_sessions') as any)
         .insert({
           trip_id: tripId,
-          user_id: userId,
+          user_id: profileId,
           trip_segment_id: tripSegmentId,
           liked_place_ids: [],
           discarded_place_ids: [],
@@ -84,16 +98,15 @@ export async function GET(
         .single();
 
       if (createError) {
-        console.error('[Explore API]', {
+        console.error('[Explore Session API]', {
           path: '/api/trips/[tripId]/explore/session',
           method: 'GET',
-          error: createError.message || 'Failed to create session',
-          stack: createError.stack,
           tripId,
-          userId,
-          tripSegmentId,
+          profileId,
+          error: createError.message || 'Failed to create session',
           errorCode: createError.code,
-          errorDetails: createError,
+          tripSegmentId,
+          context: 'create_session',
         });
         return NextResponse.json(
           { error: 'Internal server error' },
@@ -105,19 +118,22 @@ export async function GET(
     }
 
     // Get subscription status and trip limit
+    // Note: getUserSubscriptionStatus expects clerkUserId
     let isPro = false;
     try {
-      const subscriptionStatus = await getUserSubscriptionStatus(userId);
+      const authResult = await getProfileId(supabase);
+      const subscriptionStatus = await getUserSubscriptionStatus(authResult.clerkUserId);
       isPro = subscriptionStatus.isPro;
     } catch (subscriptionError: any) {
-      console.error('[Explore API]', {
+      console.error('[Explore Session API]', {
         path: '/api/trips/[tripId]/explore/session',
         method: 'GET',
-        error: subscriptionError?.message || 'Failed to get subscription status',
-        stack: subscriptionError?.stack,
         tripId,
-        userId,
+        profileId,
+        error: subscriptionError?.message || 'Failed to get subscription status',
+        errorCode: subscriptionError?.code,
         tripSegmentId,
+        context: 'subscription_status',
       });
       // Continue with default isPro = false
     }
@@ -134,16 +150,16 @@ export async function GET(
       dailyLimit: isPro ? null : FREE_SWIPE_LIMIT_PER_TRIP, // Keep field name for backward compatibility
     });
   } catch (err: any) {
-    console.error('[Explore API]', {
+    console.error('[Explore Session API]', {
       path: '/api/trips/[tripId]/explore/session',
       method: 'GET',
+      tripId: tripId || 'unknown',
+      profileId: profileId || 'unknown',
       error: err?.message || 'Internal server error',
-      stack: err?.stack,
-      tripId: (await params).tripId || 'unknown',
-      userId: (await auth()).userId || 'unknown',
+      errorCode: err?.code,
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: err?.message || 'Internal server error' },
       { status: 500 }
     );
   }
@@ -153,19 +169,34 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+  
   try {
-    const { tripId } = await params;
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    tripId = (await params).tripId;
 
     if (!tripId) {
       return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
     }
 
     const supabase = await createClient();
+
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Explore Session API]', {
+        path: '/api/trips/[tripId]/explore/session',
+        method: 'DELETE',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
     // Get trip_segment_id from query params (optional)
     const url = new URL(req.url);
@@ -182,7 +213,7 @@ export async function DELETE(
         updated_at: new Date().toISOString(),
       })
       .eq('trip_id', tripId)
-      .eq('user_id', userId);
+      .eq('user_id', profileId);
 
     // Handle NULL trip_segment_id properly
     if (tripSegmentId === null) {
@@ -199,16 +230,15 @@ export async function DELETE(
         return NextResponse.json({ success: true });
       }
 
-      console.error('[Explore API]', {
+      console.error('[Explore Session API]', {
         path: '/api/trips/[tripId]/explore/session',
         method: 'DELETE',
-        error: updateError.message || 'Failed to clear session',
-        stack: updateError.stack,
         tripId,
-        userId,
-        tripSegmentId,
+        profileId,
+        error: updateError.message || 'Failed to clear session',
         errorCode: updateError.code,
-        errorDetails: updateError,
+        tripSegmentId,
+        context: 'clear_session',
       });
       return NextResponse.json(
         { error: 'Internal server error' },
@@ -218,16 +248,16 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error('[Explore API]', {
+    console.error('[Explore Session API]', {
       path: '/api/trips/[tripId]/explore/session',
       method: 'DELETE',
+      tripId: tripId || 'unknown',
+      profileId: profileId || 'unknown',
       error: err?.message || 'Internal server error',
-      stack: err?.stack,
-      tripId: (await params).tripId || 'unknown',
-      userId: (await auth()).userId || 'unknown',
+      errorCode: err?.code,
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: err?.message || 'Internal server error' },
       { status: 500 }
     );
   }

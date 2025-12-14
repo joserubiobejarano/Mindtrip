@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
+import { getProfileId } from '@/lib/auth/getProfileId';
 import { getTripProStatus } from '@/lib/supabase/pro-status';
 import { FREE_SWIPE_LIMIT_PER_TRIP, PRO_SWIPE_LIMIT_PER_TRIP } from '@/lib/supabase/user-subscription';
 
@@ -8,12 +8,27 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+  
   try {
-    const { tripId } = await params;
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    tripId = (await params).tripId;
+    const supabase = await createClient();
+    
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Explore Swipe API]', {
+        path: '/api/trips/[tripId]/explore/swipe',
+        method: 'POST',
+        error: authError?.message || 'Failed to get profile',
+        tripId: tripId || 'unknown',
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
     }
 
     if (!tripId) {
@@ -74,14 +89,12 @@ export async function POST(
       }
     }
 
-    const supabase = await createClient();
-
     // Get or create explore session (segment-scoped if trip_segment_id provided)
     let query = supabase
       .from('explore_sessions')
       .select('*')
       .eq('trip_id', tripId)
-      .eq('user_id', userId);
+      .eq('user_id', profileId);
 
     // Handle NULL trip_segment_id properly - use .is() for null, .eq() for values
     if (trip_segment_id === null || trip_segment_id === undefined) {
@@ -93,18 +106,17 @@ export async function POST(
     const { data: sessionData, error: sessionError } = await query.maybeSingle();
 
     if (sessionError && sessionError.code !== 'PGRST116') {
-      console.error('[Explore API]', {
+      console.error('[Explore Swipe API]', {
         path: '/api/trips/[tripId]/explore/swipe',
         method: 'POST',
-        error: sessionError.message || 'Failed to fetch session',
-        stack: sessionError.stack,
         tripId,
-        userId,
+        profileId,
+        error: sessionError.message || 'Failed to fetch session',
+        errorCode: sessionError.code,
         trip_segment_id,
         action,
         place_id,
-        errorCode: sessionError.code,
-        errorDetails: sessionError,
+        context: 'fetch_session',
       });
       return NextResponse.json(
         { error: 'Internal server error' },
@@ -122,18 +134,20 @@ export async function POST(
     const session = sessionData as SessionQueryResult | null;
 
     // Get trip Pro status (account Pro OR trip Pro) and determine limit
+    // Note: getTripProStatus expects clerkUserId, so we need to get it from getProfileId
     let isProForThisTrip = false;
     try {
-      const proStatus = await getTripProStatus(supabase, userId, tripId);
+      const authResult = await getProfileId(supabase);
+      const proStatus = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
       isProForThisTrip = proStatus.isProForThisTrip;
     } catch (proStatusError: any) {
-      console.error('[Explore API]', {
+      console.error('[Explore Swipe API]', {
         path: '/api/trips/[tripId]/explore/swipe',
         method: 'POST',
-        error: proStatusError?.message || 'Failed to get trip pro status',
-        stack: proStatusError?.stack,
         tripId,
-        userId,
+        profileId,
+        error: proStatusError?.message || 'Failed to get trip pro status',
+        errorCode: proStatusError?.code,
         trip_segment_id,
         action,
         place_id,
@@ -218,7 +232,7 @@ export async function POST(
           last_swipe_at: session.last_swipe_at, // Keep timestamp for reference (not used in limit logic)
         })
         .eq('trip_id', tripId)
-        .eq('user_id', userId);
+        .eq('user_id', profileId);
 
       // Handle NULL trip_segment_id properly
       if (trip_segment_id === null || trip_segment_id === undefined) {
@@ -232,19 +246,17 @@ export async function POST(
         .single();
 
       if (updateError) {
-        console.error('[Explore API]', {
+        console.error('[Explore Swipe API]', {
           path: '/api/trips/[tripId]/explore/swipe',
           method: 'POST',
-          error: updateError.message || 'Failed to undo swipe',
-          stack: updateError.stack,
           tripId,
-          userId,
+          profileId,
+          error: updateError.message || 'Failed to undo swipe',
+          errorCode: updateError.code,
           trip_segment_id,
           action,
           place_id,
           previous_action,
-          errorCode: updateError.code,
-          errorDetails: updateError,
           context: 'undo_swipe',
         });
         return NextResponse.json(
@@ -308,7 +320,7 @@ export async function POST(
         last_swipe_at: now.toISOString(),
       })
       .eq('trip_id', tripId)
-      .eq('user_id', userId);
+      .eq('user_id', profileId);
 
     // Handle NULL trip_segment_id properly
     if (trip_segment_id === null || trip_segment_id === undefined) {
@@ -322,19 +334,17 @@ export async function POST(
       .maybeSingle();
 
     if (updateError) {
-      console.error('[Explore API]', {
+      console.error('[Explore Swipe API]', {
         path: '/api/trips/[tripId]/explore/swipe',
         method: 'POST',
-        error: updateError.message || 'Failed to update session',
-        stack: updateError.stack,
         tripId,
-        userId,
+        profileId,
+        error: updateError.message || 'Failed to update session',
+        errorCode: updateError.code,
         trip_segment_id,
         action,
         place_id,
         source: swipeSource,
-        errorCode: updateError.code,
-        errorDetails: updateError,
         context: 'update_session',
       });
       return NextResponse.json(
@@ -349,7 +359,7 @@ export async function POST(
         .from('explore_sessions') as any)
         .insert({
           trip_id: tripId,
-          user_id: userId,
+          user_id: profileId,
           trip_segment_id: trip_segment_id || null,
           liked_place_ids: updatedLiked,
           discarded_place_ids: updatedDiscarded,
@@ -360,19 +370,17 @@ export async function POST(
         .single();
 
       if (createError) {
-        console.error('[Explore API]', {
+        console.error('[Explore Swipe API]', {
           path: '/api/trips/[tripId]/explore/swipe',
           method: 'POST',
-          error: createError.message || 'Failed to create session',
-          stack: createError.stack,
           tripId,
-          userId,
+          profileId,
+          error: createError.message || 'Failed to create session',
+          errorCode: createError.code,
           trip_segment_id,
           action,
           place_id,
           source: swipeSource,
-          errorCode: createError.code,
-          errorDetails: createError,
           context: 'create_session',
         });
         return NextResponse.json(
@@ -402,16 +410,16 @@ export async function POST(
       limitReached: newSwipeCount >= limit,
     });
   } catch (err: any) {
-    console.error('[Explore API]', {
+    console.error('[Explore Swipe API]', {
       path: '/api/trips/[tripId]/explore/swipe',
       method: 'POST',
+      tripId: tripId || 'unknown',
+      profileId: profileId || 'unknown',
       error: err?.message || 'Internal server error',
-      stack: err?.stack,
-      tripId: (await params).tripId || 'unknown',
-      userId: (await auth()).userId || 'unknown',
+      errorCode: err?.code,
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: err?.message || 'Internal server error' },
       { status: 500 }
     );
   }

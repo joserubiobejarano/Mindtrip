@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
+import { getProfileId } from '@/lib/auth/getProfileId';
 import { getPlaceDetails } from '@/lib/google/places-server';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import type { SmartItinerary } from '@/types/itinerary';
@@ -11,13 +11,14 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string; dayId: string }> }
 ) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+  let dayId: string | undefined;
+  
   try {
-    const { tripId, dayId } = await params;
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const resolvedParams = await params;
+    tripId = resolvedParams.tripId;
+    dayId = resolvedParams.dayId;
 
     if (!tripId || !dayId) {
       return NextResponse.json({ error: 'Missing trip id or day id' }, { status: 400 });
@@ -36,15 +37,69 @@ export async function POST(
 
     const supabase = await createClient();
 
-    // Verify trip exists and user has access
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Bulk Add From Swipes API]', {
+        path: '/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes',
+        method: 'POST',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+        dayId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Verify trip exists and user has access (owner or member)
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('id')
+      .select('id, owner_id')
       .eq('id', tripId)
       .single();
 
     if (tripError || !trip) {
+      console.error('[Bulk Add From Swipes API]', {
+        path: '/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: tripError?.message || 'Trip not found',
+        errorCode: tripError?.code,
+        context: 'trip_lookup',
+      });
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
+    }
+
+    type TripQueryResult = {
+      id: string;
+      owner_id: string;
+    };
+
+    const tripTyped = trip as TripQueryResult;
+
+    // Check if user is owner or member
+    const { data: member } = await supabase
+      .from('trip_members')
+      .select('id')
+      .eq('trip_id', tripId)
+      .eq('user_id', profileId)
+      .single();
+
+    if (tripTyped.owner_id !== profileId && !member) {
+      console.error('[Bulk Add From Swipes API]', {
+        path: '/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: 'Forbidden: User does not have access to this trip',
+        context: 'authorization_check',
+      });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Load existing SmartItinerary
@@ -55,7 +110,15 @@ export async function POST(
       .maybeSingle();
 
     if (itineraryError) {
-      console.error('Error loading itinerary:', itineraryError);
+      console.error('[Bulk Add From Swipes API]', {
+        path: '/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes',
+        method: 'POST',
+        tripId,
+        profileId,
+        error: itineraryError.message || 'Failed to load itinerary',
+        errorCode: itineraryError.code,
+        context: 'load_itinerary',
+      });
       return NextResponse.json({ error: 'Failed to load itinerary' }, { status: 500 });
     }
 
@@ -88,6 +151,14 @@ export async function POST(
       );
     }
 
+    // Find the slot first (needed for activity limit check)
+    const slotIndex = day.slots.findIndex(s => s.label.toLowerCase() === slot);
+    if (slotIndex === -1) {
+      return NextResponse.json({ error: 'Slot not found in day' }, { status: 404 });
+    }
+
+    const targetSlot = day.slots[slotIndex];
+
     // Check activity limit before adding
     const currentActivityCount = getDayActivityCount(itinerary, dayId);
     const placesToAdd = place_ids.filter(id => !targetSlot.places.some(p => p.id === id)).length;
@@ -102,14 +173,6 @@ export async function POST(
         { status: 400 }
       );
     }
-
-    // Find the slot
-    const slotIndex = day.slots.findIndex(s => s.label.toLowerCase() === slot);
-    if (slotIndex === -1) {
-      return NextResponse.json({ error: 'Slot not found in day' }, { status: 404 });
-    }
-
-    const targetSlot = day.slots[slotIndex];
 
     // Get existing place IDs in this slot to avoid duplicates (idempotency check)
     const existingPlaceIds = new Set(targetSlot.places.map(p => p.id));
@@ -208,7 +271,15 @@ export async function POST(
         .eq('trip_id', tripId);
 
       if (updateError) {
-        console.error('Error updating itinerary:', updateError);
+        console.error('[Bulk Add From Swipes API]', {
+          path: '/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes',
+          method: 'POST',
+          tripId,
+          profileId,
+          error: updateError.message || 'Failed to update itinerary',
+          errorCode: updateError.code,
+          context: 'update_itinerary',
+        });
         return NextResponse.json({ error: 'Failed to update itinerary' }, { status: 500 });
       }
     }
@@ -230,9 +301,16 @@ export async function POST(
       })),
     });
   } catch (err: any) {
-    console.error('POST /bulk-add-from-swipes error:', err);
+    console.error('[Bulk Add From Swipes API]', {
+      path: '/api/trips/[tripId]/days/[dayId]/activities/bulk-add-from-swipes',
+      method: 'POST',
+      tripId: tripId || 'unknown',
+      profileId: profileId || 'unknown',
+      error: err?.message || 'Internal server error',
+      errorCode: err?.code,
+    });
     return NextResponse.json(
-      { error: 'Internal server error', details: err?.message },
+      { error: err?.message || 'Internal server error' },
       { status: 500 }
     );
   }

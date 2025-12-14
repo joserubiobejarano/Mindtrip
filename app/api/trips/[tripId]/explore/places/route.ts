@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
+import { getProfileId } from '@/lib/auth/getProfileId';
 import { getPlacesToExplore, type ExploreFilters } from '@/lib/google/explore-places';
 import type { SmartItinerary } from '@/types/itinerary';
 
@@ -8,19 +8,34 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
+  let profileId: string | undefined;
+  let tripId: string | undefined;
+  
   try {
-    const { tripId } = await params;
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    tripId = (await params).tripId;
 
     if (!tripId) {
       return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
     }
 
     const supabase = await createClient();
+
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Explore Places API]', {
+        path: '/api/trips/[tripId]/explore/places',
+        method: 'GET',
+        error: authError?.message || 'Failed to get profile',
+        tripId,
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
     // Get URL for query parameters
     const url = new URL(req.url);
@@ -34,7 +49,7 @@ export async function GET(
       .from('explore_sessions')
       .select('liked_place_ids, discarded_place_ids')
       .eq('trip_id', tripId)
-      .eq('user_id', userId)
+      .eq('user_id', profileId)
       .eq('trip_segment_id', segmentIdForQuery)
       .maybeSingle();
 
@@ -87,13 +102,13 @@ export async function GET(
           });
         });
       } catch (err: any) {
-        console.error('[Explore API]', {
+        console.error('[Explore Places API]', {
           path: '/api/trips/[tripId]/explore/places',
           method: 'GET',
-          error: err?.message || 'Error parsing itinerary',
-          stack: err?.stack,
           tripId,
-          userId,
+          profileId,
+          error: err?.message || 'Error parsing itinerary',
+          errorCode: err?.code,
           tripSegmentId,
           context: 'parsing_itinerary',
         });
@@ -123,19 +138,21 @@ export async function GET(
     const offset = parseInt(url.searchParams.get('offset') || '0', 10);
 
     // Check trip Pro status (account Pro OR trip Pro) for Pro-only filters
+    // Note: getTripProStatus expects clerkUserId
     let isProForThisTrip = false;
     try {
       const { getTripProStatus } = await import('@/lib/supabase/pro-status');
-      const proStatus = await getTripProStatus(supabase, userId, tripId);
+      const authResult = await getProfileId(supabase);
+      const proStatus = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
       isProForThisTrip = proStatus.isProForThisTrip;
     } catch (proStatusError: any) {
-      console.error('[Explore API]', {
+      console.error('[Explore Places API]', {
         path: '/api/trips/[tripId]/explore/places',
         method: 'GET',
-        error: proStatusError?.message || 'Failed to get trip pro status',
-        stack: proStatusError?.stack,
         tripId,
-        userId,
+        profileId,
+        error: proStatusError?.message || 'Failed to get trip pro status',
+        errorCode: proStatusError?.code,
         tripSegmentId,
         context: 'pro_status_check',
       });
@@ -181,13 +198,13 @@ export async function GET(
             dayNeighborhood = firstPlace?.area || firstPlace?.neighborhood || day.areaCluster;
           }
         } catch (err: any) {
-          console.error('[Explore API]', {
+          console.error('[Explore Places API]', {
             path: '/api/trips/[tripId]/explore/places',
             method: 'GET',
-            error: err?.message || 'Error parsing itinerary for day filter',
-            stack: err?.stack,
             tripId,
-            userId,
+            profileId,
+            error: err?.message || 'Error parsing itinerary for day filter',
+            errorCode: err?.code,
             tripSegmentId,
             dayId,
             context: 'day_filter_parsing',
@@ -215,13 +232,13 @@ export async function GET(
       places = result.places;
       totalCount = result.totalCount;
     } catch (placesError: any) {
-      console.error('[Explore API]', {
+      console.error('[Explore Places API]', {
         path: '/api/trips/[tripId]/explore/places',
         method: 'GET',
-        error: placesError?.message || 'Failed to fetch places',
-        stack: placesError?.stack,
         tripId,
-        userId,
+        profileId,
+        error: placesError?.message || 'Failed to fetch places',
+        errorCode: placesError?.code,
         tripSegmentId,
         filters: {
           neighborhood,
@@ -247,17 +264,17 @@ export async function GET(
       totalCount,
     });
   } catch (err: any) {
-    console.error('[Explore API]', {
+    console.error('[Explore Places API]', {
       path: '/api/trips/[tripId]/explore/places',
       method: 'GET',
+      tripId: tripId || 'unknown',
+      profileId: profileId || 'unknown',
       error: err?.message || 'Internal server error',
-      stack: err?.stack,
-      tripId: (await params).tripId || 'unknown',
-      userId: (await auth()).userId || 'unknown',
+      errorCode: err?.code,
     });
     return NextResponse.json(
       {
-        error: 'Internal server error',
+        error: err?.message || 'Internal server error',
       },
       { status: 500 }
     );

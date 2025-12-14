@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@/lib/supabase/server";
+import { getProfileId } from "@/lib/auth/getProfileId";
 import { getUserSubscriptionStatus } from "@/lib/supabase/user-subscription";
 import { createTripSegment } from "@/lib/supabase/trip-segments";
 import { getPlaceDetails, findGooglePlaceId } from "@/lib/google/places-server";
@@ -23,12 +23,23 @@ interface NewTripPayload {
 }
 
 export async function POST(request: NextRequest) {
+  let profileId: string | undefined;
+  
   try {
-    const { userId } = await auth();
+    const supabase = await createClient();
 
-    if (!userId) {
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Trips API]', {
+        path: '/api/trips',
+        method: 'POST',
+        error: authError?.message || 'Failed to get profile',
+      });
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: authError?.message || 'Unauthorized' },
         { status: 401 }
       );
     }
@@ -57,10 +68,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
     // Check subscription status
-    const { isPro } = await getUserSubscriptionStatus(userId);
+    // Note: getUserSubscriptionStatus expects clerkUserId
+    const authResult = await getProfileId(supabase);
+    const { isPro } = await getUserSubscriptionStatus(authResult.clerkUserId);
 
     // Determine segments to create
     let segmentsToCreate: Array<{
@@ -172,7 +183,7 @@ export async function POST(request: NextRequest) {
         destination_place_id: segmentsToCreate[0].cityPlaceId,
         center_lat: primaryPlaceDetails?.geometry?.location?.lat || null,
         center_lng: primaryPlaceDetails?.geometry?.location?.lng || null,
-        owner_id: userId,
+        owner_id: profileId,
         // Personalization fields
         travelers,
         origin_city_place_id: originCityPlaceId || null,
@@ -264,7 +275,7 @@ export async function POST(request: NextRequest) {
       .from("trip_members") as any)
       .insert({
         trip_id: trip.id,
-        user_id: userId,
+        user_id: profileId,
         email: null, // Will be populated from Clerk if needed
         role: "owner",
         display_name: null,
@@ -285,12 +296,17 @@ export async function POST(request: NextRequest) {
       trip,
       segments: createdSegments,
     });
-  } catch (error) {
-    console.error("Error creating trip:", error);
+  } catch (error: any) {
+    console.error('[Trips API]', {
+      path: '/api/trips',
+      method: 'POST',
+      profileId: profileId || 'unknown',
+      error: error?.message || 'Internal server error',
+      errorCode: error?.code,
+    });
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
+        error: error?.message || 'Internal server error',
       },
       { status: 500 }
     );
