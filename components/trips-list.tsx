@@ -58,41 +58,18 @@ export function TripsList() {
     if (!userId) return;
     
     try {
-      // Fetch trips where user is owner
-      const { data: ownedTrips, error: ownedError } = await supabase
-        .from("trips")
-        .select("*")
-        .eq("owner_id", userId)
-        .order("start_date", { ascending: true });
+      // Use API endpoint that uses profileId (UUID) instead of userId (Clerk ID)
+      const response = await fetch('/api/trips', {
+        method: 'GET',
+      });
 
-      if (ownedError) throw ownedError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch trips');
+      }
 
-      // Fetch trips where user is a member
-      const { data: memberTrips, error: memberError } = await supabase
-        .from("trip_members")
-        .select("trip_id, trips(*)")
-        .eq("user_id", userId);
-
-      if (memberError) throw memberError;
-
-      // Combine and deduplicate trips
-      const allTrips = [
-        ...(ownedTrips || []),
-        ...(memberTrips || []).map((mt: any) => mt.trips).filter(Boolean),
-      ];
-
-      // Deduplicate by id
-      const uniqueTrips = Array.from(
-        new Map(allTrips.map((trip: any) => [trip.id, trip])).values()
-      ) as Trip[];
-
-      // Sort by start_date
-      uniqueTrips.sort(
-        (a, b) =>
-          new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-      );
-
-      setTrips(uniqueTrips);
+      const data = await response.json();
+      setTrips(data.trips || []);
     } catch (error) {
       console.error("Error fetching trips:", error);
     } finally {
@@ -131,6 +108,8 @@ export function TripsList() {
     if (!tripToDelete || !userId) return;
 
     try {
+      // TODO: This should use profileId (UUID) instead of userId (Clerk ID)
+      // For now, using direct Supabase delete - this may need to be fixed separately
       const { error } = await supabase
         .from("trips")
         .delete()

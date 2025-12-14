@@ -68,18 +68,13 @@ export function useCreateTrip() {
         destinationCenter: destination.center,
         startDate,
         endDate,
-      };
-
-      // Include personalization if provided
-      if (personalization) {
-        payload.personalization = personalization;
-      } else if (travelersCount) {
-        // Backward compatibility: if travelersCount is provided but no personalization, create minimal personalization
-        payload.personalization = {
-          travelers: travelersCount,
+        // Default personalization payload (travelers=1, hasAccommodation=false)
+        // Can be overridden if personalization or travelersCount is provided
+        personalization: personalization || {
+          travelers: travelersCount || 1,
           hasAccommodation: false,
-        };
-      }
+        },
+      };
 
       const response = await fetch('/api/trips', {
         method: 'POST',

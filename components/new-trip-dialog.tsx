@@ -18,8 +18,6 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import { X, Lock, Calendar, MapPin } from "lucide-react";
 import { DialogDescription } from "@/components/ui/dialog";
 import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
-import { TripPersonalizationDialog } from "@/components/trips/TripPersonalizationDialog";
-import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -63,19 +61,6 @@ export function NewTripDialog({
     startDate?: string;
     endDate?: string;
   }>({});
-  const [showPersonalization, setShowPersonalization] = useState(false);
-  const [baseTripPayload, setBaseTripPayload] = useState<{
-    destinationPlaceId: string;
-    destinationName: string;
-    destinationCenter: [number, number];
-    startDate: string;
-    endDate: string;
-    segments?: Array<{
-      cityPlaceId: string;
-      cityName: string;
-      nights: number;
-    }>;
-  } | null>(null);
 
   const router = useRouter();
   const { user } = useUser();
@@ -106,8 +91,6 @@ export function NewTripDialog({
       setError(null);
       setFieldErrors({});
       setShowProPaywall(false);
-      setShowPersonalization(false);
-      setBaseTripPayload(null);
     }
   }, [open]);
 
@@ -230,59 +213,29 @@ export function NewTripDialog({
       return;
     }
 
-    // Store base payload
-    const basePayload = {
-      destinationPlaceId: primaryDestination.placeId,
-      destinationName: primaryDestination.name,
-      destinationCenter: primaryDestination.center,
-      startDate,
-      endDate,
-      ...(isPro && segments.length > 0 && {
-        segments: segments.map(s => ({
-          cityPlaceId: s.cityPlaceId,
-          cityName: s.cityName,
-          nights: s.nights,
-        })),
-      }),
-    };
-
-    setBaseTripPayload(basePayload);
-    setShowPersonalization(true);
-    console.log('[trip-create] opened_personalization from=trips');
-  };
-
-  const handlePersonalizationComplete = async (personalization: TripPersonalizationPayload) => {
-    if (!baseTripPayload) {
-      setError("Trip data is missing");
-      return;
-    }
-
-    // Check if this is the default skip payload (only travelers=1, hasAccommodation=false, no other fields)
-    const isSkipPayload = 
-      personalization.travelers === 1 &&
-      personalization.hasAccommodation === false &&
-      !personalization.originCityPlaceId &&
-      !personalization.originCityName &&
-      !personalization.accommodationPlaceId &&
-      !personalization.accommodationName &&
-      !personalization.accommodationAddress &&
-      !personalization.arrivalTransportMode &&
-      !personalization.arrivalTimeLocal &&
-      (!personalization.interests || personalization.interests.length === 0);
-
-    if (isSkipPayload) {
-      console.log('[trip-create] skipped_personalization from=trips');
-    } else {
-      console.log('[trip-create] completed_personalization from=trips');
-    }
-
+    // Create trip directly with default personalization
     setLoading(true);
     setError(null);
 
     try {
       const payload: any = {
-        ...baseTripPayload,
-        personalization,
+        destinationPlaceId: primaryDestination.placeId,
+        destinationName: primaryDestination.name,
+        destinationCenter: primaryDestination.center,
+        startDate,
+        endDate,
+        ...(isPro && segments.length > 0 && {
+          segments: segments.map(s => ({
+            cityPlaceId: s.cityPlaceId,
+            cityName: s.cityName,
+            nights: s.nights,
+          })),
+        }),
+        // Default personalization payload (travelers=1, hasAccommodation=false)
+        personalization: {
+          travelers: 1,
+          hasAccommodation: false,
+        },
       };
 
       const response = await fetch('/api/trips', {
@@ -299,13 +252,11 @@ export function NewTripDialog({
       }
 
       const data = await response.json();
-      setShowPersonalization(false);
       onOpenChange(false);
       onSuccess();
       router.push(`/trips/${data.trip.id}?tab=itinerary`);
     } catch (err: any) {
       setError(err.message || "An error occurred");
-      setShowPersonalization(false);
     } finally {
       setLoading(false);
     }
@@ -324,12 +275,9 @@ export function NewTripDialog({
     );
   }
 
-  // Determine if we should show the base dialog (hide when personalization is showing)
-  const showBaseDialog = open && !showPersonalization;
-
   return (
     <>
-      <Dialog open={showBaseDialog} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[min(92vw,560px)] rounded-2xl shadow-xl p-0 overflow-auto flex flex-col max-h-[90vh] [&>button]:hidden">
         {/* Blue top border matching search box */}
         <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl z-10 pointer-events-none"></div>
@@ -528,22 +476,6 @@ export function NewTripDialog({
         context="multi-city"
       />
       </Dialog>
-
-      {baseTripPayload && (
-        <TripPersonalizationDialog
-          isOpen={showPersonalization}
-          onClose={() => {
-            setShowPersonalization(false);
-            // Keep baseTripPayload so user can reopen personalization if needed
-            // It will be cleared when the main dialog closes
-          }}
-          onComplete={handlePersonalizationComplete}
-          destinationPlaceId={baseTripPayload.destinationPlaceId}
-          destinationName={baseTripPayload.destinationName}
-          startDate={baseTripPayload.startDate}
-          endDate={baseTripPayload.endDate}
-        />
-      )}
     </>
   );
 }

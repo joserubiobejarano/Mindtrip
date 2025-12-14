@@ -292,6 +292,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('[trip-create] created trip', { tripId: trip.id, ownerId: profileId });
+
     return NextResponse.json({
       trip,
       segments: createdSegments,
@@ -300,6 +302,106 @@ export async function POST(request: NextRequest) {
     console.error('[Trips API]', {
       path: '/api/trips',
       method: 'POST',
+      profileId: profileId || 'unknown',
+      error: error?.message || 'Internal server error',
+      errorCode: error?.code,
+    });
+    return NextResponse.json(
+      {
+        error: error?.message || 'Internal server error',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  let profileId: string | undefined;
+  
+  try {
+    const supabase = await createClient();
+
+    // Get profile ID for authorization
+    try {
+      const authResult = await getProfileId(supabase);
+      profileId = authResult.profileId;
+    } catch (authError: any) {
+      console.error('[Trips API]', {
+        path: '/api/trips',
+        method: 'GET',
+        error: authError?.message || 'Failed to get profile',
+      });
+      return NextResponse.json(
+        { error: authError?.message || 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Fetch trips where user is owner
+    const { data: ownedTrips, error: ownedError } = await supabase
+      .from("trips")
+      .select("*")
+      .eq("owner_id", profileId)
+      .order("start_date", { ascending: true });
+
+    if (ownedError) {
+      console.error('[Trips API]', {
+        path: '/api/trips',
+        method: 'GET',
+        error: ownedError.message,
+        profileId,
+      });
+      return NextResponse.json(
+        { error: ownedError.message || "Failed to fetch trips" },
+        { status: 500 }
+      );
+    }
+
+    // Fetch trips where user is a member
+    const { data: memberTrips, error: memberError } = await supabase
+      .from("trip_members")
+      .select("trip_id, trips(*)")
+      .eq("user_id", profileId);
+
+    if (memberError) {
+      console.error('[Trips API]', {
+        path: '/api/trips',
+        method: 'GET',
+        error: memberError.message,
+        profileId,
+      });
+      return NextResponse.json(
+        { error: memberError.message || "Failed to fetch trip members" },
+        { status: 500 }
+      );
+    }
+
+    // Combine and deduplicate trips
+    const allTrips = [
+      ...(ownedTrips || []),
+      ...(memberTrips || []).map((mt: any) => mt.trips).filter(Boolean),
+    ];
+
+    // Deduplicate by id
+    const uniqueTrips = Array.from(
+      new Map(allTrips.map((trip: any) => [trip.id, trip])).values()
+    );
+
+    // Sort by start_date
+    uniqueTrips.sort(
+      (a: any, b: any) =>
+        new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+    );
+
+    console.log('[trips-list] profileId=', profileId, 'count=', uniqueTrips.length);
+
+    return NextResponse.json({
+      trips: uniqueTrips,
+    });
+  } catch (error: any) {
+    console.error('[Trips API]', {
+      path: '/api/trips',
+      method: 'GET',
       profileId: profileId || 'unknown',
       error: error?.message || 'Internal server error',
       errorCode: error?.code,
