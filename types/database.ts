@@ -51,6 +51,9 @@ export interface Database {
           find_accommodation: boolean | null
           accommodation_address: string | null
           auto_accommodation: Json | null
+          destination_name: string | null
+          destination_country: string | null
+          destination_place_id: string | null
           created_at: string
         }
         Insert: {
@@ -68,6 +71,9 @@ export interface Database {
           find_accommodation?: boolean | null
           accommodation_address?: string | null
           auto_accommodation?: Json | null
+          destination_name?: string | null
+          destination_country?: string | null
+          destination_place_id?: string | null
           created_at?: string
         }
         Update: {
@@ -85,6 +91,9 @@ export interface Database {
           find_accommodation?: boolean | null
           accommodation_address?: string | null
           auto_accommodation?: Json | null
+          destination_name?: string | null
+          destination_country?: string | null
+          destination_place_id?: string | null
           created_at?: string
         }
       }
