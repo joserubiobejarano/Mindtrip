@@ -330,7 +330,7 @@ export function NewTripDialog({
   return (
     <>
       <Dialog open={showBaseDialog} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[min(92vw,560px)] rounded-2xl shadow-xl p-0 overflow-auto flex flex-col relative max-h-[90vh] [&>button]:hidden">
+      <DialogContent className="w-[min(92vw,560px)] rounded-2xl shadow-xl p-0 overflow-auto flex flex-col max-h-[90vh] [&>button]:hidden">
         {/* Blue top border matching search box */}
         <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl z-10 pointer-events-none"></div>
         {/* Close button positioned above the colored header */}
