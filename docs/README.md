@@ -49,6 +49,9 @@ npm run dev
 - Row Level Security (RLS) policies
 - Trip creation, listing, and management
 - Auto-generation of days for trip date ranges
+- Trip deletion with cascade cleanup ✅ **NEW**
+- Route helper utilities (`lib/routes.ts`) ✅ **NEW**
+- Clerk user ID migration improvements ✅ **NEW**
 
 ### Phase 3 - Itinerary Builder & Map ✅
 - Day selector with date display
@@ -276,6 +279,12 @@ kruno/
 **Phase 21:** ✅ Complete - Travel Advisor (Pre-Trip Planning) fully implemented
 
 **Recent Updates (January 2025):**
+- ✅ Infrastructure & UX Improvements
+  - ✅ Trip deletion feature with DELETE API endpoint (`/api/trips/[tripId]`)
+  - ✅ Route helper utilities (`lib/routes.ts` with `getTripUrl()` function)
+  - ✅ Clerk user ID migration improvements (profile lookup enhancements)
+  - ✅ Enhanced trip list UI with past trips section and delete functionality
+  - ✅ Automatic trip invitation linking on trips list load
 - ✅ Phase 21 complete - Travel Advisor (Pre-Trip Planning) fully implemented
   - ✅ Travel Advisor page (`/advisor`) with chat interface
   - ✅ API endpoint (`/api/advisor`) with GET and POST methods
@@ -323,6 +332,9 @@ kruno/
 - ✅ **Day-level filtering** - Filter Explore by specific day's neighborhood
 - ✅ **Daily swipe limits** - 50/day for free tier, unlimited for Pro
 - ✅ **Trip invitation linking** - Auto-links email invitations to user accounts after signup
+- ✅ **Trip deletion** - DELETE API endpoint with owner verification and cascade cleanup
+- ✅ **Route helpers** - Centralized URL construction utilities (`lib/routes.ts`)
+- ✅ **Clerk user ID migrations** - Improved profile lookup with `clerk_user_id` column
 
 **Next Priorities:**
 - Phase 22: Enhanced user experience features (templates, weather, photos)

@@ -292,10 +292,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[trip-create] created trip', { tripId: trip.id, ownerId: profileId });
+    console.log('[trip-create] returning trip id', trip.id);
 
     return NextResponse.json({
-      trip,
+      trip: {
+        id: trip.id,
+        ...trip,
+      },
       segments: createdSegments,
     });
   } catch (error: any) {

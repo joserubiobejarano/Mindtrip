@@ -22,6 +22,9 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Trip member invitations and collaboration
 - [x] Database migrations for schema updates
 - [x] Trip invitation linking (link email invitations to user accounts after signup)
+- [x] Trip deletion with cascade cleanup
+- [x] Route helper utilities for URL construction
+- [x] Clerk user ID migration and profile lookup improvements
 
 ### Phase 3 - Itinerary Builder & Map Integration
 - [x] Day selector with date display
@@ -426,6 +429,9 @@ For later implementation phases:
   - `saved_places` - migration file exists in `database/migrations/supabase-add-saved-places-table.sql`
   - **`explore_sessions`** - ✅ **IMPLEMENTED** For Explore feature (Tinder-style swipe) - Migration file: `database/migrations/supabase-add-explore-sessions-table.sql`
   - **`profiles.is_pro`** - ✅ **IMPLEMENTED** For user subscription status - Migration file: `database/migrations/add-is-pro-to-profiles.sql`
+  - **`profiles.clerk_user_id`** - ✅ **IMPLEMENTED** For Clerk user ID lookup - Migration files: 
+    - `database/migrations/add-clerk-user-id-to-profiles.sql` - Adds column and backfills data
+    - `database/migrations/add-unique-index-clerk-user-id.sql` - Adds unique index
   - **`trip_segments`** - ✅ **IMPLEMENTED** For multi-city trips (Pro tier) - Migration file: `database/migrations/supabase-add-trip-segments.sql`
   - **`advisor_messages`** - ✅ **IMPLEMENTED** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
   - **Segment support columns** - ✅ **IMPLEMENTED**:
@@ -555,6 +561,14 @@ For later implementation phases:
 - `DELETE /api/trips/[tripId]/segments?segmentId=<id>` - Delete segment (Pro-only)
   - Returns: `{ success: boolean }`
 
+### Trip Management
+- `DELETE /api/trips/[tripId]` - Delete a trip ✅ **NEW**
+  - Deletes trip and all associated data (cascade deletes)
+  - Requires trip ownership verification
+  - Returns: `{ success: boolean, message: string }`
+  - Location: `app/api/trips/[tripId]/route.ts`
+  - Integrated into trips list UI with delete button and confirmation dialog
+
 ### User Management
 - `GET /api/user/subscription-status` - Get user subscription status
   - Returns: `{ isPro: boolean }`
@@ -567,11 +581,36 @@ For later implementation phases:
   - Returns: `{ success: boolean, linkedCount: number }`
   - Called automatically when trips list loads to sync invitations
   - Allows invited users to see trips after signing up
+  - Location: `app/api/user/link-trip-invitations/route.ts`
 
 ### Travel Intent (Future)
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates
+
+- **2025-01-XX**: Infrastructure & UX Improvements ✅
+  - **Trip Deletion Feature**: 
+    - ✅ New DELETE endpoint `/api/trips/[tripId]` for trip deletion
+    - ✅ Delete button in trips list UI (only visible to trip owners)
+    - ✅ Confirmation dialog before deletion
+    - ✅ Automatic cleanup of all associated data (cascade deletes)
+    - ✅ Toast notifications for success/error states
+  - **Route Helper Utilities**:
+    - ✅ New `lib/routes.ts` with `getTripUrl()` helper function
+    - ✅ Centralized URL construction for trip pages
+    - ✅ Support for tab query parameters (e.g., `?tab=itinerary`)
+    - ✅ Integrated into trip creation flow and navigation
+  - **Clerk User ID Migration Improvements**:
+    - ✅ Migration: `add-clerk-user-id-to-profiles.sql` - Adds `clerk_user_id` column to profiles
+    - ✅ Migration: `add-unique-index-clerk-user-id.sql` - Adds unique index on `clerk_user_id`
+    - ✅ Enables proper profile lookup by Clerk user ID without UUID conflicts
+    - ✅ Backfills existing profiles that had Clerk IDs in the `id` column
+    - ✅ Supports both UUID-based profiles and Clerk ID-based lookups
+  - **Trip List Enhancements**:
+    - ✅ Automatic trip invitation linking on page load
+    - ✅ Past trips section with show/hide toggle
+    - ✅ Improved trip card UI with hover states
+    - ✅ Owner-only delete button visibility
 
 - **2025-01-XX**: Phase 21 Complete - Travel Advisor (Pre-Trip Planning) ✅
   - **Phase 21 Complete**: Travel Advisor feature for pre-trip planning

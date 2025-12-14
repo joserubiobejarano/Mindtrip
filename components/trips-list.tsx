@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useUser } from "@clerk/nextjs";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
@@ -10,6 +9,7 @@ import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { NewTripDialog } from "@/components/new-trip-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { format, startOfToday } from "date-fns";
+import { useToast } from "@/components/ui/toast";
 
 interface Trip {
   id: string;
@@ -31,7 +31,7 @@ export function TripsList() {
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const [showPastTrips, setShowPastTrips] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
+  const { addToast } = useToast();
 
   useEffect(() => {
     if (userId) {
@@ -108,21 +108,32 @@ export function TripsList() {
     if (!tripToDelete || !userId) return;
 
     try {
-      // TODO: This should use profileId (UUID) instead of userId (Clerk ID)
-      // For now, using direct Supabase delete - this may need to be fixed separately
-      const { error } = await supabase
-        .from("trips")
-        .delete()
-        .eq("id", tripToDelete.id);
+      const response = await fetch(`/api/trips/${tripToDelete.id}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete trip');
+      }
 
       // Remove trip from local state
       setTrips((prev) => prev.filter((t) => t.id !== tripToDelete.id));
       setTripToDelete(null);
-    } catch (error) {
+      setDeleteDialogOpen(false);
+      
+      addToast({
+        title: 'Trip removed',
+        description: `"${tripToDelete.title}" has been deleted successfully.`,
+        variant: 'default',
+      });
+    } catch (error: any) {
       console.error("Error deleting trip:", error);
-      alert("Failed to delete trip. Please try again.");
+      addToast({
+        title: 'Failed to delete trip',
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 

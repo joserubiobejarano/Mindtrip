@@ -385,6 +385,18 @@ User Clicks "Add to Itinerary"
   - Index: `idx_profiles_is_pro` (for faster Pro user lookups)
   - Used by subscription status API to determine user tier
 
+**profiles.clerk_user_id** ✅ **NEW**
+- **Location:** Migration files: 
+  - `database/migrations/add-clerk-user-id-to-profiles.sql` - Adds column and backfills data
+  - `database/migrations/add-unique-index-clerk-user-id.sql` - Adds unique index
+- **Status:** ✅ Implemented
+- **Schema:**
+  - `clerk_user_id` TEXT (nullable initially for existing records)
+  - Unique index: `idx_profiles_clerk_user_id` (enforces one profile per Clerk user)
+  - Regular index: `idx_profiles_clerk_user_id_lookup` (for performance)
+  - Backfills existing profiles that had Clerk IDs in the `id` column
+  - Enables proper profile lookup by Clerk user ID without UUID conflicts
+
 **user_travel_stats** (Future - Pro tier)
 ```sql
 CREATE TABLE user_travel_stats (
@@ -442,7 +454,9 @@ smart_itineraries
 ```
 /app/api/
 ├── trips/
+│   ├── route.ts                      # ✅ NEW: GET (list trips), POST (create trip)
 │   └── [tripId]/
+│       ├── route.ts                  # ✅ NEW: DELETE (delete trip with cascade cleanup)
 │       ├── assistant/                # ✅ NEW: Enhanced Trip Assistant (with moderation)
 │       ├── chat/                     # Trip Assistant (legacy)
 │       ├── segments/                 # ✅ NEW: Trip segments API (multi-city trips, Pro tier)
@@ -458,7 +472,8 @@ smart_itineraries
 │               └── activities/
 │                   └── bulk-add-from-swipes/  # ✅ POST: Add places to day/slot (morning/afternoon/evening)
 ├── user/
-│   └── subscription-status/          # ✅ GET: User subscription status (checks is_pro column)
+│   ├── subscription-status/          # ✅ GET: User subscription status (checks is_pro column)
+│   └── link-trip-invitations/        # ✅ POST: Link email invitations to user accounts
 ├── advisor/                          # ✅ NEW: Travel Advisor (pre-trip planning)
 │   └── route.ts                      # ✅ GET/POST: Advisor chat history and messages
 ├── ai/
@@ -555,6 +570,19 @@ hooks/
     ├── useExplorePlaces() ✅ (supports day-level filtering, Pro tier filters)
     ├── useExploreSession() ✅
     └── useSwipeAction() ✅ (supports undo functionality)
+```
+
+### Utilities & Helpers
+
+```
+lib/
+├── routes.ts                        # ✅ NEW: Route helper utilities (getTripUrl)
+├── supabase/                        # Supabase clients and helpers
+│   ├── user-subscription.ts         # Subscription status checking
+│   └── explore-integration.ts       # Explore feature integration
+├── google/                          # Google Places integration
+└── auth/
+    └── getProfileId.ts              # Profile ID lookup (uses clerk_user_id)
 ```
 
 ---
@@ -788,6 +816,15 @@ hooks/
 - Integration with homepage search
 - Transport guidance for multi-city and regional trips
 - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+
+**Infrastructure & UX Improvements** ✅ **NEW**
+- Trip deletion: DELETE `/api/trips/[tripId]` endpoint with owner verification
+- Route helpers: `lib/routes.ts` with `getTripUrl()` for centralized URL construction
+- Clerk user ID migrations: Profile lookup improvements with `clerk_user_id` column
+- Enhanced trip list: Past trips section, delete button, automatic invitation linking
+- Migration files:
+  - `database/migrations/add-clerk-user-id-to-profiles.sql`
+  - `database/migrations/add-unique-index-clerk-user-id.sql`
 
 ---
 

@@ -18,6 +18,8 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import { X, Lock, Calendar, MapPin } from "lucide-react";
 import { DialogDescription } from "@/components/ui/dialog";
 import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
+import { useToast } from "@/components/ui/toast";
+import { getTripUrl } from "@/lib/routes";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -64,6 +66,7 @@ export function NewTripDialog({
 
   const router = useRouter();
   const { user } = useUser();
+  const { addToast } = useToast();
 
   // Fetch subscription status on mount
   useEffect(() => {
@@ -252,9 +255,34 @@ export function NewTripDialog({
       }
 
       const data = await response.json();
+      const tripId = data?.trip?.id;
+      
+      console.log('[trip-create-client] created trip', { tripId, data });
+
+      if (!tripId) {
+        const errorMsg = 'Trip created but no ID returned';
+        setError(errorMsg);
+        addToast({
+          title: 'Error',
+          description: errorMsg,
+          variant: 'destructive',
+        });
+        return;
+      }
+
       onOpenChange(false);
       onSuccess();
-      router.push(`/trips/${data.trip.id}?tab=itinerary`);
+      
+      try {
+        router.push(getTripUrl(tripId, 'itinerary'));
+      } catch (navError: any) {
+        console.error('[trip-create-client] navigation failed', navError);
+        addToast({
+          title: 'Navigation failed',
+          description: 'Trip created but could not navigate to workspace. Please refresh the page.',
+          variant: 'destructive',
+        });
+      }
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {

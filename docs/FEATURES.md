@@ -42,11 +42,19 @@
 - Filter by status (upcoming, in progress, completed)
 - Search trips
 - Sort by date, name, etc.
+- Past trips section with show/hide toggle
+- Delete trip button (owner-only, with confirmation dialog)
+- Automatic trip invitation linking on page load
 
 **Trip Details**
 - View trip information
 - Edit trip details
-- Delete trip
+- **Delete trip** ✅ **NEW**
+  - DELETE API endpoint: `/api/trips/[tripId]`
+  - Owner-only deletion with verification
+  - Cascade deletion of all associated data
+  - Confirmation dialog in UI
+  - Toast notifications for success/error
 - Invite members
 - View trip members
 - **Manage trip segments (Pro tier)** ✅ **NEW**
@@ -663,6 +671,13 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - Real-time collaboration
 
 ### ✅ Recently Completed (January 2025)
+
+**Infrastructure & UX Improvements - COMPLETE** ✅
+- ✅ Trip deletion feature with DELETE API endpoint
+- ✅ Route helper utilities (`lib/routes.ts` with `getTripUrl()`)
+- ✅ Clerk user ID migration improvements (profile lookup enhancements)
+- ✅ Enhanced trip list UI with past trips section and delete functionality
+- ✅ Automatic trip invitation linking on trips list load
 
 **Phase 21: Travel Advisor (Pre-Trip Planning) - COMPLETE** ✅
 - ✅ Travel Advisor page (`/advisor`) with chat interface

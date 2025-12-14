@@ -254,6 +254,7 @@ kruno/
 │   └── use-realtime-*.ts        # Realtime hooks
 │
 ├── lib/                          # Utilities and services
+│   ├── routes.ts                # Route helper utilities (getTripUrl)
 │   ├── supabase/                # Supabase clients and helpers
 │   │   ├── client.ts            # Client-side Supabase
 │   │   ├── server.ts            # Server-side Supabase
@@ -308,9 +309,12 @@ kruno/
 **Phase 2 - Data Model & Trip Management** ✅
 - Complete database schema (11+ tables)
 - Row Level Security (RLS) policies
-- Trip CRUD operations
+- Trip CRUD operations (create, read, update, delete)
 - Auto-generation of days
 - Trip member collaboration
+- Trip deletion with cascade cleanup
+- Route helper utilities (`lib/routes.ts`)
+- Clerk user ID migration improvements
 
 **Phase 3 - Itinerary Builder & Map Integration** ✅
 - Activity CRUD operations
@@ -719,6 +723,9 @@ If migrations fail or are incomplete, these tables may need manual creation:
 - `saved_places` - For saved/bookmarked places
 - **`explore_sessions`** - ✅ **IMPLEMENTED** For Explore feature (Tinder-style swipe) - Migration file: `database/migrations/supabase-add-explore-sessions-table.sql`
 - **`profiles.is_pro`** - ✅ **IMPLEMENTED** For user subscription status - Migration file: `database/migrations/add-is-pro-to-profiles.sql`
+- **`profiles.clerk_user_id`** - ✅ **IMPLEMENTED** For Clerk user ID lookup - Migration files: 
+  - `database/migrations/add-clerk-user-id-to-profiles.sql` - Adds column and backfills data
+  - `database/migrations/add-unique-index-clerk-user-id.sql` - Adds unique index
 - **`trip_segments`** - ✅ **NEW** For multi-city trips (Pro tier) - Migration file: `database/migrations/supabase-add-trip-segments.sql`
   - **`advisor_messages`** - ✅ **NEW** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
   - **Segment support columns** - ✅ **NEW**:
@@ -795,6 +802,15 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 - Links trip_members entries with matching email to current user
 - Returns: `{ success: boolean, linkedCount: number }`
 - Called automatically when trips list loads
+
+### Trip Management APIs
+
+**`DELETE /api/trips/[tripId]`** ✅ **NEW**
+- Delete a trip and all associated data (cascade deletes)
+- Requires trip ownership verification
+- Returns: `{ success: boolean, message: string }`
+- Location: `app/api/trips/[tripId]/route.ts`
+- Integrated into trips list UI with delete button and confirmation dialog
 
 **`GET /api/user/subscription-status`**
 - Get user subscription status
