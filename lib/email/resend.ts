@@ -45,7 +45,7 @@ Founder, Kruno`;
     to: params.to,
     subject,
     text: body,
-    reply_to: "hello@kruno.app",
+    replyTo: "hello@kruno.app",
     headers: {
       "List-Unsubscribe": "<mailto:unsubscribe@kruno.app>",
     },
