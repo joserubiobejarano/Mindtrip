@@ -108,11 +108,13 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
       if (!user?.id) throw new Error("User not authenticated");
 
       // Check if profile exists to get its id (UUID)
-      const { data: existingProfile } = await supabase
+      const { data: existingProfileData } = await supabase
         .from("profiles")
         .select("id")
         .eq("clerk_user_id", user.id)
         .maybeSingle();
+      
+      const existingProfile = existingProfileData as { id: string } | null;
 
       // Generate UUID for new profiles, use existing id for updates
       // Use browser's crypto.randomUUID() for client-side generation

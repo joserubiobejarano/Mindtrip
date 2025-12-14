@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Compass, Instagram, Twitter, Facebook, Youtube } from "lucide-react";
+import Image from "next/image";
+import { Instagram, Twitter, Facebook, Youtube } from "lucide-react";
 
 export function NewFooter() {
   return (
@@ -12,9 +13,13 @@ export function NewFooter() {
           {/* Brand Column */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
-                <Compass className="w-6 h-6 text-background" strokeWidth={2} />
-              </div>
+              <Image 
+                src="/icon.svg" 
+                alt="Kruno logo" 
+                width={40}
+                height={40}
+                priority
+              />
               <span 
                 className="text-xl font-bold"
                 style={{ fontFamily: "'Patrick Hand', cursive" }}

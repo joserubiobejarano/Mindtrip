@@ -24,9 +24,10 @@ export function NewNavbar() {
         <Link href="/" className="flex items-center gap-2">
           <Image 
             src="/icon.svg" 
-            alt="Kruno" 
+            alt="Kruno logo" 
             width={32}
             height={32}
+            priority
             className="w-8 h-8"
           />
           <span className="font-display text-xl font-semibold">Kruno</span>

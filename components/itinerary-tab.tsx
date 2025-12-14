@@ -617,7 +617,7 @@ export function ItineraryTab({
           <Link href="/" className="flex-shrink-0">
             <Image 
               src="/icon.svg" 
-              alt="Kruno" 
+              alt="Kruno logo" 
               width={32} 
               height={32} 
               className="hover:opacity-80 transition-opacity"

@@ -149,12 +149,14 @@ export async function POST(req: NextRequest) {
         resolutionPath = 'found_by_clerk_user_id';
       } else {
         // Step 2: Try to find legacy profile by email where clerk_user_id IS NULL
-        const { data: profileByEmail, error: profileByEmailError } = await supabase
+        const { data: profileByEmailData, error: profileByEmailError } = await supabase
           .from('profiles')
           .select('id, welcome_email_sent_at, full_name, avatar_url')
           .eq('email', primaryEmail)
           .is('clerk_user_id', null)
           .maybeSingle();
+        
+        const profileByEmail = profileByEmailData as ProfileQueryResult | null;
 
         if (profileByEmailError) {
           console.error('[Clerk Webhook] Error fetching profile by email:', {
@@ -171,7 +173,11 @@ export async function POST(req: NextRequest) {
 
         if (profileByEmail) {
           // Claim the legacy profile
-          const updateData: any = {
+          const updateData: {
+            clerk_user_id: string;
+            full_name?: string | null;
+            avatar_url?: string | null;
+          } = {
             clerk_user_id: clerkUserId,
           };
 
@@ -185,6 +191,7 @@ export async function POST(req: NextRequest) {
 
           const { error: updateError } = await supabase
             .from('profiles')
+            // @ts-ignore - Supabase type inference issue
             .update(updateData)
             .eq('id', profileByEmail.id);
 
@@ -211,6 +218,7 @@ export async function POST(req: NextRequest) {
           const newProfileId = randomUUID();
           const { data: newProfile, error: createError } = await supabase
             .from('profiles')
+            // @ts-ignore - Supabase type inference issue
             .insert({
               id: newProfileId,
               clerk_user_id: clerkUserId,
@@ -264,6 +272,7 @@ export async function POST(req: NextRequest) {
         // Update profile with welcome_email_sent_at
         const { error: updateError } = await supabase
           .from('profiles')
+          // @ts-ignore - Supabase type inference issue
           .update({ welcome_email_sent_at: now })
           .eq('id', profile.id);
 
