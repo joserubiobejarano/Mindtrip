@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create checkout session
-    if (!process.env.STRIPE_PRICE_ID_TRIP_UNLOCK) {
+    if (!process.env.STRIPE_PRICE_ID_PER_TRIP) {
       return NextResponse.json({ error: 'Stripe price ID not configured' }, { status: 500 });
     }
 
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
       customer: stripeCustomerId,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID_TRIP_UNLOCK,
+          price: process.env.STRIPE_PRICE_ID_PER_TRIP,
           quantity: 1,
         },
       ],

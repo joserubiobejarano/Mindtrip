@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
 
@@ -15,10 +15,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const email = user.primaryEmailAddress?.emailAddress;
+    if (!email) {
+      return NextResponse.json({ error: 'Email not found' }, { status: 400 });
+    }
+
     const supabase = await createClient();
 
-    // Fetch profile
-    const { data: profileData, error: profileError } = await supabase
+    // Fetch or create profile
+    let { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
@@ -30,18 +40,44 @@ export async function POST(req: NextRequest) {
     }
 
     const profile = profileData as ProfileQueryResult | null;
+    let stripeCustomerId = profile?.stripe_customer_id;
 
-    if (!profile?.stripe_customer_id) {
-      return NextResponse.json(
-        { error: 'No Stripe customer found. Please upgrade first.' },
-        { status: 400 }
-      );
+    // Create Stripe customer if doesn't exist
+    if (!stripeCustomerId) {
+      console.log(`Creating Stripe customer for user ${userId}`);
+      const customer = await stripe.customers.create({
+        email,
+        metadata: { kruno_user_id: userId },
+      });
+
+      stripeCustomerId = customer.id;
+
+      // Update profile with Stripe customer ID
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: userId,
+          email,
+          stripe_customer_id: stripeCustomerId,
+        } as any, {
+          onConflict: 'id',
+        });
+
+      if (updateError) {
+        console.error('Error updating profile with Stripe customer ID:', updateError);
+        return NextResponse.json({ error: 'Failed to save customer ID' }, { status: 500 });
+      }
+      console.log(`Stripe customer ${stripeCustomerId} created and saved for user ${userId}`);
     }
 
     // Create portal session
+    const appUrl = process.env.APP_URL ?? 'https://kruno.app';
+    const returnUrl = `${appUrl}/settings/billing`;
+
+    console.log(`Creating billing portal session for customer ${stripeCustomerId}`);
     const portal = await stripe.billingPortal.sessions.create({
-      customer: profile.stripe_customer_id,
-      return_url: process.env.STRIPE_SUCCESS_URL || `${req.nextUrl.origin}/settings`,
+      customer: stripeCustomerId,
+      return_url: returnUrl,
     });
 
     return NextResponse.json({ url: portal.url });

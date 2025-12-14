@@ -20,6 +20,7 @@ export interface Database {
           clerk_user_id: string | null
           is_pro: boolean
           default_currency: string
+          stripe_customer_id: string | null
         }
         Insert: {
           id: string
@@ -31,6 +32,7 @@ export interface Database {
           clerk_user_id?: string | null
           is_pro?: boolean
           default_currency?: string
+          stripe_customer_id?: string | null
         }
         Update: {
           id?: string
@@ -42,6 +44,7 @@ export interface Database {
           clerk_user_id?: string | null
           is_pro?: boolean
           default_currency?: string
+          stripe_customer_id?: string | null
         }
       }
       trips: {

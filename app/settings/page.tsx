@@ -146,6 +146,35 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     }
   };
 
+  const [isOpeningPortal, setIsOpeningPortal] = useState(false);
+
+  const handleManageSubscription = async () => {
+    setIsOpeningPortal(true);
+    try {
+      const response = await fetch("/api/billing/portal", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to open billing portal");
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Error opening billing portal:", error);
+      addToast({
+        variant: "destructive",
+        title: "Failed to open billing portal",
+        description: "Please try again.",
+      });
+      setIsOpeningPortal(false);
+    }
+  };
+
   if (!isLoaded || isLoading) {
     return (
       <div className="min-h-screen bg-background p-8">
@@ -321,37 +350,6 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                             Your subscription is active.
                           </p>
                         </div>
-                        <div className="pt-4">
-                          <Button
-                            variant="default"
-                            onClick={async () => {
-                              try {
-                                const response = await fetch("/api/billing/portal", {
-                                  method: "POST",
-                                });
-
-                                if (!response.ok) {
-                                  const error = await response.json();
-                                  throw new Error(error.error || "Failed to open billing portal");
-                                }
-
-                                const { url } = await response.json();
-                                if (url) {
-                                  window.location.href = url;
-                                }
-                              } catch (error) {
-                                console.error("Error opening billing portal:", error);
-                                addToast({
-                                  variant: "destructive",
-                                  title: "Failed to open billing portal",
-                                  description: "Please try again.",
-                                });
-                              }
-                            }}
-                          >
-                            Manage Subscription
-                          </Button>
-                        </div>
                         <p className="text-sm text-muted-foreground">
                           You can change or cancel your subscription at any time in the Stripe billing portal.
                         </p>
@@ -423,6 +421,26 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                           <Sparkles className="mr-2 h-4 w-4" />
                           Upgrade to Kruno Pro
                         </Button>
+                      </div>
+                    )}
+                    
+                    {/* Manage Subscription - Available for all users */}
+                    {!isLoadingBilling && !subscriptionError && (
+                      <div className="pt-6 border-t">
+                        <div className="space-y-2">
+                          <h3 className="text-sm font-medium">Subscription Management</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Manage your payment methods, view invoices, and update your subscription settings.
+                          </p>
+                          <Button
+                            variant="outline"
+                            onClick={handleManageSubscription}
+                            disabled={isOpeningPortal}
+                            className="w-full sm:w-auto"
+                          >
+                            {isOpeningPortal ? "Opening..." : "Manage Subscription"}
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </CardContent>
