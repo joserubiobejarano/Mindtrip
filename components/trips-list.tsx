@@ -59,7 +59,7 @@ export function TripsList() {
           .from("profiles")
           .select("id")
           .eq("clerk_user_id", userId)
-          .single();
+          .single<{ id: string }>();
 
         if (error && error.code !== "PGRST116") {
           // PGRST116 is "not found" - that's okay, profile might not exist yet
