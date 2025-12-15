@@ -49,9 +49,14 @@ export function PublicItineraryPanel({
         if (res.ok) {
           const data = await res.json();
           setSmartItinerary(data);
+        } else {
+          // Handle non-OK responses gracefully
+          console.error('[public-itinerary-panel] Failed to load itinerary:', res.status, res.statusText);
+          // Don't crash, just show empty state
         }
       } catch (error) {
-        console.error('Failed to load itinerary:', error);
+        console.error('[public-itinerary-panel] Failed to load itinerary:', error);
+        // Don't crash, just show empty state
       } finally {
         setIsLoading(false);
       }

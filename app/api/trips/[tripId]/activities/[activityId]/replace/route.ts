@@ -31,13 +31,15 @@ export async function POST(
     try {
       const authResult = await getProfileId(supabase);
       profileId = authResult.profileId;
+      console.log('[activities]', { route: 'replace', tripId, activityId, profileId, status: 'start' });
     } catch (authError: any) {
-      console.error('[Replace Activity API]', {
-        path: '/api/trips/[tripId]/activities/[activityId]/replace',
-        method: 'POST',
-        error: authError?.message || 'Failed to get profile',
+      console.error('[activities]', {
+        route: 'replace',
         tripId,
         activityId,
+        profileId: 'unknown',
+        status: 'unauthorized',
+        error: authError?.message || 'Failed to get profile',
       });
       return NextResponse.json(
         { error: authError?.message || 'Unauthorized' },
@@ -81,16 +83,16 @@ export async function POST(
       .single();
 
     if (trip.owner_id !== profileId && !member) {
-      console.error('[Replace Activity API]', {
-        path: '/api/trips/[tripId]/activities/[activityId]/replace',
-        method: 'POST',
+      console.error('[activities]', {
+        route: 'replace',
         tripId,
+        activityId,
         profileId,
+        status: 'unauthorized',
         error: 'Forbidden: User does not have access to this trip',
         check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
         trip_owner_id: trip.owner_id,
         is_member: !!member,
-        context: 'authorization_check',
       });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

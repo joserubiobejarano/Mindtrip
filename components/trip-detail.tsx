@@ -9,6 +9,7 @@ import { useDays } from "@/hooks/use-days";
 import { useRealtimeActivities } from "@/hooks/use-realtime-activities";
 import { createClient } from "@/lib/supabase/client";
 import { useTrip } from "@/hooks/use-trip";
+import { ensureOwnerMember } from "@/lib/supabase/trip-members";
 import { BaseMarker } from "@/components/google-map-base";
 import { GoogleMapsProvider } from "@/components/google-maps-provider";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -30,7 +31,6 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [exploreZoom, setExploreZoom] = useState<number | undefined>(undefined);
   const [activePlace, setActivePlace] = useState<{ placeId: string; lat: number; lng: number } | null>(null);
   const exploreMarkerClickHandlerRef = useRef<((id: string) => void) | null>(null);
-  const supabase = createClient();
   const [ownerMemberChecked, setOwnerMemberChecked] = useState(false);
 
   // Enable realtime sync for activities
@@ -38,38 +38,21 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
   // Ensure owner is always a trip member
   useEffect(() => {
-    if (!tripId || !userId || !trip || ownerMemberChecked) return;
+    if (!tripId || !userId || !trip || ownerMemberChecked || !user) return;
 
-    const ensureOwnerMember = async () => {
-      // Check if user is already a member
-      const { data: existingMember } = await supabase
-        .from("trip_members")
-        .select("id")
-        .eq("trip_id", tripId)
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      if (!existingMember) {
-        // Get user's name from Clerk
-        const displayName = user?.fullName || user?.firstName || null;
-        
-        // Insert owner as member
-        await (supabase
-          .from("trip_members") as any)
-          .insert({
-            trip_id: tripId,
-            user_id: userId,
-            email: user?.primaryEmailAddress?.emailAddress || null,
-            display_name: displayName,
-            role: "owner",
-          });
+    const ensureMember = async () => {
+      try {
+        await ensureOwnerMember(tripId, user);
+        setOwnerMemberChecked(true);
+      } catch (error) {
+        console.error('[trip-detail] Error ensuring owner member:', error);
+        // Don't block UI on error, just log it
+        setOwnerMemberChecked(true);
       }
-      
-      setOwnerMemberChecked(true);
     };
 
-    ensureOwnerMember();
-  }, [tripId, userId, trip, user, ownerMemberChecked, supabase]);
+    ensureMember();
+  }, [tripId, userId, trip, user, ownerMemberChecked]);
 
   // Auto-select first day when days load
   useEffect(() => {

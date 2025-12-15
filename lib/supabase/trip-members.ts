@@ -19,36 +19,30 @@ export async function ensureOwnerMember(
 
   const supabase = createClient();
 
-  // Check if user is already a member
-  const { data: existingMember } = await supabase
-    .from("trip_members")
-    .select("id")
-    .eq("trip_id", tripId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (existingMember) {
-    // Already a member, no need to insert
-    return;
-  }
-
   // Get user's email and display name
   const email = user.primaryEmailAddress?.emailAddress || null;
   const displayName = user.fullName || user.firstName || null;
+  const profileId = user.id;
 
-  // Insert owner as member
+  // Use upsert to idempotently ensure owner member
+  // This prevents 409 errors if the member already exists
   const { error } = await (supabase
     .from("trip_members") as any)
-    .insert({
+    .upsert({
       trip_id: tripId,
-      user_id: user.id,
+      user_id: profileId,
       email,
       display_name: displayName,
       role: "owner",
+    }, {
+      onConflict: 'trip_id,email'
     });
 
   if (error) {
+    console.error('[trip-members]', { tripId, email, profileId, action: 'upsert_owner_member', error: error.message });
     throw new Error(`Failed to ensure owner member: ${error.message}`);
   }
+
+  console.log('[trip-members]', { tripId, email, profileId, action: 'upsert_owner_member' });
 }
 

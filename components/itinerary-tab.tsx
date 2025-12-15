@@ -321,6 +321,13 @@ export function ItineraryTab({
 
       // CASE 2: other errors
       if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('[itinerary-tab] loadOrGenerate: error loading itinerary', { status: res.status, error: errorData.error });
+        addToast({
+          variant: 'destructive',
+          title: 'Failed to load itinerary',
+          description: errorData.error || 'Please try again.',
+        });
         throw new Error(`Failed to load itinerary: ${res.status}`);
       }
 

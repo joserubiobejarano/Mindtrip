@@ -270,18 +270,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create trip member (owner)
+    // Create trip member (owner) using upsert to prevent 409 errors
     const { error: memberError } = await (supabase
       .from("trip_members") as any)
-      .insert({
+      .upsert({
         trip_id: trip.id,
         user_id: profileId,
         email: null, // Will be populated from Clerk if needed
         role: "owner",
         display_name: null,
+      }, {
+        onConflict: 'trip_id,email'
       });
 
     if (memberError) {
+      console.error('[trip-members]', { tripId: trip.id, email: null, profileId, action: 'create_trip_owner_member', error: memberError.message });
       // Rollback: delete everything
       await supabase.from("trip_segments").delete().eq("trip_id", trip.id);
       await supabase.from("days").delete().eq("trip_id", trip.id);
@@ -291,6 +294,8 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    console.log('[trip-members]', { tripId: trip.id, email: null, profileId, action: 'create_trip_owner_member' });
 
     console.log('[trip-create] returning trip id', trip.id);
 
