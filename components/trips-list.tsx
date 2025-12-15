@@ -10,6 +10,7 @@ import { NewTripDialog } from "@/components/new-trip-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { format, startOfToday } from "date-fns";
 import { useToast } from "@/components/ui/toast";
+import { createClient } from "@/lib/supabase/client";
 
 interface Trip {
   id: string;
@@ -30,8 +31,10 @@ export function TripsList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const [showPastTrips, setShowPastTrips] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const router = useRouter();
   const { addToast } = useToast();
+  const supabase = createClient();
 
   useEffect(() => {
     if (userId) {
@@ -42,6 +45,38 @@ export function TripsList() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  // Fetch profileId from Supabase using Clerk user ID
+  useEffect(() => {
+    if (!userId) {
+      setProfileId(null);
+      return;
+    }
+
+    const fetchProfileId = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("clerk_user_id", userId)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 is "not found" - that's okay, profile might not exist yet
+          console.error("Error fetching profile:", error);
+          return;
+        }
+
+        if (data) {
+          setProfileId(data.id);
+        }
+      } catch (error) {
+        console.error("Error fetching profileId:", error);
+      }
+    };
+
+    fetchProfileId();
+  }, [userId, supabase]);
 
   const linkTripInvitations = async () => {
     try {
@@ -182,7 +217,7 @@ export function TripsList() {
                           {format(new Date(trip.end_date), "MMM d, yyyy")}
                         </CardDescription>
                       </div>
-                      {trip.owner_id === userId && (
+                      {trip.owner_id === profileId && (
                         <Button
                           variant="ghost"
                           size="icon"
@@ -241,7 +276,7 @@ export function TripsList() {
                               {format(new Date(trip.end_date), "MMM d, yyyy")}
                             </CardDescription>
                           </div>
-                          {trip.owner_id === userId && (
+                          {trip.owner_id === profileId && (
                             <Button
                               variant="ghost"
                               size="icon"

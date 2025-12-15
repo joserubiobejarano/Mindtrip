@@ -79,8 +79,7 @@ export async function DELETE(
     console.log('[trip-delete] deleted trip', { tripId, profileId });
 
     return NextResponse.json({
-      success: true,
-      message: "Trip deleted successfully",
+      ok: true,
     });
   } catch (error: any) {
     console.error('[Trips API]', {
