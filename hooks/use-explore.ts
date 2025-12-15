@@ -66,15 +66,33 @@ export function useExplorePlaces(
       if (filters.budget !== undefined) params.set('budget', filters.budget.toString());
       if (filters.maxDistance !== undefined) params.set('maxDistance', filters.maxDistance.toString());
 
-      const response = await fetch(
-        `/api/trips/${tripId}/explore/places?${params.toString()}`
-      );
+      const url = `/api/trips/${tripId}/explore/places?${params.toString()}`;
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch places');
+        // Log error response details
+        const responseText = await response.text();
+        const responseSnippet = responseText.substring(0, 300);
+        console.error('[useExplorePlaces] API Error', {
+          status: response.status,
+          statusText: response.statusText,
+          url,
+          responseSnippet,
+        });
+        throw new Error(`Failed to fetch places: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      
+      // Log successful response shape
+      const responseKeys = Object.keys(data);
+      console.log('[useExplorePlaces] API Success', {
+        status: response.status,
+        url,
+        responseKeys,
+        placesCount: Array.isArray(data.places) ? data.places.length : 'not an array',
+      });
+      
       return data as { places: ExplorePlace[]; hasMore: boolean; totalCount: number };
     },
     enabled: enabled && !!tripId,
@@ -96,10 +114,28 @@ export function useExploreSession(tripId: string, enabled: boolean = true, tripS
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch session');
+        // Log error response details
+        const responseText = await response.text();
+        const responseSnippet = responseText.substring(0, 300);
+        console.error('[useExploreSession] API Error', {
+          status: response.status,
+          statusText: response.statusText,
+          url,
+          responseSnippet,
+        });
+        throw new Error(`Failed to fetch session: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      
+      // Log successful response shape
+      const responseKeys = Object.keys(data);
+      console.log('[useExploreSession] API Success', {
+        status: response.status,
+        url,
+        responseKeys,
+      });
+      
       return data as ExploreSession;
     },
     enabled: enabled && !!tripId,

@@ -15,10 +15,32 @@ export async function GET(
     tripId = (await params).tripId;
 
     if (!tripId) {
-      return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
+      console.log('[Explore Places API]', {
+        route: 'explore/places',
+        tripId: 'missing',
+        profileId: 'unknown',
+        ok: false,
+        status: 400,
+        check_failed: 'missing_trip_id',
+        reason: 'Missing trip id',
+      });
+      return NextResponse.json({ 
+        error: 'Missing trip id',
+        ok: false,
+        status: 400,
+        check_failed: 'missing_trip_id',
+        reason: 'Missing trip id',
+      }, { status: 400 });
     }
 
     const supabase = await createClient();
+    
+    // Log route start
+    console.log('[Explore Places API]', {
+      route: 'explore/places',
+      tripId,
+      profileId: 'pending',
+    });
 
     // Get profile ID for authorization
     try {
@@ -26,13 +48,22 @@ export async function GET(
       profileId = authResult.profileId;
     } catch (authError: any) {
       console.error('[Explore Places API]', {
-        path: '/api/trips/[tripId]/explore/places',
-        method: 'GET',
-        error: authError?.message || 'Failed to get profile',
+        route: 'explore/places',
         tripId,
+        profileId: 'unknown',
+        ok: false,
+        status: 401,
+        check_failed: 'auth',
+        reason: authError?.message || 'Failed to get profile',
       });
       return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
+        { 
+          error: authError?.message || 'Unauthorized',
+          ok: false,
+          status: 401,
+          check_failed: 'auth',
+          reason: authError?.message || 'Failed to get profile',
+        },
         { status: 401 }
       );
     }
@@ -46,15 +77,21 @@ export async function GET(
 
     if (tripError || !tripData) {
       console.error('[Explore Places API]', {
-        path: '/api/trips/[tripId]/explore/places',
-        method: 'GET',
+        route: 'explore/places',
         tripId,
         profileId,
-        error: tripError?.message || 'Trip not found',
-        errorCode: tripError?.code,
-        context: 'trip_lookup',
+        ok: false,
+        status: 404,
+        check_failed: 'trip_lookup',
+        reason: tripError?.message || 'Trip not found',
       });
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+      return NextResponse.json({ 
+        error: "Trip not found",
+        ok: false,
+        status: 404,
+        check_failed: 'trip_lookup',
+        reason: tripError?.message || 'Trip not found',
+      }, { status: 404 });
     }
 
     type TripQueryResult = {
@@ -73,18 +110,23 @@ export async function GET(
       .single();
 
     if (trip.owner_id !== profileId && !member) {
+      const checkFailed = trip.owner_id !== profileId ? 'not_owner' : 'not_member';
       console.error('[Explore Places API]', {
-        path: '/api/trips/[tripId]/explore/places',
-        method: 'GET',
+        route: 'explore/places',
         tripId,
         profileId,
-        error: 'Forbidden: User does not have access to this trip',
-        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
-        trip_owner_id: trip.owner_id,
-        is_member: !!member,
-        context: 'authorization_check',
+        ok: false,
+        status: 403,
+        check_failed: checkFailed,
+        reason: 'User does not have access to this trip',
       });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ 
+        error: "Forbidden",
+        ok: false,
+        status: 403,
+        check_failed: checkFailed,
+        reason: 'User does not have access to this trip',
+      }, { status: 403 });
     }
 
     // Get URL for query parameters
@@ -308,6 +350,15 @@ export async function GET(
     const paginatedPlaces = places.slice(offset, offset + limit);
     const hasMore = offset + limit < totalCount;
 
+    // Log success
+    console.log('[Explore Places API]', {
+      route: 'explore/places',
+      tripId,
+      profileId,
+      ok: true,
+      status: 200,
+    });
+
     return NextResponse.json({
       places: paginatedPlaces,
       hasMore,
@@ -315,16 +366,21 @@ export async function GET(
     });
   } catch (err: any) {
     console.error('[Explore Places API]', {
-      path: '/api/trips/[tripId]/explore/places',
-      method: 'GET',
+      route: 'explore/places',
       tripId: tripId || 'unknown',
       profileId: profileId || 'unknown',
-      error: err?.message || 'Internal server error',
-      errorCode: err?.code,
+      ok: false,
+      status: 500,
+      check_failed: 'internal_error',
+      reason: err?.message || 'Internal server error',
     });
     return NextResponse.json(
       {
         error: err?.message || 'Internal server error',
+        ok: false,
+        status: 500,
+        check_failed: 'internal_error',
+        reason: err?.message || 'Internal server error',
       },
       { status: 500 }
     );

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, Component, ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ExploreDeck } from "./explore/ExploreDeck";
 import { ExploreFilters } from "./explore/ExploreFilters";
 import { SwipeCounter } from "./explore/SwipeCounter";
 import { HotelSearchBanner } from "./hotel-search-banner";
+import { ErrorBoundary } from "./error-boundary";
 import { useTrip } from "@/hooks/use-trip";
 import { useTripSegments } from "@/hooks/use-trip-segments";
 import { useExploreSession, useExplorePlaces } from "@/hooks/use-explore";
@@ -13,72 +14,6 @@ import { useToast } from "@/components/ui/toast";
 import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-
-// Error boundary for Explore feature
-class ExploreErrorBoundary extends Component<
-  { children: ReactNode },
-  { hasError: boolean; error?: Error; errorInfo?: any }
-> {
-  state = { hasError: false, error: undefined, errorInfo: undefined };
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: any) {
-    // Comprehensive server-side logging for Vercel
-    console.error('[Explore Error Boundary]', {
-      error: {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      },
-      errorInfo: {
-        componentStack: errorInfo.componentStack,
-      },
-      timestamp: new Date().toISOString(),
-    });
-    
-    this.setState({ errorInfo });
-  }
-
-  handleReset = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
-  };
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
-          <div className="max-w-md space-y-4">
-            <h2 className="text-lg font-semibold text-destructive">Something went wrong</h2>
-            <p className="text-sm text-muted-foreground">
-              We encountered an error while loading Explore. This has been logged and we&apos;ll look into it.
-            </p>
-            {this.state.error && (
-              <details className="text-left mt-4 p-3 bg-muted rounded-md text-xs">
-                <summary className="cursor-pointer text-muted-foreground mb-2">Error details</summary>
-                <pre className="whitespace-pre-wrap break-words text-muted-foreground">
-                  {(this.state.error as Error).message}
-                  {(this.state.error as Error).stack && `\n\n${(this.state.error as Error).stack}`}
-                </pre>
-              </details>
-            )}
-            <Button
-              onClick={this.handleReset}
-              className="mt-6"
-              variant="default"
-            >
-              Try again
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 interface ExploreTabProps {
   tripId: string;
@@ -159,7 +94,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   }, [segments, activeSegmentId]);
 
   const handleAddToItinerary = async () => {
-    if (!safeSession || safeSession.likedPlaces.length === 0 || isAddingToItinerary) return;
+    if (!safeSession || (safeSession.likedPlaces?.length ?? 0) === 0 || isAddingToItinerary) return;
 
     setIsAddingToItinerary(true);
 
@@ -169,7 +104,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          likedPlaceIds: safeSession.likedPlaces,
+          likedPlaceIds: safeSession.likedPlaces || [],
         }),
       });
 
@@ -334,7 +269,10 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
 
       {/* Swipe Deck - Full screen on mobile, centered on desktop */}
       <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0 lg:p-6">
-        <ExploreErrorBoundary>
+        <ErrorBoundary
+          fallbackTitle="Something went wrong"
+          fallbackMessage="We encountered an error while loading Explore. This has been logged and we'll look into it."
+        >
           <ExploreDeck
             tripId={tripId}
             filters={filters}
@@ -347,7 +285,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
             }}
             hideHeader={true}
           />
-        </ExploreErrorBoundary>
+        </ErrorBoundary>
       </div>
     </div>
   );

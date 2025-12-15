@@ -14,10 +14,32 @@ export async function GET(
     tripId = (await params).tripId;
 
     if (!tripId) {
-      return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
+      console.log('[Explore Session API]', {
+        route: 'explore/session',
+        tripId: 'missing',
+        profileId: 'unknown',
+        ok: false,
+        status: 400,
+        check_failed: 'missing_trip_id',
+        reason: 'Missing trip id',
+      });
+      return NextResponse.json({ 
+        error: 'Missing trip id',
+        ok: false,
+        status: 400,
+        check_failed: 'missing_trip_id',
+        reason: 'Missing trip id',
+      }, { status: 400 });
     }
 
     const supabase = await createClient();
+    
+    // Log route start
+    console.log('[Explore Session API]', {
+      route: 'explore/session',
+      tripId,
+      profileId: 'pending',
+    });
 
     // Get profile ID for authorization
     try {
@@ -25,13 +47,22 @@ export async function GET(
       profileId = authResult.profileId;
     } catch (authError: any) {
       console.error('[Explore Session API]', {
-        path: '/api/trips/[tripId]/explore/session',
-        method: 'GET',
-        error: authError?.message || 'Failed to get profile',
+        route: 'explore/session',
         tripId,
+        profileId: 'unknown',
+        ok: false,
+        status: 401,
+        check_failed: 'auth',
+        reason: authError?.message || 'Failed to get profile',
       });
       return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
+        { 
+          error: authError?.message || 'Unauthorized',
+          ok: false,
+          status: 401,
+          check_failed: 'auth',
+          reason: authError?.message || 'Failed to get profile',
+        },
         { status: 401 }
       );
     }
@@ -45,15 +76,21 @@ export async function GET(
 
     if (tripError || !tripData) {
       console.error('[Explore Session API]', {
-        path: '/api/trips/[tripId]/explore/session',
-        method: 'GET',
+        route: 'explore/session',
         tripId,
         profileId,
-        error: tripError?.message || 'Trip not found',
-        errorCode: tripError?.code,
-        context: 'trip_lookup',
+        ok: false,
+        status: 404,
+        check_failed: 'trip_lookup',
+        reason: tripError?.message || 'Trip not found',
       });
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+      return NextResponse.json({ 
+        error: "Trip not found",
+        ok: false,
+        status: 404,
+        check_failed: 'trip_lookup',
+        reason: tripError?.message || 'Trip not found',
+      }, { status: 404 });
     }
 
     type TripQueryResult = {
@@ -72,18 +109,23 @@ export async function GET(
       .single();
 
     if (trip.owner_id !== profileId && !member) {
+      const checkFailed = trip.owner_id !== profileId ? 'not_owner' : 'not_member';
       console.error('[Explore Session API]', {
-        path: '/api/trips/[tripId]/explore/session',
-        method: 'GET',
+        route: 'explore/session',
         tripId,
         profileId,
-        error: 'Forbidden: User does not have access to this trip',
-        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
-        trip_owner_id: trip.owner_id,
-        is_member: !!member,
-        context: 'authorization_check',
+        ok: false,
+        status: 403,
+        check_failed: checkFailed,
+        reason: 'User does not have access to this trip',
       });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ 
+        error: "Forbidden",
+        ok: false,
+        status: 403,
+        check_failed: checkFailed,
+        reason: 'User does not have access to this trip',
+      }, { status: 403 });
     }
 
     // Get trip_segment_id from query params (optional)
@@ -192,6 +234,15 @@ export async function GET(
     const swipeCount = (session?.swipe_count || 0);
     const remainingSwipes = isPro ? null : Math.max(0, FREE_SWIPE_LIMIT_PER_TRIP - swipeCount);
 
+    // Log success
+    console.log('[Explore Session API]', {
+      route: 'explore/session',
+      tripId,
+      profileId,
+      ok: true,
+      status: 200,
+    });
+
     return NextResponse.json({
       likedPlaces: session.liked_place_ids || [],
       discardedPlaces: session.discarded_place_ids || [],
@@ -201,15 +252,22 @@ export async function GET(
     });
   } catch (err: any) {
     console.error('[Explore Session API]', {
-      path: '/api/trips/[tripId]/explore/session',
-      method: 'GET',
+      route: 'explore/session',
       tripId: tripId || 'unknown',
       profileId: profileId || 'unknown',
-      error: err?.message || 'Internal server error',
-      errorCode: err?.code,
+      ok: false,
+      status: 500,
+      check_failed: 'internal_error',
+      reason: err?.message || 'Internal server error',
     });
     return NextResponse.json(
-      { error: err?.message || 'Internal server error' },
+      { 
+        error: err?.message || 'Internal server error',
+        ok: false,
+        status: 500,
+        check_failed: 'internal_error',
+        reason: err?.message || 'Internal server error',
+      },
       { status: 500 }
     );
   }

@@ -13,26 +13,58 @@ export async function POST(
   
   try {
     tripId = (await params).tripId;
+    
+    if (!tripId) {
+      console.log('[Explore Swipe API]', {
+        route: 'explore/swipe',
+        tripId: 'missing',
+        profileId: 'unknown',
+        ok: false,
+        status: 400,
+        check_failed: 'missing_trip_id',
+        reason: 'Missing trip id',
+      });
+      return NextResponse.json({ 
+        error: 'Missing trip id',
+        ok: false,
+        status: 400,
+        check_failed: 'missing_trip_id',
+        reason: 'Missing trip id',
+      }, { status: 400 });
+    }
+    
     const supabase = await createClient();
+    
+    // Log route start
+    console.log('[Explore Swipe API]', {
+      route: 'explore/swipe',
+      tripId,
+      profileId: 'pending',
+    });
     
     try {
       const authResult = await getProfileId(supabase);
       profileId = authResult.profileId;
     } catch (authError: any) {
       console.error('[Explore Swipe API]', {
-        path: '/api/trips/[tripId]/explore/swipe',
-        method: 'POST',
-        error: authError?.message || 'Failed to get profile',
-        tripId: tripId || 'unknown',
+        route: 'explore/swipe',
+        tripId,
+        profileId: 'unknown',
+        ok: false,
+        status: 401,
+        check_failed: 'auth',
+        reason: authError?.message || 'Failed to get profile',
       });
       return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
+        { 
+          error: authError?.message || 'Unauthorized',
+          ok: false,
+          status: 401,
+          check_failed: 'auth',
+          reason: authError?.message || 'Failed to get profile',
+        },
         { status: 401 }
       );
-    }
-
-    if (!tripId) {
-      return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
     }
 
     // Verify user has access to trip
@@ -44,15 +76,21 @@ export async function POST(
 
     if (tripError || !tripData) {
       console.error('[Explore Swipe API]', {
-        path: '/api/trips/[tripId]/explore/swipe',
-        method: 'POST',
+        route: 'explore/swipe',
         tripId,
         profileId,
-        error: tripError?.message || 'Trip not found',
-        errorCode: tripError?.code,
-        context: 'trip_lookup',
+        ok: false,
+        status: 404,
+        check_failed: 'trip_lookup',
+        reason: tripError?.message || 'Trip not found',
       });
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+      return NextResponse.json({ 
+        error: "Trip not found",
+        ok: false,
+        status: 404,
+        check_failed: 'trip_lookup',
+        reason: tripError?.message || 'Trip not found',
+      }, { status: 404 });
     }
 
     type TripQueryResult = {
@@ -71,18 +109,23 @@ export async function POST(
       .single();
 
     if (trip.owner_id !== profileId && !member) {
+      const checkFailed = trip.owner_id !== profileId ? 'not_owner' : 'not_member';
       console.error('[Explore Swipe API]', {
-        path: '/api/trips/[tripId]/explore/swipe',
-        method: 'POST',
+        route: 'explore/swipe',
         tripId,
         profileId,
-        error: 'Forbidden: User does not have access to this trip',
-        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
-        trip_owner_id: trip.owner_id,
-        is_member: !!member,
-        context: 'authorization_check',
+        ok: false,
+        status: 403,
+        check_failed: checkFailed,
+        reason: 'User does not have access to this trip',
       });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ 
+        error: "Forbidden",
+        ok: false,
+        status: 403,
+        check_failed: checkFailed,
+        reason: 'User does not have access to this trip',
+      }, { status: 403 });
     }
 
     const body = await req.json();
@@ -453,6 +496,15 @@ export async function POST(
     // Calculate remaining swipes
     const remainingSwipes = Math.max(0, limit - newSwipeCount);
 
+    // Log success
+    console.log('[Explore Swipe API]', {
+      route: 'explore/swipe',
+      tripId,
+      profileId,
+      ok: true,
+      status: 200,
+    });
+
     return NextResponse.json({
       success: true,
       swipeCount: newSwipeCount,
@@ -461,15 +513,22 @@ export async function POST(
     });
   } catch (err: any) {
     console.error('[Explore Swipe API]', {
-      path: '/api/trips/[tripId]/explore/swipe',
-      method: 'POST',
+      route: 'explore/swipe',
       tripId: tripId || 'unknown',
       profileId: profileId || 'unknown',
-      error: err?.message || 'Internal server error',
-      errorCode: err?.code,
+      ok: false,
+      status: 500,
+      check_failed: 'internal_error',
+      reason: err?.message || 'Internal server error',
     });
     return NextResponse.json(
-      { error: err?.message || 'Internal server error' },
+      { 
+        error: err?.message || 'Internal server error',
+        ok: false,
+        status: 500,
+        check_failed: 'internal_error',
+        reason: err?.message || 'Internal server error',
+      },
       { status: 500 }
     );
   }

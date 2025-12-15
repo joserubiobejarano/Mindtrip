@@ -83,8 +83,17 @@ export function ExploreDeck({
   });
   const { addToast } = useToast();
 
-  // Derive places directly from hook result
-  const places = data?.places ?? [];
+  // Derive places directly from hook result - ensure always an array
+  const places = Array.isArray(data?.places) ? data.places : [];
+
+  // Ensure session has safe defaults
+  const safeSession = session || {
+    likedPlaces: [],
+    discardedPlaces: [],
+    swipeCount: 0,
+    remainingSwipes: null,
+    dailyLimit: null,
+  };
 
   // Sync currentIndex with places.length
   useEffect(() => {
@@ -382,14 +391,14 @@ export function ExploreDeck({
   };
 
   const handleAddToDay = async () => {
-    if (!session || session.likedPlaces.length === 0 || !dayId || !slot) return;
+    if (!safeSession || (safeSession.likedPlaces?.length ?? 0) === 0 || !dayId || !slot) return;
 
     try {
       const response = await fetch(`/api/trips/${tripId}/days/${dayId}/activities/bulk-add-from-swipes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          place_ids: session.likedPlaces,
+          place_ids: safeSession.likedPlaces || [],
           slot,
         }),
       });
@@ -453,7 +462,7 @@ export function ExploreDeck({
       
       // Call the callback
       if (onAddToDay) {
-        onAddToDay(session.likedPlaces);
+        onAddToDay(safeSession.likedPlaces || []);
       }
     } catch (error: any) {
       console.error('Error adding places to day:', error);
@@ -518,7 +527,7 @@ export function ExploreDeck({
     );
   }
 
-  const hasLikedPlaces = session && session.likedPlaces.length > 0;
+  const hasLikedPlaces = safeSession && (safeSession.likedPlaces?.length ?? 0) > 0;
 
   const cardVariants = {
     enter: { opacity: 0, scale: 0.95, y: 20 },
@@ -551,7 +560,7 @@ export function ExploreDeck({
                     onSwipeUp={handleSwipeUp}
                     disabled={
                       swipeMutation.isPending ||
-                      (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+                      (safeSession?.remainingSwipes != null && safeSession.remainingSwipes <= 0)
                     }
                   />
                 </motion.div>
@@ -570,7 +579,7 @@ export function ExploreDeck({
             canUndo={swipeHistory.length > 0}
             disabled={
               swipeMutation.isPending ||
-              (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+              (safeSession?.remainingSwipes != null && safeSession.remainingSwipes <= 0)
             }
           />
         </div>
@@ -584,7 +593,7 @@ export function ExploreDeck({
               size="lg"
             >
               <Heart className="h-4 w-4 mr-2" />
-              Add {session.likedPlaces.length} liked place{session.likedPlaces.length !== 1 ? 's' : ''} to itinerary
+              Add {safeSession.likedPlaces?.length ?? 0} liked place{(safeSession.likedPlaces?.length ?? 0) !== 1 ? 's' : ''} to itinerary
             </Button>
           </div>
         )}
@@ -844,7 +853,7 @@ export function ExploreDeck({
                       disabled={
                         idx !== 0 ||
                         swipeMutation.isPending ||
-                        (session?.remainingSwipes != null && session.remainingSwipes <= 0)
+                        (safeSession?.remainingSwipes != null && safeSession.remainingSwipes <= 0)
                       }
                     />
                   </div>
