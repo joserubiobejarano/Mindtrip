@@ -274,6 +274,7 @@ export function NewTripDialog({
       onSuccess();
       
       try {
+        console.log('[trip-create] redirecting to', getTripUrl(tripId, 'itinerary'));
         router.push(getTripUrl(tripId, 'itinerary'));
       } catch (navError: any) {
         console.error('[trip-create-client] navigation failed', navError);

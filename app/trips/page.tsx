@@ -24,7 +24,7 @@ export default async function TripsPage() {
           />
           <span className="font-display text-xl font-semibold">Kruno</span>
         </Link>
-        <h2 className="font-display text-3xl font-semibold tracking-tight mb-8">My Trips</h2>
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal md:solid-underline inline-block text-foreground mb-20" style={{ fontFamily: "'Patrick Hand', cursive" }}>My Trips</h1>
         <TripsList />
       </div>
     </div>

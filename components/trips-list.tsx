@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { NewTripDialog } from "@/components/new-trip-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
@@ -32,7 +32,6 @@ export function TripsList() {
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const [showPastTrips, setShowPastTrips] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
-  const router = useRouter();
   const { addToast } = useToast();
   const supabase = createClient();
 
@@ -203,34 +202,36 @@ export function TripsList() {
           {upcomingTrips.length > 0 && (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {upcomingTrips.map((trip) => (
-                <Card
+                <Link
                   key={trip.id}
-                  className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm"
-                  onClick={() => router.push(`/trips/${trip.id}`)}
+                  href={`/trips/${trip.id}?tab=itinerary`}
+                  className="block"
                 >
-                  <CardHeader className="p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
-                        <CardDescription className="text-sm mt-1">
-                          {format(new Date(trip.start_date), "MMM d")} -{" "}
-                          {format(new Date(trip.end_date), "MMM d, yyyy")}
-                        </CardDescription>
+                  <Card className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm">
+                    <CardHeader className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
+                          <CardDescription className="text-sm mt-1">
+                            {format(new Date(trip.start_date), "MMM d")} -{" "}
+                            {format(new Date(trip.end_date), "MMM d, yyyy")}
+                          </CardDescription>
+                        </div>
+                        {trip.owner_id === profileId && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-10 w-10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                            onClick={(e) => handleDeleteClick(trip, e)}
+                            title="Delete trip"
+                          >
+                            <Trash2 className="h-5 w-5 text-destructive" />
+                          </Button>
+                        )}
                       </div>
-                      {trip.owner_id === profileId && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                          onClick={(e) => handleDeleteClick(trip, e)}
-                          title="Delete trip"
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </div>
-                  </CardHeader>
-                </Card>
+                    </CardHeader>
+                  </Card>
+                </Link>
               ))}
             </div>
           )}
@@ -262,34 +263,36 @@ export function TripsList() {
               {showPastTrips && (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {pastTrips.map((trip) => (
-                    <Card
+                    <Link
                       key={trip.id}
-                      className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm"
-                      onClick={() => router.push(`/trips/${trip.id}`)}
+                      href={`/trips/${trip.id}?tab=itinerary`}
+                      className="block"
                     >
-                      <CardHeader className="p-6">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
-                            <CardDescription className="text-sm mt-1">
-                              {format(new Date(trip.start_date), "MMM d")} -{" "}
-                              {format(new Date(trip.end_date), "MMM d, yyyy")}
-                            </CardDescription>
+                      <Card className="relative group cursor-pointer rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 border-0 bg-card/80 backdrop-blur-sm">
+                        <CardHeader className="p-6">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <CardTitle className="text-xl mb-2 leading-tight">{trip.title}</CardTitle>
+                              <CardDescription className="text-sm mt-1">
+                                {format(new Date(trip.start_date), "MMM d")} -{" "}
+                                {format(new Date(trip.end_date), "MMM d, yyyy")}
+                              </CardDescription>
+                            </div>
+                            {trip.owner_id === profileId && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                                onClick={(e) => handleDeleteClick(trip, e)}
+                                title="Delete trip"
+                              >
+                                <Trash2 className="h-5 w-5 text-destructive" />
+                              </Button>
+                            )}
                           </div>
-                          {trip.owner_id === profileId && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                              onClick={(e) => handleDeleteClick(trip, e)}
-                              title="Delete trip"
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          )}
-                        </div>
-                      </CardHeader>
-                    </Card>
+                        </CardHeader>
+                      </Card>
+                    </Link>
                   ))}
                 </div>
               )}
