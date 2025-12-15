@@ -3,6 +3,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 import { getTripUrl } from "@/lib/routes";
+import { useToast } from "@/components/ui/toast";
 
 export interface DestinationOption {
   id: string;
@@ -44,6 +45,7 @@ export function useCreateTrip() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { user } = useUser();
+  const { addToast } = useToast();
 
   const createTrip = async ({ destination, startDate, endDate, travelersCount, personalization }: CreateTripParams) => {
     setLoading(true);
@@ -91,12 +93,38 @@ export function useCreateTrip() {
       }
 
       const data = await response.json();
-      const tripId = data?.trip?.id;
       
-      console.log('[trip-create-client] created trip', { tripId, data });
+      // Log full response (sanitized - only log structure, not sensitive data)
+      console.log('[trip-create-client] POST /api/trips response:', {
+        hasData: !!data,
+        hasTrip: !!data?.trip,
+        tripId: data?.trip?.id,
+        tripKeys: data?.trip ? Object.keys(data.trip) : null,
+        hasSegments: !!data?.segments,
+        responseShape: {
+          trip: data?.trip ? { id: data.trip.id, title: data.trip.title } : null,
+          segments: data?.segments?.length || 0,
+        },
+      });
+      
+      // Explicitly extract tripId with hard validation
+      const tripId = data?.trip?.id;
+      console.log('[trip-create-client] extracted tripId:', tripId, 'type:', typeof tripId);
 
-      if (!tripId) {
-        throw new Error('Trip created but no ID returned');
+      // Hard assertion: tripId must be a non-empty string
+      if (!tripId || typeof tripId !== 'string' || tripId.trim() === '') {
+        const errorMsg = 'Trip created but no tripId returned';
+        console.error('[trip-create-client] tripId validation failed:', {
+          tripId,
+          type: typeof tripId,
+          data: data,
+        });
+        addToast({
+          title: 'Error',
+          description: errorMsg,
+          variant: 'destructive',
+        });
+        throw new Error(errorMsg);
       }
 
       try {
