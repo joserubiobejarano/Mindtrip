@@ -127,12 +127,29 @@ export function useCreateTrip() {
         throw new Error(errorMsg);
       }
 
+      // Bulletproof navigation: use replace + refresh + fallback
+      const targetUrl = getTripUrl(tripId, 'itinerary');
+      console.log('[trip-create] redirecting to', targetUrl);
+      
       try {
-        console.log('[trip-create] redirecting to', getTripUrl(tripId, 'itinerary'));
-        router.push(getTripUrl(tripId, 'itinerary'));
+        router.replace(targetUrl);
+        router.refresh();
+        
+        // Fallback: if still on /trips after 300ms, force hard navigation
+        setTimeout(() => {
+          if (typeof window !== 'undefined' && window.location.pathname === '/trips') {
+            console.warn('[trip-create] fallback: using hard navigation');
+            window.location.assign(targetUrl);
+          }
+        }, 300);
       } catch (navError: any) {
         console.error('[trip-create-client] navigation failed', navError);
-        throw new Error('Trip created but navigation failed. Please refresh the page.');
+        // Fallback to hard navigation on error
+        if (typeof window !== 'undefined') {
+          window.location.assign(targetUrl);
+        } else {
+          throw new Error('Trip created but navigation failed. Please refresh the page.');
+        }
       }
       
       return data.trip;
