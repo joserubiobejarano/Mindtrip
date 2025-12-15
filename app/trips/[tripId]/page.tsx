@@ -46,7 +46,7 @@ export default async function TripDetailPage({
       <div className="min-h-screen bg-background p-8 flex items-center justify-center">
         <div className="text-center space-y-4 max-w-md">
           <h1 className="text-2xl font-bold">Trip not found</h1>
-          <p className="text-muted-foreground">The trip you're looking for doesn't exist or may have been deleted.</p>
+          <p className="text-muted-foreground">The trip you&apos;re looking for doesn&apos;t exist or may have been deleted.</p>
           <Link href="/trips">
             <Button>Back to My Trips</Button>
           </Link>
@@ -104,7 +104,7 @@ export default async function TripDetailPage({
       <div className="min-h-screen bg-background p-8 flex items-center justify-center">
         <div className="text-center space-y-4 max-w-md">
           <h1 className="text-2xl font-bold">Access Denied</h1>
-          <p className="text-muted-foreground">You don't have access to this trip.</p>
+          <p className="text-muted-foreground">You don&apos;t have access to this trip.</p>
           <Link href="/trips">
             <Button>Back to My Trips</Button>
           </Link>
