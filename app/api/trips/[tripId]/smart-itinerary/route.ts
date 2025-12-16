@@ -712,7 +712,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   sendSSE(controller, 'complete', validatedItinerary);
                 }
               } catch (parseError: any) {
-                console.error('[smart-itinerary] Error parsing/validating final JSON:', parseError);
+                // Log detailed error information for debugging
+                const errorDetails = {
+                  error: parseError?.message || String(parseError),
+                  stack: parseError?.stack,
+                  name: parseError?.name,
+                  zodIssues: parseError?.issues || parseError?.errors,
+                  accumulatedTextLength: accumulatedText?.length,
+                  accumulatedTextPreview: accumulatedText?.substring(0, 1000), // First 1000 chars for debugging
+                };
+                console.error('[smart-itinerary] Error parsing/validating final JSON:', errorDetails);
+                
                 sendSSE(controller, 'error', { 
                   message: 'Failed to parse itinerary',
                   details: parseError.message 
@@ -723,8 +733,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
           
           // If we didn't get complete JSON, try to parse what we have
           if (!validatedItinerary && accumulatedText) {
+            let parsed: any = null;
             try {
-              const parsed = JSON.parse(accumulatedText);
+              parsed = JSON.parse(accumulatedText);
               validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
               
               // Enrich photos
@@ -795,7 +806,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 sendSSE(controller, 'error', { message: 'Failed to save itinerary' });
               }
             } catch (err: any) {
-              console.error('[smart-itinerary] Final parse error:', err);
+              // Log detailed error information for debugging
+              const errorDetails = {
+                error: err?.message || String(err),
+                stack: err?.stack,
+                name: err?.name,
+                zodIssues: err?.issues || err?.errors,
+                accumulatedTextLength: accumulatedText?.length,
+                accumulatedTextPreview: accumulatedText?.substring(0, 1000), // First 1000 chars for debugging
+                parsedData: parsed ? JSON.stringify(parsed).substring(0, 500) : 'null', // Preview of parsed data
+              };
+              console.error('[smart-itinerary] Final parse error:', errorDetails);
+              
               sendSSE(controller, 'error', { 
                 message: 'Failed to parse itinerary',
                 details: err.message 

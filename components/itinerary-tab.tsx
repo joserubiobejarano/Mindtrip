@@ -242,9 +242,52 @@ export function ItineraryTab({
                     break;
                     
                   case 'complete':
-                    // Final complete itinerary
-                    setSmartItinerary(data.data);
-                    setStatus('loaded');
+                    // Final complete itinerary - validate before setting state
+                    try {
+                      const completeData = data.data;
+                      
+                      // Log the payload for debugging (sanitize if too large)
+                      const payloadPreview = completeData ? JSON.stringify(completeData).substring(0, 500) : 'null/undefined';
+                      console.log('[itinerary-tab] complete message received, payload preview:', payloadPreview);
+                      
+                      // Validate structure before setting state
+                      if (!completeData) {
+                        console.error('[itinerary-tab] complete: data.data is null/undefined');
+                        setError('Received incomplete itinerary data. Please try again.');
+                        setStatus('error');
+                        break;
+                      }
+                      
+                      // Ensure days is an array
+                      if (!Array.isArray(completeData.days)) {
+                        console.error('[itinerary-tab] complete: days is not an array', {
+                          days: completeData.days,
+                          type: typeof completeData.days,
+                          fullPayload: completeData
+                        });
+                        setError('Invalid itinerary format: days must be an array. Please try regenerating.');
+                        setStatus('error');
+                        break;
+                      }
+                      
+                      // Ensure tripTips is an array (default to empty if missing)
+                      const validatedData = {
+                        ...completeData,
+                        tripTips: Array.isArray(completeData.tripTips) ? completeData.tripTips : [],
+                      };
+                      
+                      setSmartItinerary(validatedData);
+                      setStatus('loaded');
+                    } catch (parseErr: any) {
+                      console.error('[itinerary-tab] complete: error validating/parsing complete data', {
+                        error: parseErr,
+                        message: parseErr?.message,
+                        stack: parseErr?.stack,
+                        dataReceived: data.data
+                      });
+                      setError('Failed to parse complete itinerary. Please try regenerating.');
+                      setStatus('error');
+                    }
                     break;
                     
                   case 'error':
@@ -287,8 +330,45 @@ export function ItineraryTab({
         // Fallback: non-streaming response (for backwards compatibility)
         const json = await res.json();
         console.log('[itinerary-tab] generateSmartItinerary: received itinerary from POST', json);
-        setSmartItinerary(json);
-        setStatus('loaded');
+        
+        // Validate structure before setting state
+        try {
+          if (!json) {
+            console.error('[itinerary-tab] generateSmartItinerary: received null/undefined data');
+            setError('Invalid itinerary data received. Please try again.');
+            setStatus('error');
+            return;
+          }
+          
+          // Ensure days is an array
+          if (!Array.isArray(json.days)) {
+            console.error('[itinerary-tab] generateSmartItinerary: days is not an array', {
+              days: json.days,
+              type: typeof json.days,
+              fullPayload: json
+            });
+            setError('Invalid itinerary format: days must be an array. Please try again.');
+            setStatus('error');
+            return;
+          }
+          
+          // Ensure tripTips is an array (default to empty if missing)
+          const validatedData = {
+            ...json,
+            tripTips: Array.isArray(json.tripTips) ? json.tripTips : [],
+          };
+          
+          setSmartItinerary(validatedData);
+          setStatus('loaded');
+        } catch (parseErr: any) {
+          console.error('[itinerary-tab] generateSmartItinerary: error validating non-streaming data', {
+            error: parseErr,
+            message: parseErr?.message,
+            dataReceived: json
+          });
+          setError('Failed to parse itinerary. Please try again.');
+          setStatus('error');
+        }
       }
     } catch (err) {
       console.error('[itinerary-tab] generateSmartItinerary error', err);
@@ -334,9 +414,46 @@ export function ItineraryTab({
       // CASE 3: we have data
       const json = await res.json();
       console.log('[itinerary-tab] loadOrGenerate: loaded itinerary from DB', json);
-      // GET handler now returns bare SmartItinerary directly
-      setSmartItinerary(json);
-      setStatus('loaded');
+      
+      // Validate structure before setting state
+      try {
+        if (!json) {
+          console.error('[itinerary-tab] loadOrGenerate: received null/undefined data');
+          setError('Invalid itinerary data received. Please try regenerating.');
+          setStatus('error');
+          return;
+        }
+        
+        // Ensure days is an array
+        if (!Array.isArray(json.days)) {
+          console.error('[itinerary-tab] loadOrGenerate: days is not an array', {
+            days: json.days,
+            type: typeof json.days,
+            fullPayload: json
+          });
+          setError('Invalid itinerary format: days must be an array. Please try regenerating.');
+          setStatus('error');
+          return;
+        }
+        
+        // Ensure tripTips is an array (default to empty if missing)
+        const validatedData = {
+          ...json,
+          tripTips: Array.isArray(json.tripTips) ? json.tripTips : [],
+        };
+        
+        // GET handler now returns bare SmartItinerary directly
+        setSmartItinerary(validatedData);
+        setStatus('loaded');
+      } catch (parseErr: any) {
+        console.error('[itinerary-tab] loadOrGenerate: error validating loaded data', {
+          error: parseErr,
+          message: parseErr?.message,
+          dataReceived: json
+        });
+        setError('Failed to parse loaded itinerary. Please try regenerating.');
+        setStatus('error');
+      }
     } catch (err) {
       console.error('[itinerary-tab] loadOrGenerate error', err);
       setError('Failed to load itinerary. Please try again.');

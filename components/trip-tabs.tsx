@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ItineraryTab } from "@/components/itinerary-tab";
 import { ExpensesTab } from "@/components/expenses-tab";
 import { ExploreTab } from "@/components/explore-tab";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { useTrip } from "@/hooks/use-trip";
 
 interface TripTabsProps {
@@ -81,27 +82,42 @@ export function TripTabs({
       </div>
       <div className="flex-1 overflow-hidden">
         <TabsContent value="explore" className="h-full mt-0">
-          <ExploreTab
-            tripId={tripId}
-            onMapUpdate={onExploreMapUpdate}
-            onMarkerClickRef={onExploreMarkerClickRef}
-            onActivePlaceChange={onActivePlaceChange}
-          />
+          <ErrorBoundary
+            fallbackTitle="Explore tab error"
+            fallbackMessage="Something went wrong with the Explore tab. Try reloading the page."
+          >
+            <ExploreTab
+              tripId={tripId}
+              onMapUpdate={onExploreMapUpdate}
+              onMarkerClickRef={onExploreMarkerClickRef}
+              onActivePlaceChange={onActivePlaceChange}
+            />
+          </ErrorBoundary>
         </TabsContent>
-        <TabsContent value="itinerary" forceMount className="h-full mt-0 data-[state=inactive]:hidden">
-          <ItineraryTab
-            tripId={tripId}
-            userId={userId}
-            selectedDayId={selectedDayId}
-            onSelectDay={onSelectDay}
-            onActivitySelect={onActivitySelect}
-          />
+        <TabsContent value="itinerary" className="h-full mt-0">
+          <ErrorBoundary
+            fallbackTitle="Itinerary tab error"
+            fallbackMessage="Something went wrong with the Itinerary tab. Try reloading the page."
+          >
+            <ItineraryTab
+              tripId={tripId}
+              userId={userId}
+              selectedDayId={selectedDayId}
+              onSelectDay={onSelectDay}
+              onActivitySelect={onActivitySelect}
+            />
+          </ErrorBoundary>
         </TabsContent>
         <TabsContent value="expenses" className="h-full mt-0 overflow-y-auto">
-          <ExpensesTab
-            tripId={tripId}
-            defaultCurrency={trip?.default_currency || "USD"}
-          />
+          <ErrorBoundary
+            fallbackTitle="Expenses tab error"
+            fallbackMessage="Something went wrong with the Expenses tab. Try reloading the page."
+          >
+            <ExpensesTab
+              tripId={tripId}
+              defaultCurrency={trip?.default_currency || "USD"}
+            />
+          </ErrorBoundary>
         </TabsContent>
       </div>
     </Tabs>

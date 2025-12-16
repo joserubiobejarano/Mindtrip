@@ -33,6 +33,6 @@ export const smartItinerarySchema = z.object({
   title: z.string(),
   summary: z.string(),
   days: z.array(itineraryDaySchema),
-  tripTips: z.array(z.string()).describe("Trip-wide tips (season, holidays, packing)"),
+  tripTips: z.array(z.string()).optional().default([]).describe("Trip-wide tips (season, holidays, packing)"),
 });
 
