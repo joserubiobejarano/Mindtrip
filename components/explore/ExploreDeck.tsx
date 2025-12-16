@@ -42,7 +42,7 @@ export function ExploreDeck({
   className,
   hideHeader = false,
 }: ExploreDeckProps) {
-  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [selectedPlaceName, setSelectedPlaceName] = useState<string | undefined>(undefined);
@@ -95,25 +95,29 @@ export function ExploreDeck({
     dailyLimit: null,
   };
 
-  // Sync currentIndex with places.length
+  // Sync currentIndex with places.length - always clamp to valid range
   useEffect(() => {
     if (places.length > 0) {
       setCurrentIndex((prev) => {
-        // if index is uninitialized or out of range, go to last card
-        if (prev === -1 || prev >= places.length) {
-          const newIndex = places.length - 1;
-          console.log(`[itinerary-swipe] initializing index to ${newIndex} (places.length: ${places.length})`);
-          return newIndex;
+        // Clamp index to valid range: [0, places.length - 1]
+        const clampedIndex = Math.min(Math.max(prev, 0), places.length - 1);
+        if (clampedIndex !== prev) {
+          console.log(`[itinerary-swipe] clamping index from ${prev} to ${clampedIndex} (places.length: ${places.length})`);
         }
-        return prev;
+        return clampedIndex;
       });
     } else {
-      setCurrentIndex(-1);
-      console.log('[itinerary-swipe] no places available, resetting index to -1');
+      // When no places, keep index at 0 (but don't render card - handled by early return)
+      setCurrentIndex(0);
     }
   }, [places.length]);
 
   const handleSwipeLeft = () => {
+    // Guard: ensure index is valid before accessing places array
+    if (currentIndex < 0 || currentIndex >= places.length) {
+      console.log('[itinerary-swipe] handleSwipeLeft: invalid index', currentIndex, 'places.length:', places.length);
+      return;
+    }
     const place = places[currentIndex];
     if (!place) {
       console.log('[itinerary-swipe] handleSwipeLeft: no place at currentIndex', currentIndex);
@@ -124,8 +128,10 @@ export function ExploreDeck({
     setLastDirection('left');
     setCurrentIndex((prev) => {
       const newIndex = prev - 1;
-      console.log(`[itinerary-swipe] advancing index from ${prev} to ${newIndex}`);
-      return newIndex;
+      // Clamp to valid range: [0, places.length - 1]
+      const clampedIndex = Math.max(0, Math.min(newIndex, places.length - 1));
+      console.log(`[itinerary-swipe] advancing index from ${prev} to ${clampedIndex} (places.length: ${places.length})`);
+      return clampedIndex;
     });
     console.log(`[itinerary-swipe] API call: dislike for place ${placeId}`);
     swipeMutation.mutate(
@@ -140,8 +146,11 @@ export function ExploreDeck({
         onSuccess: (res) => {
           if (res?.limitReached) {
             console.log('[itinerary-swipe] limit reached, rolling back index');
-            // Rollback UI if limit reached
-            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            // Rollback UI if limit reached - clamp to valid range
+            setCurrentIndex((prev) => {
+              const newIndex = prev + 1;
+              return Math.max(0, Math.min(newIndex, places.length - 1));
+            });
             return;
           }
           console.log('[itinerary-swipe] dislike API call successful');
@@ -156,8 +165,11 @@ export function ExploreDeck({
         },
         onError: (error) => {
           console.error('[itinerary-swipe] dislike API call failed:', error);
-          // Rollback UI on error
-          setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+          // Rollback UI on error - clamp to valid range
+          setCurrentIndex((prev) => {
+            const newIndex = prev + 1;
+            return Math.max(0, Math.min(newIndex, places.length - 1));
+          });
           addToast({
             title: 'Error',
             description: 'Could not save swipe. Please try again.',
@@ -169,6 +181,11 @@ export function ExploreDeck({
   };
 
   const handleSwipeRight = async () => {
+    // Guard: ensure index is valid before accessing places array
+    if (currentIndex < 0 || currentIndex >= places.length) {
+      console.log('[itinerary-swipe] handleSwipeRight: invalid index', currentIndex, 'places.length:', places.length);
+      return;
+    }
     const place = places[currentIndex];
     if (!place) {
       console.log('[itinerary-swipe] handleSwipeRight: no place at currentIndex', currentIndex);
@@ -179,8 +196,10 @@ export function ExploreDeck({
     setLastDirection('right');
     setCurrentIndex((prev) => {
       const newIndex = prev - 1;
-      console.log(`[itinerary-swipe] advancing index from ${prev} to ${newIndex}`);
-      return newIndex;
+      // Clamp to valid range: [0, places.length - 1]
+      const clampedIndex = Math.max(0, Math.min(newIndex, places.length - 1));
+      console.log(`[itinerary-swipe] advancing index from ${prev} to ${clampedIndex} (places.length: ${places.length})`);
+      return clampedIndex;
     });
     
     // In day mode, immediately add to day instead of just liking
@@ -206,8 +225,11 @@ export function ExploreDeck({
               description: error.message || 'We recommend planning no more than 12 activities per day so you have time to enjoy each place.',
               variant: 'destructive',
             });
-            // Rollback UI
-            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            // Rollback UI - clamp to valid range
+            setCurrentIndex((prev) => {
+              const newIndex = prev + 1;
+              return Math.max(0, Math.min(newIndex, places.length - 1));
+            });
             return;
           }
           
@@ -217,8 +239,11 @@ export function ExploreDeck({
               description: error.message || 'You cannot modify days that are already in the past.',
               variant: 'destructive',
             });
-            // Rollback UI
-            setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+            // Rollback UI - clamp to valid range
+            setCurrentIndex((prev) => {
+              const newIndex = prev + 1;
+              return Math.max(0, Math.min(newIndex, places.length - 1));
+            });
             return;
           }
           
@@ -243,8 +268,11 @@ export function ExploreDeck({
             });
           }
           
-          // Rollback UI on error
-          setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
+          // Rollback UI on error - clamp to valid range
+          setCurrentIndex((prev) => {
+            const newIndex = prev + 1;
+            return Math.max(0, Math.min(newIndex, places.length - 1));
+          });
           return;
         }
 
@@ -355,6 +383,11 @@ export function ExploreDeck({
   };
 
   const handleSwipeUp = () => {
+    // Guard: ensure index is valid before accessing places array
+    if (currentIndex < 0 || currentIndex >= places.length) {
+      console.log('[itinerary-swipe] handleSwipeUp: invalid index', currentIndex, 'places.length:', places.length);
+      return;
+    }
     const place = places[currentIndex];
     if (!place) {
       console.log('[itinerary-swipe] handleSwipeUp: no place at currentIndex', currentIndex);
@@ -475,7 +508,8 @@ export function ExploreDeck({
   };
 
   // Calculate currentPlace before early returns (for useEffect hook)
-  const currentPlace = currentIndex >= 0 && places.length > 0 ? places[currentIndex] : null;
+  // Ensure index is valid before accessing array
+  const currentPlace = (currentIndex >= 0 && currentIndex < places.length && places.length > 0) ? places[currentIndex] : null;
   const currentPlaceId = currentPlace?.place_id;
   const currentPlaceLat = currentPlace?.lat;
   const currentPlaceLng = currentPlace?.lng;
@@ -517,7 +551,8 @@ export function ExploreDeck({
     );
   }
 
-  if (currentIndex < 0 || !currentPlace) {
+  // Guard: ensure we have a valid place before rendering SwipeableCard
+  if (currentIndex < 0 || currentIndex >= places.length || !currentPlace) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <div className="text-sm text-muted-foreground">
