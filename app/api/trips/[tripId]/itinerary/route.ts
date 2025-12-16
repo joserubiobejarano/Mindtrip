@@ -7,11 +7,12 @@ import { getProfileId } from '@/lib/auth/getProfileId';
 export async function GET(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
   let profileId: string | undefined;
   let tripId: string | undefined;
+  let mode: string | undefined;
 
   try {
     tripId = (await params).tripId;
     const url = new URL(req.url);
-    const mode = url.searchParams.get('mode') ?? 'load';
+    mode = url.searchParams.get('mode') ?? 'load';
     
     console.log('[legacy-itinerary]', { tripId, mode });
     

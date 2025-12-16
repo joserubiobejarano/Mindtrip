@@ -459,7 +459,7 @@ export function ItineraryTab({
       setError('Failed to load itinerary. Please try again.');
       setStatus('error');
     }
-  }, [tripId, generateSmartItinerary]);
+  }, [tripId, generateSmartItinerary, addToast]);
 
   // Load days with segment info
   useEffect(() => {
