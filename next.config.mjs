@@ -25,6 +25,7 @@ const nextConfig = {
     config.resolve.alias.canvas = false;
     return config;
   },
+  productionBrowserSourceMaps: true,
 };
 
 export default nextConfig;
