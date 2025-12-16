@@ -111,17 +111,17 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
             {place.name ?? 'Unnamed place'}
           </h2>
           
-          {place.category && (
+          {place.category && typeof place.category === 'string' && (
             <span className="inline-block font-mono text-xs uppercase tracking-wider text-sage bg-sage/10 px-3 py-1 rounded-full mb-4">
-              {place.category}
+              {String(place.category)}
             </span>
           )}
 
-          {place.rating && (
+          {place.rating != null && typeof place.rating === 'number' && (
             <div className="flex items-center gap-2 mb-3">
               <Star className="w-5 h-5 fill-coral text-coral" />
               <span className="font-semibold text-foreground">{place.rating.toFixed(1)}</span>
-              {place.user_ratings_total && (
+              {place.user_ratings_total != null && typeof place.user_ratings_total === 'number' && (
                 <span className="text-muted-foreground text-sm">
                   ({place.user_ratings_total.toLocaleString()} reviews)
                 </span>
@@ -129,9 +129,9 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
             </div>
           )}
 
-          {place.address && (
+          {place.address && typeof place.address === 'string' && (
             <p className="text-sm text-muted-foreground leading-relaxed">
-              {place.address}
+              {String(place.address)}
             </p>
           )}
         </div>

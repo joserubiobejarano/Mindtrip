@@ -572,120 +572,181 @@ export function ExploreDeck({
     exitUp: { opacity: 0, y: -200 },
   };
 
-  return (
-    <>
-      <div className="flex flex-col items-center justify-center w-full h-full">
-        <div className="flex items-center justify-center w-full flex-1 min-h-0">
-          {/* Full screen on mobile, constrained on desktop */}
-          <div className="relative w-full h-full lg:max-w-[480px] lg:h-auto flex items-center justify-center z-10">
-            <AnimatePresence mode="wait">
-              {currentPlace && (
-                <motion.div
-                  key={currentPlace.place_id}
-                  variants={cardVariants}
-                  initial="enter"
-                  animate="center"
-                  exit={lastDirection === 'right' ? 'exitRight' : lastDirection === 'left' ? 'exitLeft' : lastDirection === 'up' ? 'exitUp' : 'exitRight'}
-                  className="w-full h-full flex items-center justify-center"
-                >
-                  <SwipeableCard
-                    place={currentPlace}
-                    onSwipeLeft={handleSwipeLeft}
-                    onSwipeRight={handleSwipeRight}
-                    onSwipeUp={handleSwipeUp}
-                    disabled={
-                      swipeMutation.isPending ||
-                      (safeSession?.remainingSwipes != null && safeSession.remainingSwipes <= 0)
-                    }
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+  try {
+    // Log render state before rendering
+    console.log('[explore-render-crash] render start', {
+      placesLength: places.length,
+      currentIndex,
+      currentPlaceKeys: currentPlace ? Object.keys(currentPlace) : null,
+      currentPlaceId: currentPlace?.place_id,
+      currentPlaceName: currentPlace?.name,
+    });
+
+    return (
+      <>
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <div className="flex items-center justify-center w-full flex-1 min-h-0">
+            {/* Full screen on mobile, constrained on desktop */}
+            <div className="relative w-full h-full lg:max-w-[480px] lg:h-auto flex items-center justify-center z-10">
+              {(() => {
+                console.log('[explore-render-crash] rendering AnimatePresence section');
+                return (
+                  <AnimatePresence mode="wait">
+                    {currentPlace && (
+                      <motion.div
+                        key={currentPlace.place_id}
+                        variants={cardVariants}
+                        initial="enter"
+                        animate="center"
+                        exit={lastDirection === 'right' ? 'exitRight' : lastDirection === 'left' ? 'exitLeft' : lastDirection === 'up' ? 'exitUp' : 'exitRight'}
+                        className="w-full h-full flex items-center justify-center"
+                      >
+                        {(() => {
+                          console.log('[explore-render-crash] rendering SwipeableCard', {
+                            placeId: currentPlace.place_id,
+                            placeName: currentPlace.name,
+                            placeKeys: Object.keys(currentPlace),
+                          });
+                          return (
+                            <SwipeableCard
+                              place={currentPlace}
+                              onSwipeLeft={handleSwipeLeft}
+                              onSwipeRight={handleSwipeRight}
+                              onSwipeUp={handleSwipeUp}
+                              disabled={
+                                swipeMutation.isPending ||
+                                (safeSession?.remainingSwipes != null && safeSession.remainingSwipes <= 0)
+                              }
+                            />
+                          );
+                        })()}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                );
+              })()}
+            </div>
           </div>
-        </div>
 
-        {/* Action buttons - Just below the card */}
-        <div className="flex-shrink-0 mt-2 lg:mt-6 z-20">
-          <ExploreActions
-            onUndo={handleUndo}
-            onDislike={handleSwipeLeft}
-            onLike={handleSwipeRight}
-            onDetails={handleSwipeUp}
-            canUndo={swipeHistory.length > 0}
-            disabled={
-              swipeMutation.isPending ||
-              (safeSession?.remainingSwipes != null && safeSession.remainingSwipes <= 0)
-            }
-          />
-        </div>
-
-        {/* Trip-level "Add liked places to itinerary" CTA */}
-        {mode === 'trip' && hasLikedPlaces && onAddToItinerary && (
-          <div className="mt-4 lg:mt-6 px-4 w-full max-w-[480px]">
-            <Button
-              onClick={onAddToItinerary}
-              className="w-full bg-coral hover:bg-coral/90 text-white shadow-lg"
-              size="lg"
-            >
-              <Heart className="h-4 w-4 mr-2" />
-              Add {safeSession.likedPlaces?.length ?? 0} liked place{(safeSession.likedPlaces?.length ?? 0) !== 1 ? 's' : ''} to itinerary
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Place Details Drawer */}
-      <PlaceDetailsDrawer
-        open={detailsDrawerOpen}
-        onOpenChange={setDetailsDrawerOpen}
-        placeId={selectedPlaceId}
-        placeName={selectedPlaceName}
-        onAddToPlan={() => {
-          // Handle add to plan (save to saved_places)
-          if (selectedPlaceId) {
-            const place = places.find(p => p.place_id === selectedPlaceId);
-            if (place && onAddToItinerary) {
-              // For now, just like the place and show message
-              // In future, can implement a separate "save to plan" action
-              swipeMutation.mutate(
-                { 
-                  placeId: selectedPlaceId, 
-                  action: 'like', 
-                  source: mode,
-                  dayId: mode === 'day' ? dayId : undefined,
-                  slot: mode === 'day' ? slot : undefined,
-                },
-                {
-                  onSuccess: () => {
-                    setDetailsDrawerOpen(false);
-                  },
-                }
-              );
-            }
-          }
-        }}
-        onAddToItinerary={() => {
-          // Like the place when user clicks "Add to itinerary"
-          if (selectedPlaceId) {
-            swipeMutation.mutate(
-              { 
-                placeId: selectedPlaceId, 
-                action: 'like', 
-                source: mode,
-                dayId: mode === 'day' ? dayId : undefined,
-                slot: mode === 'day' ? slot : undefined,
-              },
-              {
-                onSuccess: () => {
-                  setDetailsDrawerOpen(false);
-                },
-              }
+          {/* Action buttons - Just below the card */}
+          {(() => {
+            console.log('[explore-render-crash] rendering action buttons section');
+            return (
+              <div className="flex-shrink-0 mt-2 lg:mt-6 z-20">
+                <ExploreActions
+                  onUndo={handleUndo}
+                  onDislike={handleSwipeLeft}
+                  onLike={handleSwipeRight}
+                  onDetails={handleSwipeUp}
+                  canUndo={swipeHistory.length > 0}
+                  disabled={
+                    swipeMutation.isPending ||
+                    (safeSession?.remainingSwipes != null && safeSession.remainingSwipes <= 0)
+                  }
+                />
+              </div>
             );
-          }
-        }}
-      />
-    </>
-  );
+          })()}
+
+          {/* Trip-level "Add liked places to itinerary" CTA */}
+          {(() => {
+            console.log('[explore-render-crash] rendering add to itinerary button section', {
+              mode,
+              hasLikedPlaces,
+              likedPlacesCount: safeSession.likedPlaces?.length ?? 0,
+            });
+            return mode === 'trip' && hasLikedPlaces && onAddToItinerary ? (
+              <div className="mt-4 lg:mt-6 px-4 w-full max-w-[480px]">
+                <Button
+                  onClick={onAddToItinerary}
+                  className="w-full bg-coral hover:bg-coral/90 text-white shadow-lg"
+                  size="lg"
+                >
+                  <Heart className="h-4 w-4 mr-2" />
+                  Add {safeSession.likedPlaces?.length ?? 0} liked place{(safeSession.likedPlaces?.length ?? 0) !== 1 ? 's' : ''} to itinerary
+                </Button>
+              </div>
+            ) : null;
+          })()}
+        </div>
+
+        {/* Place Details Drawer */}
+        {(() => {
+          console.log('[explore-render-crash] rendering PlaceDetailsDrawer', {
+            detailsDrawerOpen,
+            selectedPlaceId,
+            selectedPlaceName,
+          });
+          return (
+            <PlaceDetailsDrawer
+              open={detailsDrawerOpen}
+              onOpenChange={setDetailsDrawerOpen}
+              placeId={selectedPlaceId}
+              placeName={selectedPlaceName}
+              onAddToPlan={() => {
+                // Handle add to plan (save to saved_places)
+                if (selectedPlaceId) {
+                  const place = places.find(p => p.place_id === selectedPlaceId);
+                  if (place && onAddToItinerary) {
+                    // For now, just like the place and show message
+                    // In future, can implement a separate "save to plan" action
+                    swipeMutation.mutate(
+                      { 
+                        placeId: selectedPlaceId, 
+                        action: 'like', 
+                        source: mode,
+                        dayId: mode === 'day' ? dayId : undefined,
+                        slot: mode === 'day' ? slot : undefined,
+                      },
+                      {
+                        onSuccess: () => {
+                          setDetailsDrawerOpen(false);
+                        },
+                      }
+                    );
+                  }
+                }
+              }}
+              onAddToItinerary={() => {
+                // Like the place when user clicks "Add to itinerary"
+                if (selectedPlaceId) {
+                  swipeMutation.mutate(
+                    { 
+                      placeId: selectedPlaceId, 
+                      action: 'like', 
+                      source: mode,
+                      dayId: mode === 'day' ? dayId : undefined,
+                      slot: mode === 'day' ? slot : undefined,
+                    },
+                    {
+                      onSuccess: () => {
+                        setDetailsDrawerOpen(false);
+                      },
+                    }
+                  );
+                }
+              }}
+            />
+          );
+        })()}
+      </>
+    );
+  } catch (error: any) {
+    console.error('[explore-render-crash] render error caught', {
+      error: error?.message,
+      stack: error?.stack,
+      placesLength: places.length,
+      currentIndex,
+      currentPlaceKeys: currentPlace ? Object.keys(currentPlace) : null,
+      currentPlaceId: currentPlace?.place_id,
+    });
+    // Return error UI instead of crashing
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="text-sm text-destructive">Error rendering Explore. Please refresh the page.</div>
+      </div>
+    );
+  }
 
   // ============================================
   // ORIGINAL CODE (COMMENTED OUT FOR DEBUGGING)

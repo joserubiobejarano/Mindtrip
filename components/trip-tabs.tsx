@@ -105,6 +105,7 @@ export function TripTabs({
               selectedDayId={selectedDayId}
               onSelectDay={onSelectDay}
               onActivitySelect={onActivitySelect}
+              isActive={activeTab === 'itinerary'}
             />
           </ErrorBoundary>
         </TabsContent>

@@ -32,6 +32,7 @@ interface ItineraryTabProps {
   selectedDayId?: string | null;
   onSelectDay?: (dayId: string) => void;
   onActivitySelect?: (activityId: string) => void;
+  isActive?: boolean;
 }
 
 // Helper function to convert text to bullet points, avoiding splits on decimals
@@ -78,6 +79,7 @@ export function ItineraryTab({
   selectedDayId,
   onSelectDay,
   onActivitySelect,
+  isActive = true,
 }: ItineraryTabProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
@@ -111,6 +113,7 @@ export function ItineraryTab({
   const [daysWithSegments, setDaysWithSegments] = useState<Map<string, string>>(new Map()); // day date -> segment_id
 
   const generateSmartItinerary = useCallback(async () => {
+    if (!isActive) return;
     if (!tripId) {
       console.warn('[itinerary-tab] generateSmartItinerary: missing tripId');
       setStatus('error');
@@ -375,9 +378,10 @@ export function ItineraryTab({
       setError('Failed to generate itinerary. Please try again.');
       setStatus('error');
     }
-  }, [tripId, addToast]);
+  }, [tripId, addToast, isActive]);
 
   const loadOrGenerate = useCallback(async () => {
+    if (!isActive) return;
     if (!tripId) {
       console.warn('[itinerary-tab] loadOrGenerate: missing tripId');
       return;
@@ -459,10 +463,11 @@ export function ItineraryTab({
       setError('Failed to load itinerary. Please try again.');
       setStatus('error');
     }
-  }, [tripId, generateSmartItinerary, addToast]);
+  }, [tripId, generateSmartItinerary, addToast, isActive]);
 
   // Load days with segment info
   useEffect(() => {
+    if (!isActive) return;
     if (tripId && segments.length > 0) {
       const supabase = createClient();
       supabase
@@ -489,13 +494,14 @@ export function ItineraryTab({
           }
         });
     }
-  }, [tripId, segments]);
+  }, [tripId, segments, isActive]);
 
   // 1. Load existing or start generation
   useEffect(() => {
+    if (!isActive) return;
     loadOrGenerate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripId]);
+  }, [tripId, isActive]);
 
   // Initialize expanded days with first day expanded
   useEffect(() => {
@@ -507,6 +513,7 @@ export function ItineraryTab({
   // Handle manual updates (visited, remove)
   // Since we have slots now, finding the place is a bit deeper.
   const handleUpdatePlace = async (dayId: string, placeId: string, updates: { visited?: boolean, remove?: boolean }) => {
+    if (!isActive) return;
     if (!smartItinerary) return;
 
     // Optimistic Update
@@ -571,6 +578,7 @@ export function ItineraryTab({
 
   // Handle replacing an activity with a similar one
   const handleReplaceActivity = async (dayId: string, placeId: string) => {
+    if (!isActive) return;
     if (!smartItinerary) return;
 
     // Show loading state
@@ -632,6 +640,7 @@ export function ItineraryTab({
 
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isActive) return;
     if (!chatMessage.trim() || isChatting) return;
 
     setIsChatting(true);

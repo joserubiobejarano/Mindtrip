@@ -5,6 +5,7 @@ import { getProfileId } from '@/lib/auth/getProfileId';
 // Legacy compatibility route - forwards to smart-itinerary logic
 // This handles GET /api/trips/:tripId/itinerary?mode=load
 export async function GET(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
+  console.log('[legacy-itinerary-hit]');
   let profileId: string | undefined;
   let tripId: string | undefined;
   let mode: string | undefined;
