@@ -47,6 +47,9 @@ export function ExploreFilters({
   isPro = false, // Default to false, should be passed from parent
   tripId,
 }: ExploreFiltersProps) {
+  // Temporary logging to track render loop
+  console.count("[ExploreFilters] render");
+  
   const { user } = useUser();
   const [clientIsPro, setClientIsPro] = useState(isPro);
   const [showProPaywall, setShowProPaywall] = useState(false);
@@ -82,54 +85,61 @@ export function ExploreFilters({
   // Safe default - never throw, always boolean
   // Memoize to prevent recalculating on every render
   const effectiveIsPro = useMemo(() => Boolean(isPro || clientIsPro), [isPro, clientIsPro]);
-  // Memoize handlers to prevent recreating on every render
+  
+  // Handlers use functional updates to avoid depending on filters prop
+  // This prevents callback recreation when filters change, breaking the render loop
   const handleCategoryChange = useCallback((category: string) => {
-    onFiltersChange({
-      ...filters,
+    console.log("[ExploreFilters] handleCategoryChange:", category);
+    onFiltersChange(prev => ({
+      ...prev,
       category: category === 'all' || !category ? undefined : category,
-    });
-  }, [filters, onFiltersChange]);
+    }));
+  }, [onFiltersChange]);
 
   const handleIncludeItineraryPlacesChange = useCallback((checked: boolean) => {
-    onFiltersChange({
-      ...filters,
+    console.log("[ExploreFilters] handleIncludeItineraryPlacesChange:", checked);
+    onFiltersChange(prev => ({
+      ...prev,
       includeItineraryPlaces: checked || undefined,
-    });
-  }, [filters, onFiltersChange]);
+    }));
+  }, [onFiltersChange]);
 
   const handleBudgetChange = useCallback((value: string) => {
+    console.log("[ExploreFilters] handleBudgetChange:", value);
     if (!effectiveIsPro) {
       setShowProPaywall(true);
       return;
     }
-    onFiltersChange({
-      ...filters,
+    onFiltersChange(prev => ({
+      ...prev,
       budget: value ? parseInt(value, 10) : undefined,
-    });
-  }, [effectiveIsPro, filters, onFiltersChange]);
+    }));
+  }, [effectiveIsPro, onFiltersChange]);
 
   const handleDistanceChange = useCallback((value: string) => {
+    console.log("[ExploreFilters] handleDistanceChange:", value);
     if (!effectiveIsPro) {
       setShowProPaywall(true);
       return;
     }
-    onFiltersChange({
-      ...filters,
+    onFiltersChange(prev => ({
+      ...prev,
       maxDistance: value ? parseInt(value, 10) : undefined,
-    });
-  }, [effectiveIsPro, filters, onFiltersChange]);
+    }));
+  }, [effectiveIsPro, onFiltersChange]);
 
-  // Memoize Select value props to prevent unnecessary re-renders
+  // Memoize Select value props - always return string (never undefined)
+  // Radix Select requires stable string values to prevent render loops
   const budgetValue = useMemo(() => {
     return filters.budget !== undefined && filters.budget !== null 
       ? filters.budget.toString() 
-      : undefined;
+      : "";
   }, [filters.budget]);
 
   const distanceValue = useMemo(() => {
     return filters.maxDistance !== undefined && filters.maxDistance !== null 
       ? filters.maxDistance.toString() 
-      : undefined;
+      : "";
   }, [filters.maxDistance]);
 
   return (
@@ -184,7 +194,7 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
           <div className="relative">
             <Select
-              value={budgetValue}
+              value={budgetValue || undefined}
               onValueChange={handleBudgetChange}
               disabled={!effectiveIsPro}
             >
@@ -220,7 +230,7 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
           <div className="relative">
             <Select
-              value={distanceValue}
+              value={distanceValue || undefined}
               onValueChange={handleDistanceChange}
               disabled={!effectiveIsPro}
             >
