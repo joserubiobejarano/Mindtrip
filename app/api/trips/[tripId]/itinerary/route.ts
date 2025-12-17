@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProfileId } from '@/lib/auth/getProfileId';
 
+export const dynamic = "force-dynamic";
+
 // Legacy compatibility route - forwards to smart-itinerary logic
 // This handles GET /api/trips/:tripId/itinerary?mode=load
 export async function GET(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
@@ -117,10 +119,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
 
     console.log('[legacy-itinerary] loaded from DB', { tripId, mode });
 
-    // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
-    // Same JSON shape and status codes as smart-itinerary endpoint
+    // Return obvious JSON structure to verify endpoint is working
     return NextResponse.json(
-      dataTyped.content,
+      { ok: true, route: "legacy-itinerary", tripId, mode },
       { status: 200 }
     );
   } catch (err) {

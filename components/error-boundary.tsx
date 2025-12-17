@@ -83,8 +83,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 <details className="text-left mt-4 p-3 bg-muted rounded-md text-xs">
                   <summary className="cursor-pointer text-muted-foreground mb-2 font-medium">Error details</summary>
                   <pre className="whitespace-pre-wrap break-words text-muted-foreground">
-                    {error.stack && `Stack Trace:\n${getStackPreview(error.stack)}${error.stack.split('\n').length > 5 ? '\n...' : ''}`}
-                    {errorInfo?.componentStack && `\n\nComponent Stack:\n${errorInfo.componentStack}`}
+                    {error.stack && `Stack Trace:\n${getStackPreview(String(error.stack))}${String(error.stack).split('\n').length > 5 ? '\n...' : ''}`}
+                    {errorInfo?.componentStack && `\n\nComponent Stack:\n${String(errorInfo.componentStack)}`}
                   </pre>
                 </details>
               </>

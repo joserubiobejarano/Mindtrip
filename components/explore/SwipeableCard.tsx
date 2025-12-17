@@ -108,7 +108,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           <h2 
             className="text-2xl lg:text-3xl font-semibold text-foreground mb-2"
           >
-            {place.name ?? 'Unnamed place'}
+            {typeof place.name === 'string' ? place.name : 'Unnamed place'}
           </h2>
           
           {place.category && typeof place.category === 'string' && (
