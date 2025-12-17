@@ -1,110 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getProfileId } from "@/lib/auth/getProfileId";
+import { requireTripAccess, tripAccessErrorResponse } from "@/lib/auth/require-trip-access";
 import { getOpenAIClient } from "@/lib/openai";
 import { moderateMessage, getRedirectMessage } from "@/lib/chat-moderation";
 import { getSmartItinerary } from "@/lib/supabase/smart-itineraries-server";
 import { getTripSegments } from "@/lib/supabase/trip-segments";
-
-interface AssistantRequest {
-  message: string;
-  activeSegmentId?: string;
-  activeDayId?: string;
-}
+import { validateParams, validateBody } from "@/lib/validation/validate-request";
+import { TripIdParamsSchema, AssistantMessageSchema } from "@/lib/validation/api-schemas";
+import { checkRateLimit } from "@/lib/rate-limit/rate-limit-middleware";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let profileId: string | undefined;
-  let tripId: string | undefined;
-  
   try {
-    tripId = (await params).tripId;
-    const body: AssistantRequest = await request.json();
+    // Validate params and body
+    const { tripId } = await validateParams(params, TripIdParamsSchema);
+    const body = await validateBody(request, AssistantMessageSchema);
     const { message, activeSegmentId, activeDayId } = body;
-
-    if (!message || typeof message !== "string") {
-      return NextResponse.json(
-        { error: "Message is required" },
-        { status: 400 }
-      );
-    }
 
     const supabase = await createClient();
 
-    // Get profile ID for authorization
-    try {
-      const authResult = await getProfileId(supabase);
-      profileId = authResult.profileId;
-    } catch (authError: any) {
-      console.error('[Assistant API]', {
-        path: '/api/trips/[tripId]/assistant',
-        method: 'POST',
-        error: authError?.message || 'Failed to get profile',
-        tripId,
-      });
-      return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    // Verify user has access to trip
+    const accessResult = await requireTripAccess(tripId, supabase);
+    const trip = accessResult.trip;
+    const profileId = accessResult.profileId;
 
-    // 1. Auth & trip access check
-    const { data: tripData, error: tripError } = await supabase
-      .from("trips")
-      .select("id, title, start_date, end_date, destination_name, owner_id")
-      .eq("id", tripId)
-      .single();
-
-    if (tripError || !tripData) {
-      console.error('[Assistant API]', {
-        path: '/api/trips/[tripId]/assistant',
-        method: 'POST',
-        tripId,
-        profileId,
-        error: tripError?.message || 'Trip not found',
-        errorCode: tripError?.code,
-        context: 'trip_lookup',
-      });
-      return NextResponse.json(
-        { error: "Trip not found" },
-        { status: 404 }
-      );
-    }
-
-    type TripQueryResult = {
-      id: string
-      title: string
-      start_date: string
-      end_date: string
-      destination_name: string | null
-      owner_id: string
-    }
-
-    const trip = tripData as TripQueryResult;
-
-    // Check if user has access to trip
-    const { data: member } = await supabase
-      .from("trip_members")
-      .select("id")
-      .eq("trip_id", tripId)
-      .eq("user_id", profileId)
-      .single();
-
-    if (trip.owner_id !== profileId && !member) {
-      console.error('[Assistant API]', {
-        path: '/api/trips/[tripId]/assistant',
-        method: 'POST',
-        tripId,
-        profileId,
-        error: 'Forbidden: User does not have access to this trip',
-        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
-        trip_owner_id: trip.owner_id,
-        is_member: !!member,
-        context: 'authorization_check',
-      });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Rate limiting (after auth check)
+    const rateLimitCheck = await checkRateLimit(request, 'ASSISTANT', accessResult.clerkUserId);
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response;
     }
 
     // 2. Moderation & topic relevance
@@ -348,21 +273,16 @@ Provide a helpful, concise response. Reference specific days and places from the
         suggestions: [], // For future tool actions
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof NextResponse) {
+      return error;
+    }
     console.error('[Assistant API]', {
       path: '/api/trips/[tripId]/assistant',
       method: 'POST',
-      tripId: tripId || 'unknown',
-      profileId: profileId || 'unknown',
-      error: error?.message || 'Internal server error',
-      errorCode: error?.code,
+      error: error instanceof Error ? error.message : 'Internal server error',
     });
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    return tripAccessErrorResponse(error);
   }
 }
 

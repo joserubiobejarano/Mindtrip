@@ -11,17 +11,21 @@ const isPublicRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, request) => {
-  try {
-    if (!isPublicRoute(request)) {
+  // Only protect non-public routes
+  if (!isPublicRoute(request)) {
+    try {
       await auth.protect()
+    } catch (error) {
+      // Fail securely: return 401 instead of allowing unauthorized access
+      console.error('Clerk middleware auth error:', error)
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
-    return NextResponse.next()
-  } catch (error) {
-    // If Clerk fails (e.g., missing keys), allow the request through
-    // This prevents the middleware from crashing the app
-    console.error('Clerk middleware error:', error)
-    return NextResponse.next()
   }
+  
+  return NextResponse.next()
 })
 
 export const config = {

@@ -315,7 +315,7 @@ kruno/
 
 **Phase 3 - Itinerary Builder & Map Integration** ✅
 - Activity CRUD operations
-- Mapbox GL JS integration
+- Google Maps integration
 - Interactive map with markers
 - Place search and linking
 - Real-time collaborative editing
@@ -1170,7 +1170,7 @@ npm run dev
 For questions or issues:
 - Check documentation files
 - Review code comments
-- Check Supabase/Mapbox/Google/OpenAI documentation
+- Check Supabase/Google Maps/OpenAI documentation
 - Review error logs in browser console and server logs
 
 ---

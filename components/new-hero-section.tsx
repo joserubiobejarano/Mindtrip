@@ -10,6 +10,7 @@ import { useCreateTrip } from "@/hooks/use-create-trip";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { usePaywall } from "@/hooks/usePaywall";
+import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
 
 const suggestionTags = [
   "Plan a weekend in Madrid",
@@ -40,6 +41,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
   // Form state
   const [destinationInput, setDestinationInput] = useState("");
+  const [selectedDestination, setSelectedDestination] = useState<AutocompleteDestinationOption | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -117,6 +119,9 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       // Auto-fill destination if available
       if (hasDestination) {
         setDestinationInput(data.destination);
+        // Note: User will need to select from autocomplete dropdown for proper placeId
+        // Clear any previously selected destination since we're using text input
+        setSelectedDestination(null);
         // Create a basic destination object from the input
         const foundDestination: DestinationOption = {
           id: `city-${data.destination.toLowerCase().replace(/\s+/g, '-')}`,
@@ -154,8 +159,13 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     e.preventDefault();
     setSearchError(null);
 
-    if (!destinationInput.trim()) {
-      setSearchError("Please enter a destination");
+    // Require a selected destination from autocomplete
+    if (!selectedDestination) {
+      if (destinationInput.trim()) {
+        setSearchError("Please select a city from the list");
+      } else {
+        setSearchError("Please enter a destination");
+      }
       return;
     }
 
@@ -179,13 +189,13 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       return;
     }
 
-    // Create destination object from input
+    // Convert AutocompleteDestinationOption to DestinationOption format
     const destinationObj: DestinationOption = {
-      id: `city-${destinationInput.toLowerCase().replace(/\s+/g, '-')}`,
-      placeName: destinationInput.trim(),
-      region: "",
+      id: selectedDestination.placeId,
+      placeName: selectedDestination.name,
+      region: selectedDestination.country,
       type: "City",
-      center: [0, 0],
+      center: selectedDestination.center,
     };
 
     // Create trip directly without personalization dialog
@@ -254,10 +264,14 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                       <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
                     </div>
                   </div>
-                  <Input
+                  <DestinationAutocomplete
                     value={destinationInput}
-                    onChange={(e) => setDestinationInput(e.target.value)}
-                    className="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
+                    onChange={setDestinationInput}
+                    onSelect={(dest) => {
+                      setSelectedDestination(dest);
+                      setDestinationInput(dest.description);
+                    }}
+                    inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
                     placeholder="Search destinations..."
                   />
                 </div>

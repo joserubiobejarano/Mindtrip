@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getProfileId } from "@/lib/auth/getProfileId";
-import { getTripProStatus } from "@/lib/supabase/pro-status";
+import { requireTripAccess, tripAccessErrorResponse } from "@/lib/auth/require-trip-access";
+import { requireTripPro, tripProErrorResponse } from "@/lib/auth/require-trip-pro";
 import {
   getTripSegments,
   createTripSegment,
   updateTripSegment,
   deleteTripSegment,
 } from "@/lib/supabase/trip-segments";
-import type { CreateSegmentPayload, UpdateSegmentPayload } from "@/types/trip-segments";
+import { validateParams, validateBody } from "@/lib/validation/validate-request";
+import { TripIdParamsSchema, CreateSegmentSchema, UpdateSegmentSchema } from "@/lib/validation/api-schemas";
+import { z } from "zod";
 import { addDays, format } from "date-fns";
 
 // GET - Fetch all segments for a trip
@@ -16,79 +18,13 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let profileId: string | undefined;
-  let tripId: string | undefined;
-  
   try {
-    tripId = (await params).tripId;
+    // Validate params
+    const { tripId } = await validateParams(params, TripIdParamsSchema);
     const supabase = await createClient();
 
-    // Get profile ID for authorization
-    try {
-      const authResult = await getProfileId(supabase);
-      profileId = authResult.profileId;
-    } catch (authError: any) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'GET',
-        error: authError?.message || 'Failed to get profile',
-        tripId,
-      });
-      return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     // Verify user has access to trip
-    const { data: tripData, error: tripError } = await supabase
-      .from("trips")
-      .select("id, owner_id")
-      .eq("id", tripId)
-      .single();
-
-    if (tripError || !tripData) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'GET',
-        tripId,
-        profileId,
-        error: tripError?.message || 'Trip not found',
-        errorCode: tripError?.code,
-        context: 'trip_lookup',
-      });
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
-    }
-
-    type TripQueryResult = {
-      id: string
-      owner_id: string
-    }
-
-    const trip = tripData as TripQueryResult;
-
-    // Check if user is owner or member
-    const { data: member } = await supabase
-      .from("trip_members")
-      .select("id")
-      .eq("trip_id", tripId)
-      .eq("user_id", profileId)
-      .single();
-
-    if (trip.owner_id !== profileId && !member) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'GET',
-        tripId,
-        profileId,
-        error: 'Forbidden: User does not have access to this trip',
-        check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
-        trip_owner_id: trip.owner_id,
-        is_member: !!member,
-        context: 'authorization_check',
-      });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    await requireTripAccess(tripId, supabase);
 
     const { data: segments, error } = await getTripSegments(tripId);
 
@@ -100,21 +36,16 @@ export async function GET(
     }
 
     return NextResponse.json({ segments: segments || [] });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof NextResponse) {
+      return error;
+    }
     console.error('[Segments API]', {
       path: '/api/trips/[tripId]/segments',
       method: 'GET',
-      tripId: tripId || 'unknown',
-      profileId: profileId || 'unknown',
-      error: error?.message || 'Internal server error',
-      errorCode: error?.code,
+      error: error instanceof Error ? error.message : 'Internal server error',
     });
-    return NextResponse.json(
-      {
-        error: error?.message || 'Internal server error',
-      },
-      { status: 500 }
-    );
+    return tripAccessErrorResponse(error);
   }
 }
 
@@ -123,87 +54,15 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let profileId: string | undefined;
-  let tripId: string | undefined;
-  
   try {
-    tripId = (await params).tripId;
-    const body: CreateSegmentPayload = await request.json();
+    // Validate params and body
+    const { tripId } = await validateParams(params, TripIdParamsSchema);
+    const body = await validateBody(request, CreateSegmentSchema);
     const supabase = await createClient();
 
-    // Get profile ID for authorization
-    try {
-      const authResult = await getProfileId(supabase);
-      profileId = authResult.profileId;
-    } catch (authError: any) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'POST',
-        error: authError?.message || 'Failed to get profile',
-        tripId,
-      });
-      return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Verify user owns trip first (needed for Pro status check)
-    const { data: tripData, error: tripError } = await supabase
-      .from("trips")
-      .select("id, owner_id, start_date, end_date")
-      .eq("id", tripId)
-      .single();
-
-    if (tripError || !tripData) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'POST',
-        tripId,
-        profileId,
-        error: tripError?.message || 'Trip not found',
-        errorCode: tripError?.code,
-        context: 'trip_lookup',
-      });
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
-    }
-
-    type TripQueryResult = {
-      id: string
-      owner_id: string
-      start_date: string
-      end_date: string
-    }
-
-    const trip = tripData as TripQueryResult;
-
-    if (trip.owner_id !== profileId) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'POST',
-        tripId,
-        profileId,
-        error: 'Forbidden: User does not own this trip',
-        check_failed: 'not_owner',
-        trip_owner_id: trip.owner_id,
-        context: 'authorization_check',
-      });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    // Check trip Pro status (account Pro OR trip Pro)
-    // Note: getTripProStatus expects clerkUserId
-    const authResult = await getProfileId(supabase);
-    const { isProForThisTrip } = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
-    if (!isProForThisTrip) {
-      return NextResponse.json(
-        { 
-          error: "Pro subscription or trip unlock required for multi-city trips",
-          plan_required: 'pro_or_trip_unlock'
-        },
-        { status: 403 }
-      );
-    }
+    // Verify user owns trip and has Pro (account or trip-level)
+    const proUser = await requireTripPro(tripId, supabase);
+    const trip = proUser.trip;
 
     // Get existing segments to determine order_index
     const { data: existingSegments } = await getTripSegments(tripId);
@@ -274,21 +133,16 @@ export async function POST(
     }
 
     return NextResponse.json({ segment });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof NextResponse) {
+      return error;
+    }
     console.error('[Segments API]', {
       path: '/api/trips/[tripId]/segments',
       method: 'POST',
-      tripId: tripId || 'unknown',
-      profileId: profileId || 'unknown',
-      error: error?.message || 'Internal server error',
-      errorCode: error?.code,
+      error: error instanceof Error ? error.message : 'Internal server error',
     });
-    return NextResponse.json(
-      {
-        error: error?.message || 'Internal server error',
-      },
-      { status: 500 }
-    );
+    return tripProErrorResponse(error);
   }
 }
 
@@ -297,72 +151,17 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let profileId: string | undefined;
-  let tripId: string | undefined;
-  
   try {
-    tripId = (await params).tripId;
-    const body: UpdateSegmentPayload & { segmentId: string } = await request.json();
+    // Validate params and body
+    const { tripId } = await validateParams(params, TripIdParamsSchema);
+    const body = await validateBody(request, UpdateSegmentSchema.extend({ 
+      segmentId: z.string().uuid('Invalid segment ID format')
+    }));
     const { segmentId, ...updates } = body;
     const supabase = await createClient();
 
-    // Get profile ID for authorization
-    try {
-      const authResult = await getProfileId(supabase);
-      profileId = authResult.profileId;
-    } catch (authError: any) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'PATCH',
-        error: authError?.message || 'Failed to get profile',
-        tripId,
-      });
-      return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Verify user owns trip first
-    const { data: tripData } = await supabase
-      .from("trips")
-      .select("owner_id")
-      .eq("id", tripId)
-      .single();
-
-    type TripQueryResult = {
-      owner_id: string
-    }
-
-    const trip = tripData as TripQueryResult | null;
-
-    if (!trip || trip.owner_id !== profileId) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'PATCH',
-        tripId,
-        profileId,
-        error: 'Forbidden: User does not own this trip',
-        check_failed: !trip ? 'trip_not_found' : 'not_owner',
-        trip_owner_id: trip?.owner_id,
-        context: 'authorization_check',
-      });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    // Check trip Pro status (account Pro OR trip Pro)
-    // Note: getTripProStatus expects clerkUserId
-    const authResult = await getProfileId(supabase);
-    const { isProForThisTrip } = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
-    if (!isProForThisTrip) {
-      return NextResponse.json(
-        { 
-          error: "Pro subscription or trip unlock required",
-          plan_required: 'pro_or_trip_unlock'
-        },
-        { status: 403 }
-      );
-    }
+    // Verify user owns trip and has Pro
+    await requireTripPro(tripId, supabase);
 
     // Verify segment belongs to trip
     const { data: segment } = await supabase
@@ -389,21 +188,16 @@ export async function PATCH(
     }
 
     return NextResponse.json({ segment: updatedSegment });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof NextResponse) {
+      return error;
+    }
     console.error('[Segments API]', {
       path: '/api/trips/[tripId]/segments',
       method: 'PATCH',
-      tripId: tripId || 'unknown',
-      profileId: profileId || 'unknown',
-      error: error?.message || 'Internal server error',
-      errorCode: error?.code,
+      error: error instanceof Error ? error.message : 'Internal server error',
     });
-    return NextResponse.json(
-      {
-        error: error?.message || 'Internal server error',
-      },
-      { status: 500 }
-    );
+    return tripProErrorResponse(error);
   }
 }
 
@@ -412,80 +206,23 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ tripId: string }> }
 ) {
-  let profileId: string | undefined;
-  let tripId: string | undefined;
-  
   try {
-    tripId = (await params).tripId;
+    // Validate params
+    const { tripId } = await validateParams(params, TripIdParamsSchema);
     const { searchParams } = new URL(request.url);
     const segmentId = searchParams.get("segmentId");
 
-    if (!segmentId) {
+    if (!segmentId || !z.string().uuid().safeParse(segmentId).success) {
       return NextResponse.json(
-        { error: "segmentId is required" },
+        { error: "Valid segmentId is required" },
         { status: 400 }
       );
     }
 
     const supabase = await createClient();
 
-    // Get profile ID for authorization
-    try {
-      const authResult = await getProfileId(supabase);
-      profileId = authResult.profileId;
-    } catch (authError: any) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'DELETE',
-        error: authError?.message || 'Failed to get profile',
-        tripId,
-      });
-      return NextResponse.json(
-        { error: authError?.message || 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Verify user owns trip first
-    const { data: tripData } = await supabase
-      .from("trips")
-      .select("owner_id")
-      .eq("id", tripId)
-      .single();
-
-    type TripQueryResult = {
-      owner_id: string
-    }
-
-    const trip = tripData as TripQueryResult | null;
-
-    if (!trip || trip.owner_id !== profileId) {
-      console.error('[Segments API]', {
-        path: '/api/trips/[tripId]/segments',
-        method: 'DELETE',
-        tripId,
-        profileId,
-        error: 'Forbidden: User does not own this trip',
-        check_failed: !trip ? 'trip_not_found' : 'not_owner',
-        trip_owner_id: trip?.owner_id,
-        context: 'authorization_check',
-      });
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    // Check trip Pro status (account Pro OR trip Pro)
-    // Note: getTripProStatus expects clerkUserId
-    const authResult = await getProfileId(supabase);
-    const { isProForThisTrip } = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
-    if (!isProForThisTrip) {
-      return NextResponse.json(
-        { 
-          error: "Pro subscription or trip unlock required",
-          plan_required: 'pro_or_trip_unlock'
-        },
-        { status: 403 }
-      );
-    }
+    // Verify user owns trip and has Pro
+    await requireTripPro(tripId, supabase);
 
     // Verify segment belongs to trip
     const { data: segment } = await supabase
@@ -509,21 +246,16 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof NextResponse) {
+      return error;
+    }
     console.error('[Segments API]', {
       path: '/api/trips/[tripId]/segments',
       method: 'DELETE',
-      tripId: tripId || 'unknown',
-      profileId: profileId || 'unknown',
-      error: error?.message || 'Internal server error',
-      errorCode: error?.code,
+      error: error instanceof Error ? error.message : 'Internal server error',
     });
-    return NextResponse.json(
-      {
-        error: error?.message || 'Internal server error',
-      },
-      { status: 500 }
-    );
+    return tripProErrorResponse(error);
   }
 }
 

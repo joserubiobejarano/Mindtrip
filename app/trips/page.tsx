@@ -16,8 +16,8 @@ export default async function TripsPage() {
       <div className="max-w-4xl mx-auto">
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity mb-8">
           <Image 
-            src="/icon.svg" 
-            alt="Kruno logo" 
+            src="/brand/kruno.png" 
+            alt="Kruno" 
             width={32}
             height={32}
             className="w-8 h-8"

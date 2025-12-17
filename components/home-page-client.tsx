@@ -5,7 +5,6 @@ import { NewNavbar } from "@/components/new-navbar";
 import { NewHeroSection } from "@/components/new-hero-section";
 import { NewWhyChooseSection } from "@/components/new-why-choose-section";
 import { NewExperiencesSection } from "@/components/new-experiences-section";
-import { WhyChooseSection } from "@/components/why-choose-section";
 import { NewCTASection } from "@/components/new-cta-section";
 import { NewNewsletterSection } from "@/components/new-newsletter-section";
 import { NewFooter } from "@/components/new-footer";
@@ -37,7 +36,6 @@ export function HomePageClient() {
         <NewHeroSection destination={destination} setDestination={setDestination} />
         <NewWhyChooseSection />
         <NewExperiencesSection onCityClick={handleCityClick} />
-        <WhyChooseSection />
         <NewCTASection />
         <NewNewsletterSection />
       </main>
