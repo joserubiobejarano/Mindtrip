@@ -103,7 +103,6 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Single-city trip: use destinationPlaceId and full date range
-      // destinationPlaceId is a Mapbox ID, we need to convert it to Google Place ID
       let googlePlaceId: string | null = null;
       let cityName = destinationName || "Unknown City";
       let placeDetails: any = null;
@@ -144,12 +143,13 @@ export async function POST(request: NextRequest) {
     const primaryPlaceId = segmentsToCreate[0].cityPlaceId;
     let primaryPlaceDetails: any = null;
     
-    // Check if it's a Google Place ID (starts with specific pattern) or Mapbox ID
-    if (primaryPlaceId && !primaryPlaceId.startsWith('place.')) {
-      // Likely a Google Place ID
+    // Try to get place details using Google Place ID
+    if (primaryPlaceId) {
       primaryPlaceDetails = await getPlaceDetails(primaryPlaceId);
-    } else if (segmentsToCreate[0].cityName && segmentsToCreate[0].cityName !== "Unknown City") {
-      // Try to find Google Place ID from city name
+    }
+    
+    // If we couldn't get details and have a city name, try to find Google Place ID from name
+    if (!primaryPlaceDetails && segmentsToCreate[0].cityName && segmentsToCreate[0].cityName !== "Unknown City") {
       const googlePlaceId = await findGooglePlaceId(segmentsToCreate[0].cityName);
       if (googlePlaceId) {
         primaryPlaceDetails = await getPlaceDetails(googlePlaceId);

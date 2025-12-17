@@ -33,13 +33,11 @@
     "date-fns": "^3.3.1",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.309.0",
-    "mapbox-gl": "^3.2.0",
     "next": "^15.5.9",
     "openai": "^4.28.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.49.3",
-    "react-map-gl": "^7.1.7",
     "resend": "^4.8.0",
     "stripe": "^17.4.0",
     "tailwind-merge": "^2.2.1",
@@ -47,7 +45,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/mapbox-gl": "^3.0.0",
     "@types/node": "^20.11.5",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",

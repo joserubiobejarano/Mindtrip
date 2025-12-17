@@ -99,6 +99,29 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     }
   }, [segments, activeSegmentId]);
 
+  // Handle URL params for add/replace modes
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    const day = searchParams.get('day');
+    const slot = searchParams.get('slot');
+    const activity = searchParams.get('activity');
+
+    if (mode === 'add' && day && slot) {
+      addToast({
+        title: 'Add activities',
+        description: 'Select a place to add to your itinerary',
+        variant: 'default',
+      });
+    } else if (mode === 'replace' && day && activity) {
+      addToast({
+        title: 'Replace activity',
+        description: 'Select a place to replace this item',
+        variant: 'default',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   // Log mount/unmount for debugging
   useEffect(() => {
     console.log('[DEBUG] ExploreTab mounted');

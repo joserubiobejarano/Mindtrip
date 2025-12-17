@@ -13,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DestinationAutocomplete } from "@/components/destination-autocomplete";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { X, Lock, Calendar, MapPin } from "lucide-react";
 import { DialogDescription } from "@/components/ui/dialog";
@@ -51,6 +50,7 @@ export function NewTripDialog({
 }: NewTripDialogProps) {
   const [isPro, setIsPro] = useState(false);
   const [loadingSubscription, setLoadingSubscription] = useState(true);
+  const [destinationInput, setDestinationInput] = useState("");
   const [destination, setDestination] = useState<DestinationOption | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -87,6 +87,7 @@ export function NewTripDialog({
   // Reset form when dialog closes
   useEffect(() => {
     if (!open) {
+      setDestinationInput("");
       setDestination(null);
       setStartDate("");
       setEndDate("");
@@ -125,7 +126,7 @@ export function NewTripDialog({
       }
     } else {
       // Single-city: validate destination
-      if (!destination) {
+      if (!destinationInput.trim()) {
         errors.destination = "Destination is required";
         isValid = false;
       }
@@ -154,8 +155,8 @@ export function NewTripDialog({
   };
 
   const handleAddCity = () => {
-    if (!destination) {
-      setFieldErrors(prev => ({ ...prev, destination: "Select a destination first" }));
+    if (!destinationInput.trim()) {
+      setFieldErrors(prev => ({ ...prev, destination: "Enter a destination first" }));
       return;
     }
 
@@ -165,16 +166,26 @@ export function NewTripDialog({
       return;
     }
 
+    // Create destination object from input
+    const destinationObj: DestinationOption = {
+      id: `city-${destinationInput.toLowerCase().replace(/\s+/g, '-')}`,
+      placeName: destinationInput.trim(),
+      region: "",
+      type: "City",
+      center: [0, 0],
+    };
+
     // Pro users: add segment normally
     const newSegment: CitySegment = {
       id: `segment-${Date.now()}`,
-      cityPlaceId: destination.id,
-      cityName: destination.placeName,
+      cityPlaceId: destinationObj.id,
+      cityName: destinationObj.placeName,
       nights: 2, // Default 2 nights
     };
 
     setSegments([...segments, newSegment]);
-    setDestination(null); // Clear for next city
+    setDestinationInput(""); // Clear for next city
+    setDestination(null);
   };
 
   const handleRemoveCity = (segmentId: string) => {
@@ -197,19 +208,29 @@ export function NewTripDialog({
     }
 
     // Determine primary destination (first segment for multi-city, or main destination for single-city)
-    const primaryDestination = isPro && segments.length > 0
-      ? {
-          placeId: segments[0].cityPlaceId,
-          name: segments[0].cityName,
-          center: destination?.center || [0, 0] as [number, number],
-        }
-      : destination
-        ? {
-            placeId: destination.id,
-            name: destination.placeName,
-            center: destination.center,
-          }
-        : null;
+    let primaryDestination: { placeId: string; name: string; center: [number, number] } | null = null;
+    
+    if (isPro && segments.length > 0) {
+      primaryDestination = {
+        placeId: segments[0].cityPlaceId,
+        name: segments[0].cityName,
+        center: [0, 0],
+      };
+    } else if (destinationInput.trim()) {
+      // Create destination object from input
+      const destinationObj: DestinationOption = {
+        id: `city-${destinationInput.toLowerCase().replace(/\s+/g, '-')}`,
+        placeName: destinationInput.trim(),
+        region: "",
+        type: "City",
+        center: [0, 0],
+      };
+      primaryDestination = {
+        placeId: destinationObj.id,
+        name: destinationObj.placeName,
+        center: destinationObj.center,
+      };
+    }
 
     if (!primaryDestination) {
       setError("Destination is required");
@@ -380,16 +401,15 @@ export function NewTripDialog({
                     <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
                   </div>
                 </div>
-                <DestinationAutocomplete
-                  value={destination}
-                  onChange={(value) => {
-                    setDestination(value);
-                    if (value) {
+                <Input
+                  value={destinationInput}
+                  onChange={(e) => {
+                    setDestinationInput(e.target.value);
+                    if (e.target.value.trim()) {
                       setFieldErrors((prev) => ({ ...prev, destination: undefined }));
                     }
                   }}
-                  className="w-full"
-                  inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
+                  className="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
                   placeholder="Search destinations..."
                 />
               </div>
@@ -399,7 +419,7 @@ export function NewTripDialog({
             </div>
 
             {/* Always show "+ Add city" button with PRO/lock badge */}
-            {segments.length === 0 && destination && (
+            {segments.length === 0 && destinationInput && (
               <Button
                 type="button"
                 variant="outline"
@@ -428,7 +448,7 @@ export function NewTripDialog({
                     variant="outline"
                     size="sm"
                     onClick={handleAddCity}
-                    disabled={!destination}
+                    disabled={!destinationInput.trim()}
                     className="text-xs"
                   >
                     + Add City

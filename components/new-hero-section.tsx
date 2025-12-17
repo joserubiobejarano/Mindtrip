@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { Search, MapPin, Calendar, MessageSquare, Send, Loader2, Plus, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DestinationAutocomplete } from "@/components/destination-autocomplete";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { type DestinationOption } from "@/hooks/use-create-trip";
 import { useCreateTrip } from "@/hooks/use-create-trip";
@@ -40,6 +39,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
   const { openPaywall } = usePaywall();
 
   // Form state
+  const [destinationInput, setDestinationInput] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -68,65 +68,6 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     chatInputRef.current?.focus();
   };
 
-  const searchDestinationByName = async (destinationName: string): Promise<DestinationOption | null> => {
-    try {
-      const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-      if (!mapboxToken) {
-        console.error("Mapbox token not configured");
-        return null;
-      }
-
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          destinationName
-        )}.json?access_token=${mapboxToken}&types=place,country,region&limit=1`
-      );
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const data = await response.json();
-      const features = data.features || [];
-
-      if (features.length === 0) {
-        return null;
-      }
-
-      const feature = features[0];
-      const placeName = feature.place_name.split(",")[0].trim();
-
-      const regionParts: string[] = [];
-      if (feature.context) {
-        const country = feature.context.find((ctx: any) => ctx.id.startsWith("country"));
-        const region = feature.context.find((ctx: any) => ctx.id.startsWith("region"));
-
-        if (region) regionParts.push(region.text);
-        if (country) regionParts.push(country.text);
-      }
-      const region = regionParts.join(", ") || feature.place_name.split(",").slice(1).join(",").trim();
-
-      let type: "City" | "Country" | "Region" = "City";
-      if (feature.place_type?.includes("country")) {
-        type = "Country";
-      } else if (feature.place_type?.includes("region")) {
-        type = "Region";
-      } else if (feature.place_type?.includes("place")) {
-        type = "City";
-      }
-
-      return {
-        id: feature.id,
-        placeName,
-        region,
-        type,
-        center: feature.center,
-      };
-    } catch (error) {
-      console.error("Error searching destination:", error);
-      return null;
-    }
-  };
 
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,14 +116,16 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
       // Auto-fill destination if available
       if (hasDestination) {
-        const foundDestination = await searchDestinationByName(data.destination);
-        if (foundDestination) {
-          setDestination(foundDestination);
-        } else {
-          setIntentError(`Could not find destination "${data.destination}". Please select it manually.`);
-          setParsingIntent(false);
-          return;
-        }
+        setDestinationInput(data.destination);
+        // Create a basic destination object from the input
+        const foundDestination: DestinationOption = {
+          id: `city-${data.destination.toLowerCase().replace(/\s+/g, '-')}`,
+          placeName: data.destination,
+          region: "",
+          type: "City",
+          center: [0, 0],
+        };
+        setDestination(foundDestination);
       } else {
         setIntentError("Could not extract a destination from your message. Please try again or select a destination manually.");
         setParsingIntent(false);
@@ -211,8 +154,8 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     e.preventDefault();
     setSearchError(null);
 
-    if (!destination) {
-      setSearchError("Please select a destination");
+    if (!destinationInput.trim()) {
+      setSearchError("Please enter a destination");
       return;
     }
 
@@ -236,10 +179,19 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       return;
     }
 
+    // Create destination object from input
+    const destinationObj: DestinationOption = {
+      id: `city-${destinationInput.toLowerCase().replace(/\s+/g, '-')}`,
+      placeName: destinationInput.trim(),
+      region: "",
+      type: "City",
+      center: [0, 0],
+    };
+
     // Create trip directly without personalization dialog
     try {
       await createTrip({
-        destination,
+        destination: destinationObj,
         startDate,
         endDate,
       });
@@ -276,7 +228,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                   <label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold">
                     Where to?
                   </label>
-                  {destination && (
+                  {destinationInput && (
                     <Button
                       type="button"
                       variant="ghost"
@@ -302,11 +254,10 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                       <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
                     </div>
                   </div>
-                  <DestinationAutocomplete
-                    value={destination}
-                    onChange={setDestination}
-                    className="w-full"
-                    inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
+                  <Input
+                    value={destinationInput}
+                    onChange={(e) => setDestinationInput(e.target.value)}
+                    className="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
                     placeholder="Search destinations..."
                   />
                 </div>

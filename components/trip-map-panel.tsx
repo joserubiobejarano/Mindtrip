@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { GoogleMapBase, BaseMarker } from "@/components/google-map-base";
 import { useTrip } from "@/hooks/use-trip";
 import { useActivities } from "@/hooks/use-activities";
-import { getDayRoute } from "@/lib/mapboxDirections";
 
 interface TripMapPanelProps {
   tripId: string;
@@ -32,7 +31,6 @@ export function TripMapPanel({
 }: TripMapPanelProps) {
   const { data: trip } = useTrip(tripId);
   const { activities } = useActivities(selectedDayId || "");
-  const [routePath, setRoutePath] = useState<google.maps.LatLngLiteral[]>([]);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const geolocationRequestedRef = useRef(false);
@@ -47,65 +45,6 @@ export function TripMapPanel({
       .sort()
       .join(",");
   }, [activities]);
-
-  // Calculate route for itinerary tab
-  // Guard: Only update routePath if it actually needs to change (prevents infinite loops)
-  useEffect(() => {
-    if (activeTab !== "itinerary" || !selectedDayId || !activities || activities.length < 2) {
-      // Only clear route if we actually need to (prevents redundant updates)
-      setRoutePath(prev => {
-        // Guard: only update if routePath is not already empty
-        if (prev.length === 0) return prev;
-        return [];
-      });
-      return;
-    }
-
-    const activitiesWithValidPlaces = activities
-      .filter(
-        (activity) =>
-          activity.place &&
-          activity.place.lat != null &&
-          activity.place.lng != null &&
-          !isNaN(activity.place.lat) &&
-          !isNaN(activity.place.lng)
-      )
-      .map((activity) => ({
-        id: activity.id,
-        place: {
-          lat: activity.place!.lat!,
-          lng: activity.place!.lng!,
-        },
-      }));
-
-    if (activitiesWithValidPlaces.length < 2) {
-      // Only clear route if we actually need to (prevents redundant updates)
-      setRoutePath(prev => {
-        // Guard: only update if routePath is not already empty
-        if (prev.length === 0) return prev;
-        return [];
-      });
-      return;
-    }
-
-    getDayRoute(activitiesWithValidPlaces).then((result) => {
-      // Convert Mapbox route to Google Maps format
-      if (result.routeLineGeoJson && result.routeLineGeoJson.coordinates) {
-        const path = result.routeLineGeoJson.coordinates.map((coord) => ({
-          lat: coord[1],
-          lng: coord[0],
-        }));
-        setRoutePath(path);
-      } else {
-        // Only clear route if we actually need to (prevents redundant updates)
-        setRoutePath(prev => {
-          // Guard: only update if routePath is not already empty
-          if (prev.length === 0) return prev;
-          return [];
-        });
-      }
-    });
-  }, [activityIds, selectedDayId, activeTab]);
 
 
   // Get markers based on active tab
@@ -352,7 +291,6 @@ export function TripMapPanel({
         center={initialCenter}
         zoom={initialZoom}
         markers={getMarkers()}
-        routePath={activeTab === "itinerary" && routePath.length > 0 ? routePath : undefined}
         onMarkerClick={handleMarkerClick}
         onMapLoad={(map) => {
           setMapInstance(map);

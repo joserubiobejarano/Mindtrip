@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { RouteLeg } from "@/lib/mapboxDirections";
 
 interface Activity {
   id: string;
@@ -19,7 +18,6 @@ interface Activity {
 
 interface ActivityListProps {
   activities: Activity[];
-  routeLegs?: RouteLeg[];
   onEdit: (activityId: string) => void;
   onDelete: (activityId: string) => void;
   onSelect: (activityId: string) => void;
@@ -27,7 +25,6 @@ interface ActivityListProps {
 
 export function ActivityList({
   activities,
-  routeLegs = [],
   onEdit,
   onDelete,
   onSelect,
@@ -49,16 +46,9 @@ export function ActivityList({
     );
   }
 
-  // Helper to find travel time for an activity
-  const getTravelTime = (activityId: string): number | null => {
-    const leg = routeLegs.find((leg) => leg.fromActivityId === activityId);
-    return leg ? leg.durationMinutes : null;
-  };
-
   return (
     <div className="space-y-3">
       {activities.map((activity, index) => {
-        const travelTime = getTravelTime(activity.id);
         return (
           <div key={activity.id}>
             <Card
@@ -114,11 +104,6 @@ export function ActivityList({
                 </div>
               </CardContent>
             </Card>
-            {travelTime !== null && (
-              <div className="text-xs text-muted-foreground mt-1 ml-4">
-                Walk · {travelTime} min to next stop
-              </div>
-            )}
           </div>
         );
       })}

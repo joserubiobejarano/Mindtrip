@@ -1074,9 +1074,9 @@ export function ItineraryTab({
                                                 variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  console.log('[Change] onClick fired', { dayId: day.id, placeId: place.id, dayIsPast, dayIsAtCapacity });
+                                                  console.log('[Itinerary] Change clicked', { dayId: day.id, activityId: place.id });
                                                   if (dayIsPast || dayIsAtCapacity) return;
-                                                  handleReplaceActivity(day.id, place.id);
+                                                  router.push(`/trips/${tripId}?tab=explore&mode=replace&day=${day.id}&activity=${place.id}`);
                                                 }}
                                                 disabled={dayIsPast || dayIsAtCapacity}
                                                 title={
@@ -1139,14 +1139,9 @@ export function ItineraryTab({
                                       variant="default"
                                       size="sm"
                                       onClick={() => {
-                                        console.log('[AddActivities] onClick fired', { dayId: day.id, slot: slotType, dayIsPast, dayIsAtCapacity });
+                                        console.log('[Itinerary] Add clicked', { dayId: day.id, slot: slotType });
                                         if (dayIsPast || dayIsAtCapacity) return;
-                                        setSelectedDayForExplore({
-                                          dayId: day.id,
-                                          slot: slotType,
-                                          areaCluster,
-                                        });
-                                        setDayExploreOpen(true);
+                                        router.push(`/trips/${tripId}?tab=explore&mode=add&day=${day.id}&slot=${slotType}`);
                                       }}
                                       disabled={dayIsPast || dayIsAtCapacity}
                                       title={
@@ -1399,9 +1394,9 @@ export function ItineraryTab({
                                                 variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  console.log('[Change] onClick fired', { dayId: day.id, placeId: place.id, dayIsPast, dayIsAtCapacity });
+                                                  console.log('[Itinerary] Change clicked', { dayId: day.id, activityId: place.id });
                                                   if (dayIsPast || dayIsAtCapacity) return;
-                                                  handleReplaceActivity(day.id, place.id);
+                                                  router.push(`/trips/${tripId}?tab=explore&mode=replace&day=${day.id}&activity=${place.id}`);
                                                 }}
                                                 disabled={dayIsPast || dayIsAtCapacity}
                                                 title={
@@ -1463,14 +1458,9 @@ export function ItineraryTab({
                                       variant="default"
                                       size="sm"
                                       onClick={() => {
-                                        console.log('[AddActivities] onClick fired', { dayId: day.id, slot: slotType, dayIsPast, dayIsAtCapacity });
+                                        console.log('[Itinerary] Add clicked', { dayId: day.id, slot: slotType });
                                         if (dayIsPast || dayIsAtCapacity) return;
-                                        setSelectedDayForExplore({
-                                          dayId: day.id,
-                                          slot: slotType,
-                                          areaCluster,
-                                        });
-                                        setDayExploreOpen(true);
+                                        router.push(`/trips/${tripId}?tab=explore&mode=add&day=${day.id}&slot=${slotType}`);
                                       }}
                                       disabled={dayIsPast || dayIsAtCapacity}
                                       title={
@@ -1540,49 +1530,7 @@ export function ItineraryTab({
                     )}
                   </div>
 
-                   {/* Global Affiliates */}
-                   <div className="max-w-4xl mx-auto mt-12 mb-8 text-center p-8 bg-slate-50 rounded-2xl border border-slate-100">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-4">You&apos;ll probably need...</h3>
-                        <div className="flex flex-wrap justify-center gap-4">
-                            <Button variant="outline" className="bg-white">Get an eSIM</Button>
-                            <Button variant="outline" className="bg-white">Travel Insurance</Button>
-                            <Button variant="outline" className="bg-white">Airport Transfer</Button>
-                        </div>
-                   </div>
 
-                  {/* Search Bar - At the end, not sticky */}
-                  <section className="max-w-5xl mx-auto my-8">
-                    <div className="p-6 border rounded-2xl bg-gray-50/50">
-                        <h3 className="text-lg font-semibold mb-2 text-slate-900">Search for places</h3>
-                        <p className="text-sm text-slate-500 mb-4">Discover and add places to your itinerary.</p>
-                        <div className="flex gap-2">
-                        <div className="relative flex-1">
-                            <input
-                            type="text"
-                            placeholder="Search for restaurants, attractions, activities..."
-                            className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
-                            onFocus={() => {
-                              // Open Explore drawer in trip mode when search is focused
-                              setSelectedDayForExplore(null);
-                              setDayExploreOpen(true);
-                            }}
-                            readOnly
-                            />
-                        </div>
-                        <Button 
-                            type="button"
-                            onClick={() => {
-                              setSelectedDayForExplore(null);
-                              setDayExploreOpen(true);
-                            }}
-                            className="rounded-xl px-6 bg-primary hover:bg-primary/90 h-auto"
-                        >
-                            <Plus className="h-5 w-5 mr-2" />
-                            Explore
-                        </Button>
-                        </div>
-                    </div>
-                  </section>
 
                 </div>
               )}
