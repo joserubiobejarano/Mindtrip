@@ -61,6 +61,20 @@ export function TripDetail({ tripId }: { tripId: string }) {
     }
   }, [days, selectedDayId]);
 
+  // Memoize callbacks before any early returns (React Hooks rules)
+  const handleExploreMarkerClick = useCallback((id: string) => {
+    if (exploreMarkerClickHandlerRef.current) {
+      exploreMarkerClickHandlerRef.current(id);
+    }
+  }, []);
+
+  // Memoize onExploreMapUpdate callback to prevent infinite loops
+  const handleExploreMapUpdate = useCallback((markers: BaseMarker[], center: { lat: number; lng: number } | null, zoom: number | undefined) => {
+    setExploreMarkers(markers);
+    setExploreCenter(center);
+    setExploreZoom(zoom);
+  }, []); // Empty deps - setters are stable
+
   if (!userId) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-8">
@@ -129,19 +143,6 @@ export function TripDetail({ tripId }: { tripId: string }) {
       </div>
     );
   }
-
-  const handleExploreMarkerClick = useCallback((id: string) => {
-    if (exploreMarkerClickHandlerRef.current) {
-      exploreMarkerClickHandlerRef.current(id);
-    }
-  }, []);
-
-  // Memoize onExploreMapUpdate callback to prevent infinite loops
-  const handleExploreMapUpdate = useCallback((markers: BaseMarker[], center: { lat: number; lng: number } | null, zoom: number | undefined) => {
-    setExploreMarkers(markers);
-    setExploreCenter(center);
-    setExploreZoom(zoom);
-  }, []); // Empty deps - setters are stable
 
   return (
     <GoogleMapsProvider>

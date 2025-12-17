@@ -184,7 +184,7 @@ export function TripMapPanel({
     if (!exploreMarkers || exploreMarkers.length === 0) return [];
     // Create normalized array with stable structure
     return exploreMarkers.map(m => ({ id: m.id, lat: m.lat, lng: m.lng }));
-  }, [markersKey]);
+  }, [exploreMarkers]);
   
   // Use initial center/zoom only - map will manage its own state after load
   // Memoize to prevent unnecessary re-renders when values haven't changed
@@ -197,7 +197,7 @@ export function TripMapPanel({
       return { lat: trip.center_lat, lng: trip.center_lng };
     }
     return { lat: 0, lng: 0 };
-  }, [activeTab, exploreCenterLat, exploreCenterLng, tripCenterLat, tripCenterLng]);
+  }, [activeTab, exploreCenter, trip?.center_lat, trip?.center_lng]);
   
   const initialZoom = useMemo(() => {
     if (activeTab === "explore" && exploreZoom != null) {
@@ -301,14 +301,12 @@ export function TripMapPanel({
   }, [
     activeTab,
     mapInstance,
-    exploreCenterLat,
-    exploreCenterLng,
+    exploreCenter,
     exploreZoom,
-    userLocationLat,
-    userLocationLng,
-    tripCenterLat,
-    tripCenterLng,
-    activitiesLength,
+    userLocation,
+    trip?.center_lat,
+    trip?.center_lng,
+    activities,
     activityIds,
   ]);
 

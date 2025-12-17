@@ -200,7 +200,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
       // Clear markers when no active place
       onMapUpdate([], null, undefined);
     }
-  }, [onMapUpdate, activePlace?.placeId, activePlace?.lat, activePlace?.lng]); // Use primitives instead of object
+  }, [onMapUpdate, activePlace]); // Include activePlace in dependencies
 
   // Show loading state
   if ((tripLoading || segmentsLoading) && !trip) {
