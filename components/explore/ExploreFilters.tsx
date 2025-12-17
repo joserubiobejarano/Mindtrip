@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, Dispatch, SetStateAction } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Lock } from 'lucide-react';
@@ -10,7 +10,7 @@ import { ProPaywallModal } from '@/components/pro/ProPaywallModal';
 
 interface ExploreFiltersProps {
   filters: ExploreFiltersType;
-  onFiltersChange: (filters: ExploreFiltersType) => void;
+  onFiltersChange: Dispatch<SetStateAction<ExploreFiltersType>>;
   className?: string;
   isPro?: boolean; // Pass from parent or fetch
   tripId?: string; // For paywall modal
@@ -90,7 +90,7 @@ export function ExploreFilters({
   // This prevents callback recreation when filters change, breaking the render loop
   const handleCategoryChange = useCallback((category: string) => {
     console.log("[ExploreFilters] handleCategoryChange:", category);
-    onFiltersChange(prev => ({
+    onFiltersChange((prev: ExploreFiltersType) => ({
       ...prev,
       category: category === 'all' || !category ? undefined : category,
     }));
@@ -98,7 +98,7 @@ export function ExploreFilters({
 
   const handleIncludeItineraryPlacesChange = useCallback((checked: boolean) => {
     console.log("[ExploreFilters] handleIncludeItineraryPlacesChange:", checked);
-    onFiltersChange(prev => ({
+    onFiltersChange((prev: ExploreFiltersType) => ({
       ...prev,
       includeItineraryPlaces: checked || undefined,
     }));
@@ -110,7 +110,7 @@ export function ExploreFilters({
       setShowProPaywall(true);
       return;
     }
-    onFiltersChange(prev => ({
+    onFiltersChange((prev: ExploreFiltersType) => ({
       ...prev,
       budget: value ? parseInt(value, 10) : undefined,
     }));
@@ -122,7 +122,7 @@ export function ExploreFilters({
       setShowProPaywall(true);
       return;
     }
-    onFiltersChange(prev => ({
+    onFiltersChange((prev: ExploreFiltersType) => ({
       ...prev,
       maxDistance: value ? parseInt(value, 10) : undefined,
     }));
