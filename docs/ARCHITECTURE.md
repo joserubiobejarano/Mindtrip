@@ -76,7 +76,7 @@ User Browser
         ├─► Clerk (Authentication)
         ├─► OpenAI (AI Generation)
         ├─► Google Places API (Places Data)
-        └─► Mapbox (Maps & Directions)
+        └─► Google Maps (Maps & Places)
 ```
 
 ### Data Flow Diagram
@@ -359,6 +359,13 @@ User Clicks "Add to Itinerary"
 - Pro tier feature
 - Schema: `id`, `trip_id`, `order_index`, `city_place_id`, `city_name`, `start_date`, `end_date`, `transport_type`, `notes`
 
+**trip_members** ✅ **UPDATED**
+- Trip collaborators and membership
+- Usage tracking columns: `swipe_count`, `change_count`, `search_add_count` ✅ **NEW**
+- Tracks per-user-per-trip usage for Explore features
+- Migration file: `database/migrations/add-explore-usage-limits-to-trip-members.sql`
+- Index: `idx_trip_members_usage` for performance
+
 ### New Tables for Explore Feature ✅ **IMPLEMENTED**
 
 **explore_sessions** ✅
@@ -463,6 +470,9 @@ smart_itineraries
 │       ├── itinerary-chat/           # Itinerary editing
 │       ├── smart-itinerary/          # Itinerary generation
 │       │   └── place/                # Place updates
+│       ├── activities/               # ✅ NEW: Activity management
+│       │   └── [activityId]/
+│       │       └── replace/         # ✅ NEW: Replace activity with usage limits
 │       └── explore/                  # ✅ IMPLEMENTED: Explore feature
 │           ├── places/               # ✅ GET: Fetch places
 │           ├── swipe/                # ✅ POST: Record swipe (like/dislike/undo)
@@ -471,6 +481,8 @@ smart_itineraries
 │           └── [dayId]/
 │               └── activities/
 │                   └── bulk-add-from-swipes/  # ✅ POST: Add places to day/slot (morning/afternoon/evening)
+├── places/                           # ✅ NEW: Places API
+│   └── city-autocomplete/            # ✅ NEW: City autocomplete (GET/POST)
 ├── user/
 │   ├── subscription-status/          # ✅ GET: User subscription status (checks is_pro column)
 │   └── link-trip-invitations/        # ✅ POST: Link email invitations to user accounts
@@ -478,7 +490,7 @@ smart_itineraries
 │   └── route.ts                      # ✅ GET/POST: Advisor chat history and messages
 ├── ai/
 │   └── plan-day/                    # AI day planning
-├── ai-itinerary/                    # Legacy itinerary
+├── ai-itinerary/                    # Legacy itinerary (updated with segment support)
 ├── accommodation/
 │   └── find/                        # Hotel search
 └── intent/
@@ -618,12 +630,13 @@ lib/
 - Store generated itineraries in database
 - Regenerate only when needed
 
-### Mapbox
+### Google Maps
 
 **Services:**
-- Map display (Mapbox GL JS)
-- Geocoding (address search)
-- Directions (route optimization)
+- Map display (Google Maps API)
+- Places search and autocomplete
+- Place details and photos
+- Hotel search
 
 ### Supabase
 
@@ -822,9 +835,27 @@ lib/
 - Route helpers: `lib/routes.ts` with `getTripUrl()` for centralized URL construction
 - Clerk user ID migrations: Profile lookup improvements with `clerk_user_id` column
 - Enhanced trip list: Past trips section, delete button, automatic invitation linking
+- **City Autocomplete**: Enhanced destination search with Google Places Autocomplete
+  - API: `/api/places/city-autocomplete` (GET and POST)
+  - Component: `DestinationAutocomplete` for improved UX
+  - Integrated into trip creation dialog
+- **Usage Limits System**: Per-user-per-trip usage tracking
+  - Migration: `add-explore-usage-limits-to-trip-members.sql`
+  - Tracks swipe_count, change_count, search_add_count
+  - Enforces limits based on Pro/free tier
+- **Activity Replace Feature**: Smart replacement with context-aware suggestions
+  - Endpoint: `/api/trips/[tripId]/activities/[activityId]/replace`
+  - Usage limit enforcement (10 changes for free, unlimited for Pro)
+  - Food place limit enforcement (max 1 per slot)
+  - Past-day lock protection
+- **AI Itinerary Enhancements**: Segment support and food limits
+  - Supports trip_segment_id for multi-city trips
+  - Enforces max 1 food place per time slot
+  - Improved photo matching with saved places
 - Migration files:
   - `database/migrations/add-clerk-user-id-to-profiles.sql`
   - `database/migrations/add-unique-index-clerk-user-id.sql`
+  - `database/migrations/add-explore-usage-limits-to-trip-members.sql` ✅ **NEW**
 
 ---
 

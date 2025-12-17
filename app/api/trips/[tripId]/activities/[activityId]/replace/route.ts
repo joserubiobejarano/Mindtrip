@@ -306,6 +306,36 @@ export async function POST(
     // Extract tags from types
     const tags = (placeDetails.types || []).slice(0, 3).map(t => t.replace(/_/g, ' '));
 
+    // Check if replacement is a food place
+    const foodTypes = [
+      'restaurant', 'cafe', 'bakery', 'bar', 'food', 'meal_takeaway', 'meal_delivery',
+      'night_club', 'liquor_store'
+    ];
+    const isReplacementFood = placeDetails.types?.some(type => foodTypes.includes(type)) || false;
+    
+    // If replacement is a food place, check if slot already has a food place
+    if (isReplacementFood) {
+      const existingFoodPlaces = targetSlot.places.filter(place => {
+        // Check if place has food-related tags
+        const hasFoodTag = place.tags?.some(tag => {
+          const tagLower = tag.toLowerCase();
+          return ['restaurant', 'cafe', 'bar', 'food', 'dining', 'bakery'].some(foodWord => tagLower.includes(foodWord));
+        });
+        return hasFoodTag;
+      });
+      
+      // If there's already a food place (and it's not the one being replaced), reject
+      if (existingFoodPlaces.length > 0 && !existingFoodPlaces.some(p => p.id === activityId)) {
+        return NextResponse.json(
+          {
+            error: 'food_limit_reached',
+            message: 'This time slot already has a food place. You can only have one food place per time slot.',
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     // Replace the place in the slot
     const placeIndex = targetSlot.places.findIndex(p => p.id === activityId);
     if (placeIndex !== -1) {

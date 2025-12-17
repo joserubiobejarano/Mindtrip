@@ -17,7 +17,7 @@ npm install
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://upeoxmwdwghdbgcqqtll.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwZW94bXdkd2doZGJnY3FxdGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzcxOTgsImV4cCI6MjA3OTE1MzE5OH0.6yZ4f5tUM_75mp31wQBxwLUlNmhsAF0-FGDQRDddFk0
-NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token_here
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 
 3. **Set up database:**
@@ -52,13 +52,15 @@ npm run dev
 - Trip deletion with cascade cleanup ✅ **NEW**
 - Route helper utilities (`lib/routes.ts`) ✅ **NEW**
 - Clerk user ID migration improvements ✅ **NEW**
+- City autocomplete for destination search ✅ **NEW**
+- Usage limits tracking (swipe_count, change_count, search_add_count) ✅ **NEW**
 
 ### Phase 3 - Itinerary Builder & Map ✅
 - Day selector with date display
 - Activity CRUD (create, read, update, delete)
-- Mapbox GL JS integration
+- Google Maps integration
 - Interactive map with markers and popups
-- Place search using Mapbox Geocoding API
+- Place search using Google Places API
 - Collaborative trip editing
 - Realtime sync for activities
 
@@ -119,7 +121,7 @@ npm run dev
 - Profile synchronization with Clerk
 
 ### Phase 9 - Advanced Map Features ✅
-- Route optimization using Mapbox Directions API
+- Route visualization on map
 - Visual route lines connecting activities on map
 - Automatic route calculation for day itineraries
 - Place saving/bookmarking functionality
@@ -241,7 +243,7 @@ kruno/
 - **UI Components:** shadcn/ui (Radix UI primitives)
 - **Backend:** Supabase (PostgreSQL + Auth + Realtime)
 - **Authentication:** Clerk (Email/Password + Google OAuth)
-- **Maps:** Mapbox GL JS + Mapbox Directions API
+- **Maps:** Google Maps API + Google Places API
 - **AI:** OpenAI GPT-4o-mini (for day planning and itinerary generation)
 - **Schema Validation:** Zod (for itinerary schema validation)
 - **State Management:** React Query (TanStack Query)
@@ -263,9 +265,8 @@ kruno/
 
 ## 🎯 Next Steps
 
-1. Get your Mapbox token from [mapbox.com](https://www.mapbox.com/)
+1. Get your Google Maps API key from [console.cloud.google.com](https://console.cloud.google.com/) (for Places API, hotel search, and place photos)
 2. Get your OpenAI API key from [platform.openai.com](https://platform.openai.com/) (for AI day planning, Trip Assistant, and smart itinerary generation)
-3. Get your Google Maps API key from [console.cloud.google.com](https://console.cloud.google.com/) (for Places API, hotel search, and place photos)
 4. Configure Clerk authentication (Email/Password + Google OAuth)
 5. Run the SQL schema in Supabase
 6. Run additional migrations for saved_places, trip_chat_messages, and smart_itineraries tables
@@ -285,6 +286,27 @@ kruno/
   - ✅ Clerk user ID migration improvements (profile lookup enhancements)
   - ✅ Enhanced trip list UI with past trips section and delete functionality
   - ✅ Automatic trip invitation linking on trips list load
+  - ✅ **City Autocomplete Feature** - Enhanced destination search with Google Places Autocomplete
+    - ✅ New API endpoint: `/api/places/city-autocomplete` (GET and POST)
+    - ✅ New component: `DestinationAutocomplete` for improved destination selection
+    - ✅ Integrated into trip creation dialog for better UX
+    - ✅ Supports city-only search with country information
+  - ✅ **Usage Limits System** - Per-user-per-trip usage tracking
+    - ✅ Migration: `add-explore-usage-limits-to-trip-members.sql`
+    - ✅ Tracks `swipe_count`, `change_count`, `search_add_count` per user per trip
+    - ✅ Enforces limits based on Pro/free tier status
+    - ✅ Used in activity replace and Explore features
+  - ✅ **Activity Replace Feature** - Enhanced with usage limits and smart replacement
+    - ✅ Updated `/api/trips/[tripId]/activities/[activityId]/replace` endpoint
+    - ✅ Enforces change_count limits (10 for free, unlimited for Pro)
+    - ✅ Uses Explore Places API to find contextually relevant replacements
+    - ✅ Enforces food place limit (max 1 per time slot)
+    - ✅ Past-day lock prevents modifying past days
+  - ✅ **AI Itinerary Improvements** - Enhanced with segment support and food limits
+    - ✅ Supports `trip_segment_id` for multi-city trip itineraries
+    - ✅ Enforces max 1 food place per time slot (morning/afternoon/evening)
+    - ✅ Better photo matching with saved places
+    - ✅ Improved food place detection using Google Places types
 - ✅ Phase 21 complete - Travel Advisor (Pre-Trip Planning) fully implemented
   - ✅ Travel Advisor page (`/advisor`) with chat interface
   - ✅ API endpoint (`/api/advisor`) with GET and POST methods
@@ -335,6 +357,10 @@ kruno/
 - ✅ **Trip deletion** - DELETE API endpoint with owner verification and cascade cleanup
 - ✅ **Route helpers** - Centralized URL construction utilities (`lib/routes.ts`)
 - ✅ **Clerk user ID migrations** - Improved profile lookup with `clerk_user_id` column
+- ✅ **City Autocomplete** - Enhanced destination search with Google Places Autocomplete API
+- ✅ **Usage Limits System** - Per-user-per-trip tracking for swipes, changes, and search adds
+- ✅ **Activity Replace Feature** - Smart replacement with context-aware suggestions and usage limits
+- ✅ **Food Place Limits** - Max 1 food place per time slot in AI-generated itineraries
 
 **Next Priorities:**
 - Phase 22: Enhanced user experience features (templates, weather, photos)

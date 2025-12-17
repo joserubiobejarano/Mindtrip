@@ -168,9 +168,9 @@ See [FEATURES.md](./FEATURES.md) for complete Explore feature specifications.
    - PDF export functionality
 
 11. **Maps & Routes**
-    - Interactive map with Mapbox GL JS
+    - Interactive map with Google Maps
     - Activity markers and popups
-    - Route optimization using Mapbox Directions API
+    - Route visualization on map
     - Visual route lines connecting activities
     - Automatic route calculation for day itineraries
 
@@ -184,8 +184,7 @@ See [FEATURES.md](./FEATURES.md) for complete Explore feature specifications.
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui (Radix UI primitives)
 - **State Management**: React Query (TanStack Query)
-- **Maps**: Mapbox GL JS + Mapbox Directions API
-- **Google Maps**: `@react-google-maps/api` for Places integration
+- **Maps**: Google Maps API (`@react-google-maps/api`) for map display and Places integration
 - **Date Utilities**: date-fns
 - **Form Handling**: react-hook-form
 - **Animations**: framer-motion
@@ -199,8 +198,7 @@ See [FEATURES.md](./FEATURES.md) for complete Explore feature specifications.
 - **File Storage**: Supabase Storage (if needed)
 
 ### APIs & Services
-- **Mapbox**: Maps, Geocoding, Directions
-- **Google Places API**: Place search, photos, details, hotel search
+- **Google Maps API**: Map display, Places search, photos, details, hotel search
 - **OpenAI API**: AI day planning, itinerary generation, Trip Assistant chat
 
 ### Development Tools
@@ -268,7 +266,6 @@ kruno/
 │   │   ├── places-server.ts    # Server-side Places API
 │   │   └── google-places/       # Client-side Places
 │   ├── google-places.ts         # Places utilities
-│   ├── mapboxDirections.ts      # Mapbox Directions
 │   ├── openai.ts                # OpenAI client
 │   ├── providers.tsx            # React Query provider
 │   └── utils.ts                 # General utilities
@@ -351,7 +348,7 @@ kruno/
 - Default currency selection (30+ currencies)
 
 **Phase 9 - Advanced Map Features** ✅
-- Route optimization (Mapbox Directions)
+- Route visualization
 - Visual route lines
 - Place saving/bookmarking
 - Saved places integration
@@ -602,9 +599,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
 
-# Mapbox
-NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token
-
 # Google Maps API
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
@@ -625,11 +619,7 @@ OPENAI_API_KEY=your_openai_api_key
    - Configure Email/Password and Google OAuth
    - Get publishable key and secret key
 
-3. **Mapbox**
-   - Sign up at [mapbox.com](https://mapbox.com)
-   - Get access token from Account > Access tokens
-
-4. **Google Maps API**
+3. **Google Maps API**
    - Go to [Google Cloud Console](https://console.cloud.google.com)
    - Create project and enable:
      - Places API
@@ -637,7 +627,7 @@ OPENAI_API_KEY=your_openai_api_key
      - Geocoding API (if needed)
    - Create API key and restrict it
 
-5. **OpenAI**
+4. **OpenAI**
    - Sign up at [platform.openai.com](https://platform.openai.com)
    - Create API key
    - Add billing (required for API usage)
@@ -686,6 +676,7 @@ All migration files are in `database/migrations/`. **Run these manually in order
 16. `supabase-add-segment-id-to-explore-sessions.sql` - ✅ **NEW** Links explore sessions to segments
 17. `supabase-add-trip-personalization.sql` - ✅ **NEW** Adds personalization fields to trips table
 18. `supabase-add-trip-messages.sql` - ✅ Creates `trip_chat_messages` table (may already exist)
+19. `add-explore-usage-limits-to-trip-members.sql` - ✅ **NEW** Adds usage tracking columns (swipe_count, change_count, search_add_count)
 
 **⚠️ Important**: Run migrations in the Supabase SQL Editor:
 1. Go to Supabase Dashboard > SQL Editor
@@ -733,6 +724,10 @@ If migrations fail or are incomplete, these tables may need manual creation:
   - `smart_itineraries.trip_segment_id` - Migration: `supabase-add-trip-segment-to-itineraries.sql`
   - `explore_sessions.trip_segment_id` - Migration: `supabase-add-segment-id-to-explore-sessions.sql`
 - **Trip personalization fields** - ✅ **NEW** - Migration: `supabase-add-trip-personalization.sql`
+- **`trip_members` usage tracking** - ✅ **NEW** - Migration: `add-explore-usage-limits-to-trip-members.sql`
+  - Adds `swipe_count`, `change_count`, `search_add_count` columns
+  - Tracks per-user-per-trip usage for Explore features
+  - Used to enforce Pro/free tier limits
 
 Check `database/migrations/` for SQL scripts. All migrations listed above are available and should be run manually in the Supabase SQL Editor.
 
@@ -817,6 +812,28 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 - Returns: `{ isPro: boolean }`
 - Uses `is_pro` column in `profiles` table
 - Migration file: `database/migrations/add-is-pro-to-profiles.sql`
+
+**`POST /api/trips/[tripId]/activities/[activityId]/replace`** ✅ **NEW**
+- Replace an activity in the itinerary with a contextually relevant alternative
+- Enforces usage limits based on Pro status (10 changes for free, unlimited for Pro)
+- Uses Explore Places API to find replacements based on area/category
+- Enforces food place limit (max 1 per time slot)
+- Prevents modifying past days
+- Returns: `{ success: boolean, activity: ItineraryPlace }`
+- Location: `app/api/trips/[tripId]/activities/[activityId]/replace/route.ts`
+
+**`GET /api/places/city-autocomplete`** ✅ **NEW**
+- City autocomplete search using Google Places Autocomplete API
+- Query params: `q` or `input` (search query), `location` (optional lat,lng for biasing)
+- Returns: `{ predictions: Array<{ placeId, description, city, country, ... }> }`
+- Restricted to cities only (types=(cities))
+- Location: `app/api/places/city-autocomplete/route.ts`
+
+**`POST /api/places/city-autocomplete`** ✅ **NEW**
+- Get place details including coordinates for selected city
+- Body: `{ placeId: string }`
+- Returns: `{ placeId, name, center: [lat, lng], formattedAddress }`
+- Location: `app/api/places/city-autocomplete/route.ts`
 
 ### Trip Assistant
 
@@ -934,10 +951,8 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 
 ### Map Integration
 
-- **Mapbox GL JS** for main map display
-- **Mapbox Directions API** for route optimization
-- **Google Maps API** for Places search, photos, hotel search
-- Both APIs are required for full functionality
+- **Google Maps API** for map display, Places search, photos, hotel search
+- Uses `@react-google-maps/api` for React integration
 
 ### State Management
 
@@ -1100,9 +1115,9 @@ npm run dev
 
 ### Map Not Loading
 
-- Verify Mapbox token is set
-- Check token has correct permissions
-- Verify Mapbox account is active
+- Verify Google Maps API key is set
+- Check API key has correct permissions
+- Verify Places API is enabled in Google Cloud Console
 
 ### Places Not Loading
 
@@ -1195,7 +1210,7 @@ For questions or issues:
 
 **Key Technical Points:**
 - Manual database setup required (no Supabase CLI)
-- Multiple API keys needed (Supabase, Clerk, Mapbox, Google, OpenAI)
+- Multiple API keys needed (Supabase, Clerk, Google Maps, OpenAI)
 - Two itinerary systems (legacy and new SmartItinerary format)
 - Real-time features require Supabase Realtime setup
 - **NEW**: Explore feature requires new database table and API endpoints

@@ -20,11 +20,12 @@
 ### Trip Management
 
 **Create Trip**
-- Search for destination city
+- Search for destination city (enhanced with Google Places Autocomplete) ✅ **NEW**
 - Set trip dates (start and end)
 - Trip name and description
 - Auto-generate days based on date range
 - Set trip preferences (budget, interests, currency)
+- City autocomplete component with country information ✅ **NEW**
 - **Multi-city trips (Pro tier)** ✅ **NEW**
   - Add multiple cities to a single trip
   - Each city is a "segment" with its own date range
@@ -382,6 +383,14 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - Link/unlink place
 - Edit notes
 
+**Replace Activity** ✅ **NEW**:
+- Replace activity with contextually relevant alternative
+- Smart suggestions based on area/category
+- Usage limit enforcement (10 changes for free, unlimited for Pro)
+- Food place limit (max 1 per time slot)
+- Past-day lock protection
+- One-click replacement from itinerary view
+
 **Delete Activity:**
 - Remove from itinerary
 - Confirmation dialog
@@ -678,6 +687,10 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - ✅ Clerk user ID migration improvements (profile lookup enhancements)
 - ✅ Enhanced trip list UI with past trips section and delete functionality
 - ✅ Automatic trip invitation linking on trips list load
+- ✅ **City Autocomplete Feature** - Enhanced destination search with Google Places Autocomplete
+- ✅ **Usage Limits System** - Per-user-per-trip tracking for swipes, changes, and search adds
+- ✅ **Activity Replace Feature** - Smart replacement with context-aware suggestions and usage limits
+- ✅ **AI Itinerary Enhancements** - Segment support and food place limits
 
 **Phase 21: Travel Advisor (Pre-Trip Planning) - COMPLETE** ✅
 - ✅ Travel Advisor page (`/advisor`) with chat interface

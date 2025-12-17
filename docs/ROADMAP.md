@@ -25,13 +25,15 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Trip deletion with cascade cleanup
 - [x] Route helper utilities for URL construction
 - [x] Clerk user ID migration and profile lookup improvements
+- [x] City autocomplete for destination search (Google Places Autocomplete)
+- [x] Usage limits tracking system (swipe_count, change_count, search_add_count)
 
 ### Phase 3 - Itinerary Builder & Map Integration
 - [x] Day selector with date display
 - [x] Activity CRUD operations (create, read, update, delete)
-- [x] Mapbox GL JS integration
+- [x] Google Maps integration
 - [x] Interactive map with markers and popups
-- [x] Place search using Mapbox Geocoding API
+- [x] Place search using Google Places API
 - [x] Activity-to-place linking
 - [x] Collaborative trip editing
 - [x] Realtime sync for activities
@@ -41,6 +43,8 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Destination autocomplete search
 - [x] Place discovery and exploration
 - [x] Add places to itinerary functionality
+- [x] Enhanced city autocomplete with Google Places Autocomplete API
+- [x] Activity replace feature with usage limits and smart suggestions
 
 ### Phase 5 - Expenses & Checklists
 - [x] Expense tracking with category support
@@ -70,7 +74,7 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Profile synchronization with Clerk
 
 ### Phase 9 - Advanced Map Features
-- [x] Route optimization using Mapbox Directions API
+- [x] Route visualization on map
 - [x] Visual route lines connecting activities on map
 - [x] Automatic route calculation for day itineraries
 - [x] Place saving/bookmarking functionality
@@ -107,6 +111,9 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Place photos, descriptions, and tags in structured format
 - [x] Dual itinerary system support (legacy AiItinerary format and new SmartItinerary format)
 - [x] Automatic photo enrichment from Google Places API for places and days
+- [x] Multi-city trip segment support (trip_segment_id parameter)
+- [x] Food place limit enforcement (max 1 per time slot)
+- [x] Improved food place detection using Google Places types
 
 ### Phase 15 - Explore Feature: Tinder-Style Place Discovery ✅
 - [x] Database schema for explore_sessions table (migration file created)
@@ -420,8 +427,7 @@ For later implementation phases:
 - The application uses Clerk for authentication instead of Supabase Auth
 - Database schema uses TEXT for user IDs to support Clerk's ID format
 - Realtime features require enabling replication in Supabase dashboard
-- Mapbox token is required for map and geocoding features
-- Google Maps API key is required for Places API, hotel search, and place photos
+- Google Maps API key is required for map display, Places API, hotel search, and place photos
 - OpenAI API key is required for AI day planning, smart itineraries, and Trip Assistant chat
 - Additional database tables may need to be created manually:
   - `trip_chat_messages` - for Trip Assistant chat history
@@ -611,6 +617,32 @@ For later implementation phases:
     - ✅ Past trips section with show/hide toggle
     - ✅ Improved trip card UI with hover states
     - ✅ Owner-only delete button visibility
+  - **City Autocomplete Feature** ✅ **NEW**:
+    - ✅ New API endpoint: `/api/places/city-autocomplete` (GET and POST)
+    - ✅ New component: `DestinationAutocomplete` for improved destination selection
+    - ✅ Integrated into trip creation dialog (`new-trip-dialog.tsx`)
+    - ✅ Uses Google Places Autocomplete API with city-only restriction
+    - ✅ Returns city and country information for better UX
+    - ✅ Supports location biasing for better results
+  - **Usage Limits System** ✅ **NEW**:
+    - ✅ Migration: `add-explore-usage-limits-to-trip-members.sql`
+    - ✅ Adds `swipe_count`, `change_count`, `search_add_count` columns to `trip_members` table
+    - ✅ Tracks per-user-per-trip usage for Explore features
+    - ✅ Enforces limits based on Pro/free tier status
+    - ✅ Used in activity replace and Explore swipe endpoints
+  - **Activity Replace Feature** ✅ **NEW**:
+    - ✅ New endpoint: `/api/trips/[tripId]/activities/[activityId]/replace`
+    - ✅ Enforces change_count limits (10 for free, unlimited for Pro)
+    - ✅ Uses Explore Places API to find contextually relevant replacements
+    - ✅ Enforces food place limit (max 1 per time slot)
+    - ✅ Past-day lock prevents modifying past days
+    - ✅ Smart replacement based on area/category matching
+  - **AI Itinerary Enhancements** ✅ **NEW**:
+    - ✅ Supports `trip_segment_id` parameter for multi-city trip itineraries
+    - ✅ Enforces max 1 food place per time slot (morning/afternoon/evening)
+    - ✅ Improved food place detection using Google Places types
+    - ✅ Better photo matching with saved places
+    - ✅ Enhanced food place filtering logic
 
 - **2025-01-XX**: Phase 21 Complete - Travel Advisor (Pre-Trip Planning) ✅
   - **Phase 21 Complete**: Travel Advisor feature for pre-trip planning

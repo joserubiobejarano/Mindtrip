@@ -263,7 +263,7 @@ Requirements:
               - "placeId": null (always null for now)
               - "alreadyVisited": false (always false for now)
 - For each time slot (Morning, Afternoon, Evening), target at least 4 activities where feasible. This can include major sights, short stops, viewpoints, small walks, etc. Still respect realistic travel time and opening hours.
-- At most 1 eating place per slot. Define "eating place" as restaurant, café, bar focused primarily on food/drinks. If needed for user preferences (e.g. foodie), keep other items nearby but do not exceed one eating place per slot.
+- Maximum one food place per time slot (Morning/Afternoon/Evening). Define "food place" as restaurant, café, bar, bakery, or any establishment primarily focused on food/drinks. This is a hard constraint: if multiple food places are suggested, only include the best one per slot.
 - Take into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
 - Use the destination city "${destination}" to anchor recommendations
 - Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing
@@ -371,9 +371,28 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
     }
 
     // Post-process: Enforce food place cap (max 1 per slot)
-    const foodKeywords = ['restaurant', 'cafe', 'café', 'bar', 'brunch', 'dining', 'bistro', 'eatery', 'food', 'meal', 'lunch', 'dinner', 'breakfast', 'tavern', 'pub', 'bakery', 'pizzeria', 'trattoria', 'tapas'];
-    
-    const isEatingPlace = (activity: RawActivity): boolean => {
+    // Improved food place detection function
+    const isFoodPlace = (activity: RawActivity, types?: string[] | null): boolean => {
+      // Check Google Places types first (most reliable)
+      if (types && Array.isArray(types)) {
+        const foodTypes = [
+          'restaurant', 'cafe', 'bakery', 'bar', 'food', 'meal_takeaway', 'meal_delivery',
+          'cafe', 'bakery', 'bar', 'night_club', 'liquor_store', 'store', 'supermarket'
+        ];
+        if (types.some(type => foodTypes.includes(type))) {
+          return true;
+        }
+      }
+      
+      // Fallback to keyword matching in name/description
+      const foodKeywords = [
+        'restaurant', 'cafe', 'café', 'bar', 'brunch', 'dining', 'bistro', 'eatery',
+        'food', 'meal', 'lunch', 'dinner', 'breakfast', 'tavern', 'pub', 'bakery',
+        'pizzeria', 'trattoria', 'tapas', 'taverna', 'ristorante', 'osteria', 'cantina',
+        'food court', 'food market', 'market', 'deli', 'deli', 'sandwich', 'burger',
+        'steakhouse', 'seafood', 'sushi', 'ramen', 'noodle', 'pasta', 'pizza'
+      ];
+      
       const nameLower = activity.name.toLowerCase();
       const descLower = activity.description.toLowerCase();
       return foodKeywords.some(keyword => nameLower.includes(keyword) || descLower.includes(keyword));
@@ -382,20 +401,28 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
     parsedResponse.days.forEach(day => {
       day.sections.forEach(section => {
         const activities = section.activities || [];
-        const eatingPlaces = activities.filter(isEatingPlace);
+        // Note: At this point, activities don't have types yet, so we use keyword matching
+        // Types will be available after place details are fetched
+        const eatingPlaces = activities.filter(activity => isFoodPlace(activity));
         
         if (eatingPlaces.length > 1) {
-          // Keep the first eating place
+          // Keep the first eating place (we don't have rating info at this stage)
+          // In a future enhancement, we could fetch place details here to get ratings
           const firstEatingPlace = eatingPlaces[0];
           const firstEatingIndex = activities.indexOf(firstEatingPlace);
           
           // Remove other eating places from this slot
           const filteredActivities = activities.filter((activity, index) => {
             if (index === firstEatingIndex) return true; // Keep first
-            return !isEatingPlace(activity); // Remove other eating places
+            return !isFoodPlace(activity); // Remove other eating places
           });
           
           section.activities = filteredActivities;
+          
+          // Log removed food places for debugging
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[ai-itinerary] Removed ${eatingPlaces.length - 1} food place(s) from ${day.date} ${section.label}, kept: ${firstEatingPlace.name}`);
+          }
         }
       });
     });

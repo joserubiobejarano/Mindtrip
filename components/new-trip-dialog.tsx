@@ -19,6 +19,7 @@ import { DialogDescription } from "@/components/ui/dialog";
 import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
 import { useToast } from "@/components/ui/toast";
 import { getTripUrl } from "@/lib/routes";
+import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -33,6 +34,7 @@ interface DestinationOption {
   region: string;
   type: "City" | "Country" | "Region";
   center: [number, number];
+  placeId?: string; // Google Places ID
 }
 
 interface CitySegment {
@@ -52,6 +54,7 @@ export function NewTripDialog({
   const [loadingSubscription, setLoadingSubscription] = useState(true);
   const [destinationInput, setDestinationInput] = useState("");
   const [destination, setDestination] = useState<DestinationOption | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<AutocompleteDestinationOption | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [segments, setSegments] = useState<CitySegment[]>([]);
@@ -89,6 +92,7 @@ export function NewTripDialog({
     if (!open) {
       setDestinationInput("");
       setDestination(null);
+      setSelectedDestination(null);
       setStartDate("");
       setEndDate("");
       setSegments([]);
@@ -126,7 +130,7 @@ export function NewTripDialog({
       }
     } else {
       // Single-city: validate destination
-      if (!destinationInput.trim()) {
+      if (!selectedDestination && !destinationInput.trim()) {
         errors.destination = "Destination is required";
         isValid = false;
       }
@@ -155,7 +159,7 @@ export function NewTripDialog({
   };
 
   const handleAddCity = () => {
-    if (!destinationInput.trim()) {
+    if (!selectedDestination && !destinationInput.trim()) {
       setFieldErrors(prev => ({ ...prev, destination: "Enter a destination first" }));
       return;
     }
@@ -166,26 +170,22 @@ export function NewTripDialog({
       return;
     }
 
-    // Create destination object from input
-    const destinationObj: DestinationOption = {
-      id: `city-${destinationInput.toLowerCase().replace(/\s+/g, '-')}`,
-      placeName: destinationInput.trim(),
-      region: "",
-      type: "City",
-      center: [0, 0],
-    };
+    // Use selected destination if available, otherwise create from input
+    const cityName = selectedDestination?.name || destinationInput.trim();
+    const cityPlaceId = selectedDestination?.placeId || `city-${cityName.toLowerCase().replace(/\s+/g, '-')}`;
 
     // Pro users: add segment normally
     const newSegment: CitySegment = {
       id: `segment-${Date.now()}`,
-      cityPlaceId: destinationObj.id,
-      cityName: destinationObj.placeName,
+      cityPlaceId,
+      cityName,
       nights: 2, // Default 2 nights
     };
 
     setSegments([...segments, newSegment]);
     setDestinationInput(""); // Clear for next city
     setDestination(null);
+    setSelectedDestination(null);
   };
 
   const handleRemoveCity = (segmentId: string) => {
@@ -216,8 +216,15 @@ export function NewTripDialog({
         name: segments[0].cityName,
         center: [0, 0],
       };
+    } else if (selectedDestination) {
+      // Use selected destination from autocomplete
+      primaryDestination = {
+        placeId: selectedDestination.placeId,
+        name: selectedDestination.name,
+        center: selectedDestination.center,
+      };
     } else if (destinationInput.trim()) {
-      // Create destination object from input
+      // Fallback: create destination object from input (shouldn't happen with autocomplete)
       const destinationObj: DestinationOption = {
         id: `city-${destinationInput.toLowerCase().replace(/\s+/g, '-')}`,
         placeName: destinationInput.trim(),
@@ -401,15 +408,25 @@ export function NewTripDialog({
                     <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
                   </div>
                 </div>
-                <Input
+                <DestinationAutocomplete
                   value={destinationInput}
-                  onChange={(e) => {
-                    setDestinationInput(e.target.value);
-                    if (e.target.value.trim()) {
+                  onChange={(value) => {
+                    setDestinationInput(value);
+                    if (value.trim()) {
                       setFieldErrors((prev) => ({ ...prev, destination: undefined }));
                     }
+                    // Clear selected destination if input is cleared
+                    if (!value.trim()) {
+                      setSelectedDestination(null);
+                    }
                   }}
-                  className="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
+                  onSelect={(destination) => {
+                    setSelectedDestination(destination);
+                    setDestinationInput(destination.description);
+                    setFieldErrors((prev) => ({ ...prev, destination: undefined }));
+                  }}
+                  className="w-full"
+                  inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
                   placeholder="Search destinations..."
                 />
               </div>
