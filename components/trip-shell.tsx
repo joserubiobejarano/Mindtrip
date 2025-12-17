@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { TripMapPanel } from "@/components/trip-map-panel";
 import { BaseMarker } from "@/components/google-map-base";
 
@@ -29,7 +31,20 @@ export function TripShell({
   onExploreMarkerClick,
   activePlace,
 }: TripShellProps) {
-  const showMap = activeTab === "explore";
+  const searchParams = useSearchParams();
+  const debugMode = searchParams.get('debugExplore');
+  const hideMap = debugMode === 'noMap';
+  const showMap = activeTab === "explore" && !hideMap;
+  
+  // Log mount/unmount for debugging
+  useEffect(() => {
+    if (showMap && activeTab === "explore") {
+      console.log('[DEBUG] TripMapPanel mounted');
+      return () => {
+        console.log('[DEBUG] TripMapPanel unmounted');
+      };
+    }
+  }, [showMap, activeTab]);
   
   return (
     <div className="h-screen bg-background flex overflow-hidden">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Lock } from 'lucide-react';
@@ -52,6 +52,7 @@ export function ExploreFilters({
   const [showProPaywall, setShowProPaywall] = useState(false);
 
   // Check Pro status on mount - never throw, always use safe defaults
+  // Guard state updates to prevent unnecessary re-renders
   useEffect(() => {
     if (user?.id) {
       fetch(`/api/user/subscription-status`)
@@ -62,36 +63,41 @@ export function ExploreFilters({
           return res.json();
         })
         .then(data => {
-          setClientIsPro(data?.isPro || false);
+          const newIsPro = data?.isPro || false;
+          // Only update state if value actually changed
+          setClientIsPro((prev) => prev !== newIsPro ? newIsPro : prev);
         })
         .catch((error) => {
           // Log error but don't throw - use safe default
           console.error('[ExploreFilters] Error fetching pro status:', error);
-          setClientIsPro(false);
+          // Only update state if value actually changed
+          setClientIsPro((prev) => prev !== false ? false : prev);
         });
     } else {
-      // No user ID - default to false
-      setClientIsPro(false);
+      // No user ID - default to false, but only update if different
+      setClientIsPro((prev) => prev !== false ? false : prev);
     }
   }, [user?.id]);
 
   // Safe default - never throw, always boolean
-  const effectiveIsPro = Boolean(isPro || clientIsPro);
-  const handleCategoryChange = (category: string) => {
+  // Memoize to prevent recalculating on every render
+  const effectiveIsPro = useMemo(() => Boolean(isPro || clientIsPro), [isPro, clientIsPro]);
+  // Memoize handlers to prevent recreating on every render
+  const handleCategoryChange = useCallback((category: string) => {
     onFiltersChange({
       ...filters,
       category: category === 'all' || !category ? undefined : category,
     });
-  };
+  }, [filters, onFiltersChange]);
 
-  const handleIncludeItineraryPlacesChange = (checked: boolean) => {
+  const handleIncludeItineraryPlacesChange = useCallback((checked: boolean) => {
     onFiltersChange({
       ...filters,
       includeItineraryPlaces: checked || undefined,
     });
-  };
+  }, [filters, onFiltersChange]);
 
-  const handleBudgetChange = (value: string) => {
+  const handleBudgetChange = useCallback((value: string) => {
     if (!effectiveIsPro) {
       setShowProPaywall(true);
       return;
@@ -100,9 +106,9 @@ export function ExploreFilters({
       ...filters,
       budget: value ? parseInt(value, 10) : undefined,
     });
-  };
+  }, [effectiveIsPro, filters, onFiltersChange]);
 
-  const handleDistanceChange = (value: string) => {
+  const handleDistanceChange = useCallback((value: string) => {
     if (!effectiveIsPro) {
       setShowProPaywall(true);
       return;
@@ -111,7 +117,20 @@ export function ExploreFilters({
       ...filters,
       maxDistance: value ? parseInt(value, 10) : undefined,
     });
-  };
+  }, [effectiveIsPro, filters, onFiltersChange]);
+
+  // Memoize Select value props to prevent unnecessary re-renders
+  const budgetValue = useMemo(() => {
+    return filters.budget !== undefined && filters.budget !== null 
+      ? filters.budget.toString() 
+      : undefined;
+  }, [filters.budget]);
+
+  const distanceValue = useMemo(() => {
+    return filters.maxDistance !== undefined && filters.maxDistance !== null 
+      ? filters.maxDistance.toString() 
+      : undefined;
+  }, [filters.maxDistance]);
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
@@ -165,9 +184,7 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
           <div className="relative">
             <Select
-              value={filters.budget !== undefined && filters.budget !== null 
-                ? filters.budget.toString() 
-                : undefined}
+              value={budgetValue}
               onValueChange={handleBudgetChange}
               disabled={!effectiveIsPro}
             >
@@ -203,9 +220,7 @@ export function ExploreFilters({
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
           <div className="relative">
             <Select
-              value={filters.maxDistance !== undefined && filters.maxDistance !== null 
-                ? filters.maxDistance.toString() 
-                : undefined}
+              value={distanceValue}
               onValueChange={handleDistanceChange}
               disabled={!effectiveIsPro}
             >

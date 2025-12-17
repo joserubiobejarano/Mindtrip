@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ExploreDeck } from "./explore/ExploreDeck";
 import { ExploreFilters } from "./explore/ExploreFilters";
 import { SwipeCounter } from "./explore/SwipeCounter";
@@ -28,6 +28,9 @@ interface ExploreTabProps {
 
 export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlaceChange }: ExploreTabProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const debugMode = searchParams.get('debugExplore');
+  const hideDeck = debugMode === 'noDeck';
   const { data: trip, isLoading: tripLoading, error: tripError } = useTrip(tripId);
   const { data: segments = [], isLoading: segmentsLoading, error: segmentsError } = useTripSegments(tripId);
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
@@ -92,6 +95,16 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
       setActiveSegmentId(null);
     }
   }, [segments, activeSegmentId]);
+
+  // Log mount/unmount for debugging
+  useEffect(() => {
+    if (!hideDeck) {
+      console.log('[DEBUG] ExploreDeck mounted');
+      return () => {
+        console.log('[DEBUG] ExploreDeck unmounted');
+      };
+    }
+  }, [hideDeck]);
 
   const handleAddToItinerary = async () => {
     if (!safeSession || (safeSession.likedPlaces?.length ?? 0) === 0 || isAddingToItinerary) return;
@@ -269,23 +282,27 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
 
       {/* Swipe Deck - Full screen on mobile, centered on desktop */}
       <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0 lg:p-6">
-        <ErrorBoundary
-          fallbackTitle="Something went wrong"
-          fallbackMessage="We encountered an error while loading Explore. This has been logged and we'll look into it."
-        >
-          <ExploreDeck
-            tripId={tripId}
-            filters={filters}
-            mode="trip"
-            tripSegmentId={activeSegmentId || undefined}
-            onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
-            onActivePlaceChange={(place) => {
-              setActivePlace(place);
-              onActivePlaceChange?.(place);
-            }}
-            hideHeader={true}
-          />
-        </ErrorBoundary>
+        {hideDeck ? (
+          <div className="text-sm text-muted-foreground">ExploreDeck hidden (debug mode: noDeck)</div>
+        ) : (
+          <ErrorBoundary
+            fallbackTitle="Something went wrong"
+            fallbackMessage="We encountered an error while loading Explore. This has been logged and we'll look into it."
+          >
+            <ExploreDeck
+              tripId={tripId}
+              filters={filters}
+              mode="trip"
+              tripSegmentId={activeSegmentId || undefined}
+              onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
+              onActivePlaceChange={(place) => {
+                setActivePlace(place);
+                onActivePlaceChange?.(place);
+              }}
+              hideHeader={true}
+            />
+          </ErrorBoundary>
+        )}
       </div>
     </div>
   );
