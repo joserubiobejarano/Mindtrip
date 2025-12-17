@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ExploreDeck } from "./explore/ExploreDeck";
 import { ExploreFilters } from "./explore/ExploreFilters";
@@ -166,6 +166,19 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     }
   };
 
+  // Memoized handler for active place changes - guards setActivePlace to prevent unnecessary updates
+  const handleActivePlaceChange = useCallback((place: { placeId: string; lat: number; lng: number }) => {
+    setActivePlace((prev) => {
+      // Only update if placeId, lat, or lng actually changed
+      if (prev?.placeId === place.placeId && prev?.lat === place.lat && prev?.lng === place.lng) {
+        return prev;
+      }
+      return place;
+    });
+    // Call parent callback if provided
+    onActivePlaceChange?.(place);
+  }, [onActivePlaceChange]);
+
   // Update map with active place marker (without forcing pan/zoom to avoid lag)
   // Guard updates to prevent infinite loops - only update when activePlace actually changes
   useEffect(() => {
@@ -322,10 +335,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
               mode="trip"
               tripSegmentId={activeSegmentId || undefined}
               onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
-              onActivePlaceChange={(place) => {
-                setActivePlace(place);
-                onActivePlaceChange?.(place);
-              }}
+              onActivePlaceChange={handleActivePlaceChange}
               hideHeader={true}
             />
           </ErrorBoundary>

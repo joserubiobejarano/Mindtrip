@@ -296,7 +296,7 @@ export async function getPlacesToExplore(
       let photoUrl: string | null = null;
       if (place.photos && place.photos.length > 0) {
         const photoRef = place.photos[0].photo_reference;
-        photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${GOOGLE_MAPS_API_KEY}`;
+        photoUrl = `/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=1000`;
       }
 
       return {

@@ -117,6 +117,9 @@ export interface Database {
           email: string | null
           display_name: string | null
           role: string
+          swipe_count: number
+          change_count: number
+          search_add_count: number
           created_at: string
         }
         Insert: {
@@ -126,6 +129,9 @@ export interface Database {
           email?: string | null
           display_name?: string | null
           role?: string
+          swipe_count?: number
+          change_count?: number
+          search_add_count?: number
           created_at?: string
         }
         Update: {
@@ -135,6 +141,9 @@ export interface Database {
           email?: string | null
           display_name?: string | null
           role?: string
+          swipe_count?: number
+          change_count?: number
+          search_add_count?: number
           created_at?: string
         }
       }

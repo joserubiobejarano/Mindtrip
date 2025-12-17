@@ -38,10 +38,26 @@ export function TripMapPanel({
   const geolocationRequestedRef = useRef(false);
   const prevUserLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
+  // Create stable activityIds key for dependency tracking
+  const activityIds = useMemo(() => {
+    if (!activities || activities.length === 0) return "";
+    return activities
+      .filter((a) => a.place?.lat != null && a.place?.lng != null)
+      .map((a) => a.id)
+      .sort()
+      .join(",");
+  }, [activities]);
+
   // Calculate route for itinerary tab
+  // Guard: Only update routePath if it actually needs to change (prevents infinite loops)
   useEffect(() => {
     if (activeTab !== "itinerary" || !selectedDayId || !activities || activities.length < 2) {
-      setRoutePath([]);
+      // Only clear route if we actually need to (prevents redundant updates)
+      setRoutePath(prev => {
+        // Guard: only update if routePath is not already empty
+        if (prev.length === 0) return prev;
+        return [];
+      });
       return;
     }
 
@@ -63,7 +79,12 @@ export function TripMapPanel({
       }));
 
     if (activitiesWithValidPlaces.length < 2) {
-      setRoutePath([]);
+      // Only clear route if we actually need to (prevents redundant updates)
+      setRoutePath(prev => {
+        // Guard: only update if routePath is not already empty
+        if (prev.length === 0) return prev;
+        return [];
+      });
       return;
     }
 
@@ -76,10 +97,15 @@ export function TripMapPanel({
         }));
         setRoutePath(path);
       } else {
-        setRoutePath([]);
+        // Only clear route if we actually need to (prevents redundant updates)
+        setRoutePath(prev => {
+          // Guard: only update if routePath is not already empty
+          if (prev.length === 0) return prev;
+          return [];
+        });
       }
     });
-  }, [activities, selectedDayId, activeTab]);
+  }, [activityIds, selectedDayId, activeTab]);
 
 
   // Get markers based on active tab
@@ -164,14 +190,6 @@ export function TripMapPanel({
   const tripCenterLat = trip?.center_lat;
   const tripCenterLng = trip?.center_lng;
   const activitiesLength = activities?.length ?? 0;
-  const activityIds = useMemo(() => {
-    if (!activities || activities.length === 0) return "";
-    return activities
-      .filter((a) => a.place?.lat != null && a.place?.lng != null)
-      .map((a) => a.id)
-      .sort()
-      .join(",");
-  }, [activities]);
   
   // Memoize exploreMarkers to prevent re-creation on every render
   // Create stable array reference only when contents change

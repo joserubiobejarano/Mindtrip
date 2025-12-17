@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Loader2, Heart, Sparkles } from 'lucide-react';
@@ -511,21 +511,31 @@ export function ExploreDeck({
   // Ensure index is valid before accessing array
   const currentPlace = (currentIndex >= 0 && currentIndex < places.length && places.length > 0) ? places[currentIndex] : null;
   const currentPlaceId = currentPlace?.place_id;
-  const currentPlaceLat = currentPlace?.lat;
-  const currentPlaceLng = currentPlace?.lng;
+
+  // Track last notified placeId to prevent duplicate calls
+  const lastNotifiedPlaceIdRef = useRef<string | null>(null);
 
   // Notify parent when active place changes (for map focus)
   // This hook must be called before any early returns (Rules of Hooks)
   useEffect(() => {
+    // Extract place data inside effect (currentPlace is in scope from above)
     if (!currentPlace || !onActivePlaceChange) return;
     
+    // Only notify if placeId actually changed (ref guard prevents duplicate calls)
+    if (currentPlaceId === lastNotifiedPlaceIdRef.current) return;
+    
+    // Update ref before calling callback to prevent duplicate calls
+    lastNotifiedPlaceIdRef.current = currentPlaceId;
+    
+    // Extract placeId, lat, lng from currentPlace inside effect
     onActivePlaceChange({
       placeId: currentPlace.place_id,
       lat: currentPlace.lat,
       lng: currentPlace.lng,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPlaceId, currentPlaceLat, currentPlaceLng, onActivePlaceChange]);
+    // Note: onActivePlaceChange is now memoized in ExploreTab, so it's stable
+    // The ref guard (lastNotifiedPlaceIdRef) prevents infinite loops even if callback changes
+  }, [currentPlaceId, onActivePlaceChange]); // Ref guard prevents duplicate calls per placeId
 
   if (isLoading) {
     return (

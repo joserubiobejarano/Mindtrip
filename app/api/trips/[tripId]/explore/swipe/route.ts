@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProfileId } from '@/lib/auth/getProfileId';
 import { getTripProStatus } from '@/lib/supabase/pro-status';
-import { FREE_SWIPE_LIMIT_PER_TRIP, PRO_SWIPE_LIMIT_PER_TRIP } from '@/lib/supabase/user-subscription';
+import { FREE_SWIPE_LIMIT_PER_TRIP, PRO_SWIPE_LIMIT_PER_TRIP, getUsageLimits } from '@/lib/supabase/user-subscription';
 
 export async function POST(
   req: NextRequest,
@@ -100,15 +100,17 @@ export async function POST(
 
     const trip = tripData as TripQueryResult;
 
-    // Check if user is owner or member
-    const { data: member } = await supabase
+    // Get trip_members record (for owner, we'll create/update it if needed)
+    let { data: member, error: memberError } = await supabase
       .from("trip_members")
-      .select("id")
+      .select("id, swipe_count, change_count, search_add_count")
       .eq("trip_id", tripId)
       .eq("user_id", profileId)
-      .single();
+      .maybeSingle();
 
-    if (trip.owner_id !== profileId && !member) {
+    // If user is owner but not in trip_members, we'll handle it later
+    // For now, check access
+    if (trip.owner_id !== profileId && !member && memberError?.code !== 'PGRST116') {
       const checkFailed = trip.owner_id !== profileId ? 'not_owner' : 'not_member';
       console.error('[Explore Swipe API]', {
         route: 'explore/swipe',
@@ -126,6 +128,32 @@ export async function POST(
         check_failed: checkFailed,
         reason: 'User does not have access to this trip',
       }, { status: 403 });
+    }
+
+    // If owner is not in trip_members, create a record for them
+    if (trip.owner_id === profileId && !member) {
+      const { data: newMember, error: createMemberError } = await supabase
+        .from("trip_members")
+        .insert({
+          trip_id: tripId,
+          user_id: profileId,
+          role: 'owner',
+          swipe_count: 0,
+          change_count: 0,
+          search_add_count: 0,
+        })
+        .select("id, swipe_count, change_count, search_add_count")
+        .single();
+      
+      if (createMemberError || !newMember) {
+        console.error('[Explore Swipe API] Failed to create trip_members record for owner', createMemberError);
+        return NextResponse.json({ 
+          error: "Internal server error",
+          ok: false,
+          status: 500,
+        }, { status: 500 });
+      }
+      member = newMember;
     }
 
     const body = await req.json();
@@ -248,25 +276,29 @@ export async function POST(
       });
       // Continue with default isProForThisTrip = false
     }
-    const limit = isProForThisTrip ? PRO_SWIPE_LIMIT_PER_TRIP : FREE_SWIPE_LIMIT_PER_TRIP;
+    
+    // Get usage limits based on Pro status
+    const usageLimits = getUsageLimits(isProForThisTrip);
+    const swipeLimit = usageLimits.swipe.limit;
 
-    // Get current swipe count from session (per trip, no daily reset)
-    const swipeCount = session?.swipe_count || 0;
+    // Get current swipe count from trip_members (per trip, per user)
+    const swipeCount = member?.swipe_count ?? 0;
 
-    // Check limit before mutating
-    const limitReached = swipeCount >= limit;
-    if (limitReached) {
-      const errorMessage = isProForThisTrip
-        ? "You've reached the swipe limit for this trip today. Try saving your favorites or adjusting your filters."
-        : "You've reached the swipe limit for this trip. Unlock Kruno Pro or this trip to see more places.";
-      
-      return NextResponse.json({
-        success: false,
-        swipeCount,
-        remainingSwipes: 0,
-        limitReached: true,
-        error: errorMessage,
-      });
+    // Check limit before mutating (skip for undo actions)
+    if (action !== 'undo') {
+      const limitReached = swipeCount >= swipeLimit;
+      if (limitReached) {
+        return NextResponse.json({
+          success: false,
+          error: 'LIMIT_REACHED',
+          used: swipeCount,
+          limit: swipeLimit,
+          action: 'swipe',
+          swipeCount,
+          remainingSwipes: 0,
+          limitReached: true,
+        }, { status: 403 });
+      }
     }
 
     // Handle undo action
@@ -276,7 +308,7 @@ export async function POST(
           success: false,
           error: 'No session found',
           swipeCount,
-          remainingSwipes: Math.max(0, limit - swipeCount),
+          remainingSwipes: Math.max(0, swipeLimit - swipeCount),
           limitReached: false,
         });
       }
@@ -315,13 +347,27 @@ export async function POST(
       // Decrement swipe count (but don't go below 0) - Option B: undo gives swipe back
       const newSwipeCount = Math.max(0, swipeCount - 1);
 
-      // Update session with undone swipe
+      // Update trip_members swipe_count
+      const { error: updateMemberError } = await supabase
+        .from('trip_members')
+        .update({ swipe_count: newSwipeCount })
+        .eq('trip_id', tripId)
+        .eq('user_id', profileId);
+
+      if (updateMemberError) {
+        console.error('[Explore Swipe API] Failed to update trip_members swipe_count', updateMemberError);
+        return NextResponse.json(
+          { error: 'Internal server error' },
+          { status: 500 }
+        );
+      }
+
+      // Update session with undone swipe (for liked/discarded tracking)
       let undoUpdateQuery = (supabase
         .from('explore_sessions') as any)
         .update({
           liked_place_ids: currentLiked,
           discarded_place_ids: currentDiscarded,
-          swipe_count: newSwipeCount,
           last_swipe_at: session.last_swipe_at, // Keep timestamp for reference (not used in limit logic)
         })
         .eq('trip_id', tripId)
@@ -358,7 +404,7 @@ export async function POST(
         );
       }
 
-      const remainingSwipes = Math.max(0, limit - newSwipeCount);
+      const remainingSwipes = Math.max(0, swipeLimit - newSwipeCount);
 
       return NextResponse.json({
         success: true,
@@ -375,13 +421,13 @@ export async function POST(
 
     // Check if place is already liked/discarded
     if (currentLiked.includes(place_id) || currentDiscarded.includes(place_id)) {
-      return NextResponse.json({
-        success: false,
-        error: 'Place already swiped',
-        swipeCount,
-        remainingSwipes: Math.max(0, limit - swipeCount),
-        limitReached: false,
-      });
+        return NextResponse.json({
+          success: false,
+          error: 'Place already swiped',
+          swipeCount,
+          remainingSwipes: Math.max(0, swipeLimit - swipeCount),
+          limitReached: false,
+        });
     }
 
     // Update arrays based on action
@@ -400,7 +446,22 @@ export async function POST(
     // Note: We already checked limitReached above, so this should be safe
     const newSwipeCount = swipeCount + 1;
 
-    // Update or create session
+    // Update trip_members swipe_count
+    const { error: updateMemberError } = await supabase
+      .from('trip_members')
+      .update({ swipe_count: newSwipeCount })
+      .eq('trip_id', tripId)
+      .eq('user_id', profileId);
+
+    if (updateMemberError) {
+      console.error('[Explore Swipe API] Failed to update trip_members swipe_count', updateMemberError);
+      return NextResponse.json(
+        { error: 'Internal server error' },
+        { status: 500 }
+      );
+    }
+
+    // Update or create session (for liked/discarded tracking)
     const now = new Date();
     
     // First, try to update existing session
@@ -409,7 +470,6 @@ export async function POST(
       .update({
         liked_place_ids: updatedLiked,
         discarded_place_ids: updatedDiscarded,
-        swipe_count: newSwipeCount,
         last_swipe_at: now.toISOString(),
       })
       .eq('trip_id', tripId)
@@ -456,7 +516,6 @@ export async function POST(
           trip_segment_id: trip_segment_id || null,
           liked_place_ids: updatedLiked,
           discarded_place_ids: updatedDiscarded,
-          swipe_count: newSwipeCount,
           last_swipe_at: now.toISOString(),
         })
         .select()
@@ -483,18 +542,18 @@ export async function POST(
       }
 
       // Use the newly created session
-      const remainingSwipes = Math.max(0, limit - newSwipeCount);
+      const remainingSwipes = Math.max(0, swipeLimit - newSwipeCount);
 
       return NextResponse.json({
         success: true,
         swipeCount: newSwipeCount,
         remainingSwipes,
-        limitReached: newSwipeCount >= limit,
+        limitReached: newSwipeCount >= swipeLimit,
       });
     }
 
     // Calculate remaining swipes
-    const remainingSwipes = Math.max(0, limit - newSwipeCount);
+    const remainingSwipes = Math.max(0, swipeLimit - newSwipeCount);
 
     // Log success
     console.log('[Explore Swipe API]', {
@@ -509,7 +568,7 @@ export async function POST(
       success: true,
       swipeCount: newSwipeCount,
       remainingSwipes,
-      limitReached: newSwipeCount >= limit,
+      limitReached: newSwipeCount >= swipeLimit,
     });
   } catch (err: any) {
     console.error('[Explore Swipe API]', {

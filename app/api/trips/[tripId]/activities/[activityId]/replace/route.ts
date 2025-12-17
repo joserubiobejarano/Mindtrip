@@ -7,6 +7,8 @@ import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { isPastDay } from '@/lib/utils/date-helpers';
 import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from '@/lib/supabase/smart-itineraries';
 import { getPlacesToExplore, type ExploreFilters } from '@/lib/google/explore-places';
+import { getTripProStatus } from '@/lib/supabase/pro-status';
+import { getUsageLimits } from '@/lib/supabase/user-subscription';
 
 export async function POST(
   req: NextRequest,
@@ -74,15 +76,17 @@ export async function POST(
 
     const trip = tripData as TripQueryResult;
 
-    // Check if user is owner or member
-    const { data: member } = await supabase
+    // Get trip_members record (for owner, we'll create/update it if needed)
+    let { data: member, error: memberError } = await supabase
       .from("trip_members")
-      .select("id")
+      .select("id, swipe_count, change_count, search_add_count")
       .eq("trip_id", tripId)
       .eq("user_id", profileId)
-      .single();
+      .maybeSingle();
 
-    if (trip.owner_id !== profileId && !member) {
+    // If user is owner but not in trip_members, we'll handle it later
+    // For now, check access
+    if (trip.owner_id !== profileId && !member && memberError?.code !== 'PGRST116') {
       console.error('[activities]', {
         route: 'replace',
         tripId,
@@ -95,6 +99,61 @@ export async function POST(
         is_member: !!member,
       });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // If owner is not in trip_members, create a record for them
+    if (trip.owner_id === profileId && !member) {
+      const { data: newMember, error: createMemberError } = await supabase
+        .from("trip_members")
+        .insert({
+          trip_id: tripId,
+          user_id: profileId,
+          role: 'owner',
+          swipe_count: 0,
+          change_count: 0,
+          search_add_count: 0,
+        })
+        .select("id, swipe_count, change_count, search_add_count")
+        .single();
+      
+      if (createMemberError || !newMember) {
+        console.error('[Replace Activity API] Failed to create trip_members record for owner', createMemberError);
+        return NextResponse.json({ 
+          error: "Internal server error",
+          ok: false,
+          status: 500,
+        }, { status: 500 });
+      }
+      member = newMember;
+    }
+
+    // Get trip Pro status and check change_count limit
+    let isProForThisTrip = false;
+    try {
+      const authResult = await getProfileId(supabase);
+      const proStatus = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
+      isProForThisTrip = proStatus.isProForThisTrip;
+    } catch (proStatusError: any) {
+      console.error('[Replace Activity API] Failed to get trip pro status', proStatusError);
+      // Continue with default isProForThisTrip = false
+    }
+
+    // Get usage limits based on Pro status
+    const usageLimits = getUsageLimits(isProForThisTrip);
+    const changeLimit = usageLimits.change.limit;
+    const changeCount = member?.change_count ?? 0;
+
+    // Check limit before allowing change
+    if (changeCount >= changeLimit) {
+      return NextResponse.json({
+        error: 'LIMIT_REACHED',
+        used: changeCount,
+        limit: changeLimit,
+        action: 'change',
+        message: isProForThisTrip
+          ? "You've reached the change limit for this trip. Try saving your favorites or adjusting your filters."
+          : "You've reached the change limit for this trip. Unlock Kruno Pro or this trip to see more places.",
+      }, { status: 403 });
     }
 
     // Load existing SmartItinerary
@@ -254,6 +313,19 @@ export async function POST(
     } else {
       // Place not found in slot (shouldn't happen, but handle gracefully)
       return NextResponse.json({ error: 'Place not found in slot' }, { status: 404 });
+    }
+
+    // Increment change_count before saving
+    const newChangeCount = changeCount + 1;
+    const { error: updateMemberError } = await supabase
+      .from('trip_members')
+      .update({ change_count: newChangeCount })
+      .eq('trip_id', tripId)
+      .eq('user_id', profileId);
+
+    if (updateMemberError) {
+      console.error('[Replace Activity API] Failed to update trip_members change_count', updateMemberError);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Save updated itinerary

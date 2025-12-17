@@ -85,8 +85,8 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           NOPE
         </motion.div>
 
-        {/* Image section - Takes more space on mobile for full-screen effect */}
-        <div className="relative w-full flex-1 lg:flex-none lg:aspect-[4/3] overflow-hidden min-h-[200px]">
+        {/* Image section - Fixed height for consistent rendering */}
+        <div className="relative w-full h-64 overflow-hidden">
           {place.photo_url ? (
             <>
               <Image

@@ -6,6 +6,8 @@ import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import type { SmartItinerary } from '@/types/itinerary';
 import { isPastDay } from '@/lib/utils/date-helpers';
 import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from '@/lib/supabase/smart-itineraries';
+import { getTripProStatus } from '@/lib/supabase/pro-status';
+import { getUsageLimits } from '@/lib/supabase/user-subscription';
 
 export async function POST(
   req: NextRequest,
@@ -84,15 +86,17 @@ export async function POST(
 
     const tripTyped = trip as TripQueryResult;
 
-    // Check if user is owner or member
-    const { data: member } = await supabase
+    // Get trip_members record (for owner, we'll create/update it if needed)
+    let { data: member, error: memberError } = await supabase
       .from('trip_members')
-      .select('id')
+      .select('id, swipe_count, change_count, search_add_count')
       .eq('trip_id', tripId)
       .eq('user_id', profileId)
-      .single();
+      .maybeSingle();
 
-    if (tripTyped.owner_id !== profileId && !member) {
+    // If user is owner but not in trip_members, we'll handle it later
+    // For now, check access
+    if (tripTyped.owner_id !== profileId && !member && memberError?.code !== 'PGRST116') {
       console.error('[activities]', {
         route: 'bulk-add-from-swipes',
         tripId,
@@ -105,6 +109,65 @@ export async function POST(
         is_member: !!member,
       });
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // If owner is not in trip_members, create a record for them
+    if (tripTyped.owner_id === profileId && !member) {
+      const { data: newMember, error: createMemberError } = await supabase
+        .from('trip_members')
+        .insert({
+          trip_id: tripId,
+          user_id: profileId,
+          role: 'owner',
+          swipe_count: 0,
+          change_count: 0,
+          search_add_count: 0,
+        })
+        .select('id, swipe_count, change_count, search_add_count')
+        .single();
+      
+      if (createMemberError || !newMember) {
+        console.error('[Bulk Add From Swipes API] Failed to create trip_members record for owner', createMemberError);
+        return NextResponse.json({ 
+          error: 'Internal server error',
+          ok: false,
+          status: 500,
+        }, { status: 500 });
+      }
+      member = newMember;
+    }
+
+    // Get trip Pro status and check search_add_count limit
+    let isProForThisTrip = false;
+    try {
+      const authResult = await getProfileId(supabase);
+      const proStatus = await getTripProStatus(supabase, authResult.clerkUserId, tripId);
+      isProForThisTrip = proStatus.isProForThisTrip;
+    } catch (proStatusError: any) {
+      console.error('[Bulk Add From Swipes API] Failed to get trip pro status', proStatusError);
+      // Continue with default isProForThisTrip = false
+    }
+
+    // Get usage limits based on Pro status
+    const usageLimits = getUsageLimits(isProForThisTrip);
+    const searchAddLimit = usageLimits.searchAdd.limit;
+    const searchAddCount = member?.search_add_count ?? 0;
+
+    // Count how many new places will be added (excluding duplicates)
+    const existingPlaceIds = new Set(targetSlot.places.map(p => p.id));
+    const newPlacesCount = place_ids.filter(id => !existingPlaceIds.has(id)).length;
+
+    // Check limit before allowing add
+    if (searchAddCount + newPlacesCount > searchAddLimit) {
+      return NextResponse.json({
+        error: 'LIMIT_REACHED',
+        used: searchAddCount,
+        limit: searchAddLimit,
+        action: 'searchAdd',
+        message: isProForThisTrip
+          ? "You've reached the search-add limit for this trip. Try saving your favorites or adjusting your filters."
+          : "You've reached the search-add limit for this trip. Unlock Kruno Pro or this trip to see more places.",
+      }, { status: 403 });
     }
 
     // Load existing SmartItinerary
@@ -156,7 +219,7 @@ export async function POST(
       );
     }
 
-    // Find the slot first (needed for activity limit check)
+    // Find the slot first (needed for activity limit check and duplicate detection)
     const slotIndex = day.slots.findIndex(s => s.label.toLowerCase() === slot);
     if (slotIndex === -1) {
       return NextResponse.json({ error: 'Slot not found in day' }, { status: 404 });
@@ -265,6 +328,19 @@ export async function POST(
     // Add new places to the slot (idempotent: duplicates already filtered)
     if (newPlaces.length > 0) {
       targetSlot.places = [...targetSlot.places, ...newPlaces];
+
+      // Increment search_add_count before saving
+      const newSearchAddCount = searchAddCount + newPlaces.length;
+      const { error: updateMemberError } = await supabase
+        .from('trip_members')
+        .update({ search_add_count: newSearchAddCount })
+        .eq('trip_id', tripId)
+        .eq('user_id', profileId);
+
+      if (updateMemberError) {
+        console.error('[Bulk Add From Swipes API] Failed to update trip_members search_add_count', updateMemberError);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      }
 
       // Update the itinerary in database
       const { error: updateError } = await (supabase

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, Dispatch, SetStateAction } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Lock } from 'lucide-react';
@@ -47,15 +47,13 @@ export function ExploreFilters({
   isPro = false, // Default to false, should be passed from parent
   tripId,
 }: ExploreFiltersProps) {
-  // Temporary logging to track render loop
-  console.count("[ExploreFilters] render");
-  
   const { user } = useUser();
   const [clientIsPro, setClientIsPro] = useState(isPro);
   const [showProPaywall, setShowProPaywall] = useState(false);
+  const prevIsProRef = useRef<boolean | undefined>(undefined);
 
   // Check Pro status on mount - never throw, always use safe defaults
-  // Guard state updates to prevent unnecessary re-renders
+  // Guard state updates with useRef to prevent unnecessary re-renders
   useEffect(() => {
     if (user?.id) {
       fetch(`/api/user/subscription-status`)
@@ -68,17 +66,26 @@ export function ExploreFilters({
         .then(data => {
           const newIsPro = data?.isPro || false;
           // Only update state if value actually changed
-          setClientIsPro((prev) => prev !== newIsPro ? newIsPro : prev);
+          if (prevIsProRef.current !== newIsPro) {
+            prevIsProRef.current = newIsPro;
+            setClientIsPro(newIsPro);
+          }
         })
         .catch((error) => {
           // Log error but don't throw - use safe default
           console.error('[ExploreFilters] Error fetching pro status:', error);
           // Only update state if value actually changed
-          setClientIsPro((prev) => prev !== false ? false : prev);
+          if (prevIsProRef.current !== false) {
+            prevIsProRef.current = false;
+            setClientIsPro(false);
+          }
         });
     } else {
       // No user ID - default to false, but only update if different
-      setClientIsPro((prev) => prev !== false ? false : prev);
+      if (prevIsProRef.current !== false) {
+        prevIsProRef.current = false;
+        setClientIsPro(false);
+      }
     }
   }, [user?.id]);
 
@@ -89,7 +96,6 @@ export function ExploreFilters({
   // Handlers use functional updates to avoid depending on filters prop
   // This prevents callback recreation when filters change, breaking the render loop
   const handleCategoryChange = useCallback((category: string) => {
-    console.log("[ExploreFilters] handleCategoryChange:", category);
     onFiltersChange((prev: ExploreFiltersType) => ({
       ...prev,
       category: category === 'all' || !category ? undefined : category,
@@ -97,7 +103,6 @@ export function ExploreFilters({
   }, [onFiltersChange]);
 
   const handleIncludeItineraryPlacesChange = useCallback((checked: boolean) => {
-    console.log("[ExploreFilters] handleIncludeItineraryPlacesChange:", checked);
     onFiltersChange((prev: ExploreFiltersType) => ({
       ...prev,
       includeItineraryPlaces: checked || undefined,
@@ -105,7 +110,6 @@ export function ExploreFilters({
   }, [onFiltersChange]);
 
   const handleBudgetChange = useCallback((value: string) => {
-    console.log("[ExploreFilters] handleBudgetChange:", value);
     if (!effectiveIsPro) {
       setShowProPaywall(true);
       return;
@@ -117,7 +121,6 @@ export function ExploreFilters({
   }, [effectiveIsPro, onFiltersChange]);
 
   const handleDistanceChange = useCallback((value: string) => {
-    console.log("[ExploreFilters] handleDistanceChange:", value);
     if (!effectiveIsPro) {
       setShowProPaywall(true);
       return;
@@ -128,19 +131,18 @@ export function ExploreFilters({
     }));
   }, [effectiveIsPro, onFiltersChange]);
 
-  // Memoize Select value props - always return string (never undefined)
-  // Radix Select requires stable string values to prevent render loops
-  const budgetValue = useMemo(() => {
-    return filters.budget !== undefined && filters.budget !== null 
-      ? filters.budget.toString() 
-      : "";
-  }, [filters.budget]);
+  // Compute defaultValue for uncontrolled Select components
+  // Only computed once on mount - Radix uncontrolled Select won't update after mount
+  const budgetDefaultValue = filters.budget !== undefined && filters.budget !== null 
+    ? String(filters.budget) 
+    : undefined;
 
-  const distanceValue = useMemo(() => {
-    return filters.maxDistance !== undefined && filters.maxDistance !== null 
-      ? filters.maxDistance.toString() 
-      : "";
-  }, [filters.maxDistance]);
+  const distanceDefaultValue = filters.maxDistance !== undefined && filters.maxDistance !== null 
+    ? String(filters.maxDistance) 
+    : undefined;
+
+  // Dev-mode kill-switch: use plain HTML select in development to confirm loop disappears
+  const useHtmlSelect = process.env.NODE_ENV === 'development';
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
@@ -193,25 +195,44 @@ export function ExploreFilters({
         <div className="flex items-center gap-2">
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
           <div className="relative">
-            <Select
-              value={budgetValue || undefined}
-              onValueChange={handleBudgetChange}
-              disabled={!effectiveIsPro}
-            >
-              <SelectTrigger className={cn(
-                "w-[120px] h-8 text-xs bg-white border-sage/30",
-                !effectiveIsPro && "opacity-60 cursor-not-allowed"
-              )}>
-                <SelectValue placeholder="Any budget" />
-              </SelectTrigger>
-              <SelectContent>
+            {useHtmlSelect ? (
+              <select
+                value={budgetDefaultValue || ""}
+                onChange={(e) => handleBudgetChange(e.target.value)}
+                disabled={!effectiveIsPro}
+                className={cn(
+                  "w-[120px] h-8 text-xs bg-white border border-sage/30 rounded-md px-2",
+                  !effectiveIsPro && "opacity-60 cursor-not-allowed"
+                )}
+              >
+                <option value="">Any budget</option>
                 {BUDGET_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <option key={option.value} value={option.value}>
                     {option.label}
-                  </SelectItem>
+                  </option>
                 ))}
-              </SelectContent>
-            </Select>
+              </select>
+            ) : (
+              <Select
+                defaultValue={budgetDefaultValue}
+                onValueChange={handleBudgetChange}
+                disabled={!effectiveIsPro}
+              >
+                <SelectTrigger className={cn(
+                  "w-[120px] h-8 text-xs bg-white border-sage/30",
+                  !effectiveIsPro && "opacity-60 cursor-not-allowed"
+                )}>
+                  <SelectValue placeholder="Any budget" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BUDGET_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             {!effectiveIsPro && (
               <div 
                 className="absolute inset-0 cursor-pointer z-10"
@@ -229,25 +250,44 @@ export function ExploreFilters({
         <div className="flex items-center gap-2">
           <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
           <div className="relative">
-            <Select
-              value={distanceValue || undefined}
-              onValueChange={handleDistanceChange}
-              disabled={!effectiveIsPro}
-            >
-              <SelectTrigger className={cn(
-                "w-[120px] h-8 text-xs bg-white border-sage/30",
-                !effectiveIsPro && "opacity-60 cursor-not-allowed"
-              )}>
-                <SelectValue placeholder="Any distance" />
-              </SelectTrigger>
-              <SelectContent>
+            {useHtmlSelect ? (
+              <select
+                value={distanceDefaultValue || ""}
+                onChange={(e) => handleDistanceChange(e.target.value)}
+                disabled={!effectiveIsPro}
+                className={cn(
+                  "w-[120px] h-8 text-xs bg-white border border-sage/30 rounded-md px-2",
+                  !effectiveIsPro && "opacity-60 cursor-not-allowed"
+                )}
+              >
+                <option value="">Any distance</option>
                 {DISTANCE_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <option key={option.value} value={option.value}>
                     {option.label}
-                  </SelectItem>
+                  </option>
                 ))}
-              </SelectContent>
-            </Select>
+              </select>
+            ) : (
+              <Select
+                defaultValue={distanceDefaultValue}
+                onValueChange={handleDistanceChange}
+                disabled={!effectiveIsPro}
+              >
+                <SelectTrigger className={cn(
+                  "w-[120px] h-8 text-xs bg-white border-sage/30",
+                  !effectiveIsPro && "opacity-60 cursor-not-allowed"
+                )}>
+                  <SelectValue placeholder="Any distance" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DISTANCE_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             {!effectiveIsPro && (
               <div 
                 className="absolute inset-0 cursor-pointer z-10"

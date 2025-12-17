@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Send, Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useTripSegments } from "@/hooks/use-trip-segments";
 import { format, addDays, differenceInDays } from "date-fns";
@@ -94,11 +94,6 @@ export function ItineraryTab({
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
-  
-  // Chat state
-  const [chatMessage, setChatMessage] = useState("");
-  const [isChatting, setIsChatting] = useState(false);
-  const [chatError, setChatError] = useState<string | null>(null);
   
   // Day-level Explore state
   const [dayExploreOpen, setDayExploreOpen] = useState(false);
@@ -638,42 +633,6 @@ export function ItineraryTab({
     }
   };
 
-  const handleChatSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isActive) return;
-    if (!chatMessage.trim() || isChatting) return;
-
-    setIsChatting(true);
-    setChatError(null);
-    const msg = chatMessage;
-    
-    try {
-      const res = await fetch(`/api/trips/${tripId}/itinerary-chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg })
-      });
-
-      if (!res.ok) {
-        setChatError('Failed to save itinerary');
-        setIsChatting(false);
-        return;
-      }
-
-      const json = await res.json();
-      // itinerary-chat now returns bare SmartItinerary directly
-      if (json && json.days) {
-        setSmartItinerary(json);
-        setChatMessage("");
-      }
-    } catch (error: any) {
-      console.error(error);
-      setChatError('Failed to save itinerary');
-    } finally {
-      setIsChatting(false);
-    }
-  };
-
   // Lightbox logic
   const openLightbox = (image: string, allImages: string[]) => {
     setSelectedImage(image);
@@ -1066,7 +1025,7 @@ export function ItineraryTab({
                                     {slot.places.map((place) => (
                                       <div 
                                         key={place.id} 
-                                        className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                                        className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
@@ -1089,16 +1048,18 @@ export function ItineraryTab({
                                             </div>
                                           )}
                                         </div>
-                                        <div className="flex-1 min-w-0">
+                                        <div className="min-w-0 flex-1">
                                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                                             <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
-                                            <div className="flex gap-2 self-start">
-                                              <button
+                                            <div className="shrink-0 flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   handleUpdatePlace(day.id, place.id, { visited: !place.visited });
                                                 }}
-                                                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 gap-1.5 ${
+                                                className={`rounded-full gap-1.5 ${
                                                   place.visited
                                                     ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                                                     : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
@@ -1106,10 +1067,14 @@ export function ItineraryTab({
                                               >
                                                 {place.visited && <Check className="h-3 w-3" />}
                                                 {place.visited ? "Visited" : "Mark as visited"}
-                                              </button>
-                                              <button
+                                              </Button>
+                                              <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
+                                                  console.log('[Change] onClick fired', { dayId: day.id, placeId: place.id, dayIsPast, dayIsAtCapacity });
                                                   if (dayIsPast || dayIsAtCapacity) return;
                                                   handleReplaceActivity(day.id, place.id);
                                                 }}
@@ -1121,15 +1086,22 @@ export function ItineraryTab({
                                                     ? "This day is already at capacity."
                                                     : undefined
                                                 }
-                                                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 ${
+                                                className={`rounded-full ${
                                                   dayIsPast || dayIsAtCapacity
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                                                     : "border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"
                                                 }`}
                                               >
                                                 Change
-                                              </button>
-                                              <button
+                                              </Button>
+                                              {process.env.NODE_ENV === 'development' && (
+                                                <div className="text-xs text-gray-400 mt-1">
+                                                  disabledBecause: {JSON.stringify({ dayIsPast, dayIsAtCapacity, isOwner: trip?.owner_id === userId })}
+                                                </div>
+                                              )}
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   if (dayIsPast) return;
@@ -1137,14 +1109,14 @@ export function ItineraryTab({
                                                 }}
                                                 disabled={dayIsPast}
                                                 title={dayIsPast ? "This day has already passed, so you can't modify it anymore." : undefined}
-                                                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border transition h-7 ${
+                                                className={`rounded-full ${
                                                   dayIsPast
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                                                     : "border-red-200 text-red-700 bg-red-50 hover:bg-red-100"
                                                 }`}
                                               >
                                                 Remove
-                                              </button>
+                                              </Button>
                                             </div>
                                           </div>
                                           <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
@@ -1161,11 +1133,13 @@ export function ItineraryTab({
                                   </div>
                                   
                                   {/* Add activities button - moved below activities */}
-                                  <div className="mt-4 flex justify-center md:justify-start">
+                                  <div className="mt-4 flex w-full sm:w-auto justify-start">
                                     <Button
+                                      type="button"
                                       variant="default"
                                       size="sm"
                                       onClick={() => {
+                                        console.log('[AddActivities] onClick fired', { dayId: day.id, slot: slotType, dayIsPast, dayIsAtCapacity });
                                         if (dayIsPast || dayIsAtCapacity) return;
                                         setSelectedDayForExplore({
                                           dayId: day.id,
@@ -1192,6 +1166,11 @@ export function ItineraryTab({
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
                                       <span className="sm:hidden">Add</span>
                                     </Button>
+                                    {process.env.NODE_ENV === 'development' && (
+                                      <div className="text-xs text-gray-400 mt-1 ml-2">
+                                        disabledBecause: {JSON.stringify({ dayIsPast, dayIsAtCapacity, isOwner: trip?.owner_id === userId })}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -1365,7 +1344,7 @@ export function ItineraryTab({
                                     {slot.places.map((place) => (
                                       <div 
                                         key={place.id} 
-                                        className={`flex flex-col sm:flex-row gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                                        className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
@@ -1388,16 +1367,18 @@ export function ItineraryTab({
                                             </div>
                                           )}
                                         </div>
-                                        <div className="flex-1 min-w-0">
+                                        <div className="min-w-0 flex-1">
                                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                                             <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
-                                            <div className="flex gap-2 self-start">
-                                              <button
+                                            <div className="shrink-0 flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   handleUpdatePlace(day.id, place.id, { visited: !place.visited });
                                                 }}
-                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                                className={`rounded-lg ${
                                                   place.visited
                                                     ? "bg-green-100 text-green-700 hover:bg-green-200"
                                                     : "bg-green-100 text-green-700 hover:bg-green-200"
@@ -1411,10 +1392,14 @@ export function ItineraryTab({
                                                 ) : (
                                                   "Mark visited"
                                                 )}
-                                              </button>
-                                              <button
+                                              </Button>
+                                              <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
+                                                  console.log('[Change] onClick fired', { dayId: day.id, placeId: place.id, dayIsPast, dayIsAtCapacity });
                                                   if (dayIsPast || dayIsAtCapacity) return;
                                                   handleReplaceActivity(day.id, place.id);
                                                 }}
@@ -1426,15 +1411,22 @@ export function ItineraryTab({
                                                     ? "This day is already at capacity."
                                                     : undefined
                                                 }
-                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                                className={`rounded-lg ${
                                                   dayIsPast || dayIsAtCapacity
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                                     : "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                                                 }`}
                                               >
                                                 Change
-                                              </button>
-                                              <button
+                                              </Button>
+                                              {process.env.NODE_ENV === 'development' && (
+                                                <div className="text-xs text-gray-400 mt-1">
+                                                  disabledBecause: {JSON.stringify({ dayIsPast, dayIsAtCapacity, isOwner: trip?.owner_id === userId })}
+                                                </div>
+                                              )}
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   if (dayIsPast) return;
@@ -1442,7 +1434,7 @@ export function ItineraryTab({
                                                 }}
                                                 disabled={dayIsPast}
                                                 title={dayIsPast ? "This day has already passed, so you can't modify it anymore." : undefined}
-                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                                className={`rounded-lg ${
                                                   dayIsPast
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                                     : "bg-red-100 text-red-700 hover:bg-red-200"
@@ -1450,7 +1442,7 @@ export function ItineraryTab({
                                               >
                                                 <X className="h-3 w-3 inline mr-1" />
                                                 Remove
-                                              </button>
+                                              </Button>
                                             </div>
                                           </div>
                                           <p className="text-sm text-slate-600 mt-1">{place.description}</p>
@@ -1465,11 +1457,13 @@ export function ItineraryTab({
                                   </div>
                                   
                                   {/* Add activities button - moved below activities */}
-                                  <div className="mt-4 flex justify-center md:justify-start">
+                                  <div className="mt-4 flex w-full sm:w-auto justify-start">
                                     <Button
+                                      type="button"
                                       variant="default"
                                       size="sm"
                                       onClick={() => {
+                                        console.log('[AddActivities] onClick fired', { dayId: day.id, slot: slotType, dayIsPast, dayIsAtCapacity });
                                         if (dayIsPast || dayIsAtCapacity) return;
                                         setSelectedDayForExplore({
                                           dayId: day.id,
@@ -1496,6 +1490,11 @@ export function ItineraryTab({
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
                                       <span className="sm:hidden">Add</span>
                                     </Button>
+                                    {process.env.NODE_ENV === 'development' && (
+                                      <div className="text-xs text-gray-400 mt-1 ml-2">
+                                        disabledBecause: {JSON.stringify({ dayIsPast, dayIsAtCapacity, isOwner: trip?.owner_id === userId })}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -1551,33 +1550,37 @@ export function ItineraryTab({
                         </div>
                    </div>
 
-                  {/* Chat Input - At the end, not sticky */}
+                  {/* Search Bar - At the end, not sticky */}
                   <section className="max-w-5xl mx-auto my-8">
                     <div className="p-6 border rounded-2xl bg-gray-50/50">
-                        <h3 className="text-lg font-semibold mb-2 text-slate-900">Edit this itinerary</h3>
-                        <p className="text-sm text-slate-500 mb-4">Ask me to add places, move things around, or change themes.</p>
-                        <form onSubmit={handleChatSubmit} className="flex gap-2">
+                        <h3 className="text-lg font-semibold mb-2 text-slate-900">Search for places</h3>
+                        <p className="text-sm text-slate-500 mb-4">Discover and add places to your itinerary.</p>
+                        <div className="flex gap-2">
                         <div className="relative flex-1">
                             <input
                             type="text"
-                            value={chatMessage}
-                            onChange={(e) => setChatMessage(e.target.value)}
-                            placeholder="e.g. 'Add a lunch spot on Day 1', 'Move Sagrada Familia to Day 2'"
+                            placeholder="Search for restaurants, attractions, activities..."
                             className="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
-                            disabled={isChatting}
+                            onFocus={() => {
+                              // Open Explore drawer in trip mode when search is focused
+                              setSelectedDayForExplore(null);
+                              setDayExploreOpen(true);
+                            }}
+                            readOnly
                             />
                         </div>
                         <Button 
-                            type="submit" 
-                            disabled={isChatting || !chatMessage.trim()} 
+                            type="button"
+                            onClick={() => {
+                              setSelectedDayForExplore(null);
+                              setDayExploreOpen(true);
+                            }}
                             className="rounded-xl px-6 bg-primary hover:bg-primary/90 h-auto"
                         >
-                            {isChatting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                            <Plus className="h-5 w-5 mr-2" />
+                            Explore
                         </Button>
-                        </form>
-                        {chatError && (
-                        <p className="text-sm text-red-600 mt-2">{chatError}</p>
-                        )}
+                        </div>
                     </div>
                   </section>
 
