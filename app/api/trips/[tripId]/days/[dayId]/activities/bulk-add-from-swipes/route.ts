@@ -94,9 +94,18 @@ export async function POST(
       .eq('user_id', profileId)
       .maybeSingle();
 
+    type MemberQueryResult = {
+      id: string;
+      swipe_count: number;
+      change_count: number;
+      search_add_count: number;
+    };
+
+    let memberTyped = member as MemberQueryResult | null;
+
     // If user is owner but not in trip_members, we'll handle it later
     // For now, check access
-    if (tripTyped.owner_id !== profileId && !member && memberError?.code !== 'PGRST116') {
+    if (tripTyped.owner_id !== profileId && !memberTyped && memberError?.code !== 'PGRST116') {
       console.error('[activities]', {
         route: 'bulk-add-from-swipes',
         tripId,
@@ -106,15 +115,15 @@ export async function POST(
         error: 'Forbidden: User does not have access to this trip',
         check_failed: tripTyped.owner_id !== profileId ? 'not_owner' : 'not_member',
         trip_owner_id: tripTyped.owner_id,
-        is_member: !!member,
+        is_member: !!memberTyped,
       });
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // If owner is not in trip_members, create a record for them
-    if (tripTyped.owner_id === profileId && !member) {
-      const { data: newMember, error: createMemberError } = await supabase
-        .from('trip_members')
+    if (tripTyped.owner_id === profileId && !memberTyped) {
+      const { data: newMember, error: createMemberError } = await (supabase
+        .from('trip_members') as any)
         .insert({
           trip_id: tripId,
           user_id: profileId,
@@ -134,7 +143,7 @@ export async function POST(
           status: 500,
         }, { status: 500 });
       }
-      member = newMember;
+      memberTyped = newMember as MemberQueryResult;
     }
 
     // Get trip Pro status and check search_add_count limit
@@ -151,24 +160,7 @@ export async function POST(
     // Get usage limits based on Pro status
     const usageLimits = getUsageLimits(isProForThisTrip);
     const searchAddLimit = usageLimits.searchAdd.limit;
-    const searchAddCount = member?.search_add_count ?? 0;
-
-    // Count how many new places will be added (excluding duplicates)
-    const existingPlaceIds = new Set(targetSlot.places.map(p => p.id));
-    const newPlacesCount = place_ids.filter(id => !existingPlaceIds.has(id)).length;
-
-    // Check limit before allowing add
-    if (searchAddCount + newPlacesCount > searchAddLimit) {
-      return NextResponse.json({
-        error: 'LIMIT_REACHED',
-        used: searchAddCount,
-        limit: searchAddLimit,
-        action: 'searchAdd',
-        message: isProForThisTrip
-          ? "You've reached the search-add limit for this trip. Try saving your favorites or adjusting your filters."
-          : "You've reached the search-add limit for this trip. Unlock Kruno Pro or this trip to see more places.",
-      }, { status: 403 });
-    }
+    const searchAddCount = memberTyped?.search_add_count ?? 0;
 
     // Load existing SmartItinerary
     const { data: itineraryDataRaw, error: itineraryError } = await supabase
@@ -227,9 +219,28 @@ export async function POST(
 
     const targetSlot = day.slots[slotIndex];
 
+    // Get existing place IDs in this slot to avoid duplicates (idempotency check)
+    const existingPlaceIds = new Set(targetSlot.places.map(p => p.id));
+
+    // Count how many new places will be added (excluding duplicates)
+    const newPlacesCount = place_ids.filter(id => !existingPlaceIds.has(id)).length;
+
+    // Check usage limit before allowing add
+    if (searchAddCount + newPlacesCount > searchAddLimit) {
+      return NextResponse.json({
+        error: 'LIMIT_REACHED',
+        used: searchAddCount,
+        limit: searchAddLimit,
+        action: 'searchAdd',
+        message: isProForThisTrip
+          ? "You've reached the search-add limit for this trip. Try saving your favorites or adjusting your filters."
+          : "You've reached the search-add limit for this trip. Unlock Kruno Pro or this trip to see more places.",
+      }, { status: 403 });
+    }
+
     // Check activity limit before adding
     const currentActivityCount = getDayActivityCount(itinerary, dayId);
-    const placesToAdd = place_ids.filter(id => !targetSlot.places.some(p => p.id === id)).length;
+    const placesToAdd = place_ids.filter(id => !existingPlaceIds.has(id)).length;
     
     if (currentActivityCount + placesToAdd > MAX_ACTIVITIES_PER_DAY) {
       return NextResponse.json(
@@ -241,9 +252,6 @@ export async function POST(
         { status: 400 }
       );
     }
-
-    // Get existing place IDs in this slot to avoid duplicates (idempotency check)
-    const existingPlaceIds = new Set(targetSlot.places.map(p => p.id));
 
     // Track which places were added vs skipped
     const addedPlaceIds: string[] = [];
@@ -331,8 +339,8 @@ export async function POST(
 
       // Increment search_add_count before saving
       const newSearchAddCount = searchAddCount + newPlaces.length;
-      const { error: updateMemberError } = await supabase
-        .from('trip_members')
+      const { error: updateMemberError } = await (supabase
+        .from('trip_members') as any)
         .update({ search_add_count: newSearchAddCount })
         .eq('trip_id', tripId)
         .eq('user_id', profileId);

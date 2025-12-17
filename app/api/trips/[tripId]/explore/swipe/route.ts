@@ -108,9 +108,18 @@ export async function POST(
       .eq("user_id", profileId)
       .maybeSingle();
 
+    type MemberQueryResult = {
+      id: string;
+      swipe_count: number;
+      change_count: number;
+      search_add_count: number;
+    };
+
+    let memberTyped = member as MemberQueryResult | null;
+
     // If user is owner but not in trip_members, we'll handle it later
     // For now, check access
-    if (trip.owner_id !== profileId && !member && memberError?.code !== 'PGRST116') {
+    if (trip.owner_id !== profileId && !memberTyped && memberError?.code !== 'PGRST116') {
       const checkFailed = trip.owner_id !== profileId ? 'not_owner' : 'not_member';
       console.error('[Explore Swipe API]', {
         route: 'explore/swipe',
@@ -131,9 +140,9 @@ export async function POST(
     }
 
     // If owner is not in trip_members, create a record for them
-    if (trip.owner_id === profileId && !member) {
-      const { data: newMember, error: createMemberError } = await supabase
-        .from("trip_members")
+    if (trip.owner_id === profileId && !memberTyped) {
+      const { data: newMember, error: createMemberError } = await (supabase
+        .from("trip_members") as any)
         .insert({
           trip_id: tripId,
           user_id: profileId,
@@ -153,7 +162,7 @@ export async function POST(
           status: 500,
         }, { status: 500 });
       }
-      member = newMember;
+      memberTyped = newMember as MemberQueryResult;
     }
 
     const body = await req.json();
@@ -282,7 +291,7 @@ export async function POST(
     const swipeLimit = usageLimits.swipe.limit;
 
     // Get current swipe count from trip_members (per trip, per user)
-    const swipeCount = member?.swipe_count ?? 0;
+    const swipeCount = memberTyped?.swipe_count ?? 0;
 
     // Check limit before mutating (skip for undo actions)
     if (action !== 'undo') {
@@ -339,7 +348,7 @@ export async function POST(
           success: false,
           error: 'Place not found in session or cannot be undone',
           swipeCount,
-          remainingSwipes: Math.max(0, limit - swipeCount),
+          remainingSwipes: Math.max(0, swipeLimit - swipeCount),
           limitReached: false,
         });
       }
@@ -348,8 +357,8 @@ export async function POST(
       const newSwipeCount = Math.max(0, swipeCount - 1);
 
       // Update trip_members swipe_count
-      const { error: updateMemberError } = await supabase
-        .from('trip_members')
+      const { error: updateMemberError } = await (supabase
+        .from('trip_members') as any)
         .update({ swipe_count: newSwipeCount })
         .eq('trip_id', tripId)
         .eq('user_id', profileId);
@@ -447,8 +456,8 @@ export async function POST(
     const newSwipeCount = swipeCount + 1;
 
     // Update trip_members swipe_count
-    const { error: updateMemberError } = await supabase
-      .from('trip_members')
+    const { error: updateMemberError } = await (supabase
+      .from('trip_members') as any)
       .update({ swipe_count: newSwipeCount })
       .eq('trip_id', tripId)
       .eq('user_id', profileId);

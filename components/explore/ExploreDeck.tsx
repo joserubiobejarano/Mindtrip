@@ -525,7 +525,7 @@ export function ExploreDeck({
     if (currentPlaceId === lastNotifiedPlaceIdRef.current) return;
     
     // Update ref before calling callback to prevent duplicate calls
-    lastNotifiedPlaceIdRef.current = currentPlaceId;
+    lastNotifiedPlaceIdRef.current = currentPlaceId ?? null;
     
     // Extract placeId, lat, lng from currentPlace inside effect
     onActivePlaceChange({

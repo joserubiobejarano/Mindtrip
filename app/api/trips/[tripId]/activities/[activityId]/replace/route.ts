@@ -84,9 +84,18 @@ export async function POST(
       .eq("user_id", profileId)
       .maybeSingle();
 
+    type MemberQueryResult = {
+      id: string;
+      swipe_count: number;
+      change_count: number;
+      search_add_count: number;
+    };
+
+    let memberTyped = member as MemberQueryResult | null;
+
     // If user is owner but not in trip_members, we'll handle it later
     // For now, check access
-    if (trip.owner_id !== profileId && !member && memberError?.code !== 'PGRST116') {
+    if (trip.owner_id !== profileId && !memberTyped && memberError?.code !== 'PGRST116') {
       console.error('[activities]', {
         route: 'replace',
         tripId,
@@ -96,15 +105,15 @@ export async function POST(
         error: 'Forbidden: User does not have access to this trip',
         check_failed: trip.owner_id !== profileId ? 'not_owner' : 'not_member',
         trip_owner_id: trip.owner_id,
-        is_member: !!member,
+        is_member: !!memberTyped,
       });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // If owner is not in trip_members, create a record for them
-    if (trip.owner_id === profileId && !member) {
-      const { data: newMember, error: createMemberError } = await supabase
-        .from("trip_members")
+    if (trip.owner_id === profileId && !memberTyped) {
+      const { data: newMember, error: createMemberError } = await (supabase
+        .from("trip_members") as any)
         .insert({
           trip_id: tripId,
           user_id: profileId,
@@ -124,7 +133,7 @@ export async function POST(
           status: 500,
         }, { status: 500 });
       }
-      member = newMember;
+      memberTyped = newMember as MemberQueryResult;
     }
 
     // Get trip Pro status and check change_count limit
@@ -141,7 +150,7 @@ export async function POST(
     // Get usage limits based on Pro status
     const usageLimits = getUsageLimits(isProForThisTrip);
     const changeLimit = usageLimits.change.limit;
-    const changeCount = member?.change_count ?? 0;
+    const changeCount = memberTyped?.change_count ?? 0;
 
     // Check limit before allowing change
     if (changeCount >= changeLimit) {
@@ -317,8 +326,8 @@ export async function POST(
 
     // Increment change_count before saving
     const newChangeCount = changeCount + 1;
-    const { error: updateMemberError } = await supabase
-      .from('trip_members')
+    const { error: updateMemberError } = await (supabase
+      .from('trip_members') as any)
       .update({ change_count: newChangeCount })
       .eq('trip_id', tripId)
       .eq('user_id', profileId);
