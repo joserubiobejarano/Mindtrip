@@ -25,7 +25,7 @@ import { isPastDay } from "@/lib/utils/date-helpers";
 import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from "@/lib/supabase/smart-itineraries";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
-import { getUsageLimits } from "@/lib/supabase/user-subscription";
+import { getUsageLimits } from "@/lib/supabase/usage-limits";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -138,14 +138,17 @@ export function ItineraryTab({
         .eq("clerk_user_id", user.id)
         .maybeSingle();
 
-      if (!profile?.id) return null;
+      type ProfileQueryResult = { id: string } | null;
+      const typedProfile = profile as ProfileQueryResult;
+      
+      if (!typedProfile || !typedProfile.id) return null;
 
       // Get trip member with usage counts
       const { data: member, error } = await supabase
         .from("trip_members")
         .select("id, change_count, search_add_count, swipe_count")
         .eq("trip_id", tripId)
-        .eq("user_id", profile.id)
+        .eq("user_id", typedProfile.id)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
@@ -153,7 +156,14 @@ export function ItineraryTab({
         return null;
       }
 
-      return member || null;
+      type TripMemberQueryResult = {
+        id: string;
+        change_count: number;
+        search_add_count: number;
+        swipe_count: number;
+      } | null;
+      
+      return (member as TripMemberQueryResult) || null;
     },
     enabled: !!user?.id && !!tripId,
     staleTime: 30 * 1000, // 30 seconds
