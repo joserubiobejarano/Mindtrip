@@ -85,7 +85,7 @@ export function TripMapPanel({
   // Get markers based on active tab
   const getMarkers = (): BaseMarker[] => {
     if (activeTab === "explore") {
-      return exploreMarkers;
+      return stableExploreMarkers;
     }
     if (activeTab === "itinerary" && activities) {
       return activities
@@ -172,6 +172,19 @@ export function TripMapPanel({
       .sort()
       .join(",");
   }, [activities]);
+  
+  // Memoize exploreMarkers to prevent re-creation on every render
+  // Create stable array reference only when contents change
+  const markersKey = useMemo(() => {
+    if (!exploreMarkers || exploreMarkers.length === 0) return "";
+    return exploreMarkers.map(m => `${m.id}:${m.lat}:${m.lng}`).sort().join(',');
+  }, [exploreMarkers]);
+  
+  const stableExploreMarkers = useMemo(() => {
+    if (!exploreMarkers || exploreMarkers.length === 0) return [];
+    // Create normalized array with stable structure
+    return exploreMarkers.map(m => ({ id: m.id, lat: m.lat, lng: m.lng }));
+  }, [markersKey]);
   
   // Use initial center/zoom only - map will manage its own state after load
   // Memoize to prevent unnecessary re-renders when values haven't changed

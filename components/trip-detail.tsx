@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams, useRouter } from "next/navigation";
 import { TripShell } from "@/components/trip-shell";
@@ -130,11 +130,18 @@ export function TripDetail({ tripId }: { tripId: string }) {
     );
   }
 
-  const handleExploreMarkerClick = (id: string) => {
+  const handleExploreMarkerClick = useCallback((id: string) => {
     if (exploreMarkerClickHandlerRef.current) {
       exploreMarkerClickHandlerRef.current(id);
     }
-  };
+  }, []);
+
+  // Memoize onExploreMapUpdate callback to prevent infinite loops
+  const handleExploreMapUpdate = useCallback((markers: BaseMarker[], center: { lat: number; lng: number } | null, zoom: number | undefined) => {
+    setExploreMarkers(markers);
+    setExploreCenter(center);
+    setExploreZoom(zoom);
+  }, []); // Empty deps - setters are stable
 
   return (
     <GoogleMapsProvider>
@@ -157,11 +164,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
           onActivitySelect={setSelectedActivityId}
           onTabChange={setActiveTab}
           initialTab={initialTab}
-          onExploreMapUpdate={(markers, center, zoom) => {
-            setExploreMarkers(markers);
-            setExploreCenter(center);
-            setExploreZoom(zoom);
-          }}
+          onExploreMapUpdate={handleExploreMapUpdate}
           onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
           onActivePlaceChange={setActivePlace}
         />

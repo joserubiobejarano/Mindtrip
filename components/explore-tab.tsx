@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ExploreDeck } from "./explore/ExploreDeck";
 import { ExploreFilters } from "./explore/ExploreFilters";
@@ -43,6 +43,9 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   const [filters, setFilters] = useState<ExploreFiltersType>({});
   const [isAddingToItinerary, setIsAddingToItinerary] = useState(false);
   const [activePlace, setActivePlace] = useState<{ placeId: string; lat: number; lng: number } | null>(null);
+  
+  // Track previous activePlace to prevent unnecessary map updates
+  const prevActivePlaceRef = useRef<{ placeId: string; lat: number; lng: number } | null>(null);
   
   // Gate for showing affiliate promo boxes (currently disabled)
   const showAffiliates = false;
@@ -97,6 +100,13 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   }, [segments, activeSegmentId]);
 
   // Log mount/unmount for debugging
+  useEffect(() => {
+    console.log('[DEBUG] ExploreTab mounted');
+    return () => {
+      console.log('[DEBUG] ExploreTab unmounted');
+    };
+  }, []);
+
   useEffect(() => {
     if (!hideDeck) {
       console.log('[DEBUG] ExploreDeck mounted');
@@ -157,23 +167,40 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   };
 
   // Update map with active place marker (without forcing pan/zoom to avoid lag)
+  // Guard updates to prevent infinite loops - only update when activePlace actually changes
   useEffect(() => {
-    if (onMapUpdate && activePlace) {
+    if (!onMapUpdate) return;
+    
+    // Only update if activePlace actually changed
+    const prev = prevActivePlaceRef.current;
+    const current = activePlace;
+    
+    const hasChanged = (!prev && current) || 
+                       (prev && (!current || 
+                                prev.placeId !== current.placeId ||
+                                prev.lat !== current.lat ||
+                                prev.lng !== current.lng));
+    
+    if (!hasChanged) return;
+    
+    prevActivePlaceRef.current = current;
+    
+    if (current) {
       // Only update markers, don't force center/zoom to avoid lag
       onMapUpdate(
         [{
-          id: activePlace.placeId,
-          lat: activePlace.lat,
-          lng: activePlace.lng,
+          id: current.placeId,
+          lat: current.lat,
+          lng: current.lng,
         }],
         null, // Don't force center
         undefined // Don't force zoom
       );
-    } else if (onMapUpdate && !activePlace) {
+    } else {
       // Clear markers when no active place
       onMapUpdate([], null, undefined);
     }
-  }, [onMapUpdate, activePlace]);
+  }, [onMapUpdate, activePlace?.placeId, activePlace?.lat, activePlace?.lng]); // Use primitives instead of object
 
   // Show loading state
   if ((tripLoading || segmentsLoading) && !trip) {
