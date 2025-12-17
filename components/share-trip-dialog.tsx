@@ -79,7 +79,9 @@ export function ShareTripDialog({
   const copyToClipboard = async () => {
     if (!publicSlug) return;
 
-    const url = `${window.location.origin}/p/${publicSlug}`;
+    // Use environment variable if available, otherwise fallback to window.location.origin
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "");
+    const url = `${baseUrl}/p/${publicSlug}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -111,7 +113,7 @@ export function ShareTripDialog({
               <Label>Public URL</Label>
               <div className="flex gap-2">
                 <Input
-                  value={`${typeof window !== "undefined" ? window.location.origin : ""}/p/${publicSlug}`}
+                  value={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/p/${publicSlug}`}
                   readOnly
                   className="flex-1"
                 />

@@ -569,15 +569,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       for (const slot of enrichedDay.slots) {
                         for (const place of slot.places) {
                           if (!place.photos || place.photos.length === 0) {
-                            let photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
-                            // Fallback: try generic city photo if place-specific photo fails
+                            // Use place name + area + city for more accurate photo matching
+                            // This reduces the chance of getting the wrong place's photo
+                            const placeArea = place.area || place.neighborhood || '';
+                            let photoUrl: string | null = null;
+                            
+                            // Try most specific query first: "PlaceName in Area, City"
+                            if (placeArea) {
+                              photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                            }
+                            
+                            // Fallback: "PlaceName in City"
+                            if (!photoUrl) {
+                              photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                            }
+                            
+                            // Fallback: "City PlaceName"
                             if (!photoUrl) {
                               photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
                             }
-                            // Fallback: try just the city name
-                            if (!photoUrl) {
-                              photoUrl = await findPlacePhoto(`${cityOrArea} city`);
-                            }
+                            
+                            // Last resort: don't use a generic city photo for a specific place
+                            // Better to show placeholder than wrong photo
                             place.photos = photoUrl ? [photoUrl] : [];
                           }
                         }
@@ -635,15 +648,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   for (const slot of day.slots) {
                     for (const place of slot.places) {
                       if (!place.photos || place.photos.length === 0) {
-                        let photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
-                        // Fallback: try generic city photo if place-specific photo fails
+                        // Use place name + area + city for more accurate photo matching
+                        const placeArea = place.area || place.neighborhood || '';
+                        let photoUrl: string | null = null;
+                        
+                        // Try most specific query first: "PlaceName in Area, City"
+                        if (placeArea) {
+                          photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                        }
+                        
+                        // Fallback: "PlaceName in City"
+                        if (!photoUrl) {
+                          photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                        }
+                        
+                        // Fallback: "City PlaceName"
                         if (!photoUrl) {
                           photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
                         }
-                        // Fallback: try just the city name
-                        if (!photoUrl) {
-                          photoUrl = await findPlacePhoto(`${cityOrArea} city`);
-                        }
+                        
+                        // Last resort: don't use a generic city photo for a specific place
+                        // Better to show placeholder than wrong photo
                         place.photos = photoUrl ? [photoUrl] : [];
                       }
                     }
@@ -743,15 +768,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 for (const slot of day.slots) {
                   for (const place of slot.places) {
                     if (!place.photos || place.photos.length === 0) {
-                      let photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
-                      // Fallback: try generic city photo if place-specific photo fails
+                      // Use place name + area + city for more accurate photo matching
+                      const placeArea = place.area || place.neighborhood || '';
+                      let photoUrl: string | null = null;
+                      
+                      // Try most specific query first: "PlaceName in Area, City"
+                      if (placeArea) {
+                        photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                      }
+                      
+                      // Fallback: "PlaceName in City"
+                      if (!photoUrl) {
+                        photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                      }
+                      
+                      // Fallback: "City PlaceName"
                       if (!photoUrl) {
                         photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
                       }
-                      // Fallback: try just the city name
-                      if (!photoUrl) {
-                        photoUrl = await findPlacePhoto(`${cityOrArea} city`);
-                      }
+                      
+                      // Last resort: don't use a generic city photo for a specific place
+                      // Better to show placeholder than wrong photo
                       place.photos = photoUrl ? [photoUrl] : [];
                     }
                   }

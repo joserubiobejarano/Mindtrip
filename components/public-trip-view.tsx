@@ -39,6 +39,7 @@ export function PublicTripView({ tripId, slug }: PublicTripViewProps) {
           selectedDayId={selectedDayId}
           onSelectDay={setSelectedDayId}
           onActivitySelect={setSelectedActivityId}
+          slug={slug}
         />
       </div>
     </div>

@@ -9,13 +9,6 @@ import { SmartItinerary } from "@/types/itinerary";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 
-interface PublicItineraryPanelProps {
-  tripId: string;
-  selectedDayId: string | null;
-  onSelectDay: (dayId: string) => void;
-  onActivitySelect?: (activityId: string) => void;
-}
-
 // Helper function to convert text to bullet points, avoiding splits on decimals
 function textToBulletPoints(text: string): string[] {
   const normalized = text.replace(/\s+/g, ' ').trim();
@@ -32,11 +25,20 @@ function textToBulletPoints(text: string): string[] {
     });
 }
 
+interface PublicItineraryPanelProps {
+  tripId: string;
+  selectedDayId: string | null;
+  onSelectDay: (dayId: string) => void;
+  onActivitySelect?: (activityId: string) => void;
+  slug?: string; // Add slug prop for public access
+}
+
 export function PublicItineraryPanel({
   tripId,
   selectedDayId,
   onSelectDay,
   onActivitySelect,
+  slug,
 }: PublicItineraryPanelProps) {
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
   const [smartItinerary, setSmartItinerary] = useState<SmartItinerary | null>(null);
@@ -45,7 +47,12 @@ export function PublicItineraryPanel({
   useEffect(() => {
     const loadItinerary = async () => {
       try {
-        const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
+        // Use public endpoint if slug is provided, otherwise use authenticated endpoint
+        const endpoint = slug 
+          ? `/api/public/trips/${slug}/smart-itinerary`
+          : `/api/trips/${tripId}/smart-itinerary?mode=load`;
+        
+        const res = await fetch(endpoint);
         if (res.ok) {
           const data = await res.json();
           setSmartItinerary(data);
@@ -65,7 +72,7 @@ export function PublicItineraryPanel({
     if (tripId) {
       loadItinerary();
     }
-  }, [tripId]);
+  }, [tripId, slug]);
 
   const handleExportPDF = () => {
     window.print();

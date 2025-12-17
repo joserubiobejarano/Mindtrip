@@ -1131,8 +1131,9 @@ export function ItineraryTab({
                                               alt={`Photo for ${place.name}`}
                                               fill 
                                               className="object-cover"
-                                              key={`${day.id}-${place.id}-photo`}
+                                              key={`${day.id}-${place.id}-photo-${place.name}`}
                                               onError={() => {
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id})`);
                                                 setFailedImages(prev => new Set(prev).add(`${day.id}-${place.id}-photo`));
                                               }}
                                             />
@@ -1458,8 +1459,9 @@ export function ItineraryTab({
                                               alt={`Photo for ${place.name}`}
                                               fill 
                                               className="object-cover"
-                                              key={`${day.id}-${place.id}-photo`}
+                                              key={`${day.id}-${place.id}-photo-${place.name}`}
                                               onError={() => {
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id})`);
                                                 setFailedImages(prev => new Set(prev).add(`${day.id}-${place.id}-photo`));
                                               }}
                                             />
@@ -1575,19 +1577,23 @@ export function ItineraryTab({
                                       size="sm"
                                       onClick={() => {
                                         console.log('[Itinerary] Add clicked', { dayId: day.id, slot: slotType });
-                                        if (dayIsPast || dayIsAtCapacity) return;
+                                        const isDisabled = dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit;
+                                        if (isDisabled) return;
                                         router.push(`/trips/${tripId}?tab=explore&mode=add&day=${day.id}&slot=${slotType}`);
                                       }}
-                                      disabled={dayIsPast || dayIsAtCapacity}
+                                      disabled={dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit}
                                       title={
-                                        dayIsPast
+                                        getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, tripLoading) ||
+                                        (dayIsPast
                                           ? "This day has already passed, so you can't modify it anymore."
                                           : dayIsAtCapacity
                                           ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
-                                          : undefined
+                                          : searchAddCount >= usageLimits.searchAdd.limit
+                                          ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                          : undefined)
                                       }
                                       className={`text-xs min-h-[44px] touch-manipulation ${
-                                        dayIsPast || dayIsAtCapacity
+                                        dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit
                                           ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
                                           : "bg-primary hover:bg-primary/90 text-white"
                                       }`}
@@ -1598,7 +1604,7 @@ export function ItineraryTab({
                                     </Button>
                                     {process.env.NODE_ENV === 'development' && (
                                       <div className="text-xs text-gray-400 mt-1 ml-2">
-                                        disabledBecause: {JSON.stringify({ dayIsPast, dayIsAtCapacity, isOwner: trip?.owner_id === userId })}
+                                        {getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, tripLoading) || 'Enabled'}
                                       </div>
                                     )}
                                   </div>
