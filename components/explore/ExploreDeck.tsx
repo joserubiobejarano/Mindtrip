@@ -535,7 +535,7 @@ export function ExploreDeck({
     });
     // Note: onActivePlaceChange is now memoized in ExploreTab, so it's stable
     // The ref guard (lastNotifiedPlaceIdRef) prevents infinite loops even if callback changes
-  }, [currentPlaceId, onActivePlaceChange]); // Ref guard prevents duplicate calls per placeId
+  }, [currentPlace, currentPlaceId, onActivePlaceChange]); // Ref guard prevents duplicate calls per placeId
 
   if (isLoading) {
     return (

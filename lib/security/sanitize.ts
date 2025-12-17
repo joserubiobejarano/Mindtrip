@@ -3,7 +3,8 @@ import { JSDOM } from 'jsdom';
 
 // Create a window object for DOMPurify in Node.js environment
 const window = new JSDOM('').window;
-const purify = DOMPurify(window as unknown as Window);
+// Type assertion needed because JSDOM's Window type doesn't exactly match DOMPurify's expected type
+const purify = DOMPurify(window as any);
 
 /**
  * Sanitizes HTML content to prevent XSS attacks.

@@ -3,6 +3,27 @@ import { getRateLimiter, RATE_LIMITS, type RateLimitType } from './in-memory-lim
 import { requireAuth } from '@/lib/auth/require-auth';
 
 /**
+ * Extract client IP address from NextRequest headers
+ */
+function getClientIP(request: NextRequest): string {
+  // Check x-forwarded-for header (first IP in the chain)
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    // x-forwarded-for can contain multiple IPs, take the first one
+    return forwardedFor.split(',')[0].trim();
+  }
+  
+  // Check x-real-ip header
+  const realIP = request.headers.get('x-real-ip');
+  if (realIP) {
+    return realIP.trim();
+  }
+  
+  // Fallback to unknown if no IP found
+  return 'unknown';
+}
+
+/**
  * Rate limit configuration for an endpoint
  */
 export interface RateLimitConfig {
@@ -39,7 +60,7 @@ export function withRateLimit(config: RateLimitConfig) {
         // Create rate limit key
         const identifier = config.identifier
           ? config.identifier(request, userId || 'anonymous')
-          : userId || request.ip || 'unknown';
+          : userId || getClientIP(request);
         
         const key = `${config.type}:${identifier}`;
         const limits = RATE_LIMITS[config.type];
@@ -123,7 +144,7 @@ export async function checkRateLimit(
   | { allowed: true; remainingMinute: number; remainingHour: number }
   | { allowed: false; response: NextResponse }
 > {
-  const identifier = userId || request.ip || 'unknown';
+  const identifier = userId || getClientIP(request);
   const key = `${type}:${identifier}`;
   const limits = RATE_LIMITS[type];
   const limiter = getRateLimiter();

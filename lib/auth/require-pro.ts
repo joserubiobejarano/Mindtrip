@@ -36,7 +36,13 @@ export async function requirePro(
     throw new Error('Failed to verify Pro status');
   }
   
-  const isPro = !!profile.is_pro;
+  // Type assertion to fix TypeScript inference issue with select('is_pro')
+  type ProfileQueryResult = {
+    is_pro: boolean | null;
+  };
+  
+  const profileTyped = profile as ProfileQueryResult;
+  const isPro = !!profileTyped.is_pro;
   
   if (!isPro) {
     throw new Error('Pro subscription required');
