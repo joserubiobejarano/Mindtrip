@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
     
     if (isLandmarkName && primaryPlaceDetails?.formatted_address) {
       // Extract city name from formatted_address (usually second-to-last component)
-      const addressParts = primaryPlaceDetails.formatted_address.split(',').map(s => s.trim());
+      const addressParts = primaryPlaceDetails.formatted_address.split(',').map((s: string) => s.trim());
       // Try to find city name (usually second-to-last or third-to-last component)
       // Format is typically: "Landmark Name, Street, City, Country"
       if (addressParts.length >= 2) {
