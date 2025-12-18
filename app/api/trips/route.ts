@@ -156,13 +156,37 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    const primaryCityName = primaryPlaceDetails?.name || segmentsToCreate[0].cityName;
+    // Extract city name, ensuring it's city-based, not landmark-based
+    let primaryCityName = primaryPlaceDetails?.name || segmentsToCreate[0].cityName;
+    
+    // Safety check: If primaryPlaceDetails.name contains landmark keywords, extract city from formatted_address
+    const landmarkKeywords = ['basílica', 'cathedral', 'museum', 'palace', 'tower', 'monument', 'church', 'temple', 'mosque', 'synagogue', 'shrine', 'basilica'];
+    const isLandmarkName = primaryPlaceDetails?.name && landmarkKeywords.some(keyword => 
+      primaryPlaceDetails.name.toLowerCase().includes(keyword)
+    );
+    
+    if (isLandmarkName && primaryPlaceDetails?.formatted_address) {
+      // Extract city name from formatted_address (usually second-to-last component)
+      const addressParts = primaryPlaceDetails.formatted_address.split(',').map(s => s.trim());
+      // Try to find city name (usually second-to-last or third-to-last component)
+      // Format is typically: "Landmark Name, Street, City, Country"
+      if (addressParts.length >= 2) {
+        // Use second-to-last component as city name
+        primaryCityName = addressParts[addressParts.length - 2];
+      }
+    }
+    
+    // Final fallback: Use destinationName if provided and primaryCityName looks like a landmark
+    if (destinationName && isLandmarkName) {
+      primaryCityName = destinationName;
+    }
+    
     const primaryCountry = primaryPlaceDetails?.formatted_address
       ?.split(",")
       .slice(-1)[0]
       .trim() || null;
 
-    // Generate trip title
+    // Generate trip title - ensure it's always city-based
     const tripStart = new Date(startDate);
     const tripEnd = new Date(endDate);
     const title =

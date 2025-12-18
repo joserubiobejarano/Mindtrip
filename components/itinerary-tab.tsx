@@ -244,7 +244,10 @@ export function ItineraryTab({
     if (dayIsPast) {
       reasons.push("past_day");
     }
-    if (dayIsAtCapacity) {
+    
+    // Capacity check: Only applies to 'change' type, and only as a warning (not blocking)
+    // For 'add' type, capacity should NOT block adding activities
+    if (type === 'change' && dayIsAtCapacity) {
       reasons.push(`limits_reached_capacity (${dayActivityCount}/${MAX_ACTIVITIES_PER_DAY})`);
     }
     
@@ -256,6 +259,7 @@ export function ItineraryTab({
         reasons.push("missing_activity_id");
       }
     } else if (type === 'add') {
+      // For 'add' type, only check searchAddCount limit, NOT capacity
       if (searchAddCount >= usageLimits.searchAdd.limit) {
         reasons.push(`limits_reached_add (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit})`);
       }
@@ -282,12 +286,25 @@ export function ItineraryTab({
         dayIsPast,
         dayIsAtCapacity,
         dayActivityCount,
+        capacityLimit: MAX_ACTIVITIES_PER_DAY,
+        capacityCurrent: dayActivityCount,
         changeCount,
         searchAddCount,
         usageLimits,
         tripLoading,
         tripMember: tripMember ? 'loaded' : 'not_loaded',
         reasons,
+      });
+    }
+    
+    // Log capacity values once per render (development only)
+    if (process.env.NODE_ENV === 'development' && dayId) {
+      console.log(`[DEBUG] Capacity check:`, {
+        dayId,
+        dayActivityCount,
+        limit: MAX_ACTIVITIES_PER_DAY,
+        current: dayActivityCount,
+        isAtCapacity: dayIsAtCapacity,
       });
     }
     
@@ -1092,7 +1109,11 @@ export function ItineraryTab({
                       })).filter(Boolean);
                   
                   // Deduplicate by URL to ensure unique images
-                  const uniqueDayImages = Array.from(new Set(dayImages));
+                  // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
+                  const validDayImages = dayImages.filter((img): img is string => 
+                    !!img && typeof img === 'string' && img.trim().length > 0
+                  );
+                  const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
 
@@ -1142,9 +1163,13 @@ export function ItineraryTab({
                           {/* Image Gallery */}
                           {(() => {
                             // Filter out failed images and only show valid ones
+                            // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && !!img;
+                              return !failedImages.has(imageKey) && 
+                                     !!img && 
+                                     typeof img === 'string' && 
+                                     img.trim().length > 0;
                             });
 
                             if (validImages.length === 0) {
@@ -1155,6 +1180,10 @@ export function ItineraryTab({
                               <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
                                 {validImages.map((img, idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
+                                  // Double-check validation before rendering Image
+                                  if (!img || typeof img !== 'string' || img.trim().length === 0) {
+                                    return null;
+                                  }
                                   return (
                                     <div 
                                       key={imageKey} 
@@ -1162,7 +1191,7 @@ export function ItineraryTab({
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => !!img));
+                                          openLightbox(img, dayImages.filter((img): img is string => !!img && typeof img === 'string' && img.trim().length > 0));
                                         }
                                       }}
                                     >
@@ -1228,6 +1257,8 @@ export function ItineraryTab({
                                       const photoUrl = place.photo_reference 
                                         ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
                                         : (place.photos && place.photos.length > 0 && place.photos[0] ? place.photos[0] : null);
+                                      // CRITICAL: Validate photoUrl is truthy and non-empty before rendering Image
+                                      const isValidPhotoUrl = photoUrl && typeof photoUrl === 'string' && photoUrl.trim().length > 0;
                                       const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
                                       
                                       return (
@@ -1239,7 +1270,7 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {photoUrl && !failedImages.has(imageKey) ? (
+                                          {isValidPhotoUrl && !failedImages.has(imageKey) ? (
                                             <Image 
                                               src={photoUrl} 
                                               alt={`Photo for ${place.name}`}
@@ -1369,11 +1400,12 @@ export function ItineraryTab({
                                       size="sm"
                                       onClick={() => {
                                         console.log('[Itinerary] Add clicked', { dayId: day.id, slot: slotType });
-                                        const isDisabled = dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit;
+                                        // Remove dayIsAtCapacity check - capacity should NOT block adding activities
+                                        const isDisabled = dayIsPast || searchAddCount >= usageLimits.searchAdd.limit;
                                         if (isDisabled) return;
                                         router.push(`/trips/${tripId}?tab=explore&mode=add&day=${day.id}&slot=${slotType}`);
                                       }}
-                                      disabled={dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit}
+                                      disabled={dayIsPast || searchAddCount >= usageLimits.searchAdd.limit}
                                       title={
                                         (() => {
                                           const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
@@ -1382,15 +1414,15 @@ export function ItineraryTab({
                                           }
                                           return dayIsPast
                                             ? "This day has already passed, so you can't modify it anymore."
-                                            : dayIsAtCapacity
-                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
                                             : searchAddCount >= usageLimits.searchAdd.limit
                                             ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                            : dayIsAtCapacity
+                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
                                             : undefined;
                                         })()
                                       }
                                       className={`text-xs min-h-[44px] touch-manipulation ${
-                                        dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit
+                                        dayIsPast || searchAddCount >= usageLimits.searchAdd.limit
                                           ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
                                           : "bg-primary hover:bg-primary/90 text-white"
                                       }`}
@@ -1459,7 +1491,11 @@ export function ItineraryTab({
                       })).filter(Boolean);
                   
                   // Deduplicate by URL to ensure unique images
-                  const uniqueDayImages = Array.from(new Set(dayImages));
+                  // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
+                  const validDayImages = dayImages.filter((img): img is string => 
+                    !!img && typeof img === 'string' && img.trim().length > 0
+                  );
+                  const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
 
@@ -1509,9 +1545,13 @@ export function ItineraryTab({
                           {/* Image Gallery */}
                           {(() => {
                             // Filter out failed images and only show valid ones
+                            // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && !!img;
+                              return !failedImages.has(imageKey) && 
+                                     !!img && 
+                                     typeof img === 'string' && 
+                                     img.trim().length > 0;
                             });
 
                             if (validImages.length === 0) {
@@ -1522,6 +1562,10 @@ export function ItineraryTab({
                               <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
                                 {validImages.map((img, idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
+                                  // Double-check validation before rendering Image
+                                  if (!img || typeof img !== 'string' || img.trim().length === 0) {
+                                    return null;
+                                  }
                                   return (
                                     <div 
                                       key={imageKey} 
@@ -1529,7 +1573,7 @@ export function ItineraryTab({
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => !!img));
+                                          openLightbox(img, dayImages.filter((img): img is string => !!img && typeof img === 'string' && img.trim().length > 0));
                                         }
                                       }}
                                     >
@@ -1741,11 +1785,12 @@ export function ItineraryTab({
                                       size="sm"
                                       onClick={() => {
                                         console.log('[Itinerary] Add clicked', { dayId: day.id, slot: slotType });
-                                        const isDisabled = dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit;
+                                        // Remove dayIsAtCapacity check - capacity should NOT block adding activities
+                                        const isDisabled = dayIsPast || searchAddCount >= usageLimits.searchAdd.limit;
                                         if (isDisabled) return;
                                         router.push(`/trips/${tripId}?tab=explore&mode=add&day=${day.id}&slot=${slotType}`);
                                       }}
-                                      disabled={dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit}
+                                      disabled={dayIsPast || searchAddCount >= usageLimits.searchAdd.limit}
                                       title={
                                         (() => {
                                           const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
@@ -1754,15 +1799,15 @@ export function ItineraryTab({
                                           }
                                           return dayIsPast
                                             ? "This day has already passed, so you can't modify it anymore."
-                                            : dayIsAtCapacity
-                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
                                             : searchAddCount >= usageLimits.searchAdd.limit
                                             ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                            : dayIsAtCapacity
+                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
                                             : undefined;
                                         })()
                                       }
                                       className={`text-xs min-h-[44px] touch-manipulation ${
-                                        dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit
+                                        dayIsPast || searchAddCount >= usageLimits.searchAdd.limit
                                           ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
                                           : "bg-primary hover:bg-primary/90 text-white"
                                       }`}
