@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getProfileId } from '@/lib/auth/getProfileId';
 import { SmartItinerary, ItinerarySlot, ItineraryPlace } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
-import { findPlacePhoto, getPlaceDetails, getPlacePhotoByPlaceId } from '@/lib/google/places-server';
+import { findPlacePhoto, getPlaceDetails, getPlacePhotoByPlaceId, getPlacePhotoReference, findGooglePlaceId } from '@/lib/google/places-server';
 import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { streamText } from 'ai';
@@ -107,6 +107,126 @@ function extractCompleteObjects(text: string): {
 function sendSSE(controller: ReadableStreamDefaultController, type: string, data: any) {
   const message = JSON.stringify({ type, data });
   controller.enqueue(new TextEncoder().encode(`data: ${message}\n\n`));
+}
+
+/**
+ * Resolve place_id for places missing it
+ * Uses Google Places Find API to search by name + city
+ */
+async function resolveMissingPlaceIds(
+  places: ItineraryPlace[],
+  cityOrArea: string
+): Promise<void> {
+  if (!GOOGLE_MAPS_API_KEY) return;
+
+  for (const place of places) {
+    if (!place.place_id) {
+      // Try to resolve place_id using name + city
+      const query = place.area || place.neighborhood 
+        ? `${place.name}, ${place.area || place.neighborhood}, ${cityOrArea}`
+        : `${place.name}, ${cityOrArea}`;
+      
+      const placeId = await findGooglePlaceId(query);
+      if (placeId) {
+        place.place_id = placeId;
+      }
+      // Small delay to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+}
+
+/**
+ * Enrich place with photo_reference using place_id
+ * Returns photo_reference or null
+ */
+async function enrichPlacePhotoReference(place: ItineraryPlace): Promise<string | null> {
+  if (!place.place_id) {
+    return null;
+  }
+
+  try {
+    const photoRef = await getPlacePhotoReference(place.place_id);
+    return photoRef;
+  } catch (error) {
+    console.error(`[smart-itinerary] Error fetching photo_reference for place ${place.name} (place_id: ${place.place_id}):`, error);
+    return null;
+  }
+}
+
+/**
+ * Build photo URL from photo_reference
+ */
+function buildPhotoUrl(photoRef: string): string {
+  if (!GOOGLE_MAPS_API_KEY) {
+    return '';
+  }
+  return `/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=800`;
+}
+
+/**
+ * Deduplicate photos by photo_reference and build URLs
+ * Returns array of unique photo URLs (up to maxCount)
+ */
+function deduplicateAndBuildPhotoUrls(
+  places: ItineraryPlace[],
+  maxCount: number = 4
+): string[] {
+  const seenRefs = new Set<string>();
+  const photoUrls: string[] = [];
+
+  for (const place of places) {
+    if (place.photo_reference && !seenRefs.has(place.photo_reference)) {
+      seenRefs.add(place.photo_reference);
+      photoUrls.push(buildPhotoUrl(place.photo_reference));
+      if (photoUrls.length >= maxCount) break;
+    }
+  }
+
+  return photoUrls;
+}
+
+/**
+ * Safety guard: Prevent duplicate photo_reference for different place_ids
+ * If multiple places share the same photo_reference but have different place_ids,
+ * set photo_reference to null for duplicates (keep first occurrence)
+ */
+function applyPhotoReferenceSafetyGuard(places: ItineraryPlace[]): void {
+  const refToPlaceIds = new Map<string, Set<string>>();
+
+  // Build map: photo_reference -> set of place_ids
+  for (const place of places) {
+    if (place.photo_reference && place.place_id) {
+      if (!refToPlaceIds.has(place.photo_reference)) {
+        refToPlaceIds.set(place.photo_reference, new Set());
+      }
+      refToPlaceIds.get(place.photo_reference)!.add(place.place_id);
+    }
+  }
+
+  // Check for conflicts
+  for (const [photoRef, placeIds] of refToPlaceIds.entries()) {
+    if (placeIds.size > 1) {
+      // Multiple different place_ids share the same photo_reference - this is a problem
+      console.warn(
+        `[smart-itinerary] Safety guard: photo_reference "${photoRef}" is shared by ${placeIds.size} different places. Clearing duplicates.`,
+        { placeIds: Array.from(placeIds) }
+      );
+
+      // Keep photo_reference for the first occurrence, clear for others
+      let firstOccurrence = true;
+      for (const place of places) {
+        if (place.photo_reference === photoRef && place.place_id) {
+          if (firstOccurrence) {
+            firstOccurrence = false;
+          } else {
+            place.photo_reference = undefined;
+            place.photos = [];
+          }
+        }
+      }
+    }
+  }
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
@@ -583,62 +703,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   (async () => {
                     try {
                       const enrichedDay = { ...day };
-                      for (const slot of enrichedDay.slots) {
-                        for (const place of slot.places) {
-                          if (!place.photos || place.photos.length === 0) {
-                            let photoUrl: string | null = null;
-                            
-                            // PRIORITY 1: Use place_id if available (most reliable)
-                            if (place.place_id) {
-                              photoUrl = await getPlacePhotoByPlaceId(place.place_id);
-                            }
-                            
-                            // PRIORITY 2: Fallback to text-based search only if no place_id
-                            // This is less reliable but better than nothing
-                            if (!photoUrl) {
-                              const placeArea = place.area || place.neighborhood || '';
-                              
-                              // Try most specific query first: "PlaceName in Area, City"
-                              if (placeArea) {
-                                photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
-                              }
-                              
-                              // Fallback: "PlaceName in City"
-                              if (!photoUrl) {
-                                photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
-                              }
-                              
-                              // Fallback: "City PlaceName"
-                              if (!photoUrl) {
-                                photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
-                              }
-                            }
-                            
-                            // If no photo found, leave empty array (will show placeholder in UI)
-                            // NEVER reuse another place's photo as fallback
-                            place.photos = photoUrl ? [photoUrl] : [];
-                          }
+                      const allPlaces = enrichedDay.slots.flatMap(slot => slot.places);
+                      
+                      // Step 1: Resolve missing place_ids
+                      await resolveMissingPlaceIds(allPlaces, cityOrArea);
+                      
+                      // Step 2: Enrich with photo_reference using place_id
+                      for (const place of allPlaces) {
+                        if (!place.photo_reference && place.place_id) {
+                          place.photo_reference = await enrichPlacePhotoReference(place);
                         }
-                      }
-                      
-                      // Set day photos
-                      const allPlacePhotos = enrichedDay.slots.flatMap((slot: ItinerarySlot) => 
-                        slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
-                      );
-                      
-                      // Ensure day has at least 1-2 photos even if place photos failed
-                      if (allPlacePhotos.length === 0) {
-                        const cityPhoto = await findPlacePhoto(`${cityOrArea} city`);
-                        if (cityPhoto) {
-                          enrichedDay.photos = [cityPhoto];
+                        
+                        // Build photo URL from photo_reference if available
+                        if (place.photo_reference) {
+                          place.photos = [buildPhotoUrl(place.photo_reference)];
                         } else {
-                          // Last resort: try landmark photo
-                          const landmarkPhoto = await findPlacePhoto(`${cityOrArea} landmark`);
-                          enrichedDay.photos = landmarkPhoto ? [landmarkPhoto] : [];
+                          // No photo available - will show placeholder in UI
+                          place.photos = [];
                         }
-                      } else {
-                        enrichedDay.photos = allPlacePhotos.slice(0, 4);
                       }
+                      
+                      // Step 3: Apply safety guard to prevent duplicate photos for different places
+                      applyPhotoReferenceSafetyGuard(allPlaces);
+                      
+                      // Step 4: Build day photos from unique photo_references
+                      enrichedDay.photos = deduplicateAndBuildPhotoUrls(allPlaces, 4);
                       
                       // Send updated day with photos
                       sendSSE(controller, 'day-updated', enrichedDay);
@@ -669,62 +758,36 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 }
                 
                 // Final enrichment pass for any remaining photos
-                await Promise.all(validatedItinerary.days.map(async (day) => {
-                  for (const slot of day.slots) {
-                    for (const place of slot.places) {
-                      if (!place.photos || place.photos.length === 0) {
-                        let photoUrl: string | null = null;
-                        
-                        // PRIORITY 1: Use place_id if available (most reliable)
-                        if (place.place_id) {
-                          photoUrl = await getPlacePhotoByPlaceId(place.place_id);
-                        }
-                        
-                        // PRIORITY 2: Fallback to text-based search only if no place_id
-                        if (!photoUrl) {
-                          const placeArea = place.area || place.neighborhood || '';
-                          
-                          // Try most specific query first: "PlaceName in Area, City"
-                          if (placeArea) {
-                            photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
-                          }
-                          
-                          // Fallback: "PlaceName in City"
-                          if (!photoUrl) {
-                            photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
-                          }
-                          
-                          // Fallback: "City PlaceName"
-                          if (!photoUrl) {
-                            photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
-                          }
-                        }
-                        
-                        // If no photo found, leave empty array (will show placeholder in UI)
-                        // NEVER reuse another place's photo as fallback
-                        place.photos = photoUrl ? [photoUrl] : [];
-                      }
-                    }
+                const allPlaces = validatedItinerary.days.flatMap(day => 
+                  day.slots.flatMap(slot => slot.places)
+                );
+                
+                // Step 1: Resolve missing place_ids
+                await resolveMissingPlaceIds(allPlaces, cityOrArea);
+                
+                // Step 2: Enrich with photo_reference using place_id
+                await Promise.all(allPlaces.map(async (place) => {
+                  if (!place.photo_reference && place.place_id) {
+                    place.photo_reference = await enrichPlacePhotoReference(place);
                   }
                   
-                  const allPlacePhotos = day.slots.flatMap((slot: ItinerarySlot) => 
-                    slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
-                  );
-                  
-                  // Ensure day has at least 1-2 photos even if place photos failed
-                  if (allPlacePhotos.length === 0) {
-                    const cityPhoto = await findPlacePhoto(`${cityOrArea} city`);
-                    if (cityPhoto) {
-                      day.photos = [cityPhoto];
-                    } else {
-                      // Last resort: try landmark photo
-                      const landmarkPhoto = await findPlacePhoto(`${cityOrArea} landmark`);
-                      day.photos = landmarkPhoto ? [landmarkPhoto] : [];
-                    }
+                  // Build photo URL from photo_reference if available
+                  if (place.photo_reference) {
+                    place.photos = [buildPhotoUrl(place.photo_reference)];
                   } else {
-                    day.photos = allPlacePhotos.slice(0, 4);
+                    // No photo available - will show placeholder in UI
+                    place.photos = [];
                   }
                 }));
+                
+                // Step 3: Apply safety guard to prevent duplicate photos for different places
+                applyPhotoReferenceSafetyGuard(allPlaces);
+                
+                // Step 4: Build day photos from unique photo_references
+                for (const day of validatedItinerary.days) {
+                  const dayPlaces = day.slots.flatMap(slot => slot.places);
+                  day.photos = deduplicateAndBuildPhotoUrls(dayPlaces, 4);
+                }
                 
                 // Save to Supabase
                 const { error: saveError } = await (supabase
@@ -797,62 +860,36 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
               
               // Enrich photos
-              await Promise.all(validatedItinerary.days.map(async (day) => {
-                for (const slot of day.slots) {
-                  for (const place of slot.places) {
-                    if (!place.photos || place.photos.length === 0) {
-                      let photoUrl: string | null = null;
-                      
-                      // PRIORITY 1: Use place_id if available (most reliable)
-                      if (place.place_id) {
-                        photoUrl = await getPlacePhotoByPlaceId(place.place_id);
-                      }
-                      
-                      // PRIORITY 2: Fallback to text-based search only if no place_id
-                      if (!photoUrl) {
-                        const placeArea = place.area || place.neighborhood || '';
-                        
-                        // Try most specific query first: "PlaceName in Area, City"
-                        if (placeArea) {
-                          photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
-                        }
-                        
-                        // Fallback: "PlaceName in City"
-                        if (!photoUrl) {
-                          photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
-                        }
-                        
-                        // Fallback: "City PlaceName"
-                        if (!photoUrl) {
-                          photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
-                        }
-                      }
-                      
-                      // If no photo found, leave empty array (will show placeholder in UI)
-                      // NEVER reuse another place's photo as fallback
-                      place.photos = photoUrl ? [photoUrl] : [];
-                    }
-                  }
+              const allPlaces = validatedItinerary.days.flatMap(day => 
+                day.slots.flatMap(slot => slot.places)
+              );
+              
+              // Step 1: Resolve missing place_ids
+              await resolveMissingPlaceIds(allPlaces, cityOrArea);
+              
+              // Step 2: Enrich with photo_reference using place_id
+              await Promise.all(allPlaces.map(async (place) => {
+                if (!place.photo_reference && place.place_id) {
+                  place.photo_reference = await enrichPlacePhotoReference(place);
                 }
                 
-                const allPlacePhotos = day.slots.flatMap((slot: ItinerarySlot) => 
-                  slot.places.flatMap((place: ItineraryPlace) => place.photos || [])
-                );
-                
-                // Ensure day has at least 1-2 photos even if place photos failed
-                if (allPlacePhotos.length === 0) {
-                  const cityPhoto = await findPlacePhoto(`${cityOrArea} city`);
-                  if (cityPhoto) {
-                    day.photos = [cityPhoto];
-                  } else {
-                    // Last resort: try landmark photo
-                    const landmarkPhoto = await findPlacePhoto(`${cityOrArea} landmark`);
-                    day.photos = landmarkPhoto ? [landmarkPhoto] : [];
-                  }
+                // Build photo URL from photo_reference if available
+                if (place.photo_reference) {
+                  place.photos = [buildPhotoUrl(place.photo_reference)];
                 } else {
-                  day.photos = allPlacePhotos.slice(0, 4);
+                  // No photo available - will show placeholder in UI
+                  place.photos = [];
                 }
               }));
+              
+              // Step 3: Apply safety guard to prevent duplicate photos for different places
+              applyPhotoReferenceSafetyGuard(allPlaces);
+              
+              // Step 4: Build day photos from unique photo_references
+              for (const day of validatedItinerary.days) {
+                const dayPlaces = day.slots.flatMap(slot => slot.places);
+                day.photos = deduplicateAndBuildPhotoUrls(dayPlaces, 4);
+              }
               
               // Save
               const { error: saveError } = await (supabase

@@ -1073,12 +1073,21 @@ export function ItineraryTab({
                               </div>
                             )}
                             {group.days.map((day) => {
-                  // Gather all photos from slots for the gallery
+                  // Gather all photos from day.photos (already deduplicated by backend)
+                  // Fallback to collecting from places if day.photos is empty
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
-                    : day.slots.flatMap(s => s.places.flatMap(p => p.photos || []));
+                    : day.slots.flatMap(s => s.places.flatMap(p => {
+                        // Build photo URL from photo_reference if available
+                        if (p.photo_reference) {
+                          return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
+                        }
+                        return p.photos || [];
+                      })).filter(Boolean);
                   
-                  const bannerImages = dayImages.slice(0, 4);
+                  // Deduplicate by URL to ensure unique images
+                  const uniqueDayImages = Array.from(new Set(dayImages));
+                  const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
 
                   return (
@@ -1215,17 +1224,17 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {place.photos && place.photos[0] && !failedImages.has(`${day.id}-${place.id}-photo`) ? (
+                                          {photoUrl && !failedImages.has(imageKey) ? (
                                             <Image 
-                                              src={place.photos[0]} 
+                                              src={photoUrl} 
                                               alt={`Photo for ${place.name}`}
                                               fill 
                                               className="object-cover"
-                                              key={`${day.id}-${place.id}-photo-${place.name}`}
+                                              key={imageKey}
                                               onError={() => {
-                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'})`);
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
                                                 // Mark this specific image as failed - never reuse another place's image
-                                                setFailedImages(prev => new Set(prev).add(`${day.id}-${place.id}-photo`));
+                                                setFailedImages(prev => new Set(prev).add(imageKey));
                                               }}
                                             />
                                           ) : (
@@ -1420,12 +1429,21 @@ export function ItineraryTab({
                               </div>
                             )}
                             {smartItinerary.days.map((day) => {
-                  // Gather all photos from slots for the gallery
+                  // Gather all photos from day.photos (already deduplicated by backend)
+                  // Fallback to collecting from places if day.photos is empty
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
-                    : day.slots.flatMap(s => s.places.flatMap(p => p.photos || []));
+                    : day.slots.flatMap(s => s.places.flatMap(p => {
+                        // Build photo URL from photo_reference if available
+                        if (p.photo_reference) {
+                          return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
+                        }
+                        return p.photos || [];
+                      })).filter(Boolean);
                   
-                  const bannerImages = dayImages.slice(0, 4);
+                  // Deduplicate by URL to ensure unique images
+                  const uniqueDayImages = Array.from(new Set(dayImages));
+                  const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
 
                   return (
@@ -1553,26 +1571,33 @@ export function ItineraryTab({
                                   
                                   {/* Activities */}
                                   <div className="grid gap-4">
-                                    {slot.places.map((place) => (
+                                    {slot.places.map((place) => {
+                                      // Build photo URL from photo_reference if available, otherwise use photos array
+                                      const photoUrl = place.photo_reference 
+                                        ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
+                                        : (place.photos && place.photos[0] ? place.photos[0] : null);
+                                      const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
+                                      
+                                      return (
                                       <div 
-                                        key={place.id} 
+                                        key={place.place_id ?? place.id} 
                                         className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {place.photos && place.photos[0] && !failedImages.has(`${day.id}-${place.id}-photo`) ? (
+                                          {photoUrl && !failedImages.has(imageKey) ? (
                                             <Image 
-                                              src={place.photos[0]} 
+                                              src={photoUrl} 
                                               alt={`Photo for ${place.name}`}
                                               fill 
                                               className="object-cover"
-                                              key={`${day.id}-${place.id}-photo-${place.name}`}
+                                              key={imageKey}
                                               onError={() => {
-                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'})`);
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
                                                 // Mark this specific image as failed - never reuse another place's image
-                                                setFailedImages(prev => new Set(prev).add(`${day.id}-${place.id}-photo`));
+                                                setFailedImages(prev => new Set(prev).add(imageKey));
                                               }}
                                             />
                                           ) : (
