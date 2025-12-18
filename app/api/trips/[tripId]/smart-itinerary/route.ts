@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getProfileId } from '@/lib/auth/getProfileId';
 import { SmartItinerary, ItinerarySlot, ItineraryPlace } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
-import { findPlacePhoto, getPlaceDetails } from '@/lib/google/places-server';
+import { findPlacePhoto, getPlaceDetails, getPlacePhotoByPlaceId } from '@/lib/google/places-server';
 import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { streamText } from 'ai';
@@ -400,6 +400,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       RULES:
       ${structureInstructions}
       
+      1. Trip Title:
+         - CRITICAL: The trip title MUST be city-based (e.g., "Barcelona Trip", "Madrid Trip", "Paris Trip")
+         - NEVER anchor the title around a single POI/landmark unless the user explicitly requested it
+         - Use the destination city name from the trip data (destination_name field)
+         - If dates exist, you may optionally format as: "Barcelona Trip" or "Barcelona · Dec 19–20"
+         - Plan for the city as a whole; do not anchor the entire itinerary around one landmark
+         - The title should reflect the entire trip destination, not the first activity
+      
       2. Trip Context & Personalization:
          - Use the following personalization information to tailor the itinerary:
            ${personalizationContext}
@@ -448,7 +456,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       
       3. EXACT JSON SCHEMA (you MUST return exactly this structure):
       {
-        "title": string,
+        "title": string (city-based, e.g., "Barcelona Trip"),
         "summary": string,
         "days": [
           {
@@ -473,7 +481,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                     "neighborhood": string | null,
                     "photos": string[],
                     "visited": boolean (always false),
-                    "tags": string[]
+                    "tags": string[],
+                    "place_id": string (optional, Google Places place_id - include when available for accurate photo fetching)
                   }
                 ]
               }
@@ -482,6 +491,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
         ],
         "tripTips": string[]
       }
+      
+      3a. Place Identification:
+         - CRITICAL: Include "place_id" (Google Places place_id) for each place when available
+         - The place_id enables accurate photo fetching and prevents wrong images
+         - If you know the Google place_id for a place, always include it in the place object
+         - This is especially important for well-known places, landmarks, restaurants, and attractions
+         - Example: If planning "Sagrada Família", include its Google place_id if known
+         - If place_id is not available, you may omit it, but photo fetching will be less reliable
       
       4. OUTPUT ONLY JSON matching the SmartItinerary schema. Do not include any text outside the JSON structure. Reply ONLY with a single JSON object that matches the SmartItinerary schema. Do not include any explanation or markdown. Do not wrap the response in any other object.
     `;
@@ -569,28 +586,36 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       for (const slot of enrichedDay.slots) {
                         for (const place of slot.places) {
                           if (!place.photos || place.photos.length === 0) {
-                            // Use place name + area + city for more accurate photo matching
-                            // This reduces the chance of getting the wrong place's photo
-                            const placeArea = place.area || place.neighborhood || '';
                             let photoUrl: string | null = null;
                             
-                            // Try most specific query first: "PlaceName in Area, City"
-                            if (placeArea) {
-                              photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                            // PRIORITY 1: Use place_id if available (most reliable)
+                            if (place.place_id) {
+                              photoUrl = await getPlacePhotoByPlaceId(place.place_id);
                             }
                             
-                            // Fallback: "PlaceName in City"
+                            // PRIORITY 2: Fallback to text-based search only if no place_id
+                            // This is less reliable but better than nothing
                             if (!photoUrl) {
-                              photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                              const placeArea = place.area || place.neighborhood || '';
+                              
+                              // Try most specific query first: "PlaceName in Area, City"
+                              if (placeArea) {
+                                photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                              }
+                              
+                              // Fallback: "PlaceName in City"
+                              if (!photoUrl) {
+                                photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                              }
+                              
+                              // Fallback: "City PlaceName"
+                              if (!photoUrl) {
+                                photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
+                              }
                             }
                             
-                            // Fallback: "City PlaceName"
-                            if (!photoUrl) {
-                              photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
-                            }
-                            
-                            // Last resort: don't use a generic city photo for a specific place
-                            // Better to show placeholder than wrong photo
+                            // If no photo found, leave empty array (will show placeholder in UI)
+                            // NEVER reuse another place's photo as fallback
                             place.photos = photoUrl ? [photoUrl] : [];
                           }
                         }
@@ -648,27 +673,35 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   for (const slot of day.slots) {
                     for (const place of slot.places) {
                       if (!place.photos || place.photos.length === 0) {
-                        // Use place name + area + city for more accurate photo matching
-                        const placeArea = place.area || place.neighborhood || '';
                         let photoUrl: string | null = null;
                         
-                        // Try most specific query first: "PlaceName in Area, City"
-                        if (placeArea) {
-                          photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                        // PRIORITY 1: Use place_id if available (most reliable)
+                        if (place.place_id) {
+                          photoUrl = await getPlacePhotoByPlaceId(place.place_id);
                         }
                         
-                        // Fallback: "PlaceName in City"
+                        // PRIORITY 2: Fallback to text-based search only if no place_id
                         if (!photoUrl) {
-                          photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                          const placeArea = place.area || place.neighborhood || '';
+                          
+                          // Try most specific query first: "PlaceName in Area, City"
+                          if (placeArea) {
+                            photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                          }
+                          
+                          // Fallback: "PlaceName in City"
+                          if (!photoUrl) {
+                            photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                          }
+                          
+                          // Fallback: "City PlaceName"
+                          if (!photoUrl) {
+                            photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
+                          }
                         }
                         
-                        // Fallback: "City PlaceName"
-                        if (!photoUrl) {
-                          photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
-                        }
-                        
-                        // Last resort: don't use a generic city photo for a specific place
-                        // Better to show placeholder than wrong photo
+                        // If no photo found, leave empty array (will show placeholder in UI)
+                        // NEVER reuse another place's photo as fallback
                         place.photos = photoUrl ? [photoUrl] : [];
                       }
                     }
@@ -768,27 +801,35 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 for (const slot of day.slots) {
                   for (const place of slot.places) {
                     if (!place.photos || place.photos.length === 0) {
-                      // Use place name + area + city for more accurate photo matching
-                      const placeArea = place.area || place.neighborhood || '';
                       let photoUrl: string | null = null;
                       
-                      // Try most specific query first: "PlaceName in Area, City"
-                      if (placeArea) {
-                        photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                      // PRIORITY 1: Use place_id if available (most reliable)
+                      if (place.place_id) {
+                        photoUrl = await getPlacePhotoByPlaceId(place.place_id);
                       }
                       
-                      // Fallback: "PlaceName in City"
+                      // PRIORITY 2: Fallback to text-based search only if no place_id
                       if (!photoUrl) {
-                        photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                        const placeArea = place.area || place.neighborhood || '';
+                        
+                        // Try most specific query first: "PlaceName in Area, City"
+                        if (placeArea) {
+                          photoUrl = await findPlacePhoto(`${place.name} in ${placeArea}, ${cityOrArea}`);
+                        }
+                        
+                        // Fallback: "PlaceName in City"
+                        if (!photoUrl) {
+                          photoUrl = await findPlacePhoto(`${place.name} in ${cityOrArea}`);
+                        }
+                        
+                        // Fallback: "City PlaceName"
+                        if (!photoUrl) {
+                          photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
+                        }
                       }
                       
-                      // Fallback: "City PlaceName"
-                      if (!photoUrl) {
-                        photoUrl = await findPlacePhoto(`${cityOrArea} ${place.name}`);
-                      }
-                      
-                      // Last resort: don't use a generic city photo for a specific place
-                      // Better to show placeholder than wrong photo
+                      // If no photo found, leave empty array (will show placeholder in UI)
+                      // NEVER reuse another place's photo as fallback
                       place.photos = photoUrl ? [photoUrl] : [];
                     }
                   }

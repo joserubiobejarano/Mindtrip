@@ -7,6 +7,7 @@ export interface ItineraryPlace {
   photos: string[];
   visited: boolean;
   tags: string[];     // "food", "viewpoint", etc.
+  place_id?: string;  // Google Places place_id for accurate photo fetching
 }
 
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening';
@@ -109,7 +110,8 @@ export function isSmartItinerary(obj: any): obj is SmartItinerary {
           typeof place.area !== 'string' ||
           typeof place.visited !== 'boolean' ||
           !Array.isArray(place.photos) ||
-          !Array.isArray(place.tags)
+          !Array.isArray(place.tags) ||
+          (place.place_id !== undefined && typeof place.place_id !== 'string')
         ) {
           return false;
         }

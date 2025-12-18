@@ -9,6 +9,7 @@ export const itineraryPlaceSchema = z.object({
   photos: z.array(z.string()).describe("Array of photo URLs"),
   visited: z.boolean().describe("Whether the place has been visited (should be false for new itineraries)"),
   tags: z.array(z.string()).describe("Tags like 'food', 'viewpoint', 'history'"),
+  place_id: z.string().optional().describe("Google Places place_id for accurate photo fetching (include when available)"),
 });
 
 export const itinerarySlotSchema = z.object({

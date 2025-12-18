@@ -126,22 +126,36 @@ export function ItineraryTab({
   });
 
   // Fetch trip member data with usage counts
-  const { data: tripMember } = useQuery({
+  const { data: tripMember, isLoading: tripMemberLoading } = useQuery({
     queryKey: ["trip-member-usage", tripId, user?.id],
     queryFn: async () => {
-      if (!user?.id || !tripId) return null;
+      if (!user?.id || !tripId) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[DEBUG] tripMember query: missing user.id or tripId', { userId: user?.id, tripId });
+        }
+        return null;
+      }
       
       // Get profileId from profiles table
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("id")
         .eq("clerk_user_id", user.id)
         .maybeSingle();
 
+      if (profileError && process.env.NODE_ENV === 'development') {
+        console.error("[DEBUG] Error fetching profile:", profileError);
+      }
+
       type ProfileQueryResult = { id: string } | null;
       const typedProfile = profile as ProfileQueryResult;
       
-      if (!typedProfile || !typedProfile.id) return null;
+      if (!typedProfile || !typedProfile.id) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[DEBUG] tripMember query: profile not found', { clerkUserId: user.id });
+        }
+        return null;
+      }
 
       // Get trip member with usage counts
       const { data: member, error } = await supabase
@@ -151,8 +165,14 @@ export function ItineraryTab({
         .eq("user_id", typedProfile.id)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error("Error fetching trip member:", error);
+      if (error) {
+        // PGRST116 means no rows found, which is OK (user might not be a member yet)
+        if (error.code !== 'PGRST116') {
+          console.error("Error fetching trip member:", error);
+        } else if (process.env.NODE_ENV === 'development') {
+          console.log('[DEBUG] tripMember query: user not a member yet (PGRST116)', { tripId, profileId: typedProfile.id });
+        }
+        // Return null with default counts of 0
         return null;
       }
 
@@ -163,43 +183,113 @@ export function ItineraryTab({
         swipe_count: number;
       } | null;
       
-      return (member as TripMemberQueryResult) || null;
+      const result = (member as TripMemberQueryResult);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[DEBUG] tripMember query: loaded', { 
+          tripId, 
+          profileId: typedProfile.id,
+          member: result ? {
+            id: result.id,
+            change_count: result.change_count,
+            search_add_count: result.search_add_count,
+            swipe_count: result.swipe_count,
+          } : null
+        });
+      }
+      
+      return result;
     },
     enabled: !!user?.id && !!tripId,
     staleTime: 30 * 1000, // 30 seconds
+    retry: 1, // Only retry once on error
   });
 
   // Get usage limits
   const isPro = subscriptionStatus?.isPro || false;
   const usageLimits = getUsageLimits(isPro);
+  // Default to 0 if tripMember is null/undefined (user not a member or query still loading)
+  // This ensures buttons are enabled until we know the actual counts
   const changeCount = tripMember?.change_count ?? 0;
   const searchAddCount = tripMember?.search_add_count ?? 0;
+  
+  // Log usage limits for debugging (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEBUG] Usage limits:', {
+      isPro,
+      tripMemberLoading,
+      tripMember: tripMember ? 'loaded' : 'not_loaded',
+      changeCount,
+      searchAddCount,
+      usageLimits,
+    });
+  }
 
   // Helper function to get button disabled reason (dev-only)
   const getButtonDisabledReason = useCallback((
     type: 'change' | 'add',
     dayIsPast: boolean,
     dayIsAtCapacity: boolean,
-    isLoading?: boolean
-  ): string | null => {
-    if (process.env.NODE_ENV !== 'development') return null;
+    dayActivityCount: number,
+    isLoading?: boolean,
+    dayId?: string,
+    placeId?: string
+  ): string[] => {
+    const reasons: string[] = [];
     
-    if (isLoading) return "Still loading trip data";
-    if (dayIsPast) return "Day is in the past";
-    if (dayIsAtCapacity) return `Day at capacity (max ${MAX_ACTIVITIES_PER_DAY} activities)`;
+  // Development mode only
+    
+    if (isLoading) {
+      reasons.push("loading");
+    }
+    if (dayIsPast) {
+      reasons.push("past_day");
+    }
+    if (dayIsAtCapacity) {
+      reasons.push(`limits_reached_capacity (${dayActivityCount}/${MAX_ACTIVITIES_PER_DAY})`);
+    }
     
     if (type === 'change') {
       if (changeCount >= usageLimits.change.limit) {
-        return `Change limit reached (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit})`;
+        reasons.push(`limits_reached_change (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit})`);
+      }
+      if (!placeId) {
+        reasons.push("missing_activity_id");
       }
     } else if (type === 'add') {
       if (searchAddCount >= usageLimits.searchAdd.limit) {
-        return `Add limit reached (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit})`;
+        reasons.push(`limits_reached_add (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit})`);
+      }
+      if (!dayId) {
+        reasons.push("missing_dayId");
       }
     }
     
-    return null;
-  }, [changeCount, searchAddCount, usageLimits]);
+    if (!tripId) {
+      reasons.push("missing_tripId");
+    }
+    if (!tripMember && user?.id) {
+      reasons.push("missing_trip_access");
+    }
+    
+    // Log detailed debug info (development only)
+    if (process.env.NODE_ENV === 'development' && reasons.length > 0) {
+      console.log(`[DEBUG] Button disabled (${type}):`, {
+        dayId,
+        placeId,
+        dayIsPast,
+        dayIsAtCapacity,
+        dayActivityCount,
+        changeCount,
+        searchAddCount,
+        usageLimits,
+        tripLoading,
+        tripMember: tripMember ? 'loaded' : 'not_loaded',
+        reasons,
+      });
+    }
+    
+    return reasons;
+  }, [changeCount, searchAddCount, usageLimits, tripId, tripMember, user?.id, tripLoading]);
 
   const generateSmartItinerary = useCallback(async () => {
     if (!isActive) return;
@@ -1133,11 +1223,14 @@ export function ItineraryTab({
                                               className="object-cover"
                                               key={`${day.id}-${place.id}-photo-${place.name}`}
                                               onError={() => {
-                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id})`);
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'})`);
+                                                // Mark this specific image as failed - never reuse another place's image
                                                 setFailedImages(prev => new Set(prev).add(`${day.id}-${place.id}-photo`));
                                               }}
                                             />
                                           ) : (
+                                            // Placeholder: Show when no photo or photo failed to load
+                                            // NEVER reuse another place's image as fallback
                                             <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
                                               <MapPin className="h-8 w-8 mb-1" />
                                               {place.tags && place.tags[0] && (
@@ -1181,14 +1274,19 @@ export function ItineraryTab({
                                                 }}
                                                 disabled={dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit}
                                                 title={
-                                                  getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, tripLoading) ||
-                                                  (dayIsPast
-                                                    ? "This day has already passed, so you can't modify it anymore."
-                                                    : dayIsAtCapacity
-                                                    ? "This day is already at capacity."
-                                                    : changeCount >= usageLimits.change.limit
-                                                    ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
-                                                    : undefined)
+                                                  (() => {
+                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
+                                                    if (reasons.length > 0) {
+                                                      return `Disabled: ${reasons.join(', ')}`;
+                                                    }
+                                                    return dayIsPast
+                                                      ? "This day has already passed, so you can't modify it anymore."
+                                                      : dayIsAtCapacity
+                                                      ? "This day is already at capacity."
+                                                      : changeCount >= usageLimits.change.limit
+                                                      ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                                      : undefined;
+                                                  })()
                                                 }
                                                 className={`rounded-full ${
                                                   dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit
@@ -1200,7 +1298,10 @@ export function ItineraryTab({
                                               </Button>
                                               {process.env.NODE_ENV === 'development' && (
                                                 <div className="text-xs text-gray-400 mt-1">
-                                                  {getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, tripLoading) || 'Enabled'}
+                                                  {(() => {
+                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
+                                                    return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                                  })()}
                                                 </div>
                                               )}
                                               <Button
@@ -1461,11 +1562,14 @@ export function ItineraryTab({
                                               className="object-cover"
                                               key={`${day.id}-${place.id}-photo-${place.name}`}
                                               onError={() => {
-                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id})`);
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'})`);
+                                                // Mark this specific image as failed - never reuse another place's image
                                                 setFailedImages(prev => new Set(prev).add(`${day.id}-${place.id}-photo`));
                                               }}
                                             />
                                           ) : (
+                                            // Placeholder: Show when no photo or photo failed to load
+                                            // NEVER reuse another place's image as fallback
                                             <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
                                               <MapPin className="h-8 w-8 mb-1" />
                                               {place.tags && place.tags[0] && (
@@ -1515,14 +1619,19 @@ export function ItineraryTab({
                                                 }}
                                                 disabled={dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit}
                                                 title={
-                                                  getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, tripLoading) ||
-                                                  (dayIsPast
-                                                    ? "This day has already passed, so you can't modify it anymore."
-                                                    : dayIsAtCapacity
-                                                    ? "This day is already at capacity."
-                                                    : changeCount >= usageLimits.change.limit
-                                                    ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
-                                                    : undefined)
+                                                  (() => {
+                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
+                                                    if (reasons.length > 0) {
+                                                      return `Disabled: ${reasons.join(', ')}`;
+                                                    }
+                                                    return dayIsPast
+                                                      ? "This day has already passed, so you can't modify it anymore."
+                                                      : dayIsAtCapacity
+                                                      ? "This day is already at capacity."
+                                                      : changeCount >= usageLimits.change.limit
+                                                      ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                                      : undefined;
+                                                  })()
                                                 }
                                                 className={`rounded-lg ${
                                                   dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit
@@ -1534,7 +1643,10 @@ export function ItineraryTab({
                                               </Button>
                                               {process.env.NODE_ENV === 'development' && (
                                                 <div className="text-xs text-gray-400 mt-1">
-                                                  {getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, tripLoading) || 'Enabled'}
+                                                  {(() => {
+                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
+                                                    return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                                  })()}
                                                 </div>
                                               )}
                                               <Button
@@ -1583,14 +1695,19 @@ export function ItineraryTab({
                                       }}
                                       disabled={dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit}
                                       title={
-                                        getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, tripLoading) ||
-                                        (dayIsPast
-                                          ? "This day has already passed, so you can't modify it anymore."
-                                          : dayIsAtCapacity
-                                          ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
-                                          : searchAddCount >= usageLimits.searchAdd.limit
-                                          ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
-                                          : undefined)
+                                        (() => {
+                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
+                                          if (reasons.length > 0) {
+                                            return `Disabled: ${reasons.join(', ')}`;
+                                          }
+                                          return dayIsPast
+                                            ? "This day has already passed, so you can't modify it anymore."
+                                            : dayIsAtCapacity
+                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
+                                            : searchAddCount >= usageLimits.searchAdd.limit
+                                            ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                            : undefined;
+                                        })()
                                       }
                                       className={`text-xs min-h-[44px] touch-manipulation ${
                                         dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit
@@ -1604,7 +1721,10 @@ export function ItineraryTab({
                                     </Button>
                                     {process.env.NODE_ENV === 'development' && (
                                       <div className="text-xs text-gray-400 mt-1 ml-2">
-                                        {getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, tripLoading) || 'Enabled'}
+                                        {(() => {
+                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
+                                          return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                        })()}
                                       </div>
                                     )}
                                   </div>

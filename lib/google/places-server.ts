@@ -112,3 +112,30 @@ export async function getPlaceDetails(placeId: string): Promise<{
   }
 }
 
+/**
+ * Get photo URL from place_id using Google Places Details API
+ * This is more reliable than text-based search
+ * @param placeId - Google Places place_id
+ * @returns Photo URL or null if not found
+ */
+export async function getPlacePhotoByPlaceId(placeId: string): Promise<string | null> {
+  if (!GOOGLE_MAPS_API_KEY) {
+    console.error("Missing Google Maps API Key");
+    return null;
+  }
+
+  try {
+    const placeDetails = await getPlaceDetails(placeId);
+    if (!placeDetails || !placeDetails.photos || placeDetails.photos.length === 0) {
+      return null;
+    }
+
+    const photoRef = placeDetails.photos[0].photo_reference;
+    // Construct the photo URL
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${GOOGLE_MAPS_API_KEY}`;
+  } catch (error) {
+    console.error("Error fetching photo by place_id:", error);
+    return null;
+  }
+}
+
