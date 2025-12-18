@@ -1142,9 +1142,9 @@ export function ItineraryTab({
                           {/* Image Gallery */}
                           {(() => {
                             // Filter out failed images and only show valid ones
-                            const validImages = bannerImages.filter((img, idx) => {
+                            const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && img;
+                              return !failedImages.has(imageKey) && !!img;
                             });
 
                             if (validImages.length === 0) {
@@ -1161,7 +1161,9 @@ export function ItineraryTab({
                                       className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        openLightbox(img, dayImages);
+                                        if (img) {
+                                          openLightbox(img, dayImages.filter((img): img is string => !!img));
+                                        }
                                       }}
                                     >
                                       <Image 
@@ -1507,9 +1509,9 @@ export function ItineraryTab({
                           {/* Image Gallery */}
                           {(() => {
                             // Filter out failed images and only show valid ones
-                            const validImages = bannerImages.filter((img, idx) => {
+                            const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && img;
+                              return !failedImages.has(imageKey) && !!img;
                             });
 
                             if (validImages.length === 0) {
@@ -1526,7 +1528,9 @@ export function ItineraryTab({
                                       className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        openLightbox(img, dayImages);
+                                        if (img) {
+                                          openLightbox(img, dayImages.filter((img): img is string => !!img));
+                                        }
                                       }}
                                     >
                                       <Image 
