@@ -1351,14 +1351,19 @@ export function ItineraryTab({
                                       }}
                                       disabled={dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit}
                                       title={
-                                        getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, tripLoading) ||
-                                        (dayIsPast
-                                          ? "This day has already passed, so you can't modify it anymore."
-                                          : dayIsAtCapacity
-                                          ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
-                                          : searchAddCount >= usageLimits.searchAdd.limit
-                                          ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
-                                          : undefined)
+                                        (() => {
+                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
+                                          if (reasons.length > 0) {
+                                            return `Disabled: ${reasons.join(', ')}`;
+                                          }
+                                          return dayIsPast
+                                            ? "This day has already passed, so you can't modify it anymore."
+                                            : dayIsAtCapacity
+                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
+                                            : searchAddCount >= usageLimits.searchAdd.limit
+                                            ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                            : undefined;
+                                        })()
                                       }
                                       className={`text-xs min-h-[44px] touch-manipulation ${
                                         dayIsPast || dayIsAtCapacity || searchAddCount >= usageLimits.searchAdd.limit
@@ -1372,7 +1377,10 @@ export function ItineraryTab({
                                     </Button>
                                     {process.env.NODE_ENV === 'development' && (
                                       <div className="text-xs text-gray-400 mt-1 ml-2">
-                                        {getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, tripLoading) || 'Enabled'}
+                                        {(() => {
+                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
+                                          return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                        })()}
                                       </div>
                                     )}
                                   </div>
