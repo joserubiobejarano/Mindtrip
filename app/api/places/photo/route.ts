@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
+
+// Use server-side API key only (no NEXT_PUBLIC fallback)
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const photoRef = searchParams.get('ref');
+    const photoRef = searchParams.get('ref') || searchParams.get('photo_reference');
     const maxwidth = searchParams.get('maxwidth') || '1000';
 
     if (!photoRef) {
+      console.error('[photo-api] Missing photo_reference parameter');
       return NextResponse.json(
-        { error: 'Missing required parameter: ref (photo_reference)' },
+        { error: 'Missing required parameter: ref or photo_reference' },
         { status: 400 }
       );
     }
 
     if (!GOOGLE_MAPS_API_KEY) {
+      console.error('[photo-api] Google Maps API key not configured (server key missing)');
       return NextResponse.json(
         { error: 'Google Maps API key not configured' },
         { status: 500 }
@@ -28,10 +32,16 @@ export async function GET(request: NextRequest) {
     const photoResponse = await fetch(photoUrl);
 
     if (!photoResponse.ok) {
-      console.error('Google Places Photo API error:', photoResponse.status, photoResponse.statusText);
+      const errorText = await photoResponse.text().catch(() => 'Unknown error');
+      console.error('[photo-api] Google Places Photo API error:', {
+        status: photoResponse.status,
+        statusText: photoResponse.statusText,
+        photoRef: photoRef.substring(0, 20) + '...',
+        errorText: errorText.substring(0, 200)
+      });
       return NextResponse.json(
         { error: 'Failed to fetch photo from Google Places API' },
-        { status: photoResponse.status }
+        { status: 404 }
       );
     }
 

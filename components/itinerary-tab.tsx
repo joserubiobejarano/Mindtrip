@@ -267,7 +267,10 @@ export function ItineraryTab({
     if (!tripId) {
       reasons.push("missing_tripId");
     }
-    if (!tripMember && user?.id) {
+    // Only require tripMember if user is not the owner
+    // Owner has access even if not in trip_members table
+    const isOwner = trip && trip.owner_id === user?.id;
+    if (!tripMember && user?.id && !isOwner) {
       reasons.push("missing_trip_access");
     }
     
@@ -289,7 +292,7 @@ export function ItineraryTab({
     }
     
     return reasons;
-  }, [changeCount, searchAddCount, usageLimits, tripId, tripMember, user?.id, tripLoading]);
+  }, [changeCount, searchAddCount, usageLimits, tripId, tripMember, user?.id, tripLoading, trip]);
 
   const generateSmartItinerary = useCallback(async () => {
     if (!isActive) return;
@@ -1078,11 +1081,14 @@ export function ItineraryTab({
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
                     : day.slots.flatMap(s => s.places.flatMap(p => {
-                        // Build photo URL from photo_reference if available
+                        // Fallback chain: photo_reference → legacy photos → null (placeholder)
                         if (p.photo_reference) {
                           return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
                         }
-                        return p.photos || [];
+                        if (p.photos && p.photos.length > 0 && p.photos[0]) {
+                          return p.photos[0];
+                        }
+                        return null;
                       })).filter(Boolean);
                   
                   // Deduplicate by URL to ensure unique images
@@ -1216,10 +1222,10 @@ export function ItineraryTab({
                                   {/* Activities */}
                                   <div className="grid gap-4">
                                     {slot.places.map((place) => {
-                                      // Build photo URL from photo_reference if available, otherwise use photos array
+                                      // Fallback chain: photo_reference → legacy photos → null (placeholder)
                                       const photoUrl = place.photo_reference 
                                         ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
-                                        : (place.photos && place.photos[0] ? place.photos[0] : null);
+                                        : (place.photos && place.photos.length > 0 && place.photos[0] ? place.photos[0] : null);
                                       const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
                                       
                                       return (
@@ -1312,14 +1318,13 @@ export function ItineraryTab({
                                               >
                                                 Change
                                               </Button>
-                                              {process.env.NODE_ENV === 'development' && (
-                                                <div className="text-xs text-gray-400 mt-1">
-                                                  {(() => {
-                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
-                                                    return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                                  })()}
-                                                </div>
-                                              )}
+                                              {/* TEMPORARY DEBUG: Show disable reasons in production */}
+                                              <div className="text-xs text-orange-600 mt-1">
+                                                {(() => {
+                                                  const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
+                                                  return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                                })()}
+                                              </div>
                                               <Button
                                                 size="sm"
                                                 variant="outline"
@@ -1392,14 +1397,13 @@ export function ItineraryTab({
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
                                       <span className="sm:hidden">Add</span>
                                     </Button>
-                                    {process.env.NODE_ENV === 'development' && (
-                                      <div className="text-xs text-gray-400 mt-1 ml-2">
-                                        {(() => {
-                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
-                                          return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                        })()}
-                                      </div>
-                                    )}
+                                    {/* TEMPORARY DEBUG: Show disable reasons in production */}
+                                    <div className="text-xs text-orange-600 mt-1 ml-2">
+                                      {(() => {
+                                        const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
+                                        return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                      })()}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -1442,11 +1446,14 @@ export function ItineraryTab({
                   const dayImages = (day.photos && day.photos.length > 0) 
                     ? day.photos 
                     : day.slots.flatMap(s => s.places.flatMap(p => {
-                        // Build photo URL from photo_reference if available
+                        // Fallback chain: photo_reference → legacy photos → null (placeholder)
                         if (p.photo_reference) {
                           return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
                         }
-                        return p.photos || [];
+                        if (p.photos && p.photos.length > 0 && p.photos[0]) {
+                          return p.photos[0];
+                        }
+                        return null;
                       })).filter(Boolean);
                   
                   // Deduplicate by URL to ensure unique images
@@ -1580,10 +1587,10 @@ export function ItineraryTab({
                                   {/* Activities */}
                                   <div className="grid gap-4">
                                     {slot.places.map((place) => {
-                                      // Build photo URL from photo_reference if available, otherwise use photos array
+                                      // Fallback chain: photo_reference → legacy photos → null (placeholder)
                                       const photoUrl = place.photo_reference 
                                         ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
-                                        : (place.photos && place.photos[0] ? place.photos[0] : null);
+                                        : (place.photos && place.photos.length > 0 && place.photos[0] ? place.photos[0] : null);
                                       const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
                                       
                                       return (
@@ -1682,14 +1689,13 @@ export function ItineraryTab({
                                               >
                                                 Change
                                               </Button>
-                                              {process.env.NODE_ENV === 'development' && (
-                                                <div className="text-xs text-gray-400 mt-1">
-                                                  {(() => {
-                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
-                                                    return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                                  })()}
-                                                </div>
-                                              )}
+                                              {/* TEMPORARY DEBUG: Show disable reasons in production */}
+                                              <div className="text-xs text-orange-600 mt-1">
+                                                {(() => {
+                                                  const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
+                                                  return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                                })()}
+                                              </div>
                                               <Button
                                                 size="sm"
                                                 variant="outline"
@@ -1761,14 +1767,13 @@ export function ItineraryTab({
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
                                       <span className="sm:hidden">Add</span>
                                     </Button>
-                                    {process.env.NODE_ENV === 'development' && (
-                                      <div className="text-xs text-gray-400 mt-1 ml-2">
-                                        {(() => {
-                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
-                                          return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                        })()}
-                                      </div>
-                                    )}
+                                    {/* TEMPORARY DEBUG: Show disable reasons in production */}
+                                    <div className="text-xs text-orange-600 mt-1 ml-2">
+                                      {(() => {
+                                        const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
+                                        return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
+                                      })()}
+                                    </div>
                                   </div>
                                 </div>
                               </div>

@@ -127,12 +127,15 @@ export async function getPlacePhotoReference(placeId: string): Promise<string | 
   try {
     const placeDetails = await getPlaceDetails(placeId);
     if (!placeDetails || !placeDetails.photos || placeDetails.photos.length === 0) {
+      console.log(`[places-server] No photos found for place_id: ${placeId}`);
       return null;
     }
 
-    return placeDetails.photos[0].photo_reference;
+    const photoRef = placeDetails.photos[0].photo_reference;
+    console.log(`[places-server] Successfully obtained photo_reference for place_id: ${placeId}`);
+    return photoRef;
   } catch (error) {
-    console.error("Error fetching photo_reference by place_id:", error);
+    console.error(`[places-server] Error fetching photo_reference by place_id (${placeId}):`, error);
     return null;
   }
 }

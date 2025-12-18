@@ -785,6 +785,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 // Step 3: Apply safety guard to prevent duplicate photos for different places
                 applyPhotoReferenceSafetyGuard(allPlaces);
                 
+                // DIAGNOSTIC LOGGING: Count items with place_id and photo_reference
+                const placeIdCount = allPlaces.filter(p => p.place_id).length;
+                const photoRefCount = allPlaces.filter(p => p.photo_reference).length;
+                console.log('[smart-itinerary] Diagnostic counts:', {
+                  totalPlaces: allPlaces.length,
+                  placesWithPlaceId: placeIdCount,
+                  placesWithPhotoReference: photoRefCount,
+                  tripId
+                });
+                
                 // Step 4: Build day photos from unique photo_references
                 for (const day of validatedItinerary.days) {
                   const dayPlaces = day.slots.flatMap(slot => slot.places);
@@ -887,6 +897,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               
               // Step 3: Apply safety guard to prevent duplicate photos for different places
               applyPhotoReferenceSafetyGuard(allPlaces);
+              
+              // DIAGNOSTIC LOGGING: Count items with place_id and photo_reference
+              const placeIdCount = allPlaces.filter(p => p.place_id).length;
+              const photoRefCount = allPlaces.filter(p => p.photo_reference).length;
+              console.log('[smart-itinerary] Diagnostic counts (fallback parse):', {
+                totalPlaces: allPlaces.length,
+                placesWithPlaceId: placeIdCount,
+                placesWithPhotoReference: photoRefCount,
+                tripId
+              });
               
               // Step 4: Build day photos from unique photo_references
               for (const day of validatedItinerary.days) {
