@@ -245,11 +245,8 @@ export function ItineraryTab({
       reasons.push("past_day");
     }
     
-    // Capacity check: Only applies to 'change' type, and only as a warning (not blocking)
-    // For 'add' type, capacity should NOT block adding activities
-    if (type === 'change' && dayIsAtCapacity) {
-      reasons.push(`limits_reached_capacity (${dayActivityCount}/${MAX_ACTIVITIES_PER_DAY})`);
-    }
+    // Capacity check removed for 'change' type - capacity should NOT block changing activities
+    // Capacity is only shown as a non-blocking warning badge in the UI
     
     if (type === 'change') {
       if (changeCount >= usageLimits.change.limit) {
@@ -1323,11 +1320,11 @@ export function ItineraryTab({
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   console.log('[Itinerary] Change clicked', { dayId: day.id, activityId: place.id });
-                                                  const isDisabled = dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit;
+                                                  const isDisabled = dayIsPast || changeCount >= usageLimits.change.limit;
                                                   if (isDisabled) return;
                                                   router.push(`/trips/${tripId}?tab=explore&mode=replace&day=${day.id}&activity=${place.id}`);
                                                 }}
-                                                disabled={dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit}
+                                                disabled={dayIsPast || changeCount >= usageLimits.change.limit}
                                                 title={
                                                   (() => {
                                                     const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
@@ -1336,15 +1333,13 @@ export function ItineraryTab({
                                                     }
                                                     return dayIsPast
                                                       ? "This day has already passed, so you can't modify it anymore."
-                                                      : dayIsAtCapacity
-                                                      ? "This day is already at capacity."
                                                       : changeCount >= usageLimits.change.limit
                                                       ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
                                                       : undefined;
                                                   })()
                                                 }
                                                 className={`rounded-full ${
-                                                  dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit
+                                                  dayIsPast || changeCount >= usageLimits.change.limit
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                                                     : "border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"
                                                 }`}
@@ -1709,11 +1704,11 @@ export function ItineraryTab({
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   console.log('[Itinerary] Change clicked', { dayId: day.id, activityId: place.id });
-                                                  const isDisabled = dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit;
+                                                  const isDisabled = dayIsPast || changeCount >= usageLimits.change.limit;
                                                   if (isDisabled) return;
                                                   router.push(`/trips/${tripId}?tab=explore&mode=replace&day=${day.id}&activity=${place.id}`);
                                                 }}
-                                                disabled={dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit}
+                                                disabled={dayIsPast || changeCount >= usageLimits.change.limit}
                                                 title={
                                                   (() => {
                                                     const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
@@ -1722,15 +1717,13 @@ export function ItineraryTab({
                                                     }
                                                     return dayIsPast
                                                       ? "This day has already passed, so you can't modify it anymore."
-                                                      : dayIsAtCapacity
-                                                      ? "This day is already at capacity."
                                                       : changeCount >= usageLimits.change.limit
                                                       ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
                                                       : undefined;
                                                   })()
                                                 }
                                                 className={`rounded-lg ${
-                                                  dayIsPast || dayIsAtCapacity || changeCount >= usageLimits.change.limit
+                                                  dayIsPast || changeCount >= usageLimits.change.limit
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                                     : "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                                                 }`}

@@ -19,6 +19,15 @@ interface Activity {
   } | null;
 }
 
+/**
+ * Validates if a string is a valid UUID v4 format
+ * UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where y is 8, 9, A, or B
+ */
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 export function useActivities(dayId: string) {
   const supabase = createClient();
   const queryClient = useQueryClient();
@@ -27,6 +36,14 @@ export function useActivities(dayId: string) {
     queryKey: ["activities", dayId],
     queryFn: async () => {
       if (!dayId) {
+        return [] as Activity[];
+      }
+
+      // Validate that dayId is a valid UUID before querying
+      if (!isValidUUID(dayId)) {
+        console.warn(
+          `[use-activities] Invalid UUID provided for dayId: "${dayId}". Expected a valid UUID v4 format. Skipping query and returning empty list.`
+        );
         return [] as Activity[];
       }
 

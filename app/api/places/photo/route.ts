@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 // Use server-side API key only (no NEXT_PUBLIC fallback)
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
     if (!GOOGLE_MAPS_API_KEY) {
       console.error('[photo-api] Google Maps API key not configured (server key missing)');
       return NextResponse.json(
-        { error: 'Google Maps API key not configured' },
+        { error: 'Missing GOOGLE_MAPS_API_KEY' },
         { status: 500 }
       );
     }
