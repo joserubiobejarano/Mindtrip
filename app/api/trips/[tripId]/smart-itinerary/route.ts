@@ -703,7 +703,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   (async () => {
                     try {
                       const enrichedDay = { ...day };
-                      const allPlaces = enrichedDay.slots.flatMap(slot => slot.places);
+                      const allPlaces = enrichedDay.slots.flatMap((slot: ItinerarySlot) => slot.places);
                       
                       // Step 1: Resolve missing place_ids
                       await resolveMissingPlaceIds(allPlaces, cityOrArea);
@@ -711,7 +711,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       // Step 2: Enrich with photo_reference using place_id
                       for (const place of allPlaces) {
                         if (!place.photo_reference && place.place_id) {
-                          place.photo_reference = await enrichPlacePhotoReference(place);
+                          const photoRef = await enrichPlacePhotoReference(place);
+                          place.photo_reference = photoRef || undefined;
                         }
                         
                         // Build photo URL from photo_reference if available
@@ -768,7 +769,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 // Step 2: Enrich with photo_reference using place_id
                 await Promise.all(allPlaces.map(async (place) => {
                   if (!place.photo_reference && place.place_id) {
-                    place.photo_reference = await enrichPlacePhotoReference(place);
+                    const photoRef = await enrichPlacePhotoReference(place);
+                    place.photo_reference = photoRef || undefined;
                   }
                   
                   // Build photo URL from photo_reference if available
@@ -870,7 +872,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               // Step 2: Enrich with photo_reference using place_id
               await Promise.all(allPlaces.map(async (place) => {
                 if (!place.photo_reference && place.place_id) {
-                  place.photo_reference = await enrichPlacePhotoReference(place);
+                  const photoRef = await enrichPlacePhotoReference(place);
+                  place.photo_reference = photoRef || undefined;
                 }
                 
                 // Build photo URL from photo_reference if available

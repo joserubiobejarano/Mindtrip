@@ -1215,7 +1215,14 @@ export function ItineraryTab({
                                   
                                   {/* Activities */}
                                   <div className="grid gap-4">
-                                    {slot.places.map((place) => (
+                                    {slot.places.map((place) => {
+                                      // Build photo URL from photo_reference if available, otherwise use photos array
+                                      const photoUrl = place.photo_reference 
+                                        ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
+                                        : (place.photos && place.photos[0] ? place.photos[0] : null);
+                                      const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
+                                      
+                                      return (
                                       <div 
                                         key={place.id} 
                                         className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
@@ -1343,7 +1350,8 @@ export function ItineraryTab({
                                           )}
                                         </div>
                                       </div>
-                                    ))}
+                                      )
+                                    })}
                                   </div>
                                   
                                   {/* Add activities button - moved below activities */}
@@ -1711,7 +1719,8 @@ export function ItineraryTab({
                                           )}
                                         </div>
                                       </div>
-                                    ))}
+                                      )
+                                    })}
                                   </div>
                                   
                                   {/* Add activities button - moved below activities */}
