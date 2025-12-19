@@ -20,6 +20,14 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
+    localPatterns: [
+      {
+        pathname: '/api/places/photo',
+      },
+      {
+        pathname: '/brand/**',
+      },
+    ],
   },
   webpack: (config) => {
     config.resolve.alias.canvas = false;

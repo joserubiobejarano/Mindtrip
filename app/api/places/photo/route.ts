@@ -4,10 +4,32 @@ export const runtime = 'nodejs';
 
 // Use server-side API key only (no NEXT_PUBLIC fallback)
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+const isDev = process.env.NODE_ENV === 'development';
+
+function getErrorHint(errorBody: string): string | null {
+  const bodyLower = errorBody.toLowerCase();
+  if (bodyLower.includes('request_denied')) {
+    return 'REQUEST_DENIED - Check API key restrictions or billing';
+  }
+  if (bodyLower.includes('api key') && (bodyLower.includes('restrict') || bodyLower.includes('invalid'))) {
+    return 'API key restriction - Verify key restrictions in Google Cloud Console';
+  }
+  if (bodyLower.includes('api not enabled') || bodyLower.includes('service not enabled')) {
+    return 'API not enabled - Enable Places API in Google Cloud Console';
+  }
+  return null;
+}
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
+    const debug = searchParams.get('debug');
+
+    // Dev-only debug endpoint
+    if (debug === '1') {
+      return NextResponse.json({ hasKey: !!GOOGLE_MAPS_API_KEY });
+    }
+
     const photoRef = searchParams.get('ref') || searchParams.get('photo_reference');
     const maxwidth = searchParams.get('maxwidth') || '1000';
 
@@ -35,12 +57,31 @@ export async function GET(request: NextRequest) {
 
     if (!photoResponse.ok) {
       const errorText = await photoResponse.text().catch(() => 'Unknown error');
+      const errorBodyPreview = errorText.substring(0, 300);
+      const hint = getErrorHint(errorText);
+      
+      const errorInfo = {
+        status: 'error',
+        googleStatusCode: photoResponse.status,
+        googleResponseBody: errorBodyPreview,
+        ...(hint && { hint })
+      };
+
+      // Log detailed error info server-side
       console.error('[photo-api] Google Places Photo API error:', {
         status: photoResponse.status,
         statusText: photoResponse.statusText,
         photoRef: photoRef.substring(0, 20) + '...',
-        errorText: errorText.substring(0, 200)
+        googleStatusCode: photoResponse.status,
+        googleResponseBody: errorBodyPreview,
+        hint
       });
+
+      // In dev mode, return detailed error JSON; otherwise return 404 with generic message
+      if (isDev) {
+        return NextResponse.json(errorInfo, { status: 404 });
+      }
+      
       return NextResponse.json(
         { error: 'Failed to fetch photo from Google Places API' },
         { status: 404 }
