@@ -87,8 +87,28 @@ export function resolvePlacePhotoSrc(input: any): string | null {
 
   // Case B: Input is an object
   if (typeof input === 'object' && input !== null) {
-    // Check for already-usable URL fields (priority order)
-    const urlFields = ['photoUrl', 'photo_url', 'imageUrl', 'image_url', 'url'];
+    // PRIORITY 1: Check image_url first (from activities table) - if present and usable, return immediately
+    // This avoids trying to resolve place.photos which don't serialize properly
+    if (input.image_url && typeof input.image_url === 'string') {
+      const trimmed = input.image_url.trim();
+      if (trimmed.length > 0) {
+        // Already a relative URL
+        if (trimmed.startsWith('/')) return trimmed;
+        // Already an absolute URL
+        if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+          return trimmed;
+        }
+        // If it's a Google photo reference, convert to proxy URL
+        if (isGooglePhotoReference(trimmed)) {
+          return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+        }
+        // If it's a valid URL format, return as-is
+        return trimmed;
+      }
+    }
+    
+    // PRIORITY 2: Check other already-usable URL fields
+    const urlFields = ['photoUrl', 'photo_url', 'imageUrl', 'url'];
     for (const field of urlFields) {
       const value = input[field];
       if (value && typeof value === 'string') {

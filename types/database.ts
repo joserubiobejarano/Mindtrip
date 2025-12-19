@@ -238,6 +238,7 @@ export interface Database {
           end_time: string | null
           notes: string | null
           order_number: number
+          image_url: string | null
           created_at: string
         }
         Insert: {
@@ -249,6 +250,7 @@ export interface Database {
           end_time?: string | null
           notes?: string | null
           order_number?: number
+          image_url?: string | null
           created_at?: string
         }
         Update: {
@@ -260,6 +262,7 @@ export interface Database {
           end_time?: string | null
           notes?: string | null
           order_number?: number
+          image_url?: string | null
           created_at?: string
         }
       }

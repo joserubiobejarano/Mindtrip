@@ -31,6 +31,27 @@ export async function addActivitiesForDay(
       ? `Category: ${activity.category}${activity.notes ? `\n\n${activity.notes}` : ''}`
       : activity.notes || null
 
+    // Extract image URL if available (PlannedActivity doesn't have photos, but check for any photo fields)
+    let imageUrl: string | null = null;
+    if ((activity as any).image_url && typeof (activity as any).image_url === 'string') {
+      imageUrl = (activity as any).image_url;
+    } else if ((activity as any).photoUrl && typeof (activity as any).photoUrl === 'string') {
+      imageUrl = (activity as any).photoUrl;
+    } else if ((activity as any).photos && Array.isArray((activity as any).photos) && (activity as any).photos.length > 0) {
+      const photo = (activity as any).photos[0];
+      // Check if it's a Google Maps photo object with getUrl method
+      if (photo && typeof photo.getUrl === 'function') {
+        try {
+          imageUrl = photo.getUrl({ maxWidth: 1200 });
+        } catch (err) {
+          console.error("Error getting photo URL from PlannedActivity:", err);
+          imageUrl = null;
+        }
+      } else if (typeof photo === 'string') {
+        imageUrl = photo;
+      }
+    }
+
     return {
       day_id: dayId,
       title: activity.title,
@@ -39,6 +60,7 @@ export async function addActivitiesForDay(
       notes,
       order_number: maxOrder + index + 1,
       place_id: null, // AI-generated activities don't have place_id initially
+      image_url: imageUrl,
     }
   })
 

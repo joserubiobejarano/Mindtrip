@@ -10,6 +10,7 @@ interface Activity {
   end_time: string | null;
   notes: string | null;
   order_number: number;
+  image_url?: string | null;
   place?: {
     id: string;
     name: string;
@@ -60,6 +61,17 @@ export function useActivities(dayId: string) {
         console.error("Error fetching activities:", error);
         throw error;
       }
+      
+      // Console log to verify image_url persistence
+      if (data && data.length > 0) {
+        const sample = data[0];
+        console.log('[Activities] Sample activity loaded:', {
+          id: sample.id,
+          title: sample.title,
+          image_url: sample.image_url
+        });
+      }
+      
       return (data || []) as Activity[];
     },
     enabled: !!dayId,
@@ -74,6 +86,7 @@ export function useActivities(dayId: string) {
       end_time?: string | null;
       notes?: string | null;
       order_number: number;
+      image_url?: string | null;
     }) => {
       const { data, error } = await (supabase
         .from("activities") as any)
@@ -101,6 +114,7 @@ export function useActivities(dayId: string) {
       end_time?: string | null;
       notes?: string | null;
       order_number?: number;
+      image_url?: string | null;
     }) => {
       const { data, error } = await (supabase
         .from("activities") as any)

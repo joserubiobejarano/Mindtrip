@@ -171,6 +171,27 @@ export function AddToItineraryDialog({
           ? existingActivitiesTyped[0].order_number || 0
           : 0;
 
+      // Extract image URL from place
+      let imageUrl: string | null = null;
+      
+      // If we already have a photoUrl string, use it
+      if (place.photoUrl && typeof place.photoUrl === 'string') {
+        imageUrl = place.photoUrl;
+      } 
+      // Otherwise, check if place has Google Maps photo objects
+      else if ((place as any).photos && Array.isArray((place as any).photos) && (place as any).photos.length > 0) {
+        const photo = (place as any).photos[0];
+        // Check if it's a Google Maps photo object with getUrl method
+        if (photo && typeof photo.getUrl === 'function') {
+          try {
+            imageUrl = photo.getUrl({ maxWidth: 1200 });
+          } catch (err) {
+            console.error("Error getting photo URL:", err);
+            imageUrl = null;
+          }
+        }
+      }
+
       // Create the activity
       const { error: activityError } = await (supabase
         .from("activities") as any)
@@ -182,6 +203,7 @@ export function AddToItineraryDialog({
           start_time: startTime || null,
           end_time: null,
           order_number: maxOrder + 1,
+          image_url: imageUrl,
         });
 
       if (activityError) {
