@@ -5,8 +5,9 @@
 
 /**
  * Checks if a photo source is usable (non-empty string that's a valid URL or relative path).
+ * Type guard that narrows the type to string when returning true.
  */
-export function isPhotoSrcUsable(src: any): boolean {
+export function isPhotoSrcUsable(src: any): src is string {
   if (!src || typeof src !== 'string') return false;
   const trimmed = src.trim();
   if (trimmed.length === 0) return false;
