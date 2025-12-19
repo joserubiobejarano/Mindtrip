@@ -1213,11 +1213,12 @@ export function ItineraryTab({
                                       }}
                                     >
                                       {isProxy ? (
-                                        <img 
+                                        <Image 
                                           src={img} 
                                           alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                          className="object-cover w-full h-full"
-                                          loading="lazy"
+                                          fill
+                                          unoptimized
+                                          className="object-cover"
                                           onError={() => {
                                             setFailedImages(prev => new Set(prev).add(imageKey));
                                           }}
@@ -1296,11 +1297,11 @@ export function ItineraryTab({
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
                                           {photoSrc && !failedImages.has(imageKey) ? (
-                                            <img 
+                                            <Image 
                                               src={photoSrc} 
                                               alt={`Photo for ${place.name}`}
-                                              className="object-cover w-full h-full"
-                                              loading="lazy"
+                                              fill
+                                              className="object-cover"
                                               key={imageKey}
                                               onError={() => {
                                                 console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
@@ -1619,11 +1620,12 @@ export function ItineraryTab({
                                       }}
                                     >
                                       {isProxy ? (
-                                        <img 
+                                        <Image 
                                           src={img} 
                                           alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                          className="object-cover w-full h-full"
-                                          loading="lazy"
+                                          fill
+                                          unoptimized
+                                          className="object-cover"
                                           onError={() => {
                                             setFailedImages(prev => new Set(prev).add(imageKey));
                                           }}
@@ -1702,11 +1704,11 @@ export function ItineraryTab({
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
                                           {photoSrc && !failedImages.has(imageKey) ? (
-                                            <img 
+                                            <Image 
                                               src={photoSrc} 
                                               alt={`Photo for ${place.name}`}
-                                              className="object-cover w-full h-full"
-                                              loading="lazy"
+                                              fill
+                                              className="object-cover"
                                               key={imageKey}
                                               onError={() => {
                                                 console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
@@ -1953,10 +1955,12 @@ export function ItineraryTab({
            {selectedImage && (
              <div className="relative w-full h-full flex items-center justify-center" style={{ height: '80vh' }}>
                 {selectedImage.startsWith("/api/places/photo") ? (
-                  <img 
+                  <Image 
                     src={selectedImage} 
                     alt="Fullscreen" 
-                    className="object-contain w-full h-full"
+                    fill
+                    unoptimized
+                    className="object-contain"
                   />
                 ) : (
                   <Image src={selectedImage} alt="Fullscreen" fill className="object-contain" />

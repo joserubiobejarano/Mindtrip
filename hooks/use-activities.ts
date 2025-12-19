@@ -64,7 +64,7 @@ export function useActivities(dayId: string) {
       
       // Console log to verify image_url persistence
       if (data && data.length > 0) {
-        const sample = data[0];
+        const sample = data[0] as Activity;
         console.log('[Activities] Sample activity loaded:', {
           id: sample.id,
           title: sample.title,
