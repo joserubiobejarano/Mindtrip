@@ -26,6 +26,7 @@ import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from "@/lib/supabase/smar
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getUsageLimits } from "@/lib/supabase/usage-limits";
+import { resolvePlacePhotoSrc, isPhotoSrcUsable } from "@/lib/placePhotos";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -54,19 +55,6 @@ function textToBulletPoints(text: string): string[] {
     });
 }
 
-// Helper function to validate photo URLs
-// Allows relative URLs (starting with /) and absolute URLs (http/https)
-// Rejects null, undefined, empty strings, and whitespace-only strings
-function isValidPhotoUrl(url: unknown): url is string {
-  if (!url || typeof url !== 'string') return false;
-  const trimmed = url.trim();
-  if (trimmed.length === 0) return false;
-  // Allow relative URLs (starting with /)
-  if (trimmed.startsWith('/')) return true;
-  // Allow absolute URLs (http/https)
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return true;
-  return false;
-}
 
 // Simple affiliate button component
 function AffiliateButton({ kind, day }: { kind: string, day: ItineraryDay }) {
@@ -1107,29 +1095,35 @@ export function ItineraryTab({
                   // Gather all photos from day.photos (already deduplicated by backend)
                   // Fallback to collecting from places if day.photos is empty
                   const dayImages = (day.photos && day.photos.length > 0) 
-                    ? day.photos 
-                    : day.slots.flatMap(s => s.places.flatMap(p => {
-                        // Fallback chain: photo_reference → legacy photos → null (placeholder)
-                        if (p.photo_reference) {
-                          return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
-                        }
-                        if (p.photos && p.photos.length > 0 && p.photos[0]) {
-                          // Convert photo reference to proxy URL if not already a URL
-                          return p.photos[0].startsWith('http') 
-                            ? p.photos[0] // Keep absolute URLs as-is
-                            : `/api/places/photo?ref=${encodeURIComponent(p.photos[0])}&maxwidth=800`; // Convert photo ref to proxy
-                        }
-                        return null;
-                      })).filter(Boolean);
+                    ? day.photos.map(photo => resolvePlacePhotoSrc(photo)).filter((src): src is string => src !== null)
+                    : day.slots.flatMap(s => s.places.map(p => resolvePlacePhotoSrc(p))).filter((src): src is string => src !== null);
                   
                   // Deduplicate by URL to ensure unique images
                   // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
                   const validDayImages = dayImages.filter((img): img is string => 
-                    isValidPhotoUrl(img)
+                    isPhotoSrcUsable(img)
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
+
+                  // Debug logging (development only)
+                  if (process.env.NODE_ENV === "development") {
+                    const allPlaces = day.slots.flatMap(s => s.places);
+                    console.log('[Itinerary] Photo debug:', {
+                      dayId: day.id,
+                      activitiesCount: allPlaces.length,
+                      first3Places: allPlaces.slice(0, 3).map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        hasPhotoReference: !!p.photo_reference,
+                        hasPhotos: !!p.photos?.length,
+                        photoReference: p.photo_reference,
+                        photos: p.photos,
+                        resolvedPhotoSrc: resolvePlacePhotoSrc(p),
+                      })),
+                    });
+                  }
 
                   return (
                     <Card 
@@ -1180,7 +1174,7 @@ export function ItineraryTab({
                             // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && isValidPhotoUrl(img);
+                              return !failedImages.has(imageKey) && isPhotoSrcUsable(img);
                             });
 
                             if (validImages.length === 0) {
@@ -1192,9 +1186,10 @@ export function ItineraryTab({
                                 {validImages.map((img, idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
                                   // Double-check validation before rendering Image
-                                  if (!isValidPhotoUrl(img)) {
+                                  if (!isPhotoSrcUsable(img)) {
                                     return null;
                                   }
+                                  const isProxy = img.startsWith("/api/places/photo");
                                   return (
                                     <div 
                                       key={imageKey} 
@@ -1202,7 +1197,7 @@ export function ItineraryTab({
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => isValidPhotoUrl(img)));
+                                          openLightbox(img, dayImages.filter((img): img is string => isPhotoSrcUsable(img)));
                                         }
                                       }}
                                     >
@@ -1211,6 +1206,7 @@ export function ItineraryTab({
                                         alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
                                         fill 
                                         className="object-cover"
+                                        unoptimized={isProxy}
                                         onError={() => {
                                           setFailedImages(prev => new Set(prev).add(imageKey));
                                         }}
@@ -1263,34 +1259,29 @@ export function ItineraryTab({
                                   
                                   {/* Activities */}
                                   <div className="grid gap-4">
-                                    {slot.places.map((place) => {
-                                      // Fallback chain: photo_reference → legacy photos → null (placeholder)
-                                      const photoUrl = place.photo_reference 
-                                        ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
-                                        : (place.photos && place.photos.length > 0 && place.photos[0] 
-                                            ? (place.photos[0].startsWith('http') 
-                                                ? place.photos[0] // Keep absolute URLs as-is
-                                                : `/api/places/photo?ref=${encodeURIComponent(place.photos[0])}&maxwidth=800`) // Convert photo ref to proxy
-                                            : null);
-                                      // CRITICAL: Validate photoUrl is truthy and non-empty before rendering Image
-                                      const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
+                                    {slot.places.map((place, placeIndex) => {
+                                      // Use shared photo resolver
+                                      const photoSrc = resolvePlacePhotoSrc(place);
+                                      const isProxy = photoSrc?.startsWith("/api/places/photo");
+                                      const imageKey = `${day.id}-${slotIdx}-${place.place_id ?? place.id ?? placeIndex}-photo`;
                                       
                                       return (
                                       <div 
-                                        key={place.id} 
+                                        key={`${day.id}:${slotIdx}:${place.place_id ?? place.id ?? placeIndex}`} 
                                         className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {isValidPhotoUrl(photoUrl) && !failedImages.has(imageKey) ? (
+                                          {isPhotoSrcUsable(photoSrc) && !failedImages.has(imageKey) ? (
                                             <Image 
-                                              src={photoUrl} 
+                                              src={photoSrc} 
                                               alt={`Photo for ${place.name}`}
                                               fill 
                                               className="object-cover"
                                               key={imageKey}
+                                              unoptimized={isProxy}
                                               onError={() => {
                                                 console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
                                                 // Mark this specific image as failed - never reuse another place's image
@@ -1490,29 +1481,35 @@ export function ItineraryTab({
                   // Gather all photos from day.photos (already deduplicated by backend)
                   // Fallback to collecting from places if day.photos is empty
                   const dayImages = (day.photos && day.photos.length > 0) 
-                    ? day.photos 
-                    : day.slots.flatMap(s => s.places.flatMap(p => {
-                        // Fallback chain: photo_reference → legacy photos → null (placeholder)
-                        if (p.photo_reference) {
-                          return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
-                        }
-                        if (p.photos && p.photos.length > 0 && p.photos[0]) {
-                          // Convert photo reference to proxy URL if not already a URL
-                          return p.photos[0].startsWith('http') 
-                            ? p.photos[0] // Keep absolute URLs as-is
-                            : `/api/places/photo?ref=${encodeURIComponent(p.photos[0])}&maxwidth=800`; // Convert photo ref to proxy
-                        }
-                        return null;
-                      })).filter(Boolean);
+                    ? day.photos.map(photo => resolvePlacePhotoSrc(photo)).filter((src): src is string => src !== null)
+                    : day.slots.flatMap(s => s.places.map(p => resolvePlacePhotoSrc(p))).filter((src): src is string => src !== null);
                   
                   // Deduplicate by URL to ensure unique images
                   // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
                   const validDayImages = dayImages.filter((img): img is string => 
-                    isValidPhotoUrl(img)
+                    isPhotoSrcUsable(img)
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
+
+                  // Debug logging (development only)
+                  if (process.env.NODE_ENV === "development") {
+                    const allPlaces = day.slots.flatMap(s => s.places);
+                    console.log('[Itinerary] Photo debug:', {
+                      dayId: day.id,
+                      activitiesCount: allPlaces.length,
+                      first3Places: allPlaces.slice(0, 3).map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        hasPhotoReference: !!p.photo_reference,
+                        hasPhotos: !!p.photos?.length,
+                        photoReference: p.photo_reference,
+                        photos: p.photos,
+                        resolvedPhotoSrc: resolvePlacePhotoSrc(p),
+                      })),
+                    });
+                  }
 
                   return (
                     <Card 
@@ -1563,7 +1560,7 @@ export function ItineraryTab({
                             // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && isValidPhotoUrl(img);
+                              return !failedImages.has(imageKey) && isPhotoSrcUsable(img);
                             });
 
                             if (validImages.length === 0) {
@@ -1575,9 +1572,10 @@ export function ItineraryTab({
                                 {validImages.map((img, idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
                                   // Double-check validation before rendering Image
-                                  if (!isValidPhotoUrl(img)) {
+                                  if (!isPhotoSrcUsable(img)) {
                                     return null;
                                   }
+                                  const isProxy = img.startsWith("/api/places/photo");
                                   return (
                                     <div 
                                       key={imageKey} 
@@ -1585,7 +1583,7 @@ export function ItineraryTab({
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => isValidPhotoUrl(img)));
+                                          openLightbox(img, dayImages.filter((img): img is string => isPhotoSrcUsable(img)));
                                         }
                                       }}
                                     >
@@ -1594,6 +1592,7 @@ export function ItineraryTab({
                                         alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
                                         fill 
                                         className="object-cover"
+                                        unoptimized={isProxy}
                                         onError={() => {
                                           setFailedImages(prev => new Set(prev).add(imageKey));
                                         }}
@@ -1646,33 +1645,29 @@ export function ItineraryTab({
                                   
                                   {/* Activities */}
                                   <div className="grid gap-4">
-                                    {slot.places.map((place) => {
-                                      // Fallback chain: photo_reference → legacy photos → null (placeholder)
-                                      const photoUrl = place.photo_reference 
-                                        ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
-                                        : (place.photos && place.photos.length > 0 && place.photos[0] 
-                                            ? (place.photos[0].startsWith('http') 
-                                                ? place.photos[0] // Keep absolute URLs as-is
-                                                : `/api/places/photo?ref=${encodeURIComponent(place.photos[0])}&maxwidth=800`) // Convert photo ref to proxy
-                                            : null);
-                                      const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
+                                    {slot.places.map((place, placeIndex) => {
+                                      // Use shared photo resolver
+                                      const photoSrc = resolvePlacePhotoSrc(place);
+                                      const isProxy = photoSrc?.startsWith("/api/places/photo");
+                                      const imageKey = `${day.id}-${slotIdx}-${place.place_id ?? place.id ?? placeIndex}-photo`;
                                       
                                       return (
                                       <div 
-                                        key={place.place_id ?? place.id} 
+                                        key={`${day.id}:${slotIdx}:${place.place_id ?? place.id ?? placeIndex}`} 
                                         className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {isValidPhotoUrl(photoUrl) && !failedImages.has(imageKey) ? (
+                                          {isPhotoSrcUsable(photoSrc) && !failedImages.has(imageKey) ? (
                                             <Image 
-                                              src={photoUrl} 
+                                              src={photoSrc} 
                                               alt={`Photo for ${place.name}`}
                                               fill 
                                               className="object-cover"
                                               key={imageKey}
+                                              unoptimized={isProxy}
                                               onError={() => {
                                                 console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
                                                 // Mark this specific image as failed - never reuse another place's image
