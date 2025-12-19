@@ -4,6 +4,27 @@
  */
 
 /**
+ * Checks if a string is a valid Google Places photo_reference.
+ * Returns true ONLY for real Google Places photo_reference strings.
+ * 
+ * Heuristics (must all pass):
+ * - ref is a non-empty string, trimmed
+ * - ref length >= 30
+ * - ref must NOT start with "ChIJ" (place_id)
+ * - ref must NOT include spaces
+ * - allow common photo_reference prefixes like "AZ" but do not require a specific prefix
+ */
+export function isGooglePhotoReference(ref: string): boolean {
+  if (!ref || typeof ref !== 'string') return false;
+  const trimmed = ref.trim();
+  if (trimmed.length === 0) return false;
+  if (trimmed.length < 30) return false;
+  if (trimmed.startsWith('ChIJ')) return false; // place_id prefix
+  if (trimmed.includes(' ')) return false; // no spaces allowed
+  return true;
+}
+
+/**
  * Checks if a photo source is usable (non-empty string that's a valid URL or relative path).
  * Type guard that narrows the type to string when returning true.
  */
@@ -25,15 +46,17 @@ export function isPhotoSrcUsable(src: any): src is string {
  * A) If input is a non-empty string:
  *    - Starts with "/" → return as-is (relative URL)
  *    - Starts with "http://" or "https://" → return as-is
- *    - Otherwise → treat as legacy Google photo reference → return `/api/places/photo?ref=${encodeURIComponent(input)}`
+ *    - Otherwise → ONLY convert to proxy URL if isGooglePhotoReference(ref) is true
+ *       - If valid: return `/api/places/photo?ref=${encodeURIComponent(input)}`
+ *       - If invalid: return null
  * 
  * B) If input is an object:
  *    - Check common fields for already-usable URL: photoUrl, photo_url, imageUrl, image_url, url
- *    - Check Google legacy fields: photo_reference, photoReference
+ *    - Check Google legacy fields: photo_reference, photoReference, photoRef
  *    - Check arrays: photos, photo, images:
  *       - If it's an array of strings, use first string with the same rules as (A)
- *       - If it's an array of objects, try first item's url then photo_reference/photoReference then name
- *    - Check nested place objects: if input has place, run resolver on input.place
+ *       - If it's an array of objects, try first item's url then photo_reference/photoReference/photoRef then name
+ *    - Check nested place objects: place.place.photos, activity.place.photos, activity.placePhotos, activity.photo
  * 
  * C) If nothing found, return null
  */
@@ -53,8 +76,13 @@ export function resolvePlacePhotoSrc(input: any): string | null {
       return trimmed;
     }
     
-    // Treat as legacy Google photo reference
-    return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+    // Only convert to proxy URL if it's a valid Google photo reference
+    if (isGooglePhotoReference(trimmed)) {
+      return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+    }
+    
+    // Invalid photo reference, return null
+    return null;
   }
 
   // Case B: Input is an object
@@ -70,11 +98,15 @@ export function resolvePlacePhotoSrc(input: any): string | null {
     }
 
     // Check for Google legacy photo reference fields
-    const refFields = ['photo_reference', 'photoReference'];
+    const refFields = ['photo_reference', 'photoReference', 'photoRef'];
     for (const field of refFields) {
       const value = input[field];
       if (value && typeof value === 'string') {
-        return `/api/places/photo?ref=${encodeURIComponent(value)}`;
+        // Only convert to proxy URL if it's a valid Google photo reference
+        if (isGooglePhotoReference(value)) {
+          return `/api/places/photo?ref=${encodeURIComponent(value)}`;
+        }
+        // Invalid photo reference, continue to next field
       }
     }
 
@@ -99,10 +131,14 @@ export function resolvePlacePhotoSrc(input: any): string | null {
             if (resolved) return resolved;
           }
           
-          // Try first item's photo_reference or photoReference
-          const refValue = firstItem.photo_reference || firstItem.photoReference;
+          // Try first item's photo_reference, photoReference, or photoRef
+          const refValue = firstItem.photo_reference || firstItem.photoReference || firstItem.photoRef;
           if (refValue && typeof refValue === 'string') {
-            return `/api/places/photo?ref=${encodeURIComponent(refValue)}`;
+            // Only convert to proxy URL if it's a valid Google photo reference
+            if (isGooglePhotoReference(refValue)) {
+              return `/api/places/photo?ref=${encodeURIComponent(refValue)}`;
+            }
+            // Invalid photo reference, continue to next field
           }
           
           // Try first item's name (unlikely but possible)
@@ -117,9 +153,19 @@ export function resolvePlacePhotoSrc(input: any): string | null {
       }
     }
 
-    // Check nested place object
+    // Check nested place object (place.place.photos, activity.place.photos)
     if (input.place && typeof input.place === 'object') {
       const resolved = resolvePlacePhotoSrc(input.place);
+      if (resolved) return resolved;
+    }
+
+    // Check activity-specific fields: activity.placePhotos, activity.photo
+    if (input.placePhotos) {
+      const resolved = resolvePlacePhotoSrc(input.placePhotos);
+      if (resolved) return resolved;
+    }
+    if (input.photo) {
+      const resolved = resolvePlacePhotoSrc(input.photo);
       if (resolved) return resolved;
     }
   }

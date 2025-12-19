@@ -26,7 +26,7 @@ import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from "@/lib/supabase/smar
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getUsageLimits } from "@/lib/supabase/usage-limits";
-import { resolvePlacePhotoSrc, isPhotoSrcUsable } from "@/lib/placePhotos";
+import { resolvePlacePhotoSrc, isPhotoSrcUsable, isGooglePhotoReference } from "@/lib/placePhotos";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -1107,21 +1107,32 @@ export function ItineraryTab({
                   const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
 
-                  // Debug logging (development only)
+                  // Debug logging (development only) - first 5 activities per day
                   if (process.env.NODE_ENV === "development") {
                     const allPlaces = day.slots.flatMap(s => s.places);
-                    console.log('[Itinerary] Photo debug:', {
-                      dayId: day.id,
-                      activitiesCount: allPlaces.length,
-                      first3Places: allPlaces.slice(0, 3).map(p => ({
-                        id: p.id,
-                        name: p.name,
-                        hasPhotoReference: !!p.photo_reference,
-                        hasPhotos: !!p.photos?.length,
-                        photoReference: p.photo_reference,
-                        photos: p.photos,
-                        resolvedPhotoSrc: resolvePlacePhotoSrc(p),
-                      })),
+                    const first5Places = allPlaces.slice(0, 5);
+                    first5Places.forEach((place, idx) => {
+                      const photoSrc = resolvePlacePhotoSrc(place);
+                      // Check if any raw photo field contains a valid photo reference
+                      const rawPhotoFields = {
+                        photo_reference: place.photo_reference,
+                        photos: place.photos,
+                        photo: (place as any).photo,
+                        placePhotos: (place as any).placePhotos,
+                        place: (place as any).place,
+                      };
+                      const rawPhotoValues = [
+                        place.photo_reference,
+                        ...(Array.isArray(place.photos) ? place.photos : []),
+                        (place as any).photo,
+                        (place as any).placePhotos,
+                        (place as any).place?.photo_reference,
+                        (place as any).place?.photos,
+                      ].filter(Boolean);
+                      const hasValidRef = rawPhotoValues.some((val) => 
+                        typeof val === 'string' && isGooglePhotoReference(val)
+                      );
+                      console.log(`[Itinerary] Day ${day.id} Activity ${idx + 1}: ${place.name} | raw: ${JSON.stringify(rawPhotoFields)} | resolved: ${photoSrc || 'null'} | validRef: ${hasValidRef}`);
                     });
                   }
 
@@ -1273,46 +1284,30 @@ export function ItineraryTab({
                                     {slot.places.map((place, placeIndex) => {
                                       // Use shared photo resolver
                                       const photoSrc = resolvePlacePhotoSrc(place);
-                                      const isProxy = photoSrc?.startsWith("/api/places/photo");
                                       const imageKey = `${day.id}-${slotIdx}-${place.place_id ?? place.id ?? placeIndex}-photo`;
                                       
                                       return (
                                       <div 
-                                        key={`${day.id}:${slotIdx}:${place.place_id ?? place.id ?? placeIndex}`} 
+                                        key={`${day.id}:${slotIdx}:${placeIndex}`} 
                                         className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {isPhotoSrcUsable(photoSrc) && !failedImages.has(imageKey) ? (
-                                            photoSrc?.startsWith("/api/places/photo") ? (
-                                              <img 
-                                                src={photoSrc} 
-                                                alt={`Photo for ${place.name}`}
-                                                className="object-cover w-full h-full"
-                                                loading="lazy"
-                                                key={imageKey}
-                                                onError={() => {
-                                                  console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
-                                                  // Mark this specific image as failed - never reuse another place's image
-                                                  setFailedImages(prev => new Set(prev).add(imageKey));
-                                                }}
-                                              />
-                                            ) : (
-                                              <Image 
-                                                src={photoSrc} 
-                                                alt={`Photo for ${place.name}`}
-                                                fill 
-                                                className="object-cover"
-                                                key={imageKey}
-                                                onError={() => {
-                                                  console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
-                                                  // Mark this specific image as failed - never reuse another place's image
-                                                  setFailedImages(prev => new Set(prev).add(imageKey));
-                                                }}
-                                              />
-                                            )
+                                          {photoSrc && !failedImages.has(imageKey) ? (
+                                            <img 
+                                              src={photoSrc} 
+                                              alt={`Photo for ${place.name}`}
+                                              className="object-cover w-full h-full"
+                                              loading="lazy"
+                                              key={imageKey}
+                                              onError={() => {
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
+                                                // Mark this specific image as failed - never reuse another place's image
+                                                setFailedImages(prev => new Set(prev).add(imageKey));
+                                              }}
+                                            />
                                           ) : (
                                             // Placeholder: Show when no photo or photo failed to load
                                             // NEVER reuse another place's image as fallback
@@ -1518,21 +1513,32 @@ export function ItineraryTab({
                   const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.has(day.id);
 
-                  // Debug logging (development only)
+                  // Debug logging (development only) - first 5 activities per day
                   if (process.env.NODE_ENV === "development") {
                     const allPlaces = day.slots.flatMap(s => s.places);
-                    console.log('[Itinerary] Photo debug:', {
-                      dayId: day.id,
-                      activitiesCount: allPlaces.length,
-                      first3Places: allPlaces.slice(0, 3).map(p => ({
-                        id: p.id,
-                        name: p.name,
-                        hasPhotoReference: !!p.photo_reference,
-                        hasPhotos: !!p.photos?.length,
-                        photoReference: p.photo_reference,
-                        photos: p.photos,
-                        resolvedPhotoSrc: resolvePlacePhotoSrc(p),
-                      })),
+                    const first5Places = allPlaces.slice(0, 5);
+                    first5Places.forEach((place, idx) => {
+                      const photoSrc = resolvePlacePhotoSrc(place);
+                      // Check if any raw photo field contains a valid photo reference
+                      const rawPhotoFields = {
+                        photo_reference: place.photo_reference,
+                        photos: place.photos,
+                        photo: (place as any).photo,
+                        placePhotos: (place as any).placePhotos,
+                        place: (place as any).place,
+                      };
+                      const rawPhotoValues = [
+                        place.photo_reference,
+                        ...(Array.isArray(place.photos) ? place.photos : []),
+                        (place as any).photo,
+                        (place as any).placePhotos,
+                        (place as any).place?.photo_reference,
+                        (place as any).place?.photos,
+                      ].filter(Boolean);
+                      const hasValidRef = rawPhotoValues.some((val) => 
+                        typeof val === 'string' && isGooglePhotoReference(val)
+                      );
+                      console.log(`[Itinerary] Day ${day.id} Activity ${idx + 1}: ${place.name} | raw: ${JSON.stringify(rawPhotoFields)} | resolved: ${photoSrc || 'null'} | validRef: ${hasValidRef}`);
                     });
                   }
 
@@ -1684,46 +1690,30 @@ export function ItineraryTab({
                                     {slot.places.map((place, placeIndex) => {
                                       // Use shared photo resolver
                                       const photoSrc = resolvePlacePhotoSrc(place);
-                                      const isProxy = photoSrc?.startsWith("/api/places/photo");
                                       const imageKey = `${day.id}-${slotIdx}-${place.place_id ?? place.id ?? placeIndex}-photo`;
                                       
                                       return (
                                       <div 
-                                        key={`${day.id}:${slotIdx}:${place.place_id ?? place.id ?? placeIndex}`} 
+                                        key={`${day.id}:${slotIdx}:${placeIndex}`} 
                                         className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {isPhotoSrcUsable(photoSrc) && !failedImages.has(imageKey) ? (
-                                            photoSrc?.startsWith("/api/places/photo") ? (
-                                              <img 
-                                                src={photoSrc} 
-                                                alt={`Photo for ${place.name}`}
-                                                className="object-cover w-full h-full"
-                                                loading="lazy"
-                                                key={imageKey}
-                                                onError={() => {
-                                                  console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
-                                                  // Mark this specific image as failed - never reuse another place's image
-                                                  setFailedImages(prev => new Set(prev).add(imageKey));
-                                                }}
-                                              />
-                                            ) : (
-                                              <Image 
-                                                src={photoSrc} 
-                                                alt={`Photo for ${place.name}`}
-                                                fill 
-                                                className="object-cover"
-                                                key={imageKey}
-                                                onError={() => {
-                                                  console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
-                                                  // Mark this specific image as failed - never reuse another place's image
-                                                  setFailedImages(prev => new Set(prev).add(imageKey));
-                                                }}
-                                              />
-                                            )
+                                          {photoSrc && !failedImages.has(imageKey) ? (
+                                            <img 
+                                              src={photoSrc} 
+                                              alt={`Photo for ${place.name}`}
+                                              className="object-cover w-full h-full"
+                                              loading="lazy"
+                                              key={imageKey}
+                                              onError={() => {
+                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
+                                                // Mark this specific image as failed - never reuse another place's image
+                                                setFailedImages(prev => new Set(prev).add(imageKey));
+                                              }}
+                                            />
                                           ) : (
                                             // Placeholder: Show when no photo or photo failed to load
                                             // NEVER reuse another place's image as fallback

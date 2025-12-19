@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isGooglePhotoReference } from '@/lib/placePhotos';
 
 export const runtime = 'nodejs';
 
@@ -37,6 +38,22 @@ export async function GET(request: NextRequest) {
       console.error('[photo-api] Missing photo_reference parameter');
       return NextResponse.json(
         { error: 'Missing required parameter: ref or photo_reference' },
+        { status: 400 }
+      );
+    }
+
+    // Validate photo reference - must be a valid Google Places photo_reference
+    if (!isGooglePhotoReference(photoRef)) {
+      if (isDev) {
+        console.error('[photo-api] Invalid photo reference:', {
+          ref: photoRef.substring(0, 50) + (photoRef.length > 50 ? '...' : ''),
+          length: photoRef.length,
+          startsWithChIJ: photoRef.startsWith('ChIJ'),
+          hasSpaces: photoRef.includes(' '),
+        });
+      }
+      return NextResponse.json(
+        { error: 'Invalid photo reference' },
         { status: 400 }
       );
     }
