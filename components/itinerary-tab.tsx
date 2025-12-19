@@ -54,6 +54,20 @@ function textToBulletPoints(text: string): string[] {
     });
 }
 
+// Helper function to validate photo URLs
+// Allows relative URLs (starting with /) and absolute URLs (http/https)
+// Rejects null, undefined, empty strings, and whitespace-only strings
+function isValidPhotoUrl(url: unknown): url is string {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (trimmed.length === 0) return false;
+  // Allow relative URLs (starting with /)
+  if (trimmed.startsWith('/')) return true;
+  // Allow absolute URLs (http/https)
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return true;
+  return false;
+}
+
 // Simple affiliate button component
 function AffiliateButton({ kind, day }: { kind: string, day: ItineraryDay }) {
   // Fallback or placeholder logic for affiliates since we removed the specific AffiliateSuggestion type from explicit Day interface in new schema
@@ -1100,7 +1114,10 @@ export function ItineraryTab({
                           return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
                         }
                         if (p.photos && p.photos.length > 0 && p.photos[0]) {
-                          return p.photos[0];
+                          // Convert photo reference to proxy URL if not already a URL
+                          return p.photos[0].startsWith('http') 
+                            ? p.photos[0] // Keep absolute URLs as-is
+                            : `/api/places/photo?ref=${encodeURIComponent(p.photos[0])}&maxwidth=800`; // Convert photo ref to proxy
                         }
                         return null;
                       })).filter(Boolean);
@@ -1108,7 +1125,7 @@ export function ItineraryTab({
                   // Deduplicate by URL to ensure unique images
                   // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
                   const validDayImages = dayImages.filter((img): img is string => 
-                    !!img && typeof img === 'string' && img.trim().length > 0
+                    isValidPhotoUrl(img)
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
@@ -1163,10 +1180,7 @@ export function ItineraryTab({
                             // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && 
-                                     !!img && 
-                                     typeof img === 'string' && 
-                                     img.trim().length > 0;
+                              return !failedImages.has(imageKey) && isValidPhotoUrl(img);
                             });
 
                             if (validImages.length === 0) {
@@ -1178,7 +1192,7 @@ export function ItineraryTab({
                                 {validImages.map((img, idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
                                   // Double-check validation before rendering Image
-                                  if (!img || typeof img !== 'string' || img.trim().length === 0) {
+                                  if (!isValidPhotoUrl(img)) {
                                     return null;
                                   }
                                   return (
@@ -1188,7 +1202,7 @@ export function ItineraryTab({
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => !!img && typeof img === 'string' && img.trim().length > 0));
+                                          openLightbox(img, dayImages.filter((img): img is string => isValidPhotoUrl(img)));
                                         }
                                       }}
                                     >
@@ -1253,9 +1267,12 @@ export function ItineraryTab({
                                       // Fallback chain: photo_reference → legacy photos → null (placeholder)
                                       const photoUrl = place.photo_reference 
                                         ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
-                                        : (place.photos && place.photos.length > 0 && place.photos[0] ? place.photos[0] : null);
+                                        : (place.photos && place.photos.length > 0 && place.photos[0] 
+                                            ? (place.photos[0].startsWith('http') 
+                                                ? place.photos[0] // Keep absolute URLs as-is
+                                                : `/api/places/photo?ref=${encodeURIComponent(place.photos[0])}&maxwidth=800`) // Convert photo ref to proxy
+                                            : null);
                                       // CRITICAL: Validate photoUrl is truthy and non-empty before rendering Image
-                                      const isValidPhotoUrl = photoUrl && typeof photoUrl === 'string' && photoUrl.trim().length > 0;
                                       const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
                                       
                                       return (
@@ -1267,7 +1284,7 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {isValidPhotoUrl && !failedImages.has(imageKey) ? (
+                                          {isValidPhotoUrl(photoUrl) && !failedImages.has(imageKey) ? (
                                             <Image 
                                               src={photoUrl} 
                                               alt={`Photo for ${place.name}`}
@@ -1480,7 +1497,10 @@ export function ItineraryTab({
                           return `/api/places/photo?ref=${encodeURIComponent(p.photo_reference)}&maxwidth=800`;
                         }
                         if (p.photos && p.photos.length > 0 && p.photos[0]) {
-                          return p.photos[0];
+                          // Convert photo reference to proxy URL if not already a URL
+                          return p.photos[0].startsWith('http') 
+                            ? p.photos[0] // Keep absolute URLs as-is
+                            : `/api/places/photo?ref=${encodeURIComponent(p.photos[0])}&maxwidth=800`; // Convert photo ref to proxy
                         }
                         return null;
                       })).filter(Boolean);
@@ -1488,7 +1508,7 @@ export function ItineraryTab({
                   // Deduplicate by URL to ensure unique images
                   // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
                   const validDayImages = dayImages.filter((img): img is string => 
-                    !!img && typeof img === 'string' && img.trim().length > 0
+                    isValidPhotoUrl(img)
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
@@ -1543,10 +1563,7 @@ export function ItineraryTab({
                             // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
-                              return !failedImages.has(imageKey) && 
-                                     !!img && 
-                                     typeof img === 'string' && 
-                                     img.trim().length > 0;
+                              return !failedImages.has(imageKey) && isValidPhotoUrl(img);
                             });
 
                             if (validImages.length === 0) {
@@ -1558,7 +1575,7 @@ export function ItineraryTab({
                                 {validImages.map((img, idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
                                   // Double-check validation before rendering Image
-                                  if (!img || typeof img !== 'string' || img.trim().length === 0) {
+                                  if (!isValidPhotoUrl(img)) {
                                     return null;
                                   }
                                   return (
@@ -1568,7 +1585,7 @@ export function ItineraryTab({
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => !!img && typeof img === 'string' && img.trim().length > 0));
+                                          openLightbox(img, dayImages.filter((img): img is string => isValidPhotoUrl(img)));
                                         }
                                       }}
                                     >
@@ -1633,7 +1650,11 @@ export function ItineraryTab({
                                       // Fallback chain: photo_reference → legacy photos → null (placeholder)
                                       const photoUrl = place.photo_reference 
                                         ? `/api/places/photo?ref=${encodeURIComponent(place.photo_reference)}&maxwidth=800`
-                                        : (place.photos && place.photos.length > 0 && place.photos[0] ? place.photos[0] : null);
+                                        : (place.photos && place.photos.length > 0 && place.photos[0] 
+                                            ? (place.photos[0].startsWith('http') 
+                                                ? place.photos[0] // Keep absolute URLs as-is
+                                                : `/api/places/photo?ref=${encodeURIComponent(place.photos[0])}&maxwidth=800`) // Convert photo ref to proxy
+                                            : null);
                                       const imageKey = `${day.id}-${place.place_id ?? place.id}-photo`;
                                       
                                       return (
@@ -1645,7 +1666,7 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {photoUrl && !failedImages.has(imageKey) ? (
+                                          {isValidPhotoUrl(photoUrl) && !failedImages.has(imageKey) ? (
                                             <Image 
                                               src={photoUrl} 
                                               alt={`Photo for ${place.name}`}
