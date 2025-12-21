@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Loader2, Heart, Sparkles } from 'lucide-react';
@@ -93,8 +93,10 @@ export function ExploreDeck({
   });
   const { addToast } = useToast();
 
-  // Derive places directly from hook result - ensure always an array
-  const rawPlaces = Array.isArray(data?.places) ? data.places : [];
+  // Derive places directly from hook result - ensure always an array (memoized to prevent unnecessary re-renders)
+  const rawPlaces = useMemo(() => {
+    return Array.isArray(data?.places) ? data.places : [];
+  }, [data?.places]);
 
   // Compute itinerary place keys (memoized)
   const itineraryPlaceKeys = useMemo(() => {

@@ -52,7 +52,9 @@ export function useTripActivities(tripId: string) {
         return [] as Activity[];
       }
 
-      const dayIds = days.map((day) => day.id);
+      // Type assertion for days array
+      type DayRow = { id: string };
+      const dayIds = (days as DayRow[]).map((day) => day.id);
 
       // Fetch all activities for all days with place data including external_id
       const { data: activities, error: activitiesError } = await supabase

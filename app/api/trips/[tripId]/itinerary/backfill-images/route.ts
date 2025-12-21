@@ -216,8 +216,9 @@ export async function POST(
 
       // Extract inputs for logging
       const placeId = place.id;
-      const placeLat = place.lat ?? trip.center_lat ?? undefined;
-      const placeLng = place.lng ?? trip.center_lng ?? undefined;
+      // Note: ItineraryPlace doesn't have lat/lng properties, use trip center as fallback
+      const placeLat = (place as any).lat ?? trip.center_lat ?? undefined;
+      const placeLng = (place as any).lng ?? trip.center_lng ?? undefined;
       
       // Check if place already has photo_reference
       let hadPhotoRef = false;

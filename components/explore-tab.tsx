@@ -206,10 +206,8 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
               lng: selectedPlace.lng,
               neighborhood: selectedPlace.neighborhood,
               district: selectedPlace.district,
-              description: selectedPlace.description,
               types: selectedPlace.types,
-              photo_reference: selectedPlace.photo_reference,
-              image_url: selectedPlace.image_url,
+              photo_url: selectedPlace.photo_url,
             },
           }),
         });
@@ -425,7 +423,7 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
 
             {/* Place Details Card */}
             <div>
-              <ExplorePlaceDetailsCard place={currentPlace} tripCity={trip?.destination_city || undefined} />
+              <ExplorePlaceDetailsCard place={currentPlace} tripCity={trip?.destination_name || undefined} />
             </div>
           </div>
         </div>
