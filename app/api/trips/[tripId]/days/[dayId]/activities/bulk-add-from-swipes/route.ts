@@ -8,6 +8,7 @@ import { isPastDay } from '@/lib/utils/date-helpers';
 import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from '@/lib/supabase/smart-itineraries';
 import { getTripProStatus } from '@/lib/supabase/pro-status';
 import { getUsageLimits } from '@/lib/supabase/user-subscription';
+import { cachePlaceImage } from '@/lib/images/cache-place-image';
 
 export async function POST(
   req: NextRequest,
@@ -258,15 +259,17 @@ export async function POST(
     const skippedPlaceIds: string[] = [];
 
     // Fetch place details from Google Places API
+    // Note: photos is stored as Array<{ photo_reference: string }> for backward compatibility with resolvePlacePhotoSrc
     const newPlaces: Array<{
       id: string;
       name: string;
       description: string;
       area: string;
       neighborhood: string | null;
-      photos: string[];
+      photos: Array<{ photo_reference: string }>;
       visited: boolean;
       tags: string[];
+      image_url?: string;
     }> = [];
 
     if (!GOOGLE_MAPS_API_KEY) {
@@ -283,18 +286,10 @@ export async function POST(
       try {
         const placeDetails = await getPlaceDetails(placeId);
         if (placeDetails) {
-          // Get photos
-          const photos: string[] = [];
+          // Extract photo reference from first photo
+          let photoRef: string | null = null;
           if (placeDetails.photos && placeDetails.photos.length > 0) {
-            // Use first 3 photos
-            for (let i = 0; i < Math.min(3, placeDetails.photos.length); i++) {
-              const photo = placeDetails.photos[i];
-              if (photo?.photo_reference) {
-                photos.push(
-                  `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
-                );
-              }
-            }
+            photoRef = placeDetails.photos[0]?.photo_reference || null;
           }
 
           // Extract area/neighborhood from address
@@ -302,6 +297,29 @@ export async function POST(
           const addressParts = address.split(',').map(p => p.trim());
           const area = addressParts.length > 1 ? addressParts[addressParts.length - 2] : addressParts[0] || 'Unknown';
           const neighborhood = addressParts.length > 2 ? addressParts[addressParts.length - 3] : null;
+          const country = addressParts.length > 0 ? addressParts[addressParts.length - 1] : undefined;
+
+          // Extract coordinates
+          const lat = placeDetails.geometry?.location?.lat;
+          const lng = placeDetails.geometry?.location?.lng;
+
+          // Cache image to Supabase Storage
+          let imageUrl: string | null = null;
+          try {
+            imageUrl = await cachePlaceImage({
+              tripId,
+              placeId,
+              title: placeDetails.name || 'Unknown Place',
+              city: area,
+              country,
+              photoRef: photoRef || undefined,
+              lat,
+              lng,
+            });
+          } catch (cacheError) {
+            console.error(`[bulk-add-from-swipes] Error caching image for place ${placeId}:`, cacheError);
+            // Continue without image - not a fatal error
+          }
 
           // Generate description from place details
           const description = placeDetails.editorial_summary?.overview || 
@@ -311,17 +329,36 @@ export async function POST(
           // Extract tags from types
           const tags = (placeDetails.types || []).slice(0, 3).map(t => t.replace(/_/g, ' '));
 
-          newPlaces.push({
+          // Create place with image_url and photos array
+          // Store photos as [{ photo_reference: photoRef }] for backward compatibility with resolvePlacePhotoSrc
+          const newPlace: any = {
             id: placeId,
             name: placeDetails.name || 'Unknown Place',
             description,
             area,
             neighborhood,
-            photos,
+            photos: photoRef ? [{ photo_reference: photoRef }] : [],
             visited: false,
             tags,
-          });
+          };
+
+          // Set image_url if we have a cached image (primary source for images)
+          if (imageUrl) {
+            newPlace.image_url = imageUrl;
+          }
+
+          newPlaces.push(newPlace);
           addedPlaceIds.push(placeId);
+          
+          // Debug logging (dev only)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[bulk-add-from-swipes] Saved place with image:', {
+              placeId,
+              name: placeDetails.name || 'Unknown Place',
+              image_url: imageUrl,
+              photoRef,
+            });
+          }
         }
 
         // Small delay to avoid rate limits

@@ -9,6 +9,7 @@ export interface ItineraryPlace {
   tags: string[];     // "food", "viewpoint", etc.
   place_id?: string;  // Google Places place_id for accurate photo fetching
   photo_reference?: string;  // Google Places photo_reference for reliable image fetching
+  image_url?: string | null;  // Stable Supabase Storage URL (prioritized over photos array)
 }
 
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening';

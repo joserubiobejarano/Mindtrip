@@ -62,14 +62,15 @@ export function useActivities(dayId: string) {
         throw error;
       }
       
-      // Console log to verify image_url persistence
+      // Debug log: Show first 3 activities with key fields (one-time, not spamming)
       if (data && data.length > 0) {
-        const sample = data[0] as Activity;
-        console.log('[Activities] Sample activity loaded:', {
-          id: sample.id,
-          title: sample.title,
-          image_url: sample.image_url
-        });
+        const firstThree = data.slice(0, 3).map((activity: Activity) => ({
+          id: activity.id,
+          title: activity.title,
+          place_id: activity.place_id,
+          image_url: activity.image_url
+        }));
+        console.log('[Activities] First 3 activities loaded:', firstThree);
       }
       
       return (data || []) as Activity[];

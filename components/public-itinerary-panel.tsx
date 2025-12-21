@@ -9,6 +9,11 @@ import { SmartItinerary } from "@/types/itinerary";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 
+// Helper to check if image src is a places proxy that needs unoptimized rendering
+const isPlacesProxy = (src?: string | null): boolean => {
+  return typeof src === "string" && src.startsWith("/api/places/photo");
+}
+
 // Helper function to convert text to bullet points, avoiding splits on decimals
 function textToBulletPoints(text: string): string[] {
   const normalized = text.replace(/\s+/g, ' ').trim();
@@ -194,21 +199,29 @@ export function PublicItineraryPanel({
                     return null; // Don't render empty gallery
                   }
 
+                  const shouldUnoptimize = validImages.some(img => isPlacesProxy(img));
+                  if (process.env.NODE_ENV === 'development' && validImages.length > 0) {
+                    console.debug('[PublicItineraryPanel] Banner images:', { count: validImages.length, unoptimized: shouldUnoptimize, firstSrc: validImages[0] });
+                  }
                   return (
                     <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
-                      {validImages.map((img, idx) => (
-                        <div 
-                          key={idx} 
-                          className="relative flex-1 min-w-0 aspect-[4/3] overflow-hidden"
-                        >
-                          <Image 
-                            src={img} 
-                            alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                            fill 
-                            className="object-cover"
-                          />
-                        </div>
-                      ))}
+                      {validImages.map((img, idx) => {
+                        const shouldUnoptimizeImg = isPlacesProxy(img);
+                        return (
+                          <div 
+                            key={idx} 
+                            className="relative flex-1 min-w-0 aspect-[4/3] overflow-hidden"
+                          >
+                            <Image 
+                              src={img} 
+                              alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
+                              fill 
+                              unoptimized={shouldUnoptimizeImg}
+                              className="object-cover"
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })()}
@@ -254,9 +267,21 @@ export function PublicItineraryPanel({
                                 }}
                               >
                                 <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                  {place.photos && place.photos[0] ? (
-                                    <Image src={place.photos[0]} alt={place.name} fill className="object-cover" />
-                                  ) : (
+                                  {place.photos && place.photos[0] ? (() => {
+                                    const shouldUnoptimize = isPlacesProxy(place.photos[0]);
+                                    if (process.env.NODE_ENV === 'development' && slotIdx === 0 && place === slot.places[0]) {
+                                      console.debug('[PublicItineraryPanel] Place activity image:', { src: place.photos[0], placeName: place.name, unoptimized: shouldUnoptimize });
+                                    }
+                                    return (
+                                      <Image 
+                                        src={place.photos[0]} 
+                                        alt={place.name} 
+                                        fill 
+                                        unoptimized={shouldUnoptimize}
+                                        className="object-cover" 
+                                      />
+                                    );
+                                  })() : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400">
                                       <span className="text-xs">No image</span>
                                     </div>

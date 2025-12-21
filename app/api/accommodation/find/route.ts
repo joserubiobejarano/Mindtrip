@@ -17,8 +17,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    // Use server-side API key only (no NEXT_PUBLIC fallback for security)
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
+      console.error('[accommodation-find] Google Maps API key not configured (server key missing)');
       return NextResponse.json(
         { error: "Google Maps API key not configured" },
         { status: 500 }

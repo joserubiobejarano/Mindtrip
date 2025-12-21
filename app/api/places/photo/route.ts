@@ -7,6 +7,17 @@ export const runtime = 'nodejs';
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 const isDev = process.env.NODE_ENV === 'development';
 
+
+/**
+ * Returns a small 1x1 transparent PNG as a placeholder image.
+ * This is returned with 200 status to prevent retry storms when photos are unavailable.
+ */
+function getPlaceholderImage(): Buffer {
+  // 1x1 transparent PNG (67 bytes)
+  const placeholderBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  return Buffer.from(placeholderBase64, 'base64');
+}
+
 function getErrorHint(errorBody: string): string | null {
   const bodyLower = errorBody.toLowerCase();
   if (bodyLower.includes('request_denied')) {
@@ -31,15 +42,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ hasKey: !!GOOGLE_MAPS_API_KEY });
     }
 
+    const maxwidth = searchParams.get('maxWidth') || searchParams.get('maxwidth') || '1200';
     const photoRef = searchParams.get('ref') || searchParams.get('photo_reference');
-    const maxwidth = searchParams.get('maxwidth') || '1000';
 
     if (!photoRef) {
-      console.error('[photo-api] Missing photo_reference parameter');
-      return NextResponse.json(
-        { error: 'Missing required parameter: ref or photo_reference' },
-        { status: 400 }
-      );
+      if (isDev) {
+        console.warn('[photo-api] Missing photo_reference parameter - returning placeholder');
+      }
+      // Return placeholder image (200) with dev-only warning
+      const placeholder = getPlaceholderImage();
+      return new NextResponse(placeholder, {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=3600',
+          'Content-Length': placeholder.length.toString(),
+        },
+      });
     }
 
     // Validate photo reference - must be a valid Google Places photo_reference
@@ -76,13 +95,6 @@ export async function GET(request: NextRequest) {
       const errorText = await photoResponse.text().catch(() => 'Unknown error');
       const errorBodyPreview = errorText.substring(0, 300);
       const hint = getErrorHint(errorText);
-      
-      const errorInfo = {
-        status: 'error',
-        googleStatusCode: photoResponse.status,
-        googleResponseBody: errorBodyPreview,
-        ...(hint && { hint })
-      };
 
       // Log detailed error info server-side
       console.error('[photo-api] Google Places Photo API error:', {
@@ -94,15 +106,16 @@ export async function GET(request: NextRequest) {
         hint
       });
 
-      // In dev mode, return detailed error JSON; otherwise return 404 with generic message
-      if (isDev) {
-        return NextResponse.json(errorInfo, { status: 404 });
-      }
-      
-      return NextResponse.json(
-        { error: 'Failed to fetch photo from Google Places API' },
-        { status: 404 }
-      );
+      // Return placeholder image (200) instead of 404 to prevent retry storms
+      const placeholder = getPlaceholderImage();
+      return new NextResponse(placeholder, {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=3600',
+          'Content-Length': placeholder.length.toString(),
+        },
+      });
     }
 
     // Get the image data as a buffer
@@ -116,7 +129,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
+        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
         'Content-Length': imageBuffer.byteLength.toString(),
       },
     });

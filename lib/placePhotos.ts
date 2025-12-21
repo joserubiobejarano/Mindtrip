@@ -87,7 +87,7 @@ export function resolvePlacePhotoSrc(input: any): string | null {
 
   // Case B: Input is an object
   if (typeof input === 'object' && input !== null) {
-    // PRIORITY 1: Check image_url first (from activities table) - if present and usable, return immediately
+    // PRIORITY 1: Check image_url first (from SmartItinerary activities) - if present and usable, return immediately
     // This avoids trying to resolve place.photos which don't serialize properly
     if (input.image_url && typeof input.image_url === 'string') {
       const trimmed = input.image_url.trim();
@@ -107,7 +107,42 @@ export function resolvePlacePhotoSrc(input: any): string | null {
       }
     }
     
-    // PRIORITY 2: Check other already-usable URL fields
+    // PRIORITY 1b: Check imageUrl (camelCase variant) defensively
+    if (input.imageUrl && typeof input.imageUrl === 'string') {
+      const trimmed = input.imageUrl.trim();
+      if (trimmed.length > 0) {
+        // Already a relative URL
+        if (trimmed.startsWith('/')) return trimmed;
+        // Already an absolute URL
+        if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+          return trimmed;
+        }
+        // If it's a Google photo reference, convert to proxy URL
+        if (isGooglePhotoReference(trimmed)) {
+          return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+        }
+        // If it's a valid URL format, return as-is
+        return trimmed;
+      }
+    }
+    
+    // PRIORITY 2: Check photos array for photo_reference or ref
+    // This matches Explore cards which store photos[0] as a photo_reference string
+    if (input.photos && Array.isArray(input.photos) && input.photos.length > 0) {
+      const firstPhoto = input.photos[0];
+      if (typeof firstPhoto === 'string') {
+        const resolved = resolvePlacePhotoSrc(firstPhoto);
+        if (resolved) return resolved;
+      } else if (typeof firstPhoto === 'object' && firstPhoto !== null) {
+        // Check for photo_reference or ref in object
+        const refValue = firstPhoto.photo_reference || firstPhoto.photoReference || firstPhoto.ref;
+        if (refValue && typeof refValue === 'string' && isGooglePhotoReference(refValue)) {
+          return `/api/places/photo?ref=${encodeURIComponent(refValue)}`;
+        }
+      }
+    }
+    
+    // PRIORITY 3: Check other already-usable URL fields
     const urlFields = ['photoUrl', 'photo_url', 'imageUrl', 'url'];
     for (const field of urlFields) {
       const value = input[field];

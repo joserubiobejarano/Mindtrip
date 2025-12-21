@@ -171,25 +171,55 @@ export function AddToItineraryDialog({
           ? existingActivitiesTyped[0].order_number || 0
           : 0;
 
-      // Extract image URL from place
+      // Cache image to Supabase Storage
       let imageUrl: string | null = null;
       
-      // If we already have a photoUrl string, use it
-      if (place.photoUrl && typeof place.photoUrl === 'string') {
-        imageUrl = place.photoUrl;
-      } 
-      // Otherwise, check if place has Google Maps photo objects
-      else if ((place as any).photos && Array.isArray((place as any).photos) && (place as any).photos.length > 0) {
-        const photo = (place as any).photos[0];
-        // Check if it's a Google Maps photo object with getUrl method
-        if (photo && typeof photo.getUrl === 'function') {
-          try {
-            imageUrl = photo.getUrl({ maxWidth: 1200 });
-          } catch (err) {
-            console.error("Error getting photo URL:", err);
-            imageUrl = null;
+      try {
+        // Extract photoRef from place if available
+        let photoRef: string | undefined;
+        if ((place as any).photo_reference) {
+          photoRef = (place as any).photo_reference;
+        } else if ((place as any).photos && Array.isArray((place as any).photos) && (place as any).photos.length > 0) {
+          const photo = (place as any).photos[0];
+          if (photo && typeof photo === 'object') {
+            photoRef = photo.photo_reference || photo.photoReference || photo.ref;
+          } else if (typeof photo === 'string') {
+            photoRef = photo;
           }
         }
+
+        // Extract city/country from address if available
+        const addressParts = place.address?.split(',').map((p: string) => p.trim()) || [];
+        const city = addressParts.length > 1 ? addressParts[addressParts.length - 2] : undefined;
+        const country = addressParts.length > 0 ? addressParts[addressParts.length - 1] : undefined;
+
+        // Call image caching API
+        const cacheResponse = await fetch('/api/images/cache-place-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            tripId,
+            placeId: place.id,
+            title: activityTitle.trim() || place.name,
+            city,
+            country,
+            photoRef,
+            lat: place.lat,
+            lng: place.lng,
+          }),
+        });
+
+        if (cacheResponse.ok) {
+          const data = await cacheResponse.json();
+          imageUrl = data.image_url || null;
+        } else {
+          console.warn('[add-to-itinerary-dialog] Image caching failed, continuing without image');
+        }
+      } catch (cacheError) {
+        console.error('[add-to-itinerary-dialog] Error caching image:', cacheError);
+        // Continue without image - not a fatal error
       }
 
       // Create the activity
@@ -205,6 +235,15 @@ export function AddToItineraryDialog({
           order_number: maxOrder + 1,
           image_url: imageUrl,
         });
+
+      // Debug logging (dev only)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[add-to-itinerary-dialog] Saved activity with image:', {
+          placeId: place.id,
+          title: activityTitle.trim(),
+          image_url: imageUrl,
+        });
+      }
 
       if (activityError) {
         console.error("Error creating activity:", activityError);

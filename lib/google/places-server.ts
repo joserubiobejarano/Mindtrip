@@ -1,4 +1,5 @@
-export const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
+// Use server-side API key only (no NEXT_PUBLIC fallback for security)
+export const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 /**
  * Fetch a single representative photo URL for a place name using Google Places API (Server-side)

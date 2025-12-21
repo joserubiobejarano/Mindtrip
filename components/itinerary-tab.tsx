@@ -26,7 +26,7 @@ import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from "@/lib/supabase/smar
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getUsageLimits } from "@/lib/supabase/usage-limits";
-import { resolvePlacePhotoSrc, isPhotoSrcUsable, isGooglePhotoReference } from "@/lib/placePhotos";
+import { resolvePlacePhotoSrc, isPhotoSrcUsable } from "@/lib/placePhotos";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -53,6 +53,11 @@ function textToBulletPoints(text: string): string[] {
       // Ensure each bullet ends with a period
       return s.endsWith('.') ? s : s + '.';
     });
+}
+
+// Helper to check if image src is a places proxy that needs unoptimized rendering
+const isPlacesProxy = (src?: string | null): boolean => {
+  return typeof src === "string" && src.startsWith("/api/places/photo");
 }
 
 
@@ -99,6 +104,7 @@ export function ItineraryTab({
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const [isBackfillingImages, setIsBackfillingImages] = useState(false);
   
   // Day-level Explore state
   const [dayExploreOpen, setDayExploreOpen] = useState(false);
@@ -663,6 +669,62 @@ export function ItineraryTab({
     }
   }, [tripId, generateSmartItinerary, addToast, isActive]);
 
+  // Check if any places need photos
+  const hasPlacesNeedingPhotos = useCallback((): boolean => {
+    if (!smartItinerary?.days) return false;
+    
+    for (const day of smartItinerary.days) {
+      for (const slot of day.slots || []) {
+        for (const place of slot.places || []) {
+          if (!place.place_id) continue;
+          const hasPhoto = place.photos && 
+                          Array.isArray(place.photos) && 
+                          place.photos.length > 0 && 
+                          isPhotoSrcUsable(place.photos[0]);
+          if (!hasPhoto) return true;
+        }
+      }
+    }
+    return false;
+  }, [smartItinerary]);
+
+  // Backfill images for places missing photos
+  const handleBackfillImages = useCallback(async () => {
+    if (!tripId || isBackfillingImages) return;
+
+    setIsBackfillingImages(true);
+    try {
+      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error || 'Failed to backfill images');
+      }
+
+      const result = await response.json();
+      
+      addToast({
+        title: 'Images updated',
+        description: `Updated ${result.updatedCount} place${result.updatedCount !== 1 ? 's' : ''} with photos.`,
+        variant: 'success',
+      });
+
+      // Refetch itinerary to show updated images
+      await loadOrGenerate();
+    } catch (error: any) {
+      console.error('[itinerary-tab] Error backfilling images:', error);
+      addToast({
+        title: 'Error',
+        description: error.message || 'Failed to backfill images',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBackfillingImages(false);
+    }
+  }, [tripId, isBackfillingImages, addToast, loadOrGenerate]);
+
   // Load days with segment info
   useEffect(() => {
     if (!isActive) return;
@@ -995,9 +1057,29 @@ export function ItineraryTab({
                   {/* Trip Summary */}
                   {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
                     <div className="space-y-4 mb-10 max-w-4xl mx-auto">
-                      {smartItinerary.title && (
-                        <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
-                      )}
+                      <div className="flex items-center justify-center gap-3">
+                        {smartItinerary.title && (
+                          <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
+                        )}
+                        {process.env.NODE_ENV === 'development' && hasPlacesNeedingPhotos() && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleBackfillImages}
+                            disabled={isBackfillingImages}
+                            className="text-xs"
+                          >
+                            {isBackfillingImages ? (
+                              <>
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                Fixing...
+                              </>
+                            ) : (
+                              'Fix Images'
+                            )}
+                          </Button>
+                        )}
+                      </div>
                       {smartItinerary.summary && (
                         <div className="prose prose-neutral max-w-none text-slate-900 text-left">
                           <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
@@ -1200,7 +1282,10 @@ export function ItineraryTab({
                                   if (!isPhotoSrcUsable(img)) {
                                     return null;
                                   }
-                                  const isProxy = img.startsWith("/api/places/photo");
+                                  const shouldUnoptimize = isPlacesProxy(img);
+                                  if (process.env.NODE_ENV === 'development' && idx === 0) {
+                                    console.debug('[ItineraryTab] Banner image:', { src: img, unoptimized: shouldUnoptimize });
+                                  }
                                   return (
                                     <div 
                                       key={imageKey} 
@@ -1212,28 +1297,16 @@ export function ItineraryTab({
                                         }
                                       }}
                                     >
-                                      {isProxy ? (
-                                        <Image 
-                                          src={img} 
-                                          alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                          fill
-                                          unoptimized
-                                          className="object-cover"
-                                          onError={() => {
-                                            setFailedImages(prev => new Set(prev).add(imageKey));
-                                          }}
-                                        />
-                                      ) : (
-                                        <Image 
-                                          src={img} 
-                                          alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                          fill 
-                                          className="object-cover"
-                                          onError={() => {
-                                            setFailedImages(prev => new Set(prev).add(imageKey));
-                                          }}
-                                        />
-                                      )}
+                                      <Image 
+                                        src={img} 
+                                        alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
+                                        fill
+                                        unoptimized={shouldUnoptimize}
+                                        className="object-cover"
+                                        onError={() => {
+                                          setFailedImages(prev => new Set(prev).add(imageKey));
+                                        }}
+                                      />
                                     </div>
                                   );
                                 })}
@@ -1296,20 +1369,27 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {photoSrc && !failedImages.has(imageKey) ? (
-                                            <Image 
-                                              src={photoSrc} 
-                                              alt={`Photo for ${place.name}`}
-                                              fill
-                                              className="object-cover"
-                                              key={imageKey}
-                                              onError={() => {
-                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
-                                                // Mark this specific image as failed - never reuse another place's image
-                                                setFailedImages(prev => new Set(prev).add(imageKey));
-                                              }}
-                                            />
-                                          ) : (
+                                          {photoSrc && !failedImages.has(imageKey) ? (() => {
+                                            const shouldUnoptimize = isPlacesProxy(photoSrc);
+                                            if (process.env.NODE_ENV === 'development' && placeIndex === 0 && slotIdx === 0) {
+                                              console.debug('[ItineraryTab] Place activity image:', { src: photoSrc, placeName: place.name, unoptimized: shouldUnoptimize });
+                                            }
+                                            return (
+                                              <Image 
+                                                src={photoSrc} 
+                                                alt={`Photo for ${place.name}`}
+                                                fill
+                                                unoptimized={shouldUnoptimize}
+                                                className="object-cover"
+                                                key={imageKey}
+                                                onError={() => {
+                                                  console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
+                                                  // Mark this specific image as failed - never reuse another place's image
+                                                  setFailedImages(prev => new Set(prev).add(imageKey));
+                                                }}
+                                              />
+                                            );
+                                          })() : (
                                             // Placeholder: Show when no photo or photo failed to load
                                             // NEVER reuse another place's image as fallback
                                             <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
@@ -1607,7 +1687,10 @@ export function ItineraryTab({
                                   if (!isPhotoSrcUsable(img)) {
                                     return null;
                                   }
-                                  const isProxy = img.startsWith("/api/places/photo");
+                                  const shouldUnoptimize = isPlacesProxy(img);
+                                  if (process.env.NODE_ENV === 'development' && idx === 0) {
+                                    console.debug('[ItineraryTab] Banner image (collapsed):', { src: img, unoptimized: shouldUnoptimize });
+                                  }
                                   return (
                                     <div 
                                       key={imageKey} 
@@ -1619,28 +1702,16 @@ export function ItineraryTab({
                                         }
                                       }}
                                     >
-                                      {isProxy ? (
-                                        <Image 
-                                          src={img} 
-                                          alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                          fill
-                                          unoptimized
-                                          className="object-cover"
-                                          onError={() => {
-                                            setFailedImages(prev => new Set(prev).add(imageKey));
-                                          }}
-                                        />
-                                      ) : (
-                                        <Image 
-                                          src={img} 
-                                          alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                          fill 
-                                          className="object-cover"
-                                          onError={() => {
-                                            setFailedImages(prev => new Set(prev).add(imageKey));
-                                          }}
-                                        />
-                                      )}
+                                      <Image 
+                                        src={img} 
+                                        alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
+                                        fill
+                                        unoptimized={shouldUnoptimize}
+                                        className="object-cover"
+                                        onError={() => {
+                                          setFailedImages(prev => new Set(prev).add(imageKey));
+                                        }}
+                                      />
                                     </div>
                                   );
                                 })}
@@ -1703,20 +1774,27 @@ export function ItineraryTab({
                                         }}
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                          {photoSrc && !failedImages.has(imageKey) ? (
-                                            <Image 
-                                              src={photoSrc} 
-                                              alt={`Photo for ${place.name}`}
-                                              fill
-                                              className="object-cover"
-                                              key={imageKey}
-                                              onError={() => {
-                                                console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
-                                                // Mark this specific image as failed - never reuse another place's image
-                                                setFailedImages(prev => new Set(prev).add(imageKey));
-                                              }}
-                                            />
-                                          ) : (
+                                          {photoSrc && !failedImages.has(imageKey) ? (() => {
+                                            const shouldUnoptimize = isPlacesProxy(photoSrc);
+                                            if (process.env.NODE_ENV === 'development' && placeIndex === 0 && slotIdx === 0) {
+                                              console.debug('[ItineraryTab] Place activity image:', { src: photoSrc, placeName: place.name, unoptimized: shouldUnoptimize });
+                                            }
+                                            return (
+                                              <Image 
+                                                src={photoSrc} 
+                                                alt={`Photo for ${place.name}`}
+                                                fill
+                                                unoptimized={shouldUnoptimize}
+                                                className="object-cover"
+                                                key={imageKey}
+                                                onError={() => {
+                                                  console.warn(`[Itinerary] Photo failed to load for place: ${place.name} (ID: ${place.id}, place_id: ${place.place_id || 'none'}, photo_reference: ${place.photo_reference || 'none'})`);
+                                                  // Mark this specific image as failed - never reuse another place's image
+                                                  setFailedImages(prev => new Set(prev).add(imageKey));
+                                                }}
+                                              />
+                                            );
+                                          })() : (
                                             // Placeholder: Show when no photo or photo failed to load
                                             // NEVER reuse another place's image as fallback
                                             <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
@@ -1952,19 +2030,20 @@ export function ItineraryTab({
       {/* Lightbox */}
       <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-black/90 border-none sm:rounded-none overflow-hidden flex items-center justify-center">
-           {selectedImage && (
-             <div className="relative w-full h-full flex items-center justify-center" style={{ height: '80vh' }}>
-                {selectedImage.startsWith("/api/places/photo") ? (
-                  <Image 
-                    src={selectedImage} 
-                    alt="Fullscreen" 
-                    fill
-                    unoptimized
-                    className="object-contain"
-                  />
-                ) : (
-                  <Image src={selectedImage} alt="Fullscreen" fill className="object-contain" />
-                )}
+          {selectedImage && (() => {
+            const shouldUnoptimize = isPlacesProxy(selectedImage);
+            if (process.env.NODE_ENV === 'development') {
+              console.debug('[ItineraryTab] Lightbox image:', { src: selectedImage, unoptimized: shouldUnoptimize });
+            }
+            return (
+              <div className="relative w-full h-full flex items-center justify-center" style={{ height: '80vh' }}>
+                <Image 
+                  src={selectedImage} 
+                  alt="Fullscreen" 
+                  fill
+                  unoptimized={shouldUnoptimize}
+                  className="object-contain"
+                />
                 
                 {lightboxImages.length > 1 && (
                   <>
@@ -1983,8 +2062,9 @@ export function ItineraryTab({
                 >
                   <X className="h-6 w-6" />
                 </button>
-             </div>
-           )}
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 

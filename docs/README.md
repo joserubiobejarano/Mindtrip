@@ -17,8 +17,14 @@ npm install
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://upeoxmwdwghdbgcqqtll.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwZW94bXdkd2doZGJnY3FxdGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzcxOTgsImV4cCI6MjA3OTE1MzE5OH0.6yZ4f5tUM_75mp31wQBxwLUlNmhsAF0-FGDQRDddFk0
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_client_side
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_server_side
 ```
+
+**Important:** 
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` is used for client-side Google Maps JS only
+- `GOOGLE_MAPS_API_KEY` is used for server-side API routes only (never exposed to client)
+- **Restart your dev server** after changing environment variables
 
 3. **Set up database:**
    - Open Supabase SQL Editor
