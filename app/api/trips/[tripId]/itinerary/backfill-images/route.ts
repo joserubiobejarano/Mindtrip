@@ -5,6 +5,7 @@ import { findPhotoRefForActivity } from '@/lib/google/places-backfill';
 import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries-server';
 import type { SmartItinerary, ItineraryPlace } from '@/types/itinerary';
 import { isGooglePhotoReference } from '@/lib/placePhotos';
+import { cachePlaceImageWithDetails, type ProviderAttempt, type ImageProvider } from '@/lib/images/cache-place-image';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +56,25 @@ export async function POST(
 
     if (!tripId) {
       return NextResponse.json({ error: 'Missing trip id' }, { status: 400 });
+    }
+
+    // Parse request body for dryRun and limit
+    let dryRun = false;
+    let limit: number | undefined;
+    try {
+      const body = await req.json().catch(() => ({}));
+      dryRun = body.dryRun === true;
+      limit = typeof body.limit === 'number' ? body.limit : undefined;
+    } catch {
+      // Body parsing failed, use defaults
+    }
+
+    if (isDev) {
+      console.log('[backfill-images] Starting backfill:', {
+        tripId,
+        dryRun,
+        limit: limit || MAX_UPDATES_PER_RUN,
+      });
     }
 
     const supabase = await createClient();
@@ -173,63 +193,224 @@ export async function POST(
     let updated = 0;
     let notFound = 0;
     let errors = 0;
-    const hasMore = placesNeedingImages.length > MAX_UPDATES_PER_RUN;
-    const placesToProcess = placesNeedingImages.slice(0, MAX_UPDATES_PER_RUN);
+    const maxLimit = limit || MAX_UPDATES_PER_RUN;
+    const hasMore = placesNeedingImages.length > maxLimit;
+    const placesToProcess = placesNeedingImages.slice(0, maxLimit);
     const city = trip.destination_name || '';
-    const updatedPlaces: Array<{ name: string; image_url: string }> = [];
+    const country = trip.destination_country || '';
+    
+    // Detailed report items
+    interface ReportItem {
+      title: string;
+      placeId?: string;
+      hadPhotoRef: boolean;
+      providerAttempts: ProviderAttempt[];
+      chosenProvider: ImageProvider | null;
+      chosenUrl: string | null;
+    }
+    
+    const reportItems: ReportItem[] = [];
 
     for (const { place, dayIndex, slotIndex, placeIndex } of placesToProcess) {
       scanned++;
 
-      try {
-        // Find photo reference using text search
-        const photoRef = await findPhotoRefForActivity({
+      // Extract inputs for logging
+      const placeId = place.id;
+      const placeLat = place.lat ?? trip.center_lat ?? undefined;
+      const placeLng = place.lng ?? trip.center_lng ?? undefined;
+      
+      // Check if place already has photo_reference
+      let hadPhotoRef = false;
+      if (place.photo_reference && typeof place.photo_reference === 'string' && isGooglePhotoReference(place.photo_reference)) {
+        hadPhotoRef = true;
+      } else if (place.photos && Array.isArray(place.photos) && place.photos.length > 0) {
+        const firstPhoto = place.photos[0];
+        if (typeof firstPhoto === 'string' && isGooglePhotoReference(firstPhoto)) {
+          hadPhotoRef = true;
+        } else if (typeof firstPhoto === 'object' && firstPhoto !== null) {
+          const ref = (firstPhoto as any).photo_reference || (firstPhoto as any).photoReference || (firstPhoto as any).ref;
+          if (ref && typeof ref === 'string' && isGooglePhotoReference(ref)) {
+            hadPhotoRef = true;
+          }
+        }
+      }
+
+      if (isDev) {
+        console.log('[backfill-images] Processing place:', {
           title: place.name,
           city,
-          country: trip.destination_country || undefined,
-          lat: trip.center_lat || undefined,
-          lng: trip.center_lng || undefined,
+          country,
+          placeId,
+          hadPhotoRef,
+          hasCoords: placeLat !== undefined && placeLng !== undefined,
+          inputs: {
+            place_id: placeId,
+            photo_reference: hadPhotoRef ? 'present' : 'missing',
+            lat: placeLat,
+            lng: placeLng,
+          },
         });
+      }
 
-        if (!photoRef) {
-          notFound++;
-          continue;
-        }
-
-        // Construct proxy URL (same format as Explore)
-        const proxyUrl = `/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=1000`;
-
-        // Update place in SmartItinerary JSON
-        const targetPlace = itinerary.days[dayIndex].slots[slotIndex].places[placeIndex];
-        targetPlace.image_url = proxyUrl;
-        // Set photos array with the photo URL
-        targetPlace.photos = [proxyUrl];
-
-        updated++;
-        
-        // Track updated places for dev logging
-        if (updatedPlaces.length < 3) {
-          updatedPlaces.push({
-            name: place.name,
-            image_url: proxyUrl,
+      try {
+        // Find photo reference using text search (if not already present)
+        let photoRef: string | null = null;
+        if (hadPhotoRef) {
+          // Use existing photo_reference
+          if (place.photo_reference && typeof place.photo_reference === 'string') {
+            photoRef = place.photo_reference;
+          } else if (place.photos && Array.isArray(place.photos) && place.photos.length > 0) {
+            const firstPhoto = place.photos[0];
+            if (typeof firstPhoto === 'string' && isGooglePhotoReference(firstPhoto)) {
+              photoRef = firstPhoto;
+            } else if (typeof firstPhoto === 'object' && firstPhoto !== null) {
+              const ref = (firstPhoto as any).photo_reference || (firstPhoto as any).photoReference || (firstPhoto as any).ref;
+              if (ref && typeof ref === 'string' && isGooglePhotoReference(ref)) {
+                photoRef = ref;
+              }
+            }
+          }
+        } else {
+          // Search for photo reference
+          photoRef = await findPhotoRefForActivity({
+            title: place.name,
+            city,
+            country: trip.destination_country || undefined,
+            lat: trip.center_lat || undefined,
+            lng: trip.center_lng || undefined,
           });
         }
 
+        if (!photoRef) {
+          notFound++;
+          
+          // Still try to cache without photoRef (will try Unsplash/Mapbox)
+          const cacheResult = await cachePlaceImageWithDetails({
+            tripId,
+            placeId: place.id,
+            title: place.name,
+            city,
+            country: trip.destination_country || undefined,
+            photoRef: undefined,
+            lat: placeLat,
+            lng: placeLng,
+          });
+
+          const reportItem: ReportItem = {
+            title: place.name,
+            placeId,
+            hadPhotoRef: false,
+            providerAttempts: cacheResult.attempts,
+            chosenProvider: cacheResult.providerUsed,
+            chosenUrl: cacheResult.publicUrl,
+          };
+          
+          if (reportItems.length < 20) {
+            reportItems.push(reportItem);
+          }
+
+          if (isDev) {
+            console.log('[backfill-images] Place processed (no photoRef found):', {
+              title: place.name,
+              attempts: cacheResult.attempts.map(a => ({
+                provider: a.provider,
+                ok: a.ok,
+                reason: a.reason,
+              })),
+              result: cacheResult.publicUrl ? 'success' : 'failed',
+            });
+          }
+
+          if (cacheResult.publicUrl && !dryRun) {
+            // Update place in SmartItinerary JSON with cached URL
+            const targetPlace = itinerary.days[dayIndex].slots[slotIndex].places[placeIndex];
+            targetPlace.image_url = cacheResult.publicUrl;
+            targetPlace.photos = [];
+            updated++;
+          }
+          
+          continue;
+        }
+
+        // Cache image to Supabase Storage using cachePlaceImageWithDetails
+        const cacheResult = await cachePlaceImageWithDetails({
+          tripId,
+          placeId: place.id,
+          title: place.name,
+          city,
+          country: trip.destination_country || undefined,
+          photoRef,
+          lat: placeLat,
+          lng: placeLng,
+        });
+
+        const reportItem: ReportItem = {
+          title: place.name,
+          placeId,
+          hadPhotoRef: true,
+          providerAttempts: cacheResult.attempts,
+          chosenProvider: cacheResult.providerUsed,
+          chosenUrl: cacheResult.publicUrl,
+        };
+
+        if (reportItems.length < 20) {
+          reportItems.push(reportItem);
+        }
+
+        if (!cacheResult.publicUrl) {
+          if (isDev) {
+            console.warn('[backfill-images] Failed to cache image for place:', {
+              name: place.name,
+              attempts: cacheResult.attempts.map(a => ({
+                provider: a.provider,
+                ok: a.ok,
+                reason: a.reason,
+              })),
+            });
+          }
+          errors++;
+          continue;
+        }
+
+        if (!dryRun) {
+          // Update place in SmartItinerary JSON with cached URL
+          const targetPlace = itinerary.days[dayIndex].slots[slotIndex].places[placeIndex];
+          targetPlace.image_url = cacheResult.publicUrl;
+          // Clear photos array since we now have a cached image_url
+          targetPlace.photos = [];
+        }
+
+        updated++;
+
         // Dev-only logging
         if (isDev) {
-          console.debug('[backfill-images] Place updated:', {
+          console.log('[backfill-images] Place processed:', {
             name: place.name,
-            proxyUrl,
+            provider: cacheResult.providerUsed,
+            image_url: cacheResult.publicUrl.substring(0, 80) + '...',
+            dryRun,
           });
         }
       } catch (error: any) {
         console.error(`[backfill-images] Error processing place ${place.name}:`, error);
         errors++;
+        
+        // Add error item to report
+        if (reportItems.length < 20) {
+          reportItems.push({
+            title: place.name,
+            placeId,
+            hadPhotoRef,
+            providerAttempts: [],
+            chosenProvider: null,
+            chosenUrl: null,
+          });
+        }
       }
     }
 
-    // Save updated SmartItinerary JSON back to DB
-    if (updated > 0) {
+    // Save updated SmartItinerary JSON back to DB (only if not dry run and we have updates)
+    if (!dryRun && updated > 0) {
       const { error: saveError } = await upsertSmartItinerary(tripId, itinerary);
 
       if (saveError) {
@@ -247,15 +428,27 @@ export async function POST(
       notFound,
       errors,
       hasMore,
+      items: reportItems,
     };
 
-    // Dev-only debug log: summary + first 3 updated places
+    // Dev-only debug log: full details
     if (isDev) {
       console.log('[backfill-images] Backfill complete:', {
         tripId,
-        ...response,
+        dryRun,
+        scanned,
+        updated,
+        notFound,
+        errors,
+        hasMore,
         totalPlaces: placesNeedingImages.length,
-        sampleUpdated: updatedPlaces,
+        items: reportItems.map(item => ({
+          title: item.title,
+          hadPhotoRef: item.hadPhotoRef,
+          attempts: item.providerAttempts.length,
+          chosenProvider: item.chosenProvider,
+          success: !!item.chosenUrl,
+        })),
       });
     }
 

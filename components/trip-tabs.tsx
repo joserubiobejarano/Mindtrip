@@ -92,6 +92,7 @@ export function TripTabs({
               onMarkerClickRef={onExploreMarkerClickRef}
               onActivePlaceChange={onActivePlaceChange}
             />
+            {/* Note: onMapUpdate and related props are kept for backwards compatibility but no longer used in Explore */}
           </ErrorBoundary>
         </TabsContent>
         <TabsContent value="itinerary" className="h-full mt-0">

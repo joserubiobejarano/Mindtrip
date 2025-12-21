@@ -6,9 +6,10 @@ import { getPlaceDetails } from '@/lib/google/places-server';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { isPastDay } from '@/lib/utils/date-helpers';
 import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from '@/lib/supabase/smart-itineraries';
-import { getPlacesToExplore, type ExploreFilters } from '@/lib/google/explore-places';
 import { getTripProStatus } from '@/lib/supabase/pro-status';
 import { getUsageLimits } from '@/lib/supabase/user-subscription';
+import { cachePlaceImage } from '@/lib/images/cache-place-image';
+import type { ExplorePlace } from '@/lib/google/explore-places';
 
 export async function POST(
   req: NextRequest,
@@ -222,137 +223,159 @@ export async function POST(
       );
     }
 
-    // Get existing place details to use for finding replacement
-    const currentArea = targetPlace.area || targetPlace.neighborhood || targetDay.areaCluster;
-    const currentCategory = targetPlace.tags?.[0] || null;
+    // Get request body - expect { place: ExplorePlace } payload
+    const body = await req.json();
+    const { place: placePayload } = body;
+
+    if (!placePayload || !placePayload.place_id) {
+      return NextResponse.json({ error: 'Missing place payload' }, { status: 400 });
+    }
+
+    const newPlaceId = placePayload.place_id;
+
+    // Check for duplicates: if new place_id already exists in itinerary (any day), return 409
+    for (const day of itinerary.days || []) {
+      for (const slot of day.slots || []) {
+        for (const place of slot.places || []) {
+          if (place.id === newPlaceId) {
+            return NextResponse.json(
+              {
+                error: 'duplicate_place',
+                message: 'Already in itinerary',
+              },
+              { status: 409 }
+            );
+          }
+        }
+      }
+    }
+
+    // Find the index of the activity to replace (preserve position)
+    const placeIndex = targetSlot.places.findIndex(p => p.id === activityId);
+    if (placeIndex === -1) {
+      return NextResponse.json({ error: 'Activity not found in slot' }, { status: 404 });
+    }
+
+    // Fetch place details if payload is incomplete (only has place_id)
+    let placeDetails: any = null;
+    if (!placePayload.name || !placePayload.address) {
+      if (!GOOGLE_MAPS_API_KEY) {
+        return NextResponse.json({ error: 'Google Maps API key not configured' }, { status: 500 });
+      }
+
+      try {
+        placeDetails = await getPlaceDetails(newPlaceId);
+        if (!placeDetails) {
+          return NextResponse.json({ error: 'Place not found' }, { status: 404 });
+        }
+      } catch (error) {
+        console.error(`[replace-activity] Error fetching place details for ${newPlaceId}:`, error);
+        return NextResponse.json({ error: 'Failed to fetch place details' }, { status: 500 });
+      }
+    }
+
+    // Use place details or payload for place information
+    const placeName = placePayload.name || placeDetails?.name || 'Unknown Place';
+    const placeAddress = placePayload.address || placeDetails?.formatted_address || '';
+    const placeTypes = placePayload.types || placeDetails?.types || [];
+
+    // Extract area/neighborhood from place payload, placeDetails, or address
+    let area: string;
+    let neighborhood: string | null = null;
     
-    // Get all place IDs already in this day to exclude them
-    const placesInDay = new Set<string>();
-    for (const slot of targetDay.slots) {
-      for (const place of slot.places || []) {
-        if (place.id) {
-          placesInDay.add(place.id);
-        }
-      }
+    if (placePayload.neighborhood) {
+      area = placePayload.neighborhood;
+      neighborhood = placePayload.district || null;
+    } else if (placeDetails?.formatted_address || placeAddress) {
+      const addressParts = (placeDetails?.formatted_address || placeAddress).split(',').map((p: string) => p.trim());
+      area = addressParts.length > 1 ? addressParts[addressParts.length - 2] : addressParts[0] || 'Unknown';
+      neighborhood = addressParts.length > 2 ? addressParts[addressParts.length - 3] : null;
+    } else {
+      area = 'Unknown';
     }
 
-    // Find replacement using explore places API
-    if (!GOOGLE_MAPS_API_KEY) {
-      return NextResponse.json({ error: 'Google Maps API key not configured' }, { status: 500 });
-    }
-
-    const filters: ExploreFilters = {
-      neighborhood: currentArea || undefined,
-      category: currentCategory || undefined,
-      excludePlaceIds: Array.from(placesInDay), // Exclude current place and all others in this day
-      includeItineraryPlaces: false,
-    };
-
-    // Fetch replacement places
-    const { places: replacementPlaces } = await getPlacesToExplore(tripId, filters);
-
-    // Filter out the current place if it somehow appears
-    const filteredPlaces = replacementPlaces.filter(p => p.place_id !== activityId);
-
-    if (filteredPlaces.length === 0) {
-      return NextResponse.json(
-        {
-          error: 'no_replacement_found',
-          message: 'We couldn\'t find a good alternative nearby. Try Explore to discover more places.',
-        },
-        { status: 404 }
-      );
-    }
-
-    // Pick the first replacement place
-    const replacementPlaceId = filteredPlaces[0].place_id;
-
-    // Fetch detailed place information
-    const placeDetails = await getPlaceDetails(replacementPlaceId);
-    if (!placeDetails) {
-      return NextResponse.json(
-        {
-          error: 'no_replacement_found',
-          message: 'We couldn\'t find a good alternative nearby. Try Explore to discover more places.',
-        },
-        { status: 404 }
-      );
-    }
-
-    // Get photos
-    const photos: string[] = [];
-    if (placeDetails.photos && placeDetails.photos.length > 0) {
-      for (let i = 0; i < Math.min(3, placeDetails.photos.length); i++) {
-        const photo = placeDetails.photos[i];
-        if (photo?.photo_reference) {
-          photos.push(
-            `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
-          );
-        }
-      }
-    }
-
-    // Extract area/neighborhood from address
-    const address = placeDetails.formatted_address || '';
-    const addressParts = address.split(',').map(p => p.trim());
-    const area = addressParts.length > 1 ? addressParts[addressParts.length - 2] : addressParts[0] || 'Unknown';
-    const neighborhood = addressParts.length > 2 ? addressParts[addressParts.length - 3] : null;
-
-    // Generate description
-    const description = placeDetails.editorial_summary?.overview || 
-                      placeDetails.types?.[0]?.replace(/_/g, ' ') || 
+    // Generate description from place payload, placeDetails, or use default
+    const description = placePayload.description || 
+                      placeDetails?.editorial_summary?.overview ||
+                      (placeTypes.length > 0 ? placeTypes[0].replace(/_/g, ' ') : null) ||
                       'A great place to visit';
 
-    // Extract tags from types
-    const tags = (placeDetails.types || []).slice(0, 3).map(t => t.replace(/_/g, ' '));
+    // Extract tags from place payload types or placeDetails types
+    const tags = placeTypes.length > 0 ?
+      (Array.isArray(placeTypes) ? placeTypes.slice(0, 3).map((t: string) => t.replace(/_/g, ' ')) : []) : 
+      [];
 
-    // Check if replacement is a food place
-    const foodTypes = [
-      'restaurant', 'cafe', 'bakery', 'bar', 'food', 'meal_takeaway', 'meal_delivery',
-      'night_club', 'liquor_store'
-    ];
-    const isReplacementFood = placeDetails.types?.some(type => foodTypes.includes(type)) || false;
-    
-    // If replacement is a food place, check if slot already has a food place
-    if (isReplacementFood) {
-      const existingFoodPlaces = targetSlot.places.filter(place => {
-        // Check if place has food-related tags
-        const hasFoodTag = place.tags?.some(tag => {
-          const tagLower = tag.toLowerCase();
-          return ['restaurant', 'cafe', 'bar', 'food', 'dining', 'bakery'].some(foodWord => tagLower.includes(foodWord));
-        });
-        return hasFoodTag;
-      });
-      
-      // If there's already a food place (and it's not the one being replaced), reject
-      if (existingFoodPlaces.length > 0 && !existingFoodPlaces.some(p => p.id === activityId)) {
-        return NextResponse.json(
-          {
-            error: 'food_limit_reached',
-            message: 'This time slot already has a food place. You can only have one food place per time slot.',
-          },
-          { status: 400 }
-        );
+    // If place payload has image_url, use it; otherwise fetch and cache
+    let imageUrl: string | null = null;
+    if (placePayload.image_url) {
+      imageUrl = placePayload.image_url;
+    } else {
+      // Extract photo reference from placeDetails
+      let photoRef: string | null = null;
+      if (placeDetails?.photos && placeDetails.photos.length > 0) {
+        photoRef = placeDetails.photos[0]?.photo_reference || null;
+      } else if (placePayload.photo_reference) {
+        photoRef = placePayload.photo_reference;
+      }
+
+      // Extract coordinates
+      const lat = placeDetails?.geometry?.location?.lat || placePayload.lat;
+      const lng = placeDetails?.geometry?.location?.lng || placePayload.lng;
+
+      // Extract country for image caching
+      const addressParts = (placeDetails?.formatted_address || placeAddress).split(',').map((p: string) => p.trim());
+      const country = addressParts.length > 0 ? addressParts[addressParts.length - 1] : undefined;
+
+      // Cache image
+      if (photoRef || (lat !== undefined && lng !== undefined)) {
+        try {
+          imageUrl = await cachePlaceImage({
+            tripId,
+            placeId: newPlaceId,
+            title: placeName,
+            city: area,
+            country,
+            photoRef: photoRef || undefined,
+            lat,
+            lng,
+          });
+        } catch (cacheError) {
+          console.error(`[replace-activity] Error caching image for place ${newPlaceId}:`, cacheError);
+          // Continue without image - not a fatal error
+        }
       }
     }
 
-    // Replace the place in the slot
-    const placeIndex = targetSlot.places.findIndex(p => p.id === activityId);
-    if (placeIndex !== -1) {
-      targetSlot.places[placeIndex] = {
-        id: replacementPlaceId,
-        name: placeDetails.name || 'Unknown Place',
-        description,
-        area,
-        neighborhood,
-        photos,
-        visited: false, // Reset visited status for new place
-        tags,
-      };
-    } else {
-      // Place not found in slot (shouldn't happen, but handle gracefully)
-      return NextResponse.json({ error: 'Place not found in slot' }, { status: 404 });
+    // Fallback: if still no image_url and placeDetails has photos, use photo proxy URL
+    let fallbackPhotos: string[] = [];
+    if (!imageUrl && placeDetails?.photos && placeDetails.photos.length > 0) {
+      const photoRef = placeDetails.photos[0]?.photo_reference;
+      if (photoRef && GOOGLE_MAPS_API_KEY) {
+        // Use proxy URL as last resort
+        fallbackPhotos = [`/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=800`];
+      }
     }
+
+    // Replace the place in the slot at the same index (preserve position)
+    const newPlace: any = {
+      id: newPlaceId,
+      name: placeName,
+      description,
+      area,
+      neighborhood,
+      photos: fallbackPhotos, // Empty array or proxy URL fallback
+      visited: false, // Reset visited status for new place
+      tags,
+      place_id: newPlaceId, // Store place_id for reference
+    };
+
+    // Set image_url if we have one (preferred over photos)
+    if (imageUrl) {
+      newPlace.image_url = imageUrl;
+      newPlace.photos = []; // Clear photos array when using image_url
+    }
+
+    targetSlot.places[placeIndex] = newPlace;
 
     // Increment change_count before saving
     const newChangeCount = changeCount + 1;
@@ -381,10 +404,24 @@ export async function POST(
       return NextResponse.json({ error: 'Failed to update itinerary' }, { status: 500 });
     }
 
+    // DEV logging
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[ReplaceMode] replacing activity', {
+        tripId,
+        activityId,
+        newPlaceId,
+        newPlaceName: placePayload.name,
+        dayId: targetDay.id,
+        slot: targetSlot.label,
+        position: placeIndex,
+      });
+    }
+
     // Return the updated activity
     return NextResponse.json({
       success: true,
       activity: targetSlot.places[placeIndex],
+      day: targetDay,
     });
   } catch (err: any) {
     console.error('POST /replace activity error:', err);

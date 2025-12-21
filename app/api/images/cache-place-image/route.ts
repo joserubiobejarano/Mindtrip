@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cachePlaceImage, type CachePlaceImageParams } from '@/lib/images/cache-place-image';
+import { cachePlaceImageWithDetails, type CachePlaceImageParams } from '@/lib/images/cache-place-image';
 import { getProfileId } from '@/lib/auth/getProfileId';
 import { createClient } from '@/lib/supabase/server';
+
+const isDev = process.env.NODE_ENV === 'development';
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,7 +50,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Cache the image
+    // Cache the image with detailed result
     const params: CachePlaceImageParams = {
       tripId,
       placeId,
@@ -60,9 +62,35 @@ export async function POST(request: NextRequest) {
       lng,
     };
 
-    const imageUrl = await cachePlaceImage(params);
+    const result = await cachePlaceImageWithDetails(params);
 
-    return NextResponse.json({ image_url: imageUrl });
+    // Log full details server-side (both dev and prod)
+    console.log('[cache-place-image API] Result:', {
+      providerUsed: result.providerUsed,
+      uploadOk: result.uploadOk,
+      hasPublicUrl: !!result.publicUrl,
+      error: result.error,
+      title: title.substring(0, 50),
+    });
+
+    // Return different response format for dev vs prod
+    if (isDev) {
+      // Dev: return full details
+      return NextResponse.json({
+        providerUsed: result.providerUsed,
+        uploadOk: result.uploadOk,
+        publicUrl: result.publicUrl,
+        error: result.error,
+        image_url: result.publicUrl, // Also include for backward compatibility
+      });
+    } else {
+      // Prod: return minimal response
+      return NextResponse.json({
+        publicUrl: result.publicUrl,
+        providerUsed: result.providerUsed,
+        image_url: result.publicUrl, // Also include for backward compatibility
+      });
+    }
   } catch (error: any) {
     console.error('[cache-place-image API] Error:', error);
     return NextResponse.json(

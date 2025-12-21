@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
 import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ExploreDeck } from "@/components/explore/ExploreDeck";
 import { ExploreFilters } from "@/components/explore/ExploreFilters";
@@ -105,6 +105,8 @@ export function ItineraryTab({
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [isBackfillingImages, setIsBackfillingImages] = useState(false);
+  const [backfillReport, setBackfillReport] = useState<any>(null);
+  const [showBackfillReport, setShowBackfillReport] = useState(false);
   
   // Day-level Explore state
   const [dayExploreOpen, setDayExploreOpen] = useState(false);
@@ -688,7 +690,7 @@ export function ItineraryTab({
     return false;
   }, [smartItinerary]);
 
-  // Backfill images for places missing photos
+  // Backfill images for places missing photos (legacy - writes to DB)
   const handleBackfillImages = useCallback(async () => {
     if (!tripId || isBackfillingImages) return;
 
@@ -696,6 +698,8 @@ export function ItineraryTab({
     try {
       const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dryRun: false, limit: 20 }),
       });
 
       if (!response.ok) {
@@ -707,7 +711,7 @@ export function ItineraryTab({
       
       addToast({
         title: 'Images updated',
-        description: `Updated ${result.updatedCount} place${result.updatedCount !== 1 ? 's' : ''} with photos.`,
+        description: `Updated ${result.updated} place${result.updated !== 1 ? 's' : ''} with photos.`,
         variant: 'success',
       });
 
@@ -715,6 +719,87 @@ export function ItineraryTab({
       await loadOrGenerate();
     } catch (error: any) {
       console.error('[itinerary-tab] Error backfilling images:', error);
+      addToast({
+        title: 'Error',
+        description: error.message || 'Failed to backfill images',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBackfillingImages(false);
+    }
+  }, [tripId, isBackfillingImages, addToast, loadOrGenerate]);
+
+  // Backfill images in debug mode (dry run, no DB writes)
+  const handleBackfillImagesDebug = useCallback(async () => {
+    if (!tripId || isBackfillingImages) return;
+
+    setIsBackfillingImages(true);
+    setBackfillReport(null);
+    try {
+      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dryRun: true, limit: 10 }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error || 'Failed to backfill images');
+      }
+
+      const result = await response.json();
+      setBackfillReport(result);
+      setShowBackfillReport(true);
+      
+      addToast({
+        title: 'Debug report generated',
+        description: `Scanned ${result.scanned} places. See report below.`,
+        variant: 'success',
+      });
+    } catch (error: any) {
+      console.error('[itinerary-tab] Error backfilling images (debug):', error);
+      addToast({
+        title: 'Error',
+        description: error.message || 'Failed to backfill images',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBackfillingImages(false);
+    }
+  }, [tripId, isBackfillingImages, addToast]);
+
+  // Backfill images in write mode (writes to DB)
+  const handleBackfillImagesWrite = useCallback(async () => {
+    if (!tripId || isBackfillingImages) return;
+
+    setIsBackfillingImages(true);
+    setBackfillReport(null);
+    try {
+      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dryRun: false, limit: 20 }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error || 'Failed to backfill images');
+      }
+
+      const result = await response.json();
+      setBackfillReport(result);
+      setShowBackfillReport(true);
+      
+      addToast({
+        title: 'Images updated',
+        description: `Updated ${result.updated} place${result.updated !== 1 ? 's' : ''} with photos.`,
+        variant: 'success',
+      });
+
+      // Refetch itinerary to show updated images
+      await loadOrGenerate();
+    } catch (error: any) {
+      console.error('[itinerary-tab] Error backfilling images (write):', error);
       addToast({
         title: 'Error',
         description: error.message || 'Failed to backfill images',
@@ -1062,24 +1147,64 @@ export function ItineraryTab({
                           <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
                         )}
                         {process.env.NODE_ENV === 'development' && hasPlacesNeedingPhotos() && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={handleBackfillImages}
-                            disabled={isBackfillingImages}
-                            className="text-xs"
-                          >
-                            {isBackfillingImages ? (
-                              <>
-                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                Fixing...
-                              </>
-                            ) : (
-                              'Fix Images'
-                            )}
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleBackfillImagesDebug}
+                              disabled={isBackfillingImages}
+                              className="text-xs"
+                            >
+                              {isBackfillingImages ? (
+                                <>
+                                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                  Running...
+                                </>
+                              ) : (
+                                'Backfill Images (debug)'
+                              )}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleBackfillImagesWrite}
+                              disabled={isBackfillingImages}
+                              className="text-xs"
+                            >
+                              {isBackfillingImages ? (
+                                <>
+                                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                  Writing...
+                                </>
+                              ) : (
+                                'Backfill Images (write)'
+                              )}
+                            </Button>
+                          </div>
                         )}
                       </div>
+                      {process.env.NODE_ENV === 'development' && backfillReport && (
+                        <div className="mt-4 border rounded-lg bg-slate-50">
+                          <button
+                            onClick={() => setShowBackfillReport(!showBackfillReport)}
+                            className="w-full px-4 py-2 flex items-center justify-between text-sm font-medium text-slate-700 hover:bg-slate-100"
+                          >
+                            <span>Backfill Report (scanned: {backfillReport.scanned}, updated: {backfillReport.updated}, notFound: {backfillReport.notFound}, errors: {backfillReport.errors})</span>
+                            {showBackfillReport ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </button>
+                          {showBackfillReport && (
+                            <div className="p-4 border-t bg-white">
+                              <pre className="text-xs overflow-auto max-h-96 bg-slate-50 p-4 rounded border">
+                                {JSON.stringify(backfillReport, null, 2)}
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      )}
                       {smartItinerary.summary && (
                         <div className="prose prose-neutral max-w-none text-slate-900 text-left">
                           <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
@@ -1301,6 +1426,7 @@ export function ItineraryTab({
                                         src={img} 
                                         alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
                                         fill
+                                        sizes="(max-width: 768px) 25vw, 25vw"
                                         unoptimized={shouldUnoptimize}
                                         className="object-cover"
                                         onError={() => {
@@ -1379,6 +1505,7 @@ export function ItineraryTab({
                                                 src={photoSrc} 
                                                 alt={`Photo for ${place.name}`}
                                                 fill
+                                                sizes="(max-width: 640px) 100vw, 96px"
                                                 unoptimized={shouldUnoptimize}
                                                 className="object-cover"
                                                 key={imageKey}
@@ -1455,13 +1582,6 @@ export function ItineraryTab({
                                               >
                                                 Change
                                               </Button>
-                                              {/* TEMPORARY DEBUG: Show disable reasons in production */}
-                                              <div className="text-xs text-orange-600 mt-1">
-                                                {(() => {
-                                                  const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
-                                                  return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                                })()}
-                                              </div>
                                               <Button
                                                 size="sm"
                                                 variant="outline"
@@ -1535,13 +1655,6 @@ export function ItineraryTab({
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
                                       <span className="sm:hidden">Add</span>
                                     </Button>
-                                    {/* TEMPORARY DEBUG: Show disable reasons in production */}
-                                    <div className="text-xs text-orange-600 mt-1 ml-2">
-                                      {(() => {
-                                        const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
-                                        return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                      })()}
-                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -1706,6 +1819,7 @@ export function ItineraryTab({
                                         src={img} 
                                         alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
                                         fill
+                                        sizes="(max-width: 768px) 25vw, 25vw"
                                         unoptimized={shouldUnoptimize}
                                         className="object-cover"
                                         onError={() => {
@@ -1784,6 +1898,7 @@ export function ItineraryTab({
                                                 src={photoSrc} 
                                                 alt={`Photo for ${place.name}`}
                                                 fill
+                                                sizes="(max-width: 640px) 100vw, 96px"
                                                 unoptimized={shouldUnoptimize}
                                                 className="object-cover"
                                                 key={imageKey}
@@ -1866,13 +1981,6 @@ export function ItineraryTab({
                                               >
                                                 Change
                                               </Button>
-                                              {/* TEMPORARY DEBUG: Show disable reasons in production */}
-                                              <div className="text-xs text-orange-600 mt-1">
-                                                {(() => {
-                                                  const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
-                                                  return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                                })()}
-                                              </div>
                                               <Button
                                                 size="sm"
                                                 variant="outline"
@@ -1945,13 +2053,6 @@ export function ItineraryTab({
                                       <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
                                       <span className="sm:hidden">Add</span>
                                     </Button>
-                                    {/* TEMPORARY DEBUG: Show disable reasons in production */}
-                                    <div className="text-xs text-orange-600 mt-1 ml-2">
-                                      {(() => {
-                                        const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
-                                        return reasons.length > 0 ? `Disabled: ${reasons.join(', ')}` : 'Enabled';
-                                      })()}
-                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -2030,6 +2131,7 @@ export function ItineraryTab({
       {/* Lightbox */}
       <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-black/90 border-none sm:rounded-none overflow-hidden flex items-center justify-center">
+          <DialogTitle className="sr-only">Image Lightbox</DialogTitle>
           {selectedImage && (() => {
             const shouldUnoptimize = isPlacesProxy(selectedImage);
             if (process.env.NODE_ENV === 'development') {
@@ -2041,6 +2143,7 @@ export function ItineraryTab({
                   src={selectedImage} 
                   alt="Fullscreen" 
                   fill
+                  sizes="90vw"
                   unoptimized={shouldUnoptimize}
                   className="object-contain"
                 />

@@ -59,9 +59,9 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
   };
 
   return (
-    <div className="h-full w-full flex items-center justify-center lg:p-4">
+    <div className="h-full w-full max-h-full flex items-center justify-center lg:p-4">
       <motion.div
-        className="w-full h-full lg:max-w-sm lg:h-auto bg-white rounded-[2rem] lg:rounded-[2rem] shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl relative flex flex-col"
+        className="w-full h-full max-h-full lg:max-w-lg bg-white rounded-[2rem] lg:rounded-[2rem] shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl relative flex flex-col"
         style={{ x, y, rotate }}
         drag={!disabled}
         dragElastic={0.3}
@@ -85,8 +85,9 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           NOPE
         </motion.div>
 
-        {/* Image section - Fixed height for consistent rendering */}
-        <div className="relative w-full h-64 overflow-hidden">
+        {/* Image section - Constrained height to prevent card from growing too tall */}
+        {/* Uses aspect ratio-friendly height that fits within card constraints */}
+        <div className="relative w-full h-64 lg:h-80 flex-shrink-0 overflow-hidden">
           {place.photo_url ? (
             <>
               <Image
@@ -103,10 +104,10 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           )}
         </div>
 
-        {/* Content section - Slightly larger with more padding */}
-        <div className="p-5 lg:p-7 flex-shrink-0">
+        {/* Content section - Scrollable if needed, but typically fits within card height */}
+        <div className="p-5 lg:p-8 flex-shrink-0 overflow-y-auto min-h-0">
           <h2 
-            className="text-2xl lg:text-3xl font-semibold text-foreground mb-2"
+            className="text-2xl lg:text-4xl font-semibold text-foreground mb-2"
           >
             {typeof place.name === 'string' ? place.name : 'Unnamed place'}
           </h2>
@@ -119,10 +120,10 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
 
           {place.rating != null && typeof place.rating === 'number' && (
             <div className="flex items-center gap-2 mb-3">
-              <Star className="w-5 h-5 fill-coral text-coral" />
-              <span className="font-semibold text-foreground">{place.rating.toFixed(1)}</span>
+              <Star className="w-5 h-5 lg:w-6 lg:h-6 fill-coral text-coral" />
+              <span className="font-semibold text-foreground lg:text-lg">{place.rating.toFixed(1)}</span>
               {place.user_ratings_total != null && typeof place.user_ratings_total === 'number' && (
-                <span className="text-muted-foreground text-sm">
+                <span className="text-muted-foreground text-sm lg:text-base">
                   ({place.user_ratings_total.toLocaleString()} reviews)
                 </span>
               )}
@@ -130,7 +131,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           )}
 
           {place.address && typeof place.address === 'string' && (
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm lg:text-base text-muted-foreground leading-relaxed">
               {String(place.address)}
             </p>
           )}

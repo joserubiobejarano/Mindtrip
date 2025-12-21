@@ -8,6 +8,7 @@ import { Download } from "lucide-react";
 import { SmartItinerary } from "@/types/itinerary";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
+import { resolvePlacePhotoSrc } from "@/lib/placePhotos";
 
 // Helper to check if image src is a places proxy that needs unoptimized rendering
 const isPlacesProxy = (src?: string | null): boolean => {
@@ -169,9 +170,10 @@ export function PublicItineraryPanel({
         {/* Days */}
         <div className="space-y-12">
           {smartItinerary.days.map((day) => {
+            // Use resolvePlacePhotoSrc to prioritize image_url over photos array
             const dayImages = (day.photos && day.photos.length > 0) 
-              ? day.photos 
-              : day.slots.flatMap(s => s.places.flatMap(p => p.photos || []));
+              ? day.photos.map(photo => resolvePlacePhotoSrc(photo)).filter((src): src is string => src !== null)
+              : day.slots.flatMap(s => s.places.map(p => resolvePlacePhotoSrc(p))).filter((src): src is string => src !== null);
             
             const bannerImages = dayImages.slice(0, 4);
 
@@ -216,6 +218,7 @@ export function PublicItineraryPanel({
                               src={img} 
                               alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
                               fill 
+                              sizes="(max-width: 768px) 25vw, 25vw"
                               unoptimized={shouldUnoptimizeImg}
                               className="object-cover"
                             />
@@ -267,25 +270,40 @@ export function PublicItineraryPanel({
                                 }}
                               >
                                 <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                  {place.photos && place.photos[0] ? (() => {
-                                    const shouldUnoptimize = isPlacesProxy(place.photos[0]);
-                                    if (process.env.NODE_ENV === 'development' && slotIdx === 0 && place === slot.places[0]) {
-                                      console.debug('[PublicItineraryPanel] Place activity image:', { src: place.photos[0], placeName: place.name, unoptimized: shouldUnoptimize });
+                                  {(() => {
+                                    const resolvedSrc = resolvePlacePhotoSrc(place);
+                                    if (resolvedSrc) {
+                                      const shouldUnoptimize = isPlacesProxy(resolvedSrc);
+                                      // Dev log: show one sample place's resolved image src and source
+                                      if (process.env.NODE_ENV !== 'production' && slotIdx === 0 && place === slot.places[0]) {
+                                        const cameFromImageUrl = place.image_url && resolvedSrc === place.image_url;
+                                        console.log('[PublicItineraryPanel] Sample place image resolution:', {
+                                          placeName: place.name,
+                                          resolvedSrc,
+                                          cameFromImageUrl,
+                                          hasImageUrl: !!place.image_url,
+                                          hasPhotos: !!(place.photos && place.photos.length > 0),
+                                          unoptimized: shouldUnoptimize
+                                        });
+                                      }
+                                      return (
+                                        <Image 
+                                          src={resolvedSrc} 
+                                          alt={place.name} 
+                                          fill 
+                                          sizes="(max-width: 640px) 100vw, 96px"
+                                          unoptimized={shouldUnoptimize}
+                                          className="object-cover" 
+                                        />
+                                      );
+                                    } else {
+                                      return (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                          <span className="text-xs">No image</span>
+                                        </div>
+                                      );
                                     }
-                                    return (
-                                      <Image 
-                                        src={place.photos[0]} 
-                                        alt={place.name} 
-                                        fill 
-                                        unoptimized={shouldUnoptimize}
-                                        className="object-cover" 
-                                      />
-                                    );
-                                  })() : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                      <span className="text-xs">No image</span>
-                                    </div>
-                                  )}
+                                  })()}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>

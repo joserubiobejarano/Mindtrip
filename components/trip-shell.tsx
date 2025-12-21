@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import { TripMapPanel } from "@/components/trip-map-panel";
 import { BaseMarker } from "@/components/google-map-base";
 
 interface TripShellProps {
   tripId: string;
   activeTab: string;
   children: React.ReactNode;
-  // Map props
+  // Map props (only used for Itinerary tab now)
   selectedDayId: string | null;
   selectedActivityId?: string | null;
   exploreMarkers?: BaseMarker[];
@@ -31,42 +28,13 @@ export function TripShell({
   onExploreMarkerClick,
   activePlace,
 }: TripShellProps) {
-  const searchParams = useSearchParams();
-  const debugMode = searchParams.get('debugExplore');
-  const hideMap = debugMode === 'noMap';
-  const showMap = activeTab === "explore" && !hideMap;
-  
-  // Log mount/unmount for debugging
-  useEffect(() => {
-    if (showMap && activeTab === "explore") {
-      console.log('[DEBUG] TripMapPanel mounted');
-      return () => {
-        console.log('[DEBUG] TripMapPanel unmounted');
-      };
-    }
-  }, [showMap, activeTab]);
+  // Explore tab no longer uses map - content is full width
+  // Map props are kept for potential future use with other tabs but not used for Explore
   
   return (
     <div className="h-screen bg-background flex overflow-hidden">
-      {/* Map Panel - Left (Hidden on Mobile for Explore tab) - Only visible on Explore tab */}
-      {showMap && (
-        <div className="hidden lg:flex lg:w-[50%] bg-sage/20 items-center justify-center overflow-hidden">
-          <TripMapPanel
-            tripId={tripId}
-            selectedDayId={selectedDayId}
-            selectedActivityId={selectedActivityId}
-            activeTab={activeTab}
-            exploreMarkers={exploreMarkers}
-            exploreCenter={exploreCenter}
-            exploreZoom={exploreZoom}
-            onExploreMarkerClick={onExploreMarkerClick}
-            activePlace={activePlace}
-          />
-        </div>
-      )}
-
-      {/* Content Panel - Right (Full screen on Mobile for Explore, 50% on Desktop) - 100% on other tabs */}
-      <div className={`flex flex-col overflow-hidden ${showMap ? 'flex-1 lg:w-[50%] bg-cream' : 'flex-1 bg-background'}`}>
+      {/* Content Panel - Full width for all tabs now */}
+      <div className="flex-1 bg-background flex flex-col overflow-hidden">
         {children}
       </div>
     </div>

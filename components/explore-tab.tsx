@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ExploreDeck } from "./explore/ExploreDeck";
 import { ExploreFilters } from "./explore/ExploreFilters";
 import { SwipeCounter } from "./explore/SwipeCounter";
+import { ExplorePlaceDetailsCard } from "./explore/ExplorePlaceDetailsCard";
 import { HotelSearchBanner } from "./hotel-search-banner";
 import { ErrorBoundary } from "./error-boundary";
 import { useTrip } from "@/hooks/use-trip";
 import { useTripSegments } from "@/hooks/use-trip-segments";
 import { useExploreSession, useExplorePlaces } from "@/hooks/use-explore";
 import { useToast } from "@/components/ui/toast";
-import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
+import type { ExploreFilters as ExploreFiltersType, ExplorePlace } from "@/lib/google/explore-places";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
@@ -42,10 +43,10 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
   const { addToast } = useToast();
   const [filters, setFilters] = useState<ExploreFiltersType>({});
   const [isAddingToItinerary, setIsAddingToItinerary] = useState(false);
-  const [activePlace, setActivePlace] = useState<{ placeId: string; lat: number; lng: number } | null>(null);
+  const [currentPlace, setCurrentPlace] = useState<ExplorePlace | null>(null);
   
-  // Track previous activePlace to prevent unnecessary map updates
-  const prevActivePlaceRef = useRef<{ placeId: string; lat: number; lng: number } | null>(null);
+  // Replace mode state
+  const [replaceTarget, setReplaceTarget] = useState<{ tripId: string; dayId: string; activityId: string; activityName?: string } | null>(null);
   
   // Gate for showing affiliate promo boxes (currently disabled)
   const showAffiliates = false;
@@ -112,15 +113,52 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
         description: 'Select a place to add to your itinerary',
         variant: 'default',
       });
+      setReplaceTarget(null);
     } else if (mode === 'replace' && day && activity) {
-      addToast({
-        title: 'Replace activity',
-        description: 'Select a place to replace this item',
-        variant: 'default',
-      });
+      // Set replace target from URL params
+      const newReplaceTarget = {
+        tripId,
+        dayId: day,
+        activityId: activity,
+      };
+      setReplaceTarget(newReplaceTarget);
+      
+      // DEV logging
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[ReplaceMode] target', newReplaceTarget);
+      }
+
+      // Fetch activity name for label
+      const fetchActivityName = async () => {
+        try {
+          const response = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
+          if (response.ok) {
+            const itinerary = await response.json();
+            // Find the activity in the itinerary
+            for (const itineraryDay of itinerary.days || []) {
+              if (itineraryDay.id === day) {
+                for (const slot of itineraryDay.slots || []) {
+                  const place = slot.places?.find((p: any) => p.id === activity);
+                  if (place) {
+                    setReplaceTarget(prev => prev ? { ...prev, activityName: place.name } : null);
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+          }
+        } catch (error) {
+          console.error('[ReplaceMode] Failed to fetch activity name:', error);
+          // Continue without activity name - not critical
+        }
+      };
+      fetchActivityName();
+    } else {
+      setReplaceTarget(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, tripId]);
 
   // Log mount/unmount for debugging
   useEffect(() => {
@@ -139,9 +177,89 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     }
   }, [hideDeck]);
 
-  const handleAddToItinerary = async () => {
-    if (!safeSession || (safeSession.likedPlaces?.length ?? 0) === 0 || isAddingToItinerary) return;
+  const handleAddToItinerary = async (selectedPlace?: ExplorePlace) => {
+    // Handle replace mode
+    if (replaceTarget) {
+      if (!selectedPlace || !selectedPlace.place_id) {
+        addToast({
+          title: 'No place selected',
+          description: 'Please select a place to replace this activity',
+          variant: 'default',
+        });
+        return;
+      }
 
+      if (isAddingToItinerary) return;
+      setIsAddingToItinerary(true);
+
+      try {
+        // Pass the full ExplorePlace object to the API
+        const response = await fetch(`/api/trips/${tripId}/activities/${replaceTarget.activityId}/replace`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            place: {
+              place_id: selectedPlace.place_id,
+              name: selectedPlace.name,
+              address: selectedPlace.address,
+              lat: selectedPlace.lat,
+              lng: selectedPlace.lng,
+              neighborhood: selectedPlace.neighborhood,
+              district: selectedPlace.district,
+              description: selectedPlace.description,
+              types: selectedPlace.types,
+              photo_reference: selectedPlace.photo_reference,
+              image_url: selectedPlace.image_url,
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          
+          // Handle 409 (duplicate) error
+          if (response.status === 409) {
+            addToast({
+              title: 'Already in itinerary',
+              description: error.message || 'This place is already in your itinerary',
+              variant: 'destructive',
+            });
+            // Keep user in Explore to pick another
+            return;
+          }
+          
+          throw new Error(error.error || error.message || 'Failed to replace activity');
+        }
+
+        // DEV logging
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[ReplaceMode] replacing with', selectedPlace.place_id, selectedPlace.name);
+        }
+
+        // Show success toast
+        addToast({
+          title: 'Replaced!',
+          description: 'Activity replaced successfully',
+          variant: 'success',
+        });
+
+        // Clear URL params and navigate to itinerary tab
+        setReplaceTarget(null);
+        router.push(`/trips/${tripId}?tab=itinerary`);
+      } catch (error: any) {
+        addToast({
+          title: 'Error',
+          description: error.message || 'Failed to replace activity',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsAddingToItinerary(false);
+      }
+      return;
+    }
+
+    // Normal add mode (existing flow)
+    if (!safeSession || (safeSession.likedPlaces?.length ?? 0) === 0 || isAddingToItinerary) return;
     setIsAddingToItinerary(true);
 
     try {
@@ -189,54 +307,11 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
     }
   };
 
-  // Memoized handler for active place changes - guards setActivePlace to prevent unnecessary updates
+  // Legacy callback handler (kept for backwards compatibility but not used for map updates)
   const handleActivePlaceChange = useCallback((place: { placeId: string; lat: number; lng: number }) => {
-    setActivePlace((prev) => {
-      // Only update if placeId, lat, or lng actually changed
-      if (prev?.placeId === place.placeId && prev?.lat === place.lat && prev?.lng === place.lng) {
-        return prev;
-      }
-      return place;
-    });
-    // Call parent callback if provided
+    // Call parent callback if provided (but map is no longer rendered in Explore)
     onActivePlaceChange?.(place);
   }, [onActivePlaceChange]);
-
-  // Update map with active place marker (without forcing pan/zoom to avoid lag)
-  // Guard updates to prevent infinite loops - only update when activePlace actually changes
-  useEffect(() => {
-    if (!onMapUpdate) return;
-    
-    // Only update if activePlace actually changed
-    const prev = prevActivePlaceRef.current;
-    const current = activePlace;
-    
-    const hasChanged = (!prev && current) || 
-                       (prev && (!current || 
-                                prev.placeId !== current.placeId ||
-                                prev.lat !== current.lat ||
-                                prev.lng !== current.lng));
-    
-    if (!hasChanged) return;
-    
-    prevActivePlaceRef.current = current;
-    
-    if (current) {
-      // Only update markers, don't force center/zoom to avoid lag
-      onMapUpdate(
-        [{
-          id: current.placeId,
-          lat: current.lat,
-          lng: current.lng,
-        }],
-        null, // Don't force center
-        undefined // Don't force zoom
-      );
-    } else {
-      // Clear markers when no active place
-      onMapUpdate([], null, undefined);
-    }
-  }, [onMapUpdate, activePlace]); // Include activePlace in dependencies
 
   // Show loading state
   if ((tripLoading || segmentsLoading) && !trip) {
@@ -333,36 +408,52 @@ export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlac
         </div>
       )}
 
-      {/* Filters Section - Hidden on mobile for full-screen card experience */}
-      <div className="hidden lg:block px-6 py-4 border-b border-sage/20 flex-shrink-0">
-        <ExploreFilters filters={filters} onFiltersChange={setFilters} tripId={tripId} />
-      </div>
+      {/* Main Content - 2-column layout on desktop, full screen on mobile */}
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        {/* Left Sidebar - Desktop only */}
+        <div className="hidden lg:flex lg:w-[340px] lg:flex-shrink-0 flex-col border-r border-sage/20 bg-cream/30 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            {/* Filters */}
+            <div>
+              <ExploreFilters filters={filters} onFiltersChange={setFilters} tripId={tripId} />
+            </div>
 
-      {/* Swipe limit message - only shown when limit is reached - Hidden on mobile */}
-      <div className="hidden lg:block px-6 pt-4 flex-shrink-0">
-        <SwipeCounter tripId={tripId} />
-      </div>
+            {/* Swipe Counter */}
+            <div>
+              <SwipeCounter tripId={tripId} />
+            </div>
 
-      {/* Swipe Deck - Full screen on mobile, centered on desktop */}
-      <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0 lg:p-6">
-        {hideDeck ? (
-          <div className="text-sm text-muted-foreground">ExploreDeck hidden (debug mode: noDeck)</div>
-        ) : (
-          <ErrorBoundary
-            fallbackTitle="Something went wrong"
-            fallbackMessage="We encountered an error while loading Explore. This has been logged and we'll look into it."
-          >
-            <ExploreDeck
-              tripId={tripId}
-              filters={filters}
-              mode="trip"
-              tripSegmentId={activeSegmentId || undefined}
-              onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
-              onActivePlaceChange={handleActivePlaceChange}
-              hideHeader={true}
-            />
-          </ErrorBoundary>
-        )}
+            {/* Place Details Card */}
+            <div>
+              <ExplorePlaceDetailsCard place={currentPlace} tripCity={trip?.destination_city || undefined} />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Main Area - Swipe Deck */}
+        <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0 p-4 lg:p-8">
+          {hideDeck ? (
+            <div className="text-sm text-muted-foreground">ExploreDeck hidden (debug mode: noDeck)</div>
+          ) : (
+            <ErrorBoundary
+              fallbackTitle="Something went wrong"
+              fallbackMessage="We encountered an error while loading Explore. This has been logged and we'll look into it."
+            >
+              <ExploreDeck
+                tripId={tripId}
+                filters={filters}
+                mode="trip"
+                tripSegmentId={activeSegmentId || undefined}
+                onAddToItinerary={isAddingToItinerary ? undefined : handleAddToItinerary}
+                onActivePlaceChange={handleActivePlaceChange}
+                onCurrentPlaceChange={setCurrentPlace}
+                hideHeader={true}
+                replaceTarget={replaceTarget ? { tripId: replaceTarget.tripId, dayId: replaceTarget.dayId, activityId: replaceTarget.activityId } : undefined}
+                replacingActivityName={replaceTarget?.activityName}
+              />
+            </ErrorBoundary>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,8 @@ import { getTripProStatus } from '@/lib/supabase/pro-status';
 import { getUsageLimits } from '@/lib/supabase/user-subscription';
 import { cachePlaceImage } from '@/lib/images/cache-place-image';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ tripId: string; dayId: string }> }
@@ -329,22 +331,29 @@ export async function POST(
           const tags = (placeDetails.types || []).slice(0, 3).map(t => t.replace(/_/g, ' '));
 
           // Create place with image_url and photos array
-          // Build photo URL if we have a photo reference
-          const photoUrl = photoRef ? `/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=800` : '';
           const newPlace: any = {
             id: placeId,
             name: placeDetails.name || 'Unknown Place',
             description,
             area,
             neighborhood,
-            photos: photoUrl ? [photoUrl] : [],
+            photos: [], // Empty - we use image_url instead
             visited: false,
             tags,
           };
 
           // Set image_url if we have a cached image (primary source for images)
+          // If cached image exists, use it. Otherwise, photos array stays empty.
           if (imageUrl) {
             newPlace.image_url = imageUrl;
+          } else if (photoRef) {
+            // Only use proxy URL as last resort if caching failed
+            // This should be rare - caching should succeed in most cases
+            const photoUrl = `/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=800`;
+            newPlace.photos = [photoUrl];
+            if (isDev) {
+              console.warn('[bulk-add-from-swipes] Using proxy URL fallback (caching failed):', placeDetails.name);
+            }
           }
 
           newPlaces.push(newPlace);

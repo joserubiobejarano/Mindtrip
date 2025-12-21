@@ -4,6 +4,7 @@ const nextConfig = {
     remotePatterns: [
       // Supabase storage (your project)
       { protocol: "https", hostname: "upeoxmwdghdbgqcqtll.supabase.co" },
+      { protocol: "https", hostname: "itgxsmgaoptvkxctnbty.supabase.co" },
 
       // Google APIs + assets that commonly serve Places photos
       { protocol: "https", hostname: "maps.googleapis.com" },

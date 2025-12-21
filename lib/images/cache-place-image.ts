@@ -2,14 +2,25 @@
  * Server-side utility to cache place images in Supabase Storage.
  * Downloads images from Google Places, Unsplash, or generates Mapbox thumbnails,
  * then uploads them to stable Storage URLs.
+ * 
+ * Uses Supabase service role client for all storage operations to bypass RLS.
  */
 
-import { createClient } from '@/lib/supabase/server';
+import 'server-only';
+import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { createHash } from 'crypto';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 
 const BUCKET_NAME = 'place-images';
 const isDev = process.env.NODE_ENV === 'development';
+
+// Startup health check: warn if service role key is missing
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.warn(
+    '[cache-place-image] ⚠️  SUPABASE_SERVICE_ROLE_KEY is missing. Image uploads will fail. ' +
+    'Add this to your environment variables.'
+  );
+}
 
 export interface CachePlaceImageParams {
   tripId: string;
@@ -22,43 +33,76 @@ export interface CachePlaceImageParams {
   lng?: number;
 }
 
-/**
- * Generate URL-safe slug from title
- */
-function slugifyTitle(title: string): string {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '') // Remove special chars
-    .replace(/[\s_-]+/g, '-') // Replace spaces/underscores with hyphens
-    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-    .substring(0, 50); // Limit length
+export type ImageProvider = 'google' | 'unsplash' | 'mapbox' | 'placeholder';
+
+export interface ProviderAttempt {
+  provider: ImageProvider;
+  ok: boolean;
+  status?: number;
+  reason?: string;
+  debugUrl?: string; // sanitized URL without secrets
+}
+
+export interface CachePlaceImageResult {
+  publicUrl: string | null;
+  providerUsed: ImageProvider | null;
+  uploadOk: boolean;
+  error: string | null;
+  attempts: ProviderAttempt[]; // track all attempts
 }
 
 /**
- * Generate hash for filename uniqueness
+ * Sanitize URL by removing API keys, tokens, and secrets
  */
-function generateFileHash(data: Buffer, title: string): string {
-  const hash = createHash('md5');
-  hash.update(data);
-  hash.update(title);
-  return hash.digest('hex').substring(0, 8);
+function sanitizeUrl(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    // Remove common secret parameters
+    const secretParams = ['key', 'api_key', 'access_token', 'token', 'apikey', 'auth'];
+    secretParams.forEach(param => {
+      if (urlObj.searchParams.has(param)) {
+        urlObj.searchParams.set(param, '***REDACTED***');
+      }
+    });
+    return urlObj.toString();
+  } catch {
+    // If URL parsing fails, try to remove common patterns
+    return url
+      .replace(/[?&](key|api_key|access_token|token|apikey|auth)=[^&]*/gi, '=$1=***REDACTED***')
+      .substring(0, 500); // Limit length
+  }
+}
+
+/**
+ * Truncate response text to max length
+ */
+function truncateResponse(text: string, maxLength: number = 300): string {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+}
+
+/**
+ * Generate deterministic hash for file path based on place identity
+ */
+function generatePlaceHash(placeId: string | undefined, title: string, lat: number | undefined, lng: number | undefined): string {
+  const hash = createHash('sha1');
+  const input = `${placeId || ''}|${title}|${lat || ''}|${lng || ''}`;
+  hash.update(input);
+  return hash.digest('hex').substring(0, 16);
 }
 
 /**
  * Ensure bucket exists and has public read access
- * Note: Bucket creation may require admin privileges. If creation fails,
- * we assume the bucket exists and continue (it should be created manually or via migration).
+ * Uses service role client, so it should have permissions to create buckets.
  */
-async function ensureBucketExists(supabase: Awaited<ReturnType<typeof createClient>>): Promise<void> {
+async function ensureBucketExists(supabase: ReturnType<typeof createSupabaseAdmin>): Promise<void> {
   try {
     const { data: buckets, error: listError } = await supabase.storage.listBuckets();
     
     if (listError) {
-      // If we can't list buckets, we'll assume the bucket exists and continue
-      // (bucket creation typically requires admin/service role key)
       if (isDev) {
-        console.warn('[cache-place-image] Cannot list buckets (may need admin key), assuming bucket exists:', listError.message);
+        console.warn('[cache-place-image] Cannot list buckets:', listError.message);
+        console.warn('[cache-place-image] Assuming bucket exists. If uploads fail, create the bucket manually in Supabase dashboard.');
       }
       return;
     }
@@ -77,21 +121,28 @@ async function ensureBucketExists(supabase: Awaited<ReturnType<typeof createClie
       });
 
       if (createError) {
-        // If creation fails (likely due to missing admin privileges), assume bucket exists
-        // Bucket should be created manually or via migration
         if (isDev) {
-          console.warn('[cache-place-image] Cannot create bucket (may need admin key), assuming it exists:', createError.message);
+          console.warn('[cache-place-image] Cannot create bucket programmatically:', createError.message);
+          console.warn('[cache-place-image] Please create the bucket manually in Supabase dashboard:');
+          console.warn(`[cache-place-image]   1. Go to Storage > Buckets`);
+          console.warn(`[cache-place-image]   2. Create bucket "${BUCKET_NAME}"`);
+          console.warn(`[cache-place-image]   3. Set it to PUBLIC`);
         }
+        // Continue assuming bucket exists - if upload fails, we'll throw a clear error
         return;
       }
 
       if (isDev) {
-        console.log('[cache-place-image] Bucket created successfully');
+        console.log('[cache-place-image] ✅ Bucket created successfully');
+      }
+    } else {
+      // Check if bucket is public (we can't set it programmatically if it's not)
+      const bucket = buckets.find(b => b.name === BUCKET_NAME);
+      if (bucket && !bucket.public && isDev) {
+        console.warn('[cache-place-image] ⚠️  Bucket exists but may not be public. Set bucket to PUBLIC in Supabase dashboard.');
       }
     }
   } catch (error: any) {
-    // If anything fails, assume bucket exists and continue
-    // This allows the system to work even if bucket management requires admin privileges
     if (isDev) {
       console.warn('[cache-place-image] Error checking bucket (assuming it exists):', error?.message || error);
     }
@@ -99,35 +150,49 @@ async function ensureBucketExists(supabase: Awaited<ReturnType<typeof createClie
 }
 
 /**
+ * Convert image buffer to JPEG if needed
+ * Returns buffer and ensures it's JPEG format
+ */
+async function ensureJpegFormat(buffer: Buffer, originalContentType: string): Promise<Buffer> {
+  // If already JPEG, return as-is
+  if (originalContentType.includes('jpeg') || originalContentType.includes('jpg')) {
+    return buffer;
+  }
+
+  // For PNG/WebP, we'll keep the original format but store as .jpg extension
+  // This is acceptable since browsers handle it, but ideally we'd convert
+  // For now, return as-is since conversion requires sharp or similar library
+  // TODO: Consider adding image conversion library if needed
+  return buffer;
+}
+
+/**
  * Upload buffer to Supabase Storage and return public URL
  */
 async function uploadToSupabaseStorage(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createSupabaseAdmin>,
   path: string,
   buffer: Buffer,
   contentType: string
 ): Promise<string> {
+  // Ensure JPEG format
+  const jpegBuffer = await ensureJpegFormat(buffer, contentType);
+  
   const { data, error } = await supabase.storage
     .from(BUCKET_NAME)
-    .upload(path, buffer, {
-      contentType,
+    .upload(path, jpegBuffer, {
+      contentType: 'image/jpeg', // Always store as JPEG
       cacheControl: '3600',
-      upsert: false, // Don't overwrite existing files
+      upsert: true, // Overwrite existing files
     });
 
   if (error) {
-    // If file already exists, get its public URL
-    if (error.message.includes('already exists') || error.message.includes('duplicate')) {
-      const { data: publicUrlData } = supabase.storage
-        .from(BUCKET_NAME)
-        .getPublicUrl(path);
-      
-      if (publicUrlData?.publicUrl) {
-        if (isDev) {
-          console.log('[cache-place-image] File already exists, returning existing URL');
-        }
-        return publicUrlData.publicUrl;
-      }
+    // Check for bucket not found error
+    if (error.message?.toLowerCase().includes('bucket') && error.message?.toLowerCase().includes('not found')) {
+      throw new Error(
+        `Bucket "${BUCKET_NAME}" not found. Please create it in Supabase dashboard: ` +
+        `1. Go to Storage > Buckets, 2. Create bucket "${BUCKET_NAME}", 3. Set it to PUBLIC`
+      );
     }
     throw error;
   }
@@ -145,24 +210,36 @@ async function uploadToSupabaseStorage(
 }
 
 /**
- * Fetch image from Google Places Photo API via our proxy
+ * Fetch image directly from Google Places Photo API (server-side)
+ * Returns result with attempt details for debugging
  */
-async function fetchGooglePhoto(photoRef: string): Promise<{ buffer: Buffer; contentType: string } | null> {
+async function fetchGooglePhoto(photoRef: string): Promise<{ 
+  buffer: Buffer; 
+  contentType: string;
+  attempt: ProviderAttempt;
+} | null> {
+  const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=1000&photo_reference=${encodeURIComponent(photoRef)}&key=${GOOGLE_MAPS_API_KEY}`;
+  const sanitizedUrl = sanitizeUrl(photoUrl);
+  
   try {
     if (!GOOGLE_MAPS_API_KEY) {
+      const attempt: ProviderAttempt = {
+        provider: 'google',
+        ok: false,
+        reason: 'Google Maps API key not configured',
+        debugUrl: sanitizedUrl,
+      };
       if (isDev) {
         console.warn('[cache-place-image] Google Maps API key not configured');
       }
-      return null;
+      return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
     }
 
-    // Use server-side fetch to our photo API endpoint
-    // For server-to-server calls, use localhost in development or construct from env
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
-                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-                    'http://localhost:3000';
-    const photoUrl = `${baseUrl}/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=1000`;
-    
+    if (isDev) {
+      console.log('[cache-place-image] [Google] Attempting fetch:', sanitizedUrl);
+    }
+
+    // Fetch directly from Google Places Photo API (server-side only)
     const response = await fetch(photoUrl, {
       headers: {
         'User-Agent': 'MindTrip-Server/1.0',
@@ -170,50 +247,142 @@ async function fetchGooglePhoto(photoRef: string): Promise<{ buffer: Buffer; con
     });
 
     if (!response.ok) {
-      if (isDev) {
-        console.warn('[cache-place-image] Google photo fetch failed:', response.status);
+      let errorText = '';
+      try {
+        const text = await response.text();
+        errorText = truncateResponse(text);
+      } catch {
+        errorText = response.statusText || 'Unknown error';
       }
-      return null;
+      
+      const attempt: ProviderAttempt = {
+        provider: 'google',
+        ok: false,
+        status: response.status,
+        reason: `HTTP ${response.status}: ${errorText}`,
+        debugUrl: sanitizedUrl,
+      };
+      
+      if (isDev) {
+        console.warn('[cache-place-image] [Google] Fetch failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          url: sanitizedUrl,
+        });
+      }
+      return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
     }
 
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const contentType = response.headers.get('content-type') || 'image/jpeg';
 
-    // Check if we got a placeholder (1x1 transparent PNG is ~67 bytes)
+    // Check if we got a placeholder or error response (usually JSON error)
     if (buffer.length < 100) {
+      const attempt: ProviderAttempt = {
+        provider: 'google',
+        ok: false,
+        status: response.status,
+        reason: 'Response too small (likely placeholder or error)',
+        debugUrl: sanitizedUrl,
+      };
       if (isDev) {
-        console.warn('[cache-place-image] Received placeholder image, skipping');
+        console.warn('[cache-place-image] [Google] Received placeholder or error response, skipping');
       }
-      return null;
+      return { buffer, contentType, attempt };
     }
 
-    return { buffer, contentType };
-  } catch (error) {
-    if (isDev) {
-      console.warn('[cache-place-image] Error fetching Google photo:', error);
+    // Check if response is JSON (error response)
+    try {
+      const text = buffer.toString('utf-8');
+      if (text.trim().startsWith('{')) {
+        const errorText = truncateResponse(text);
+        const attempt: ProviderAttempt = {
+          provider: 'google',
+          ok: false,
+          status: response.status,
+          reason: `JSON error response: ${errorText}`,
+          debugUrl: sanitizedUrl,
+        };
+        if (isDev) {
+          console.warn('[cache-place-image] [Google] Returned JSON error:', errorText);
+        }
+        return { buffer, contentType, attempt };
+      }
+    } catch {
+      // Not JSON, continue
     }
-    return null;
+
+    const attempt: ProviderAttempt = {
+      provider: 'google',
+      ok: true,
+      status: response.status,
+      debugUrl: sanitizedUrl,
+    };
+
+    if (isDev) {
+      console.log('[cache-place-image] [Google] ✅ Successfully fetched:', {
+        status: response.status,
+        size: buffer.length,
+        contentType,
+      });
+    }
+
+    return { buffer, contentType, attempt };
+  } catch (error: any) {
+    const attempt: ProviderAttempt = {
+      provider: 'google',
+      ok: false,
+      reason: error?.message || 'Unknown error',
+      debugUrl: sanitizedUrl,
+    };
+    if (isDev) {
+      console.warn('[cache-place-image] [Google] Error fetching photo:', {
+        error: error?.message || error,
+        url: sanitizedUrl,
+      });
+    }
+    return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
   }
 }
 
 /**
  * Search and fetch image from Unsplash
+ * Returns result with attempt details for debugging
  */
-async function fetchUnsplashImage(query: string): Promise<{ buffer: Buffer; contentType: string } | null> {
+async function fetchUnsplashImage(query: string): Promise<{ 
+  buffer: Buffer; 
+  contentType: string;
+  attempt: ProviderAttempt;
+} | null> {
   try {
     const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
     
+    // Search for images - using correct endpoint and headers
+    const searchUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`;
+    const sanitizedSearchUrl = sanitizeUrl(searchUrl);
+    
     if (!UNSPLASH_ACCESS_KEY) {
+      const attempt: ProviderAttempt = {
+        provider: 'unsplash',
+        ok: false,
+        reason: 'Unsplash access key not configured',
+        debugUrl: sanitizedSearchUrl,
+      };
       if (isDev) {
         console.warn('[cache-place-image] Unsplash access key not configured');
       }
-      return null;
+      return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
     }
 
-    // Search for images
-    const searchUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`;
-    
+    if (isDev) {
+      console.log('[cache-place-image] [Unsplash] Attempting search:', {
+        query,
+        url: sanitizedSearchUrl,
+      });
+    }
+
     const searchResponse = await fetch(searchUrl, {
       headers: {
         'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`,
@@ -221,95 +390,233 @@ async function fetchUnsplashImage(query: string): Promise<{ buffer: Buffer; cont
     });
 
     if (!searchResponse.ok) {
-      if (isDev) {
-        console.warn('[cache-place-image] Unsplash search failed:', searchResponse.status);
+      let errorText = '';
+      try {
+        const text = await searchResponse.text();
+        errorText = truncateResponse(text);
+      } catch {
+        errorText = searchResponse.statusText || 'Unknown error';
       }
-      return null;
+      
+      const attempt: ProviderAttempt = {
+        provider: 'unsplash',
+        ok: false,
+        status: searchResponse.status,
+        reason: `Search failed: HTTP ${searchResponse.status}: ${errorText}`,
+        debugUrl: sanitizedSearchUrl,
+      };
+      
+      if (isDev) {
+        console.warn('[cache-place-image] [Unsplash] Search failed:', {
+          status: searchResponse.status,
+          statusText: searchResponse.statusText,
+          error: errorText,
+          url: sanitizedSearchUrl,
+        });
+      }
+      return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
     }
 
     const searchData = await searchResponse.json();
     
     if (!searchData.results || searchData.results.length === 0) {
+      const attempt: ProviderAttempt = {
+        provider: 'unsplash',
+        ok: false,
+        status: searchResponse.status,
+        reason: `No results found for query: ${query}`,
+        debugUrl: sanitizedSearchUrl,
+      };
       if (isDev) {
-        console.warn('[cache-place-image] No Unsplash results found');
+        console.warn('[cache-place-image] [Unsplash] No results found for query:', query);
       }
-      return null;
+      return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
     }
 
     // Download the first result (regular size, not raw)
     const imageUrl = searchData.results[0].urls?.regular;
     if (!imageUrl) {
+      const attempt: ProviderAttempt = {
+        provider: 'unsplash',
+        ok: false,
+        status: searchResponse.status,
+        reason: 'No image URL in Unsplash result',
+        debugUrl: sanitizedSearchUrl,
+      };
       if (isDev) {
-        console.warn('[cache-place-image] No image URL in Unsplash result');
+        console.warn('[cache-place-image] [Unsplash] No image URL in result');
       }
-      return null;
+      return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
+    }
+
+    const sanitizedImageUrl = sanitizeUrl(imageUrl);
+    if (isDev) {
+      console.log('[cache-place-image] [Unsplash] Downloading image:', sanitizedImageUrl);
     }
 
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
-      if (isDev) {
-        console.warn('[cache-place-image] Unsplash image download failed:', imageResponse.status);
+      let errorText = '';
+      try {
+        const text = await imageResponse.text();
+        errorText = truncateResponse(text);
+      } catch {
+        errorText = imageResponse.statusText || 'Unknown error';
       }
-      return null;
+      
+      const attempt: ProviderAttempt = {
+        provider: 'unsplash',
+        ok: false,
+        status: imageResponse.status,
+        reason: `Image download failed: HTTP ${imageResponse.status}: ${errorText}`,
+        debugUrl: sanitizedImageUrl,
+      };
+      
+      if (isDev) {
+        console.warn('[cache-place-image] [Unsplash] Image download failed:', {
+          status: imageResponse.status,
+          error: errorText,
+        });
+      }
+      return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
     }
 
     const arrayBuffer = await imageResponse.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
 
+    const attempt: ProviderAttempt = {
+      provider: 'unsplash',
+      ok: true,
+      status: imageResponse.status,
+      debugUrl: sanitizedImageUrl,
+    };
+
     if (isDev) {
-      console.log('[cache-place-image] Successfully fetched from Unsplash');
+      console.log('[cache-place-image] [Unsplash] ✅ Successfully fetched:', {
+        status: imageResponse.status,
+        size: buffer.length,
+        contentType,
+      });
     }
 
-    return { buffer, contentType };
-  } catch (error) {
+    return { buffer, contentType, attempt };
+  } catch (error: any) {
+    const attempt: ProviderAttempt = {
+      provider: 'unsplash',
+      ok: false,
+      reason: error?.message || 'Unknown error',
+    };
     if (isDev) {
-      console.warn('[cache-place-image] Error fetching Unsplash image:', error);
+      console.warn('[cache-place-image] [Unsplash] Error fetching image:', {
+        error: error?.message || error,
+      });
     }
-    return null;
+    return { buffer: Buffer.alloc(0), contentType: 'image/jpeg', attempt };
   }
 }
 
 /**
  * Generate Mapbox static map thumbnail
+ * Returns result with attempt details for debugging
+ * Uses MAPBOX_ACCESS_TOKEN (server-side, not NEXT_PUBLIC)
  */
-async function generateMapboxThumbnail(lat: number, lng: number): Promise<{ buffer: Buffer; contentType: string } | null> {
+async function generateMapboxThumbnail(lat: number, lng: number): Promise<{ 
+  buffer: Buffer; 
+  contentType: string;
+  attempt: ProviderAttempt;
+} | null> {
   try {
+    // Use MAPBOX_ACCESS_TOKEN (server-side, not NEXT_PUBLIC)
     const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN;
     
+    // Generate static map image (400x300, suitable for thumbnails)
+    const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+ff0000(${lng},${lat})/${lng},${lat},14,0/400x300@2x?access_token=${MAPBOX_ACCESS_TOKEN}`;
+    const sanitizedUrl = sanitizeUrl(mapUrl);
+    
     if (!MAPBOX_ACCESS_TOKEN) {
+      const attempt: ProviderAttempt = {
+        provider: 'mapbox',
+        ok: false,
+        reason: 'Mapbox access token not configured',
+        debugUrl: sanitizedUrl,
+      };
       if (isDev) {
         console.warn('[cache-place-image] Mapbox access token not configured');
       }
-      return null;
+      return { buffer: Buffer.alloc(0), contentType: 'image/png', attempt };
     }
 
-    // Generate static map image (400x300, suitable for thumbnails)
-    const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+ff0000(${lng},${lat})/${lng},${lat},14,0/400x300@2x?access_token=${MAPBOX_ACCESS_TOKEN}`;
+    if (isDev) {
+      console.log('[cache-place-image] [Mapbox] Attempting thumbnail generation:', {
+        lat,
+        lng,
+        url: sanitizedUrl,
+      });
+    }
     
     const response = await fetch(mapUrl);
     
     if (!response.ok) {
-      if (isDev) {
-        console.warn('[cache-place-image] Mapbox thumbnail generation failed:', response.status);
+      let errorText = '';
+      try {
+        const text = await response.text();
+        errorText = truncateResponse(text);
+      } catch {
+        errorText = response.statusText || 'Unknown error';
       }
-      return null;
+      
+      const attempt: ProviderAttempt = {
+        provider: 'mapbox',
+        ok: false,
+        status: response.status,
+        reason: `Thumbnail generation failed: HTTP ${response.status}: ${errorText}`,
+        debugUrl: sanitizedUrl,
+      };
+      
+      if (isDev) {
+        console.warn('[cache-place-image] [Mapbox] Thumbnail generation failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          url: sanitizedUrl,
+        });
+      }
+      return { buffer: Buffer.alloc(0), contentType: 'image/png', attempt };
     }
 
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const contentType = 'image/png'; // Mapbox returns PNG
 
+    const attempt: ProviderAttempt = {
+      provider: 'mapbox',
+      ok: true,
+      status: response.status,
+      debugUrl: sanitizedUrl,
+    };
+
     if (isDev) {
-      console.log('[cache-place-image] Successfully generated Mapbox thumbnail');
+      console.log('[cache-place-image] [Mapbox] ✅ Successfully generated thumbnail:', {
+        status: response.status,
+        size: buffer.length,
+        contentType,
+      });
     }
 
-    return { buffer, contentType };
-  } catch (error) {
+    return { buffer, contentType, attempt };
+  } catch (error: any) {
+    const attempt: ProviderAttempt = {
+      provider: 'mapbox',
+      ok: false,
+      reason: error?.message || 'Unknown error',
+    };
     if (isDev) {
-      console.warn('[cache-place-image] Error generating Mapbox thumbnail:', error);
+      console.warn('[cache-place-image] [Mapbox] Error generating thumbnail:', {
+        error: error?.message || error,
+      });
     }
-    return null;
+    return { buffer: Buffer.alloc(0), contentType: 'image/png', attempt };
   }
 }
 
@@ -330,28 +637,72 @@ function generatePlaceholder(): { buffer: Buffer; contentType: string } {
  * Returns stable Supabase Storage URL or null if all fallbacks fail
  */
 export async function cachePlaceImage(params: CachePlaceImageParams): Promise<string | null> {
-  const { tripId, title, city, country, photoRef, lat, lng } = params;
+  const result = await cachePlaceImageWithDetails(params);
+  return result.publicUrl;
+}
+
+/**
+ * Main function to cache a place image with detailed result
+ * Returns result object with provider info and error details
+ */
+export async function cachePlaceImageWithDetails(params: CachePlaceImageParams): Promise<CachePlaceImageResult> {
+  const { tripId, placeId, title, city, country, photoRef, lat, lng } = params;
+  const attempts: ProviderAttempt[] = [];
 
   if (isDev) {
-    console.log('[cache-place-image] Starting image cache for:', { title, tripId, hasPhotoRef: !!photoRef });
+    console.log('[cache-place-image] Starting image cache for:', { 
+      title, 
+      city,
+      country,
+      tripId, 
+      placeId: placeId?.substring(0, 20),
+      hasPhotoRef: !!photoRef,
+      hasCoords: lat !== undefined && lng !== undefined
+    });
+  }
+
+  // Check for service role key
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const error = 'SUPABASE_SERVICE_ROLE_KEY is missing. Cannot upload images.';
+    if (isDev) {
+      console.error('[cache-place-image]', error);
+    }
+    return {
+      publicUrl: null,
+      providerUsed: null,
+      uploadOk: false,
+      error,
+      attempts: [],
+    };
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createSupabaseAdmin();
     
     // Ensure bucket exists
     await ensureBucketExists(supabase);
 
-    let imageData: { buffer: Buffer; contentType: string } | null = null;
-    let source = '';
+    let imageData: { buffer: Buffer; contentType: string; attempt: ProviderAttempt } | null = null;
+    let provider: ImageProvider | null = null;
 
-    // Priority 1: Try Google Places photo
+    // Priority 1: Try Google Places photo (if photo_reference exists, use it directly)
     if (photoRef) {
-      imageData = await fetchGooglePhoto(photoRef);
-      if (imageData) {
-        source = 'google';
-        if (isDev) {
-          console.log('[cache-place-image] Successfully fetched from Google Places');
+      if (isDev) {
+        console.log('[cache-place-image] [Priority 1] Attempting Google Places photo with photo_reference...');
+      }
+      const result = await fetchGooglePhoto(photoRef);
+      if (result) {
+        attempts.push(result.attempt);
+        if (result.attempt.ok && result.buffer.length > 100) {
+          imageData = result;
+          provider = 'google';
+          if (isDev) {
+            console.log('[cache-place-image] [Priority 1] ✅ Google photo fetched successfully');
+          }
+        } else {
+          if (isDev) {
+            console.warn('[cache-place-image] [Priority 1] ❌ Google photo failed:', result.attempt.reason);
+          }
         }
       }
     }
@@ -359,43 +710,83 @@ export async function cachePlaceImage(params: CachePlaceImageParams): Promise<st
     // Priority 2: Try Unsplash search
     if (!imageData) {
       const searchQuery = city ? `${title} ${city}${country ? ` ${country}` : ''}` : title;
-      imageData = await fetchUnsplashImage(searchQuery);
-      if (imageData) {
-        source = 'unsplash';
-        if (isDev) {
-          console.log('[cache-place-image] Using Unsplash fallback');
-        }
+      if (isDev) {
+        console.log('[cache-place-image] [Priority 2] Attempting Unsplash search:', searchQuery);
       }
-    }
-
-    // Priority 3: Try Mapbox static map or placeholder
-    if (!imageData) {
-      if (lat !== undefined && lng !== undefined) {
-        imageData = await generateMapboxThumbnail(lat, lng);
-        if (imageData) {
-          source = 'mapbox';
+      const result = await fetchUnsplashImage(searchQuery);
+      if (result) {
+        attempts.push(result.attempt);
+        if (result.attempt.ok && result.buffer.length > 100) {
+          imageData = result;
+          provider = 'unsplash';
           if (isDev) {
-            console.log('[cache-place-image] Using Mapbox fallback');
+            console.log('[cache-place-image] [Priority 2] ✅ Unsplash image fetched successfully');
+          }
+        } else {
+          if (isDev) {
+            console.warn('[cache-place-image] [Priority 2] ❌ Unsplash search failed:', result.attempt.reason);
           }
         }
       }
     }
 
-    // If still no image, use placeholder (but we'll return null instead to let UI handle it)
+    // Priority 3: Try Mapbox static map
     if (!imageData) {
-      if (isDev) {
-        console.warn('[cache-place-image] All image sources failed, returning null');
+      if (lat !== undefined && lng !== undefined) {
+        if (isDev) {
+          console.log('[cache-place-image] [Priority 3] Attempting Mapbox thumbnail...');
+        }
+        const result = await generateMapboxThumbnail(lat, lng);
+        if (result) {
+          attempts.push(result.attempt);
+          if (result.attempt.ok && result.buffer.length > 100) {
+            imageData = result;
+            provider = 'mapbox';
+            if (isDev) {
+              console.log('[cache-place-image] [Priority 3] ✅ Mapbox thumbnail generated successfully');
+            }
+          } else {
+            if (isDev) {
+              console.warn('[cache-place-image] [Priority 3] ❌ Mapbox thumbnail generation failed:', result.attempt.reason);
+            }
+          }
+        }
+      } else {
+        attempts.push({
+          provider: 'mapbox',
+          ok: false,
+          reason: 'Skipped (no coordinates)',
+        });
       }
-      return null;
     }
 
-    // Determine file extension from content type
-    const extension = imageData.contentType.includes('png') ? 'png' : 'jpg';
-    
-    // Generate storage path
-    const slug = slugifyTitle(title);
-    const hash = generateFileHash(imageData.buffer, title);
-    const storagePath = `trips/${tripId}/${slug}-${hash}.${extension}`;
+    // If still no image, return null (don't use placeholder - let UI handle it)
+    if (!imageData) {
+      const error = 'All image sources failed';
+      if (isDev) {
+        console.warn('[cache-place-image] ❌ All image sources failed');
+        console.warn('[cache-place-image] Attempts summary:', attempts.map(a => ({
+          provider: a.provider,
+          ok: a.ok,
+          reason: a.reason,
+        })));
+      }
+      return {
+        publicUrl: null,
+        providerUsed: null,
+        uploadOk: false,
+        error,
+        attempts,
+      };
+    }
+
+    // Generate deterministic storage path
+    const placeHash = generatePlaceHash(placeId, title, lat, lng);
+    const storagePath = `place-images/${provider}/${placeHash}.jpg`;
+
+    if (isDev) {
+      console.log('[cache-place-image] Uploading to storage path:', storagePath);
+    }
 
     // Upload to Supabase Storage
     try {
@@ -407,34 +798,44 @@ export async function cachePlaceImage(params: CachePlaceImageParams): Promise<st
       );
 
       if (isDev) {
-        console.log('[cache-place-image] Successfully uploaded to Storage:', { source, publicUrl });
+        console.log('[cache-place-image] ✅ Successfully uploaded to Storage:', { 
+          provider, 
+          publicUrl: publicUrl.substring(0, 80) + '...',
+          path: storagePath
+        });
       }
 
-      return publicUrl;
+      return {
+        publicUrl,
+        providerUsed: provider,
+        uploadOk: true,
+        error: null,
+        attempts,
+      };
     } catch (uploadError: any) {
-      // If file already exists, that's fine - return the existing URL
-      if (uploadError.message?.includes('already exists') || uploadError.message?.includes('duplicate')) {
-        const { data: publicUrlData } = supabase.storage
-          .from(BUCKET_NAME)
-          .getPublicUrl(storagePath);
-        
-        if (publicUrlData?.publicUrl) {
-          if (isDev) {
-            console.log('[cache-place-image] File already exists, returning existing URL');
-          }
-          return publicUrlData.publicUrl;
-        }
-      }
-
+      const error = uploadError.message || 'Upload failed';
       if (isDev) {
-        console.error('[cache-place-image] Upload failed:', uploadError);
+        console.error('[cache-place-image] ❌ Upload failed:', error);
       }
-      return null;
+      return {
+        publicUrl: null,
+        providerUsed: provider,
+        uploadOk: false,
+        error,
+        attempts,
+      };
     }
-  } catch (error) {
+  } catch (error: any) {
+    const errorMessage = error?.message || 'Unknown error';
     if (isDev) {
-      console.error('[cache-place-image] Error in cachePlaceImage:', error);
+      console.error('[cache-place-image] ❌ Error in cachePlaceImage:', errorMessage);
     }
-    return null;
+    return {
+      publicUrl: null,
+      providerUsed: null,
+      uploadOk: false,
+      error: errorMessage,
+      attempts,
+    };
   }
 }

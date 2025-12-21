@@ -89,39 +89,42 @@ export function resolvePlacePhotoSrc(input: any): string | null {
   if (typeof input === 'object' && input !== null) {
     // PRIORITY 1: Check image_url first (from SmartItinerary activities) - if present and usable, return immediately
     // This avoids trying to resolve place.photos which don't serialize properly
+    // IMPORTANT: If image_url is already a URL (cached Supabase URL or any http/https URL), never convert it to proxy
     if (input.image_url && typeof input.image_url === 'string') {
       const trimmed = input.image_url.trim();
       if (trimmed.length > 0) {
-        // Already a relative URL
+        // Already a relative URL (e.g., /api/places/photo)
         if (trimmed.startsWith('/')) return trimmed;
-        // Already an absolute URL
+        // Already an absolute URL (e.g., Supabase Storage URL, Google lh3 URL, etc.)
+        // NEVER convert these to proxy URLs - they're already usable
         if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
           return trimmed;
         }
-        // If it's a Google photo reference, convert to proxy URL
+        // Only if it's NOT a URL and IS a valid Google photo reference, convert to proxy URL
         if (isGooglePhotoReference(trimmed)) {
           return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
         }
-        // If it's a valid URL format, return as-is
+        // If it's not a URL and not a photo reference, return as-is (might be invalid data)
         return trimmed;
       }
     }
     
     // PRIORITY 1b: Check imageUrl (camelCase variant) defensively
+    // Same logic as image_url - never convert cached URLs to proxy
     if (input.imageUrl && typeof input.imageUrl === 'string') {
       const trimmed = input.imageUrl.trim();
       if (trimmed.length > 0) {
         // Already a relative URL
         if (trimmed.startsWith('/')) return trimmed;
-        // Already an absolute URL
+        // Already an absolute URL - NEVER convert cached URLs to proxy
         if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
           return trimmed;
         }
-        // If it's a Google photo reference, convert to proxy URL
+        // Only convert if it's a valid Google photo reference (not a URL)
         if (isGooglePhotoReference(trimmed)) {
           return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
         }
-        // If it's a valid URL format, return as-is
+        // Return as-is if not a URL and not a photo reference
         return trimmed;
       }
     }

@@ -2,15 +2,20 @@
 
 This directory contains the brand logo and related assets.
 
-## Required Files
+## Logo Files
 
-- `kruno.png` - The main Kruno logo PNG file (to be provided)
+- `/public/icon.svg` - The main Kruno logo SVG file (used throughout the UI)
 
-This logo will be used for:
+This logo is used for:
 - Navbar logo (40x40px display)
 - Header logo (32x32px display)
-- Favicon generation (app/icon.png, app/favicon.ico, app/apple-icon.png)
+- Footer logo (40x40px display)
+- Itinerary header logo (32x32px display)
+
+Note: Favicon and app icons are configured separately in `app/layout.tsx` using `/favicon.ico` and `/apple-touch-icon.png`.
 
 ## Usage
 
-The logo is referenced via absolute path: `/brand/kruno.png`
+The logo is referenced via absolute path: `/icon.svg`
+
+All Image components using the logo must include width and height props (no fill usage).

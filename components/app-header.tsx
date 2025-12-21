@@ -13,7 +13,7 @@ export function AppHeader() {
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2">
             <Image 
-              src="/brand/kruno.png" 
+              src="/icon.svg" 
               alt="Kruno" 
               width={32}
               height={32}

@@ -12,6 +12,8 @@ import type { ExplorePlace, ExploreFilters } from '@/lib/google/explore-places';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/toast';
 import { usePaywall } from '@/hooks/usePaywall';
+import { useTripActivities } from '@/hooks/use-trip-activities';
+import { getItineraryPlaceKeys, normalizePlaceKey } from '@/lib/itinerary/dedupe';
 
 interface ExploreDeckProps {
   tripId: string;
@@ -21,11 +23,14 @@ interface ExploreDeckProps {
   slot?: 'morning' | 'afternoon' | 'evening';
   areaCluster?: string;
   tripSegmentId?: string;
-  onAddToItinerary?: () => void;
+  onAddToItinerary?: (selectedPlace?: ExplorePlace) => void;
   onAddToDay?: (placeIds: string[]) => void;
   onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
+  onCurrentPlaceChange?: (place: ExplorePlace | null) => void;
   className?: string;
   hideHeader?: boolean;
+  replaceTarget?: { tripId: string; dayId: string; activityId: string };
+  replacingActivityName?: string;
 }
 
 export function ExploreDeck({
@@ -39,8 +44,11 @@ export function ExploreDeck({
   onAddToItinerary,
   onAddToDay,
   onActivePlaceChange,
+  onCurrentPlaceChange,
   className,
   hideHeader = false,
+  replaceTarget,
+  replacingActivityName,
 }: ExploreDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
@@ -48,6 +56,7 @@ export function ExploreDeck({
   const [selectedPlaceName, setSelectedPlaceName] = useState<string | undefined>(undefined);
   const [swipeHistory, setSwipeHistory] = useState<Array<{ placeId: string; action: 'like' | 'dislike' }>>([]);
   const [lastDirection, setLastDirection] = useState<'left' | 'right' | 'up' | null>(null);
+  const [selectedReplacementPlace, setSelectedReplacementPlace] = useState<ExplorePlace | null>(null);
 
   // Build filters based on mode - memoized to prevent unnecessary re-renders
   // Use individual filter properties for stability instead of the whole filters object
@@ -77,6 +86,7 @@ export function ExploreDeck({
 
   const { data: session } = useExploreSession(tripId, true, tripSegmentId);
   const { data, isLoading, error: placesError } = useExplorePlaces(tripId, effectiveFilters, true, dayId, slot, tripSegmentId);
+  const { data: activities = [], isLoading: activitiesLoading } = useTripActivities(tripId);
   const { openPaywall } = usePaywall();
   const swipeMutation = useSwipeAction(tripId, tripSegmentId, (tripId) => {
     openPaywall({ reason: "pro_feature", source: "explore_swipe_limit", tripId });
@@ -84,7 +94,110 @@ export function ExploreDeck({
   const { addToast } = useToast();
 
   // Derive places directly from hook result - ensure always an array
-  const places = Array.isArray(data?.places) ? data.places : [];
+  const rawPlaces = Array.isArray(data?.places) ? data.places : [];
+
+  // Compute itinerary place keys (memoized)
+  const itineraryPlaceKeys = useMemo(() => {
+    const keys = getItineraryPlaceKeys(activities);
+    // DEV-only logging
+    if (process.env.NODE_ENV === 'development') {
+      console.debug("[Explore] existingItineraryPlaceIds size", keys.placeIds.size);
+    }
+    return keys;
+  }, [activities]);
+
+  // Filter and dedupe places based on itinerary
+  const places = useMemo(() => {
+    const beforeCount = rawPlaces.length;
+    let filtered: ExplorePlace[];
+
+    // If includeItineraryPlaces is true, skip filtering
+    if (filters.includeItineraryPlaces) {
+      filtered = rawPlaces;
+    } else {
+      // Filter out places already in itinerary
+      filtered = rawPlaces.filter((place) => {
+        // Primary match: place_id (if available)
+        if (place.place_id && itineraryPlaceKeys.placeIds.has(place.place_id)) {
+          return false;
+        }
+
+        // Fallback match: normalized name + area/city (only if place_id is missing)
+        if (!place.place_id) {
+          // Extract city/area from address similar to dedupe helper
+          let area: string | null = place.neighborhood || place.district || null;
+          let city: string | null = null;
+          if (place.address) {
+            const addressParts = place.address.split(',').map(p => p.trim());
+            if (addressParts.length > 1) {
+              city = addressParts[addressParts.length - 2] || addressParts[addressParts.length - 1] || null;
+              if (!area && addressParts.length > 2) {
+                area = addressParts[addressParts.length - 3] || null;
+              }
+            }
+          }
+          const normalizedKey = normalizePlaceKey(place.name, area, city);
+          if (normalizedKey && itineraryPlaceKeys.fallbackKeys.has(normalizedKey)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    // Dedupe explore results themselves by place_id or normalized key
+    const seenPlaceIds = new Set<string>();
+    const seenKeys = new Set<string>();
+    const deduped: ExplorePlace[] = [];
+
+    for (const place of filtered) {
+      // Check by place_id first
+      if (place.place_id) {
+        if (seenPlaceIds.has(place.place_id)) {
+          continue;
+        }
+        seenPlaceIds.add(place.place_id);
+      } else {
+        // Fallback: check by normalized key
+        let area: string | null = place.neighborhood || place.district || null;
+        let city: string | null = null;
+        if (place.address) {
+          const addressParts = place.address.split(',').map(p => p.trim());
+          if (addressParts.length > 1) {
+            city = addressParts[addressParts.length - 2] || addressParts[addressParts.length - 1] || null;
+            if (!area && addressParts.length > 2) {
+              area = addressParts[addressParts.length - 3] || null;
+            }
+          }
+        }
+        const normalizedKey = normalizePlaceKey(place.name, area, city);
+        if (normalizedKey && seenKeys.has(normalizedKey)) {
+          continue;
+        }
+        if (normalizedKey) {
+          seenKeys.add(normalizedKey);
+        }
+      }
+
+      deduped.push(place);
+    }
+
+    const afterCount = deduped.length;
+    const removedCount = beforeCount - afterCount;
+
+    // DEV-only logging
+    if (process.env.NODE_ENV === 'development') {
+      console.debug("[Explore] filtered places", {
+        before: beforeCount,
+        after: afterCount,
+        showAlreadyInItinerary: filters.includeItineraryPlaces,
+        removed: removedCount,
+      });
+    }
+
+    return deduped;
+  }, [rawPlaces, itineraryPlaceKeys, filters.includeItineraryPlaces]);
 
   // Ensure session has safe defaults
   const safeSession = session || {
@@ -94,6 +207,52 @@ export function ExploreDeck({
     remainingSwipes: null,
     dailyLimit: null,
   };
+
+  // Helper to check if a place is already in itinerary
+  const isPlaceInItinerary = useCallback((place: ExplorePlace): boolean => {
+    // Primary match: place_id (if available)
+    if (place.place_id && itineraryPlaceKeys.placeIds.has(place.place_id)) {
+      return true;
+    }
+
+    // Fallback match: normalized name + area/city (only if place_id is missing)
+    if (!place.place_id) {
+      // Extract city/area from address similar to dedupe helper
+      let area: string | null = place.neighborhood || place.district || null;
+      let city: string | null = null;
+      if (place.address) {
+        const addressParts = place.address.split(',').map(p => p.trim());
+        if (addressParts.length > 1) {
+          city = addressParts[addressParts.length - 2] || addressParts[addressParts.length - 1] || null;
+          if (!area && addressParts.length > 2) {
+            area = addressParts[addressParts.length - 3] || null;
+          }
+        }
+      }
+      const normalizedKey = normalizePlaceKey(place.name, area, city);
+      if (normalizedKey && itineraryPlaceKeys.fallbackKeys.has(normalizedKey)) {
+        return true;
+      }
+    }
+
+    return false;
+  }, [itineraryPlaceKeys]);
+
+  // In replace mode, enforce single selection - only keep the latest liked place
+  const likedPlacesForReplace = useMemo(() => {
+    if (replaceTarget && safeSession.likedPlaces && safeSession.likedPlaces.length > 0) {
+      // Return only the most recent liked place (last in array)
+      return [safeSession.likedPlaces[safeSession.likedPlaces.length - 1]];
+    }
+    return safeSession.likedPlaces || [];
+  }, [replaceTarget, safeSession.likedPlaces]);
+
+  // Clear selected replacement when replaceTarget changes
+  useEffect(() => {
+    if (!replaceTarget) {
+      setSelectedReplacementPlace(null);
+    }
+  }, [replaceTarget]);
 
   // Sync currentIndex with places.length - always clamp to valid range
   useEffect(() => {
@@ -193,6 +352,84 @@ export function ExploreDeck({
     }
     const placeId = place.place_id;
     console.log(`[itinerary-swipe] swipe right triggered for place ${placeId} (${place.name})`);
+    
+    // Check if place is already in itinerary (guardrail)
+    const isInItinerary = isPlaceInItinerary(place);
+    
+    // Handle replace mode
+    if (replaceTarget) {
+      // In replace mode, check if already in itinerary
+      if (isInItinerary) {
+        addToast({
+          title: 'Already in itinerary',
+          description: 'This place is already in your itinerary. Please select a different place.',
+          variant: 'destructive',
+        });
+        return; // Don't select, don't advance
+      }
+      
+      // Set selected replacement place (don't advance card)
+      setSelectedReplacementPlace(place);
+      addToast({
+        title: 'Selected',
+        description: `Selected: ${place.name}`,
+        variant: 'default',
+      });
+      
+      // Still like the place for session tracking (but don't advance)
+      console.log(`[itinerary-swipe] replace mode: API call: like for place ${placeId}`);
+      swipeMutation.mutate(
+        { 
+          placeId, 
+          action: 'like', 
+          source: mode === 'day' ? 'day' : 'trip',
+          dayId: mode === 'day' ? dayId : undefined,
+          slot: mode === 'day' ? slot : undefined,
+        },
+        {
+          onSuccess: (res) => {
+            if (res?.limitReached) {
+              console.log('[itinerary-swipe] limit reached in replace mode');
+              // Clear selection if limit reached
+              setSelectedReplacementPlace(null);
+              return;
+            }
+            console.log('[itinerary-swipe] like API call successful (replace mode)');
+          },
+          onError: (error) => {
+            console.error('[itinerary-swipe] like API call failed (replace mode):', error);
+            // Clear selection on error
+            setSelectedReplacementPlace(null);
+            addToast({
+              title: 'Error',
+              description: 'Could not save selection. Please try again.',
+              variant: 'destructive',
+            });
+          },
+        }
+      );
+      return; // Don't advance card in replace mode
+    }
+    
+    // Normal mode: check if already in itinerary
+    if (isInItinerary) {
+      addToast({
+        title: 'Already in itinerary',
+        description: 'This place is already in your itinerary.',
+        variant: 'default',
+      });
+      // Still advance card so user can continue exploring
+      setLastDirection('right');
+      setCurrentIndex((prev) => {
+        const newIndex = prev - 1;
+        const clampedIndex = Math.max(0, Math.min(newIndex, places.length - 1));
+        console.log(`[itinerary-swipe] advancing index from ${prev} to ${clampedIndex} (places.length: ${places.length})`);
+        return clampedIndex;
+      });
+      return; // Don't add to liked places
+    }
+    
+    // Normal mode: advance card and like the place
     setLastDirection('right');
     setCurrentIndex((prev) => {
       const newIndex = prev - 1;
@@ -514,8 +751,9 @@ export function ExploreDeck({
 
   // Track last notified placeId to prevent duplicate calls
   const lastNotifiedPlaceIdRef = useRef<string | null>(null);
+  const lastNotifiedPlaceRef = useRef<ExplorePlace | null>(null);
 
-  // Notify parent when active place changes (for map focus)
+  // Notify parent when active place changes (for map focus - legacy, kept for backwards compatibility)
   // This hook must be called before any early returns (Rules of Hooks)
   useEffect(() => {
     // Extract place data inside effect (currentPlace is in scope from above)
@@ -537,6 +775,21 @@ export function ExploreDeck({
     // The ref guard (lastNotifiedPlaceIdRef) prevents infinite loops even if callback changes
   }, [currentPlace, currentPlaceId, onActivePlaceChange]); // Ref guard prevents duplicate calls per placeId
 
+  // Notify parent when current place changes (for place details card)
+  useEffect(() => {
+    if (!onCurrentPlaceChange) return;
+    
+    // Only notify if place actually changed (ref guard prevents duplicate calls)
+    const prevPlace = lastNotifiedPlaceRef.current;
+    if (prevPlace?.place_id === currentPlace?.place_id) return;
+    
+    // Update ref before calling callback
+    lastNotifiedPlaceRef.current = currentPlace ?? null;
+    
+    // Call callback with full place object or null
+    onCurrentPlaceChange(currentPlace ?? null);
+  }, [currentPlace, onCurrentPlaceChange]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
@@ -554,9 +807,15 @@ export function ExploreDeck({
   }
 
   if (places.length === 0) {
+    // Show different message if we filtered out all places vs no results from API
+    const hasRawPlaces = rawPlaces.length > 0;
+    const message = hasRawPlaces && !filters.includeItineraryPlaces
+      ? 'No more new places in this area. Try changing filters or toggle "Show places already in itinerary".'
+      : 'No places found. Try changing filters.';
+
     return (
       <div className="flex items-center justify-center w-full h-full">
-        <div className="text-sm text-muted-foreground">No places found. Try changing filters.</div>
+        <div className="text-sm text-muted-foreground">{message}</div>
       </div>
     );
   }
@@ -585,9 +844,11 @@ export function ExploreDeck({
   return (
     <>
       <div className="flex flex-col items-center justify-center w-full h-full">
-        <div className="flex items-center justify-center w-full flex-1 min-h-0">
-          {/* Full screen on mobile, constrained on desktop */}
-          <div className="relative w-full h-full lg:max-w-[480px] lg:h-auto flex items-center justify-center z-10">
+        {/* Card area - flex-1 with max-height constraint to leave space for buttons */}
+        {/* Max height calculation: 100vh - header/padding (~200px) - buttons area (~100px) = ~calc(100vh - 300px) */}
+        <div className="flex items-center justify-center w-full flex-1 min-h-0 max-h-[calc(100vh-300px)] lg:max-h-[600px]">
+          {/* Full screen on mobile, larger on desktop */}
+          <div className="relative w-full h-full lg:max-w-[600px] flex items-center justify-center z-10">
             <AnimatePresence mode="wait">
               {currentPlace && (
                 <motion.div
@@ -596,7 +857,7 @@ export function ExploreDeck({
                   initial="enter"
                   animate="center"
                   exit={lastDirection === 'right' ? 'exitRight' : lastDirection === 'left' ? 'exitLeft' : lastDirection === 'up' ? 'exitUp' : 'exitRight'}
-                  className="w-full h-full flex items-center justify-center"
+                  className="w-full h-full max-h-full flex items-center justify-center"
                 >
                   <SwipeableCard
                     place={currentPlace}
@@ -614,7 +875,7 @@ export function ExploreDeck({
           </div>
         </div>
 
-        {/* Action buttons - Just below the card */}
+        {/* Action buttons - Fixed height area, always visible, never covered by card */}
         <div className="flex-shrink-0 mt-2 lg:mt-6 z-20">
           <ExploreActions
             onUndo={handleUndo}
@@ -629,17 +890,61 @@ export function ExploreDeck({
           />
         </div>
 
-        {/* Trip-level "Add liked places to itinerary" CTA */}
-        {mode === 'trip' && hasLikedPlaces && onAddToItinerary ? (
+        {/* Replace mode label */}
+        {replaceTarget && replacingActivityName && (
+          <div className="mt-4 px-4 w-full max-w-[480px] text-center">
+            <p className="text-sm text-muted-foreground">
+              Replacing: <span className="font-medium">{replacingActivityName}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Selected replacement indicator */}
+        {replaceTarget && selectedReplacementPlace && (
+          <div className="mt-2 px-4 w-full max-w-[480px] text-center">
+            <p className="text-sm text-muted-foreground">
+              Selected: <span className="font-medium text-coral">{selectedReplacementPlace.name}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Trip-level "Add liked places to itinerary" CTA or Replace button */}
+        {mode === 'trip' && onAddToItinerary ? (
           <div className="mt-4 lg:mt-6 px-4 w-full max-w-[480px]">
-            <Button
-              onClick={onAddToItinerary}
-              className="w-full bg-coral hover:bg-coral/90 text-white shadow-lg"
-              size="lg"
-            >
-              <Heart className="h-4 w-4 mr-2" />
-              Add {safeSession.likedPlaces?.length ?? 0} liked place{(safeSession.likedPlaces?.length ?? 0) !== 1 ? 's' : ''} to itinerary
-            </Button>
+            {replaceTarget ? (
+              // Replace mode: show button when replacement is selected
+              selectedReplacementPlace ? (
+                <Button
+                  onClick={() => onAddToItinerary?.(selectedReplacementPlace)}
+                  className="w-full bg-coral hover:bg-coral/90 text-white shadow-lg"
+                  size="lg"
+                >
+                  <Heart className="h-4 w-4 mr-2" />
+                  Replace with {selectedReplacementPlace.name}
+                </Button>
+              ) : (
+                <Button
+                  disabled
+                  className="w-full bg-gray-300 text-gray-500 cursor-not-allowed shadow-lg"
+                  size="lg"
+                >
+                  <Heart className="h-4 w-4 mr-2" />
+                  Select a place to replace
+                </Button>
+              )
+            ) : (
+              // Normal mode: show add button when there are liked places
+              hasLikedPlaces ? (
+                <Button
+                  onClick={() => onAddToItinerary?.()}
+                  className="w-full bg-coral hover:bg-coral/90 text-white shadow-lg"
+                  size="lg"
+                >
+                  <Heart className="h-4 w-4 mr-2" />
+                  Add {safeSession.likedPlaces?.length ?? 0} liked place{(safeSession.likedPlaces?.length ?? 0) !== 1 ? 's' : ''} to itinerary
+                </Button>
+              ) : null
+            )}
           </div>
         ) : null}
       </div>

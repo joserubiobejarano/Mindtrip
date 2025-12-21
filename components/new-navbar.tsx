@@ -23,7 +23,7 @@ export function NewNavbar() {
       <nav className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Image 
-            src="/brand/kruno.png" 
+            src="/icon.svg" 
             alt="Kruno" 
             width={40}
             height={40}
