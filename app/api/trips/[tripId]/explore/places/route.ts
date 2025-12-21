@@ -193,6 +193,16 @@ export async function GET(
             });
           });
         });
+        
+        // DEV-only logging
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[Explore Places API] itinerary places extracted', {
+            tripId,
+            tripSegmentId,
+            itineraryPlaceIdsCount: alreadyPlannedPlaceIds.length,
+            includeItineraryPlaces,
+          });
+        }
       } catch (err: any) {
         console.error('[Explore Places API]', {
           path: '/api/trips/[tripId]/explore/places',
@@ -214,6 +224,19 @@ export async function GET(
       ...(session?.discarded_place_ids || []),
       ...(includeItineraryPlaces ? [] : alreadyPlannedPlaceIds),
     ];
+    
+    // DEV-only logging
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[Explore Places API] excluded place IDs', {
+        tripId,
+        tripSegmentId,
+        itineraryPlaceIdsCount: alreadyPlannedPlaceIds.length,
+        likedPlaceIdsCount: session?.liked_place_ids?.length || 0,
+        discardedPlaceIdsCount: session?.discarded_place_ids?.length || 0,
+        totalExcludedCount: excludedPlaceIds.length,
+        includeItineraryPlaces,
+      });
+    }
 
     // Get query parameters for filters
     const neighborhood = url.searchParams.get('neighborhood') || undefined;
@@ -323,6 +346,18 @@ export async function GET(
       const result = await getPlacesToExplore(tripId, filters);
       places = result.places;
       totalCount = result.totalCount;
+      
+      // DEV-only logging
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[Explore Places API] places fetched', {
+          tripId,
+          tripSegmentId,
+          placesCount: places.length,
+          totalCount,
+          includeItineraryPlaces,
+          excludedPlaceIdsCount: uniqueExcludedIds.length,
+        });
+      }
     } catch (placesError: any) {
       console.error('[Explore Places API]', {
         path: '/api/trips/[tripId]/explore/places',

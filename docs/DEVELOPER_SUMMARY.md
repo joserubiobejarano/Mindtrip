@@ -1210,10 +1210,18 @@ For questions or issues:
 
 **Key Technical Points:**
 - Manual database setup required (no Supabase CLI)
-- Multiple API keys needed (Supabase, Clerk, Google Maps, OpenAI)
+- Multiple API keys needed (Supabase, Clerk, Google Maps, OpenAI, Stripe)
 - Two itinerary systems (legacy and new SmartItinerary format)
 - Real-time features require Supabase Realtime setup
 - **NEW**: Explore feature requires new database table and API endpoints
+- **NEW**: Image caching requires Supabase Storage bucket (`place-images`)
+- **NEW**: Billing system requires Stripe account and webhook configuration
+
+**Recent Additions (January 2025):**
+- **Billing & Subscriptions**: Complete Stripe integration for Pro subscriptions and trip-level unlocks
+- **Image Caching System**: Production-proof image caching in Supabase Storage with multi-provider fallback
+- **Trip Regeneration Stats**: Daily regeneration limit tracking for Smart Itinerary regeneration
+- **Enhanced Security**: Rate limiting, input validation, XSS protection, and comprehensive security documentation
 
 **Next Steps:**
 1. **🚀 Phase 22: Enhanced User Experience** - Weather integration, trip templates, photo uploads
@@ -1221,9 +1229,9 @@ For questions or issues:
 3. Polish and bug fixes
 4. User testing and feedback
 5. Mobile app development
-6. Monetization implementation
+6. Monetization implementation (billing system already implemented)
 
-The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phases 17-21 are complete - Day-level Explore integration, multi-city trips, trip personalization, enhanced assistant, and Travel Advisor are fully functional.**
+The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phases 17-21 are complete - Day-level Explore integration, multi-city trips, trip personalization, enhanced assistant, Travel Advisor, billing system, and image caching are fully functional.**
 
 ---
 

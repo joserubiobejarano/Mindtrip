@@ -10,8 +10,6 @@ import { useRealtimeActivities } from "@/hooks/use-realtime-activities";
 import { createClient } from "@/lib/supabase/client";
 import { useTrip } from "@/hooks/use-trip";
 import { ensureOwnerMember } from "@/lib/supabase/trip-members";
-import { BaseMarker } from "@/components/google-map-base";
-import { GoogleMapsProvider } from "@/components/google-maps-provider";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -26,11 +24,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const initialTab = searchParams.get("tab") || "itinerary";
   const [activeTab, setActiveTab] = useState<string>(initialTab);
-  const [exploreMarkers, setExploreMarkers] = useState<BaseMarker[]>([]);
-  const [exploreCenter, setExploreCenter] = useState<{ lat: number; lng: number } | null>(null);
-  const [exploreZoom, setExploreZoom] = useState<number | undefined>(undefined);
   const [activePlace, setActivePlace] = useState<{ placeId: string; lat: number; lng: number } | null>(null);
-  const exploreMarkerClickHandlerRef = useRef<((id: string) => void) | null>(null);
   const [ownerMemberChecked, setOwnerMemberChecked] = useState(false);
 
   // Enable realtime sync for activities
@@ -61,19 +55,6 @@ export function TripDetail({ tripId }: { tripId: string }) {
     }
   }, [days, selectedDayId]);
 
-  // Memoize callbacks before any early returns (React Hooks rules)
-  const handleExploreMarkerClick = useCallback((id: string) => {
-    if (exploreMarkerClickHandlerRef.current) {
-      exploreMarkerClickHandlerRef.current(id);
-    }
-  }, []);
-
-  // Memoize onExploreMapUpdate callback to prevent infinite loops
-  const handleExploreMapUpdate = useCallback((markers: BaseMarker[], center: { lat: number; lng: number } | null, zoom: number | undefined) => {
-    setExploreMarkers(markers);
-    setExploreCenter(center);
-    setExploreZoom(zoom);
-  }, []); // Empty deps - setters are stable
 
   if (!userId) {
     return (
@@ -145,32 +126,24 @@ export function TripDetail({ tripId }: { tripId: string }) {
   }
 
   return (
-    <GoogleMapsProvider>
-      <TripShell
+    <TripShell
+      tripId={tripId}
+      activeTab={activeTab}
+      selectedDayId={selectedDayId}
+      selectedActivityId={selectedActivityId}
+      activePlace={activePlace}
+    >
+      <TripTabs
         tripId={tripId}
-        activeTab={activeTab}
+        userId={userId}
         selectedDayId={selectedDayId}
-        selectedActivityId={selectedActivityId}
-        exploreMarkers={exploreMarkers}
-        exploreCenter={exploreCenter}
-        exploreZoom={exploreZoom}
-        onExploreMarkerClick={handleExploreMarkerClick}
-        activePlace={activePlace}
-      >
-        <TripTabs
-          tripId={tripId}
-          userId={userId}
-          selectedDayId={selectedDayId}
-          onSelectDay={setSelectedDayId}
-          onActivitySelect={setSelectedActivityId}
-          onTabChange={setActiveTab}
-          initialTab={initialTab}
-          onExploreMapUpdate={handleExploreMapUpdate}
-          onExploreMarkerClickRef={exploreMarkerClickHandlerRef}
-          onActivePlaceChange={setActivePlace}
-        />
-      </TripShell>
-    </GoogleMapsProvider>
+        onSelectDay={setSelectedDayId}
+        onActivitySelect={setSelectedActivityId}
+        onTabChange={setActiveTab}
+        initialTab={initialTab}
+        onActivePlaceChange={setActivePlace}
+      />
+    </TripShell>
   );
 }
 

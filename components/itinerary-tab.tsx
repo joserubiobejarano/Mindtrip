@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useTripSegments } from "@/hooks/use-trip-segments";
 import { format, addDays, differenceInDays } from "date-fns";
@@ -27,6 +27,7 @@ import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getUsageLimits } from "@/lib/supabase/usage-limits";
 import { resolvePlacePhotoSrc, isPhotoSrcUsable, isGooglePhotoReference } from "@/lib/placePhotos";
+import { DayAccordionHeader } from "@/components/day-accordion-header";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -105,8 +106,6 @@ export function ItineraryTab({
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [isBackfillingImages, setIsBackfillingImages] = useState(false);
-  const [backfillReport, setBackfillReport] = useState<any>(null);
-  const [showBackfillReport, setShowBackfillReport] = useState(false);
   
   // Day-level Explore state
   const [dayExploreOpen, setDayExploreOpen] = useState(false);
@@ -661,6 +660,20 @@ export function ItineraryTab({
         // GET handler now returns bare SmartItinerary directly
         setSmartItinerary(validatedData);
         setStatus('loaded');
+        
+        // Dev-only log: verify image_url values exist in fetched data
+        if (process.env.NODE_ENV === 'development') {
+          const samplePlace = validatedData.days?.[0]?.slots?.[0]?.places?.[0];
+          if (samplePlace) {
+            console.log('[itinerary-tab] loadOrGenerate: sample place after fetch', {
+              placeName: samplePlace.name,
+              hasImageUrl: !!samplePlace.image_url,
+              imageUrl: samplePlace.image_url ? samplePlace.image_url.substring(0, 80) + '...' : null,
+              hasPhotos: !!samplePlace.photos && Array.isArray(samplePlace.photos) && samplePlace.photos.length > 0,
+              photosLength: Array.isArray(samplePlace.photos) ? samplePlace.photos.length : 0,
+            });
+          }
+        }
       } catch (parseErr: any) {
         console.error('[itinerary-tab] loadOrGenerate: error validating loaded data', {
           error: parseErr,
@@ -740,7 +753,16 @@ export function ItineraryTab({
       }
 
       // Refresh itinerary data to show new images
+      // Add small delay to ensure DB write has propagated
+      await new Promise(resolve => setTimeout(resolve, 500));
       await loadOrGenerate();
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[itinerary-tab] triggerAutoBackfill: refreshed itinerary after backfill', {
+          scanned: result.scanned,
+          updated: result.updated,
+        });
+      }
     } catch (error: any) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[itinerary-tab] triggerAutoBackfill: error', error);
@@ -756,145 +778,6 @@ export function ItineraryTab({
   useEffect(() => {
     triggerAutoBackfillRef.current = triggerAutoBackfill;
   }, [triggerAutoBackfill]);
-
-  // Check if any places need photos
-  const hasPlacesNeedingPhotos = useCallback((): boolean => {
-    if (!smartItinerary?.days) return false;
-    
-    for (const day of smartItinerary.days) {
-      for (const slot of day.slots || []) {
-        for (const place of slot.places || []) {
-          if (!place.place_id) continue;
-          const hasPhoto = place.photos && 
-                          Array.isArray(place.photos) && 
-                          place.photos.length > 0 && 
-                          isPhotoSrcUsable(place.photos[0]);
-          if (!hasPhoto) return true;
-        }
-      }
-    }
-    return false;
-  }, [smartItinerary]);
-
-  // Backfill images for places missing photos (legacy - writes to DB)
-  const handleBackfillImages = useCallback(async () => {
-    if (!tripId || isBackfillingImages) return;
-
-    setIsBackfillingImages(true);
-    try {
-      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dryRun: false, limit: 20 }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(error.error || 'Failed to backfill images');
-      }
-
-      const result = await response.json();
-      
-      addToast({
-        title: 'Images updated',
-        description: `Updated ${result.updated} place${result.updated !== 1 ? 's' : ''} with photos.`,
-        variant: 'success',
-      });
-
-      // Refetch itinerary to show updated images
-      await loadOrGenerate();
-    } catch (error: any) {
-      console.error('[itinerary-tab] Error backfilling images:', error);
-      addToast({
-        title: 'Error',
-        description: error.message || 'Failed to backfill images',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsBackfillingImages(false);
-    }
-  }, [tripId, isBackfillingImages, addToast, loadOrGenerate]);
-
-  // Backfill images in debug mode (dry run, no DB writes)
-  const handleBackfillImagesDebug = useCallback(async () => {
-    if (!tripId || isBackfillingImages) return;
-
-    setIsBackfillingImages(true);
-    setBackfillReport(null);
-    try {
-      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dryRun: true, limit: 10 }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(error.error || 'Failed to backfill images');
-      }
-
-      const result = await response.json();
-      setBackfillReport(result);
-      setShowBackfillReport(true);
-      
-      addToast({
-        title: 'Debug report generated',
-        description: `Scanned ${result.scanned} places. See report below.`,
-        variant: 'success',
-      });
-    } catch (error: any) {
-      console.error('[itinerary-tab] Error backfilling images (debug):', error);
-      addToast({
-        title: 'Error',
-        description: error.message || 'Failed to backfill images',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsBackfillingImages(false);
-    }
-  }, [tripId, isBackfillingImages, addToast]);
-
-  // Backfill images in write mode (writes to DB)
-  const handleBackfillImagesWrite = useCallback(async () => {
-    if (!tripId || isBackfillingImages) return;
-
-    setIsBackfillingImages(true);
-    setBackfillReport(null);
-    try {
-      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dryRun: false, limit: 20 }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(error.error || 'Failed to backfill images');
-      }
-
-      const result = await response.json();
-      setBackfillReport(result);
-      setShowBackfillReport(true);
-      
-      addToast({
-        title: 'Images updated',
-        description: `Updated ${result.updated} place${result.updated !== 1 ? 's' : ''} with photos.`,
-        variant: 'success',
-      });
-
-      // Refetch itinerary to show updated images
-      await loadOrGenerate();
-    } catch (error: any) {
-      console.error('[itinerary-tab] Error backfilling images (write):', error);
-      addToast({
-        title: 'Error',
-        description: error.message || 'Failed to backfill images',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsBackfillingImages(false);
-    }
-  }, [tripId, isBackfillingImages, addToast, loadOrGenerate]);
 
   // Load days with segment info
   useEffect(() => {
@@ -1165,8 +1048,9 @@ export function ItineraryTab({
               <Users className="h-4 w-4 mr-2" />
               Tripmates
             </Button>
-            <Button variant="outline" size="icon" onClick={() => setShareDialogOpen(true)}>
-              <Share2 className="h-4 w-4" />
+            <Button variant="outline" size="sm" onClick={() => setShareDialogOpen(true)}>
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
             </Button>
             {trip.owner_id === userId && (
               <div className="relative" ref={settingsMenuRef}>
@@ -1230,68 +1114,8 @@ export function ItineraryTab({
                   {/* Trip Summary */}
                   {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
                     <div className="space-y-4 mb-10 max-w-4xl mx-auto">
-                      <div className="flex items-center justify-center gap-3">
-                        {smartItinerary.title && (
-                          <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
-                        )}
-                        {process.env.NODE_ENV === 'development' && hasPlacesNeedingPhotos() && (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleBackfillImagesDebug}
-                              disabled={isBackfillingImages}
-                              className="text-xs"
-                            >
-                              {isBackfillingImages ? (
-                                <>
-                                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                  Running...
-                                </>
-                              ) : (
-                                'Backfill Images (debug)'
-                              )}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleBackfillImagesWrite}
-                              disabled={isBackfillingImages}
-                              className="text-xs"
-                            >
-                              {isBackfillingImages ? (
-                                <>
-                                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                  Writing...
-                                </>
-                              ) : (
-                                'Backfill Images (write)'
-                              )}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                      {process.env.NODE_ENV === 'development' && backfillReport && (
-                        <div className="mt-4 border rounded-lg bg-slate-50">
-                          <button
-                            onClick={() => setShowBackfillReport(!showBackfillReport)}
-                            className="w-full px-4 py-2 flex items-center justify-between text-sm font-medium text-slate-700 hover:bg-slate-100"
-                          >
-                            <span>Backfill Report (scanned: {backfillReport.scanned}, updated: {backfillReport.updated}, notFound: {backfillReport.notFound}, errors: {backfillReport.errors})</span>
-                            {showBackfillReport ? (
-                              <ChevronUp className="h-4 w-4" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4" />
-                            )}
-                          </button>
-                          {showBackfillReport && (
-                            <div className="p-4 border-t bg-white">
-                              <pre className="text-xs overflow-auto max-h-96 bg-slate-50 p-4 rounded border">
-                                {JSON.stringify(backfillReport, null, 2)}
-                              </pre>
-                            </div>
-                          )}
-                        </div>
+                      {smartItinerary.title && (
+                        <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
                       )}
                       {smartItinerary.summary && (
                         <div className="prose prose-neutral max-w-none text-slate-900 text-left">
@@ -1437,10 +1261,10 @@ export function ItineraryTab({
                       id={`day-${day.id}`}
                       className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
                     >
-                      <CardHeader 
-                        className="bg-gray-50 border-b pb-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                      <DayAccordionHeader
+                        day={day}
+                        isExpanded={isExpanded}
+                        onToggle={() => {
                           setExpandedDays(prev => {
                             const newSet = new Set(prev);
                             if (newSet.has(day.id)) {
@@ -1450,27 +1274,9 @@ export function ItineraryTab({
                             }
                             return newSet;
                           });
-                          onSelectDay?.(day.id);
                         }}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                              Day {day.index} – {day.title}
-                            </CardTitle>
-                            <CardDescription className="text-base font-medium text-slate-600 mt-1">
-                              {day.theme} • {format(new Date(day.date), "EEEE, MMMM d")}
-                            </CardDescription>
-                          </div>
-                          <div className="flex items-center">
-                            {isExpanded ? (
-                              <ChevronUp className="h-5 w-5 text-slate-600" />
-                            ) : (
-                              <ChevronDown className="h-5 w-5 text-slate-600" />
-                            )}
-                          </div>
-                        </div>
-                      </CardHeader>
+                        onSelectDay={onSelectDay}
+                      />
                       
                       {isExpanded && (
                         <>
@@ -1586,7 +1392,14 @@ export function ItineraryTab({
                                           {photoSrc && !failedImages.has(imageKey) ? (() => {
                                             const shouldUnoptimize = isPlacesProxy(photoSrc);
                                             if (process.env.NODE_ENV === 'development' && placeIndex === 0 && slotIdx === 0) {
-                                              console.debug('[ItineraryTab] Place activity image:', { src: photoSrc, placeName: place.name, unoptimized: shouldUnoptimize });
+                                              console.log('[ItineraryTab] Place activity image (dev log):', { 
+                                                placeName: place.name,
+                                                hasImageUrl: !!place.image_url,
+                                                imageUrl: place.image_url ? place.image_url.substring(0, 80) + '...' : null,
+                                                hasPhotos: !!place.photos && Array.isArray(place.photos) && place.photos.length > 0,
+                                                resolvedSrc: photoSrc.substring(0, 80) + '...',
+                                                unoptimized: shouldUnoptimize 
+                                              });
                                             }
                                             return (
                                               <Image 
@@ -1830,10 +1643,10 @@ export function ItineraryTab({
                       id={`day-${day.id}`}
                       className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
                     >
-                      <CardHeader 
-                        className="bg-gray-50 border-b pb-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                      <DayAccordionHeader
+                        day={day}
+                        isExpanded={isExpanded}
+                        onToggle={() => {
                           setExpandedDays(prev => {
                             const newSet = new Set(prev);
                             if (newSet.has(day.id)) {
@@ -1843,27 +1656,9 @@ export function ItineraryTab({
                             }
                             return newSet;
                           });
-                          onSelectDay?.(day.id);
                         }}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                              Day {day.index} – {day.title}
-                            </CardTitle>
-                            <CardDescription className="text-base font-medium text-slate-600 mt-1">
-                              {day.theme} • {format(new Date(day.date), "EEEE, MMMM d")}
-                            </CardDescription>
-                          </div>
-                          <div className="flex items-center">
-                            {isExpanded ? (
-                              <ChevronUp className="h-5 w-5 text-slate-600" />
-                            ) : (
-                              <ChevronDown className="h-5 w-5 text-slate-600" />
-                            )}
-                          </div>
-                        </div>
-                      </CardHeader>
+                        onSelectDay={onSelectDay}
+                      />
                       
                       {isExpanded && (
                         <>
@@ -1979,7 +1774,14 @@ export function ItineraryTab({
                                           {photoSrc && !failedImages.has(imageKey) ? (() => {
                                             const shouldUnoptimize = isPlacesProxy(photoSrc);
                                             if (process.env.NODE_ENV === 'development' && placeIndex === 0 && slotIdx === 0) {
-                                              console.debug('[ItineraryTab] Place activity image:', { src: photoSrc, placeName: place.name, unoptimized: shouldUnoptimize });
+                                              console.log('[ItineraryTab] Place activity image (dev log):', { 
+                                                placeName: place.name,
+                                                hasImageUrl: !!place.image_url,
+                                                imageUrl: place.image_url ? place.image_url.substring(0, 80) + '...' : null,
+                                                hasPhotos: !!place.photos && Array.isArray(place.photos) && place.photos.length > 0,
+                                                resolvedSrc: photoSrc.substring(0, 80) + '...',
+                                                unoptimized: shouldUnoptimize 
+                                              });
                                             }
                                             return (
                                               <Image 

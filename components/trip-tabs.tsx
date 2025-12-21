@@ -15,12 +15,6 @@ interface TripTabsProps {
   onSelectDay: (dayId: string) => void;
   onActivitySelect?: (activityId: string) => void;
   onTabChange?: (tab: string) => void;
-  onExploreMapUpdate?: (
-    markers: import("@/components/google-map-base").BaseMarker[],
-    center: { lat: number; lng: number } | null,
-    zoom: number | undefined
-  ) => void;
-  onExploreMarkerClickRef?: React.MutableRefObject<((id: string) => void) | null>;
   onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
 }
 
@@ -31,8 +25,6 @@ export function TripTabs({
   onSelectDay,
   onActivitySelect,
   onTabChange,
-  onExploreMapUpdate,
-  onExploreMarkerClickRef,
   onActivePlaceChange,
   initialTab,
 }: TripTabsProps & { initialTab?: string }) {
@@ -88,11 +80,8 @@ export function TripTabs({
           >
             <ExploreTab
               tripId={tripId}
-              onMapUpdate={onExploreMapUpdate}
-              onMarkerClickRef={onExploreMarkerClickRef}
               onActivePlaceChange={onActivePlaceChange}
             />
-            {/* Note: onMapUpdate and related props are kept for backwards compatibility but no longer used in Explore */}
           </ErrorBoundary>
         </TabsContent>
         <TabsContent value="itinerary" className="h-full mt-0">

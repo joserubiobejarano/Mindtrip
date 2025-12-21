@@ -6,9 +6,10 @@ import { useTrip } from "@/hooks/use-trip";
 import { format } from "date-fns";
 import { Download } from "lucide-react";
 import { SmartItinerary } from "@/types/itinerary";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { resolvePlacePhotoSrc } from "@/lib/placePhotos";
+import { DayAccordionHeader } from "@/components/day-accordion-header";
 
 // Helper to check if image src is a places proxy that needs unoptimized rendering
 const isPlacesProxy = (src?: string | null): boolean => {
@@ -49,6 +50,7 @@ export function PublicItineraryPanel({
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
   const [smartItinerary, setSmartItinerary] = useState<SmartItinerary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadItinerary = async () => {
@@ -79,6 +81,13 @@ export function PublicItineraryPanel({
       loadItinerary();
     }
   }, [tripId, slug]);
+
+  // Initialize expanded days with first day expanded
+  useEffect(() => {
+    if (smartItinerary?.days && smartItinerary.days.length > 0 && expandedDays.size === 0) {
+      setExpandedDays(new Set([smartItinerary.days[0].id]));
+    }
+  }, [smartItinerary, expandedDays.size]);
 
   const handleExportPDF = () => {
     window.print();
@@ -176,154 +185,166 @@ export function PublicItineraryPanel({
               : day.slots.flatMap(s => s.places.map(p => resolvePlacePhotoSrc(p))).filter((src): src is string => src !== null);
             
             const bannerImages = dayImages.slice(0, 4);
+            const isExpanded = expandedDays.has(day.id);
 
             return (
               <Card 
                 key={day.id} 
                 id={`day-${day.id}`}
                 className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
-                onClick={() => onSelectDay?.(day.id)}
               >
-                <CardHeader className="bg-gray-50 border-b pb-4">
-                  <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                    Day {day.index} – {day.title}
-                  </CardTitle>
-                  <CardDescription className="text-base font-medium text-slate-600 mt-1">
-                    {day.theme} • {format(new Date(day.date), "EEEE, MMMM d")}
-                  </CardDescription>
-                </CardHeader>
+                <DayAccordionHeader
+                  day={day}
+                  isExpanded={isExpanded}
+                  onToggle={() => {
+                    setExpandedDays(prev => {
+                      const newSet = new Set(prev);
+                      if (newSet.has(day.id)) {
+                        newSet.delete(day.id);
+                      } else {
+                        newSet.add(day.id);
+                      }
+                      return newSet;
+                    });
+                  }}
+                  onSelectDay={onSelectDay}
+                />
                 
-                {(() => {
-                  // Filter out invalid/empty images
-                  const validImages = bannerImages.filter(Boolean);
-                  
-                  if (validImages.length === 0) {
-                    return null; // Don't render empty gallery
-                  }
+                {isExpanded && (
+                  <>
+                    {(() => {
+                      // Filter out invalid/empty images
+                      const validImages = bannerImages.filter(Boolean);
+                      
+                      if (validImages.length === 0) {
+                        return null; // Don't render empty gallery
+                      }
 
-                  const shouldUnoptimize = validImages.some(img => isPlacesProxy(img));
-                  if (process.env.NODE_ENV === 'development' && validImages.length > 0) {
-                    console.debug('[PublicItineraryPanel] Banner images:', { count: validImages.length, unoptimized: shouldUnoptimize, firstSrc: validImages[0] });
-                  }
-                  return (
-                    <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
-                      {validImages.map((img, idx) => {
-                        const shouldUnoptimizeImg = isPlacesProxy(img);
-                        return (
-                          <div 
-                            key={idx} 
-                            className="relative flex-1 min-w-0 aspect-[4/3] overflow-hidden"
-                          >
-                            <Image 
-                              src={img} 
-                              alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                              fill 
-                              sizes="(max-width: 768px) 25vw, 25vw"
-                              unoptimized={shouldUnoptimizeImg}
-                              className="object-cover"
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
-
-                <CardContent className="p-6 space-y-6">
-                  {day.overview && (
-                    <div className="prose prose-neutral max-w-none text-slate-900">
-                      <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
-                        {textToBulletPoints(day.overview).map((point, idx) => (
-                          <li key={idx} className="font-normal">
-                            {point}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  <div className="space-y-8 mt-6">
-                    {day.slots.map((slot, slotIdx) => (
-                      <div key={slotIdx} className="space-y-4">
-                        <div className="pt-4 border-t border-gray-200">
-                          {/* Moment of day label and summary */}
-                          <div className="flex flex-col gap-2 pb-4">
-                            <div className="flex justify-center md:justify-center">
-                              <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                {slot.label}
-                              </span>
-                            </div>
-                            <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
-                              {slot.summary}
-                            </p>
-                          </div>
-                          
-                          {/* Activities */}
-                          <div className="grid gap-4">
-                            {slot.places.map((place) => (
+                      const shouldUnoptimize = validImages.some(img => isPlacesProxy(img));
+                      if (process.env.NODE_ENV === 'development' && validImages.length > 0) {
+                        console.debug('[PublicItineraryPanel] Banner images:', { count: validImages.length, unoptimized: shouldUnoptimize, firstSrc: validImages[0] });
+                      }
+                      return (
+                        <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
+                          {validImages.map((img, idx) => {
+                            const shouldUnoptimizeImg = isPlacesProxy(img);
+                            return (
                               <div 
-                                key={place.id} 
-                                className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border bg-white"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onActivitySelect?.(place.id);
-                                }}
+                                key={idx} 
+                                className="relative flex-1 min-w-0 aspect-[4/3] overflow-hidden"
                               >
-                                <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
-                                  {(() => {
-                                    const resolvedSrc = resolvePlacePhotoSrc(place);
-                                    if (resolvedSrc) {
-                                      const shouldUnoptimize = isPlacesProxy(resolvedSrc);
-                                      // Dev log: show one sample place's resolved image src and source
-                                      if (process.env.NODE_ENV !== 'production' && slotIdx === 0 && place === slot.places[0]) {
-                                        const cameFromImageUrl = place.image_url && resolvedSrc === place.image_url;
-                                        console.log('[PublicItineraryPanel] Sample place image resolution:', {
-                                          placeName: place.name,
-                                          resolvedSrc,
-                                          cameFromImageUrl,
-                                          hasImageUrl: !!place.image_url,
-                                          hasPhotos: !!(place.photos && place.photos.length > 0),
-                                          unoptimized: shouldUnoptimize
-                                        });
-                                      }
-                                      return (
-                                        <Image 
-                                          src={resolvedSrc} 
-                                          alt={place.name} 
-                                          fill 
-                                          sizes="(max-width: 640px) 100vw, 96px"
-                                          unoptimized={shouldUnoptimize}
-                                          className="object-cover" 
-                                        />
-                                      );
-                                    } else {
-                                      return (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                          <span className="text-xs">No image</span>
-                                        </div>
-                                      );
-                                    }
-                                  })()}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
-                                  <p className="text-slate-700 text-sm mt-2 leading-relaxed">
-                                    {place.description}
-                                  </p>
-                                  {place.area && (
-                                    <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                                      {place.area}
-                                    </span>
-                                  )}
-                                </div>
+                                <Image 
+                                  src={img} 
+                                  alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
+                                  fill 
+                                  sizes="(max-width: 768px) 25vw, 25vw"
+                                  unoptimized={shouldUnoptimizeImg}
+                                  className="object-cover"
+                                />
                               </div>
-                            ))}
-                          </div>
+                            );
+                          })}
                         </div>
+                      );
+                    })()}
+
+                    <CardContent className="p-6 space-y-6">
+                      {day.overview && (
+                        <div className="prose prose-neutral max-w-none text-slate-900">
+                          <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
+                            {textToBulletPoints(day.overview).map((point, idx) => (
+                              <li key={idx} className="font-normal">
+                                {point}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      <div className="space-y-8 mt-6">
+                        {day.slots.map((slot, slotIdx) => (
+                          <div key={slotIdx} className="space-y-4">
+                            <div className="pt-4 border-t border-gray-200">
+                              {/* Moment of day label and summary */}
+                              <div className="flex flex-col gap-2 pb-4">
+                                <div className="flex justify-center md:justify-center">
+                                  <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                    {slot.label}
+                                  </span>
+                                </div>
+                                <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
+                                  {slot.summary}
+                                </p>
+                              </div>
+                              
+                              {/* Activities */}
+                              <div className="grid gap-4">
+                                {slot.places.map((place) => (
+                                  <div 
+                                    key={place.id} 
+                                    className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border bg-white"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onActivitySelect?.(place.id);
+                                    }}
+                                  >
+                                    <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
+                                      {(() => {
+                                        const resolvedSrc = resolvePlacePhotoSrc(place);
+                                        if (resolvedSrc) {
+                                          const shouldUnoptimize = isPlacesProxy(resolvedSrc);
+                                          // Dev log: show one sample place's resolved image src and source
+                                          if (process.env.NODE_ENV !== 'production' && slotIdx === 0 && place === slot.places[0]) {
+                                            const cameFromImageUrl = place.image_url && resolvedSrc === place.image_url;
+                                            console.log('[PublicItineraryPanel] Sample place image resolution:', {
+                                              placeName: place.name,
+                                              resolvedSrc,
+                                              cameFromImageUrl,
+                                              hasImageUrl: !!place.image_url,
+                                              hasPhotos: !!(place.photos && place.photos.length > 0),
+                                              unoptimized: shouldUnoptimize
+                                            });
+                                          }
+                                          return (
+                                            <Image 
+                                              src={resolvedSrc} 
+                                              alt={place.name} 
+                                              fill 
+                                              sizes="(max-width: 640px) 100vw, 96px"
+                                              unoptimized={shouldUnoptimize}
+                                              className="object-cover" 
+                                            />
+                                          );
+                                        } else {
+                                          return (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                              <span className="text-xs">No image</span>
+                                            </div>
+                                          );
+                                        }
+                                      })()}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                      <p className="text-slate-700 text-sm mt-2 leading-relaxed">
+                                        {place.description}
+                                      </p>
+                                      {place.area && (
+                                        <span className="inline-block mt-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                                          {place.area}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
+                    </CardContent>
+                  </>
+                )}
               </Card>
             );
           })}

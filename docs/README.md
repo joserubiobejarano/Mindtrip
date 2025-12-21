@@ -19,11 +19,18 @@ NEXT_PUBLIC_SUPABASE_URL=https://upeoxmwdwghdbgcqqtll.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwZW94bXdkd2doZGJnY3FxdGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzcxOTgsImV4cCI6MjA3OTE1MzE5OH0.6yZ4f5tUM_75mp31wQBxwLUlNmhsAF0-FGDQRDddFk0
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_client_side
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_server_side
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+OPENAI_API_KEY=your_openai_api_key
 ```
 
 **Important:** 
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` is used for client-side Google Maps JS only
 - `GOOGLE_MAPS_API_KEY` is used for server-side API routes only (never exposed to client)
+- `SUPABASE_SERVICE_ROLE_KEY` is **REQUIRED** for image caching in Supabase Storage (never exposed to client)
+- `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are required for billing/subscription features
+- `OPENAI_API_KEY` is required for AI features (itinerary generation, Trip Assistant, Travel Advisor)
 - **Restart your dev server** after changing environment variables
 
 3. **Set up database:**
@@ -262,6 +269,9 @@ kruno/
 - **[NEXT_STEPS.md](./NEXT_STEPS.md)** - 🆕 **NEW** Explore feature implementation plan
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - 🆕 **NEW** System architecture and data flow
 - **[FEATURES.md](./FEATURES.md)** - 🆕 **NEW** Complete feature list and specifications
+- **[PRO_VS_FREE.md](./PRO_VS_FREE.md)** - ⚠️ **UPDATED** Pro vs Free feature comparison and usage limits
+- **[SECURITY.md](./SECURITY.md)** - ⚠️ **UPDATED** Security architecture, rate limiting, and best practices
+- **[images.md](./images.md)** - 🆕 **NEW** Image caching system documentation (Supabase Storage)
 - [mobile-roadmap.md](./mobile-roadmap.md) - Mobile app development roadmap
 - [monetization.md](./monetization.md) - Monetization strategy and revenue plans
 - [COMMANDS.md](./COMMANDS.md) - All commands to run (if exists)
@@ -273,12 +283,19 @@ kruno/
 
 1. Get your Google Maps API key from [console.cloud.google.com](https://console.cloud.google.com/) (for Places API, hotel search, and place photos)
 2. Get your OpenAI API key from [platform.openai.com](https://platform.openai.com/) (for AI day planning, Trip Assistant, and smart itinerary generation)
-4. Configure Clerk authentication (Email/Password + Google OAuth)
-5. Run the SQL schema in Supabase
-6. Run additional migrations for saved_places, trip_chat_messages, and smart_itineraries tables
-7. Enable Realtime for required tables
-8. Install dependencies: `npm install`
-9. Start developing!
+3. Get your Supabase Service Role Key from Supabase Dashboard > Settings > API (for image caching)
+4. Get your Stripe keys from [dashboard.stripe.com](https://dashboard.stripe.com/) (for billing/subscriptions)
+5. Configure Clerk authentication (Email/Password + Google OAuth)
+6. Run the SQL schema in Supabase
+7. Run additional migrations (see `database/migrations/` folder for complete list):
+   - `saved_places`, `trip_chat_messages`, `smart_itineraries` tables
+   - `explore_sessions`, `trip_segments`, `advisor_messages` tables
+   - `trip_regeneration_stats` table
+   - Trip Pro fields, usage limits, subscription status, etc.
+8. Enable Realtime for required tables
+9. Create `place-images` bucket in Supabase Storage (PUBLIC) for image caching (optional, see [images.md](./images.md))
+10. Install dependencies: `npm install`
+11. Start developing!
 
 ## 📊 Current Status
 
@@ -366,7 +383,23 @@ kruno/
 - ✅ **City Autocomplete** - Enhanced destination search with Google Places Autocomplete API
 - ✅ **Usage Limits System** - Per-user-per-trip tracking for swipes, changes, and search adds
 - ✅ **Activity Replace Feature** - Smart replacement with context-aware suggestions and usage limits
-- ✅ **Food Place Limits** - Max 1 food place per time slot in AI-generated itineraries
+  - ✅ **Food Place Limits** - Max 1 food place per time slot in AI-generated itineraries
+  - ✅ **Billing & Subscriptions** - Stripe integration for Pro subscriptions and trip-level unlocks
+    - ✅ Subscription checkout API (`/api/billing/checkout/subscription`)
+    - ✅ Trip Pro checkout API (`/api/billing/checkout/trip`)
+    - ✅ Stripe webhook handler (`/api/billing/webhook`) for subscription events
+    - ✅ Billing portal API (`/api/billing/portal`) for customer self-service
+    - ✅ Account-level Pro (`profiles.is_pro`) and trip-level Pro (`trips.has_trip_pro`)
+  - ✅ **Image Caching System** - Production-proof image caching in Supabase Storage
+    - ✅ API endpoint: `/api/images/cache-place-image` for caching place images
+    - ✅ Health check endpoint: `/api/debug/image-cache-health`
+    - ✅ Automatic image caching from Google Places, Unsplash, and Mapbox
+    - ✅ Deterministic file paths prevent duplicates
+    - ✅ See [images.md](./images.md) for complete documentation
+  - ✅ **Trip Regeneration Stats** - Daily regeneration limit tracking
+    - ✅ Database table: `trip_regeneration_stats` for tracking per-trip-per-day regeneration counts
+    - ✅ Enforces limits: 2 regenerations/day for free tier, 5 for Pro tier
+    - ✅ Migration: `supabase-add-regeneration-stats.sql`
 
 **Next Priorities:**
 - Phase 22: Enhanced user experience features (templates, weather, photos)

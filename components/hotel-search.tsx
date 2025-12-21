@@ -10,9 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Star, MapPin, ExternalLink, Loader2, ArrowLeft } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
-import { GoogleMapBase } from "@/components/google-map-base";
-import type { BaseMarker } from "@/components/google-map-base";
-import { searchHotels, type HotelType, type HotelResult } from "@/lib/google-places/hotels";
+import { type HotelType, type HotelResult } from "@/lib/google-places/hotels";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ui/toast";
 import {
@@ -39,31 +37,12 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
   const [selectedHotel, setSelectedHotel] = useState<HotelResult | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const mapServiceRef = useRef<google.maps.places.PlacesService | null>(null);
   const supabase = createClient();
   const { addToast } = useToast();
   const router = useRouter();
 
-  // Initialize PlacesService
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.google && window.google.maps && !mapServiceRef.current) {
-      const tempDiv = document.createElement("div");
-      tempDiv.style.display = "none";
-      document.body.appendChild(tempDiv);
-      const tempMap = new google.maps.Map(tempDiv, {
-        center: { lat: 0, lng: 0 },
-        zoom: 1,
-      });
-      mapServiceRef.current = new google.maps.places.PlacesService(tempMap);
-      
-      return () => {
-        document.body.removeChild(tempDiv);
-      };
-    }
-  }, []);
-
   const searchHotelsForTrip = useCallback(async () => {
-    if (!trip || !mapServiceRef.current || trip.center_lat == null || trip.center_lng == null) {
+    if (!trip || trip.center_lat == null || trip.center_lng == null) {
       return;
     }
 
@@ -71,21 +50,10 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
     setError(null);
 
     try {
-      const location = {
-        lat: trip.center_lat,
-        lng: trip.center_lng,
-      };
-
-      const results = await searchHotels(mapServiceRef.current, location, hotelType);
-      
-      // Sort by rating and review count
-      const sorted = results.sort((a, b) => {
-        const aScore = (a.rating || 0) * (a.user_ratings_total || 0);
-        const bScore = (b.rating || 0) * (b.user_ratings_total || 0);
-        return bScore - aScore;
-      });
-
-      setRawHotels(sorted);
+      // Hotel search requires Google Maps JS SDK which has been removed
+      // TODO: Refactor to use Places API REST endpoint instead
+      setError("Hotel search is currently unavailable. Please check back later.");
+      setRawHotels([]);
     } catch (err) {
       console.error("Error searching hotels:", err);
       setError(err instanceof Error ? err.message : "Failed to search hotels");
@@ -130,7 +98,7 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
 
   // Search hotels when filters change
   useEffect(() => {
-    if (trip && trip.center_lat != null && trip.center_lng != null && mapServiceRef.current) {
+    if (trip && trip.center_lat != null && trip.center_lng != null) {
       searchHotelsForTrip();
     }
   }, [trip, hotelType, searchHotelsForTrip]);
@@ -201,15 +169,6 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
     return "Hotel";
   };
 
-  const markers: BaseMarker[] = hotels.map((hotel) => ({
-    id: hotel.place_id,
-    lat: hotel.geometry.location.lat,
-    lng: hotel.geometry.location.lng,
-  }));
-
-  const mapCenter = trip && trip.center_lat != null && trip.center_lng != null
-    ? { lat: trip.center_lat, lng: trip.center_lng }
-    : null;
 
   if (!trip) {
     return (
@@ -221,21 +180,8 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
 
   return (
     <div className="h-full flex">
-      {/* Left: Map */}
-      <div className="w-1/2 border-r">
-        <GoogleMapBase
-          markers={markers}
-          center={mapCenter}
-          zoom={12}
-          onMarkerClick={(id) => {
-            const hotel = hotels.find((h) => h.place_id === id);
-            if (hotel) handleViewDetails(hotel);
-          }}
-        />
-      </div>
-
-      {/* Right: Filters + Hotel List */}
-      <div className="w-1/2 flex flex-col overflow-hidden">
+      {/* Filters + Hotel List */}
+      <div className="w-full flex flex-col overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b">
           <Button

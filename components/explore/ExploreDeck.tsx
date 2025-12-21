@@ -103,7 +103,11 @@ export function ExploreDeck({
     const keys = getItineraryPlaceKeys(activities);
     // DEV-only logging
     if (process.env.NODE_ENV === 'development') {
-      console.debug("[Explore] existingItineraryPlaceIds size", keys.placeIds.size);
+      console.debug("[Explore] itinerary place keys", {
+        placeIdsSize: keys.placeIds.size,
+        fallbackKeysSize: keys.fallbackKeys.size,
+        activitiesCount: activities.length,
+      });
     }
     return keys;
   }, [activities]);
@@ -193,8 +197,10 @@ export function ExploreDeck({
       console.debug("[Explore] filtered places", {
         before: beforeCount,
         after: afterCount,
-        showAlreadyInItinerary: filters.includeItineraryPlaces,
         removed: removedCount,
+        showAlreadyInItinerary: filters.includeItineraryPlaces,
+        itineraryPlaceIdsSize: itineraryPlaceKeys.placeIds.size,
+        itineraryFallbackKeysSize: itineraryPlaceKeys.fallbackKeys.size,
       });
     }
 
@@ -812,7 +818,7 @@ export function ExploreDeck({
     // Show different message if we filtered out all places vs no results from API
     const hasRawPlaces = rawPlaces.length > 0;
     const message = hasRawPlaces && !filters.includeItineraryPlaces
-      ? 'No more new places in this area. Try changing filters or toggle "Show places already in itinerary".'
+      ? 'No more new places. Try widening filters or enable \'Show places already in itinerary\'.'
       : 'No places found. Try changing filters.';
 
     return (

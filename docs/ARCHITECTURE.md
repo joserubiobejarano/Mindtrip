@@ -353,6 +353,14 @@ User Clicks "Add to Itinerary"
 - RLS policies for user access
 - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
 
+**trip_regeneration_stats** ✅ **NEW**
+- Tracks daily regeneration counts per trip for Smart Itinerary regeneration limits
+- Schema: `id`, `trip_id`, `date`, `count`, `created_at`, `updated_at`
+- UNIQUE constraint on (trip_id, date) for per-day tracking
+- Indexes: `idx_trip_regeneration_stats_trip_id`, `idx_trip_regeneration_stats_date`, `idx_trip_regeneration_stats_trip_date`
+- Used to enforce daily regeneration limits (2 for free tier, 5 for Pro tier)
+- Migration file: `database/migrations/supabase-add-regeneration-stats.sql`
+
 **trip_segments** ✅ **NEW**
 - Multi-city trip segments
 - Each segment represents a city/portion of trip with date range
@@ -365,6 +373,18 @@ User Clicks "Add to Itinerary"
 - Tracks per-user-per-trip usage for Explore features
 - Migration file: `database/migrations/add-explore-usage-limits-to-trip-members.sql`
 - Index: `idx_trip_members_usage` for performance
+
+**trips** ✅ **UPDATED**
+- Trip-level Pro unlock fields: `has_trip_pro`, `stripe_trip_payment_id` ✅ **NEW**
+- `has_trip_pro`: Boolean flag for trip-level Pro unlock (one-time payment)
+- `stripe_trip_payment_id`: Stores Stripe payment intent ID for trip unlock
+- Migration file: `database/migrations/add-trip-pro-fields-to-trips.sql`
+- Indexes: `idx_trips_has_trip_pro`, `idx_trips_stripe_trip_payment_id`
+
+**profiles** ✅ **UPDATED**
+- Billing fields: `stripe_customer_id` ✅ **NEW**
+- Stores Stripe customer ID for subscription management
+- Migration file: `database/migrations/add-stripe-customer-id-to-profiles.sql`
 
 ### New Tables for Explore Feature ✅ **IMPLEMENTED**
 
@@ -488,6 +508,14 @@ smart_itineraries
 │   └── link-trip-invitations/        # ✅ POST: Link email invitations to user accounts
 ├── advisor/                          # ✅ NEW: Travel Advisor (pre-trip planning)
 │   └── route.ts                      # ✅ GET/POST: Advisor chat history and messages
+├── billing/                          # ✅ NEW: Billing and subscription management
+│   ├── checkout/
+│   │   ├── subscription/            # ✅ POST: Create Stripe checkout for Pro subscription
+│   │   └── trip/                    # ✅ POST: Create Stripe checkout for trip Pro unlock
+│   ├── portal/                      # ✅ GET: Stripe customer portal session
+│   └── webhook/                     # ✅ POST: Stripe webhook handler for subscription events
+├── images/                           # ✅ NEW: Image caching system
+│   └── cache-place-image/           # ✅ POST: Cache place images in Supabase Storage
 ├── ai/
 │   └── plan-day/                    # AI day planning
 ├── ai-itinerary/                    # Legacy itinerary (updated with segment support)
@@ -829,6 +857,28 @@ lib/
 - Integration with homepage search
 - Transport guidance for multi-city and regional trips
 - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+
+**Billing & Subscriptions** ✅ **NEW**
+- Stripe integration for Pro subscriptions and trip-level unlocks
+- API endpoints: `/api/billing/checkout/subscription`, `/api/billing/checkout/trip`, `/api/billing/portal`, `/api/billing/webhook`
+- Database: `profiles.stripe_customer_id`, `profiles.is_pro`, `trips.has_trip_pro`, `trips.stripe_trip_payment_id`
+- Migration files: `add-stripe-customer-id-to-profiles.sql`, `add-is-pro-to-profiles.sql`, `add-trip-pro-fields-to-trips.sql`
+- Webhook handler updates subscription status automatically
+
+**Image Caching System** ✅ **NEW**
+- Production-proof image caching in Supabase Storage
+- API endpoint: `/api/images/cache-place-image`
+- Health check: `/api/debug/image-cache-health`
+- Automatic image caching from Google Places, Unsplash, Mapbox
+- Deterministic file paths prevent duplicates
+- Public bucket: `place-images` (must be created manually)
+- See [images.md](./images.md) for complete documentation
+
+**Trip Regeneration Stats** ✅ **NEW**
+- Database: `trip_regeneration_stats` table for tracking daily regeneration counts
+- Enforces daily limits: 2 regenerations/day for free tier, 5 for Pro tier
+- Migration file: `database/migrations/supabase-add-regeneration-stats.sql`
+- Used by Smart Itinerary regeneration endpoint
 
 **Infrastructure & UX Improvements** ✅ **NEW**
 - Trip deletion: DELETE `/api/trips/[tripId]` endpoint with owner verification

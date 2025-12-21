@@ -589,10 +589,74 @@ For later implementation phases:
   - Allows invited users to see trips after signing up
   - Location: `app/api/user/link-trip-invitations/route.ts`
 
+### Billing & Subscriptions ✅ NEW
+- `POST /api/billing/checkout/subscription` - Create Stripe checkout session for Pro subscription
+  - Body: `{ returnUrl?: string }`
+  - Returns: `{ url: string }` (Stripe checkout URL)
+  - Creates or retrieves Stripe customer
+  - Creates checkout session for yearly Pro subscription
+  - Location: `app/api/billing/checkout/subscription/route.ts`
+
+- `POST /api/billing/checkout/trip` - Create Stripe checkout session for trip Pro unlock
+  - Body: `{ tripId: string, returnUrl?: string }`
+  - Returns: `{ url: string }` (Stripe checkout URL)
+  - Creates one-time payment for trip Pro unlock
+  - Location: `app/api/billing/checkout/trip/route.ts`
+
+- `GET /api/billing/portal` - Get Stripe customer portal session
+  - Returns: `{ url: string }` (Stripe portal URL)
+  - Allows users to manage subscription, update payment method, view invoices
+  - Location: `app/api/billing/portal/route.ts`
+
+- `POST /api/billing/webhook` - Handle Stripe webhook events
+  - Handles subscription events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+  - Updates `profiles.is_pro` based on subscription status
+  - Updates `trips.has_trip_pro` for trip unlocks
+  - Location: `app/api/billing/webhook/route.ts`
+
+### Image Caching ✅ NEW
+- `POST /api/images/cache-place-image` - Cache a place image in Supabase Storage
+  - Body: `{ tripId: string, placeId?: string, title: string, city?: string, country?: string, photoRef?: string, lat?: number, lng?: number }`
+  - Returns: `{ image_url: string, providerUsed: string, uploadOk: boolean }`
+  - Caches image from Google Places, Unsplash, or Mapbox
+  - Uses deterministic file paths to prevent duplicates
+  - Location: `app/api/images/cache-place-image/route.ts`
+  - See [images.md](./images.md) for complete documentation
+
+- `GET /api/debug/image-cache-health` - Check image caching system health
+  - Returns: `{ healthy: boolean, hasServiceRoleKey: boolean, canAccessPlaceImagesBucket: boolean, ... }`
+  - Location: `app/api/debug/image-cache-health/route.ts`
+
 ### Travel Intent (Future)
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates
+
+- **2025-01-XX**: Billing & Subscriptions ✅ **NEW**
+  - **Stripe Integration**:
+    - ✅ Subscription checkout API (`/api/billing/checkout/subscription`)
+    - ✅ Trip Pro unlock checkout API (`/api/billing/checkout/trip`)
+    - ✅ Stripe webhook handler (`/api/billing/webhook`) for subscription events
+    - ✅ Billing portal API (`/api/billing/portal`) for customer self-service
+    - ✅ Account-level Pro (`profiles.is_pro`) and trip-level Pro (`trips.has_trip_pro`)
+    - ✅ Database migrations: `add-stripe-customer-id-to-profiles.sql`, `add-is-pro-to-profiles.sql`, `add-trip-pro-fields-to-trips.sql`
+    - ✅ Automatic subscription status updates via webhook
+
+- **2025-01-XX**: Image Caching System ✅ **NEW**
+  - **Supabase Storage Integration**:
+    - ✅ Image caching API endpoint (`/api/images/cache-place-image`)
+    - ✅ Health check endpoint (`/api/debug/image-cache-health`)
+    - ✅ Automatic image caching from Google Places, Unsplash, Mapbox
+    - ✅ Deterministic file paths prevent duplicates
+    - ✅ Public bucket: `place-images` (must be created manually)
+    - ✅ See [images.md](./images.md) for complete documentation
+
+- **2025-01-XX**: Trip Regeneration Stats ✅ **NEW**
+  - **Regeneration Limit Tracking**:
+    - ✅ Database table: `trip_regeneration_stats` for tracking daily regeneration counts
+    - ✅ Migration file: `supabase-add-regeneration-stats.sql`
+    - ✅ Daily limit enforcement: 2 regenerations/day for free tier, 5 for Pro tier
+    - ✅ Integration with Smart Itinerary regeneration endpoint
 
 - **2025-01-XX**: Infrastructure & UX Improvements ✅
   - **Trip Deletion Feature**: 

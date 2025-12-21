@@ -18,16 +18,10 @@ import { Button } from "@/components/ui/button";
 
 interface ExploreTabProps {
   tripId: string;
-  onMapUpdate?: (
-    markers: import("@/components/google-map-base").BaseMarker[],
-    center: { lat: number; lng: number } | null,
-    zoom: number | undefined
-  ) => void;
-  onMarkerClickRef?: React.MutableRefObject<((id: string) => void) | null>;
   onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
 }
 
-export function ExploreTab({ tripId, onMapUpdate, onMarkerClickRef, onActivePlaceChange }: ExploreTabProps) {
+export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const debugMode = searchParams.get('debugExplore');

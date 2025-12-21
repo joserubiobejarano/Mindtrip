@@ -268,6 +268,87 @@ The Explore feature is a Tinder-style swipe experience for discovering places in
   - Automatic topic redirection for off-topic queries
   - Improved system prompts for focused travel assistance
 
+### Billing & Subscriptions ✅ **NEW**
+
+**Overview:**
+The billing system integrates with Stripe to manage Pro subscriptions and trip-level Pro unlocks. Users can upgrade to Pro at the account level (yearly subscription) or unlock Pro features for individual trips (one-time payment).
+
+**Features:**
+- **Account-Level Pro Subscriptions**
+  - Yearly Pro subscription via Stripe
+  - Unlimited features across all trips
+  - Automatic renewal via Stripe
+  - Subscription management via Stripe Customer Portal
+- **Trip-Level Pro Unlocks**
+  - One-time payment per trip to unlock Pro features
+  - Useful for users who only need Pro for specific trips
+  - Single payment, no recurring subscription
+- **Stripe Integration**
+  - Checkout sessions for subscriptions and trip unlocks
+  - Webhook handler for subscription events (activate, cancel, update)
+  - Customer portal for self-service subscription management
+  - Automatic status updates (`profiles.is_pro`, `trips.has_trip_pro`)
+
+**API Endpoints:**
+- `POST /api/billing/checkout/subscription` - Create subscription checkout session
+- `POST /api/billing/checkout/trip` - Create trip Pro unlock checkout session
+- `GET /api/billing/portal` - Get Stripe customer portal session
+- `POST /api/billing/webhook` - Handle Stripe webhook events
+
+**Database Schema:**
+- `profiles.stripe_customer_id` - Stripe customer ID
+- `profiles.is_pro` - Account-level Pro status
+- `trips.has_trip_pro` - Trip-level Pro unlock status
+- `trips.stripe_trip_payment_id` - Payment intent ID for trip unlock
+
+**Migration Files:**
+- `add-stripe-customer-id-to-profiles.sql`
+- `add-is-pro-to-profiles.sql`
+- `add-trip-pro-fields-to-trips.sql`
+
+### Image Caching System ✅ **NEW**
+
+**Overview:**
+Production-proof image caching system that stores place images in Supabase Storage for stable, reliable image URLs. Images are cached from multiple sources with a fallback chain.
+
+**Features:**
+- **Automatic Image Caching**
+  - Caches images from Google Places, Unsplash, and Mapbox
+  - Priority order: Google Places → Unsplash → Mapbox
+  - Deterministic file paths prevent duplicate uploads
+- **Storage**
+  - Supabase Storage bucket: `place-images` (PUBLIC)
+  - File path format: `place-images/{provider}/{hash}.jpg`
+  - Public URLs for direct image access
+- **API Endpoints:**
+  - `POST /api/images/cache-place-image` - Cache a place image
+  - `GET /api/debug/image-cache-health` - Check system health
+
+**Technical Details:**
+- Uses Supabase Service Role client for uploads
+- SHA1 hash-based file paths (deterministic)
+- Always stores as `.jpg` extension
+- Health check endpoint for debugging
+- See [images.md](./images.md) for complete documentation
+
+### Trip Regeneration Stats ✅ **NEW**
+
+**Overview:**
+Tracks daily regeneration counts per trip to enforce Smart Itinerary regeneration limits based on subscription tier.
+
+**Features:**
+- **Daily Limit Tracking**
+  - Tracks regeneration count per trip per day
+  - Free tier: 2 regenerations per day per trip
+  - Pro tier: 5 regenerations per day per trip
+- **Database Table**
+  - `trip_regeneration_stats` table with UNIQUE constraint on (trip_id, date)
+  - Automatic count increment on regeneration
+  - Used by Smart Itinerary regeneration endpoint
+
+**Migration File:**
+- `supabase-add-regeneration-stats.sql`
+
 ### Travel Advisor (Pre-Trip Planning) ✅ **NEW**
 
 **Overview:**
@@ -702,6 +783,28 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - ✅ Integration with homepage search (routes to advisor for travel queries)
 - ✅ Transport guidance for multi-city and regional trips
 - ✅ Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+
+**Billing & Subscriptions - COMPLETE** ✅
+- ✅ Stripe integration for Pro subscriptions and trip-level unlocks
+- ✅ Subscription checkout API endpoint
+- ✅ Trip Pro unlock checkout API endpoint
+- ✅ Stripe webhook handler for subscription events
+- ✅ Customer portal API for subscription management
+- ✅ Database migrations for billing fields
+- ✅ Automatic subscription status updates
+
+**Image Caching System - COMPLETE** ✅
+- ✅ Production-proof image caching in Supabase Storage
+- ✅ API endpoint for caching place images
+- ✅ Health check endpoint for debugging
+- ✅ Automatic image caching from multiple sources (Google Places, Unsplash, Mapbox)
+- ✅ Deterministic file paths prevent duplicates
+- ✅ See [images.md](./images.md) for complete documentation
+
+**Trip Regeneration Stats - COMPLETE** ✅
+- ✅ Database table for tracking daily regeneration counts
+- ✅ Daily limit enforcement (2 for free, 5 for Pro)
+- ✅ Integration with Smart Itinerary regeneration endpoint
 
 **Phase 18-20: Multi-City Trips, Personalization & Enhanced Assistant - COMPLETE** ✅
 - ✅ Multi-city trip support with trip segments (Pro tier)
