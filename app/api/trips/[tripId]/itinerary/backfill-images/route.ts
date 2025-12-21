@@ -202,8 +202,8 @@ export async function POST(
         // Update place in SmartItinerary JSON
         const targetPlace = itinerary.days[dayIndex].slots[slotIndex].places[placeIndex];
         targetPlace.image_url = proxyUrl;
-        // Also set photos for backward compatibility with resolvePlacePhotoSrc
-        targetPlace.photos = [{ photo_reference: photoRef }];
+        // Set photos array with the photo URL
+        targetPlace.photos = [proxyUrl];
 
         updated++;
         

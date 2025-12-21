@@ -26,7 +26,7 @@ import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY } from "@/lib/supabase/smar
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getUsageLimits } from "@/lib/supabase/usage-limits";
-import { resolvePlacePhotoSrc, isPhotoSrcUsable } from "@/lib/placePhotos";
+import { resolvePlacePhotoSrc, isPhotoSrcUsable, isGooglePhotoReference } from "@/lib/placePhotos";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 

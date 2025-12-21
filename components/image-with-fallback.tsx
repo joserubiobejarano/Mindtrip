@@ -28,7 +28,8 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
     if (process.env.NODE_ENV === 'development' && src) {
       console.debug('[ImageWithFallback] Image render:', { src, unoptimized: shouldUnoptimize, isPlacesProxy: isPlacesProxy(src) });
     }
-  }, []); // Only log once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only log once on mount - dependencies intentionally omitted
 
   // For error state, use regular img since it's a data URI
   if (didError) {

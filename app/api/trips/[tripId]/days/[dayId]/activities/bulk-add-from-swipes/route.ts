@@ -259,14 +259,13 @@ export async function POST(
     const skippedPlaceIds: string[] = [];
 
     // Fetch place details from Google Places API
-    // Note: photos is stored as Array<{ photo_reference: string }> for backward compatibility with resolvePlacePhotoSrc
     const newPlaces: Array<{
       id: string;
       name: string;
       description: string;
       area: string;
       neighborhood: string | null;
-      photos: Array<{ photo_reference: string }>;
+      photos: string[];
       visited: boolean;
       tags: string[];
       image_url?: string;
@@ -330,14 +329,15 @@ export async function POST(
           const tags = (placeDetails.types || []).slice(0, 3).map(t => t.replace(/_/g, ' '));
 
           // Create place with image_url and photos array
-          // Store photos as [{ photo_reference: photoRef }] for backward compatibility with resolvePlacePhotoSrc
+          // Build photo URL if we have a photo reference
+          const photoUrl = photoRef ? `/api/places/photo?ref=${encodeURIComponent(photoRef)}&maxwidth=800` : '';
           const newPlace: any = {
             id: placeId,
             name: placeDetails.name || 'Unknown Place',
             description,
             area,
             neighborhood,
-            photos: photoRef ? [{ photo_reference: photoRef }] : [],
+            photos: photoUrl ? [photoUrl] : [],
             visited: false,
             tags,
           };

@@ -51,7 +51,8 @@ export async function GET(request: NextRequest) {
       }
       // Return placeholder image (200) with dev-only warning
       const placeholder = getPlaceholderImage();
-      return new NextResponse(placeholder, {
+      const placeholderArray = new Uint8Array(placeholder);
+      return new NextResponse(placeholderArray, {
         status: 200,
         headers: {
           'Content-Type': 'image/png',
@@ -108,7 +109,8 @@ export async function GET(request: NextRequest) {
 
       // Return placeholder image (200) instead of 404 to prevent retry storms
       const placeholder = getPlaceholderImage();
-      return new NextResponse(placeholder, {
+      const placeholderArray = new Uint8Array(placeholder);
+      return new NextResponse(placeholderArray, {
         status: 200,
         headers: {
           'Content-Type': 'image/png',
