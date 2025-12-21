@@ -60,7 +60,7 @@ export function HotelSearch({ tripId }: HotelSearchProps) {
     } finally {
       setLoading(false);
     }
-  }, [trip, hotelType]);
+  }, [trip]);
 
   // Filter hotels based on budget
   useEffect(() => {
