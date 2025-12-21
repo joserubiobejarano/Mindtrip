@@ -116,6 +116,8 @@ export function ItineraryTab({
   const router = useRouter();
   const { addToast } = useToast();
   const settingsMenuRef = useRef<HTMLDivElement>(null);
+  const didAutoBackfillRef = useRef<boolean>(false);
+  const triggerAutoBackfillRef = useRef<(() => Promise<void>) | null>(null);
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
   const { data: segments = [], isLoading: segmentsLoading } = useTripSegments(tripId);
   const [daysWithSegments, setDaysWithSegments] = useState<Map<string, string>>(new Map()); // day date -> segment_id
@@ -487,6 +489,8 @@ export function ItineraryTab({
                       
                       setSmartItinerary(validatedData);
                       setStatus('loaded');
+                      // Trigger auto-backfill after itinerary is loaded
+                      setTimeout(() => triggerAutoBackfillRef.current?.(), 500);
                     } catch (parseErr: any) {
                       console.error('[itinerary-tab] complete: error validating/parsing complete data', {
                         error: parseErr,
@@ -569,6 +573,8 @@ export function ItineraryTab({
           
           setSmartItinerary(validatedData);
           setStatus('loaded');
+          // Trigger auto-backfill after itinerary is loaded
+          setTimeout(() => triggerAutoBackfillRef.current?.(), 500);
         } catch (parseErr: any) {
           console.error('[itinerary-tab] generateSmartItinerary: error validating non-streaming data', {
             error: parseErr,
@@ -670,6 +676,86 @@ export function ItineraryTab({
       setStatus('error');
     }
   }, [tripId, generateSmartItinerary, addToast, isActive]);
+
+  const triggerAutoBackfill = useCallback(async () => {
+    // Prevent duplicate calls
+    if (didAutoBackfillRef.current) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[itinerary-tab] triggerAutoBackfill: already ran, skipping');
+      }
+      return;
+    }
+
+    if (!tripId) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[itinerary-tab] triggerAutoBackfill: missing tripId');
+      }
+      return;
+    }
+
+    // Mark as running to prevent duplicates
+    didAutoBackfillRef.current = true;
+    setIsBackfillingImages(true);
+
+    if (process.env.NODE_ENV === 'development') {
+      addToast({
+        title: 'Fetching images...',
+        description: 'Loading place photos for your itinerary',
+        variant: 'default',
+      });
+    }
+
+    try {
+      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dryRun: false,
+          limit: 50,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `Backfill failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[itinerary-tab] triggerAutoBackfill: success', {
+          scanned: result.scanned,
+          updated: result.updated,
+          notFound: result.notFound,
+          errors: result.errors,
+        });
+
+        addToast({
+          title: 'Images updated',
+          description: `Updated ${result.updated || 0} place${result.updated !== 1 ? 's' : ''} with photos`,
+          variant: 'success',
+        });
+      }
+
+      // Refresh itinerary data to show new images
+      await loadOrGenerate();
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[itinerary-tab] triggerAutoBackfill: error', error);
+      }
+      // Don't show error toast - this is a background process
+      // Don't break the UI - just log and continue
+    } finally {
+      setIsBackfillingImages(false);
+    }
+  }, [tripId, addToast, loadOrGenerate]);
+
+  // Store triggerAutoBackfill in ref so generateSmartItinerary can call it
+  useEffect(() => {
+    triggerAutoBackfillRef.current = triggerAutoBackfill;
+  }, [triggerAutoBackfill]);
 
   // Check if any places need photos
   const hasPlacesNeedingPhotos = useCallback((): boolean => {
@@ -844,6 +930,8 @@ export function ItineraryTab({
   // 1. Load existing or start generation
   useEffect(() => {
     if (!isActive) return;
+    // Reset backfill ref when tripId changes
+    didAutoBackfillRef.current = false;
     loadOrGenerate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId, isActive]);
