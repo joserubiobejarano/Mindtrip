@@ -1584,9 +1584,9 @@ export function ItineraryTab({
                         {/* Affiliate Buttons - Moved below activities */}
                         <div className="mt-8 pt-6 border-t border-gray-100">
                           <div className="flex flex-wrap gap-3">
-                            <AffiliateButton kind="hotel" day={day} t={t} />
-                            <AffiliateButton kind="tour" day={day} t={t} />
-                            <AffiliateButton kind="sim" day={day} t={t} />
+                            <AffiliateButton kind="hotel" day={day} t={t as (key: string) => string} />
+                            <AffiliateButton kind="tour" day={day} t={t as (key: string) => string} />
+                            <AffiliateButton kind="sim" day={day} t={t as (key: string) => string} />
                           </div>
                         </div>
 
@@ -1976,9 +1976,9 @@ export function ItineraryTab({
                         {/* Affiliate Buttons - Moved below activities */}
                         <div className="mt-8 pt-6 border-t border-gray-100">
                           <div className="flex flex-wrap gap-3">
-                            <AffiliateButton kind="hotel" day={day} t={t} />
-                            <AffiliateButton kind="tour" day={day} t={t} />
-                            <AffiliateButton kind="sim" day={day} t={t} />
+                            <AffiliateButton kind="hotel" day={day} t={t as (key: string) => string} />
+                            <AffiliateButton kind="tour" day={day} t={t as (key: string) => string} />
+                            <AffiliateButton kind="sim" day={day} t={t as (key: string) => string} />
                           </div>
                         </div>
 

@@ -42,7 +42,8 @@ export async function POST(
         .eq("user_id", profileId)
         .maybeSingle();
 
-      if (member && (member.role === "owner" || member.role === "editor")) {
+      type MemberRole = { role: string };
+      if (member && ((member as MemberRole).role === "owner" || (member as MemberRole).role === "editor")) {
         hasPermission = true;
       }
     }
@@ -55,6 +56,7 @@ export async function POST(
     }
 
     // Load trip members with email and display_name
+    type Member = { id: string; email: string | null; display_name: string | null };
     const { data: members, error: membersError } = await supabase
       .from("trip_members")
       .select("id, email, display_name")
@@ -73,6 +75,7 @@ export async function POST(
     }
 
     // Load expenses for the trip
+    type Expense = { id: string; amount: number; currency: string; paid_by_member_id: string };
     const { data: expenses, error: expensesError } = await supabase
       .from("expenses")
       .select("id, amount, currency, paid_by_member_id")
@@ -84,12 +87,13 @@ export async function POST(
     }
 
     // Load expense shares
+    type ExpenseShare = { expense_id: string; member_id: string; amount: number };
     const { data: shares, error: sharesError } = await supabase
       .from("expense_shares")
       .select("expense_id, member_id, amount")
       .in(
         "expense_id",
-        (expenses || []).map((e) => e.id)
+        ((expenses || []) as Expense[]).map((e) => e.id)
       );
 
     if (sharesError) {
@@ -102,12 +106,12 @@ export async function POST(
     const balanceMap: Record<string, number> = {};
 
     // Initialize balances for all members
-    members.forEach((member) => {
+    (members as Member[]).forEach((member) => {
       balanceMap[member.id] = 0;
     });
 
     // Only calculate for expenses in default currency
-    (expenses || [])
+    ((expenses || []) as Expense[])
       .filter((expense) => expense.currency === defaultCurrency)
       .forEach((expense) => {
         // Add amount paid by member (they are owed this)
@@ -115,7 +119,7 @@ export async function POST(
           (balanceMap[expense.paid_by_member_id] || 0) + expense.amount;
 
         // Subtract shares (each member owes their share)
-        (shares || [])
+        ((shares || []) as ExpenseShare[])
           .filter((share) => share.expense_id === expense.id)
           .forEach((share) => {
             balanceMap[share.member_id] =
@@ -124,7 +128,7 @@ export async function POST(
       });
 
     // Calculate total spent
-    const totalSpent = (expenses || [])
+    const totalSpent = ((expenses || []) as Expense[])
       .filter((expense) => expense.currency === defaultCurrency)
       .reduce((sum, expense) => sum + expense.amount, 0);
 
@@ -134,7 +138,7 @@ export async function POST(
     };
 
     // Sort members alphabetically by name
-    const sortedMembers = [...members].sort((a, b) => {
+    const sortedMembers = [...(members as Member[])].sort((a, b) => {
       const aName = getMemberName(a);
       const bName = getMemberName(b);
       return aName.localeCompare(bName);
@@ -171,7 +175,7 @@ export async function POST(
 
     // Send emails to all tripmates with email addresses
     let sentCount = 0;
-    const emailPromises = members
+    const emailPromises = (members as Member[])
       .filter((member) => member.email) // Only members with email
       .map((member) => {
         return sendExpensesSummaryEmail({

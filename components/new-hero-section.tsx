@@ -74,6 +74,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
         placeId: destination.id,
         name: destination.placeName,
         description: destination.placeName,
+        city: destination.placeName, // Use placeName as city fallback
         center: destination.center,
         country: destination.region,
       });

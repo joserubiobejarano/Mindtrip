@@ -18,7 +18,8 @@ interface ExploreFiltersProps {
 }
 
 // Categories will be translated in the component using t()
-const CATEGORIES = [
+type CategoryItem = { value: string; labelKey?: string; label?: string };
+const CATEGORIES: CategoryItem[] = [
   { value: 'all', labelKey: 'explore_filters_category_all' },
   { value: 'tourist attractions', labelKey: 'explore_filters_category_attractions' },
   { value: 'museums', labelKey: 'explore_filters_category_museums' },
@@ -27,7 +28,8 @@ const CATEGORIES = [
   { value: 'bars', labelKey: 'explore_filters_category_nightlife' },
 ];
 
-const BUDGET_OPTIONS = [
+type OptionItem = { value: string; labelKey?: string; label?: string };
+const BUDGET_OPTIONS: OptionItem[] = [
   { value: '0', labelKey: 'explore_filters_budget_free' },
   { value: '1', label: '$' },
   { value: '2', label: '$$' },
@@ -35,7 +37,7 @@ const BUDGET_OPTIONS = [
   { value: '4', label: '$$$$' },
 ];
 
-const DISTANCE_OPTIONS = [
+const DISTANCE_OPTIONS: OptionItem[] = [
   { value: '1000', labelKey: 'explore_filters_distance_1km' },
   { value: '2000', labelKey: 'explore_filters_distance_2km' },
   { value: '5000', labelKey: 'explore_filters_distance_5km' },

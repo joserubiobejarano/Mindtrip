@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { getEmailCopy, type EmailLanguage } from './email-copy';
+import { getEmailCopy, type EmailLanguage } from '../email-copy';
 
 let resendClient: Resend | null = null;
 

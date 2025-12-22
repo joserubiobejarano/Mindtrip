@@ -56,13 +56,14 @@ export async function POST() {
     }
 
     // Extract trip IDs before updating
-    const tripIds = pendingInvites.map((invite) => invite.trip_id);
+    type PendingInvite = { id: string; trip_id: string; email: string | null };
+    const tripIds = ((pendingInvites || []) as PendingInvite[]).map((invite) => invite.trip_id);
 
     // Update all matching trip_members entries to set user_id
-    const { data: updatedMembers, error: updateError } = await supabase
-      .from("trip_members")
+    const { data: updatedMembers, error: updateError } = await (supabase
+      .from("trip_members") as any)
       .update({ user_id: userId })
-      .in("id", pendingInvites.map((invite) => invite.id))
+      .in("id", ((pendingInvites || []) as PendingInvite[]).map((invite) => invite.id))
       .select("trip_id");
 
     if (updateError) {
@@ -74,8 +75,9 @@ export async function POST() {
     }
 
     // Extract unique trip IDs from updated members
+    type UpdatedMember = { trip_id: string };
     const linkedTripIds = Array.from(
-      new Set((updatedMembers || []).map((member) => member.trip_id))
+      new Set(((updatedMembers || []) as UpdatedMember[]).map((member) => member.trip_id))
     );
 
     return NextResponse.json({

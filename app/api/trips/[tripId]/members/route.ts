@@ -130,7 +130,8 @@ export async function POST(
     }
 
     // Determine user_id: use clerk_user_id if profile exists, otherwise NULL
-    const userId = profile?.clerk_user_id || null;
+    type Profile = { clerk_user_id: string | null; full_name: string | null };
+    const userId = (profile as Profile | null)?.clerk_user_id || null;
 
     // Get inviter name from Clerk
     const inviter = await currentUser();
@@ -145,7 +146,7 @@ export async function POST(
           user_id: userId,
           email: normalizedEmail,
           role,
-          display_name: profile?.full_name || null,
+          display_name: (profile as Profile | null)?.full_name || null,
         },
         {
           onConflict: "trip_id,email",

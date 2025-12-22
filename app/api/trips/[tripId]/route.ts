@@ -103,7 +103,8 @@ export async function GET(
     }
 
     // Check if user is owner
-    const isOwner = tripData.owner_id === profileId;
+    type Trip = { owner_id: string; [key: string]: any };
+    const isOwner = (tripData as Trip).owner_id === profileId;
 
     // Check if user is a member
     const { data: isMember } = await supabase

@@ -34,7 +34,14 @@ export async function GET(
     }
 
     // Sort by display_name if available, otherwise by email (same as web)
-    const sortedMembers = (members || []).sort((a, b) => {
+    type Member = {
+      id: string;
+      email: string | null;
+      display_name: string | null;
+      user_id: string | null;
+      role: string;
+    };
+    const sortedMembers = ((members || []) as Member[]).sort((a, b) => {
       const aName = a.display_name || a.email || "";
       const bName = b.display_name || b.email || "";
       return aName.localeCompare(bName);
