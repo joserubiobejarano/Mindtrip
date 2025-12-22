@@ -27,6 +27,9 @@ import { UserPlus, Trash2 } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { cn } from "@/lib/utils";
 import { ensureOwnerMember } from "@/lib/supabase/trip-members";
+import { useToast } from "@/components/ui/toast";
+import { useLanguage } from "@/components/providers/language-provider";
+import { TranslationKey } from "@/lib/i18n";
 
 interface TripMembersDialogProps {
   open: boolean;
@@ -54,8 +57,8 @@ function getInitials(member: TripMember): string {
 }
 
 // Helper to get display name
-function getDisplayName(member: TripMember): string {
-  return member.display_name || member.email || "Unknown";
+function getDisplayName(member: TripMember, t: (key: TranslationKey) => string): string {
+  return member.display_name || member.email || t("tripmates_unknown");
 }
 
 // Helper to get role badge color
@@ -79,12 +82,14 @@ export function TripMembersDialog({
   userId,
 }: TripMembersDialogProps) {
   const { user } = useUser();
+  const { t, language } = useLanguage();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"editor" | "viewer">("editor");
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { data: trip } = useTrip(tripId);
+  const { addToast } = useToast();
 
   // Ensure current user is a trip member
   useEffect(() => {
@@ -119,29 +124,44 @@ export function TripMembersDialog({
 
   const inviteMember = useMutation({
     mutationFn: async (data: { email: string; role: "editor" | "viewer" }) => {
-      const { data: member, error } = await (supabase
-        .from("trip_members") as any)
-        .insert({
-          trip_id: tripId,
-          user_id: null, // Will be set when user signs up
+      const response = await fetch(`/api/trips/${tripId}/members`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           email: data.email,
           role: data.role,
-          display_name: null, // Will be set when user signs up
-        })
-        .select()
-        .single();
+          language: language,
+        }),
+      });
 
-      if (error) {
-        console.error("Error inviting member:", error.message);
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || t("tripmates_toast_invite_error_desc"));
       }
-      return member;
+
+      return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trip-members", tripId] });
       setEmail("");
       setRole("editor");
       setError(null);
+      addToast({
+        title: t("tripmates_toast_invite_sent"),
+        description: t("tripmates_toast_invite_sent_desc").replace("{email}", variables.email),
+        variant: "success",
+      });
+    },
+    onError: (err: any) => {
+      const errorMessage = err.message || t("tripmates_toast_invite_error_desc");
+      setError(errorMessage);
+      addToast({
+        title: t("tripmates_toast_invite_error"),
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 
@@ -165,7 +185,7 @@ export function TripMembersDialog({
 
     try {
       if (!email || !email.includes("@")) {
-        throw new Error("Please enter a valid email address");
+        throw new Error(t("tripmates_error_invalid_email"));
       }
 
       // Check if member already exists
@@ -174,7 +194,7 @@ export function TripMembersDialog({
       );
 
       if (existingMember) {
-        throw new Error("This member is already invited");
+        throw new Error(t("tripmates_error_already_invited"));
       }
 
       await inviteMember.mutateAsync({
@@ -182,16 +202,16 @@ export function TripMembersDialog({
         role,
       });
     } catch (err: any) {
-      setError(err.message || "Failed to invite member");
+      setError(err.message || t("tripmates_error_failed_invite"));
     }
   };
 
   const handleRemove = async (memberId: string, memberRole: string) => {
     if (memberRole === "owner") {
-      setError("Cannot remove the owner");
+      setError(t("tripmates_error_cannot_remove_owner"));
       return;
     }
-    if (confirm("Are you sure you want to remove this member?")) {
+    if (confirm(t("tripmates_confirm_remove"))) {
       await removeMember.mutateAsync(memberId);
     }
   };
@@ -200,27 +220,27 @@ export function TripMembersDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Tripmates</DialogTitle>
+          <DialogTitle>{t("tripmates_title")}</DialogTitle>
           <DialogDescription>
-            Manage trip members and invite collaborators.
+            {t("tripmates_subtitle")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Members List */}
           <div className="space-y-2">
-            <Label>Current Members ({members.length})</Label>
+            <Label>{t("tripmates_members_label_count").replace("{count}", members.length.toString())}</Label>
             {members.length === 0 ? (
               <Card>
                 <CardContent className="p-4 text-center text-muted-foreground">
-                  No members yet. Invite someone to get started!
+                  {t("tripmates_empty_description")}
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-2">
                 {members.map((member) => {
                   const isCurrentUser = member.user_id === userId;
-                  const displayNameText = getDisplayName(member);
+                  const displayNameText = getDisplayName(member, t);
                   const initials = getInitials(member);
                   
                   return (
@@ -237,7 +257,7 @@ export function TripMembersDialog({
                                 {displayNameText}
                               </span>
                               {isCurrentUser && (
-                                <span className="text-xs text-muted-foreground">(You)</span>
+                                <span className="text-xs text-muted-foreground">{t("tripmates_you")}</span>
                               )}
                             </div>
                             {member.display_name && member.email && (
@@ -252,7 +272,7 @@ export function TripMembersDialog({
                                   getRoleBadgeClass(member.role)
                                 )}
                               >
-                                {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                                {t(`tripmates_role_${member.role}` as TranslationKey)}
                               </span>
                             </div>
                           </div>
@@ -278,28 +298,28 @@ export function TripMembersDialog({
           {/* Invite Form - Only visible to owner */}
           {isOwner && (
             <div className="border-t pt-4 space-y-4">
-              <Label className="text-base font-semibold">Invite by Email</Label>
+              <Label className="text-base font-semibold">{t("tripmates_invite_section")}</Label>
               <form onSubmit={handleInvite} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t("tripmates_email_label")}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="friend@example.com"
+                    placeholder={t("tripmates_email_placeholder")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">Role *</Label>
+                  <Label htmlFor="role">{t("tripmates_role_label")}</Label>
                   <Select value={role} onValueChange={(value: "editor" | "viewer") => setRole(value)}>
                     <SelectTrigger id="role">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="editor">Editor</SelectItem>
-                      <SelectItem value="viewer">Viewer</SelectItem>
+                      <SelectItem value="editor">{t("tripmates_role_editor")}</SelectItem>
+                      <SelectItem value="viewer">{t("tripmates_role_viewer")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -310,7 +330,7 @@ export function TripMembersDialog({
                 )}
                 <Button type="submit" disabled={inviteMember.isPending} className="w-full">
                   <UserPlus className="mr-2 h-4 w-4" />
-                  {inviteMember.isPending ? "Inviting..." : "Invite"}
+                  {inviteMember.isPending ? t("tripmates_invite_sending") : t("tripmates_invite_button")}
                 </Button>
               </form>
             </div>
@@ -318,14 +338,14 @@ export function TripMembersDialog({
 
           {!isOwner && (
             <div className="border-t pt-4 text-sm text-muted-foreground text-center">
-              Only the trip owner can invite members.
+              {t("tripmates_owner_only_hint")}
             </div>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("tripmates_close")}
           </Button>
         </DialogFooter>
       </DialogContent>

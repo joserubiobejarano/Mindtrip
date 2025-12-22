@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, DollarSign } from "lucide-react";
+import { Plus, DollarSign, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/toast";
 import {
@@ -27,6 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ensureOwnerMember } from "@/lib/supabase/trip-members";
+import { useTrip } from "@/hooks/use-trip";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface Expense {
   id: string;
@@ -58,6 +60,7 @@ interface TripMember {
   email: string | null;
   display_name: string | null;
   user_id: string | null;
+  role: string | null;
 }
 
 const EXPENSE_CATEGORIES = [
@@ -76,6 +79,7 @@ interface ExpensesTabProps {
 export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   const { user } = useUser();
   const { addToast } = useToast();
+  const { t, language } = useLanguage();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -86,6 +90,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const { data: trip } = useTrip(tripId);
 
   // Ensure current user is a trip member before loading data
   const [ownerMemberEnsured, setOwnerMemberEnsured] = useState(false);
@@ -235,7 +240,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
     mutationFn: async () => {
       const amountNum = parseFloat(amount);
       if (!description || !amountNum || !paidBy || sharingMembers.length === 0) {
-        throw new Error("Please fill in all required fields");
+        throw new Error(t("expenses_error_required_fields"));
       }
 
       // Create expense
@@ -254,11 +259,11 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
 
       if (expenseError) {
         console.error("Error creating expense:", expenseError.message);
-        throw new Error(expenseError.message || "Failed to create expense");
+        throw new Error(expenseError.message || t("expenses_error_creating_desc"));
       }
       if (!expense) {
         console.error("Error creating expense: No expense returned");
-        throw new Error("Failed to create expense");
+        throw new Error(t("expenses_error_creating_desc"));
       }
 
       // Create shares (equal split)
@@ -288,11 +293,11 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
       setError(null);
     },
     onError: (error: Error) => {
-      const errorMessage = error.message || "Failed to create expense. Please try again.";
+      const errorMessage = error.message || t("expenses_error_creating_desc");
       setError(errorMessage);
       addToast({
         variant: "destructive",
-        title: "Error creating expense",
+        title: t("expenses_error_creating"),
         description: errorMessage,
       });
     },
@@ -308,16 +313,58 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
   };
 
   const getMemberName = (member: TripMember | { email: string | null; display_name?: string | null }) => {
-    return member.display_name || member.email || "Unknown";
+    return member.display_name || member.email || t("expenses_unknown");
   };
+
+  // Check if user can send balance summary (owner or editor role)
+  // Note: Trip owners should be members with role "owner" via ensureOwnerMember
+  const canSendSummary = user?.id && members.some(
+    (m) => m.user_id === user.id && (m.role === "owner" || m.role === "editor")
+  );
+
+  // Send balance summary mutation
+  const sendSummary = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/trips/${tripId}/expenses/send-summary`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language: language || "en",
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: t("expenses_summary_error_desc") }));
+        throw new Error(error.error || t("expenses_summary_error_desc"));
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      addToast({
+        variant: "success",
+        title: t("expenses_summary_sent"),
+        description: t("expenses_summary_sent_desc").replace("{count}", data.sentCount.toString()),
+      });
+    },
+    onError: (error: Error) => {
+      addToast({
+        variant: "destructive",
+        title: t("expenses_summary_error"),
+        description: t("expenses_summary_error_desc"),
+      });
+    },
+  });
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Expenses</h2>
-        <Button onClick={() => setDialogOpen(true)}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>{t("expenses_title")}</h2>
+        <Button onClick={() => setDialogOpen(true)} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
-          Add Expense
+          {t("expenses_add_expense")}
         </Button>
       </div>
 
@@ -332,20 +379,20 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Total Spent</CardTitle>
+              <CardTitle>{t("expenses_total_spent")}</CardTitle>
               <CardDescription>
-                Total expenses for this trip
+                {t("expenses_total_spent_desc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {Object.entries(totalsByCurrency).map(([currency, total]) => (
                   <div
                     key={currency}
-                    className="flex justify-between items-center p-3 rounded-md bg-muted"
+                    className="flex justify-between items-center p-4 rounded-md bg-muted"
                   >
-                    <span className="font-medium text-lg">{currency}</span>
-                    <span className="text-2xl font-bold">
+                    <span className="font-medium text-base text-foreground">{currency}</span>
+                    <span className="text-xl font-semibold text-foreground">
                       {currency} {total.toFixed(2)}
                     </span>
                   </div>
@@ -356,13 +403,27 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         );
       })()}
 
+      {/* Send Balance Summary Button */}
+      {canSendSummary && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => sendSummary.mutate()}
+            disabled={sendSummary.isPending}
+            className="w-full sm:w-auto"
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            {sendSummary.isPending ? t("expenses_sending") : t("expenses_send_summary")}
+          </Button>
+        </div>
+      )}
+
       {/* Balance Summary */}
       {balances.data && Object.keys(balances.data).length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Balance Summary</CardTitle>
+            <CardTitle>{t("expenses_balance_summary")}</CardTitle>
             <CardDescription>
-              Positive = is owed, Negative = owes
+              {t("expenses_balance_hint")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -375,24 +436,24 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
                 return (
                   <div
                     key={member.id}
-                    className="flex justify-between items-center p-3 rounded-md bg-muted"
+                    className="flex justify-between items-center p-4 rounded-md bg-muted"
                   >
-                    <span className="font-medium">{getMemberName(member)}</span>
+                    <span className="font-medium text-foreground">{getMemberName(member)}</span>
                     <div className="text-right">
                       <span
                         className={
                           roundedBalance > 0
-                            ? "text-green-600 dark:text-green-400 font-semibold"
+                            ? "text-green-600 dark:text-green-400 font-semibold text-base"
                             : roundedBalance < 0
-                            ? "text-red-600 dark:text-red-400 font-semibold"
-                            : "text-muted-foreground"
+                            ? "text-red-600 dark:text-red-400 font-semibold text-base"
+                            : "text-muted-foreground font-medium"
                         }
                       >
                         {roundedBalance > 0 ? "+" : ""}
                         {defaultCurrency} {Math.abs(roundedBalance).toFixed(2)}
                       </span>
                       <div className="text-xs text-muted-foreground mt-1">
-                        {roundedBalance > 0 ? "(is owed)" : roundedBalance < 0 ? "(owes)" : "(settled)"}
+                        {roundedBalance > 0 ? t("expenses_is_owed") : roundedBalance < 0 ? t("expenses_owes") : t("expenses_settled")}
                       </div>
                     </div>
                   </div>
@@ -408,37 +469,41 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
         {expenses.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center text-muted-foreground">
-              No expenses yet. Add your first expense to get started!
+              <div className="space-y-1">
+                <p className="font-medium">{t("expenses_empty_title")}</p>
+                <p className="text-sm">{t("expenses_empty_description")}</p>
+              </div>
             </CardContent>
           </Card>
         ) : (
           expenses.map((expense) => (
             <Card key={expense.id}>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-semibold">{expense.description}</h3>
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg text-foreground mb-1">{expense.description}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {expense.category} • Paid by {getMemberName(expense.paid_by_member)}
+                      {expense.category && <span>{expense.category} • </span>}
+                      {t("expenses_paid_by").replace("{name}", getMemberName(expense.paid_by_member))}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {format(new Date(expense.created_at), "MMM d, yyyy")}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-lg">
+                  <div className="text-right ml-4 flex-shrink-0">
+                    <p className="font-semibold text-lg text-foreground">
                       {expense.currency} {expense.amount.toFixed(2)}
                     </p>
                   </div>
                 </div>
                 {expense.shares.length > 0 && (
-                  <div className="mt-2 pt-2 border-t">
-                    <p className="text-xs text-muted-foreground mb-1">Shared by:</p>
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-2 font-medium">{t("expenses_shared_by")}</p>
                     <div className="flex flex-wrap gap-2">
                       {expense.shares.map((share) => (
                         <span
                           key={share.id}
-                          className="text-xs px-2 py-1 bg-muted rounded-md"
+                          className="text-xs px-2.5 py-1 bg-muted rounded-md text-foreground"
                         >
                           {getMemberName(share.member)}: {expense.currency}{" "}
                           {share.amount.toFixed(2)}
@@ -465,9 +530,9 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Expense</DialogTitle>
+            <DialogTitle>{t("expenses_dialog_title")}</DialogTitle>
             <DialogDescription>
-              Record an expense and split it among trip members.
+              {t("expenses_dialog_description")}
             </DialogDescription>
           </DialogHeader>
           <form
@@ -484,10 +549,10 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">{t("expenses_form_description")}</Label>
               <Input
                 id="description"
-                placeholder="e.g., Hotel booking"
+                placeholder={t("expenses_form_description_placeholder")}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
@@ -495,22 +560,22 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="amount">Amount *</Label>
+                <Label htmlFor="amount">{t("expenses_form_amount")}</Label>
                 <Input
                   id="amount"
                   type="number"
                   step="0.01"
-                  placeholder="0.00"
+                  placeholder={t("expenses_form_amount_placeholder")}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="currency">Currency *</Label>
+                <Label htmlFor="currency">{t("expenses_form_currency")}</Label>
                 <Input
                   id="currency"
-                  placeholder="USD"
+                  placeholder={t("expenses_form_currency_placeholder")}
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value.toUpperCase())}
                   required
@@ -518,10 +583,10 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t("expenses_form_category")}</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t("expenses_form_category_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {EXPENSE_CATEGORIES.map((cat) => (
@@ -533,10 +598,10 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="paid_by">Paid By *</Label>
+              <Label htmlFor="paid_by">{t("expenses_form_paid_by")}</Label>
               {members.length === 0 ? (
                 <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
-                  Add at least one tripmate to start tracking expenses.
+                  {t("expenses_form_no_members_hint")}
                 </div>
               ) : (
                 <Select 
@@ -546,7 +611,7 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
                   disabled={members.length === 1}
                 >
                   <SelectTrigger id="paid_by">
-                    <SelectValue placeholder="Select member" />
+                    <SelectValue placeholder={t("expenses_form_paid_by_placeholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     {members.map((member) => (
@@ -559,10 +624,10 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
               )}
             </div>
             <div className="space-y-2">
-              <Label>Share With *</Label>
+              <Label>{t("expenses_form_share_with")}</Label>
               {members.length === 0 ? (
                 <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
-                  Add at least one tripmate to start tracking expenses.
+                  {t("expenses_form_no_members_hint")}
                 </div>
               ) : (
                 <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">
@@ -600,10 +665,10 @@ export function ExpensesTab({ tripId, defaultCurrency }: ExpensesTabProps) {
                 }}
                 disabled={createExpense.isPending}
               >
-                Cancel
+                {t("expenses_form_cancel")}
               </Button>
               <Button type="submit" disabled={createExpense.isPending}>
-                {createExpense.isPending ? "Adding..." : "Add Expense"}
+                {createExpense.isPending ? t("expenses_adding") : t("expenses_add_expense")}
               </Button>
             </DialogFooter>
           </form>

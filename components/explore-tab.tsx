@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/toast";
 import type { ExploreFilters as ExploreFiltersType, ExplorePlace } from "@/lib/google/explore-places";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface ExploreTabProps {
   tripId: string;
@@ -35,6 +36,7 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
     error: sessionError 
   } = useExploreSession(tripId, true, activeSegmentId || undefined);
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [filters, setFilters] = useState<ExploreFiltersType>({});
   const [isAddingToItinerary, setIsAddingToItinerary] = useState(false);
   const [currentPlace, setCurrentPlace] = useState<ExplorePlace | null>(null);
@@ -71,14 +73,14 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
 
       if (isForbidden || isServerError) {
         addToast({
-          title: 'Error loading trip',
-          description: 'Couldn\'t load places, please refresh',
+          title: t('explore_error_loading_trip'),
+          description: t('explore_error_couldnt_load'),
           variant: 'destructive',
         });
       } else {
         addToast({
-          title: 'Error loading trip',
-          description: error?.message || 'Failed to load trip data',
+          title: t('explore_error_loading_trip'),
+          description: error?.message || t('explore_error_failed_load'),
           variant: 'destructive',
         });
       }
@@ -103,8 +105,8 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
 
     if (mode === 'add' && day && slot) {
       addToast({
-        title: 'Add activities',
-        description: 'Select a place to add to your itinerary',
+        title: t('explore_toast_add_activities'),
+        description: t('explore_toast_select_place'),
         variant: 'default',
       });
       setReplaceTarget(null);
@@ -176,8 +178,8 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
     if (replaceTarget) {
       if (!selectedPlace || !selectedPlace.place_id) {
         addToast({
-          title: 'No place selected',
-          description: 'Please select a place to replace this activity',
+          title: t('explore_toast_no_place_selected'),
+          description: t('explore_toast_select_replace'),
           variant: 'default',
         });
         return;
@@ -212,15 +214,15 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
           // Handle 409 (duplicate) error
           if (response.status === 409) {
             addToast({
-              title: 'Already in itinerary',
-              description: error.message || 'This place is already in your itinerary',
+              title: t('explore_toast_already_in_itinerary'),
+              description: error.message || t('explore_toast_already_in_itinerary_desc'),
               variant: 'destructive',
             });
             // Keep user in Explore to pick another
             return;
           }
           
-          throw new Error(error.error || error.message || 'Failed to replace activity');
+          throw new Error(error.error || error.message || t('explore_toast_failed_replace'));
         }
 
         // DEV logging
@@ -230,8 +232,8 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
 
         // Show success toast
         addToast({
-          title: 'Replaced!',
-          description: 'Activity replaced successfully',
+          title: t('explore_toast_replaced'),
+          description: t('explore_toast_replaced_desc'),
           variant: 'success',
         });
 
@@ -240,8 +242,8 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
         router.push(`/trips/${tripId}?tab=itinerary`);
       } catch (error: any) {
         addToast({
-          title: 'Error',
-          description: error.message || 'Failed to replace activity',
+          title: t('explore_toast_error'),
+          description: error.message || t('explore_toast_failed_replace'),
           variant: 'destructive',
         });
       } finally {
@@ -274,14 +276,14 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
       // Show appropriate toast based on distribution result
       if (result.addedToLastDayOnly) {
         addToast({
-          title: 'Places added',
-          description: `We added ${result.distributed} place${result.distributed !== 1 ? 's' : ''} to your last day. Consider removing some activities if it feels too packed.`,
+          title: t('explore_toast_places_added'),
+          description: t('explore_toast_places_added_last_day').replace('{count}', result.distributed.toString()),
           variant: 'default',
         });
       } else {
         addToast({
-          title: 'Success!',
-          description: `Added ${result.distributed} place${result.distributed !== 1 ? 's' : ''} to your itinerary`,
+          title: t('explore_toast_success'),
+          description: t('explore_toast_added_to_itinerary').replace('{count}', result.distributed.toString()),
           variant: 'success',
         });
       }
@@ -290,8 +292,8 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
       router.push(`/trips/${tripId}?tab=itinerary`);
     } catch (error: any) {
       addToast({
-        title: 'Error',
-        description: error.message || 'Failed to add places to itinerary',
+        title: t('explore_toast_error'),
+        description: error.message || t('explore_toast_failed_add'),
         variant: 'destructive',
       });
     } finally {
@@ -309,7 +311,7 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
   if ((tripLoading || segmentsLoading) && !trip) {
     return (
       <div className="p-6">
-        <div className="text-muted-foreground">Loading trip...</div>
+        <div className="text-muted-foreground">{t('explore_loading_trip')}</div>
       </div>
     );
   }
@@ -331,13 +333,13 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
       return (
         <div className="p-6 text-center">
           <p className="text-sm text-muted-foreground mb-4">
-            Couldn&apos;t load places, please refresh
+            {t('explore_error_couldnt_load')}
           </p>
           <Button
             onClick={() => window.location.reload()}
             variant="outline"
           >
-            Refresh
+            {t('explore_button_refresh')}
           </Button>
         </div>
       );
@@ -349,13 +351,13 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
     return (
       <div className="p-6 text-center">
         <p className="text-sm text-muted-foreground mb-4">
-          Couldn&apos;t load places, please refresh
+          {t('explore_error_couldnt_load')}
         </p>
         <Button
           onClick={() => window.location.reload()}
           variant="outline"
         >
-          Refresh
+          {t('explore_button_refresh')}
         </Button>
       </div>
     );
@@ -366,13 +368,13 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
     return (
       <div className="p-6 text-center">
         <p className="text-sm text-muted-foreground mb-4">
-          Unable to load explore session. Please refresh the page.
+          {t('explore_error_session')}
         </p>
         <Button
           onClick={() => window.location.reload()}
           variant="outline"
         >
-          Refresh
+          {t('explore_button_refresh')}
         </Button>
       </div>
     );
@@ -428,8 +430,8 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
             <div className="text-sm text-muted-foreground">ExploreDeck hidden (debug mode: noDeck)</div>
           ) : (
             <ErrorBoundary
-              fallbackTitle="Something went wrong"
-              fallbackMessage="We encountered an error while loading Explore. This has been logged and we'll look into it."
+              fallbackTitle={t('explore_error_boundary_title')}
+              fallbackMessage={t('explore_error_boundary_message')}
             >
               <ExploreDeck
                 tripId={tripId}

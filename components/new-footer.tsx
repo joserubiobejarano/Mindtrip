@@ -3,8 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Instagram, Twitter, Facebook, Youtube } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function NewFooter() {
+  const { t } = useLanguage();
   return (
     <footer className="py-12 px-6" style={{ backgroundColor: 'hsl(var(--cream))' }}>
       <div className="max-w-6xl mx-auto">
@@ -20,15 +22,9 @@ export function NewFooter() {
                 height={40}
                 priority
               />
-              <span 
-                className="text-xl font-bold"
-                style={{ fontFamily: "'Patrick Hand', cursive" }}
-              >
-                Kruno
-              </span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Your companion for unforgettable adventures around the world
+              {t('footer_tagline')}
             </p>
             <div className="flex gap-3">
               <a href="#" className="w-10 h-10 border-2 border-foreground rounded-lg flex items-center justify-center hover:bg-foreground hover:text-background transition-colors">
@@ -52,7 +48,7 @@ export function NewFooter() {
               className="text-lg font-bold mb-4 relative inline-block"
               style={{ fontFamily: "'Patrick Hand', cursive" }}
             >
-              Explore
+              {t('footer_explore')}
               <span 
                 className="absolute -bottom-1 left-0 right-0 h-1"
                 style={{
@@ -63,11 +59,11 @@ export function NewFooter() {
               ></span>
             </h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Destinations</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Experiences</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Travel Guides</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Trip Planner</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Community</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_destinations')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_experiences')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_travel_guides')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_trip_planner')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_community')}</Link></li>
             </ul>
           </div>
 
@@ -77,7 +73,7 @@ export function NewFooter() {
               className="text-lg font-bold mb-4 relative inline-block"
               style={{ fontFamily: "'Patrick Hand', cursive" }}
             >
-              Company
+              {t('footer_company')}
               <span 
                 className="absolute -bottom-1 left-0 right-0 h-1"
                 style={{
@@ -88,11 +84,11 @@ export function NewFooter() {
               ></span>
             </h3>
             <ul className="space-y-2">
-              <li><Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">About Us</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Careers</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Press</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Partners</Link></li>
+              <li><Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_about')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_careers')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_press')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_blog')}</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_partners')}</Link></li>
             </ul>
           </div>
 
@@ -102,7 +98,7 @@ export function NewFooter() {
               className="text-lg font-bold mb-4 relative inline-block"
               style={{ fontFamily: "'Patrick Hand', cursive" }}
             >
-              Support
+              {t('footer_support')}
               <span 
                 className="absolute -bottom-1 left-0 right-0 h-1"
                 style={{
@@ -113,11 +109,11 @@ export function NewFooter() {
               ></span>
             </h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Help Center</Link></li>
-              <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">Contact Us</Link></li>
-              <li><Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">Terms of Service</Link></li>
-              <li><Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">Cookie Policy</Link></li>
+              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_help')}</Link></li>
+              <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_contact')}</Link></li>
+              <li><Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_privacy')}</Link></li>
+              <li><Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_terms')}</Link></li>
+              <li><Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_cookies')}</Link></li>
             </ul>
           </div>
         </div>
@@ -125,10 +121,10 @@ export function NewFooter() {
         {/* Bottom Section */}
         <div className="border-t border-dashed border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            Made with ❤️ by travelers, for travelers
+            {t('footer_copyright_made')}
           </p>
           <p className="text-sm text-muted-foreground">
-            ©2025 Kruno. All rights reserved.
+            {t('footer_copyright_year')}
           </p>
         </div>
       </div>

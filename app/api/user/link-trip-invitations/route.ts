@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Links the current user's email to any trip_members entries that have matching email but null user_id.
@@ -25,27 +26,62 @@ export async function POST() {
       );
     }
 
-    const supabase = await createClient();
+    // Normalize email to lowercase for case-insensitive matching
+    const normalizedEmail = userEmail.toLowerCase().trim();
 
-    // Update trip_members entries where email matches and user_id is null
-    const { data, error } = await (supabase
-      .from("trip_members") as any)
+    // Use admin client to bypass RLS when updating trip_members with null user_id
+    const supabase = createSupabaseAdmin();
+
+    // Find all trip_members entries where email matches (case-insensitive) and user_id is null
+    const { data: pendingInvites, error: findError } = await supabase
+      .from("trip_members")
+      .select("id, trip_id, email")
+      .ilike("email", normalizedEmail)
+      .is("user_id", null);
+
+    if (findError) {
+      console.error("Error finding pending trip invitations:", findError);
+      return NextResponse.json(
+        { error: "Failed to find trip invitations" },
+        { status: 500 }
+      );
+    }
+
+    if (!pendingInvites || pendingInvites.length === 0) {
+      return NextResponse.json({
+        success: true,
+        linkedTripIds: [],
+        linkedCount: 0,
+      });
+    }
+
+    // Extract trip IDs before updating
+    const tripIds = pendingInvites.map((invite) => invite.trip_id);
+
+    // Update all matching trip_members entries to set user_id
+    const { data: updatedMembers, error: updateError } = await supabase
+      .from("trip_members")
       .update({ user_id: userId })
-      .eq("email", userEmail.toLowerCase())
-      .is("user_id", null)
-      .select();
+      .in("id", pendingInvites.map((invite) => invite.id))
+      .select("trip_id");
 
-    if (error) {
-      console.error("Error linking trip invitations:", error);
+    if (updateError) {
+      console.error("Error linking trip invitations:", updateError);
       return NextResponse.json(
         { error: "Failed to link trip invitations" },
         { status: 500 }
       );
     }
 
+    // Extract unique trip IDs from updated members
+    const linkedTripIds = Array.from(
+      new Set((updatedMembers || []).map((member) => member.trip_id))
+    );
+
     return NextResponse.json({
       success: true,
-      linkedCount: data?.length || 0,
+      linkedTripIds,
+      linkedCount: linkedTripIds.length,
     });
   } catch (error) {
     console.error("Error in link-trip-invitations:", error);

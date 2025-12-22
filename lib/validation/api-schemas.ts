@@ -83,6 +83,7 @@ export const AssistantMessageSchema = z.object({
   message: z.string().min(1, 'Message is required').max(5000, 'Message too long'),
   activeSegmentId: UUIDSchema.optional(),
   activeDayId: DayIdSchema.optional(),
+  language: z.enum(['en', 'es']).optional(),
 }).strict();
 
 // Itinerary generation

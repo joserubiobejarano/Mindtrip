@@ -7,6 +7,7 @@ import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ExploreFilters as ExploreFiltersType } from '@/lib/google/explore-places';
 import { ProPaywallModal } from '@/components/pro/ProPaywallModal';
+import { useLanguage } from '@/components/providers/language-provider';
 
 interface ExploreFiltersProps {
   filters: ExploreFiltersType;
@@ -16,17 +17,18 @@ interface ExploreFiltersProps {
   tripId?: string; // For paywall modal
 }
 
+// Categories will be translated in the component using t()
 const CATEGORIES = [
-  { value: 'all', label: 'All' },
-  { value: 'tourist attractions', label: 'Attractions' },
-  { value: 'museums', label: 'Museums' },
-  { value: 'restaurants', label: 'Restaurants' },
-  { value: 'parks', label: 'Parks' },
-  { value: 'bars', label: 'Nightlife' },
+  { value: 'all', labelKey: 'explore_filters_category_all' },
+  { value: 'tourist attractions', labelKey: 'explore_filters_category_attractions' },
+  { value: 'museums', labelKey: 'explore_filters_category_museums' },
+  { value: 'restaurants', labelKey: 'explore_filters_category_restaurants' },
+  { value: 'parks', labelKey: 'explore_filters_category_parks' },
+  { value: 'bars', labelKey: 'explore_filters_category_nightlife' },
 ];
 
 const BUDGET_OPTIONS = [
-  { value: '0', label: 'Free' },
+  { value: '0', labelKey: 'explore_filters_budget_free' },
   { value: '1', label: '$' },
   { value: '2', label: '$$' },
   { value: '3', label: '$$$' },
@@ -34,10 +36,10 @@ const BUDGET_OPTIONS = [
 ];
 
 const DISTANCE_OPTIONS = [
-  { value: '1000', label: 'Within 1 km' },
-  { value: '2000', label: 'Within 2 km' },
-  { value: '5000', label: 'Within 5 km' },
-  { value: '10000', label: 'Within 10 km' },
+  { value: '1000', labelKey: 'explore_filters_distance_1km' },
+  { value: '2000', labelKey: 'explore_filters_distance_2km' },
+  { value: '5000', labelKey: 'explore_filters_distance_5km' },
+  { value: '10000', labelKey: 'explore_filters_distance_10km' },
 ];
 
 export function ExploreFilters({
@@ -51,6 +53,7 @@ export function ExploreFilters({
   const [clientIsPro, setClientIsPro] = useState(isPro);
   const [showProPaywall, setShowProPaywall] = useState(false);
   const prevIsProRef = useRef<boolean | undefined>(undefined);
+  const { t } = useLanguage();
 
   // Check Pro status on mount - never throw, always use safe defaults
   // Guard state updates with useRef to prevent unnecessary re-renders
@@ -160,13 +163,13 @@ export function ExploreFilters({
           >
             {filters.includeItineraryPlaces && <div className="w-2 h-2 rounded-full bg-white" />}
           </div>
-          <span className="text-sm text-foreground">Show places already in itinerary</span>
+          <span className="text-sm text-foreground">{t('explore_filters_show_in_itinerary')}</span>
         </label>
       </div>
 
       {/* Category Filter */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="font-mono text-xs text-sage uppercase tracking-wider">Category:</span>
+        <span className="font-mono text-xs text-sage uppercase tracking-wider">{t('explore_filters_category')}</span>
         {CATEGORIES.map((cat) => {
           // Handle "all" category - show as active when no category filter is set
           const isActive = cat.value === 'all' 
@@ -183,7 +186,7 @@ export function ExploreFilters({
                   : "bg-white text-foreground border-sage/30 hover:border-coral hover:text-coral"
               )}
             >
-              {cat.label}
+              {cat.labelKey ? t(cat.labelKey as any) : cat.label}
             </button>
           );
         })}
@@ -193,7 +196,7 @@ export function ExploreFilters({
       <div className="flex items-center gap-3 flex-wrap">
         {/* Budget Filter (Pro only) */}
         <div className="flex items-center gap-2">
-          <label className="font-mono text-xs text-sage uppercase tracking-wider">Budget:</label>
+          <label className="font-mono text-xs text-sage uppercase tracking-wider">{t('explore_filters_budget')}</label>
           <div className="relative">
             {useHtmlSelect ? (
               <select
@@ -205,10 +208,10 @@ export function ExploreFilters({
                   !effectiveIsPro && "opacity-60 cursor-not-allowed"
                 )}
               >
-                <option value="">Any budget</option>
+                <option value="">{t('explore_filters_any_budget')}</option>
                 {BUDGET_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {option.labelKey ? t(option.labelKey as any) : option.label}
                   </option>
                 ))}
               </select>
@@ -222,12 +225,12 @@ export function ExploreFilters({
                   "w-[120px] h-8 text-xs bg-white border-sage/30",
                   !effectiveIsPro && "opacity-60 cursor-not-allowed"
                 )}>
-                  <SelectValue placeholder="Any budget" />
+                  <SelectValue placeholder={t('explore_filters_any_budget')} />
                 </SelectTrigger>
                 <SelectContent>
                   {BUDGET_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                      {option.labelKey ? t(option.labelKey as any) : option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -237,7 +240,7 @@ export function ExploreFilters({
               <div 
                 className="absolute inset-0 cursor-pointer z-10"
                 onClick={() => setShowProPaywall(true)}
-                title="Upgrade to Pro to use budget filter"
+                title={t('explore_filters_upgrade_budget')}
               />
             )}
             {!effectiveIsPro && (
@@ -248,7 +251,7 @@ export function ExploreFilters({
 
         {/* Distance Filter (Pro only) */}
         <div className="flex items-center gap-2">
-          <label className="font-mono text-xs text-sage uppercase tracking-wider">Distance:</label>
+          <label className="font-mono text-xs text-sage uppercase tracking-wider">{t('explore_filters_distance')}</label>
           <div className="relative">
             {useHtmlSelect ? (
               <select
@@ -260,10 +263,10 @@ export function ExploreFilters({
                   !effectiveIsPro && "opacity-60 cursor-not-allowed"
                 )}
               >
-                <option value="">Any distance</option>
+                <option value="">{t('explore_filters_any_distance')}</option>
                 {DISTANCE_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {option.labelKey ? t(option.labelKey as any) : option.label}
                   </option>
                 ))}
               </select>
@@ -277,12 +280,12 @@ export function ExploreFilters({
                   "w-[120px] h-8 text-xs bg-white border-sage/30",
                   !effectiveIsPro && "opacity-60 cursor-not-allowed"
                 )}>
-                  <SelectValue placeholder="Any distance" />
+                  <SelectValue placeholder={t('explore_filters_any_distance')} />
                 </SelectTrigger>
                 <SelectContent>
                   {DISTANCE_OPTIONS.filter(opt => opt.value && opt.value.trim() !== '').map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                      {option.labelKey ? t(option.labelKey as any) : option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -292,7 +295,7 @@ export function ExploreFilters({
               <div 
                 className="absolute inset-0 cursor-pointer z-10"
                 onClick={() => setShowProPaywall(true)}
-                title="Upgrade to Pro to use distance filter"
+                title={t('explore_filters_upgrade_distance')}
               />
             )}
             {!effectiveIsPro && (

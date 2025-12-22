@@ -15,6 +15,7 @@ import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
+import { useLanguage } from "@/components/providers/language-provider";
 import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -63,18 +64,18 @@ const isPlacesProxy = (src?: string | null): boolean => {
 
 
 // Simple affiliate button component
-function AffiliateButton({ kind, day }: { kind: string, day: ItineraryDay }) {
+function AffiliateButton({ kind, day, t }: { kind: string, day: ItineraryDay, t: (key: string) => string }) {
   // Fallback or placeholder logic for affiliates since we removed the specific AffiliateSuggestion type from explicit Day interface in new schema
   // But we can check if we want to add hardcoded or dynamic ones. 
   // For now, adhering to instruction "AffiliateButton kind=..."
   // I will create a simple button.
   
   const labels: Record<string, string> = {
-    hotel: "Find hotels",
-    tour: "Book tours",
-    sim: "Get eSim",
-    insurance: "Travel Insurance",
-    transport: "Transport"
+    hotel: t('itinerary_affiliate_hotels'),
+    tour: t('itinerary_affiliate_tours'),
+    sim: t('itinerary_affiliate_sim'),
+    insurance: t('itinerary_affiliate_insurance'),
+    transport: t('itinerary_affiliate_transport')
   };
 
   return (
@@ -104,7 +105,10 @@ export function ItineraryTab({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
-  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  // Track the single open day ID (null means all days are collapsed)
+  // Collapsible behavior allows users to collapse all days for better overview
+  const [expandedDays, setExpandedDays] = useState<string | null>(null);
+  const hasInitializedRef = useRef(false);
   const [isBackfillingImages, setIsBackfillingImages] = useState(false);
   
   // Day-level Explore state
@@ -121,6 +125,7 @@ export function ItineraryTab({
   const { data: segments = [], isLoading: segmentsLoading } = useTripSegments(tripId);
   const [daysWithSegments, setDaysWithSegments] = useState<Map<string, string>>(new Map()); // day date -> segment_id
   const { user } = useUser();
+  const { language, t } = useLanguage();
   const supabase = createClient();
 
   // Fetch subscription status
@@ -324,7 +329,7 @@ export function ItineraryTab({
     if (!tripId) {
       console.warn('[itinerary-tab] generateSmartItinerary: missing tripId');
       setStatus('error');
-      setError('Missing trip id.');
+      setError(t('itinerary_error_missing_trip_id'));
       return;
     }
 
@@ -335,6 +340,12 @@ export function ItineraryTab({
     try {
       const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          language,
+        }),
       });
 
       console.log('[itinerary-tab] generateSmartItinerary: POST status', res.status);
@@ -346,12 +357,12 @@ export function ItineraryTab({
         // Handle regeneration limit reached error
         if (body?.error === 'regeneration_limit_reached') {
           addToast({
-            title: 'Too many changes today',
-            description: body.message || 'You\'ve tweaked this itinerary a lot already 😅 Take some time to enjoy your trip, and try changes again tomorrow.',
+            title: t('itinerary_toast_too_many_changes'),
+            description: body.message || t('itinerary_toast_tweaked_lot'),
             variant: 'destructive',
           });
           setStatus('error');
-          setError('Regeneration limit reached');
+          setError(t('itinerary_error_regeneration_limit'));
           return;
         }
         
@@ -463,7 +474,7 @@ export function ItineraryTab({
                       // Validate structure before setting state
                       if (!completeData) {
                         console.error('[itinerary-tab] complete: data.data is null/undefined');
-                        setError('Received incomplete itinerary data. Please try again.');
+                        setError(t('itinerary_error_incomplete_data'));
                         setStatus('error');
                         break;
                       }
@@ -475,7 +486,7 @@ export function ItineraryTab({
                           type: typeof completeData.days,
                           fullPayload: completeData
                         });
-                        setError('Invalid itinerary format: days must be an array. Please try regenerating.');
+                        setError(t('itinerary_error_invalid_format'));
                         setStatus('error');
                         break;
                       }
@@ -497,7 +508,7 @@ export function ItineraryTab({
                         stack: parseErr?.stack,
                         dataReceived: data.data
                       });
-                      setError('Failed to parse complete itinerary. Please try regenerating.');
+                      setError(t('itinerary_error_failed_parse'));
                       setStatus('error');
                     }
                     break;
@@ -507,11 +518,11 @@ export function ItineraryTab({
                     // If we have partial data, show it but also show the error
                     setSmartItinerary(prev => {
                       if (prev && prev.days && prev.days.length > 0) {
-                        setError(data.data.message || 'An error occurred while generating. Some days may be incomplete.');
+                        setError(data.data.message || t('itinerary_error_generation_incomplete'));
                         setStatus('loaded'); // Show partial data
                         return prev;
                       } else {
-                        setError(data.data.message || 'An error occurred');
+                        setError(data.data.message || t('itinerary_error_occurred'));
                         setStatus('error');
                         return null;
                       }
@@ -533,7 +544,7 @@ export function ItineraryTab({
             return prev;
           } else {
             // No data received, treat as error
-            setError('No itinerary data was received');
+            setError(t('itinerary_error_no_data'));
             setStatus('error');
             return null;
           }
@@ -547,7 +558,7 @@ export function ItineraryTab({
         try {
           if (!json) {
             console.error('[itinerary-tab] generateSmartItinerary: received null/undefined data');
-            setError('Invalid itinerary data received. Please try again.');
+            setError(t('itinerary_error_invalid_data'));
             setStatus('error');
             return;
           }
@@ -559,7 +570,7 @@ export function ItineraryTab({
               type: typeof json.days,
               fullPayload: json
             });
-            setError('Invalid itinerary format: days must be an array. Please try again.');
+            setError(t('itinerary_error_invalid_format'));
             setStatus('error');
             return;
           }
@@ -580,16 +591,16 @@ export function ItineraryTab({
             message: parseErr?.message,
             dataReceived: json
           });
-          setError('Failed to parse itinerary. Please try again.');
+          setError(t('itinerary_error_failed_parse'));
           setStatus('error');
         }
       }
     } catch (err) {
       console.error('[itinerary-tab] generateSmartItinerary error', err);
-      setError('Failed to generate itinerary. Please try again.');
+      setError(t('itinerary_error_failed_generate'));
       setStatus('error');
     }
-  }, [tripId, addToast, isActive]);
+  }, [tripId, addToast, isActive, t]);
 
   const loadOrGenerate = useCallback(async () => {
     if (!isActive) return;
@@ -620,8 +631,8 @@ export function ItineraryTab({
         console.error('[itinerary-tab] loadOrGenerate: error loading itinerary', { status: res.status, error: errorData.error });
         addToast({
           variant: 'destructive',
-          title: 'Failed to load itinerary',
-          description: errorData.error || 'Please try again.',
+          title: t('itinerary_toast_failed_load'),
+          description: errorData.error || t('itinerary_toast_please_try_again'),
         });
         throw new Error(`Failed to load itinerary: ${res.status}`);
       }
@@ -634,7 +645,7 @@ export function ItineraryTab({
       try {
         if (!json) {
           console.error('[itinerary-tab] loadOrGenerate: received null/undefined data');
-          setError('Invalid itinerary data received. Please try regenerating.');
+          setError(t('itinerary_error_invalid_data'));
           setStatus('error');
           return;
         }
@@ -646,7 +657,7 @@ export function ItineraryTab({
             type: typeof json.days,
             fullPayload: json
           });
-          setError('Invalid itinerary format: days must be an array. Please try regenerating.');
+          setError(t('itinerary_error_invalid_format'));
           setStatus('error');
           return;
         }
@@ -680,15 +691,15 @@ export function ItineraryTab({
           message: parseErr?.message,
           dataReceived: json
         });
-        setError('Failed to parse loaded itinerary. Please try regenerating.');
+        setError(t('itinerary_error_failed_parse_loaded'));
         setStatus('error');
       }
     } catch (err) {
       console.error('[itinerary-tab] loadOrGenerate error', err);
-      setError('Failed to load itinerary. Please try again.');
+      setError(t('itinerary_error_failed_load'));
       setStatus('error');
     }
-  }, [tripId, generateSmartItinerary, addToast, isActive]);
+  }, [tripId, generateSmartItinerary, addToast, isActive, t]);
 
   const triggerAutoBackfill = useCallback(async () => {
     // Prevent duplicate calls
@@ -712,8 +723,8 @@ export function ItineraryTab({
 
     if (process.env.NODE_ENV === 'development') {
       addToast({
-        title: 'Fetching images...',
-        description: 'Loading place photos for your itinerary',
+        title: t('itinerary_toast_fetching_images'),
+        description: t('itinerary_toast_loading_photos'),
         variant: 'default',
       });
     }
@@ -746,8 +757,8 @@ export function ItineraryTab({
         });
 
         addToast({
-          title: 'Images updated',
-          description: `Updated ${result.updated || 0} place${result.updated !== 1 ? 's' : ''} with photos`,
+          title: t('itinerary_toast_images_updated'),
+          description: t('itinerary_toast_images_updated_count').replace('{count}', (result.updated || 0).toString()),
           variant: 'success',
         });
       }
@@ -819,12 +830,14 @@ export function ItineraryTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId, isActive]);
 
-  // Initialize expanded days with first day expanded
+  // Initialize expanded days with first day expanded (only once on initial load)
+  // This allows users to collapse all days without forcing another to open
   useEffect(() => {
-    if (smartItinerary?.days && smartItinerary.days.length > 0 && expandedDays.size === 0) {
-      setExpandedDays(new Set([smartItinerary.days[0].id]));
+    if (smartItinerary?.days && smartItinerary.days.length > 0 && !hasInitializedRef.current) {
+      setExpandedDays(smartItinerary.days[0].id);
+      hasInitializedRef.current = true;
     }
-  }, [smartItinerary, expandedDays.size]);
+  }, [smartItinerary]);
 
   // Handle manual updates (visited, remove)
   // Since we have slots now, finding the place is a bit deeper.
@@ -876,8 +889,8 @@ export function ItineraryTab({
           setSmartItinerary(smartItinerary);
           addToast({
             variant: 'destructive',
-            title: 'Cannot modify past day',
-            description: errorData.message || 'You cannot modify days that are already in the past.',
+            title: t('itinerary_toast_cannot_modify_past'),
+            description: errorData.message || t('itinerary_toast_cannot_modify_past_desc'),
           });
           return;
         }
@@ -888,7 +901,7 @@ export function ItineraryTab({
       console.error("Failed to sync place update", error);
       // Rollback optimistic update
       setSmartItinerary(smartItinerary);
-      addToast({ variant: "destructive", title: "Failed to save change" });
+      addToast({ variant: "destructive", title: t('itinerary_toast_failed_save') });
     }
   };
 
@@ -899,8 +912,8 @@ export function ItineraryTab({
 
     // Show loading state
     addToast({
-      title: 'Finding replacement...',
-      description: 'Looking for a similar place nearby',
+      title: t('itinerary_toast_finding_replacement'),
+      description: t('itinerary_toast_looking_similar'),
       variant: 'default',
     });
 
@@ -916,8 +929,8 @@ export function ItineraryTab({
         if (errorData.error === 'past_day_locked') {
           addToast({
             variant: 'destructive',
-            title: 'Cannot modify past day',
-            description: errorData.message || 'You cannot modify days that are already in the past.',
+            title: t('itinerary_toast_cannot_modify_past'),
+            description: errorData.message || t('itinerary_toast_cannot_modify_past_desc'),
           });
           return;
         }
@@ -925,8 +938,8 @@ export function ItineraryTab({
         if (errorData.error === 'no_replacement_found') {
           addToast({
             variant: 'destructive',
-            title: 'No replacement found',
-            description: errorData.message || 'We couldn\'t find a good alternative nearby. Try Explore to discover more places.',
+            title: t('itinerary_toast_no_replacement'),
+            description: errorData.message || t('itinerary_toast_no_replacement_desc'),
           });
           return;
         }
@@ -940,16 +953,16 @@ export function ItineraryTab({
       await loadOrGenerate();
 
       addToast({
-        title: 'Activity replaced',
-        description: `Changed to ${result.activity.name}`,
+        title: t('itinerary_toast_activity_replaced'),
+        description: t('itinerary_toast_changed_to').replace('{name}', result.activity.name),
         variant: 'success',
       });
     } catch (error) {
       console.error("Failed to replace activity", error);
       addToast({
         variant: 'destructive',
-        title: 'Failed to replace activity',
-        description: error instanceof Error ? error.message : 'Please try again.',
+        title: t('itinerary_toast_failed_replace'),
+        description: error instanceof Error ? error.message : t('itinerary_toast_please_try_again'),
       });
     }
   };
@@ -988,8 +1001,8 @@ export function ItineraryTab({
   }, [settingsMenuOpen]);
 
 
-  if (tripLoading) return <div className="p-6">Loading...</div>;
-  if (!trip) return <div className="p-6">Trip not found</div>;
+  if (tripLoading) return <div className="p-6">{t('itinerary_loading')}</div>;
+  if (!trip) return <div className="p-6">{t('itinerary_trip_not_found')}</div>;
 
   // Helper components for loading and error states
   const LoadingCard = ({ title, subtitle }: { title: string; subtitle: string }) => (
@@ -1007,7 +1020,7 @@ export function ItineraryTab({
   const ErrorCard = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
     <Card className="bg-red-50 border-red-200 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
       <CardHeader>
-        <CardTitle className="text-red-900">We couldn&apos;t load your itinerary</CardTitle>
+        <CardTitle className="text-red-900">{t('itinerary_error_could_not_load')}</CardTitle>
         <CardDescription className="text-red-700">{message}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -1016,7 +1029,7 @@ export function ItineraryTab({
           variant="outline" 
           className="bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
         >
-          Retry
+          {t('itinerary_retry')}
         </Button>
       </CardContent>
     </Card>
@@ -1046,11 +1059,11 @@ export function ItineraryTab({
         <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setMembersDialogOpen(true)}>
               <Users className="h-4 w-4 mr-2" />
-              Tripmates
+              {t('trip_tabs_tripmates')}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setShareDialogOpen(true)}>
               <Share2 className="h-4 w-4 mr-2" />
-              Share
+              {t('itinerary_share')}
             </Button>
             {trip.owner_id === userId && (
               <div className="relative" ref={settingsMenuRef}>
@@ -1063,7 +1076,7 @@ export function ItineraryTab({
                       onClick={() => { setSettingsMenuOpen(false); setDeleteDialogOpen(true); }}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center gap-2"
                     >
-                      <Trash2 className="h-4 w-4" /> Delete trip
+                      <Trash2 className="h-4 w-4" /> {t('itinerary_delete_trip')}
                     </button>
                   </div>
                 )}
@@ -1079,23 +1092,23 @@ export function ItineraryTab({
           {/* Loading State */}
           {status === 'loading' && (
             <LoadingCard
-              title="We're crafting your itinerary…"
-              subtitle="Loading your saved plan…"
+              title={t('itinerary_generating_title')}
+              subtitle={t('itinerary_generating_subtitle_loading')}
             />
           )}
 
           {/* Generating State - only show if we have no partial data */}
           {status === 'generating' && (!smartItinerary || !smartItinerary.days || smartItinerary.days.length === 0) && (
             <LoadingCard
-              title="We're crafting your itinerary…"
-              subtitle="Designing your days and finding great spots…"
+              title={t('itinerary_generating_title')}
+              subtitle={t('itinerary_generating_subtitle_designing')}
             />
           )}
 
           {/* Error State */}
           {status === 'error' && (
             <ErrorCard
-              message={error ?? 'Something went wrong.'}
+              message={error ?? t('itinerary_error_something_wrong')}
               onRetry={loadOrGenerate}
             />
           )}
@@ -1106,7 +1119,7 @@ export function ItineraryTab({
               {/* Safety guard: check if days is a valid array */}
               {!Array.isArray(smartItinerary.days) ? (
                 <ErrorCard
-                  message="There was a problem with your itinerary. Please try generating it again."
+                  message={t('itinerary_error_problem_regenerate')}
                   onRetry={loadOrGenerate}
                 />
               ) : (
@@ -1130,7 +1143,7 @@ export function ItineraryTab({
                       )}
                       {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
                         <div className="mt-6 text-left max-w-3xl mx-auto">
-                          <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>Trip Tips &amp; Notes</h3>
+                          <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>{t('itinerary_trip_tips')}</h3>
                           <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
                             {smartItinerary.tripTips.map((tip, i) => (
                               <li key={i}>{tip}</li>
@@ -1175,11 +1188,11 @@ export function ItineraryTab({
                                     id: `travel-${prevSegment.id}-${currentSegment.id}`,
                                     index: day.index - 0.5,
                                     date: format(prevEnd, 'yyyy-MM-dd'),
-                                    title: `Travel: ${prevSegment.city_name} → ${currentSegment.city_name}`,
+                                    title: t('itinerary_travel_day').replace('{from}', prevSegment.city_name).replace('{to}', currentSegment.city_name),
                                     theme: 'Travel',
                                     areaCluster: '',
                                     photos: [],
-                                    overview: `Travel day from ${prevSegment.city_name} to ${currentSegment.city_name}`,
+                                    overview: t('itinerary_travel_day_overview').replace('{from}', prevSegment.city_name).replace('{to}', currentSegment.city_name),
                                     slots: [],
                                   };
                                   currentDays = [travelDay, day];
@@ -1206,7 +1219,7 @@ export function ItineraryTab({
                                 </h3>
                                 <p className="text-sm text-slate-600 mt-1">
                                   {format(new Date(group.segment.start_date), "MMM d")} – {format(new Date(group.segment.end_date), "MMM d")} 
-                                  {' '}({differenceInDays(new Date(group.segment.end_date), new Date(group.segment.start_date)) + 1} nights)
+                                  {' '}({t('itinerary_nights').replace('{count}', (differenceInDays(new Date(group.segment.end_date), new Date(group.segment.start_date)) + 1).toString())})
                                 </p>
                               </div>
                             )}
@@ -1224,7 +1237,7 @@ export function ItineraryTab({
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
-                  const isExpanded = expandedDays.has(day.id);
+                  const isExpanded = expandedDays === day.id;
 
                   // Debug logging (development only) - first 5 activities per day
                   if (process.env.NODE_ENV === "development") {
@@ -1266,13 +1279,12 @@ export function ItineraryTab({
                         isExpanded={isExpanded}
                         onToggle={() => {
                           setExpandedDays(prev => {
-                            const newSet = new Set(prev);
-                            if (newSet.has(day.id)) {
-                              newSet.delete(day.id);
-                            } else {
-                              newSet.add(day.id);
+                            // If clicking the currently open day, collapse it (set to null)
+                            if (prev === day.id) {
+                              return null;
                             }
-                            return newSet;
+                            // Otherwise, open this day (closes any other open day)
+                            return day.id;
                           });
                         }}
                         onSelectDay={onSelectDay}
@@ -1448,7 +1460,7 @@ export function ItineraryTab({
                                                 }`}
                                               >
                                                 {place.visited && <Check className="h-3 w-3" />}
-                                                {place.visited ? "Visited" : "Mark as visited"}
+                                                {place.visited ? t('itinerary_visited') : t('itinerary_mark_visited')}
                                               </Button>
                                               <Button
                                                 type="button"
@@ -1469,9 +1481,12 @@ export function ItineraryTab({
                                                       return `Disabled: ${reasons.join(', ')}`;
                                                     }
                                                     return dayIsPast
-                                                      ? "This day has already passed, so you can't modify it anymore."
+                                                      ? t('itinerary_tooltip_day_passed')
                                                       : changeCount >= usageLimits.change.limit
-                                                      ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                                      ? t('itinerary_tooltip_change_limit')
+                                                        .replace('{count}', changeCount.toString())
+                                                        .replace('{limit}', usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit.toString())
+                                                        .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
                                                       : undefined;
                                                   })()
                                                 }
@@ -1481,7 +1496,7 @@ export function ItineraryTab({
                                                     : "border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"
                                                 }`}
                                               >
-                                                Change
+                                                {t('itinerary_change')}
                                               </Button>
                                               <Button
                                                 size="sm"
@@ -1492,14 +1507,14 @@ export function ItineraryTab({
                                                   handleUpdatePlace(day.id, place.id, { remove: true });
                                                 }}
                                                 disabled={dayIsPast}
-                                                title={dayIsPast ? "This day has already passed, so you can't modify it anymore." : undefined}
+                                                title={dayIsPast ? t('itinerary_tooltip_day_passed') : undefined}
                                                 className={`rounded-full ${
                                                   dayIsPast
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                                                     : "border-red-200 text-red-700 bg-red-50 hover:bg-red-100"
                                                 }`}
                                               >
-                                                Remove
+                                                {t('itinerary_remove')}
                                               </Button>
                                             </div>
                                           </div>
@@ -1538,11 +1553,14 @@ export function ItineraryTab({
                                             return `Disabled: ${reasons.join(', ')}`;
                                           }
                                           return dayIsPast
-                                            ? "This day has already passed, so you can't modify it anymore."
+                                            ? t('itinerary_tooltip_day_passed')
                                             : searchAddCount >= usageLimits.searchAdd.limit
-                                            ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                            ? t('itinerary_tooltip_add_limit')
+                                              .replace('{count}', searchAddCount.toString())
+                                              .replace('{limit}', usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit.toString())
+                                              .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
                                             : dayIsAtCapacity
-                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
+                                            ? t('itinerary_tooltip_day_full').replace('{max}', MAX_ACTIVITIES_PER_DAY.toString())
                                             : undefined;
                                         })()
                                       }
@@ -1553,8 +1571,8 @@ export function ItineraryTab({
                                       }`}
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
-                                      <span className="sm:hidden">Add</span>
+                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', slot.label.toLowerCase())}</span>
+                                      <span className="sm:hidden">{t('itinerary_add')}</span>
                                     </Button>
                                   </div>
                                 </div>
@@ -1566,9 +1584,9 @@ export function ItineraryTab({
                         {/* Affiliate Buttons - Moved below activities */}
                         <div className="mt-8 pt-6 border-t border-gray-100">
                           <div className="flex flex-wrap gap-3">
-                            <AffiliateButton kind="hotel" day={day} />
-                            <AffiliateButton kind="tour" day={day} />
-                            <AffiliateButton kind="sim" day={day} />
+                            <AffiliateButton kind="hotel" day={day} t={t} />
+                            <AffiliateButton kind="tour" day={day} t={t} />
+                            <AffiliateButton kind="sim" day={day} t={t} />
                           </div>
                         </div>
 
@@ -1606,7 +1624,7 @@ export function ItineraryTab({
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
-                  const isExpanded = expandedDays.has(day.id);
+                  const isExpanded = expandedDays === day.id;
 
                   // Debug logging (development only) - first 5 activities per day
                   if (process.env.NODE_ENV === "development") {
@@ -1648,13 +1666,12 @@ export function ItineraryTab({
                         isExpanded={isExpanded}
                         onToggle={() => {
                           setExpandedDays(prev => {
-                            const newSet = new Set(prev);
-                            if (newSet.has(day.id)) {
-                              newSet.delete(day.id);
-                            } else {
-                              newSet.add(day.id);
+                            // If clicking the currently open day, collapse it (set to null)
+                            if (prev === day.id) {
+                              return null;
                             }
-                            return newSet;
+                            // Otherwise, open this day (closes any other open day)
+                            return day.id;
                           });
                         }}
                         onSelectDay={onSelectDay}
@@ -1832,10 +1849,10 @@ export function ItineraryTab({
                                                 {place.visited ? (
                                                   <>
                                                     <Check className="h-3 w-3 inline mr-1" />
-                                                    Visited
+                                                    {t('itinerary_visited')}
                                                   </>
                                                 ) : (
-                                                  "Mark visited"
+                                                  t('itinerary_mark_visited_alt')
                                                 )}
                                               </Button>
                                               <Button
@@ -1857,9 +1874,12 @@ export function ItineraryTab({
                                                       return `Disabled: ${reasons.join(', ')}`;
                                                     }
                                                     return dayIsPast
-                                                      ? "This day has already passed, so you can't modify it anymore."
+                                                      ? t('itinerary_tooltip_day_passed')
                                                       : changeCount >= usageLimits.change.limit
-                                                      ? `You've reached the change limit (${changeCount}/${usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                                      ? t('itinerary_tooltip_change_limit')
+                                                        .replace('{count}', changeCount.toString())
+                                                        .replace('{limit}', usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit.toString())
+                                                        .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
                                                       : undefined;
                                                   })()
                                                 }
@@ -1869,7 +1889,7 @@ export function ItineraryTab({
                                                     : "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                                                 }`}
                                               >
-                                                Change
+                                                {t('itinerary_change')}
                                               </Button>
                                               <Button
                                                 size="sm"
@@ -1880,7 +1900,7 @@ export function ItineraryTab({
                                                   handleUpdatePlace(day.id, place.id, { remove: true });
                                                 }}
                                                 disabled={dayIsPast}
-                                                title={dayIsPast ? "This day has already passed, so you can't modify it anymore." : undefined}
+                                                title={dayIsPast ? t('itinerary_tooltip_day_passed') : undefined}
                                                 className={`rounded-lg ${
                                                   dayIsPast
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -1888,7 +1908,7 @@ export function ItineraryTab({
                                                 }`}
                                               >
                                                 <X className="h-3 w-3 inline mr-1" />
-                                                Remove
+                                                {t('itinerary_remove')}
                                               </Button>
                                             </div>
                                           </div>
@@ -1925,11 +1945,14 @@ export function ItineraryTab({
                                             return `Disabled: ${reasons.join(', ')}`;
                                           }
                                           return dayIsPast
-                                            ? "This day has already passed, so you can't modify it anymore."
+                                            ? t('itinerary_tooltip_day_passed')
                                             : searchAddCount >= usageLimits.searchAdd.limit
-                                            ? `You've reached the add limit (${searchAddCount}/${usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit}). ${isPro ? 'Try saving your favorites or adjusting your filters.' : 'Unlock Kruno Pro to see more places.'}`
+                                            ? t('itinerary_tooltip_add_limit')
+                                              .replace('{count}', searchAddCount.toString())
+                                              .replace('{limit}', usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit.toString())
+                                              .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
                                             : dayIsAtCapacity
-                                            ? `This day is already quite full. We recommend no more than ${MAX_ACTIVITIES_PER_DAY} activities per day.`
+                                            ? t('itinerary_tooltip_day_full').replace('{max}', MAX_ACTIVITIES_PER_DAY.toString())
                                             : undefined;
                                         })()
                                       }
@@ -1940,8 +1963,8 @@ export function ItineraryTab({
                                       }`}
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">Add {slot.label.toLowerCase()} activities</span>
-                                      <span className="sm:hidden">Add</span>
+                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', slot.label.toLowerCase())}</span>
+                                      <span className="sm:hidden">{t('itinerary_add')}</span>
                                     </Button>
                                   </div>
                                 </div>
@@ -1953,9 +1976,9 @@ export function ItineraryTab({
                         {/* Affiliate Buttons - Moved below activities */}
                         <div className="mt-8 pt-6 border-t border-gray-100">
                           <div className="flex flex-wrap gap-3">
-                            <AffiliateButton kind="hotel" day={day} />
-                            <AffiliateButton kind="tour" day={day} />
-                            <AffiliateButton kind="sim" day={day} />
+                            <AffiliateButton kind="hotel" day={day} t={t} />
+                            <AffiliateButton kind="tour" day={day} t={t} />
+                            <AffiliateButton kind="sim" day={day} t={t} />
                           </div>
                         </div>
 
@@ -1977,12 +2000,12 @@ export function ItineraryTab({
                           <div className="flex items-center gap-2">
                             <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
                             <CardTitle className="text-lg font-medium text-gray-500">
-                              Generating more days...
+                              {t('itinerary_generating_more_days')}
                             </CardTitle>
                           </div>
                         </CardHeader>
                         <CardContent className="p-6">
-                          <p className="text-sm text-gray-500">We&apos;re crafting the rest of your itinerary...</p>
+                          <p className="text-sm text-gray-500">{t('itinerary_generating_rest')}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -1998,7 +2021,7 @@ export function ItineraryTab({
           {/* Fallback: if status is loaded but no itinerary (shouldn't happen, but safety check) */}
           {status === 'loaded' && !smartItinerary && (
             <ErrorCard
-              message="No itinerary yet. Try generating it again."
+              message={t('itinerary_error_no_itinerary')}
               onRetry={loadOrGenerate}
             />
           )}
@@ -2006,8 +2029,8 @@ export function ItineraryTab({
           {/* Fallback: if status is idle (shouldn't happen after mount, but safety check) */}
           {status === 'idle' && (
             <LoadingCard
-              title="We're crafting your itinerary…"
-              subtitle="Preparing…"
+              title={t('itinerary_generating_title')}
+              subtitle={t('itinerary_preparing')}
             />
           )}
         </div>
@@ -2067,8 +2090,8 @@ export function ItineraryTab({
           <SheetHeader className="p-4 border-b flex-shrink-0">
             <SheetTitle className="text-xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
               {selectedDayForExplore?.slot 
-                ? `Add activities to ${selectedDayForExplore.slot}`
-                : 'Add activities to this day'}
+                ? t('itinerary_add_to_slot').replace('{slot}', selectedDayForExplore.slot)
+                : t('itinerary_add_to_day')}
             </SheetTitle>
           </SheetHeader>
           

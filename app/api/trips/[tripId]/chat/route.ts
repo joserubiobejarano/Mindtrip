@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfileId } from "@/lib/auth/getProfileId";
 import { getOpenAIClient } from "@/lib/openai";
 import { moderateMessage, getRedirectMessage } from "@/lib/chat-moderation";
+import type { Language } from "@/lib/i18n";
 
 export async function POST(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function POST(
   try {
     tripId = (await params).tripId;
     const body = await request.json();
-    const { message } = body;
+    const { message, language: rawLanguage } = body;
 
     if (!message || typeof message !== "string") {
       return NextResponse.json(
@@ -22,6 +23,9 @@ export async function POST(
         { status: 400 }
       );
     }
+
+    // Parse and normalize language from request body (default to 'en')
+    const language: Language = rawLanguage === 'es' ? 'es' : 'en';
 
     const supabase = await createClient();
 
@@ -174,6 +178,11 @@ export async function POST(
       ? recentMessages.reverse().map((m) => `${m.role}: ${m.content}`).join("\n")
       : "";
 
+    // Build language-specific instruction
+    const languageInstruction = language === 'es'
+      ? 'Responde siempre en español claro y natural. Todas tus respuestas deben estar en español.'
+      : 'Always respond in natural English. All your responses should be in English.';
+
     const prompt = `You are a helpful travel planning assistant for Kruno. The user is planning a trip to ${destination} from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}.
 
 ${conversationHistory ? `Recent conversation:\n${conversationHistory}\n` : ""}
@@ -192,6 +201,8 @@ Respond in a friendly, conversational tone.`;
         {
           role: "system",
           content: `You are a travel planning assistant for Kruno. You ONLY help with trip planning, itinerary adjustments, destination information, activity suggestions, and travel-related questions.
+
+${languageInstruction}
 
 If asked about anything unrelated to travel or trip planning, politely redirect: "I can't help you with that, but I can help with planning your trip activities, suggesting places to visit, or adjusting your itinerary."
 

@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { MapPin } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
+import { useLanguage } from "@/components/providers/language-provider";
 
 const getCategoryColor = (category: string) => {
   const colors: Record<string, { bg: string; text: string; border: string; hoverColor: string }> = {
@@ -133,6 +134,7 @@ interface NewExperiencesSectionProps {
 export function NewExperiencesSection({ onCityClick }: NewExperiencesSectionProps) {
   const router = useRouter();
   const { isSignedIn } = useAuth();
+  const { t } = useLanguage();
 
   const handleViewAll = () => {
     if (isSignedIn) {
@@ -150,10 +152,10 @@ export function NewExperiencesSection({ onCityClick }: NewExperiencesSectionProp
             className="text-4xl md:text-5xl mb-4"
             style={{ fontFamily: "'Patrick Hand', cursive" }}
           >
-            Unique Experiences
+            {t('home_experiences_title')}
           </h2>
           <p className="text-muted-foreground">
-            Handpicked activities that make your trip unforgettable
+            {t('home_experiences_subtitle')}
           </p>
         </div>
 
@@ -172,7 +174,7 @@ export function NewExperiencesSection({ onCityClick }: NewExperiencesSectionProp
             onClick={handleViewAll}
             className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-6 shadow-lg transform hover:scale-105 transition-transform font-mono text-xs tracking-wider uppercase"
           >
-            View All Destinations
+            {t('home_experiences_view_all')}
           </Button>
         </div>
       </div>

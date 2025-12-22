@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function NewNavbar() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
 
   const handleCTAClick = () => {
     if (isSignedIn) {
@@ -30,7 +32,6 @@ export function NewNavbar() {
             priority
             className="w-10 h-10"
           />
-          <span className="font-display text-xl font-semibold">Kruno</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -38,41 +39,65 @@ export function NewNavbar() {
             href="/"
             className="font-mono text-xs tracking-wider uppercase hover:text-primary transition-colors"
           >
-            Travel Planning
+            {t('nav_planning')}
           </Link>
           <Link
             href="/hotels"
             className="font-mono text-xs tracking-wider uppercase hover:text-primary transition-colors"
           >
-            Hotels
+            {t('nav_hotels')}
           </Link>
           <Link
             href="/flights"
             className="font-mono text-xs tracking-wider uppercase hover:text-primary transition-colors"
           >
-            Flights
+            {t('nav_flights')}
           </Link>
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Language Switcher */}
+          <div className="flex items-center bg-secondary rounded-full p-1 mr-2">
+            <button
+              onClick={() => setLanguage('en')}
+              className={`px-2 py-1 rounded-full text-[10px] font-mono transition-colors ${
+                language === 'en' 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLanguage('es')}
+              className={`px-2 py-1 rounded-full text-[10px] font-mono transition-colors ${
+                language === 'es' 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              ES
+            </button>
+          </div>
+
           <SignedOut>
             <Link
               href="/sign-in"
               className="font-mono text-xs tracking-wider uppercase hover:text-primary transition-colors hidden sm:block"
             >
-              Sign In
+              {t('nav_sign_in')}
             </Link>
             <Button
               onClick={handleCTAClick}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs tracking-wider uppercase rounded-full px-6"
             >
-              Get Started
+              {t('nav_get_started')}
             </Button>
           </SignedOut>
           <SignedIn>
             <Link href="/trips">
               <Button variant="ghost" className="font-mono text-xs tracking-wider uppercase hidden sm:block">
-                My Trips
+                {t('nav_trips')}
               </Button>
             </Link>
             <UserButton

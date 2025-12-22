@@ -2,6 +2,7 @@ import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { ItineraryDay } from "@/types/itinerary";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface DayAccordionHeaderProps {
   day: ItineraryDay;
@@ -16,6 +17,8 @@ export function DayAccordionHeader({
   onToggle,
   onSelectDay,
 }: DayAccordionHeaderProps) {
+  const { t } = useLanguage();
+  
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggle();
@@ -30,7 +33,7 @@ export function DayAccordionHeader({
       <div className="flex justify-between items-start">
         <div>
           <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-            Day {day.index} – {day.title}
+            {t('itinerary_day_prefix').replace('{index}', day.index.toString())} – {day.title}
           </CardTitle>
           <CardDescription className="text-base font-medium text-slate-600 mt-1">
             {day.theme} • {format(new Date(day.date), "EEEE, MMMM d")}

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLanguage } from '@/components/providers/language-provider';
 
 export interface TripAssistantMessage {
   id: string;
@@ -18,6 +19,7 @@ export function useTripAssistant(
 ) {
   const queryClient = useQueryClient();
   const { activeSegmentId, activeDayId } = options || {};
+  const { language } = useLanguage();
 
   // Fetch message history from trip_chat_messages
   const { data: messages = [], isLoading: isLoadingMessages } = useQuery({
@@ -70,6 +72,7 @@ export function useTripAssistant(
           message,
           activeSegmentId,
           activeDayId,
+          language,
         }),
       });
 

@@ -9,6 +9,7 @@ import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
+import type { Language } from '@/lib/i18n';
 
 export const maxDuration = 300;
 
@@ -354,12 +355,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     let mustIncludePlaceIds: string[] = [];
     let alreadyPlannedPlaceIds: string[] = [];
     let preserveStructure = false;
+    let language: Language = 'en';
 
     try {
       const body = await req.json().catch(() => ({}));
       mustIncludePlaceIds = body.must_include_place_ids || [];
       alreadyPlannedPlaceIds = body.already_planned_place_ids || [];
       preserveStructure = body.preserve_structure || false;
+      language = body.language === 'es' ? 'es' : 'en';
     } catch {
       // Body parsing failed, continue with defaults
     }
@@ -514,7 +517,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
          - Cluster mustIncludePlaces with other places in the same neighborhood/area when possible.`;
     }
 
+    const languageInstructions = language === 'es' 
+      ? 'Eres un planificador de viajes experto. Responde siempre en español claro y natural para todos los campos de texto (títulos, resúmenes, descripciones, etc.).'
+      : 'You are an expert travel planner. Always respond in natural English for all text fields (titles, summaries, descriptions, etc.).';
+
     const system = `
+      ${languageInstructions}
+
       You are an expert travel planner. Generate a multi-day travel itinerary as JSON matching the SmartItinerary schema.
 
       RULES:

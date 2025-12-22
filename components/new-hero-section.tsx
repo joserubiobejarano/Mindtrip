@@ -11,21 +11,22 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { usePaywall } from "@/hooks/usePaywall";
 import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
+import { useLanguage } from "@/components/providers/language-provider";
 
-const suggestionTags = [
-  "Plan a weekend in Madrid",
-  "Backpacking in Europe",
-  "Family trip",
-  "Romantic city break",
-  "Workation ideas",
-];
+const suggestionTagKeys = [
+  "home_hero_suggestion_weekend",
+  "home_hero_suggestion_backpacking",
+  "home_hero_suggestion_family",
+  "home_hero_suggestion_romantic",
+  "home_hero_suggestion_workation",
+] as const;
 
-const suggestionPrompts: Record<string, string> = {
-  "Plan a weekend in Madrid": "Plan a 3-day weekend in Madrid in March for 2 people, focusing on food, culture, and some nightlife.",
-  "Backpacking in Europe": "Create a 10-day backpacking route across 3–4 cities in Europe starting from Madrid, using mostly trains and buses.",
-  "Family trip": "Suggest a 7-day family-friendly trip with kids (8 and 10 years old), somewhere warm in December, flying from Madrid.",
-  "Romantic city break": "Find a romantic 4-day city break in Europe in spring for a couple who loves coffee shops, viewpoints, and photography.",
-  "Workation ideas": "Recommend 3 workation destinations with good Wi-Fi, cafes to work from, and mild weather in winter, flying from Madrid.",
+const suggestionPromptKeys: Record<string, string> = {
+  "home_hero_suggestion_weekend": "home_hero_suggestion_weekend_prompt",
+  "home_hero_suggestion_backpacking": "home_hero_suggestion_backpacking_prompt",
+  "home_hero_suggestion_family": "home_hero_suggestion_family_prompt",
+  "home_hero_suggestion_romantic": "home_hero_suggestion_romantic_prompt",
+  "home_hero_suggestion_workation": "home_hero_suggestion_workation_prompt",
 };
 
 interface NewHeroSectionProps {
@@ -38,6 +39,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
   const router = useRouter();
   const { createTrip, loading: creatingTrip } = useCreateTrip();
   const { openPaywall } = usePaywall();
+  const { t } = useLanguage();
 
   // Form state
   const [destinationInput, setDestinationInput] = useState("");
@@ -64,9 +66,32 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     }
   }, [isSignedIn, userId]);
 
-  const handleSuggestionClick = (tag: string) => {
-    const prompt = suggestionPrompts[tag] || tag;
-    setChatInput(prompt);
+  // Sync destination from prop (e.g. from Experiences section)
+  useEffect(() => {
+    if (destination) {
+      setDestinationInput(destination.placeName);
+      setSelectedDestination({
+        placeId: destination.id,
+        name: destination.placeName,
+        description: destination.placeName,
+        center: destination.center,
+        country: destination.region,
+      });
+      // Scroll to the search section when a destination is selected from experiences
+      const searchSection = document.getElementById('search-section');
+      if (searchSection) {
+        searchSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [destination]);
+
+  const handleSuggestionClick = (tagKey: string) => {
+    const promptKey = suggestionPromptKeys[tagKey];
+    if (promptKey) {
+      setChatInput(t(promptKey as any));
+    } else {
+      setChatInput(t(tagKey as any));
+    }
     chatInputRef.current?.focus();
   };
 
@@ -88,7 +113,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
       // If message is clearly non-travel, show error
       if (!hasTravelKeywords && message.split(" ").length < 5) {
-        setIntentError("I can help you plan trips and itineraries, but not other topics. Try describing the kind of trip you want.");
+        setIntentError(t('home_hero_error_non_travel'));
         setParsingIntent(false);
         return;
       }
@@ -105,7 +130,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       const result = await response.json();
 
       if (!result.success) {
-        setIntentError(result.error || "Could not understand your request. Please try again.");
+        setIntentError(result.error || t('home_hero_error_could_not_understand'));
         setParsingIntent(false);
         return;
       }
@@ -132,7 +157,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
         };
         setDestination(foundDestination);
       } else {
-        setIntentError("Could not extract a destination from your message. Please try again or select a destination manually.");
+        setIntentError(t('home_hero_error_no_destination'));
         setParsingIntent(false);
         return;
       }
@@ -150,7 +175,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       setParsingIntent(false);
     } catch (error) {
       console.error("Error parsing travel intent:", error);
-      setIntentError("Failed to process your request. Please try again.");
+      setIntentError(t('home_hero_error_failed_process'));
       setParsingIntent(false);
     }
   };
@@ -162,20 +187,20 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     // Require a selected destination from autocomplete
     if (!selectedDestination) {
       if (destinationInput.trim()) {
-        setSearchError("Please select a city from the list");
+        setSearchError(t('home_hero_error_select_city'));
       } else {
-        setSearchError("Please enter a destination");
+        setSearchError(t('home_hero_error_enter_destination'));
       }
       return;
     }
 
     if (!startDate || !endDate) {
-      setSearchError("Please select both start and end dates");
+      setSearchError(t('home_hero_error_select_dates'));
       return;
     }
 
     if (new Date(endDate) < new Date(startDate)) {
-      setSearchError("End date must be after start date");
+      setSearchError(t('home_hero_error_invalid_dates'));
       return;
     }
 
@@ -185,7 +210,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     }
 
     if (!userId) {
-      setSearchError("Please sign in to create a trip");
+      setSearchError(t('home_hero_error_sign_in'));
       return;
     }
 
@@ -222,11 +247,11 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       <div className="w-[70%] max-w-6xl mx-auto text-center relative mt-8">
         {/* Main Title */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal md:solid-underline inline-block text-foreground mb-20" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-          Find Your Adventure
+          {t('home_hero_title')}
         </h1>
 
         {/* Search Card */}
-        <div className="bg-card rounded-2xl shadow-xl p-6 md:p-8 pt-20 relative overflow-visible">
+        <div id="search-section" className="bg-card rounded-2xl shadow-xl p-6 md:p-8 pt-20 relative overflow-visible">
           {/* Solid Border on Top - Higher */}
           <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl"></div>
           <div className="mt-[60px]">
@@ -236,7 +261,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
               <div className="flex flex-col items-start md:col-span-5">
                 <div className="flex items-center justify-between w-full mb-2">
                   <label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold">
-                    Where to?
+                    {t('home_search_where')}
                   </label>
                   {destinationInput && (
                     <Button
@@ -253,7 +278,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                       className="h-6 px-2 text-xs font-mono"
                     >
                       <Plus className="h-3 w-3 mr-1" />
-                      Multi-city
+                      {t('home_multi_city')}
                       {!isPro && <Lock className="h-3 w-3 ml-1" />}
                     </Button>
                   )}
@@ -272,7 +297,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                       setDestinationInput(dest.description);
                     }}
                     inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
-                    placeholder="Search destinations..."
+                    placeholder={t('home_search_placeholder')}
                   />
                 </div>
               </div>
@@ -280,7 +305,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
               {/* Check-in */}
               <div className="flex flex-col items-start md:col-span-4">
                 <label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold mb-2">
-                  Check-in
+                  {t('home_search_checkin')}
                 </label>
                 <div className="relative w-full">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -290,7 +315,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                     onStartDateChange={setStartDate}
                     onEndDateChange={setEndDate}
                     className="w-full pl-10 bg-secondary border-0 rounded-xl h-12 font-body text-left justify-start hover:bg-secondary"
-                    placeholder="Add dates"
+                    placeholder={t('home_search_add_dates')}
                     hideIcon={true}
                   />
                 </div>
@@ -304,7 +329,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs tracking-wider uppercase rounded-xl h-12 gap-2 w-full px-6"
                 >
                   <Search className="w-4 h-4" />
-                  {creatingTrip ? "Searching..." : "Search"}
+                  {creatingTrip ? t('home_search_searching') : t('home_search_button')}
                 </Button>
               </div>
             </div>
@@ -316,14 +341,14 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
           {/* Suggestion Tags */}
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide flex-nowrap">
-            {suggestionTags.map((tag) => (
+            {suggestionTagKeys.map((tagKey) => (
               <button
-                key={tag}
+                key={tagKey}
                 type="button"
-                onClick={() => handleSuggestionClick(tag)}
+                onClick={() => handleSuggestionClick(tagKey)}
                 className="px-4 py-2 bg-secondary rounded-full font-mono text-xs hover:bg-muted hover:text-foreground transition-colors whitespace-nowrap flex-shrink-0"
               >
-                {tag}
+                {t(tagKey)}
               </button>
             ))}
           </div>
@@ -336,7 +361,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
               type="text"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Or tell us where to go..."
+              placeholder={t('home_ai_placeholder')}
               className="pl-12 pr-12 bg-transparent border border-dashed border-muted-foreground/30 rounded-xl h-14 font-body"
               disabled={parsingIntent}
             />
@@ -360,8 +385,8 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
         {/* Testimonial - positioned below search box */}
         <div className="mt-20 bg-card shadow-lg rounded-lg p-3 transform -rotate-6 animate-float hidden md:block mx-auto w-fit">
-          <p className="font-display text-sm italic">&quot;Best trip ever!&quot;</p>
-          <p className="text-xs text-muted-foreground mt-1">- Sarah</p>
+          <p className="font-display text-sm italic">&quot;{t('home_hero_testimonial')}&quot;</p>
+          <p className="text-xs text-muted-foreground mt-1">- {t('home_hero_testimonial_author')}</p>
         </div>
       </div>
     </section>

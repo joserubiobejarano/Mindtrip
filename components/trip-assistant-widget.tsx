@@ -7,6 +7,7 @@ import { Send, Loader2, MessageCircle, ChevronDown } from "lucide-react";
 import { getChatMessages, type ChatMessage } from "@/lib/supabase/trip-chat-messages";
 import { useToast } from "@/components/ui/toast";
 import { clsx } from "clsx";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface TripAssistantWidgetProps {
   tripId: string;
@@ -23,6 +24,7 @@ export function TripAssistantWidget({ tripId }: TripAssistantWidgetProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
+  const { language } = useLanguage();
 
   const loadChatMessages = useCallback(async (limit: number = 20, offset: number = 0) => {
     setLoadingChatMessages(true);
@@ -94,7 +96,7 @@ export function TripAssistantWidget({ tripId }: TripAssistantWidgetProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, language }),
       });
 
       if (!response.ok) {

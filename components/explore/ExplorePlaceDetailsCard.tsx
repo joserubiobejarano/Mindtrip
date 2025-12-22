@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star, MapPin, Copy, Check, ExternalLink } from "lucide-react";
 import type { ExplorePlace } from "@/lib/google/explore-places";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface ExplorePlaceDetailsCardProps {
   place: ExplorePlace | null;
@@ -12,6 +13,7 @@ interface ExplorePlaceDetailsCardProps {
 
 export function ExplorePlaceDetailsCard({ place, tripCity }: ExplorePlaceDetailsCardProps) {
   const [copied, setCopied] = useState(false);
+  const { t } = useLanguage();
 
   const handleCopyAddress = async () => {
     if (!place) return;
@@ -147,7 +149,7 @@ export function ExplorePlaceDetailsCard({ place, tripCity }: ExplorePlaceDetails
             )}
           >
             <ExternalLink className="w-4 h-4" />
-            Open in Maps
+            {t('explore_button_open_maps')}
           </button>
           <button
             onClick={handleCopyAddress}
@@ -161,12 +163,12 @@ export function ExplorePlaceDetailsCard({ place, tripCity }: ExplorePlaceDetails
             {copied ? (
               <>
                 <Check className="w-4 h-4" />
-                Copied!
+                {t('explore_button_copied')}
               </>
             ) : (
               <>
                 <Copy className="w-4 h-4" />
-                Copy Address
+                {t('explore_button_copy_address')}
               </>
             )}
           </button>

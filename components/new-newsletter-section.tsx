@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Send, Star } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function NewNewsletterSection() {
   const [email, setEmail] = useState("");
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,21 +37,21 @@ export function NewNewsletterSection() {
                 className="text-3xl md:text-4xl mb-0"
                 style={{ fontFamily: "'Patrick Hand', cursive" }}
               >
-                Plan smarter, travel better.
+                {t('home_newsletter_title')}
               </h2>
             </div>
             <p className="text-muted-foreground text-lg mt-4">
-              Get built itineraries, destination ideas and hotel deals straight to your inbox.
+              {t('home_newsletter_description')}
             </p>
             <p className="text-sm mt-2" style={{ color: '#1e40af' }}>
-              No spam, just travel inspo.
+              {t('home_newsletter_no_spam')}
             </p>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 pt-4">
               <Input
                 type="email"
-                placeholder="your.email@adventure.com"
+                placeholder={t('home_newsletter_placeholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-14 border-2 border-foreground rounded-full px-6 flex-1 font-mono text-sm bg-background focus:border-primary transition-colors"
@@ -60,7 +62,7 @@ export function NewNewsletterSection() {
                 className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-14 border-2 border-foreground font-mono text-xs tracking-wider uppercase shadow-md hover:shadow-lg transition-all"
               >
                 <Send className="mr-2 h-4 w-4" />
-                Subscribe
+                {t('home_newsletter_subscribe')}
               </Button>
             </form>
           </div>

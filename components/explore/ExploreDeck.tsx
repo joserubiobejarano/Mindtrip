@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/toast';
 import { usePaywall } from '@/hooks/usePaywall';
 import { useTripActivities } from '@/hooks/use-trip-activities';
 import { getItineraryPlaceKeys, normalizePlaceKey } from '@/lib/itinerary/dedupe';
+import { useLanguage } from '@/components/providers/language-provider';
 
 interface ExploreDeckProps {
   tripId: string;
@@ -92,6 +93,7 @@ export function ExploreDeck({
     openPaywall({ reason: "pro_feature", source: "explore_swipe_limit", tripId });
   });
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   // Derive places directly from hook result - ensure always an array (memoized to prevent unnecessary re-renders)
   const rawPlaces = useMemo(() => {
@@ -338,8 +340,8 @@ export function ExploreDeck({
             return Math.max(0, Math.min(newIndex, places.length - 1));
           });
           addToast({
-            title: 'Error',
-            description: 'Could not save swipe. Please try again.',
+            title: t('explore_toast_error'),
+            description: t('explore_toast_could_not_save_swipe'),
             variant: 'destructive',
           });
         },
@@ -369,8 +371,8 @@ export function ExploreDeck({
       // In replace mode, check if already in itinerary
       if (isInItinerary) {
         addToast({
-          title: 'Already in itinerary',
-          description: 'This place is already in your itinerary. Please select a different place.',
+          title: t('explore_toast_already_in_itinerary'),
+          description: t('explore_toast_already_in_itinerary_desc_replace'),
           variant: 'destructive',
         });
         return; // Don't select, don't advance
@@ -379,8 +381,8 @@ export function ExploreDeck({
       // Set selected replacement place (don't advance card)
       setSelectedReplacementPlace(place);
       addToast({
-        title: 'Selected',
-        description: `Selected: ${place.name}`,
+        title: t('explore_toast_selected'),
+        description: t('explore_toast_selected_desc').replace('{name}', place.name),
         variant: 'default',
       });
       
@@ -409,8 +411,8 @@ export function ExploreDeck({
             // Clear selection on error
             setSelectedReplacementPlace(null);
             addToast({
-              title: 'Error',
-              description: 'Could not save selection. Please try again.',
+              title: t('explore_toast_error'),
+              description: t('explore_toast_could_not_save_selection'),
               variant: 'destructive',
             });
           },
@@ -422,8 +424,8 @@ export function ExploreDeck({
     // Normal mode: check if already in itinerary
     if (isInItinerary) {
       addToast({
-        title: 'Already in itinerary',
-        description: 'This place is already in your itinerary.',
+        title: t('explore_toast_already_in_itinerary'),
+        description: t('explore_toast_already_in_itinerary_desc'),
         variant: 'default',
       });
       // Still advance card so user can continue exploring
@@ -466,8 +468,8 @@ export function ExploreDeck({
           // Handle specific error types
           if (error.error === 'day_activity_limit') {
             addToast({
-              title: 'Day is full',
-              description: error.message || 'We recommend planning no more than 12 activities per day so you have time to enjoy each place.',
+              title: t('explore_toast_day_full'),
+              description: error.message || t('explore_toast_day_full_desc'),
               variant: 'destructive',
             });
             // Rollback UI - clamp to valid range
@@ -480,8 +482,8 @@ export function ExploreDeck({
           
           if (error.error === 'past_day_locked') {
             addToast({
-              title: 'Cannot modify past day',
-              description: error.message || 'You cannot modify days that are already in the past.',
+              title: t('explore_toast_cannot_modify_past'),
+              description: error.message || t('explore_toast_cannot_modify_past_desc'),
               variant: 'destructive',
             });
             // Rollback UI - clamp to valid range
@@ -495,20 +497,20 @@ export function ExploreDeck({
           // Handle other error status codes
           if (response.status === 401 || response.status === 403) {
             addToast({
-              title: 'Access denied',
-              description: error.error || 'You do not have permission to perform this action.',
+              title: t('explore_toast_access_denied'),
+              description: error.error || t('explore_toast_access_denied_desc'),
               variant: 'destructive',
             });
           } else if (response.status === 404) {
             addToast({
-              title: 'Not found',
-              description: error.error || 'The requested resource was not found.',
+              title: t('explore_toast_not_found'),
+              description: error.error || t('explore_toast_not_found_desc'),
               variant: 'destructive',
             });
           } else {
             addToast({
-              title: 'Error',
-              description: error.error || 'Could not add place to day. Please try again.',
+              title: t('explore_toast_error'),
+              description: error.error || t('explore_toast_could_not_add_day'),
               variant: 'destructive',
             });
           }
@@ -527,8 +529,8 @@ export function ExploreDeck({
         // Show success toast
         if (result.addedCount > 0) {
           addToast({
-            title: 'Place added',
-            description: `Added to ${slot}`,
+            title: t('explore_toast_place_added'),
+            description: t('explore_toast_added_to_slot').replace('{slot}', slot),
             variant: 'success',
           });
         }
@@ -577,8 +579,8 @@ export function ExploreDeck({
         // Only show toast if we haven't already shown one
         if (!error.toastShown) {
           addToast({
-            title: 'Error',
-            description: error.message || 'Could not add place to day. Please try again.',
+            title: t('explore_toast_error'),
+            description: error.message || t('explore_toast_could_not_add_day'),
             variant: 'destructive',
           });
         }
@@ -617,8 +619,8 @@ export function ExploreDeck({
             // Rollback UI on error
             setCurrentIndex((prev) => Math.min(prev + 1, places.length - 1));
             addToast({
-              title: 'Error',
-              description: 'Could not save swipe. Please try again.',
+              title: t('explore_toast_error'),
+              description: t('explore_toast_could_not_save_swipe'),
               variant: 'destructive',
             });
           },
@@ -687,8 +689,8 @@ export function ExploreDeck({
         // Handle specific error types
         if (error.error === 'day_activity_limit') {
           addToast({
-            title: 'Day is full',
-            description: error.message || 'We recommend planning no more than 12 activities per day so you have time to enjoy each place.',
+            title: t('explore_toast_day_full'),
+            description: error.message || t('explore_toast_day_full_desc'),
             variant: 'destructive',
           });
           return;
@@ -696,8 +698,8 @@ export function ExploreDeck({
         
         if (error.error === 'past_day_locked') {
           addToast({
-            title: 'Cannot modify past day',
-            description: error.message || 'You cannot modify days that are already in the past.',
+            title: t('explore_toast_cannot_modify_past'),
+            description: error.message || t('explore_toast_cannot_modify_past_desc'),
             variant: 'destructive',
           });
           return;
@@ -706,20 +708,20 @@ export function ExploreDeck({
         // Handle other error status codes
         if (response.status === 401 || response.status === 403) {
           addToast({
-            title: 'Access denied',
-            description: error.error || 'You do not have permission to perform this action.',
+            title: t('explore_toast_access_denied'),
+            description: error.error || t('explore_toast_access_denied_desc'),
             variant: 'destructive',
           });
         } else if (response.status === 404) {
           addToast({
-            title: 'Not found',
-            description: error.error || 'The requested resource was not found.',
+            title: t('explore_toast_not_found'),
+            description: error.error || t('explore_toast_not_found_desc'),
             variant: 'destructive',
           });
         } else {
           addToast({
-            title: 'Error',
-            description: error.error || 'Could not add places to day. Please try again.',
+            title: t('explore_toast_error'),
+            description: error.error || t('explore_toast_could_not_add_places_day'),
             variant: 'destructive',
           });
         }
@@ -731,9 +733,10 @@ export function ExploreDeck({
       
       // Show success toast
       if (result.addedCount > 0) {
+        const placeText = result.addedCount === 1 ? t('explore_place_one') : t('explore_place_many');
         addToast({
-          title: 'Places added',
-          description: `${result.addedCount} place${result.addedCount !== 1 ? 's' : ''} added to ${slot}`,
+          title: t('explore_toast_places_added'),
+          description: t('explore_toast_places_added_slot').replace('{count}', result.addedCount.toString()).replace('{slot}', slot),
           variant: 'success',
         });
       }
@@ -745,8 +748,8 @@ export function ExploreDeck({
     } catch (error: any) {
       console.error('Error adding places to day:', error);
       addToast({
-        title: 'Error',
-        description: error.message || 'Failed to add places to day. Please try again.',
+        title: t('explore_toast_error'),
+        description: error.message || t('explore_toast_could_not_add_places_day'),
         variant: 'destructive',
       });
     }
@@ -801,7 +804,7 @@ export function ExploreDeck({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
-        <div className="text-sm text-muted-foreground">Loading places…</div>
+        <div className="text-sm text-muted-foreground">{t('explore_loading_places')}</div>
       </div>
     );
   }
@@ -809,7 +812,7 @@ export function ExploreDeck({
   if (placesError) {
     return (
       <div className="flex items-center justify-center w-full h-full">
-        <div className="text-sm text-destructive">Error loading places. Please try again.</div>
+        <div className="text-sm text-destructive">{t('explore_error_loading')}</div>
       </div>
     );
   }
@@ -818,8 +821,8 @@ export function ExploreDeck({
     // Show different message if we filtered out all places vs no results from API
     const hasRawPlaces = rawPlaces.length > 0;
     const message = hasRawPlaces && !filters.includeItineraryPlaces
-      ? 'No more new places. Try widening filters or enable \'Show places already in itinerary\'.'
-      : 'No places found. Try changing filters.';
+      ? t('explore_empty_no_more_new')
+      : t('explore_empty_no_places');
 
     return (
       <div className="flex items-center justify-center w-full h-full">
@@ -833,7 +836,7 @@ export function ExploreDeck({
     return (
       <div className="flex items-center justify-center w-full h-full">
         <div className="text-sm text-muted-foreground">
-          No more places. Try changing filters.
+          {t('explore_empty_no_more')}
         </div>
       </div>
     );
@@ -902,7 +905,7 @@ export function ExploreDeck({
         {replaceTarget && replacingActivityName && (
           <div className="mt-4 px-4 w-full max-w-[480px] text-center">
             <p className="text-sm text-muted-foreground">
-              Replacing: <span className="font-medium">{replacingActivityName}</span>
+              {t('explore_replace_mode_replacing').replace('{name}', replacingActivityName)}
             </p>
           </div>
         )}
@@ -911,7 +914,7 @@ export function ExploreDeck({
         {replaceTarget && selectedReplacementPlace && (
           <div className="mt-2 px-4 w-full max-w-[480px] text-center">
             <p className="text-sm text-muted-foreground">
-              Selected: <span className="font-medium text-coral">{selectedReplacementPlace.name}</span>
+              {t('explore_replace_mode_selected').replace('{name}', selectedReplacementPlace.name)}
             </p>
           </div>
         )}
@@ -928,7 +931,7 @@ export function ExploreDeck({
                   size="lg"
                 >
                   <Heart className="h-4 w-4 mr-2" />
-                  Replace with {selectedReplacementPlace.name}
+                  {t('explore_replace_mode_button').replace('{name}', selectedReplacementPlace.name)}
                 </Button>
               ) : (
                 <Button
@@ -937,7 +940,7 @@ export function ExploreDeck({
                   size="lg"
                 >
                   <Heart className="h-4 w-4 mr-2" />
-                  Select a place to replace
+                  {t('explore_replace_mode_select')}
                 </Button>
               )
             ) : (
@@ -949,7 +952,7 @@ export function ExploreDeck({
                   size="lg"
                 >
                   <Heart className="h-4 w-4 mr-2" />
-                  Add {safeSession.likedPlaces?.length ?? 0} liked place{(safeSession.likedPlaces?.length ?? 0) !== 1 ? 's' : ''} to itinerary
+                  {t('explore_add_liked_places').replace('{count}', (safeSession.likedPlaces?.length ?? 0).toString())}
                 </Button>
               ) : null
             )}

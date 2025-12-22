@@ -20,6 +20,7 @@ import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
 import { useToast } from "@/components/ui/toast";
 import { getTripUrl } from "@/lib/routes";
 import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -70,6 +71,7 @@ export function NewTripDialog({
   const router = useRouter();
   const { user } = useUser();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   // Fetch subscription status on mount
   useEffect(() => {
@@ -361,9 +363,9 @@ export function NewTripDialog({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Loading...</DialogTitle>
+            <DialogTitle>{t('trip_create_loading')}</DialogTitle>
           </DialogHeader>
-          <div className="p-6 text-center">Loading...</div>
+          <div className="p-6 text-center">{t('trip_create_loading')}</div>
         </DialogContent>
       </Dialog>
     );
@@ -376,7 +378,7 @@ export function NewTripDialog({
         {/* Blue top border matching search box */}
         <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl z-10 pointer-events-none"></div>
         {/* Close button positioned above the colored header */}
-        <Button
+          <Button
           variant="ghost"
           size="icon"
           className="absolute right-4 top-4 z-50 h-8 w-8 text-white hover:bg-white/20 hover:text-white rounded-full"
@@ -384,14 +386,14 @@ export function NewTripDialog({
           type="button"
         >
           <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
+          <span className="sr-only">{t('trip_create_close')}</span>
         </Button>
         <DialogHeader className="pt-[60px] px-6 py-5 flex-shrink-0 relative z-20 bg-background rounded-t-2xl">
           <DialogTitle className="text-2xl font-bold text-foreground">
-            Create New Trip
+            {t('trip_create_title')}
           </DialogTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            Plan a single or multi-city trip. Add multiple cities with Pro.
+            {t('trip_create_description')}
           </p>
         </DialogHeader>
 
@@ -400,7 +402,7 @@ export function NewTripDialog({
             {/* Always show multi-city UI structure */}
             <div className="flex flex-col items-start">
               <Label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold mb-2">
-                {segments.length > 0 ? "Primary City" : "Where to?"}
+                {segments.length > 0 ? t('trip_create_primary_city_label') : t('trip_create_destination_label')}
               </Label>
               <div className="relative w-full">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
@@ -427,7 +429,7 @@ export function NewTripDialog({
                   }}
                   className="w-full"
                   inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
-                  placeholder="Search destinations..."
+                  placeholder={t('trip_create_destination_placeholder')}
                 />
               </div>
               {fieldErrors.destination && (
@@ -443,7 +445,7 @@ export function NewTripDialog({
                 onClick={handleAddCity}
                 className="w-full"
               >
-                + Add City
+                {t('trip_create_add_city')}
                 {!isPro && (
                   <Lock className="ml-2 h-3 w-3" />
                 )}
@@ -459,7 +461,7 @@ export function NewTripDialog({
             {segments.length > 0 && (
               <div className="space-y-3 border-t pt-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-base font-medium">Cities</Label>
+                  <Label className="text-base font-medium">{t('trip_create_cities_label')}</Label>
                   <Button
                     type="button"
                     variant="outline"
@@ -468,7 +470,7 @@ export function NewTripDialog({
                     disabled={!destinationInput.trim()}
                     className="text-xs"
                   >
-                    + Add City
+                    {t('trip_create_add_city')}
                     {!isPro && (
                       <Lock className="ml-1 h-3 w-3" />
                     )}
@@ -488,7 +490,7 @@ export function NewTripDialog({
                       <p className="font-medium text-sm">{segment.cityName}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Label htmlFor={`nights-${segment.id}`} className="text-xs text-gray-600">
-                          Nights:
+                          {t('trip_create_nights_label')}
                         </Label>
                         <Input
                           id={`nights-${segment.id}`}
@@ -521,7 +523,7 @@ export function NewTripDialog({
             <div className="border-t pt-4 space-y-4">
               <div className="flex flex-col items-start">
                 <Label className="font-mono text-[10px] tracking-wider uppercase text-foreground font-semibold mb-2">
-                  Check-in
+                  {t('trip_create_checkin_label')}
                 </Label>
                 <div className="relative w-full">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -537,7 +539,7 @@ export function NewTripDialog({
                       setFieldErrors((prev) => ({ ...prev, endDate: undefined }));
                     }}
                     className="w-full pl-10 bg-secondary border-0 rounded-xl h-12 font-body text-left justify-start hover:bg-secondary"
-                    placeholder="Add dates"
+                    placeholder={t('trip_create_dates_placeholder')}
                     hideIcon={true}
                   />
                 </div>
@@ -564,10 +566,10 @@ export function NewTripDialog({
               disabled={loading}
               className="rounded-xl"
             >
-              Cancel
+              {t('trip_create_cancel')}
             </Button>
             <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
-              Continue
+              {t('trip_create_continue')}
             </Button>
           </DialogFooter>
         </form>

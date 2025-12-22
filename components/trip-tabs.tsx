@@ -7,6 +7,7 @@ import { ExpensesTab } from "@/components/expenses-tab";
 import { ExploreTab } from "@/components/explore-tab";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useTrip } from "@/hooks/use-trip";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface TripTabsProps {
   tripId: string;
@@ -30,6 +31,7 @@ export function TripTabs({
 }: TripTabsProps & { initialTab?: string }) {
   const { data: trip } = useTrip(tripId);
   const [activeTab, setActiveTab] = useState(initialTab || "itinerary");
+  const { t } = useLanguage();
 
   // Update activeTab when initialTab changes (e.g., from URL query param)
   useEffect(() => {
@@ -44,9 +46,9 @@ export function TripTabs({
   };
 
   const tabs = [
-    { slug: "explore", label: "Explore" },
-    { slug: "itinerary", label: "Itinerary" },
-    { slug: "expenses", label: "Expenses" },
+    { slug: "explore", label: t('trip_tabs_explore') },
+    { slug: "itinerary", label: t('trip_tabs_itinerary') },
+    { slug: "expenses", label: t('trip_tabs_expenses') },
   ];
 
   return (

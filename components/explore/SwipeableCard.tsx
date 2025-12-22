@@ -4,6 +4,7 @@ import { motion, useMotionValue, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
 import type { ExplorePlace } from '@/lib/google/explore-places';
+import { useLanguage } from '@/components/providers/language-provider';
 
 interface SwipeableCardProps {
   place: ExplorePlace;
@@ -18,6 +19,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-8, 0, 8]);
+  const { t } = useLanguage();
   
   // Overlay opacities for LIKE/NOPE
   const likeOpacity = useTransform(x, [80, 140], [0, 1]);
@@ -74,7 +76,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           className="absolute top-6 left-6 px-4 py-2 rounded-xl border-2 border-emerald-500 text-emerald-500 text-lg font-bold bg-white/80 z-10 pointer-events-none"
           style={{ opacity: likeOpacity, rotate: -12 }}
         >
-          LIKE
+          {t('explore_card_like')}
         </motion.div>
 
         {/* NOPE overlay */}
@@ -82,7 +84,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           className="absolute top-6 right-6 px-4 py-2 rounded-xl border-2 border-rose-500 text-rose-500 text-lg font-bold bg-white/80 z-10 pointer-events-none"
           style={{ opacity: nopeOpacity, rotate: 12 }}
         >
-          NOPE
+          {t('explore_card_nope')}
         </motion.div>
 
         {/* Image section - Constrained height to prevent card from growing too tall */}
@@ -109,7 +111,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
           <h2 
             className="text-2xl lg:text-4xl font-semibold text-foreground mb-2"
           >
-            {typeof place.name === 'string' ? place.name : 'Unnamed place'}
+            {typeof place.name === 'string' ? place.name : t('explore_card_unnamed')}
           </h2>
           
           {place.category && typeof place.category === 'string' && (

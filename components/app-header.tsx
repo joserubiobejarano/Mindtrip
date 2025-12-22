@@ -5,8 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function AppHeader() {
+  const { language, setLanguage, t } = useLanguage();
+
   return (
     <header className="border-b border-border bg-background">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -19,26 +22,49 @@ export function AppHeader() {
               height={32}
               priority
             />
-            <span className="text-xl font-bold">Kruno</span>
           </Link>
           <SignedIn>
             <Link href="/trips" className="text-sm text-muted-foreground hover:text-foreground">
-              My trips
+              {t('nav_trips')}
             </Link>
           </SignedIn>
         </div>
         <div className="flex items-center gap-4">
+          {/* Language Switcher */}
+          <div className="flex items-center bg-secondary rounded-full p-1 mr-2">
+            <button
+              onClick={() => setLanguage('en')}
+              className={`px-2 py-1 rounded-full text-[10px] font-mono transition-colors ${
+                language === 'en' 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLanguage('es')}
+              className={`px-2 py-1 rounded-full text-[10px] font-mono transition-colors ${
+                language === 'es' 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              ES
+            </button>
+          </div>
+
           <SignedOut>
             <SignInButton forceRedirectUrl="/">
-              <Button variant="ghost">Sign In</Button>
+              <Button variant="ghost">{t('nav_sign_in')}</Button>
             </SignInButton>
             <SignUpButton forceRedirectUrl="/">
-              <Button>Sign Up</Button>
+              <Button>{t('nav_get_started')}</Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
             <Link href="/settings">
-              <Button variant="ghost" size="icon" title="Settings">
+              <Button variant="ghost" size="icon" title={t('nav_settings')}>
                 <Settings className="h-5 w-5" />
               </Button>
             </Link>

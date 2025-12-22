@@ -1,3 +1,15 @@
+/**
+ * Trip Assistant API Route
+ * 
+ * Language Support Audit Summary:
+ * - Trip Assistant client: ✅ (use-trip-assistant.ts, trip-assistant-panel.tsx, trip-assistant-widget.tsx)
+ * - Trip Assistant API: ✅ (this file and /api/trips/[tripId]/chat/route.ts)
+ * - Advisor client: ❌ (Advisor feature not implemented)
+ * - Advisor API: ❌ (Advisor feature not implemented)
+ * 
+ * Language is parsed from request body, normalized to 'en' | 'es', and injected into system prompt.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireTripAccess, tripAccessErrorResponse } from "@/lib/auth/require-trip-access";
@@ -8,6 +20,7 @@ import { getTripSegments } from "@/lib/supabase/trip-segments";
 import { validateParams, validateBody } from "@/lib/validation/validate-request";
 import { TripIdParamsSchema, AssistantMessageSchema } from "@/lib/validation/api-schemas";
 import { checkRateLimit } from "@/lib/rate-limit/rate-limit-middleware";
+import type { Language } from "@/lib/i18n";
 
 export async function POST(
   request: NextRequest,
@@ -17,7 +30,10 @@ export async function POST(
     // Validate params and body
     const { tripId } = await validateParams(params, TripIdParamsSchema);
     const body = await validateBody(request, AssistantMessageSchema);
-    const { message, activeSegmentId, activeDayId } = body;
+    const { message, activeSegmentId, activeDayId, language: rawLanguage } = body;
+    
+    // Parse and normalize language from request body (default to 'en')
+    const language: Language = rawLanguage === 'es' ? 'es' : 'en';
 
     const supabase = await createClient();
 
@@ -177,7 +193,13 @@ export async function POST(
     const recentMessages = (recentMessagesData || []) as MessageQueryResult[];
 
     // 4. Build OpenAI request
+    const languageInstruction = language === 'es'
+      ? 'Responde siempre en español claro y natural. Todas tus respuestas deben estar en español.'
+      : 'Always respond in natural English. All your responses should be in English.';
+    
     const systemPrompt = `You are the Kruno Travel Assistant for a single trip.
+
+${languageInstruction}
 
 You can ONLY talk about travel, this specific trip, its cities, activities, food, logistics, and budgeting.
 

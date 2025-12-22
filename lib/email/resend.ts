@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { getEmailCopy, type EmailLanguage } from './email-copy';
 
 let resendClient: Resend | null = null;
 
@@ -19,32 +20,87 @@ function getResendClient(): Resend {
 export async function sendWelcomeEmail(params: {
   to: string;
   firstName?: string | null;
+  language?: EmailLanguage;
 }) {
   const resend = getResendClient();
   const from = process.env.EMAIL_FROM ?? 'no-reply@kruno.app';
-  const appUrl = process.env.APP_URL ?? 'https://kruno.app';
+  const language = params.language || 'en';
 
-  const subject = 'Welcome to Kruno ✈️';
-  const greeting = `Hey ${params.firstName || 'there'},`;
-  const body = `${greeting}
-
-Welcome to Kruno! We're excited to help you plan your next adventure with less stress, fewer decisions, and more confidence.
-
-With Kruno, you can focus on what matters most: enjoying your trip. We handle the planning, so you can experience the journey.
-
-Get started by creating your first itinerary at:
-${appUrl}
-
-Happy travels!
-
-Jose
-Founder, Kruno`;
+  const emailCopy = getEmailCopy('welcome', language, {
+    firstName: params.firstName,
+    appName: 'Kruno',
+  });
 
   return resend.emails.send({
     from,
     to: params.to,
-    subject,
-    text: body,
+    subject: emailCopy.subject,
+    text: emailCopy.text,
+    replyTo: "hello@kruno.app",
+    headers: {
+      "List-Unsubscribe": "<mailto:unsubscribe@kruno.app>",
+    },
+  });
+}
+
+export async function sendTripInvitationEmail(params: {
+  to: string;
+  tripName: string;
+  inviterName: string;
+  tripId: string;
+  language?: EmailLanguage;
+}) {
+  const resend = getResendClient();
+  const from = process.env.EMAIL_FROM ?? 'no-reply@kruno.app';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'https://kruno.app';
+  const inviteUrl = `${appUrl}/trips?invitedTripId=${params.tripId}`;
+  const language = params.language || 'en';
+  
+  // Build deep link URL: kruno://link?invitedTripId=<tripId>&lang=<language>
+  const deepLinkUrl = `kruno://link?invitedTripId=${params.tripId}${language !== 'en' ? `&lang=${language}` : ''}`;
+
+  const emailCopy = getEmailCopy('trip_invite', language, {
+    tripName: params.tripName,
+    inviterName: params.inviterName,
+    ctaUrl: inviteUrl,
+    deepLinkUrl,
+  });
+
+  return resend.emails.send({
+    from,
+    to: params.to,
+    subject: emailCopy.subject,
+    html: emailCopy.html,
+    text: emailCopy.text,
+    replyTo: "hello@kruno.app",
+    headers: {
+      "List-Unsubscribe": "<mailto:unsubscribe@kruno.app>",
+    },
+  });
+}
+
+export async function sendExpensesSummaryEmail(params: {
+  to: string;
+  tripName: string;
+  totalText: string;
+  summaryText: string;
+  language?: EmailLanguage;
+}) {
+  const resend = getResendClient();
+  const from = process.env.EMAIL_FROM ?? 'no-reply@kruno.app';
+  const language = params.language || 'en';
+
+  const emailCopy = getEmailCopy('expenses_summary', language, {
+    tripName: params.tripName,
+    totalText: params.totalText,
+    summaryText: params.summaryText,
+  });
+
+  return resend.emails.send({
+    from,
+    to: params.to,
+    subject: emailCopy.subject,
+    text: emailCopy.text,
     replyTo: "hello@kruno.app",
     headers: {
       "List-Unsubscribe": "<mailto:unsubscribe@kruno.app>",

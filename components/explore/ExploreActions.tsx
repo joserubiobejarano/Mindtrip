@@ -2,6 +2,7 @@
 
 import { Undo2, X, Heart, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/components/providers/language-provider';
 
 interface ExploreActionsProps {
   onUndo: () => void;
@@ -20,6 +21,7 @@ export function ExploreActions({
   canUndo,
   disabled = false,
 }: ExploreActionsProps) {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center gap-4 mt-8">
       <button
@@ -29,7 +31,7 @@ export function ExploreActions({
         )}
         onClick={onUndo}
         disabled={!canUndo || disabled}
-        aria-label="Undo"
+        aria-label={t('explore_button_undo')}
       >
         <Undo2 className="w-5 h-5" />
       </button>
@@ -38,7 +40,7 @@ export function ExploreActions({
         className="w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-red-500 shadow-lg flex items-center justify-center text-white hover:scale-105 transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onDislike}
         disabled={disabled}
-        aria-label="Dislike"
+        aria-label={t('explore_button_skip')}
       >
         <X className="w-7 h-7" />
       </button>
@@ -47,7 +49,7 @@ export function ExploreActions({
         className="w-16 h-16 rounded-full bg-gradient-to-br from-coral to-coral/80 shadow-lg flex items-center justify-center text-white hover:scale-105 transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onLike}
         disabled={disabled}
-        aria-label="Like"
+        aria-label={t('explore_button_like')}
       >
         <Heart className="w-7 h-7" />
       </button>
@@ -56,7 +58,7 @@ export function ExploreActions({
         className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center text-muted-foreground hover:text-coral transition-colors duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={onDetails}
         disabled={disabled}
-        aria-label="Details"
+        aria-label={t('explore_button_details')}
       >
         <Info className="w-5 h-5" />
       </button>
