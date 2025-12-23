@@ -464,13 +464,14 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - Link/unlink place
 - Edit notes
 
-**Replace Activity** ✅ **NEW**:
+**Replace Activity** ✅ **NEW** (January 2025):
 - Replace activity with contextually relevant alternative
-- Smart suggestions based on area/category
-- Usage limit enforcement (10 changes for free, unlimited for Pro)
+- Smart suggestions based on area/category using Explore Places API
+- Usage limit enforcement (5 changes for free, unlimited for Pro)
 - Food place limit (max 1 per time slot)
-- Past-day lock protection
+- Past-day lock protection (prevents modifying past days)
 - One-click replacement from itinerary view
+- Endpoint: `/api/trips/[tripId]/activities/[activityId]/replace`
 
 **Delete Activity:**
 - Remove from itinerary
@@ -877,5 +878,51 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 
 ---
 
+## Security Features ✅ **NEW** (January 2025)
+
+**Overview:**
+Comprehensive security architecture with centralized auth helpers, input validation, rate limiting, and XSS protection.
+
+**Features:**
+- **Centralized Auth Helpers** (`lib/auth/`)
+  - `requireAuth()` - Ensures user is authenticated
+  - `requirePro()` - Ensures account-level Pro subscription
+  - `requireTripAccess()` - Ensures user has access to trip (owner or member)
+  - `requireTripOwner()` - Ensures user owns the trip
+  - `requireTripPro()` - Ensures user has Pro (account or trip-level)
+- **Input Validation** (`lib/validation/`)
+  - Zod schemas for all API route inputs
+  - Validation helpers: `validateBody()`, `validateQuery()`, `validateParams()`
+  - Strict mode: Unknown fields are rejected
+  - Type-safe validated data
+- **Rate Limiting** (`lib/rate-limit/`)
+  - In-memory rate limiter (can upgrade to Redis)
+  - Protected endpoints: AI (10/min, 100/hour), Places (30/min, 500/hour), Assistant/Chat (20/min, 200/hour)
+  - Rate limit headers in responses
+- **XSS Protection**
+  - DOMPurify sanitization for user-generated content
+  - Sanitization functions for different content types
+- **See [SECURITY.md](./SECURITY.md) for complete documentation**
+
 **Last Updated:** January 2025
+
+## Recent Changes Summary (January 2025)
+
+### Added
+- **Billing & Subscriptions System**: Complete Stripe integration
+- **Image Caching System**: Production-proof image storage in Supabase Storage
+- **Trip Regeneration Stats**: Daily regeneration limit tracking
+- **Security Architecture**: Centralized auth helpers, input validation, rate limiting, XSS protection
+- **Activity Replace Feature**: Smart activity replacement with usage limits
+- **City Autocomplete**: Enhanced destination search
+- **Usage Limits System**: Per-user-per-trip tracking
+
+### Changed
+- **Pro vs Free Limits**: Updated swipe limits (10 per trip for free, 100 for Pro)
+- **Change Limits**: Added (5 for free, unlimited for Pro)
+- **Search Add Limits**: Added (5 for free, unlimited for Pro)
+- **Security**: All API routes now use centralized auth helpers and Zod validation
+
+### Removed
+- None (no features removed in this update)
 

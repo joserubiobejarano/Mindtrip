@@ -1219,9 +1219,35 @@ For questions or issues:
 
 **Recent Additions (January 2025):**
 - **Billing & Subscriptions**: Complete Stripe integration for Pro subscriptions and trip-level unlocks
+  - Subscription checkout API (`/api/billing/checkout/subscription`)
+  - Trip Pro unlock checkout API (`/api/billing/checkout/trip`)
+  - Stripe webhook handler (`/api/billing/webhook`) for automatic status updates
+  - Billing portal API (`/api/billing/portal`) for customer self-service
+  - Database migrations for billing fields
 - **Image Caching System**: Production-proof image caching in Supabase Storage with multi-provider fallback
+  - API endpoint: `/api/images/cache-place-image`
+  - Health check: `/api/debug/image-cache-health`
+  - Supports Google Places, Unsplash, and Mapbox as image sources
+  - Requires `SUPABASE_SERVICE_ROLE_KEY` and manual bucket creation
 - **Trip Regeneration Stats**: Daily regeneration limit tracking for Smart Itinerary regeneration
-- **Enhanced Security**: Rate limiting, input validation, XSS protection, and comprehensive security documentation
+  - Database table: `trip_regeneration_stats`
+  - Limits: 2 regenerations/day (free), 5/day (Pro)
+- **Security Architecture**: Comprehensive security improvements
+  - Centralized auth helpers (`lib/auth/`) for consistent authorization
+  - Input validation with Zod schemas (`lib/validation/`)
+  - Rate limiting system (`lib/rate-limit/`) for API protection
+  - XSS protection with DOMPurify sanitization
+  - See [SECURITY.md](./SECURITY.md) for complete documentation
+- **Activity Replace Feature**: Smart activity replacement with usage limits
+  - Endpoint: `/api/trips/[tripId]/activities/[activityId]/replace`
+  - Usage limit enforcement (5 for free, unlimited for Pro)
+  - Context-aware suggestions using Explore Places API
+- **City Autocomplete**: Enhanced destination search with Google Places Autocomplete
+  - API: `/api/places/city-autocomplete` (GET and POST)
+  - Component: `DestinationAutocomplete`
+- **Usage Limits System**: Per-user-per-trip tracking
+  - Tracks `swipe_count`, `change_count`, `search_add_count`
+  - Limits: 10 swipes/trip (free), 100 (Pro); 5 changes/trip (free), unlimited (Pro); 5 search adds/trip (free), unlimited (Pro)
 
 **Next Steps:**
 1. **🚀 Phase 22: Enhanced User Experience** - Weather integration, trip templates, photo uploads
@@ -1229,7 +1255,12 @@ For questions or issues:
 3. Polish and bug fixes
 4. User testing and feedback
 5. Mobile app development
-6. Monetization implementation (billing system already implemented)
+6. ~~Monetization implementation~~ ✅ **COMPLETE** - Billing system fully implemented
+
+**Important Setup Notes:**
+- **Billing**: Requires Stripe account and webhook configuration. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` environment variables.
+- **Image Caching**: Requires `SUPABASE_SERVICE_ROLE_KEY` and manual creation of `place-images` bucket in Supabase Storage (set to PUBLIC).
+- **Security**: All API routes now use centralized auth helpers. See [SECURITY.md](./SECURITY.md) for implementation details.
 
 The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phases 17-21 are complete - Day-level Explore integration, multi-city trips, trip personalization, enhanced assistant, Travel Advisor, billing system, and image caching are fully functional.**
 

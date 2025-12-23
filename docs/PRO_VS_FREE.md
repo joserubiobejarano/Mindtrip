@@ -64,13 +64,16 @@ The Explore feature allows users to discover places and add them to their itiner
 
 **Constants:**
 ```typescript
-FREE_SWIPE_LIMIT_PER_TRIP = 10
-PRO_SWIPE_LIMIT_PER_TRIP = 100
-FREE_CHANGE_LIMIT = 5
-PRO_CHANGE_LIMIT = Infinity
-FREE_SEARCH_ADD_LIMIT = 5
-PRO_SEARCH_ADD_LIMIT = Infinity
+// Defined in lib/supabase/usage-limits.ts
+FREE_SWIPE_LIMIT_PER_TRIP = 10      // 10 swipes per trip (free tier)
+PRO_SWIPE_LIMIT_PER_TRIP = 100      // 100 swipes per trip (Pro tier)
+FREE_CHANGE_LIMIT = 5               // 5 changes per trip (free tier)
+PRO_CHANGE_LIMIT = Infinity         // Unlimited changes (Pro tier)
+FREE_SEARCH_ADD_LIMIT = 5           // 5 search adds per trip (free tier)
+PRO_SEARCH_ADD_LIMIT = Infinity     // Unlimited search adds (Pro tier)
 ```
+
+**Note:** Limits are per-user-per-trip, tracked in `trip_members` table. Limits reset when a new trip is created, but persist for the lifetime of the trip.
 
 ---
 
@@ -321,13 +324,31 @@ When implementing or modifying Pro features, verify:
 
 ---
 
-**Last Updated**: Based on codebase analysis as of current date
+**Last Updated**: January 2025
 **Maintained By**: Development Team
 **Related Docs**: 
 - `docs/monetization.md` - Monetization strategy
 - `docs/ARCHITECTURE.md` - System architecture
 - `lib/supabase/user-subscription.ts` - Subscription utilities
 - `lib/supabase/pro-status.ts` - Pro status checking
+- `lib/supabase/usage-limits.ts` - Usage limit constants and helpers
+
+## Recent Changes (January 2025)
+
+### Added
+- **Billing & Subscriptions**: Complete Stripe integration for Pro subscriptions and trip-level unlocks
+- **Trip-Level Pro**: Individual trips can be unlocked with Pro features (one-time payment)
+- **Usage Limits System**: Per-user-per-trip tracking for swipes, changes, and search adds
+- **Activity Replace Feature**: Smart activity replacement with usage limit enforcement
+
+### Changed
+- **Swipe Limits**: Changed from daily limits (50/day) to per-trip limits (10 per trip for free, 100 for Pro)
+- **Change Limits**: Added new limit type (5 for free, unlimited for Pro)
+- **Search Add Limits**: Added new limit type (5 for free, unlimited for Pro)
+- **Pro Status Logic**: Now supports both account-level Pro (`profiles.is_pro`) and trip-level Pro (`trips.has_trip_pro`)
+
+### Removed
+- None (no features removed in this update)
 
 ---
 

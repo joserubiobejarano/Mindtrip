@@ -303,6 +303,31 @@ kruno/
 **Phase 21:** ✅ Complete - Travel Advisor (Pre-Trip Planning) fully implemented
 
 **Recent Updates (January 2025):**
+- ✅ **Billing & Subscriptions System** - Complete Stripe integration
+  - ✅ Subscription checkout API (`/api/billing/checkout/subscription`) for account-level Pro
+  - ✅ Trip Pro unlock checkout API (`/api/billing/checkout/trip`) for trip-level Pro
+  - ✅ Stripe webhook handler (`/api/billing/webhook`) for automatic status updates
+  - ✅ Billing portal API (`/api/billing/portal`) for customer self-service
+  - ✅ Account-level Pro (`profiles.is_pro`) and trip-level Pro (`trips.has_trip_pro`)
+  - ✅ Database migrations: `add-stripe-customer-id-to-profiles.sql`, `add-is-pro-to-profiles.sql`, `add-trip-pro-fields-to-trips.sql`
+  - ✅ Automatic subscription status updates via webhook events
+- ✅ **Image Caching System** - Production-proof image storage
+  - ✅ API endpoint: `/api/images/cache-place-image` for caching place images
+  - ✅ Health check endpoint: `/api/debug/image-cache-health`
+  - ✅ Automatic image caching from Google Places, Unsplash, and Mapbox
+  - ✅ Deterministic file paths prevent duplicates
+  - ✅ Supabase Storage bucket: `place-images` (PUBLIC)
+  - ✅ See [images.md](./images.md) for complete documentation
+- ✅ **Trip Regeneration Stats** - Daily regeneration limit tracking
+  - ✅ Database table: `trip_regeneration_stats` for tracking per-trip-per-day regeneration counts
+  - ✅ Enforces limits: 2 regenerations/day for free tier, 5 for Pro tier
+  - ✅ Migration: `supabase-add-regeneration-stats.sql`
+- ✅ **Security Architecture Improvements**
+  - ✅ Centralized auth helpers (`lib/auth/`) for consistent authorization
+  - ✅ Input validation with Zod schemas (`lib/validation/`)
+  - ✅ Rate limiting system (`lib/rate-limit/`) for API protection
+  - ✅ XSS protection with DOMPurify sanitization
+  - ✅ See [SECURITY.md](./SECURITY.md) for complete documentation
 - ✅ Infrastructure & UX Improvements
   - ✅ Trip deletion feature with DELETE API endpoint (`/api/trips/[tripId]`)
   - ✅ Route helper utilities (`lib/routes.ts` with `getTripUrl()` function)
@@ -321,7 +346,7 @@ kruno/
     - ✅ Used in activity replace and Explore features
   - ✅ **Activity Replace Feature** - Enhanced with usage limits and smart replacement
     - ✅ Updated `/api/trips/[tripId]/activities/[activityId]/replace` endpoint
-    - ✅ Enforces change_count limits (10 for free, unlimited for Pro)
+    - ✅ Enforces change_count limits (5 for free, unlimited for Pro)
     - ✅ Uses Explore Places API to find contextually relevant replacements
     - ✅ Enforces food place limit (max 1 per time slot)
     - ✅ Past-day lock prevents modifying past days
@@ -384,22 +409,6 @@ kruno/
 - ✅ **Usage Limits System** - Per-user-per-trip tracking for swipes, changes, and search adds
 - ✅ **Activity Replace Feature** - Smart replacement with context-aware suggestions and usage limits
   - ✅ **Food Place Limits** - Max 1 food place per time slot in AI-generated itineraries
-  - ✅ **Billing & Subscriptions** - Stripe integration for Pro subscriptions and trip-level unlocks
-    - ✅ Subscription checkout API (`/api/billing/checkout/subscription`)
-    - ✅ Trip Pro checkout API (`/api/billing/checkout/trip`)
-    - ✅ Stripe webhook handler (`/api/billing/webhook`) for subscription events
-    - ✅ Billing portal API (`/api/billing/portal`) for customer self-service
-    - ✅ Account-level Pro (`profiles.is_pro`) and trip-level Pro (`trips.has_trip_pro`)
-  - ✅ **Image Caching System** - Production-proof image caching in Supabase Storage
-    - ✅ API endpoint: `/api/images/cache-place-image` for caching place images
-    - ✅ Health check endpoint: `/api/debug/image-cache-health`
-    - ✅ Automatic image caching from Google Places, Unsplash, and Mapbox
-    - ✅ Deterministic file paths prevent duplicates
-    - ✅ See [images.md](./images.md) for complete documentation
-  - ✅ **Trip Regeneration Stats** - Daily regeneration limit tracking
-    - ✅ Database table: `trip_regeneration_stats` for tracking per-trip-per-day regeneration counts
-    - ✅ Enforces limits: 2 regenerations/day for free tier, 5 for Pro tier
-    - ✅ Migration: `supabase-add-regeneration-stats.sql`
 
 **Next Priorities:**
 - Phase 22: Enhanced user experience features (templates, weather, photos)
@@ -409,6 +418,12 @@ kruno/
 - Future: Multi-city Explore support and travel stats/badges
 - Mobile app development
 - Web mobile optimization
+
+**Important Notes:**
+- **Billing System**: Stripe integration is fully implemented. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` environment variables and configure webhook endpoint in Stripe Dashboard.
+- **Image Caching**: Requires `SUPABASE_SERVICE_ROLE_KEY` and manual creation of `place-images` bucket in Supabase Storage (set to PUBLIC).
+- **Security**: All API routes now use centralized auth helpers and input validation. See [SECURITY.md](./SECURITY.md) for details.
+- **Usage Limits**: Updated limits - Free tier: 10 swipes/trip, 5 changes/trip, 5 search adds/trip. Pro tier: 100 swipes/trip, unlimited changes and search adds.
 
 ## 📱 Mobile App
 

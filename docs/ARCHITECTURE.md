@@ -858,56 +858,129 @@ lib/
 - Transport guidance for multi-city and regional trips
 - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
 
-**Billing & Subscriptions** ✅ **NEW**
-- Stripe integration for Pro subscriptions and trip-level unlocks
-- API endpoints: `/api/billing/checkout/subscription`, `/api/billing/checkout/trip`, `/api/billing/portal`, `/api/billing/webhook`
-- Database: `profiles.stripe_customer_id`, `profiles.is_pro`, `trips.has_trip_pro`, `trips.stripe_trip_payment_id`
-- Migration files: `add-stripe-customer-id-to-profiles.sql`, `add-is-pro-to-profiles.sql`, `add-trip-pro-fields-to-trips.sql`
-- Webhook handler updates subscription status automatically
+**Billing & Subscriptions** ✅ **NEW** (January 2025)
+- **Complete Stripe Integration**: Full billing system for Pro subscriptions and trip-level unlocks
+- **API Endpoints**:
+  - `POST /api/billing/checkout/subscription` - Create Stripe checkout for account-level Pro subscription
+  - `POST /api/billing/checkout/trip` - Create Stripe checkout for trip-level Pro unlock (one-time payment)
+  - `GET /api/billing/portal` - Get Stripe customer portal session for subscription management
+  - `POST /api/billing/webhook` - Handle Stripe webhook events (subscription created/updated/deleted, checkout completed)
+- **Database Schema**:
+  - `profiles.stripe_customer_id` - Stripe customer ID for subscription management
+  - `profiles.is_pro` - Account-level Pro subscription status (updated via webhook)
+  - `trips.has_trip_pro` - Trip-level Pro unlock status (one-time payment)
+  - `trips.stripe_trip_payment_id` - Payment intent ID for trip unlock tracking
+- **Migration Files**:
+  - `add-stripe-customer-id-to-profiles.sql` - Adds `stripe_customer_id` column
+  - `add-is-pro-to-profiles.sql` - Adds `is_pro` column with index
+  - `add-trip-pro-fields-to-trips.sql` - Adds `has_trip_pro` and `stripe_trip_payment_id` columns
+- **Webhook Events Handled**:
+  - `checkout.session.completed` - Activates trip Pro unlock
+  - `customer.subscription.created` - Sets `is_pro = true`
+  - `customer.subscription.updated` - Updates `is_pro` based on status
+  - `customer.subscription.deleted` - Sets `is_pro = false`
+- **Pro Status Logic**: `isProForThisTrip = isAccountPro OR isTripPro` (implemented in `lib/supabase/pro-status.ts`)
 
-**Image Caching System** ✅ **NEW**
-- Production-proof image caching in Supabase Storage
-- API endpoint: `/api/images/cache-place-image`
-- Health check: `/api/debug/image-cache-health`
-- Automatic image caching from Google Places, Unsplash, Mapbox
-- Deterministic file paths prevent duplicates
-- Public bucket: `place-images` (must be created manually)
-- See [images.md](./images.md) for complete documentation
+**Image Caching System** ✅ **NEW** (January 2025)
+- **Production-Proof Image Storage**: Stores place images in Supabase Storage for stable URLs
+- **API Endpoint**: `POST /api/images/cache-place-image` - Caches images from multiple sources
+- **Health Check**: `GET /api/debug/image-cache-health` - Verifies system configuration
+- **Image Sources** (priority order):
+  1. Google Places Photo API (if `photoRef` provided)
+  2. Unsplash search API (fallback)
+  3. Mapbox static map API (last resort, uses coordinates)
+- **Storage Details**:
+  - Bucket: `place-images` (PUBLIC, must be created manually in Supabase Dashboard)
+  - File path format: `place-images/{provider}/{sha1_hash}.jpg`
+  - Deterministic paths prevent duplicate uploads
+  - Always stored as `.jpg` extension
+- **Requirements**:
+  - `SUPABASE_SERVICE_ROLE_KEY` (REQUIRED) - Used for uploads (bypasses RLS)
+  - `GOOGLE_MAPS_API_KEY` (recommended) - For Google Places photos
+  - `UNSPLASH_ACCESS_KEY` (optional) - For Unsplash fallback
+  - `MAPBOX_ACCESS_TOKEN` (optional) - For Mapbox static maps
+- **See [images.md](./images.md) for complete documentation**
 
-**Trip Regeneration Stats** ✅ **NEW**
-- Database: `trip_regeneration_stats` table for tracking daily regeneration counts
-- Enforces daily limits: 2 regenerations/day for free tier, 5 for Pro tier
-- Migration file: `database/migrations/supabase-add-regeneration-stats.sql`
-- Used by Smart Itinerary regeneration endpoint
+**Trip Regeneration Stats** ✅ **NEW** (January 2025)
+- **Database**: `trip_regeneration_stats` table for tracking daily regeneration counts per trip
+- **Daily Limits**: 2 regenerations/day for free tier, 5 for Pro tier
+- **Migration File**: `database/migrations/supabase-add-regeneration-stats.sql`
+- **Usage**: Enforced in Smart Itinerary regeneration endpoint (`/api/trips/[tripId]/smart-itinerary`)
+- **Schema**: UNIQUE constraint on (trip_id, date) for per-day tracking
 
-**Infrastructure & UX Improvements** ✅ **NEW**
-- Trip deletion: DELETE `/api/trips/[tripId]` endpoint with owner verification
+**Security Architecture** ✅ **NEW** (January 2025)
+- **Centralized Auth Helpers** (`lib/auth/`):
+  - `requireAuth()` - Ensures user is authenticated
+  - `requirePro()` - Ensures account-level Pro subscription
+  - `requireTripAccess()` - Ensures user has access to trip (owner or member)
+  - `requireTripOwner()` - Ensures user owns the trip
+  - `requireTripPro()` - Ensures user has Pro (account or trip-level)
+- **Input Validation** (`lib/validation/`):
+  - Zod schemas for all API route inputs (`api-schemas.ts`)
+  - Validation helpers: `validateBody()`, `validateQuery()`, `validateParams()`
+  - Strict mode: Unknown fields are rejected
+  - Type-safe validated data
+- **Rate Limiting** (`lib/rate-limit/`):
+  - In-memory rate limiter (can upgrade to Redis for multi-instance)
+  - Protected endpoints: AI endpoints (10/min, 100/hour), Places (30/min, 500/hour), Assistant/Chat (20/min, 200/hour)
+  - Rate limit headers in responses
+- **XSS Protection**:
+  - DOMPurify sanitization for user-generated content
+  - Sanitization functions: `sanitizeHtml()`, `escapeHtml()`, `sanitizeUserContent()`, `sanitizeChatMessage()`
+- **See [SECURITY.md](./SECURITY.md) for complete documentation**
+
+**Infrastructure & UX Improvements** ✅ **NEW** (January 2025)
+- Trip deletion: DELETE `/api/trips/[tripId]` endpoint with owner verification and cascade cleanup
 - Route helpers: `lib/routes.ts` with `getTripUrl()` for centralized URL construction
-- Clerk user ID migrations: Profile lookup improvements with `clerk_user_id` column
+- Clerk user ID migrations: Profile lookup improvements with `clerk_user_id` column and unique index
 - Enhanced trip list: Past trips section, delete button, automatic invitation linking
 - **City Autocomplete**: Enhanced destination search with Google Places Autocomplete
   - API: `/api/places/city-autocomplete` (GET and POST)
   - Component: `DestinationAutocomplete` for improved UX
   - Integrated into trip creation dialog
+  - Supports location biasing for better results
 - **Usage Limits System**: Per-user-per-trip usage tracking
   - Migration: `add-explore-usage-limits-to-trip-members.sql`
-  - Tracks swipe_count, change_count, search_add_count
-  - Enforces limits based on Pro/free tier
+  - Tracks `swipe_count`, `change_count`, `search_add_count` per user per trip
+  - Enforces limits based on Pro/free tier (see PRO_VS_FREE.md for limits)
 - **Activity Replace Feature**: Smart replacement with context-aware suggestions
   - Endpoint: `/api/trips/[tripId]/activities/[activityId]/replace`
-  - Usage limit enforcement (10 changes for free, unlimited for Pro)
+  - Usage limit enforcement (5 changes for free, unlimited for Pro)
   - Food place limit enforcement (max 1 per slot)
   - Past-day lock protection
+  - Uses Explore Places API to find contextually relevant replacements
 - **AI Itinerary Enhancements**: Segment support and food limits
-  - Supports trip_segment_id for multi-city trips
-  - Enforces max 1 food place per time slot
+  - Supports `trip_segment_id` for multi-city trips
+  - Enforces max 1 food place per time slot (morning/afternoon/evening)
   - Improved photo matching with saved places
-- Migration files:
+  - Better food place detection using Google Places types
+- **Migration files**:
   - `database/migrations/add-clerk-user-id-to-profiles.sql`
   - `database/migrations/add-unique-index-clerk-user-id.sql`
-  - `database/migrations/add-explore-usage-limits-to-trip-members.sql` ✅ **NEW**
+  - `database/migrations/add-explore-usage-limits-to-trip-members.sql`
 
 ---
+
+## Recent Changes Summary (January 2025)
+
+### Added
+- **Billing & Subscriptions System**: Complete Stripe integration with subscription and trip-level Pro unlocks
+- **Image Caching System**: Production-proof image storage in Supabase Storage with multi-provider fallback
+- **Trip Regeneration Stats**: Daily regeneration limit tracking per trip
+- **Security Architecture**: Centralized auth helpers, input validation, rate limiting, XSS protection
+- **Activity Replace Feature**: Smart activity replacement with usage limits and context-aware suggestions
+- **City Autocomplete**: Enhanced destination search with Google Places Autocomplete API
+- **Usage Limits System**: Per-user-per-trip tracking for swipes, changes, and search adds
+
+### Changed
+- **Pro vs Free Limits**: Updated swipe limits from 50/day to 10 per trip (free tier), 100 per trip (Pro tier)
+- **Change Limits**: Added change_count limits (5 for free, unlimited for Pro)
+- **Search Add Limits**: Added search_add_count limits (5 for free, unlimited for Pro)
+- **Security**: All API routes now use centralized auth helpers and Zod validation
+- **AI Itinerary**: Enhanced with food place limits (max 1 per time slot) and better detection
+
+### Removed
+- None (no features removed in this update)
 
 **Last Updated:** January 2025
 

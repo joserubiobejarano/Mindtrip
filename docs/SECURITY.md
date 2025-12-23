@@ -319,6 +319,36 @@ console.error('[API Name]', {
 5. **Penetration Testing**: Regular security audits
 6. **Dependency Scanning**: Automated vulnerability scanning
 
+## Recent Changes (January 2025)
+
+### Added
+- **Centralized Auth Helpers** (`lib/auth/`):
+  - `requireAuth()` - Ensures user is authenticated
+  - `requirePro()` - Ensures account-level Pro subscription
+  - `requireTripAccess()` - Ensures user has access to trip (owner or member)
+  - `requireTripOwner()` - Ensures user owns the trip
+  - `requireTripPro()` - Ensures user has Pro (account or trip-level)
+- **Input Validation System** (`lib/validation/`):
+  - Zod schemas for all API route inputs (`api-schemas.ts`)
+  - Validation helpers: `validateBody()`, `validateQuery()`, `validateParams()`
+  - Strict mode: Unknown fields are rejected
+  - Type-safe validated data
+- **Rate Limiting System** (`lib/rate-limit/`):
+  - In-memory rate limiter (`in-memory-limiter.ts`)
+  - Rate limit middleware (`rate-limit-middleware.ts`)
+  - Protected endpoints: AI (10/min, 100/hour), Places (30/min, 500/hour), Assistant/Chat (20/min, 200/hour)
+  - Rate limit headers in responses
+- **XSS Protection**:
+  - DOMPurify sanitization for user-generated content
+  - Sanitization functions: `sanitizeHtml()`, `escapeHtml()`, `sanitizeUserContent()`, `sanitizeChatMessage()`
+
+### Changed
+- **Middleware Security**: Middleware now fails securely (returns 401) instead of allowing requests through on auth errors
+- **All API Routes**: Now use centralized auth helpers and Zod validation for consistency
+
+### Removed
+- None (no security features removed in this update)
+
 ## References
 
 - [Clerk Security Best Practices](https://clerk.com/docs/security)

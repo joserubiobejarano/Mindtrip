@@ -6,6 +6,7 @@ import { validateParams } from "@/lib/validation/validate-request";
 import { TripIdParamsSchema } from "@/lib/validation/api-schemas";
 import { currentUser } from "@clerk/nextjs/server";
 import { sendTripInvitationEmail } from "@/lib/email/resend";
+import { sendExpoPush } from "@/lib/push/expo";
 
 interface InviteMemberBody {
   email: string;
@@ -119,7 +120,7 @@ export async function POST(
     // Look up profile by email (case-insensitive)
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("clerk_user_id, full_name")
+      .select("id, clerk_user_id, full_name")
       .ilike("email", normalizedEmail)
       .maybeSingle();
 
@@ -130,8 +131,9 @@ export async function POST(
     }
 
     // Determine user_id: use clerk_user_id if profile exists, otherwise NULL
-    type Profile = { clerk_user_id: string | null; full_name: string | null };
+    type Profile = { id: string; clerk_user_id: string | null; full_name: string | null };
     const userId = (profile as Profile | null)?.clerk_user_id || null;
+    const profileId = (profile as Profile | null)?.id || null;
 
     // Get inviter name from Clerk
     const inviter = await currentUser();
@@ -177,6 +179,74 @@ export async function POST(
       // The member is already added, so we'll just log the error
       console.error("[trip-members] Error sending invitation email:", emailError);
       // Continue - member is still added even if email fails
+    }
+
+    // Send push notification if user has an account and push tokens
+    if (profileId) {
+      try {
+        // Get all push tokens for the invited user
+        const { data: pushTokens, error: tokensError } = await supabase
+          .from("user_push_tokens")
+          .select("token")
+          .eq("user_id", profileId);
+
+        if (tokensError) {
+          console.error("[trip-members] Error fetching push tokens:", tokensError);
+          // Continue - push notification failure shouldn't break invite
+        } else if (pushTokens && pushTokens.length > 0) {
+          // Build notification message based on language
+          const notificationLanguage = language || 'en';
+          const title = notificationLanguage === 'es' 
+            ? "Te han invitado" 
+            : "You've been invited";
+          const body = notificationLanguage === 'es'
+            ? `Te invitaron a unirte a "${trip.title}".`
+            : `You were invited to join "${trip.title}".`;
+
+          // Send push notification to all user's devices
+          const tokens = pushTokens.map(pt => pt.token);
+          const pushResult = await sendExpoPush(tokens, {
+            title,
+            body,
+            data: { 
+              tripId,
+              deepLink: `kruno://link?invitedTripId=${tripId}`
+            },
+            sound: 'default',
+            priority: 'default',
+          });
+
+          // Clean up invalid tokens if any were reported
+          if (pushResult.invalidTokens && pushResult.invalidTokens.length > 0) {
+            try {
+              const { error: deleteError } = await supabase
+                .from('user_push_tokens')
+                .delete()
+                .in('token', pushResult.invalidTokens);
+
+              if (deleteError) {
+                console.error("[trip-members] Error cleaning up invalid push tokens:", deleteError);
+              } else {
+                console.log(`[trip-members] Cleaned up ${pushResult.invalidTokens.length} invalid push token(s)`);
+              }
+            } catch (cleanupError: any) {
+              // Log but don't fail - cleanup errors shouldn't break invite flow
+              console.error("[trip-members] Error during token cleanup:", cleanupError);
+            }
+          }
+
+          if (!pushResult.success) {
+            console.error("[trip-members] Error sending push notification:", pushResult.errors);
+            // Continue - push notification failure shouldn't break invite
+          } else {
+            console.log(`[trip-members] Push notification sent to ${tokens.length} device(s) for user ${profileId}`);
+          }
+        }
+      } catch (pushError: any) {
+        // Log push error but don't fail the request
+        console.error("[trip-members] Error sending push notification:", pushError);
+        // Continue - member is still added even if push fails
+      }
     }
 
     return NextResponse.json({ success: true });

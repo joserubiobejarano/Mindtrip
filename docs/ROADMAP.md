@@ -630,7 +630,25 @@ For later implementation phases:
 ### Travel Intent (Future)
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
-## 🔄 Recent Updates
+## 🔄 Recent Updates (January 2025)
+
+- **2025-01-XX**: Security Architecture ✅ **NEW**
+  - **Centralized Auth System**:
+    - ✅ Auth helpers in `lib/auth/` (requireAuth, requirePro, requireTripAccess, requireTripOwner, requireTripPro)
+    - ✅ Consistent authorization across all API routes
+    - ✅ Proper error handling and status codes
+  - **Input Validation**:
+    - ✅ Zod schemas for all API inputs (`lib/validation/api-schemas.ts`)
+    - ✅ Validation helpers (`validateBody`, `validateQuery`, `validateParams`)
+    - ✅ Type-safe validated data
+  - **Rate Limiting**:
+    - ✅ In-memory rate limiter (`lib/rate-limit/in-memory-limiter.ts`)
+    - ✅ Protected endpoints: AI (10/min, 100/hour), Places (30/min, 500/hour), Assistant/Chat (20/min, 200/hour)
+    - ✅ Rate limit headers in responses
+  - **XSS Protection**:
+    - ✅ DOMPurify sanitization for user-generated content
+    - ✅ Sanitization functions for different content types
+  - **See [SECURITY.md](./SECURITY.md) for complete documentation**
 
 - **2025-01-XX**: Billing & Subscriptions ✅ **NEW**
   - **Stripe Integration**:
@@ -658,7 +676,7 @@ For later implementation phases:
     - ✅ Daily limit enforcement: 2 regenerations/day for free tier, 5 for Pro tier
     - ✅ Integration with Smart Itinerary regeneration endpoint
 
-- **2025-01-XX**: Infrastructure & UX Improvements ✅
+- **2025-01-XX**: Infrastructure & UX Improvements ✅ **UPDATED**
   - **Trip Deletion Feature**: 
     - ✅ New DELETE endpoint `/api/trips/[tripId]` for trip deletion
     - ✅ Delete button in trips list UI (only visible to trip owners)
@@ -696,7 +714,7 @@ For later implementation phases:
     - ✅ Used in activity replace and Explore swipe endpoints
   - **Activity Replace Feature** ✅ **NEW**:
     - ✅ New endpoint: `/api/trips/[tripId]/activities/[activityId]/replace`
-    - ✅ Enforces change_count limits (10 for free, unlimited for Pro)
+    - ✅ Enforces change_count limits (5 for free, unlimited for Pro)
     - ✅ Uses Explore Places API to find contextually relevant replacements
     - ✅ Enforces food place limit (max 1 per time slot)
     - ✅ Past-day lock prevents modifying past days
