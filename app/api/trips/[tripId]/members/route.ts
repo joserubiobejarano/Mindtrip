@@ -133,7 +133,7 @@ export async function POST(
     // Determine user_id: use clerk_user_id if profile exists, otherwise NULL
     type Profile = { id: string; clerk_user_id: string | null; full_name: string | null };
     const userId = (profile as Profile | null)?.clerk_user_id || null;
-    const profileId = (profile as Profile | null)?.id || null;
+    const invitedProfileId = (profile as Profile | null)?.id || null;
 
     // Get inviter name from Clerk
     const inviter = await currentUser();
@@ -182,13 +182,13 @@ export async function POST(
     }
 
     // Send push notification if user has an account and push tokens
-    if (profileId) {
+    if (invitedProfileId) {
       try {
         // Get all push tokens for the invited user
         const { data: pushTokens, error: tokensError } = await supabase
           .from("user_push_tokens")
           .select("token")
-          .eq("user_id", profileId);
+          .eq("user_id", invitedProfileId);
 
         if (tokensError) {
           console.error("[trip-members] Error fetching push tokens:", tokensError);
@@ -204,7 +204,8 @@ export async function POST(
             : `You were invited to join "${trip.title}".`;
 
           // Send push notification to all user's devices
-          const tokens = pushTokens.map(pt => pt.token);
+          type PushToken = { token: string };
+          const tokens = (pushTokens as PushToken[]).map(pt => pt.token);
           const pushResult = await sendExpoPush(tokens, {
             title,
             body,
@@ -239,7 +240,7 @@ export async function POST(
             console.error("[trip-members] Error sending push notification:", pushResult.errors);
             // Continue - push notification failure shouldn't break invite
           } else {
-            console.log(`[trip-members] Push notification sent to ${tokens.length} device(s) for user ${profileId}`);
+            console.log(`[trip-members] Push notification sent to ${tokens.length} device(s) for user ${invitedProfileId}`);
           }
         }
       } catch (pushError: any) {

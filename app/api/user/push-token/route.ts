@@ -60,13 +60,18 @@ export async function POST(request: NextRequest) {
     // Otherwise, insert new row
     if (existingToken) {
       // Token exists - update user_id and last_seen_at (handles device switching)
-      const { error: updateError } = await supabase
-        .from('user_push_tokens')
-        .update({
-          user_id: authResult.profileId,
-          last_seen_at: new Date().toISOString(),
-          ...(platform && { platform }),
-        })
+      const updateData: {
+        user_id: string;
+        last_seen_at: string;
+        platform?: 'ios' | 'android';
+      } = {
+        user_id: authResult.profileId,
+        last_seen_at: new Date().toISOString(),
+        ...(platform && { platform }),
+      };
+      const { error: updateError } = await (supabase
+        .from('user_push_tokens') as any)
+        .update(updateData)
         .eq('token', token.trim());
 
       if (updateError) {
@@ -78,8 +83,8 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Token doesn't exist - insert new row
-      const { error: insertError } = await supabase
-        .from('user_push_tokens')
+      const { error: insertError } = await (supabase
+        .from('user_push_tokens') as any)
         .insert({
           user_id: authResult.profileId,
           token: token.trim(),
