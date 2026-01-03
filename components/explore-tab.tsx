@@ -85,7 +85,7 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
         });
       }
     }
-  }, [tripError, segmentsError, addToast]);
+  }, [tripError, segmentsError, addToast, t]);
 
   // Set initial segment if multi-city
   useEffect(() => {

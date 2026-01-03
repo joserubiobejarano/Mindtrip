@@ -262,7 +262,10 @@ export async function POST(
       } else if (allMembers && allMembers.length > 0) {
         // Collect all profile IDs (UUIDs) from member Clerk IDs
         const profileIds: string[] = [];
-        for (const member of allMembers) {
+        // Type assertion: allMembers contains user_id (not null due to .not filter)
+        type MemberWithUserId = { user_id: string };
+        const members = allMembers as MemberWithUserId[];
+        for (const member of members) {
           if (member.user_id) {
             // Look up profile by clerk_user_id
             const { data: profile, error: profileError } = await supabase
@@ -271,8 +274,10 @@ export async function POST(
               .eq("clerk_user_id", member.user_id)
               .maybeSingle();
 
-            if (!profileError && profile?.id) {
-              profileIds.push(profile.id);
+            // Type assertion: profile contains id when not null
+            type ProfileWithId = { id: string };
+            if (!profileError && profile && (profile as ProfileWithId).id) {
+              profileIds.push((profile as ProfileWithId).id);
             }
           }
         }

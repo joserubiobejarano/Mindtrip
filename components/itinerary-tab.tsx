@@ -600,7 +600,7 @@ export function ItineraryTab({
       setError(t('itinerary_error_failed_generate'));
       setStatus('error');
     }
-  }, [tripId, addToast, isActive, t]);
+  }, [tripId, addToast, isActive, t, language]);
 
   const loadOrGenerate = useCallback(async () => {
     if (!isActive) return;
@@ -783,7 +783,7 @@ export function ItineraryTab({
     } finally {
       setIsBackfillingImages(false);
     }
-  }, [tripId, addToast, loadOrGenerate]);
+  }, [tripId, addToast, loadOrGenerate, t]);
 
   // Store triggerAutoBackfill in ref so generateSmartItinerary can call it
   useEffect(() => {

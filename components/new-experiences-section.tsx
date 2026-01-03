@@ -80,6 +80,7 @@ const cities = [
 
 function CityCard({ city, onCityClick }: { city: typeof cities[0]; onCityClick: (cityName: string) => void }) {
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useLanguage();
   const primaryCategory = city.categories[0];
   const primaryCategoryColors = getCategoryColor(primaryCategory);
 
@@ -111,12 +112,12 @@ function CityCard({ city, onCityClick }: { city: typeof cities[0]; onCityClick: 
             color: isHovered ? primaryCategoryColors.hoverColor : 'inherit'
           }}
         >
-          {t(city.i18nKey)}
+          {t(city.i18nKey as any)}
         </h3>
         <div className="flex items-start gap-2 text-muted-foreground text-sm mb-3">
           <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <p className="line-clamp-2">
-            {city.attractionsI18nKeys.map((key) => t(key)).join(', ')}
+            {city.attractionsI18nKeys.map((key) => t(key as any)).join(', ')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
