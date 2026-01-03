@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useLanguage } from '@/src/providers/language-provider';
 import { apiJson } from '@/src/lib/api';
 import { getCacheKey, getCachedJson, setCachedJson } from '@/src/lib/cache';
+import { containerStyle } from '@/src/lib/responsive';
 
 interface Trip {
   id: string;
@@ -117,33 +118,37 @@ export default function TripsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('mobile_trips_title' as any)}</Text>
-        {cacheStatus && (
-          <Text style={styles.statusLabel}>
-            {cacheStatus === 'cached' 
-              ? t('mobile_offline_cached' as any) 
-              : t('mobile_offline_no_connection' as any)}
-          </Text>
-        )}
-      </View>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {trips.map((trip) => (
-          <TouchableOpacity
-            key={trip.id}
-            style={styles.tripCard}
-            onPress={() => handleTripPress(trip.id)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.tripTitle}>{trip.title || trip.destination_name || 'Untitled Trip'}</Text>
-            {trip.start_date && trip.end_date && (
-              <Text style={styles.tripDates}>
-                {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
+      <View style={{ alignItems: 'center' }}>
+        <View style={containerStyle.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{t('mobile_trips_title' as any)}</Text>
+            {cacheStatus && (
+              <Text style={styles.statusLabel}>
+                {cacheStatus === 'cached' 
+                  ? t('mobile_offline_cached' as any) 
+                  : t('mobile_offline_no_connection' as any)}
               </Text>
             )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+          </View>
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+            {trips.map((trip) => (
+              <TouchableOpacity
+                key={trip.id}
+                style={styles.tripCard}
+                onPress={() => handleTripPress(trip.id)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.tripTitle}>{trip.title || trip.destination_name || 'Untitled Trip'}</Text>
+                {trip.start_date && trip.end_date && (
+                  <Text style={styles.tripDates}>
+                    {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </View>
     </View>
   );
 }

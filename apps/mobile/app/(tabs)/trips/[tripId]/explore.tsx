@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '@/src/providers/language-provider';
 import { apiJson, apiFetch } from '@/src/lib/api';
 import { getCacheKey, clearCacheKey } from '@/src/lib/cache';
+import { containerStyle } from '@/src/lib/responsive';
 
 // Type definitions matching web Explore types
 interface ExplorePlace {
@@ -367,14 +368,16 @@ export default function ExploreScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>{t('mobile_explore_title' as any)}</Text>
-      </View>
-      
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.cardContainer}>
+      <View style={{ alignItems: 'center' }}>
+        <View style={containerStyle.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+              <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>{t('mobile_explore_title' as any)}</Text>
+          </View>
+          
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.cardContainer}>
         <View style={styles.card}>
           {currentPlace.photo_url && (
             <Image source={{ uri: currentPlace.photo_url }} style={styles.cardImage} />
@@ -419,10 +422,10 @@ export default function ExploreScreen() {
             )}
           </View>
         </View>
-      </ScrollView>
+          </ScrollView>
 
-      {/* Action buttons */}
-      <View style={styles.actions}>
+          {/* Action buttons */}
+          <View style={styles.actions}>
         <TouchableOpacity
           style={[styles.skipButton, isDisabled && styles.buttonDisabled]}
           onPress={() => handleSwipe('dislike')}
@@ -451,14 +454,16 @@ export default function ExploreScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Swipe counter */}
-      {session && session.remainingSwipes !== null && (
-        <View style={styles.counter}>
-          <Text style={styles.counterText}>
-            {session.remainingSwipes} {session.remainingSwipes === 1 ? 'swipe' : 'swipes'} remaining
-          </Text>
+          {/* Swipe counter */}
+          {session && session.remainingSwipes !== null && (
+            <View style={styles.counter}>
+              <Text style={styles.counterText}>
+                {session.remainingSwipes} {session.remainingSwipes === 1 ? 'swipe' : 'swipes'} remaining
+              </Text>
+            </View>
+          )}
         </View>
-      )}
+      </View>
     </View>
   );
 }

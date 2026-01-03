@@ -55,8 +55,7 @@ export function NewWhyChooseSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 
-            className="text-4xl md:text-5xl mb-4" 
-            style={{ fontFamily: "'Patrick Hand', cursive" }}
+            className="text-4xl md:text-5xl mb-4 font-display" 
           >
             {t('home_why_choose_title')}
           </h2>
@@ -85,8 +84,7 @@ export function NewWhyChooseSection() {
                 />
               </div>
               <h3 
-                className="text-xl font-bold mb-2 text-left"
-                style={{ fontFamily: "'Patrick Hand', cursive" }}
+                className="text-xl font-bold mb-2 text-left font-display"
               >
                 {t(reason.titleKey)}
               </h3>

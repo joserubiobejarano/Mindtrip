@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '@/src/providers/language-provider';
 import { apiJson, apiFetch } from '@/src/lib/api';
 import { useUser } from '@clerk/clerk-expo';
+import { containerStyle } from '@/src/lib/responsive';
 
 interface TripMember {
   id: string;
@@ -205,27 +206,29 @@ export default function TripmatesScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>{t('mobile_tripmates_title' as any)}</Text>
-        {canInvite() && (
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setModalVisible(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.addButtonText}>+</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <View style={{ alignItems: 'center' }}>
+        <View style={containerStyle.container}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>{t('mobile_tripmates_title' as any)}</Text>
+            {canInvite() && (
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => setModalVisible(true)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.addButtonText}>+</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {members.length === 0 ? (
           <View style={styles.card}>
             <Text style={styles.emptyTitle}>{t('mobile_tripmates_empty_title' as any)}</Text>
@@ -268,9 +271,11 @@ export default function TripmatesScreen() {
                 </View>
               </View>
             );
-          })
+          }          )
         )}
-      </ScrollView>
+          </ScrollView>
+        </View>
+      </View>
 
       {/* Invite Modal */}
       <Modal

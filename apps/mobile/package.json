@@ -4,9 +4,17 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
+    "start:tunnel": "expo start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "eas:login": "eas login",
+    "eas:build:dev:ios": "eas build --profile development --platform ios",
+    "eas:build:dev:android": "eas build --profile development --platform android",
+    "eas:build:prod:ios": "eas build --profile production --platform ios",
+    "eas:build:prod:android": "eas build --profile production --platform android",
+    "eas:submit:ios": "eas submit --platform ios",
+    "eas:submit:android": "eas submit --platform android"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^1.13.3",

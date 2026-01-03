@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/providers/language-provider";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { MenuIcon } from "lucide-react";
 
 export function NewNavbar() {
   const router = useRouter();
@@ -54,6 +56,49 @@ export function NewNavbar() {
             {t('nav_flights')}
           </Link>
         </div>
+
+        {/* Mobile menu */}
+        <Sheet>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" size="icon">
+              <MenuIcon className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 pr-0">
+            <Link href="/" className="flex items-center gap-2 mb-6">
+              <Image src="/icon.svg" alt="Kruno" width={32} height={32} />
+              <span className="text-2xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>Kruno</span>
+            </Link>
+            <nav className="flex flex-col gap-4 text-lg">
+              <Link
+                href="/"
+                className="font-mono uppercase hover:text-primary transition-colors py-2"
+              >
+                {t('nav_planning')}
+              </Link>
+              <Link
+                href="/hotels"
+                className="font-mono uppercase hover:text-primary transition-colors py-2"
+              >
+                {t('nav_hotels')}
+              </Link>
+              <Link
+                href="/flights"
+                className="font-mono uppercase hover:text-primary transition-colors py-2"
+              >
+                {t('nav_flights')}
+              </Link>
+              <SignedIn>
+                <Link
+                  href="/trips"
+                  className="font-mono uppercase hover:text-primary transition-colors py-2"
+                >
+                  {t('nav_trips')}
+                </Link>
+              </SignedIn>
+            </nav>
+          </SheetContent>
+        </Sheet>
 
         <div className="flex items-center gap-4">
           {/* Language Switcher */}

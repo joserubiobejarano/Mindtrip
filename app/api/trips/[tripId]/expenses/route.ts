@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { requireTripAccess, tripAccessErrorResponse } from "@/lib/auth/require-trip-access";
 import { validateParams } from "@/lib/validation/validate-request";
 import { TripIdParamsSchema } from "@/lib/validation/api-schemas";
+import { currentUser } from "@clerk/nextjs/server";
+import { sendExpoPush } from "@/lib/push/expo";
 
 // GET /api/trips/[tripId]/expenses - Returns expenses list with shares and member info
 export async function GET(
@@ -89,6 +91,7 @@ export async function POST(
       category,
       paid_by_member_id,
       shared_by_member_ids,
+      language,
     } = body;
 
     // Validate required fields
@@ -237,6 +240,115 @@ export async function POST(
       return NextResponse.json({
         expense: expense,
       });
+    }
+
+    // Send push notifications to other trip members
+    try {
+      // Get creator's name from Clerk
+      const creator = await currentUser();
+      const creatorName = creator?.fullName || creator?.firstName || "Someone";
+
+      // Get all trip members (excluding the creator)
+      const { data: allMembers, error: membersError } = await supabase
+        .from("trip_members")
+        .select("user_id")
+        .eq("trip_id", tripId)
+        .not("user_id", "is", null)
+        .neq("user_id", accessResult.clerkUserId);
+
+      if (membersError) {
+        console.error("[Expenses API] Error fetching trip members for push notifications:", membersError);
+        // Continue - push notification failure shouldn't break expense creation
+      } else if (allMembers && allMembers.length > 0) {
+        // Collect all profile IDs (UUIDs) from member Clerk IDs
+        const profileIds: string[] = [];
+        for (const member of allMembers) {
+          if (member.user_id) {
+            // Look up profile by clerk_user_id
+            const { data: profile, error: profileError } = await supabase
+              .from("profiles")
+              .select("id")
+              .eq("clerk_user_id", member.user_id)
+              .maybeSingle();
+
+            if (!profileError && profile?.id) {
+              profileIds.push(profile.id);
+            }
+          }
+        }
+
+        // Get all push tokens for all recipient profiles
+        if (profileIds.length > 0) {
+          const { data: pushTokens, error: tokensError } = await supabase
+            .from("user_push_tokens")
+            .select("token")
+            .in("user_id", profileIds);
+
+          if (tokensError) {
+            console.error("[Expenses API] Error fetching push tokens:", tokensError);
+            // Continue - push notification failure shouldn't break expense creation
+          } else if (pushTokens && pushTokens.length > 0) {
+            // Build notification message based on language
+            const notificationLanguage = language || 'en';
+            const title = notificationLanguage === 'es' 
+              ? "Nuevo gasto añadido" 
+              : "New expense added";
+            
+            // Format description with safe fallback
+            const expenseLabel = description.trim() || (notificationLanguage === 'es' ? "un gasto" : "an expense");
+            const body = notificationLanguage === 'es'
+              ? `${creatorName} añadió ${amount} ${currency.toUpperCase()} para ${expenseLabel}`
+              : `${creatorName} added ${amount} ${currency.toUpperCase()} for ${expenseLabel}`;
+
+            // Send push notification to all devices
+            type PushToken = { token: string };
+            const tokens = (pushTokens as PushToken[]).map(pt => pt.token);
+            // Deduplicate tokens
+            const uniqueTokens = [...new Set(tokens)];
+            
+            const pushResult = await sendExpoPush(uniqueTokens, {
+              title,
+              body,
+              data: { 
+                tripId,
+                deepLink: `kruno://link?tripId=${tripId}&screen=expenses`
+              },
+              sound: 'default',
+              priority: 'default',
+            });
+
+            // Clean up invalid tokens if any were reported
+            if (pushResult.invalidTokens && pushResult.invalidTokens.length > 0) {
+              try {
+                const { error: deleteError } = await supabase
+                  .from('user_push_tokens')
+                  .delete()
+                  .in('token', pushResult.invalidTokens);
+
+                if (deleteError) {
+                  console.error("[Expenses API] Error cleaning up invalid push tokens:", deleteError);
+                } else {
+                  console.log(`[Expenses API] Cleaned up ${pushResult.invalidTokens.length} invalid push token(s)`);
+                }
+              } catch (cleanupError: any) {
+                // Log but don't fail - cleanup errors shouldn't break expense creation
+                console.error("[Expenses API] Error during token cleanup:", cleanupError);
+              }
+            }
+
+            if (!pushResult.success) {
+              console.error("[Expenses API] Error sending push notification:", pushResult.errors);
+              // Continue - push notification failure shouldn't break expense creation
+            } else {
+              console.log(`[Expenses API] Push notification sent to ${uniqueTokens.length} device(s) for expense creation`);
+            }
+          }
+        }
+      }
+    } catch (pushError: any) {
+      // Log push error but don't fail the request
+      console.error("[Expenses API] Error sending push notification:", pushError);
+      // Continue - expense is still created even if push fails
     }
 
     return NextResponse.json({

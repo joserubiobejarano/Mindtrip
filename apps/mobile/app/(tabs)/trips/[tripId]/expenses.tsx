@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '@/src/providers/language-provider';
 import { apiJson, apiFetch } from '@/src/lib/api';
 import { useUser } from '@clerk/clerk-expo';
+import { containerStyle } from '@/src/lib/responsive';
 
 interface Expense {
   id: string;
@@ -353,20 +354,22 @@ export default function ExpensesScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>{t('mobile_expenses_title' as any)}</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={{ alignItems: 'center' }}>
+        <View style={containerStyle.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+              <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>{t('mobile_expenses_title' as any)}</Text>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {/* Total Spent Summary */}
         {Object.keys(totalSpent).length > 0 && (
           <View style={styles.card}>
@@ -473,7 +476,9 @@ export default function ExpensesScreen() {
             </View>
           ))
         )}
-      </ScrollView>
+          </ScrollView>
+        </View>
+      </View>
 
       {/* Add Expense Modal */}
       <Modal

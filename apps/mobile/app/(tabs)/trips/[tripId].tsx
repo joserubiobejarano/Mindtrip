@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '@/src/providers/language-provider';
 import { apiJson, apiFetch } from '@/src/lib/api';
 import { getCacheKey, getCachedJson, setCachedJson } from '@/src/lib/cache';
+import { containerStyle } from '@/src/lib/responsive';
 
 interface Trip {
   id: string;
@@ -431,22 +432,24 @@ export default function TripDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('mobile_trip_detail_title' as any)}</Text>
-        {(tripCacheStatus || itineraryCacheStatus) && (
-          <Text style={styles.statusLabel}>
-            {tripCacheStatus === 'offline' || itineraryCacheStatus === 'offline'
-              ? t('mobile_offline_no_connection' as any)
-              : tripCacheStatus === 'cached' || itineraryCacheStatus === 'cached'
-              ? t('mobile_offline_cached' as any)
-              : null}
-          </Text>
-        )}
-      </View>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <View style={{ alignItems: 'center' }}>
+        <View style={containerStyle.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{t('mobile_trip_detail_title' as any)}</Text>
+            {(tripCacheStatus || itineraryCacheStatus) && (
+              <Text style={styles.statusLabel}>
+                {tripCacheStatus === 'offline' || itineraryCacheStatus === 'offline'
+                  ? t('mobile_offline_no_connection' as any)
+                  : tripCacheStatus === 'cached' || itineraryCacheStatus === 'cached'
+                  ? t('mobile_offline_cached' as any)
+                  : null}
+              </Text>
+            )}
+          </View>
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <Text style={styles.label}>Trip Title</Text>
-          <Text style={styles.value}>{trip.title || trip.destination_name || 'Untitled Trip'}</Text>
+          <Text style={styles.value}>{t(trip.title as any) || t(trip.destination_name as any) || t('my_trips_trip' as any)}</Text>
         </View>
         <View style={styles.section}>
           <Text style={styles.label}>Trip ID</Text>
@@ -456,7 +459,7 @@ export default function TripDetailScreen() {
           <View style={styles.section}>
             <Text style={styles.label}>Dates</Text>
             <Text style={styles.value}>
-              {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
+              {new Date(trip.start_date).toLocaleDateString(language)} - {new Date(trip.end_date).toLocaleDateString(language)}
             </Text>
           </View>
         )}
@@ -486,7 +489,9 @@ export default function TripDetailScreen() {
           </View>
         </View>
         {renderItinerarySection()}
-      </ScrollView>
+          </ScrollView>
+        </View>
+      </View>
     </View>
   );
 }
@@ -765,6 +770,7 @@ const styles = StyleSheet.create({
   },
   quickActionsRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
     marginTop: 8,
   },

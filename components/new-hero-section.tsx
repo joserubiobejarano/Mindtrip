@@ -247,7 +247,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
       <div className="w-[70%] max-w-6xl mx-auto text-center relative mt-8">
         {/* Main Title */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal md:solid-underline inline-block text-foreground mb-20" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal md:solid-underline inline-block text-foreground mb-20 font-display">
           {t('home_hero_title')}
         </h1>
 
@@ -286,8 +286,8 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                 </div>
                 <div className="relative w-full">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                    <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-                      <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
+                    <div className="w-9 h-9 md:w-8 md:h-8 rounded-full bg-accent flex items-center justify-center">
+                      <MapPin className="w-5 h-5 md:w-4 md:h-4 text-muted-foreground" strokeWidth={2} />
                     </div>
                   </div>
                   <DestinationAutocomplete
@@ -297,7 +297,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                       setSelectedDestination(dest);
                       setDestinationInput(dest.description);
                     }}
-                    inputClassName="pl-14 bg-accent border-0 rounded-xl h-12 font-body placeholder:text-muted-foreground"
+                    inputClassName="pl-16 md:pl-14 bg-accent border-0 rounded-xl h-14 md:h-12 font-body placeholder:text-muted-foreground text-base md:text-sm"
                     placeholder={t('home_search_placeholder')}
                   />
                 </div>
@@ -309,13 +309,13 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                   {t('home_search_checkin')}
                 </label>
                 <div className="relative w-full">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 md:w-4 md:h-4 text-muted-foreground" />
                   <DateRangePicker
                     startDate={startDate}
                     endDate={endDate}
                     onStartDateChange={setStartDate}
                     onEndDateChange={setEndDate}
-                    className="w-full pl-10 bg-secondary border-0 rounded-xl h-12 font-body text-left justify-start hover:bg-secondary"
+                    className="w-full pl-12 md:pl-10 bg-secondary border-0 rounded-xl h-14 md:h-12 font-body text-left justify-start hover:bg-secondary text-base md:text-sm"
                     placeholder={t('home_search_add_dates')}
                     hideIcon={true}
                   />
@@ -327,7 +327,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
                 <Button
                   type="submit"
                   disabled={creatingTrip}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs tracking-wider uppercase rounded-xl h-12 gap-2 w-full px-6"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs tracking-wider uppercase rounded-xl h-14 md:h-12 gap-2 w-full px-6"
                 >
                   <Search className="w-4 h-4" />
                   {creatingTrip ? t('home_search_searching') : t('home_search_button')}

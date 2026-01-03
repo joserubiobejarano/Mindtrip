@@ -4,9 +4,11 @@ import { Tabs } from 'expo-router';
 import { useAuth } from '@clerk/clerk-expo';
 import * as Notifications from 'expo-notifications';
 import { apiJson } from '@/src/lib/api';
+import { useLanguage } from "@/src/providers/language-provider";
 
 export default function TabsLayout() {
   const { isSignedIn, isLoaded } = useAuth();
+  const { t } = useLanguage();
 
   // Register push token when user is authenticated
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="trips"
         options={{
-          title: 'Trips',
+          title: t('nav_trips'),
         }}
       />
     </Tabs>

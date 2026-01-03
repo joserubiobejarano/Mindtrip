@@ -26,43 +26,55 @@ const cities = [
     categories: ["Culture", "Sightseeing", "Nature"],
     image: "https://images.unsplash.com/photo-1570841964538-c0406b497337?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsb25kb24lMjBjaXR5c2NhcGUlMjB0aGFtZXN8ZW58MXx8fHwxNzY0MTA3ODA2fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     title: "London",
+    i18nKey: "city_london",
     location: "United Kingdom",
     attractions: ["Big Ben", "Tower Bridge", "British Museum"],
+    attractionsI18nKeys: ["attraction_big_ben", "attraction_tower_bridge", "attraction_british_museum"],
   },
   {
     categories: ["Culture", "Nature", "Food & Drink"],
     image: "https://images.unsplash.com/photo-1534203137048-137aa03c692e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbXN0ZXJkYW0lMjBjYW5hbCUyMGhvdXNlc3xlbnwxfHx8fDE3NjQwOTQ3MjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     title: "Amsterdam",
+    i18nKey: "city_amsterdam",
     location: "Netherlands",
     attractions: ["Van Gogh Museum", "Anne Frank House", "Canal Cruise"],
+    attractionsI18nKeys: ["attraction_van_gogh_museum", "attraction_anne_frank_house", "attraction_canal_cruise"],
   },
   {
     categories: ["Sightseeing", "Culture", "Food & Drink", "Nature"],
     image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYXJjZWxvbmElMjBzYWdyYWRhJTIwZmFtaWxpYXxlbnwxfHx8fDE3NjQwNTU2NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     title: "Barcelona",
+    i18nKey: "city_barcelona",
     location: "Spain",
     attractions: ["Sagrada Familia", "Park Güell", "La Rambla"],
+    attractionsI18nKeys: ["attraction_sagrada_familia", "attraction_park_guell", "attraction_la_rambla"],
   },
   {
     categories: ["Culture", "Sightseeing", "Food & Drink", "Nature"],
     image: "https://images.unsplash.com/photo-1431274172761-fca41d930114?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXJpcyUyMGVpZmZlbCUyMHRvd2VyfGVufDF8fHx8MTc2NDA3NTkwMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     title: "Paris",
+    i18nKey: "city_paris",
     location: "France",
     attractions: ["Eiffel Tower", "Louvre", "Notre-Dame"],
+    attractionsI18nKeys: ["attraction_eiffel_tower", "attraction_louvre", "attraction_notre_dame"],
   },
   {
     categories: ["Culture", "Nature", "Sightseeing"],
     image: "https://images.unsplash.com/photo-1704471504038-5443d863e3a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZXJsaW4lMjBicmFuZGVuYnVyZyUyMGdhdGV8ZW58MXx8fHwxNzY0MDQ5MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     title: "Berlin",
+    i18nKey: "city_berlin",
     location: "Germany",
     attractions: ["Brandenburg Gate", "Museum Island", "Berlin Wall"],
+    attractionsI18nKeys: ["attraction_brandenburg_gate", "attraction_museum_island", "attraction_berlin_wall"],
   },
   {
     categories: ["Sightseeing", "Culture", "Food & Drink"],
     image: "https://images.unsplash.com/photo-1552432552-06c0b0a94dda?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb21lJTIwY29sb3NzZXVtJTIwdmF0aWNhbnxlbnwxfHx8fDE3NjQxMDc4MDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     title: "Rome",
+    i18nKey: "city_rome",
     location: "Italy",
     attractions: ["Colosseum", "Vatican", "Trevi Fountain"],
+    attractionsI18nKeys: ["attraction_colosseum", "attraction_vatican", "attraction_trevi_fountain"],
   },
 ];
 
@@ -94,17 +106,17 @@ function CityCard({ city, onCityClick }: { city: typeof cities[0]; onCityClick: 
       <div className="p-5 flex flex-col">
         <h3 
           className="text-2xl font-bold mb-2 transition-colors duration-300"
-          style={{ 
+          style={{
             fontFamily: "'Patrick Hand', cursive",
             color: isHovered ? primaryCategoryColors.hoverColor : 'inherit'
           }}
         >
-          {city.title}
+          {t(city.i18nKey)}
         </h3>
         <div className="flex items-start gap-2 text-muted-foreground text-sm mb-3">
           <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <p className="line-clamp-2">
-            {city.attractions.join(', ')}
+            {city.attractionsI18nKeys.map((key) => t(key)).join(', ')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
