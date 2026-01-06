@@ -2,8 +2,12 @@ import { useEffect, useRef } from 'react';
 import { Stack } from 'expo-router';
 import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ClerkProvider } from '@/src/providers/clerk-provider';
 import { LanguageProvider } from '@/src/providers/language-provider';
+
+const LAST_NOTIFICATION_KEY = 'last_notification_payload';
+const LAST_DEEP_LINK_KEY = 'last_deep_link';
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -20,9 +24,37 @@ export default function RootLayout() {
   const responseListener = useRef<Notifications.Subscription>();
 
   useEffect(() => {
+    // Listen for notifications received (foreground)
+    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+      const data = notification.request.content.data;
+      // Store notification payload
+      const payload = {
+        ...data,
+        title: notification.request.content.title,
+        body: notification.request.content.body,
+        timestamp: new Date().toISOString(),
+      };
+      AsyncStorage.setItem(LAST_NOTIFICATION_KEY, JSON.stringify(payload)).catch((error) => {
+        console.error('[notification-handler] Error storing notification payload:', error);
+      });
+    });
+
     // Listen for notification taps
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
+      
+      // Store deep link if present
+      if (data?.deepLink && typeof data.deepLink === 'string') {
+        AsyncStorage.setItem(LAST_DEEP_LINK_KEY, data.deepLink).catch((error) => {
+          console.error('[notification-handler] Error storing deep link:', error);
+        });
+      } else if (data?.tripId && typeof data.tripId === 'string') {
+        // Store fallback deep link
+        const fallbackLink = `kruno://link?tripId=${data.tripId}`;
+        AsyncStorage.setItem(LAST_DEEP_LINK_KEY, fallbackLink).catch((error) => {
+          console.error('[notification-handler] Error storing deep link:', error);
+        });
+      }
       
       // Check if deepLink exists and parse it
       if (data?.deepLink && typeof data.deepLink === 'string' && data.deepLink.startsWith('kruno://link?')) {
@@ -54,6 +86,9 @@ export default function RootLayout() {
     });
 
     return () => {
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
       if (responseListener.current) {
         Notifications.removeNotificationSubscription(responseListener.current);
       }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileId } from "@/lib/auth/getProfileId";
+import { getProfileIdFromRequest } from "@/lib/auth/getProfileIdFromRequest";
 import { getUserSubscriptionStatus } from "@/lib/supabase/user-subscription";
 import { createTripSegment } from "@/lib/supabase/trip-segments";
 import { getPlaceDetails, findGooglePlaceId } from "@/lib/google/places-server";
@@ -349,19 +350,30 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   let profileId: string | undefined;
+  let authMethod: 'bearer' | 'cookie' | undefined;
   
   try {
     const supabase = await createClient();
 
-    // Get profile ID for authorization
+    // Get profile ID for authorization (supports both Bearer token and cookie/session)
     try {
-      const authResult = await getProfileId(supabase);
+      const authResult = await getProfileIdFromRequest(request, supabase);
       profileId = authResult.profileId;
+      authMethod = authResult.authMethod;
+      
+      console.log('[Trips API] Authentication successful', {
+        path: '/api/trips',
+        method: 'GET',
+        profileId,
+        clerkUserId: authResult.clerkUserId,
+        authMethod,
+      });
     } catch (authError: any) {
-      console.error('[Trips API]', {
+      console.error('[Trips API] Authentication failed', {
         path: '/api/trips',
         method: 'GET',
         error: authError?.message || 'Failed to get profile',
+        authMethod: authMethod || 'unknown',
       });
       return NextResponse.json(
         { error: authError?.message || 'Unauthorized' },
@@ -425,16 +437,23 @@ export async function GET(request: NextRequest) {
         new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
     );
 
-    console.log('[trips-list] profileId=', profileId, 'count=', uniqueTrips.length);
+    console.log('[Trips API] Success', {
+      path: '/api/trips',
+      method: 'GET',
+      profileId,
+      authMethod,
+      tripCount: uniqueTrips.length,
+    });
 
     return NextResponse.json({
       trips: uniqueTrips,
     });
   } catch (error: any) {
-    console.error('[Trips API]', {
+    console.error('[Trips API] Error', {
       path: '/api/trips',
       method: 'GET',
       profileId: profileId || 'unknown',
+      authMethod: authMethod || 'unknown',
       error: error?.message || 'Internal server error',
       errorCode: error?.code,
     });

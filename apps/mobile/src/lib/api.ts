@@ -1,13 +1,14 @@
-import { getToken } from '@clerk/clerk-expo';
-
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
 export interface ApiOptions extends RequestInit {
-  requireAuth?: boolean;
+  token?: string;
+  method?: string;
+  body?: any;
+  headers?: HeadersInit;
 }
 
 export async function apiFetch(path: string, options: ApiOptions = {}): Promise<Response> {
-  const { requireAuth = true, headers = {}, ...fetchOptions } = options;
+  const { token, headers = {}, method, body, ...fetchOptions } = options;
 
   const url = `${API_URL}${path.startsWith('/') ? path : `/${path}`}`;
 
@@ -16,22 +17,16 @@ export async function apiFetch(path: string, options: ApiOptions = {}): Promise<
     ...headers,
   };
 
-  // Add authentication token if required
-  if (requireAuth) {
-    try {
-      const token = await getToken();
-      if (token) {
-        requestHeaders['Authorization'] = `Bearer ${token}`;
-      }
-    } catch (error) {
-      console.error('Error getting auth token:', error);
-      // Continue without token, API will return 401 if auth is required
-    }
+  // Add authentication token if provided
+  if (token) {
+    requestHeaders['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(url, {
     ...fetchOptions,
+    method: method || fetchOptions.method || 'GET',
     headers: requestHeaders,
+    body: body ? JSON.stringify(body) : fetchOptions.body,
   });
 
   if (!response.ok) {
@@ -46,5 +41,10 @@ export async function apiFetch(path: string, options: ApiOptions = {}): Promise<
 export async function apiJson<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const response = await apiFetch(path, options);
   return response.json();
+}
+
+// Helper function to fetch trips
+export async function fetchTrips(token?: string) {
+  return apiJson<{ trips: any[] }>('/api/trips', { token });
 }
 

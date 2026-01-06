@@ -1022,7 +1022,7 @@ export function ExploreDeck({
       {/* Header with swipe counter and undo button - Hidden when hideHeader is true *//*
       {!hideHeader && (
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
-          <h2 className="text-lg font-semibold">Discover Places</h2>
+          <h2 className="text-lg font-semibold" style={{ fontFamily: "'Patrick Hand', cursive" }}>Discover Places</h2>
           <div className="flex items-center gap-2 sm:gap-4">
             {swipeHistory.length > 0 && (
               <Button

@@ -10,8 +10,8 @@
         "simulator": true
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": ""
+        "EXPO_PUBLIC_API_URL": "http://192.168.1.135:3000",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_YXNzdXJpbmctd2FydGhvZy05MS5jbGVyay5hY2NvdW50cy5kZXYk"
       }
     },
     "preview": {

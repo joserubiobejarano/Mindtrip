@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@clerk/clerk-expo';
 import { useLanguage } from '@/src/providers/language-provider';
 import { apiJson } from '@/src/lib/api';
 import { getCacheKey, getCachedJson, setCachedJson } from '@/src/lib/cache';
@@ -22,6 +23,7 @@ export default function TripsScreen() {
   const [cacheStatus, setCacheStatus] = useState<'cached' | 'offline' | null>(null);
   const { t } = useLanguage();
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const TRIPS_CACHE_KEY = getCacheKey(['trips', 'list']);
 
@@ -47,23 +49,37 @@ export default function TripsScreen() {
   };
 
   const fetchTrips = async () => {
+    let token: string | null = null;
     try {
       setLoading(true);
       setError(null);
       setCacheStatus(null);
-      const data = await apiJson<{ trips: Trip[] }>('/api/trips');
+      token = await getToken();
+      const data = await apiJson<{ trips: Trip[] }>('/api/trips', { token: token || undefined });
       setTrips(data.trips || []);
       // Step 3: Cache the successful response
       await setCachedJson(TRIPS_CACHE_KEY, data);
     } catch (err) {
       console.error('Error fetching trips:', err);
-      // Step 4: On failure, if we have cached data, keep showing it with offline label
-      const cached = await getCachedJson<{ trips: Trip[] }>(TRIPS_CACHE_KEY);
-      if (cached.data && cached.data.trips && cached.data.trips.length > 0) {
-        setCacheStatus('offline');
+      
+      // Check if it's a 401 error
+      const is401 = err instanceof Error && err.message.includes('401');
+      if (is401) {
+        const errorMessage = "You're signed in, but the API rejected the token. Backend needs to accept Clerk Bearer tokens.";
+        setError(errorMessage);
+        // Log first ~20 chars of token (never the full token)
+        if (token) {
+          console.log('Token prefix:', token.substring(0, 20));
+        }
       } else {
-        // No cache available, show error
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        // Step 4: On failure, if we have cached data, keep showing it with offline label
+        const cached = await getCachedJson<{ trips: Trip[] }>(TRIPS_CACHE_KEY);
+        if (cached.data && cached.data.trips && cached.data.trips.length > 0) {
+          setCacheStatus('offline');
+        } else {
+          // No cache available, show error
+          setError(err instanceof Error ? err.message : 'Unknown error');
+        }
       }
     } finally {
       setLoading(false);

@@ -40,9 +40,9 @@ export default function Index() {
     return null;
   }
 
-  // If not authenticated, redirect to welcome
+  // If not authenticated, redirect to sign-in
   if (!isSignedIn) {
-    return <Redirect href="/(auth)/welcome" />;
+    return <Redirect href="/(auth)/sign-in" />;
   }
 
   // Wait for pending link check to complete

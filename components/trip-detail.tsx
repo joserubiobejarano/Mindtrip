@@ -90,7 +90,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         <div className="text-center space-y-4 max-w-md">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
           <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-foreground">Something went wrong</h2>
+            <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: "'Patrick Hand', cursive" }}>Something went wrong</h2>
             <p className="text-muted-foreground">{errorMessage}</p>
           </div>
           <div className="flex gap-2 justify-center">

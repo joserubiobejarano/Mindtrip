@@ -427,7 +427,25 @@ kruno/
 
 ## 📱 Mobile App
 
-A native mobile app is planned for iOS and Android. See [mobile-roadmap.md](./docs/mobile-roadmap.md) for the complete development plan.
+A native mobile app is in active development for iOS and Android.
+
+**Current Status:** Phase 1 Complete - Authentication & Basic Navigation Working
+- ✅ Sign-in, sign-up, Google SSO working
+- ✅ Expo Router file-based routing
+- ✅ Bearer token authentication with backend API
+- ✅ Basic trip screens (minimal UI)
+- 🎯 Next: NativeWind migration to match web UI
+
+**Documentation:**
+- **[Mobile App README](../apps/mobile/README.md)** - Current status, setup, and implementation details
+- **[Mobile Roadmap](./mobile-roadmap.md)** - Complete development plan and timeline
+
+**Key Implementation Details:**
+- Uses Expo Router + Clerk auth (email/pass + Google SSO)
+- Bearer token authentication (mobile) vs cookie/session (web)
+- Path alias fixes (`@/` imports) via Metro + Babel + TS config
+- Push token registration (non-blocking, with known issues)
+- Assets in `apps/mobile/assets/` directory
 
 ## 📄 License
 

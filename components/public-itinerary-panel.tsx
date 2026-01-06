@@ -324,9 +324,9 @@ export function PublicItineraryPanel({
                                         }
                                       })()}
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
-                                      <p className="text-slate-700 text-sm mt-2 leading-relaxed">
+                                    <div className="flex-1 min-w-0 w-full sm:w-auto">
+                                      <h4 className="font-bold text-lg text-slate-900 break-words" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                      <p className="text-slate-700 text-sm mt-2 leading-relaxed break-words">
                                         {place.description}
                                       </p>
                                       {place.area && (

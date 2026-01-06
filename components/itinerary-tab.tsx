@@ -128,6 +128,15 @@ export function ItineraryTab({
   const { language, t } = useLanguage();
   const supabase = createClient();
 
+  // Helper function to translate slot labels (Morning/Afternoon/Evening)
+  const translateSlotLabel = (slotLabel: string): string => {
+    const normalized = slotLabel.toLowerCase();
+    if (normalized === 'morning') return t('itinerary_morning');
+    if (normalized === 'afternoon') return t('itinerary_afternoon');
+    if (normalized === 'evening') return t('itinerary_evening');
+    return slotLabel; // Fallback to original if unknown
+  };
+
   // Fetch subscription status
   const { data: subscriptionStatus } = useQuery({
     queryKey: ["subscription-status", user?.id],
@@ -1377,7 +1386,7 @@ export function ItineraryTab({
                                   <div className="flex flex-col gap-2 pb-4">
                                     <div className="flex justify-center md:justify-center">
                                       <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                        {slot.label}
+                                        {translateSlotLabel(slot.label)}
                                       </span>
                                     </div>
                                     <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
@@ -1453,14 +1462,15 @@ export function ItineraryTab({
                                                   e.stopPropagation();
                                                   handleUpdatePlace(day.id, place.id, { visited: !place.visited });
                                                 }}
-                                                className={`rounded-full gap-1.5 ${
+                                                className={`rounded-full gap-1.5 whitespace-nowrap ${
                                                   place.visited
                                                     ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                                                     : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                                                 }`}
                                               >
                                                 {place.visited && <Check className="h-3 w-3" />}
-                                                {place.visited ? t('itinerary_visited') : t('itinerary_mark_visited')}
+                                                <span className="hidden xs:inline">{place.visited ? t('itinerary_visited') : t('itinerary_mark_visited')}</span>
+                                                <span className="xs:hidden">{place.visited ? t('itinerary_visited') : t('itinerary_mark_visited')}</span>
                                               </Button>
                                               <Button
                                                 type="button"
@@ -1490,7 +1500,7 @@ export function ItineraryTab({
                                                       : undefined;
                                                   })()
                                                 }
-                                                className={`rounded-full ${
+                                                className={`rounded-full whitespace-nowrap ${
                                                   dayIsPast || changeCount >= usageLimits.change.limit
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                                                     : "border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"
@@ -1508,7 +1518,7 @@ export function ItineraryTab({
                                                 }}
                                                 disabled={dayIsPast}
                                                 title={dayIsPast ? t('itinerary_tooltip_day_passed') : undefined}
-                                                className={`rounded-full ${
+                                                className={`rounded-full whitespace-nowrap ${
                                                   dayIsPast
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                                                     : "border-red-200 text-red-700 bg-red-50 hover:bg-red-100"
@@ -1518,7 +1528,7 @@ export function ItineraryTab({
                                               </Button>
                                             </div>
                                           </div>
-                                          <p className="text-slate-700 text-sm mt-2 leading-relaxed line-clamp-2">
+                                          <p className="text-slate-700 text-sm mt-2 leading-relaxed break-words">
                                             {place.description}
                                           </p>
                                           {place.area && (
@@ -1571,7 +1581,7 @@ export function ItineraryTab({
                                       }`}
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', slot.label.toLowerCase())}</span>
+                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', translateSlotLabel(slot.label).toLowerCase())}</span>
                                       <span className="sm:hidden">{t('itinerary_add')}</span>
                                     </Button>
                                   </div>
@@ -1764,7 +1774,7 @@ export function ItineraryTab({
                                   <div className="flex flex-col gap-2 pb-4">
                                     <div className="flex justify-center md:justify-center">
                                       <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                        {slot.label}
+                                        {translateSlotLabel(slot.label)}
                                       </span>
                                     </div>
                                     <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
@@ -1782,7 +1792,7 @@ export function ItineraryTab({
                                       return (
                                       <div 
                                         key={`${day.id}:${slotIdx}:${placeIndex}`} 
-                                        className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
+                                        className={`flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
                                         onClick={(e) => {
                                           onActivitySelect?.(place.id);
                                         }}
@@ -1829,10 +1839,10 @@ export function ItineraryTab({
                                             </div>
                                           )}
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                            <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
-                                            <div className="shrink-0 flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                                        <div className="min-w-0 flex-1 w-full sm:w-auto">
+                                          <div className="flex flex-col gap-2 mb-2">
+                                            <h4 className="font-bold text-lg text-slate-900 break-words" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                            <div className="flex flex-wrap items-center gap-2">
                                               <Button
                                                 size="sm"
                                                 variant="outline"
@@ -1840,7 +1850,7 @@ export function ItineraryTab({
                                                   e.stopPropagation();
                                                   handleUpdatePlace(day.id, place.id, { visited: !place.visited });
                                                 }}
-                                                className={`rounded-lg ${
+                                                className={`rounded-lg whitespace-nowrap ${
                                                   place.visited
                                                     ? "bg-green-100 text-green-700 hover:bg-green-200"
                                                     : "bg-green-100 text-green-700 hover:bg-green-200"
@@ -1883,7 +1893,7 @@ export function ItineraryTab({
                                                       : undefined;
                                                   })()
                                                 }
-                                                className={`rounded-lg ${
+                                                className={`rounded-lg whitespace-nowrap ${
                                                   dayIsPast || changeCount >= usageLimits.change.limit
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                                     : "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
@@ -1901,7 +1911,7 @@ export function ItineraryTab({
                                                 }}
                                                 disabled={dayIsPast}
                                                 title={dayIsPast ? t('itinerary_tooltip_day_passed') : undefined}
-                                                className={`rounded-lg ${
+                                                className={`rounded-lg whitespace-nowrap ${
                                                   dayIsPast
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                                     : "bg-red-100 text-red-700 hover:bg-red-200"
@@ -1912,7 +1922,7 @@ export function ItineraryTab({
                                               </Button>
                                             </div>
                                           </div>
-                                          <p className="text-sm text-slate-600 mt-1">{place.description}</p>
+                                          <p className="text-sm text-slate-600 mt-1 break-words">{place.description}</p>
                                           {place.area && (
                                             <span className="inline-block mt-2 px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
                                               {place.area}
@@ -1963,7 +1973,7 @@ export function ItineraryTab({
                                       }`}
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', slot.label.toLowerCase())}</span>
+                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', translateSlotLabel(slot.label).toLowerCase())}</span>
                                       <span className="sm:hidden">{t('itinerary_add')}</span>
                                     </Button>
                                   </div>

@@ -40,7 +40,7 @@ export function NewFeaturesSection() {
     <section className="py-20 px-6 bg-cream">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl mb-4">
+          <h2 className="text-4xl md:text-5xl mb-4" style={{ fontFamily: "'Patrick Hand', cursive" }}>
             Why travelers love <span className="wavy-underline">Kruno</span>
           </h2>
           <p className="font-mono text-sm text-muted-foreground max-w-xl mx-auto">
@@ -54,7 +54,7 @@ export function NewFeaturesSection() {
               <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4">
                 <feature.icon className="w-6 h-6 text-foreground" />
               </div>
-              <h3 className="font-display text-xl mb-2">{feature.title}</h3>
+              <h3 className="text-xl mb-2" style={{ fontFamily: "'Patrick Hand', cursive" }}>{feature.title}</h3>
               <p className="text-muted-foreground text-sm">{feature.description}</p>
             </div>
           ))}

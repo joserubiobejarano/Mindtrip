@@ -247,7 +247,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
       <div className="w-[70%] max-w-6xl mx-auto text-center relative mt-8">
         {/* Main Title */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal md:solid-underline inline-block text-foreground mb-20 font-display">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal md:solid-underline inline-block text-foreground mb-20" style={{ fontFamily: "'Patrick Hand', cursive" }}>
           {t('home_hero_title')}
         </h1>
 

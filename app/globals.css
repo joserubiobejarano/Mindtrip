@@ -105,7 +105,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
+    font-family: 'Patrick Hand', cursive;
   }
 }
 
@@ -118,7 +118,7 @@
       font-size: 2.5rem;
       font-weight: 700;
       line-height: 1.3;
-      font-family: 'Caveat', cursive;
+      font-family: 'Patrick Hand', cursive;
     }
 
     h2 {
@@ -163,7 +163,7 @@
       font-size: 1.25rem;
       font-weight: 600;
       line-height: 1.4;
-      font-family: 'Caveat', cursive;
+      font-family: 'Patrick Hand', cursive;
     }
 
     p {
