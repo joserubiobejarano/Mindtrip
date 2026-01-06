@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Parse request body
-    const body: PushTestBody = await request.json();
-    const { language = 'en' } = body;
+    const requestBody: PushTestBody = await request.json();
+    const { language = 'en' } = requestBody;
 
     // Get all push tokens for the current user
     const { data: pushTokens, error: tokensError } = await supabase
@@ -59,10 +59,10 @@ export async function POST(request: NextRequest) {
           .limit(1);
 
         if (memberTrips && memberTrips.length > 0) {
-          tripId = memberTrips[0].trip_id;
+          tripId = (memberTrips[0] as { trip_id: string }).trip_id;
         }
       } else {
-        tripId = ownedTrips[0].id;
+        tripId = (ownedTrips[0] as { id: string }).id;
       }
     } catch (tripError) {
       console.error('[push-test] Error fetching trips:', tripError);

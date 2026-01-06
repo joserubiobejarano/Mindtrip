@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { auth, clerkClient, verifyToken } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ProfileAuthResult } from './getProfileId';
@@ -28,7 +28,7 @@ export async function getProfileIdFromRequest(
 
     try {
       // Verify the token with Clerk
-      const session = await clerkClient.verifyToken(token);
+      const session = await verifyToken(token, {});
       clerkUserId = session.sub; // sub is the user ID in JWT
 
       console.log('[Auth] Bearer token verified', {
@@ -42,7 +42,8 @@ export async function getProfileIdFromRequest(
 
       // Get user info from Clerk for Bearer token auth
       try {
-        const user = await clerkClient.users.getUser(clerkUserId);
+        const client = await clerkClient();
+        const user = await client.users.getUser(clerkUserId);
         email = user.primaryEmailAddress?.emailAddress || '';
       } catch (userError: any) {
         console.warn('[Auth] Could not fetch user email from Clerk', {
