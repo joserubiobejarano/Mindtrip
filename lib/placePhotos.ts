@@ -39,6 +39,13 @@ export function isPhotoSrcUsable(src: any): src is string {
   return false;
 }
 
+interface ResolvePhotoOptions {
+  usedImageUrls?: Set<string>;
+  usedPlaceIds?: Set<string>;
+  placeId?: string | null;
+  allowDedupedFallback?: boolean; // If true, allows returning a generic image or null if main is duped
+}
+
 /**
  * Resolves a place photo source from various input shapes to a usable URL string or null.
  * 
@@ -59,175 +66,196 @@ export function isPhotoSrcUsable(src: any): src is string {
  *    - Check nested place objects: place.place.photos, activity.place.photos, activity.placePhotos, activity.photo
  * 
  * C) If nothing found, return null
+ *
+ * @param input The input object or string representing a photo source.
+ * @param options Options for deduplication and fallback.
  */
-export function resolvePlacePhotoSrc(input: any): string | null {
-  if (!input) return null;
+export function resolvePlacePhotoSrc(input: any, options?: ResolvePhotoOptions): string | null {
+  const { usedImageUrls, usedPlaceIds, placeId, allowDedupedFallback = false } = options || {};
 
-  // Case A: Input is a string
-  if (typeof input === 'string') {
-    const trimmed = input.trim();
-    if (trimmed.length === 0) return null;
-    
-    // Already a relative URL
-    if (trimmed.startsWith('/')) return trimmed;
-    
-    // Already an absolute URL
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      return trimmed;
+  const checkAndAdd = (url: string, currentPlaceId?: string | null): string | null => {
+    if (usedImageUrls && usedImageUrls.has(url)) {
+      return null; // Duplicate URL
+    }
+    if (currentPlaceId && usedPlaceIds && usedPlaceIds.has(currentPlaceId)) {
+      return null; // Duplicate primary image for this place ID
     }
     
-    // Only convert to proxy URL if it's a valid Google photo reference
-    if (isGooglePhotoReference(trimmed)) {
-      return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+    // If it's not a duplicate, mark it as used
+    if (usedImageUrls) usedImageUrls.add(url);
+    if (currentPlaceId && usedPlaceIds) usedPlaceIds.add(currentPlaceId);
+    return url;
+  };
+
+  const tryResolveAndCheck = (source: any, currentPlaceId?: string | null): string | null => {
+    // Recursively call resolvePlacePhotoSrc without deduplication checks for inner resolutions
+    // The main checkAndAdd handles the top-level deduplication
+    const resolvedUrl = _resolvePlacePhotoSrcInternal(source);
+    if (resolvedUrl) {
+      return checkAndAdd(resolvedUrl, currentPlaceId);
     }
-    
-    // Invalid photo reference, return null
     return null;
-  }
+  };
 
-  // Case B: Input is an object
-  if (typeof input === 'object' && input !== null) {
-    // PRIORITY 1: Check image_url first (from SmartItinerary activities) - if present and usable, return immediately
-    // This avoids trying to resolve place.photos which don't serialize properly
-    // IMPORTANT: If image_url is already a URL (cached Supabase URL or any http/https URL), never convert it to proxy
-    if (input.image_url && typeof input.image_url === 'string') {
-      const trimmed = input.image_url.trim();
-      if (trimmed.length > 0) {
-        // Already a relative URL (e.g., /api/places/photo)
-        if (trimmed.startsWith('/')) return trimmed;
-        // Already an absolute URL (e.g., Supabase Storage URL, Google lh3 URL, etc.)
-        // NEVER convert these to proxy URLs - they're already usable
-        if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-          return trimmed;
-        }
-        // Only if it's NOT a URL and IS a valid Google photo reference, convert to proxy URL
-        if (isGooglePhotoReference(trimmed)) {
-          return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
-        }
-        // If it's not a URL and not a photo reference, return as-is (might be invalid data)
+  // Internal helper to avoid infinite recursion for the new options parameter
+  const _resolvePlacePhotoSrcInternal = (inputInternal: any): string | null => {
+    if (!inputInternal) return null;
+
+    // Case A: Input is a string
+    if (typeof inputInternal === 'string') {
+      const trimmed = inputInternal.trim();
+      if (trimmed.length === 0) return null;
+      
+      if (trimmed.startsWith('/')) return trimmed;
+      
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
         return trimmed;
       }
+      
+      if (isGooglePhotoReference(trimmed)) {
+        return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+      }
+      
+      return null;
     }
-    
-    // PRIORITY 1b: Check imageUrl (camelCase variant) defensively
-    // Same logic as image_url - never convert cached URLs to proxy
-    if (input.imageUrl && typeof input.imageUrl === 'string') {
-      const trimmed = input.imageUrl.trim();
-      if (trimmed.length > 0) {
-        // Already a relative URL
-        if (trimmed.startsWith('/')) return trimmed;
-        // Already an absolute URL - NEVER convert cached URLs to proxy
-        if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+
+    // Case B: Input is an object
+    if (typeof inputInternal === 'object' && inputInternal !== null) {
+      // PRIORITY 1: Check image_url first
+      if (inputInternal.image_url && typeof inputInternal.image_url === 'string') {
+        const trimmed = inputInternal.image_url.trim();
+        if (trimmed.length > 0) {
+          if (trimmed.startsWith('/')) return trimmed;
+          if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+            return trimmed;
+          }
+          if (isGooglePhotoReference(trimmed)) {
+            return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+          }
+          return trimmed; // Potentially invalid but returned as-is for now
+        }
+      }
+      
+      // PRIORITY 1b: Check imageUrl (camelCase variant)
+      if (inputInternal.imageUrl && typeof inputInternal.imageUrl === 'string') {
+        const trimmed = inputInternal.imageUrl.trim();
+        if (trimmed.length > 0) {
+          if (trimmed.startsWith('/')) return trimmed;
+          if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+            return trimmed;
+          }
+          if (isGooglePhotoReference(trimmed)) {
+            return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
+          }
           return trimmed;
         }
-        // Only convert if it's a valid Google photo reference (not a URL)
-        if (isGooglePhotoReference(trimmed)) {
-          return `/api/places/photo?ref=${encodeURIComponent(trimmed)}`;
-        }
-        // Return as-is if not a URL and not a photo reference
-        return trimmed;
       }
-    }
-    
-    // PRIORITY 2: Check photos array for photo_reference or ref
-    // This matches Explore cards which store photos[0] as a photo_reference string
-    if (input.photos && Array.isArray(input.photos) && input.photos.length > 0) {
-      const firstPhoto = input.photos[0];
-      if (typeof firstPhoto === 'string') {
-        const resolved = resolvePlacePhotoSrc(firstPhoto);
-        if (resolved) return resolved;
-      } else if (typeof firstPhoto === 'object' && firstPhoto !== null) {
-        // Check for photo_reference or ref in object
-        const refValue = firstPhoto.photo_reference || firstPhoto.photoReference || firstPhoto.ref;
-        if (refValue && typeof refValue === 'string' && isGooglePhotoReference(refValue)) {
-          return `/api/places/photo?ref=${encodeURIComponent(refValue)}`;
+      
+      // PRIORITY 2: Check photos array for photo_reference or ref
+      if (inputInternal.photos && Array.isArray(inputInternal.photos) && inputInternal.photos.length > 0) {
+        const firstPhoto = inputInternal.photos[0];
+        if (typeof firstPhoto === 'string') {
+          const resolved = _resolvePlacePhotoSrcInternal(firstPhoto);
+          if (resolved) return resolved;
+        } else if (typeof firstPhoto === 'object' && firstPhoto !== null) {
+          const refValue = firstPhoto.photo_reference || firstPhoto.photoReference || firstPhoto.ref;
+          if (refValue && typeof refValue === 'string' && isGooglePhotoReference(refValue)) {
+            return `/api/places/photo?ref=${encodeURIComponent(refValue)}`;
+          }
         }
       }
-    }
-    
-    // PRIORITY 3: Check other already-usable URL fields
-    const urlFields = ['photoUrl', 'photo_url', 'imageUrl', 'url'];
-    for (const field of urlFields) {
-      const value = input[field];
-      if (value && typeof value === 'string') {
-        const resolved = resolvePlacePhotoSrc(value); // Recursively handle string
-        if (resolved) return resolved;
-      }
-    }
-
-    // Check for Google legacy photo reference fields
-    const refFields = ['photo_reference', 'photoReference', 'photoRef'];
-    for (const field of refFields) {
-      const value = input[field];
-      if (value && typeof value === 'string') {
-        // Only convert to proxy URL if it's a valid Google photo reference
-        if (isGooglePhotoReference(value)) {
-          return `/api/places/photo?ref=${encodeURIComponent(value)}`;
-        }
-        // Invalid photo reference, continue to next field
-      }
-    }
-
-    // Check for array fields: photos, photo, images
-    const arrayFields = ['photos', 'photo', 'images'];
-    for (const field of arrayFields) {
-      const arr = input[field];
-      if (Array.isArray(arr) && arr.length > 0) {
-        const firstItem = arr[0];
-        
-        // Array of strings
-        if (typeof firstItem === 'string') {
-          const resolved = resolvePlacePhotoSrc(firstItem); // Recursively handle string
+      
+      // PRIORITY 3: Check other already-usable URL fields
+      const urlFields = ['photoUrl', 'photo_url', 'imageUrl', 'url'];
+      for (const field of urlFields) {
+        const value = inputInternal[field];
+        if (value && typeof value === 'string') {
+          const resolved = _resolvePlacePhotoSrcInternal(value);
           if (resolved) return resolved;
         }
-        
-        // Array of objects
-        if (typeof firstItem === 'object' && firstItem !== null) {
-          // Try first item's url field
-          if (firstItem.url && typeof firstItem.url === 'string') {
-            const resolved = resolvePlacePhotoSrc(firstItem.url);
+      }
+
+      // Check for Google legacy photo reference fields
+      const refFields = ['photo_reference', 'photoReference', 'photoRef'];
+      for (const field of refFields) {
+        const value = inputInternal[field];
+        if (value && typeof value === 'string') {
+          if (isGooglePhotoReference(value)) {
+            return `/api/places/photo?ref=${encodeURIComponent(value)}`;
+          }
+        }
+      }
+
+      // Check for array fields: photos, photo, images
+      const arrayFields = ['photos', 'photo', 'images'];
+      for (const field of arrayFields) {
+        const arr = inputInternal[field];
+        if (Array.isArray(arr) && arr.length > 0) {
+          const firstItem = arr[0];
+          
+          if (typeof firstItem === 'string') {
+            const resolved = _resolvePlacePhotoSrcInternal(firstItem);
             if (resolved) return resolved;
           }
           
-          // Try first item's photo_reference, photoReference, or photoRef
-          const refValue = firstItem.photo_reference || firstItem.photoReference || firstItem.photoRef;
-          if (refValue && typeof refValue === 'string') {
-            // Only convert to proxy URL if it's a valid Google photo reference
-            if (isGooglePhotoReference(refValue)) {
-              return `/api/places/photo?ref=${encodeURIComponent(refValue)}`;
-            }
-            // Invalid photo reference, continue to next field
-          }
-          
-          // Try first item's name (unlikely but possible)
-          if (firstItem.name && typeof firstItem.name === 'string') {
-            // Only treat as photo reference if it doesn't look like a URL
-            if (!firstItem.name.startsWith('http') && !firstItem.name.startsWith('/')) {
-              const resolved = resolvePlacePhotoSrc(firstItem.name);
+          if (typeof firstItem === 'object' && firstItem !== null) {
+            if (firstItem.url && typeof firstItem.url === 'string') {
+              const resolved = _resolvePlacePhotoSrcInternal(firstItem.url);
               if (resolved) return resolved;
+            }
+            
+            const refValue = firstItem.photo_reference || firstItem.photoReference || firstItem.ref;
+            if (refValue && typeof refValue === 'string') {
+              if (isGooglePhotoReference(refValue)) {
+                return `/api/places/photo?ref=${encodeURIComponent(refValue)}`;
+              }
+            }
+            
+            if (firstItem.name && typeof firstItem.name === 'string') {
+              if (!firstItem.name.startsWith('http') && !firstItem.name.startsWith('/')) {
+                const resolved = _resolvePlacePhotoSrcInternal(firstItem.name);
+                if (resolved) return resolved;
+              }
             }
           }
         }
       }
+
+      // Check nested place object
+      if (inputInternal.place && typeof inputInternal.place === 'object') {
+        const resolved = _resolvePlacePhotoSrcInternal(inputInternal.place);
+        if (resolved) return resolved;
+      }
+
+      // Check activity-specific fields
+      if (inputInternal.placePhotos) {
+        const resolved = _resolvePlacePhotoSrcInternal(inputInternal.placePhotos);
+        if (resolved) return resolved;
+      }
+      if (inputInternal.photo) {
+        const resolved = _resolvePlacePhotoSrcInternal(inputInternal.photo);
+        if (resolved) return resolved;
+      }
     }
 
-    // Check nested place object (place.place.photos, activity.place.photos)
-    if (input.place && typeof input.place === 'object') {
-      const resolved = resolvePlacePhotoSrc(input.place);
-      if (resolved) return resolved;
-    }
+    return null;
+  };
 
-    // Check activity-specific fields: activity.placePhotos, activity.photo
-    if (input.placePhotos) {
-      const resolved = resolvePlacePhotoSrc(input.placePhotos);
-      if (resolved) return resolved;
-    }
-    if (input.photo) {
-      const resolved = resolvePlacePhotoSrc(input.photo);
-      if (resolved) return resolved;
+  // Main resolution and deduplication logic
+  let resolvedPhotoUrl = _resolvePlacePhotoSrcInternal(input);
+
+  if (resolvedPhotoUrl) {
+    const checkedUrl = checkAndAdd(resolvedPhotoUrl, placeId);
+    if (checkedUrl) {
+      return checkedUrl;
+    } else if (allowDedupedFallback) {
+      // If the main image is a duplicate and fallback is allowed, try a generic or skip
+      // For now, simply return null or a generic city image if available (not implemented yet)
+      // This is where logic for 'secondary images OR a generic city/neighborhood image OR skip image' would go.
+      // For MVP, just returning null.
+      return null;
     }
   }
 
-  // Case C: Nothing found
   return null;
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getOpenAIClient } from '@/lib/openai'
 import { findPlacePhoto } from '@/lib/google/places-server'
+import { resolvePlacePhotoSrc } from '@/lib/placePhotos' // Import resolvePlacePhotoSrc
 import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries-server'
 import type { TripSegment } from '@/types/trip-segments'
 
@@ -38,8 +39,8 @@ function getGoodForLabel(types: string[] | null | undefined): string | null {
  */
 function matchSuggestionToSavedPlace(
   suggestion: string,
-  savedPlaces: Array<{ name: string; photo_url: string | null; types: string[] | null }>
-): { photoUrl: string | null; goodFor: string | null } | null {
+  savedPlaces: Array<{ name: string; photo_url: string | null; types: string[] | null; place_id: string | null }>
+): { photoUrl: string | null; goodFor: string | null; placeId: string | null } | null {
   if (!savedPlaces || savedPlaces.length === 0) return null
 
   const suggestionLower = suggestion.toLowerCase().trim()
@@ -56,6 +57,7 @@ function matchSuggestionToSavedPlace(
   return {
     photoUrl: matchedPlace.photo_url,
     goodFor: getGoodForLabel(matchedPlace.types),
+    placeId: matchedPlace.place_id,
   }
 }
 
@@ -190,7 +192,7 @@ export async function POST(request: NextRequest) {
     // Load saved places for the trip (from saved_places table)
     const { data: savedPlaces, error: placesError } = await supabase
       .from('saved_places')
-      .select('name, address, lat, lng, types, photo_url')
+      .select('name, address, lat, lng, types, photo_url, place_id')
       .eq('trip_id', tripId)
       .order('created_at', { ascending: false })
       .limit(20)
@@ -201,6 +203,7 @@ export async function POST(request: NextRequest) {
         lng: number | null;
         types: string[] | null;
         photo_url: string | null;
+        place_id: string | null;
       }>>();
 
     if (placesError) {
@@ -220,8 +223,12 @@ export async function POST(request: NextRequest) {
       const placesList = savedPlaces.map(p => {
         const typesStr = p.types && p.types.length > 0 ? ` (${p.types.slice(0, 2).join(', ')})` : ''
         return `- ${p.name}${p.address ? ` - ${p.address}` : ''}${typesStr}`
-      }).join('\n')
-      savedPlacesText = `\n\nSaved places of interest (prioritize including these in the itinerary):\n${placesList}`
+      }).join('
+')
+      savedPlacesText = `
+
+Saved places of interest (prioritize including these in the itinerary):
+${placesList}`
     }
 
     const daysInfo = (days || []).map(day => {
@@ -230,7 +237,7 @@ export async function POST(request: NextRequest) {
         date: date.toISOString().split('T')[0],
         dayNumber: day.day_number,
         dayOfWeek: date.toLocaleDateString('en-US', { weekday: 'long' }),
-        month: date.toLocaleDateString('en-US', { month: 'long' }),
+        month: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         day: date.getDate(),
         year: date.getFullYear(),
       }
@@ -244,7 +251,8 @@ Trip Details:
 - Number of days: ${days?.length || 0}${savedPlacesText}
 
 Days to plan:
-${daysInfo.map(d => `- Day ${d.dayNumber}: ${d.dayOfWeek}, ${d.month} ${d.day}, ${d.year} (${d.date})`).join('\n')}
+${daysInfo.map(d => `- Day ${d.dayNumber}: ${d.dayOfWeek}, ${d.month} ${d.day}, ${d.year} (${d.date})`).join('
+')}
 
 Requirements:
 - 1 entry per day of the trip.
@@ -262,11 +270,15 @@ Requirements:
               - "description": 2-3 sentences with practical info (opening hours, tips, what to expect)
               - "placeId": null (always null for now)
               - "alreadyVisited": false (always false for now)
-- For each time slot (Morning, Afternoon, Evening), target at least 4 activities where feasible. This can include major sights, short stops, viewpoints, small walks, etc. Still respect realistic travel time and opening hours.
+- For each time slot (Morning, Afternoon, Evening), target at least 4-6 activities where feasible. This can include major sights, short stops, viewpoints, small walks, etc. Still respect realistic travel time and opening hours.
+- Ensure day plans cover multiple neighborhoods and diverse activity categories (e.g., landmark, food, neighborhood, viewpoint, cultural, local experience, park). Avoid clustering all activities around a single landmark or area.
+- Require at least 4-6 unique Points of Interest (POIs) per day, spread across at least 2-3 different areas/neighborhoods of the city.
 - Maximum one food place per time slot (Morning/Afternoon/Evening). Define "food place" as restaurant, café, bar, bakery, or any establishment primarily focused on food/drinks. This is a hard constraint: if multiple food places are suggested, only include the best one per slot.
 - Take into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
-- Use the destination city "${destination}" to anchor recommendations
-- Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing
+- Use the destination city "${destination}" to anchor recommendations, but ensure variety across daily activities rather than dominating with a single "trip title" landmark.
+- Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing.
+- Avoid adding the exact same place or landmark more than once to the itinerary, UNLESS it is a significant landmark that offers a distinctly different experience at different times (e.g., day vs. night visit).
+- When a place is suggested multiple times (e.g., a restaurant for lunch and dinner), pick the most suitable slot and do not duplicate. If a place must be visited multiple times, make sure the activity description for each visit is unique and highlights the different experience.
 - Avoid booking links or specific booking recommendations - just give ideas and context
 - Provide realistic timing and themes for each day
 - Include seasonal considerations (weather, local events, etc.)
@@ -427,6 +439,10 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
       });
     });
 
+    // Initialize sets for deduplication within the current itinerary generation
+    const usedImageUrls = new Set<string>();
+    const usedPlaceIds = new Set<string>();
+
     // Process itinerary: Fetch photos and prepare activities for insertion
     const activitiesToInsert: any[] = [];
     let globalOrderCounter = 0;
@@ -439,7 +455,8 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
       const heroPhotoUrls = await Promise.all(
         (day.heroImages || []).slice(0, 6).map(async (searchTerm) => {
           const query = `${searchTerm} in ${destination}${country ? `, ${country}` : ''}`;
-          return await findPlacePhoto(query);
+          // Pass deduplication sets when finding hero images
+          return await findPlacePhoto(query, { usedImageUrls, usedPlaceIds, placeId: null, allowDedupedFallback: true });
         })
       );
 
@@ -450,11 +467,13 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
           // Try to match with saved place first
           let match = matchSuggestionToSavedPlace(activity.name, savedPlaces || []);
           let photoUrl = match?.photoUrl;
+          let activityPlaceId = match?.placeId || activity.placeId;
           
           // If no photo from saved place, try Google Places
           if (!photoUrl) {
              const query = `${activity.name} in ${destination}${country ? `, ${country}` : ''}`;
-             photoUrl = await findPlacePhoto(query);
+             // Pass deduplication sets and placeId to resolvePlacePhotoSrc
+             photoUrl = await findPlacePhoto(query, { usedImageUrls, usedPlaceIds, placeId: activityPlaceId, allowDedupedFallback: true });
           }
 
           // Prepare activity record
@@ -478,6 +497,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
               end_time: endTime,
               photo_url: photoUrl,
               order_number: globalOrderCounter++,
+              place_id: activityPlaceId, // Save the resolved placeId
             });
           }
 
@@ -486,7 +506,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
             description: activity.description,
             photoUrl: photoUrl,
             goodFor: match?.goodFor,
-            placeId: activity.placeId,
+            placeId: activityPlaceId, // Return the resolved placeId
             alreadyVisited: activity.alreadyVisited || false,
           } as ActivitySuggestion;
         }));

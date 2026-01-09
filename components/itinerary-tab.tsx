@@ -107,7 +107,7 @@ export function ItineraryTab({
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   // Track the single open day ID (null means all days are collapsed)
   // Collapsible behavior allows users to collapse all days for better overview
-  const [expandedDays, setExpandedDays] = useState<string | null>(null);
+    const [expandedDays, setExpandedDays] = useState<string[]>([]);
   const hasInitializedRef = useRef(false);
   const [isBackfillingImages, setIsBackfillingImages] = useState(false);
   
@@ -523,15 +523,24 @@ export function ItineraryTab({
                     break;
                     
                   case 'error':
-                    console.error('[itinerary-tab] SSE error:', data.data);
+                    const errorData = data.data;
+                    const errorMessage = errorData?.message || errorData || 'Failed to generate itinerary';
+                    const errorDetails = errorData?.details || errorData?.zodIssues;
+                    
+                    console.error('[itinerary-tab] SSE error:', {
+                      message: errorMessage,
+                      details: errorDetails,
+                      fullError: errorData
+                    });
+                    
                     // If we have partial data, show it but also show the error
                     setSmartItinerary(prev => {
                       if (prev && prev.days && prev.days.length > 0) {
-                        setError(data.data.message || t('itinerary_error_generation_incomplete'));
+                        setError(errorMessage);
                         setStatus('loaded'); // Show partial data
                         return prev;
                       } else {
-                        setError(data.data.message || t('itinerary_error_occurred'));
+                        setError(errorMessage);
                         setStatus('error');
                         return null;
                       }
@@ -1246,7 +1255,7 @@ export function ItineraryTab({
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
-                  const isExpanded = expandedDays === day.id;
+                  const isExpanded = expandedDays.includes(day.id);
 
                   // Debug logging (development only) - first 5 activities per day
                   if (process.env.NODE_ENV === "development") {
@@ -1288,12 +1297,11 @@ export function ItineraryTab({
                         isExpanded={isExpanded}
                         onToggle={() => {
                           setExpandedDays(prev => {
-                            // If clicking the currently open day, collapse it (set to null)
-                            if (prev === day.id) {
-                              return null;
+                            if (prev.includes(day.id)) {
+                              return prev.filter(id => id !== day.id);
+                            } else {
+                              return [...prev, day.id];
                             }
-                            // Otherwise, open this day (closes any other open day)
-                            return day.id;
                           });
                         }}
                         onSelectDay={onSelectDay}
@@ -1453,7 +1461,7 @@ export function ItineraryTab({
                                         </div>
                                         <div className="min-w-0 flex-1">
                                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                            <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                            <h4 className={`font-bold text-lg text-slate-900 ${place.visited ? 'line-through' : ''}`} style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
                                             <div className="shrink-0 flex flex-col sm:flex-row items-end sm:items-center gap-2">
                                               <Button
                                                 size="sm"
@@ -1473,7 +1481,6 @@ export function ItineraryTab({
                                                 <span className="xs:hidden">{place.visited ? t('itinerary_visited') : t('itinerary_mark_visited')}</span>
                                               </Button>
                                               <Button
-                                                type="button"
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={(e) => {
@@ -1526,9 +1533,20 @@ export function ItineraryTab({
                                               >
                                                 {t('itinerary_remove')}
                                               </Button>
+                                              <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.google_place_id}`, "_blank");
+                                                }}
+                                              >
+                                                {t('itinerary_open_in_google_maps')}
+                                              </Button>
                                             </div>
                                           </div>
-                                          <p className="text-slate-700 text-sm mt-2 leading-relaxed break-words">
+                                          <p className={`text-slate-700 text-sm mt-2 leading-relaxed break-words ${place.visited ? 'line-through' : ''}`}>
                                             {place.description}
                                           </p>
                                           {place.area && (
@@ -1634,7 +1652,7 @@ export function ItineraryTab({
                   );
                   const uniqueDayImages = Array.from(new Set(validDayImages));
                   const bannerImages = uniqueDayImages.slice(0, 4);
-                  const isExpanded = expandedDays === day.id;
+                  const isExpanded = expandedDays.includes(day.id);
 
                   // Debug logging (development only) - first 5 activities per day
                   if (process.env.NODE_ENV === "development") {
@@ -1676,12 +1694,11 @@ export function ItineraryTab({
                         isExpanded={isExpanded}
                         onToggle={() => {
                           setExpandedDays(prev => {
-                            // If clicking the currently open day, collapse it (set to null)
-                            if (prev === day.id) {
-                              return null;
+                            if (prev.includes(day.id)) {
+                              return prev.filter(id => id !== day.id);
+                            } else {
+                              return [...prev, day.id];
                             }
-                            // Otherwise, open this day (closes any other open day)
-                            return day.id;
                           });
                         }}
                         onSelectDay={onSelectDay}
@@ -1866,7 +1883,6 @@ export function ItineraryTab({
                                                 )}
                                               </Button>
                                               <Button
-                                                type="button"
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={(e) => {
@@ -1919,6 +1935,17 @@ export function ItineraryTab({
                                               >
                                                 <X className="h-3 w-3 inline mr-1" />
                                                 {t('itinerary_remove')}
+                                              </Button>
+                                              <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.google_place_id}`, "_blank");
+                                                }}
+                                              >
+                                                {t('itinerary_open_in_google_maps')}
                                               </Button>
                                             </div>
                                           </div>
