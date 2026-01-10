@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getOpenAIClient } from '@/lib/openai'
-import { findPlacePhoto } from '@/lib/google/places-server'
+import { findPlacePhoto, getCityFromLatLng, isLandmark } from '@/lib/google/places-server'
 import { resolvePlacePhotoSrc } from '@/lib/placePhotos' // Import resolvePlacePhotoSrc
 import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries-server'
 import type { TripSegment } from '@/types/trip-segments'
+
+interface TripDetails {
+  title: string;
+  start_date: string;
+  end_date: string;
+  center_lat: number | null;
+  center_lng: number | null;
+  destination_name: string | null;
+  destination_country: string | null;
+  destination_city: string | null;
+}
 
 /**
  * Get a human-readable "good for" label based on place types
@@ -129,7 +140,7 @@ export async function POST(request: NextRequest) {
     // Load trip data
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country')
+      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country, destination_city')
       .eq('id', tripId)
       .single<{
         title: string;
@@ -139,6 +150,7 @@ export async function POST(request: NextRequest) {
         center_lng: number | null;
         destination_name: string | null;
         destination_country: string | null;
+        destination_city: string | null;
       }>()
 
     if (tripError || !trip) {
@@ -212,10 +224,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Build the prompt (use segment data if available)
-    const destination = segment?.city_name || trip.destination_name || trip.title
-    const country = trip.destination_country || ""
-    const startDate = segment ? new Date(segment.start_date) : new Date(trip.start_date)
-    const endDate = segment ? new Date(segment.end_date) : new Date(trip.end_date)
+    // Determine the primary destination for the prompt
+    let primaryDestination = trip.destination_city || trip.destination_name || trip.title;
+    let resolvedCity = trip.destination_city;
+
+    // If primaryDestination is a landmark and no city is resolved, attempt to reverse geocode
+    if (!resolvedCity && trip.center_lat && trip.center_lng && (await isLandmark(primaryDestination))) {
+      const cityFromLatLng = await getCityFromLatLng(trip.center_lat, trip.center_lng);
+      if (cityFromLatLng) {
+        resolvedCity = cityFromLatLng;
+        primaryDestination = cityFromLatLng; // Use the resolved city as the primary destination
+        // Update the trip with the resolved city
+        await supabase.from('trips').update({ destination_city: cityFromLatLng }).eq('id', tripId);
+      }
+    }
+
+    // Set destination and country for the prompt
+    const destination = segment?.city_name || primaryDestination;
+    const country = trip.destination_country || "";
+    const startDate = segment ? new Date(segment.start_date) : new Date(trip.start_date);
+    const endDate = segment ? new Date(segment.end_date) : new Date(trip.end_date);
     
     // Format saved places for the prompt
     let savedPlacesText = ''
@@ -268,11 +296,10 @@ Requirements:
               - "description": 2-3 sentences with practical info (opening hours, tips, what to expect)
               - "placeId": null (always null for now)
               - "alreadyVisited": false (always false for now)
+- **Hard Constraint**: If the trip is 2 or more days, it *must* include at least 3 different areas/neighborhoods of the city. If the trip is 1 day, it *must* include at least 2 different areas/neighborhoods.
+- **Hard Constraint**: Must include category diversity. Each day must feature activities from at least 4 different categories from this list: sightseeing, food, park/nature, culture, viewpoint, local streets/market.
+- **Hard Constraint**: No single Point of Interest (POI) can appear in more than 1 activity block per day (e.g., if a museum is visited in the morning, it cannot be visited again in the afternoon or evening of the same day). Exceptions for distinctly different experiences (e.g. day/night visit to a major landmark) must be explicitly justified in the activity description.
 - For each time slot (Morning, Afternoon, Evening), target at least 4-6 activities where feasible. This can include major sights, short stops, viewpoints, small walks, etc. Still respect realistic travel time and opening hours.
-- Ensure day plans cover multiple neighborhoods and diverse activity categories (e.g., landmark, food, neighborhood, viewpoint, cultural, local experience, park). Avoid clustering all activities around a single landmark or area.
-- Require at least 4-6 unique Points of Interest (POIs) per day, spread across at least 2-3 different areas/neighborhoods of the city.
-- Maximum one food place per time slot (Morning/Afternoon/Evening). Define "food place" as restaurant, café, bar, bakery, or any establishment primarily focused on food/drinks. This is a hard constraint: if multiple food places are suggested, only include the best one per slot.
-- Take into account the actual dates (season, weekends, holidays, local events like Christmas markets, festivals, etc.)
 - Use the destination city "${destination}" to anchor recommendations, but ensure variety across daily activities rather than dominating with a single "trip title" landmark.
 - Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing.
 - Avoid adding the exact same place or landmark more than once to the itinerary, UNLESS it is a significant landmark that offers a distinctly different experience at different times (e.g., day vs. night visit).
@@ -454,7 +481,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
         (day.heroImages || []).slice(0, 6).map(async (searchTerm) => {
           const query = `${searchTerm} in ${destination}${country ? `, ${country}` : ''}`;
           // Pass deduplication sets when finding hero images
-          return await findPlacePhoto(query, { usedImageUrls, usedPlaceIds, placeId: null, allowDedupedFallback: true });
+          return await findPlacePhoto(query, { usedImageUrls, usedPlaceIds, placeId: null, allowDedupedFallback: true, destinationCity: destination });
         })
       );
 
@@ -471,7 +498,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
           if (!photoUrl) {
              const query = `${activity.name} in ${destination}${country ? `, ${country}` : ''}`;
              // Pass deduplication sets and placeId to resolvePlacePhotoSrc
-             photoUrl = await findPlacePhoto(query, { usedImageUrls, usedPlaceIds, placeId: activityPlaceId, allowDedupedFallback: true });
+             photoUrl = await findPlacePhoto(query, { usedImageUrls, usedPlaceIds, placeId: activityPlaceId, allowDedupedFallback: true, destinationCity: destination });
           }
 
           // Prepare activity record

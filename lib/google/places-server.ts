@@ -2,6 +2,34 @@
 export const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 /**
+ * Get a generic city photo using Google Places API (Server-side)
+ * This is a fallback when no specific place photo can be found or is deduped.
+ */
+export async function getGenericCityPhoto(cityName: string): Promise<string | null> {
+  if (!GOOGLE_MAPS_API_KEY) {
+    console.error("Missing Google Maps API Key");
+    return null;
+  }
+
+  try {
+    const query = `${cityName} city skyline`; // A generic query for a city photo
+    const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=photos&key=${GOOGLE_MAPS_API_KEY}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.candidates && data.candidates.length > 0 && data.candidates[0].photos && data.candidates[0].photos.length > 0) {
+      const photoRef = data.candidates[0].photos[0].photo_reference;
+      return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${GOOGLE_MAPS_API_KEY}`;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching generic city photo:", error);
+    return null;
+  }
+}
+
+/**
  * Fetch a single representative photo URL for a place name using Google Places API (Server-side)
  */
 export async function findPlacePhoto(query: string, options?: {
@@ -9,6 +37,7 @@ export async function findPlacePhoto(query: string, options?: {
   usedPlaceIds?: Set<string>;
   placeId?: string | null;
   allowDedupedFallback?: boolean;
+  destinationCity?: string; // New parameter
 }): Promise<string | null> {
   if (!GOOGLE_MAPS_API_KEY) {
     console.error("Missing Google Maps API Key");
@@ -59,6 +88,15 @@ export async function findPlacePhoto(query: string, options?: {
       }
     }
     
+    // If no unique photo found after all attempts, try a generic city photo if allowed
+    if (allowDedupedFallback && destinationCity) {
+      const genericPhoto = await getGenericCityPhoto(destinationCity);
+      if (genericPhoto) {
+        usedImageUrls?.add(genericPhoto);
+        return genericPhoto;
+      }
+    }
+
     return null;
   } catch (error) {
     console.error("Error fetching place photo:", error);
@@ -194,5 +232,60 @@ export async function getPlacePhotoByPlaceId(placeId: string): Promise<string | 
     console.error("Error fetching photo by place_id:", error);
     return null;
   }
+}
+
+export async function getCityFromLatLng(lat: number, lng: number): Promise<string | null> {
+  if (!GOOGLE_MAPS_API_KEY) {
+    console.error("Missing Google Maps API Key");
+    return null;
+  }
+
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=locality&key=${GOOGLE_MAPS_API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status === 'OK' && data.results && data.results.length > 0) {
+      for (const result of data.results) {
+        if (result.types.includes('locality')) {
+          const cityComponent = result.address_components.find((comp: any) => comp.types.includes('locality'));
+          if (cityComponent) {
+            return cityComponent.long_name;
+          }
+        }
+      }
+    }
+    console.error('Google Geocoding API error:', data.status, data.error_message);
+    return null;
+  } catch (error) {
+    console.error("Error reverse geocoding:", error);
+    return null;
+  }
+}
+
+// A very basic heuristic to check if a string might be a landmark
+// In a real application, this would involve a more robust lookup or NLP
+export async function isLandmark(name: string): Promise<boolean> {
+  const commonLandmarkKeywords = [
+    "tower", "palace", "museum", "cathedral", "church", "park", "garden", "square", "bridge",
+    "castle", "fort", "temple", "monument", "statue", "market", "gallery", "arena", "coliseum",
+    "stadium", "zoo", "aquarium", "opera", "theater", "university", "library", "hospital", "station",
+    "airport", "hotel", "resort", "mall", "store", "restaurant", "cafe", "bar", "club", "beach",
+    "mountain", "lake", "river", "waterfall", "forest", "desert", "valley", "canyon", "volcano",
+    "island", "reef", "cave", "ruins", "pyramid", "sphinx", "wall", "gate", "fountain", "memorial",
+    "historic", "ancient", "national park", "wildlife", "sanctuary", "reserve", "landmark"
+  ];
+
+  const lowerName = name.toLowerCase();
+
+  // Check if the name contains common landmark keywords
+  if (commonLandmarkKeywords.some(keyword => lowerName.includes(keyword))) {
+    return true;
+  }
+
+  // A more sophisticated check might involve calling Google Places Details API
+  // and checking the 'types' array for common landmark types (e.g., 'point_of_interest', 'tourist_attraction')
+  // For now, this basic keyword check is sufficient as a starting point.
+  return false;
 }
 

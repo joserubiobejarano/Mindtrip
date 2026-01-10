@@ -3,6 +3,7 @@
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "@/components/ui/logo";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/providers/language-provider";
@@ -15,13 +16,7 @@ export function AppHeader() {
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <Image 
-              src="/icon.svg" 
-              alt="Kruno" 
-              width={32}
-              height={32}
-              priority
-            />
+            <Logo />
           </Link>
           <SignedIn>
             <Link href="/trips" className="text-sm text-muted-foreground hover:text-foreground">
@@ -30,29 +25,6 @@ export function AppHeader() {
           </SignedIn>
         </div>
         <div className="flex items-center gap-4">
-          {/* Language Switcher */}
-          <div className="flex items-center bg-secondary rounded-full p-1 mr-2">
-            <button
-              onClick={() => setLanguage('en')}
-              className={`px-2 py-1 rounded-full text-[10px] font-mono transition-colors ${
-                language === 'en' 
-                  ? "bg-primary text-primary-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => setLanguage('es')}
-              className={`px-2 py-1 rounded-full text-[10px] font-mono transition-colors ${
-                language === 'es' 
-                  ? "bg-primary text-primary-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              ES
-            </button>
-          </div>
 
           <SignedOut>
             <SignInButton forceRedirectUrl="/">

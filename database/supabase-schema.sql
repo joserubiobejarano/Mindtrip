@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS trips (
   end_date DATE NOT NULL,
   default_currency TEXT NOT NULL DEFAULT 'USD',
   owner_id TEXT NOT NULL,
+  destination_city TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

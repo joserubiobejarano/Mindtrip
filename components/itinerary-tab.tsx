@@ -1485,41 +1485,6 @@ export function ItineraryTab({
                                                 variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  console.log('[Itinerary] Change clicked', { dayId: day.id, activityId: place.id });
-                                                  const isDisabled = dayIsPast || changeCount >= usageLimits.change.limit;
-                                                  if (isDisabled) return;
-                                                  router.push(`/trips/${tripId}?tab=explore&mode=replace&day=${day.id}&activity=${place.id}`);
-                                                }}
-                                                disabled={dayIsPast || changeCount >= usageLimits.change.limit}
-                                                title={
-                                                  (() => {
-                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
-                                                    if (reasons.length > 0) {
-                                                      return `Disabled: ${reasons.join(', ')}`;
-                                                    }
-                                                    return dayIsPast
-                                                      ? t('itinerary_tooltip_day_passed')
-                                                      : changeCount >= usageLimits.change.limit
-                                                      ? t('itinerary_tooltip_change_limit')
-                                                        .replace('{count}', changeCount.toString())
-                                                        .replace('{limit}', usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit.toString())
-                                                        .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
-                                                      : undefined;
-                                                  })()
-                                                }
-                                                className={`rounded-full whitespace-nowrap ${
-                                                  dayIsPast || changeCount >= usageLimits.change.limit
-                                                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
-                                                    : "border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"
-                                                }`}
-                                              >
-                                                {t('itinerary_change')}
-                                              </Button>
-                                              <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
                                                   if (dayIsPast) return;
                                                   handleUpdatePlace(day.id, place.id, { remove: true });
                                                 }}
@@ -1909,14 +1874,6 @@ export function ItineraryTab({
                                                       : undefined;
                                                   })()
                                                 }
-                                                className={`rounded-lg whitespace-nowrap ${
-                                                  dayIsPast || changeCount >= usageLimits.change.limit
-                                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                    : "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
-                                                }`}
-                                              >
-                                                {t('itinerary_change')}
-                                              </Button>
                                               <Button
                                                 size="sm"
                                                 variant="outline"

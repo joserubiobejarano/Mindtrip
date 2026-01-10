@@ -88,6 +88,18 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Created development roadmap
 - [x] Created mobile app roadmap
 
+### Phase 10.5 - UI Components & Infrastructure ✅ **NEW**
+- [x] App Header component (`components/app-header.tsx`) with Logo, navigation, and user controls
+- [x] Logo component (`components/ui/logo.tsx`) for consistent branding
+- [x] Enhanced Itinerary Tab component with day-level Explore integration
+- [x] Day-level "Add activities" buttons on each time slot (morning/afternoon/evening)
+- [x] ExploreDeck integration in itinerary view for day-specific place discovery
+- [x] Usage limits display and enforcement in itinerary UI
+- [x] Photo resolution with cached image support
+- [x] Past-day lock protection in itinerary editing
+- [x] Activity count limits per day enforcement
+- [x] Accordion-style day headers (`DayAccordionHeader` component)
+
 ### Phase 11 - AI-Powered Trip Assistant & Smart Features
 - [x] Trip Assistant chat interface (AI-powered conversational assistant)
 - [x] Chat message persistence and history
@@ -114,6 +126,9 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Multi-city trip segment support (trip_segment_id parameter)
 - [x] Food place limit enforcement (max 1 per time slot)
 - [x] Improved food place detection using Google Places types
+- [x] Enhanced AI itinerary route with better photo matching and city resolution
+- [x] Generic city photo fallback functionality
+- [x] Enhanced Google Places server utilities (photo fetching, city resolution, landmark detection)
 
 ### Phase 15 - Explore Feature: Tinder-Style Place Discovery ✅
 - [x] Database schema for explore_sessions table (migration file created)
@@ -439,6 +454,7 @@ For later implementation phases:
     - `database/migrations/add-clerk-user-id-to-profiles.sql` - Adds column and backfills data
     - `database/migrations/add-unique-index-clerk-user-id.sql` - Adds unique index
   - **`trip_segments`** - ✅ **IMPLEMENTED** For multi-city trips (Pro tier) - Migration file: `database/migrations/supabase-add-trip-segments.sql`
+- **Database Schema** (`database/supabase-schema.sql`) - ✅ **UPDATED** with Clerk authentication support (TEXT for user IDs instead of UUID)
   - **`advisor_messages`** - ✅ **IMPLEMENTED** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
   - **Segment support columns** - ✅ **IMPLEMENTED**:
     - `days.trip_segment_id` - Links days to segments (`supabase-add-segment-id-to-days.sql`)
@@ -631,6 +647,44 @@ For later implementation phases:
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates (January 2025)
+
+- **2025-01-XX**: UI Components & Infrastructure ✅ **NEW**
+  - **App Header Component** (`components/app-header.tsx`):
+    - ✅ New unified app header with Logo component
+    - ✅ Navigation links (Trips link for signed-in users)
+    - ✅ Sign in/Sign up buttons for signed-out users
+    - ✅ Settings link and UserButton for signed-in users
+    - ✅ Language provider integration for internationalization
+    - ✅ Responsive design with container layout
+  - **Logo Component** (`components/ui/logo.tsx`):
+    - ✅ Reusable Logo component with "Kruno" branding
+    - ✅ Orange color scheme with custom font (Patrick Hand)
+    - ✅ Used in app header and throughout the application
+  - **Enhanced Itinerary Tab** (`components/itinerary-tab.tsx`):
+    - ✅ Day-level Explore integration with "Add activities" buttons
+    - ✅ ExploreDeck integration for day-specific place discovery
+    - ✅ Pre-filtering by day's neighborhood and time slot
+    - ✅ Immediate add-to-day functionality (swipe right adds to day/slot)
+    - ✅ Usage limits display and enforcement
+    - ✅ Photo resolution with cached image support
+    - ✅ Past-day lock protection
+    - ✅ Activity count limits per day
+    - ✅ Enhanced UI with accordion-style day headers
+  - **AI Itinerary Route Enhancements** (`app/api/ai-itinerary/route.ts`):
+    - ✅ Multi-city trip segment support (`trip_segment_id` parameter)
+    - ✅ Food place limit enforcement (max 1 per time slot)
+    - ✅ Improved food place detection using Google Places types
+    - ✅ Better photo matching with saved places
+    - ✅ Enhanced photo deduplication logic
+    - ✅ Generic city photo fallback when place photos unavailable
+    - ✅ City resolution from coordinates for landmark destinations
+  - **Google Places Server Utilities** (`lib/google/places-server.ts`):
+    - ✅ Enhanced photo fetching with deduplication support
+    - ✅ City resolution from lat/lng coordinates (`getCityFromLatLng`)
+    - ✅ Landmark detection (`isLandmark`) for better destination handling
+    - ✅ Place photo reference fetching by place_id
+    - ✅ Generic city photo fallback functionality
+    - ✅ Improved photo URL construction and caching
 
 - **2025-01-XX**: Security Architecture ✅ **NEW**
   - **Centralized Auth System**:

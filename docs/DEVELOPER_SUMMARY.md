@@ -640,6 +640,8 @@ OPENAI_API_KEY=your_openai_api_key
 
 The main database schema is in `database/supabase-schema.sql`. This creates all core tables:
 
+**Important:** The schema uses TEXT for user IDs to support Clerk authentication (not Supabase Auth). User IDs are stored as Clerk user IDs (e.g., "user_35oLHG0nQ6kzb4SqR8") instead of UUIDs.
+
 - `profiles` - User profiles
 - `trips` - Trip information
 - `days` - Days within trips
@@ -1218,6 +1220,15 @@ For questions or issues:
 - **NEW**: Billing system requires Stripe account and webhook configuration
 
 **Recent Additions (January 2025):**
+
+- **UI Components & Infrastructure**:
+  - ✅ **App Header Component** (`components/app-header.tsx`) - Unified header with Logo, navigation, sign in/up buttons, settings link
+  - ✅ **Logo Component** (`components/ui/logo.tsx`) - Reusable Logo component with "Kruno" branding
+  - ✅ **Enhanced Itinerary Tab** (`components/itinerary-tab.tsx`) - Day-level Explore integration, usage limits, photo resolution, past-day lock
+  - ✅ **AI Itinerary Route Enhancements** (`app/api/ai-itinerary/route.ts`) - Segment support, food limits, better photo matching
+  - ✅ **Google Places Server Utilities** (`lib/google/places-server.ts`) - Enhanced photo fetching, city resolution, landmark detection
+
+- **Billing & Subscriptions**:
 - **Billing & Subscriptions**: Complete Stripe integration for Pro subscriptions and trip-level unlocks
   - Subscription checkout API (`/api/billing/checkout/subscription`)
   - Trip Pro unlock checkout API (`/api/billing/checkout/trip`)

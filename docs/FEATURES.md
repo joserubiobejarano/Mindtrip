@@ -17,6 +17,34 @@
 
 ## Core Features
 
+### UI Components ✅ **NEW** (January 2025)
+
+**App Header** (`components/app-header.tsx`):
+- Unified app header with Logo component
+- Navigation links (Trips link for signed-in users)
+- Sign in/Sign up buttons for signed-out users
+- Settings link and UserButton for signed-in users
+- Language provider integration for internationalization
+- Responsive container layout
+
+**Logo Component** (`components/ui/logo.tsx`):
+- Reusable Logo component with "Kruno" branding
+- Orange color scheme with custom font (Patrick Hand)
+- Used throughout the application for consistent branding
+
+**Enhanced Itinerary Tab** (`components/itinerary-tab.tsx`):
+- Day-level Explore integration with "Add activities" buttons
+- ExploreDeck component integration for day-specific place discovery
+- Pre-filtering by day's neighborhood and time slot
+- Immediate add-to-day functionality (swipe right adds to day/slot)
+- Usage limits display and enforcement
+- Photo resolution with cached image support
+- Past-day lock protection
+- Activity count limits per day
+- Enhanced UI with accordion-style day headers
+- Smart itinerary loading and error handling
+- Segment-aware itinerary display for multi-city trips
+
 ### Trip Management
 
 **Create Trip**
@@ -464,6 +492,15 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - Link/unlink place
 - Edit notes
 
+**Day-Level Activity Management** ✅ **NEW** (January 2025):
+- "Add activities" button on each time slot (morning/afternoon/evening) in itinerary view
+- Day-level Explore drawer/sheet with pre-filtered places
+- Pre-filtering by day's neighborhood (areaCluster) and time slot
+- Immediate add-to-day: swiping right in day mode adds place directly to that day/slot
+- Activity count limits per day (MAX_ACTIVITIES_PER_DAY)
+- Past-day lock protection (prevents modifying past days)
+- Usage limits display and enforcement (swipes, changes, search adds)
+
 **Replace Activity** ✅ **NEW** (January 2025):
 - Replace activity with contextually relevant alternative
 - Smart suggestions based on area/category using Explore Places API
@@ -907,6 +944,52 @@ Comprehensive security architecture with centralized auth helpers, input validat
 **Last Updated:** January 2025
 
 ## Recent Changes Summary (January 2025)
+
+### UI Components & Infrastructure ✅ **NEW**
+
+**App Header Component** (`components/app-header.tsx`):
+- Unified app header with Logo, navigation, and user controls
+- Sign in/Sign up buttons for unauthenticated users
+- Settings link and UserButton for authenticated users
+- Language provider integration for internationalization
+- Responsive container layout
+
+**Logo Component** (`components/ui/logo.tsx`):
+- Reusable Logo component with "Kruno" branding
+- Orange color scheme with custom font (Patrick Hand)
+- Used throughout the application for consistent branding
+
+**Enhanced Itinerary Tab** (`components/itinerary-tab.tsx`):
+- Day-level Explore integration with "Add activities" buttons on each time slot
+- ExploreDeck component integration for day-specific place discovery
+- Pre-filtering by day's neighborhood (areaCluster) and time slot
+- Immediate add-to-day: swiping right in day mode adds place directly to that day/slot
+- Usage limits display and enforcement (swipes, changes, search adds)
+- Photo resolution with cached image support (`resolvePlacePhotoSrc`)
+- Past-day lock protection (prevents modifying past days)
+- Activity count limits per day (MAX_ACTIVITIES_PER_DAY)
+- Enhanced UI with accordion-style day headers (`DayAccordionHeader`)
+- Smart itinerary loading and error handling
+- Segment-aware itinerary display for multi-city trips
+
+**AI Itinerary Route Enhancements** (`app/api/ai-itinerary/route.ts`):
+- Multi-city trip segment support (`trip_segment_id` parameter)
+- Food place limit enforcement (max 1 per time slot: morning/afternoon/evening)
+- Improved food place detection using Google Places types
+- Better photo matching with saved places (`matchSuggestionToSavedPlace`)
+- Enhanced photo deduplication logic (`usedImageUrls`, `usedPlaceIds`)
+- Generic city photo fallback when place photos unavailable
+- City resolution from coordinates for landmark destinations
+- Segment-aware day loading and itinerary generation
+
+**Google Places Server Utilities** (`lib/google/places-server.ts`):
+- Enhanced photo fetching with deduplication support
+- City resolution from lat/lng coordinates (`getCityFromLatLng`)
+- Landmark detection (`isLandmark`) for better destination handling
+- Place photo reference fetching by place_id (`getPlacePhotoReference`)
+- Generic city photo fallback functionality (`getGenericCityPhoto`)
+- Improved photo URL construction and caching
+- Place details fetching with comprehensive field support
 
 ### Added
 - **Billing & Subscriptions System**: Complete Stripe integration

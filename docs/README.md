@@ -303,6 +303,15 @@ kruno/
 **Phase 21:** ✅ Complete - Travel Advisor (Pre-Trip Planning) fully implemented
 
 **Recent Updates (January 2025):**
+
+- ✅ **UI Components & Infrastructure** - **NEW**
+  - ✅ **App Header Component** (`components/app-header.tsx`) - Unified header with Logo, navigation, and user controls
+  - ✅ **Logo Component** (`components/ui/logo.tsx`) - Reusable Logo component with "Kruno" branding
+  - ✅ **Enhanced Itinerary Tab** (`components/itinerary-tab.tsx`) - Day-level Explore integration, usage limits, photo resolution
+  - ✅ **AI Itinerary Route Enhancements** (`app/api/ai-itinerary/route.ts`) - Segment support, food limits, better photo matching
+  - ✅ **Google Places Server Utilities** (`lib/google/places-server.ts`) - Enhanced photo fetching, city resolution, landmark detection
+
+- ✅ **Billing & Subscriptions System** - Complete Stripe integration
 - ✅ **Billing & Subscriptions System** - Complete Stripe integration
   - ✅ Subscription checkout API (`/api/billing/checkout/subscription`) for account-level Pro
   - ✅ Trip Pro unlock checkout API (`/api/billing/checkout/trip`) for trip-level Pro

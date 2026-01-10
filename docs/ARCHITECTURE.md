@@ -564,18 +564,23 @@ app/
 │       └── page.tsx                 # Trip detail page
 │           └── TripShell
 │               └── TripTabs
-│                   ├── ItineraryTab
+│                   ├── ItineraryTab ✅ **ENHANCED**
 │                   ├── ExploreTab (updated) ✅
 │                   ├── ExpensesTab
 │                   └── ChecklistsTab
 └── components/
+    ├── app-header.tsx                # ✅ NEW: Unified app header with Logo
+    ├── ui/
+    │   └── logo.tsx                  # ✅ NEW: Reusable Logo component
+    ├── itinerary-tab.tsx             # ✅ ENHANCED: Day-level Explore integration
+    ├── day-accordion-header.tsx      # ✅ NEW: Accordion-style day headers
     ├── explore/                      # ✅ IMPLEMENTED: Explore components
     │   ├── SwipeableCard.tsx ✅
     │   ├── ExploreDeck.tsx ✅
     │   ├── ExploreFilters.tsx ✅
     │   └── SwipeCounter.tsx ✅
     └── itinerary/
-        └── AddMoreActivitiesButton.tsx  # Phase 17 (🚧 UI component remaining)
+        └── (day-level integration now in itinerary-tab.tsx) ✅
 ```
 
 ### State Management
@@ -928,6 +933,13 @@ lib/
   - DOMPurify sanitization for user-generated content
   - Sanitization functions: `sanitizeHtml()`, `escapeHtml()`, `sanitizeUserContent()`, `sanitizeChatMessage()`
 - **See [SECURITY.md](./SECURITY.md) for complete documentation**
+
+**UI Components & Infrastructure** ✅ **NEW** (January 2025)
+- **App Header Component**: Unified header with Logo, navigation, and user controls (`components/app-header.tsx`)
+- **Logo Component**: Reusable branding component (`components/ui/logo.tsx`)
+- **Enhanced Itinerary Tab**: Day-level Explore integration, usage limits, photo resolution (`components/itinerary-tab.tsx`)
+- **AI Itinerary Enhancements**: Segment support, food limits, better photo matching (`app/api/ai-itinerary/route.ts`)
+- **Google Places Utilities**: Enhanced photo fetching, city resolution, landmark detection (`lib/google/places-server.ts`)
 
 **Infrastructure & UX Improvements** ✅ **NEW** (January 2025)
 - Trip deletion: DELETE `/api/trips/[tripId]` endpoint with owner verification and cascade cleanup

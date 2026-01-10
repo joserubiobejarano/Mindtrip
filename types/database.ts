@@ -65,6 +65,7 @@ export interface Database {
           auto_accommodation: Json | null
           destination_name: string | null
           destination_country: string | null
+          destination_city: string | null
           destination_place_id: string | null
           created_at: string
         }
@@ -85,6 +86,7 @@ export interface Database {
           auto_accommodation?: Json | null
           destination_name?: string | null
           destination_country?: string | null
+          destination_city?: string | null
           destination_place_id?: string | null
           created_at?: string
         }
@@ -105,6 +107,7 @@ export interface Database {
           auto_accommodation?: Json | null
           destination_name?: string | null
           destination_country?: string | null
+          destination_city?: string | null
           destination_place_id?: string | null
           created_at?: string
         }
