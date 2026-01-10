@@ -4,31 +4,59 @@ export const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 /**
  * Fetch a single representative photo URL for a place name using Google Places API (Server-side)
  */
-export async function findPlacePhoto(query: string): Promise<string | null> {
+export async function findPlacePhoto(query: string, options?: {
+  usedImageUrls?: Set<string>;
+  usedPlaceIds?: Set<string>;
+  placeId?: string | null;
+  allowDedupedFallback?: boolean;
+}): Promise<string | null> {
   if (!GOOGLE_MAPS_API_KEY) {
     console.error("Missing Google Maps API Key");
     return null;
   }
 
   try {
+    const { usedImageUrls, usedPlaceIds, placeId, allowDedupedFallback } = options || {};
+
+    let actualPlaceId = placeId;
+
+    // If a placeId is provided, prioritize getting a photo for it
+    if (actualPlaceId) {
+      const photoUrlById = await getPlacePhotoByPlaceId(actualPlaceId);
+      if (photoUrlById && (!usedImageUrls || !usedImageUrls.has(photoUrlById))) {
+        usedImageUrls?.add(photoUrlById);
+        return photoUrlById;
+      }
+    }
+
+    // Fallback to text search if no specific placeId or if photo from placeId was deduped
     // Use Find Place API to get the photo reference
     // We request 'photos' field to get photo references
-    const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=photos&key=${GOOGLE_MAPS_API_KEY}`;
+    const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=place_id,photos&key=${GOOGLE_MAPS_API_KEY}`;
     
     const res = await fetch(url);
     const data = await res.json();
 
-    if (
-      data.candidates &&
-      data.candidates.length > 0 &&
-      data.candidates[0].photos &&
-      data.candidates[0].photos.length > 0
-    ) {
-      const photoRef = data.candidates[0].photos[0].photo_reference;
-      // Construct the photo URL
-      // Google Places Photo API returns the image binary, but we can store the URL that serves it
-      // Note: This URL will redirect to the actual image. Browsers handle this fine.
-      return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${GOOGLE_MAPS_API_KEY}`;
+    if (data.candidates && data.candidates.length > 0) {
+      // If we found a new place ID and it's already used, try other candidates if allowed
+      for (const candidate of data.candidates) {
+        if (usedPlaceIds && candidate.place_id && usedPlaceIds.has(candidate.place_id)) {
+          if (!allowDedupedFallback) {
+            continue; // Skip this candidate if deduping is strict
+          }
+        }
+
+        if (candidate.photos && candidate.photos.length > 0) {
+          const photoRef = candidate.photos[0].photo_reference;
+          const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${GOOGLE_MAPS_API_KEY}`;
+          
+          if (!usedImageUrls || !usedImageUrls.has(photoUrl)) {
+            usedImageUrls?.add(photoUrl);
+            usedPlaceIds?.add(candidate.place_id);
+            return photoUrl;
+          }
+        }
+      }
     }
     
     return null;

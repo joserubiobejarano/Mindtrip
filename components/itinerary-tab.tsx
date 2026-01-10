@@ -852,7 +852,7 @@ export function ItineraryTab({
   // This allows users to collapse all days without forcing another to open
   useEffect(() => {
     if (smartItinerary?.days && smartItinerary.days.length > 0 && !hasInitializedRef.current) {
-      setExpandedDays(smartItinerary.days[0].id);
+      setExpandedDays([smartItinerary.days[0].id]);
       hasInitializedRef.current = true;
     }
   }, [smartItinerary]);
@@ -1539,7 +1539,7 @@ export function ItineraryTab({
                                                 variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.google_place_id}`, "_blank");
+                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.place_id}`, "_blank");
                                                 }}
                                               >
                                                 {t('itinerary_open_in_google_maps')}
@@ -1942,7 +1942,7 @@ export function ItineraryTab({
                                                 variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.google_place_id}`, "_blank");
+                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.place_id}`, "_blank");
                                                 }}
                                               >
                                                 {t('itinerary_open_in_google_maps')}

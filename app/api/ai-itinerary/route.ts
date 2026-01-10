@@ -223,8 +223,7 @@ export async function POST(request: NextRequest) {
       const placesList = savedPlaces.map(p => {
         const typesStr = p.types && p.types.length > 0 ? ` (${p.types.slice(0, 2).join(', ')})` : ''
         return `- ${p.name}${p.address ? ` - ${p.address}` : ''}${typesStr}`
-      }).join('
-')
+      }).join('\n')
       savedPlacesText = `
 
 Saved places of interest (prioritize including these in the itinerary):
@@ -251,8 +250,7 @@ Trip Details:
 - Number of days: ${days?.length || 0}${savedPlacesText}
 
 Days to plan:
-${daysInfo.map(d => `- Day ${d.dayNumber}: ${d.dayOfWeek}, ${d.month} ${d.day}, ${d.year} (${d.date})`).join('
-')}
+${daysInfo.map(d => `- Day ${d.dayNumber}: ${d.dayOfWeek}, ${d.month} ${d.day}, ${d.year} (${d.date})`).join('\n')}
 
 Requirements:
 - 1 entry per day of the trip.
