@@ -52,6 +52,7 @@ export function NewTripDialog({
   userId,
 }: NewTripDialogProps) {
   const [isPro, setIsPro] = useState(false);
+  const [tripCount, setTripCount] = useState(0);
   const [loadingSubscription, setLoadingSubscription] = useState(true);
   const [destinationInput, setDestinationInput] = useState("");
   const [destination, setDestination] = useState<DestinationOption | null>(null);
@@ -76,14 +77,24 @@ export function NewTripDialog({
   // Fetch subscription status on mount
   useEffect(() => {
     if (open && userId) {
-      fetch('/api/user/subscription-status')
+      const fetchSubscriptionStatus = fetch('/api/user/subscription-status')
         .then(res => res.json())
-        .then(data => {
-          setIsPro(data.isPro || false);
+        .then(data => data.isPro || false);
+
+      const fetchTripCount = fetch('/api/trips')
+        .then(res => res.json())
+        .then(data => data.trips.length || 0);
+
+      Promise.all([fetchSubscriptionStatus, fetchTripCount])
+        .then(([isProUser, tripCount]) => {
+          setIsPro(isProUser);
+          setTripCount(tripCount);
           setLoadingSubscription(false);
         })
-        .catch(() => {
+        .catch((err) => {
+          console.error("Failed to fetch subscription status or trip count", err);
           setIsPro(false);
+          setTripCount(0); // Assume 0 trips on error
           setLoadingSubscription(false);
         });
     }
@@ -206,6 +217,14 @@ export function NewTripDialog({
     setFieldErrors({});
 
     if (!validateForm()) {
+      return;
+    }
+
+    // Free user trip limit check
+    const FREE_TRIP_LIMIT = 2;
+    if (!isPro && tripCount >= FREE_TRIP_LIMIT) {
+      setShowProPaywall(true);
+      setLoading(false);
       return;
     }
 
