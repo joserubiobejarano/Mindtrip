@@ -45,7 +45,7 @@ export async function findPlacePhoto(query: string, options?: {
   }
 
   try {
-    const { usedImageUrls, usedPlaceIds, placeId, allowDedupedFallback } = options || {};
+    const { usedImageUrls, usedPlaceIds, placeId, allowDedupedFallback, destinationCity } = options || {};
 
     let actualPlaceId = placeId;
 

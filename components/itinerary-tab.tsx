@@ -1874,6 +1874,10 @@ export function ItineraryTab({
                                                       : undefined;
                                                   })()
                                                 }
+                                                className="rounded-lg whitespace-nowrap"
+                                              >
+                                                {t('itinerary_change')}
+                                              </Button>
                                               <Button
                                                 size="sm"
                                                 variant="outline"

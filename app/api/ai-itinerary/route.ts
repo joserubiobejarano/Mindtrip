@@ -235,6 +235,7 @@ export async function POST(request: NextRequest) {
         resolvedCity = cityFromLatLng;
         primaryDestination = cityFromLatLng; // Use the resolved city as the primary destination
         // Update the trip with the resolved city
+        // @ts-expect-error - destination_city exists in schema but types may not be updated
         await supabase.from('trips').update({ destination_city: cityFromLatLng }).eq('id', tripId);
       }
     }
