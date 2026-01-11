@@ -232,6 +232,10 @@ export async function GET(
         
         const { data: daysData, error: daysError } = await daysQuery;
         
+        type DayQueryResult = {
+          id: string
+        }
+        
         if (daysError) {
           console.error('[Explore Places API]', {
             path: '/api/trips/[tripId]/explore/places',
@@ -244,7 +248,8 @@ export async function GET(
             context: 'fetching_days_for_activities',
           });
         } else if (daysData && daysData.length > 0) {
-          const dayIds = daysData.map(day => day.id);
+          const daysDataTyped = daysData as DayQueryResult[];
+          const dayIds = daysDataTyped.map(day => day.id);
           
           // Get all activities for these days that have place_id
           const { data: activitiesData, error: activitiesError } = await supabase
@@ -252,6 +257,10 @@ export async function GET(
             .select('place_id')
             .in('day_id', dayIds)
             .not('place_id', 'is', null);
+          
+          type ActivityQueryResult = {
+            place_id: string | null
+          }
           
           if (activitiesError) {
             console.error('[Explore Places API]', {
@@ -265,9 +274,10 @@ export async function GET(
               context: 'fetching_activities',
             });
           } else if (activitiesData && activitiesData.length > 0) {
+            const activitiesDataTyped = activitiesData as ActivityQueryResult[];
             // Get unique place_ids
             const placeIds = Array.from(new Set(
-              activitiesData
+              activitiesDataTyped
                 .map(activity => activity.place_id)
                 .filter((id): id is string => id !== null)
             ));
@@ -283,6 +293,10 @@ export async function GET(
                 .in('id', placeIds)
                 .not('external_id', 'is', null);
               
+              type PlaceQueryResult = {
+                external_id: string | null
+              }
+              
               if (placesError) {
                 console.error('[Explore Places API]', {
                   path: '/api/trips/[tripId]/explore/places',
@@ -295,8 +309,9 @@ export async function GET(
                   context: 'fetching_places_external_ids',
                 });
               } else if (placesData && placesData.length > 0) {
+                const placesDataTyped = placesData as PlaceQueryResult[];
                 // Extract external_id (Google place_id) values
-                const activityPlaceIds = placesData
+                const activityPlaceIds = placesDataTyped
                   .map(place => place.external_id)
                   .filter((id): id is string => id !== null);
                 

@@ -135,10 +135,10 @@ export function ExploreAddToDayDialog({
 
           if (hasDuplicate) {
             // Place already exists in itinerary - show error
-            const errorMessage = t('explore_error_already_in_itinerary') || 'This place is already in your itinerary';
+            const errorMessage = (t as any)('explore_error_already_in_itinerary') || 'This place is already in your itinerary';
             setError(errorMessage);
             addToast({
-              title: t('explore_toast_already_in_itinerary') || 'Already in itinerary',
+              title: (t as any)('explore_toast_already_in_itinerary') || 'Already in itinerary',
               description: errorMessage,
               variant: 'destructive',
             });
@@ -359,9 +359,9 @@ export function ExploreAddToDayDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('explore_add_to_itinerary')}</DialogTitle>
+          <DialogTitle>{(t as any)('explore_add_to_itinerary')}</DialogTitle>
           <DialogDescription>
-            {t('explore_select_day_description')}
+            {(t as any)('explore_select_day_description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

@@ -867,7 +867,7 @@ export function ItineraryTab({
     } finally {
       setIsBackfillingImages(false);
     }
-  }, [tripId, addToast, loadOrGenerate, t]);
+  }, [tripId, loadOrGenerate]);
 
   // Store triggerAutoBackfill in ref so generateSmartItinerary can call it
   useEffect(() => {

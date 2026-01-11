@@ -538,6 +538,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             // Update the trip's destination_city in the database for future use
             await supabase
               .from('trips')
+              // @ts-ignore - Supabase type inference issue
               .update({ destination_city: extractedCity })
               .eq('id', tripId);
           } else if (extractedCity) {
@@ -568,6 +569,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   // Update the trip's destination_city
                   await supabase
                     .from('trips')
+                    // @ts-ignore - Supabase type inference issue
                     .update({ destination_city: extractedCity })
                     .eq('id', tripId);
                   break;
@@ -590,6 +592,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             cityName = cityFromCoords;
             await supabase
               .from('trips')
+              // @ts-ignore - Supabase type inference issue
               .update({ destination_city: cityFromCoords })
               .eq('id', tripId);
           }
@@ -739,6 +742,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   // Update destination_city
                   await supabase
                     .from('trips')
+                    // @ts-ignore - Supabase type inference issue
                     .update({ destination_city: cityName })
                     .eq('id', tripId);
                   break;
@@ -762,6 +766,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             // Update destination_city
             await supabase
               .from('trips')
+              // @ts-ignore - Supabase type inference issue
               .update({ destination_city: cityName })
               .eq('id', tripId);
           } else if (cityFromCoords) {
