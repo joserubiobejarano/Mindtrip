@@ -107,7 +107,7 @@ export function SwipeableCard({ place, onSwipeLeft, onSwipeRight, onSwipeUp, dis
         </div>
 
         {/* Content section - Scrollable if needed, but typically fits within card height */}
-        <div className="p-5 lg:p-8 flex-shrink-0 overflow-y-auto min-h-0">
+        <div className="px-5 pt-5 pb-6 lg:px-8 lg:pt-8 lg:pb-10 flex-shrink-0 overflow-y-auto min-h-0">
           <h2 
             className="text-2xl lg:text-4xl font-semibold text-foreground mb-2"
           >

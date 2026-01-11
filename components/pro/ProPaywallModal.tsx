@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export type ProPaywallModalProps = {
   open: boolean;
@@ -19,20 +20,22 @@ export type ProPaywallModalProps = {
   context?: string;
 };
 
-const CONTEXT_MESSAGES: Record<string, string> = {
-  "multi-city": "Multi-city trips are a Pro feature.",
-  "swipes": "You've reached the swipe limit. Upgrade to continue discovering more places.",
-  "filters": "Advanced filters (budget & distance) are a Pro feature.",
+const CONTEXT_KEYS: Record<string, string> = {
+  "multi-city": "paywall_context_multi_city",
+  "swipes": "paywall_context_swipes",
+  "filters": "paywall_context_filters",
+  "trip-limit": "paywall_context_trip_limit",
+  "trip-duration": "paywall_context_trip_duration",
 };
 
-const BENEFITS = [
-  "Longer trips (more than 14 days)",
-  "Higher swipe limits (100 per trip vs 10 free)",
-  "Multi-city itineraries",
-  "Advanced Explore filters (budget & distance)",
-  "Higher regeneration limits",
-  "Unlimited active trips",
-  "Future collaboration features (polls, comments, etc.)",
+const BENEFIT_KEYS = [
+  "paywall_benefit_longer_trips",
+  "paywall_benefit_swipe_limits",
+  "paywall_benefit_multi_city",
+  "paywall_benefit_advanced_filters",
+  "paywall_benefit_regeneration_limits",
+  "paywall_benefit_unlimited_trips",
+  "paywall_benefit_collaboration",
 ];
 
 export function ProPaywallModal({
@@ -45,10 +48,11 @@ export function ProPaywallModal({
   const [isLoadingTrip, setIsLoadingTrip] = useState(false);
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
-  const subtitle = context && CONTEXT_MESSAGES[context]
-    ? CONTEXT_MESSAGES[context]
-    : "Upgrade to unlock premium features and get the most out of Kruno.";
+  const subtitle = context && CONTEXT_KEYS[context]
+    ? t(CONTEXT_KEYS[context] as any)
+    : t("paywall_default_subtitle");
 
   const handleSubscriptionCheckout = async () => {
     setIsLoadingSubscription(true);
@@ -70,8 +74,8 @@ export function ProPaywallModal({
       console.error("Error creating subscription checkout:", error);
       addToast({
         variant: "destructive",
-        title: "Failed to start checkout",
-        description: error.message || "Please try again.",
+        title: t("paywall_error_checkout_title"),
+        description: error.message || t("paywall_error_checkout_desc"),
       });
       setIsLoadingSubscription(false);
     }
@@ -103,8 +107,8 @@ export function ProPaywallModal({
       console.error("Error creating trip unlock checkout:", error);
       addToast({
         variant: "destructive",
-        title: "Failed to start checkout",
-        description: error.message || "Please try again.",
+        title: t("paywall_error_checkout_title"),
+        description: error.message || t("paywall_error_checkout_desc"),
       });
       setIsLoadingTrip(false);
     }
@@ -130,8 +134,8 @@ export function ProPaywallModal({
       console.error("Error opening billing portal:", error);
       addToast({
         variant: "destructive",
-        title: "Failed to open billing portal",
-        description: error.message || "Please try again.",
+        title: t("paywall_error_portal_title"),
+        description: error.message || t("paywall_error_portal_desc"),
       });
       setIsLoadingPortal(false);
     }
@@ -143,17 +147,17 @@ export function ProPaywallModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Unlock Kruno Pro</DialogTitle>
+          <DialogTitle>{t("paywall_title")}</DialogTitle>
           <DialogDescription>{subtitle}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Benefits List */}
           <div className="space-y-2">
-            {BENEFITS.map((benefit, index) => (
+            {BENEFIT_KEYS.map((benefitKey, index) => (
               <div key={index} className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-foreground">{benefit}</span>
+                <span className="text-sm text-foreground">{t(benefitKey as any)}</span>
               </div>
             ))}
           </div>
@@ -169,10 +173,10 @@ export function ProPaywallModal({
               {isLoadingSubscription ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
+                  {t("paywall_loading")}
                 </>
               ) : (
-                "Upgrade to Kruno Pro"
+                t("paywall_button_upgrade")
               )}
             </Button>
 
@@ -186,10 +190,10 @@ export function ProPaywallModal({
                 {isLoadingTrip ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
+                    {t("paywall_loading")}
                   </>
                 ) : (
-                  "Unlock this trip only"
+                  t("paywall_button_unlock_trip")
                 )}
               </Button>
             )}
@@ -202,7 +206,7 @@ export function ProPaywallModal({
               disabled={isLoading}
               className="text-sm text-muted-foreground hover:text-foreground underline disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoadingPortal ? "Loading..." : "Manage existing subscription"}
+              {isLoadingPortal ? t("paywall_loading") : t("paywall_button_manage_subscription")}
             </button>
           </div>
         </div>

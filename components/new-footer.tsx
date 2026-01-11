@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Instagram, Twitter, Facebook, Youtube } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
+import { Logo } from "@/components/ui/logo";
 
 export function NewFooter() {
   const { t } = useLanguage();
@@ -15,13 +15,7 @@ export function NewFooter() {
           {/* Brand Column */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <Image 
-                src="/icon.svg" 
-                alt="Kruno logo" 
-                width={40}
-                height={40}
-                priority
-              />
+              <Logo size="md" />
             </Link>
             <p className="text-sm text-muted-foreground">
               {t('footer_tagline')}

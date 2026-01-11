@@ -75,6 +75,13 @@
 - Delete trip button (owner-only, with confirmation dialog)
 - Automatic trip invitation linking on page load
 
+**User Settings**
+- Settings page (`/settings`) with dynamic routing
+- User profile settings section (display name, currency preferences)
+- Billing/subscription management section (integration with Stripe Customer Portal)
+- Language preferences section
+- Internationalization (i18n) support with language switching
+
 **Trip Details**
 - View trip information
 - Edit trip details
@@ -316,6 +323,12 @@ The billing system integrates with Stripe to manage Pro subscriptions and trip-l
   - Webhook handler for subscription events (activate, cancel, update)
   - Customer portal for self-service subscription management
   - Automatic status updates (`profiles.is_pro`, `trips.has_trip_pro`)
+- **Billing UI Components**
+  - `PaywallModal` component (`components/billing/PaywallModal.tsx`) - General paywall for Pro features
+  - `ProPaywallModal` component (`components/pro/ProPaywallModal.tsx`) - Context-aware Pro paywall with feature-specific messaging
+  - `paywall-dialog.tsx` component - Paywall dialog wrapper for various contexts
+  - Integrated into: Explore filters, new trip dialog (multi-city), hero section, trip creation flow
+  - Context-aware messaging based on feature being accessed (multi-city, advanced filters, etc.)
 
 **API Endpoints:**
 - `POST /api/billing/checkout/subscription` - Create subscription checkout session
@@ -914,6 +927,37 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - Advanced filters (Pro tier)
 
 ---
+
+## Internationalization (i18n) ✅ **NEW** (January 2025)
+
+**Overview:**
+Multi-language support system with language switching and translation management.
+
+**Features:**
+- **Language Provider** (`components/providers/language-provider.tsx`):
+  - React context for language state management
+  - Language switching functionality
+  - Language preference persistence
+- **i18n Utility** (`lib/i18n.ts`):
+  - Translation key management
+  - Language-specific translations
+  - Translation function for components
+- **Translation Coverage**:
+  - Trip-related UI elements
+  - Explore tab components
+  - Trip members dialog
+  - Hero section and landing page
+  - Error messages and notifications
+  - Settings and preferences
+
+**Usage:**
+```typescript
+import { useLanguage } from '@/components/providers/language-provider';
+import { TranslationKey } from '@/lib/i18n';
+
+const { language, setLanguage, t } = useLanguage();
+const translatedText = t('some_translation_key' as TranslationKey);
+```
 
 ## Security Features ✅ **NEW** (January 2025)
 

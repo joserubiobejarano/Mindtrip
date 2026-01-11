@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
@@ -14,6 +14,7 @@ import { TripMembersDialog } from "@/components/trip-members-dialog";
 import { DeleteTripDialog } from "@/components/delete-trip-dialog";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useToast } from "@/components/ui/toast";
 import { useLanguage } from "@/components/providers/language-provider";
 import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
@@ -428,13 +429,29 @@ export function ItineraryTab({
                     break;
                     
                   case 'day':
-                    // Add or update day
-                    const dayIndex = partialItinerary.days?.findIndex(d => d.id === data.data.id) ?? -1;
+                    // Add or update day - deduplicate by both ID and index to prevent duplicate Day 1
+                    const dayData = data.data;
+                    const dayIndex = partialItinerary.days?.findIndex(d => d.id === dayData.id) ?? -1;
+                    
+                    // Also check if a day with the same index already exists (different ID)
+                    const existingDayByIndex = partialItinerary.days?.find(d => d.index === dayData.index && d.id !== dayData.id);
+                    
                     if (dayIndex >= 0) {
-                      partialItinerary.days![dayIndex] = data.data;
+                      // Update existing day with same ID
+                      partialItinerary.days![dayIndex] = dayData;
+                    } else if (existingDayByIndex) {
+                      // Replace day with same index but different ID (deduplicate)
+                      const existingIndex = partialItinerary.days!.findIndex(d => d.index === dayData.index);
+                      if (existingIndex >= 0) {
+                        console.warn(`[itinerary-tab] Replacing duplicate day with index ${dayData.index} (old ID: ${existingDayByIndex.id}, new ID: ${dayData.id})`);
+                        partialItinerary.days![existingIndex] = dayData;
+                      } else {
+                        partialItinerary.days = [...(partialItinerary.days || []), dayData];
+                      }
                     } else {
-                      partialItinerary.days = [...(partialItinerary.days || []), data.data];
+                      partialItinerary.days = [...(partialItinerary.days || []), dayData];
                     }
+                    
                     setSmartItinerary(prev => {
                       const base = prev || {
                         title: partialItinerary.title || '',
@@ -442,13 +459,43 @@ export function ItineraryTab({
                         days: [],
                         tripTips: partialItinerary.tripTips || [],
                       };
-                      const existingDayIndex = base.days.findIndex(d => d.id === data.data.id);
-                      if (existingDayIndex >= 0) {
+                      
+                      // Deduplicate by ID first
+                      const existingDayIndexById = base.days.findIndex(d => d.id === dayData.id);
+                      if (existingDayIndexById >= 0) {
                         const newDays = [...base.days];
-                        newDays[existingDayIndex] = data.data;
-                        return { ...base, days: newDays };
+                        newDays[existingDayIndexById] = dayData;
+                        // Ensure no duplicate indices after update
+                        const indexMap = new Map<number, any>();
+                        for (const day of newDays) {
+                          if (day.index !== undefined) {
+                            // Keep the most recent occurrence of each index
+                            indexMap.set(day.index, day);
+                          }
+                        }
+                        return { ...base, days: Array.from(indexMap.values()).sort((a, b) => a.index - b.index) };
                       }
-                      return { ...base, days: [...base.days, data.data] };
+                      
+                      // Check for duplicate index (different ID) - deduplicate
+                      const existingDayByIndex = base.days.find(d => d.index === dayData.index && d.id !== dayData.id);
+                      if (existingDayByIndex && dayData.index !== undefined) {
+                        console.warn(`[itinerary-tab] Replacing duplicate day with index ${dayData.index} (old ID: ${existingDayByIndex.id}, new ID: ${dayData.id})`);
+                        const newDays = base.days.filter(d => d.index !== dayData.index || d.id === dayData.id);
+                        newDays.push(dayData);
+                        // Sort by index
+                        return { ...base, days: newDays.sort((a, b) => a.index - b.index) };
+                      }
+                      
+                      // No duplicate, add normally but ensure no duplicate indices
+                      const newDays = [...base.days, dayData];
+                      const indexMap = new Map<number, any>();
+                      for (const day of newDays) {
+                        if (day.index !== undefined) {
+                          // Keep the most recent occurrence of each index
+                          indexMap.set(day.index, day);
+                        }
+                      }
+                      return { ...base, days: Array.from(indexMap.values()).sort((a, b) => a.index - b.index) };
                     });
                     break;
                     
@@ -500,9 +547,20 @@ export function ItineraryTab({
                         break;
                       }
                       
+                      // Deduplicate days by index to prevent duplicate Day 1
+                      const deduplicatedDays = new Map<number, any>();
+                      for (const day of completeData.days) {
+                        if (day.index !== undefined) {
+                          // Keep the last occurrence of each index (most complete version)
+                          deduplicatedDays.set(day.index, day);
+                        }
+                      }
+                      const sortedDays = Array.from(deduplicatedDays.values()).sort((a, b) => a.index - b.index);
+                      
                       // Ensure tripTips is an array (default to empty if missing)
                       const validatedData = {
                         ...completeData,
+                        days: sortedDays,
                         tripTips: Array.isArray(completeData.tripTips) ? completeData.tripTips : [],
                       };
                       
@@ -593,9 +651,20 @@ export function ItineraryTab({
             return;
           }
           
+          // Deduplicate days by index to prevent duplicate Day 1 (non-streaming fallback)
+          const deduplicatedDays = new Map<number, any>();
+          for (const day of json.days) {
+            if (day.index !== undefined) {
+              // Keep the last occurrence of each index (most complete version)
+              deduplicatedDays.set(day.index, day);
+            }
+          }
+          const sortedDays = Array.from(deduplicatedDays.values()).sort((a, b) => a.index - b.index);
+          
           // Ensure tripTips is an array (default to empty if missing)
           const validatedData = {
             ...json,
+            days: sortedDays,
             tripTips: Array.isArray(json.tripTips) ? json.tripTips : [],
           };
           
@@ -680,9 +749,20 @@ export function ItineraryTab({
           return;
         }
         
+        // Deduplicate days by index to prevent duplicate Day 1 (database load)
+        const deduplicatedDays = new Map<number, any>();
+        for (const day of json.days) {
+          if (day.index !== undefined) {
+            // Keep the last occurrence of each index (most complete version)
+            deduplicatedDays.set(day.index, day);
+          }
+        }
+        const sortedDays = Array.from(deduplicatedDays.values()).sort((a, b) => a.index - b.index);
+        
         // Ensure tripTips is an array (default to empty if missing)
         const validatedData = {
           ...json,
+          days: sortedDays,
           tripTips: Array.isArray(json.tripTips) ? json.tripTips : [],
         };
         
@@ -739,14 +819,6 @@ export function ItineraryTab({
     didAutoBackfillRef.current = true;
     setIsBackfillingImages(true);
 
-    if (process.env.NODE_ENV === 'development') {
-      addToast({
-        title: t('itinerary_toast_fetching_images'),
-        description: t('itinerary_toast_loading_photos'),
-        variant: 'default',
-      });
-    }
-
     try {
       const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
         method: 'POST',
@@ -772,12 +844,6 @@ export function ItineraryTab({
           updated: result.updated,
           notFound: result.notFound,
           errors: result.errors,
-        });
-
-        addToast({
-          title: t('itinerary_toast_images_updated'),
-          description: t('itinerary_toast_images_updated_count').replace('{count}', (result.updated || 0).toString()),
-          variant: 'success',
         });
       }
 
@@ -1059,13 +1125,7 @@ export function ItineraryTab({
       <div className="px-6 py-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex-shrink-0">
-            <Image 
-              src="/icon.svg" 
-              alt="Kruno logo" 
-              width={32} 
-              height={32} 
-              className="hover:opacity-80 transition-opacity"
-            />
+            <Logo size="sm" className="hover:opacity-80 transition-opacity" />
           </Link>
           <div>
             <h1 className="text-xl font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>{trip.title}</h1>
@@ -1131,7 +1191,7 @@ export function ItineraryTab({
             />
           )}
 
-          {/* Itinerary (loaded or generating with partial data) */}
+          {/* Itinerary (loaded or generating with partial data) - Only show if days exist */}
           {(status === 'loaded' || (status === 'generating' && smartItinerary)) && smartItinerary && (
             <>
               {/* Safety guard: check if days is a valid array */}
@@ -1140,10 +1200,10 @@ export function ItineraryTab({
                   message={t('itinerary_error_problem_regenerate')}
                   onRetry={loadOrGenerate}
                 />
-              ) : (
+              ) : smartItinerary.days && smartItinerary.days.length > 0 ? (
                 <div className="space-y-8 pb-10">
-                  {/* Trip Summary */}
-                  {(smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
+                  {/* Trip Summary - Only show if days are loaded */}
+                  {smartItinerary.days && smartItinerary.days.length > 0 && (smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
                     <div className="space-y-4 mb-10 max-w-4xl mx-auto">
                       {smartItinerary.title && (
                         <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
@@ -1230,17 +1290,6 @@ export function ItineraryTab({
                         // Render grouped days
                         return groupedDays.map((group, groupIdx) => (
                           <div key={group.segment?.id || `no-segment-${groupIdx}`} className="space-y-8">
-                            {group.segment && (
-                              <div className="border-b-2 border-slate-200 pb-2">
-                                <h3 className="text-2xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                  {group.segment.city_name}
-                                </h3>
-                                <p className="text-sm text-slate-600 mt-1">
-                                  {format(new Date(group.segment.start_date), "MMM d")} – {format(new Date(group.segment.end_date), "MMM d")} 
-                                  {' '}({t('itinerary_nights').replace('{count}', (differenceInDays(new Date(group.segment.end_date), new Date(group.segment.start_date)) + 1).toString())})
-                                </p>
-                              </div>
-                            )}
                             {group.days.map((day) => {
                   // Gather all photos from day.photos (already deduplicated by backend)
                   // Fallback to collecting from places if day.photos is empty
@@ -1493,6 +1542,8 @@ export function ItineraryTab({
                                                 className={`rounded-full whitespace-nowrap ${
                                                   dayIsPast
                                                     ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                                                    : place.visited
+                                                    ? "border-gray-200 text-gray-400 bg-gray-50"
                                                     : "border-red-200 text-red-700 bg-red-50 hover:bg-red-100"
                                                 }`}
                                               >
@@ -1506,6 +1557,11 @@ export function ItineraryTab({
                                                   e.stopPropagation();
                                                   window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.place_id}`, "_blank");
                                                 }}
+                                                className={`whitespace-nowrap ${
+                                                  place.visited
+                                                    ? "border-gray-200 text-gray-400 bg-gray-50"
+                                                    : ""
+                                                }`}
                                               >
                                                 {t('itinerary_open_in_google_maps')}
                                               </Button>
@@ -1592,17 +1648,9 @@ export function ItineraryTab({
                           </div>
                         ))
                       } else {
-                        // Single-city trip: render days normally (show city name once at top if single segment)
-                        const singleSegment = segments.length === 1 ? segments[0] : null;
+                        // Single-city trip: render days normally
                         return (
                           <>
-                            {singleSegment && (
-                              <div className="border-b-2 border-slate-200 pb-2 mb-8">
-                                <h3 className="text-2xl font-bold text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                  {singleSegment.city_name}
-                                </h3>
-                              </div>
-                            )}
                             {smartItinerary.days.map((day) => {
                   // Gather all photos from day.photos (already deduplicated by backend)
                   // Fallback to collecting from places if day.photos is empty
@@ -1823,7 +1871,7 @@ export function ItineraryTab({
                                         </div>
                                         <div className="min-w-0 flex-1 w-full sm:w-auto">
                                           <div className="flex flex-col gap-2 mb-2">
-                                            <h4 className="font-bold text-lg text-slate-900 break-words" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                            <h4 className={`font-bold text-lg text-slate-900 break-words ${place.visited ? 'line-through' : ''}`} style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
                                             <div className="flex flex-wrap items-center gap-2">
                                               <Button
                                                 size="sm"
@@ -1852,37 +1900,6 @@ export function ItineraryTab({
                                                 variant="outline"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  console.log('[Itinerary] Change clicked', { dayId: day.id, activityId: place.id });
-                                                  const isDisabled = dayIsPast || changeCount >= usageLimits.change.limit;
-                                                  if (isDisabled) return;
-                                                  router.push(`/trips/${tripId}?tab=explore&mode=replace&day=${day.id}&activity=${place.id}`);
-                                                }}
-                                                disabled={dayIsPast || changeCount >= usageLimits.change.limit}
-                                                title={
-                                                  (() => {
-                                                    const reasons = getButtonDisabledReason('change', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id, place.id);
-                                                    if (reasons.length > 0) {
-                                                      return `Disabled: ${reasons.join(', ')}`;
-                                                    }
-                                                    return dayIsPast
-                                                      ? t('itinerary_tooltip_day_passed')
-                                                      : changeCount >= usageLimits.change.limit
-                                                      ? t('itinerary_tooltip_change_limit')
-                                                        .replace('{count}', changeCount.toString())
-                                                        .replace('{limit}', usageLimits.change.limit === Infinity ? '∞' : usageLimits.change.limit.toString())
-                                                        .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
-                                                      : undefined;
-                                                  })()
-                                                }
-                                                className="rounded-lg whitespace-nowrap"
-                                              >
-                                                {t('itinerary_change')}
-                                              </Button>
-                                              <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
                                                   if (dayIsPast) return;
                                                   handleUpdatePlace(day.id, place.id, { remove: true });
                                                 }}
@@ -1891,6 +1908,8 @@ export function ItineraryTab({
                                                 className={`rounded-lg whitespace-nowrap ${
                                                   dayIsPast
                                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                    : place.visited
+                                                    ? "bg-gray-100 text-gray-400 border-gray-200"
                                                     : "bg-red-100 text-red-700 hover:bg-red-200"
                                                 }`}
                                               >
@@ -1905,12 +1924,17 @@ export function ItineraryTab({
                                                   e.stopPropagation();
                                                   window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.place_id}`, "_blank");
                                                 }}
+                                                className={`whitespace-nowrap ${
+                                                  place.visited
+                                                    ? "bg-gray-100 text-gray-400 border-gray-200"
+                                                    : ""
+                                                }`}
                                               >
                                                 {t('itinerary_open_in_google_maps')}
                                               </Button>
                                             </div>
                                           </div>
-                                          <p className="text-sm text-slate-600 mt-1 break-words">{place.description}</p>
+                                          <p className={`text-sm text-slate-600 mt-1 break-words ${place.visited ? 'line-through' : ''}`}>{place.description}</p>
                                           {place.area && (
                                             <span className="inline-block mt-2 px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
                                               {place.area}
@@ -2008,11 +2032,8 @@ export function ItineraryTab({
                       </Card>
                     )}
                   </div>
-
-
-
                 </div>
-              )}
+              ) : null}
             </>
           )}
 

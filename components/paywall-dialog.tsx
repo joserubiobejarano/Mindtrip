@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface PaywallDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ export function PaywallDialog({
 }: PaywallDialogProps) {
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
   const [isLoadingTrip, setIsLoadingTrip] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubscriptionCheckout = async () => {
     if (!tripId) return;
@@ -50,7 +52,7 @@ export function PaywallDialog({
       }
     } catch (error) {
       console.error("Error creating subscription checkout:", error);
-      alert("Failed to start checkout. Please try again.");
+      alert(t("paywall_error_checkout_title") + ": " + t("paywall_error_checkout_desc"));
       setIsLoadingSubscription(false);
     }
   };
@@ -79,7 +81,7 @@ export function PaywallDialog({
       }
     } catch (error) {
       console.error("Error creating trip unlock checkout:", error);
-      alert("Failed to start checkout. Please try again.");
+      alert(t("paywall_error_checkout_title") + ": " + t("paywall_error_checkout_desc"));
       setIsLoadingTrip(false);
     }
   };
@@ -88,20 +90,20 @@ export function PaywallDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Upgrade to Unlock {featureName}</DialogTitle>
+          <DialogTitle>{t("paywall_dialog_upgrade_title").replace("{featureName}", featureName)}</DialogTitle>
           <DialogDescription>
-            {message || `You need Kruno Pro to use ${featureName}. Choose an option below:`}
+            {message || t("paywall_dialog_default_message").replace("{featureName}", featureName)}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {tripId && (
             <div className="border rounded-lg p-4 space-y-2">
-              <h3 className="font-semibold">Unlock This Trip</h3>
+              <h3 className="font-semibold">{t("paywall_dialog_unlock_trip_title")}</h3>
               <p className="text-sm text-muted-foreground">
-                Unlock Pro features for this trip only
+                {t("paywall_dialog_unlock_trip_desc")}
               </p>
-              <p className="text-lg font-bold">$6.99</p>
+              <p className="text-lg font-bold">{t("paywall_dialog_unlock_trip_price")}</p>
               <Button
                 onClick={handleTripUnlock}
                 disabled={isLoadingTrip || isLoadingSubscription}
@@ -110,21 +112,21 @@ export function PaywallDialog({
                 {isLoadingTrip ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
+                    {t("paywall_loading")}
                   </>
                 ) : (
-                  "Unlock This Trip"
+                  t("paywall_dialog_unlock_trip_button")
                 )}
               </Button>
             </div>
           )}
 
           <div className="border rounded-lg p-4 space-y-2">
-            <h3 className="font-semibold">Kruno Pro (Yearly)</h3>
+            <h3 className="font-semibold">{t("paywall_dialog_pro_yearly_title")}</h3>
             <p className="text-sm text-muted-foreground">
-              Unlock Pro features for all your trips
+              {t("paywall_dialog_pro_yearly_desc")}
             </p>
-            <p className="text-lg font-bold">$49.99/year</p>
+            <p className="text-lg font-bold">{t("paywall_dialog_pro_yearly_price")}</p>
             <Button
               onClick={handleSubscriptionCheckout}
               disabled={isLoadingTrip || isLoadingSubscription}
@@ -134,10 +136,10 @@ export function PaywallDialog({
               {isLoadingSubscription ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
+                  {t("paywall_loading")}
                 </>
               ) : (
-                "Get Kruno Pro"
+                t("paywall_dialog_pro_button")
               )}
             </Button>
           </div>
@@ -145,7 +147,7 @@ export function PaywallDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("paywall_dialog_cancel")}
           </Button>
         </DialogFooter>
       </DialogContent>

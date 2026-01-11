@@ -4,7 +4,7 @@ import { getProfileId } from "@/lib/auth/getProfileId";
 import { getProfileIdFromRequest } from "@/lib/auth/getProfileIdFromRequest";
 import { getUserSubscriptionStatus } from "@/lib/supabase/user-subscription";
 import { createTripSegment } from "@/lib/supabase/trip-segments";
-import { getPlaceDetails, findGooglePlaceId } from "@/lib/google/places-server";
+import { getPlaceDetails, findGooglePlaceId, GOOGLE_MAPS_API_KEY } from "@/lib/google/places-server";
 import { eachDayOfInterval, format, addDays } from "date-fns";
 import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 
@@ -73,6 +73,54 @@ export async function POST(request: NextRequest) {
     // Note: getUserSubscriptionStatus expects clerkUserId
     const authResult = await getProfileId(supabase);
     const { isPro } = await getUserSubscriptionStatus(authResult.clerkUserId);
+
+    // Enforce trip limit for free users
+    const FREE_TRIP_LIMIT = 1;
+    if (!isPro) {
+      // Count existing trips owned by this user
+      const { count: tripCount, error: countError } = await supabase
+        .from("trips")
+        .select("*", { count: "exact", head: true })
+        .eq("owner_id", profileId);
+
+      if (countError) {
+        console.error('[Trips API] Error counting trips:', {
+          profileId,
+          error: countError.message,
+        });
+        return NextResponse.json(
+          { error: "Failed to check trip limit" },
+          { status: 500 }
+        );
+      }
+
+      if ((tripCount || 0) >= FREE_TRIP_LIMIT) {
+        return NextResponse.json(
+          { 
+            error: "trip_limit_reached",
+            message: "Free users can only create 1 trip. Upgrade to Pro to create unlimited trips.",
+          },
+          { status: 403 }
+        );
+      }
+
+      // Enforce trip duration limit for free users (4 days max)
+      const FREE_TRIP_MAX_DAYS = 4;
+      const tripStart = new Date(startDate);
+      const tripEnd = new Date(endDate);
+      const diffTime = tripEnd.getTime() - tripStart.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+
+      if (diffDays > FREE_TRIP_MAX_DAYS) {
+        return NextResponse.json(
+          { 
+            error: "trip_duration_limit_reached",
+            message: "Free users are only allowed to create trips up to 4 days. Please select dates within that range or upgrade to Pro to create longer trips.",
+          },
+          { status: 403 }
+        );
+      }
+    }
 
     // Determine segments to create
     let segmentsToCreate: Array<{
@@ -158,28 +206,221 @@ export async function POST(request: NextRequest) {
     }
     
     // Extract city name, ensuring it's city-based, not landmark-based
-    let primaryCityName = primaryPlaceDetails?.name || segmentsToCreate[0].cityName;
+    // CRITICAL: Check Google Places types FIRST - this is the most reliable way to detect landmarks
+    // Google Places types include: stadium, tourist_attraction, point_of_interest, museum, etc.
+    const landmarkTypes = [
+      'stadium', 'arena', 'tourist_attraction', 'point_of_interest', 'museum', 
+      'church', 'mosque', 'synagogue', 'temple', 'shrine', 'cathedral', 'basilica',
+      'park', 'amusement_park', 'zoo', 'aquarium', 'library', 'university', 'college',
+      'theater', 'movie_theater', 'opera', 'art_gallery', 'casino', 'night_club',
+      'shopping_mall', 'market', 'gym', 'hospital', 'airport', 'train_station', 'bus_station',
+      'establishment' // Sometimes landmarks are just marked as 'establishment'
+    ];
     
-    // Safety check: If primaryPlaceDetails.name contains landmark keywords, extract city from formatted_address
-    const landmarkKeywords = ['basílica', 'cathedral', 'museum', 'palace', 'tower', 'monument', 'church', 'temple', 'mosque', 'synagogue', 'shrine', 'basilica'];
-    const isLandmarkName = primaryPlaceDetails?.name && landmarkKeywords.some(keyword => 
-      primaryPlaceDetails.name.toLowerCase().includes(keyword)
+    // Check if place has landmark types (PRIORITY 1 - Most reliable)
+    const hasLandmarkType = primaryPlaceDetails?.types && primaryPlaceDetails.types.some(
+      (type: string) => landmarkTypes.includes(type.toLowerCase())
     );
     
-    if (isLandmarkName && primaryPlaceDetails?.formatted_address) {
-      // Extract city name from formatted_address (usually second-to-last component)
-      const addressParts = primaryPlaceDetails.formatted_address.split(',').map((s: string) => s.trim());
-      // Try to find city name (usually second-to-last or third-to-last component)
-      // Format is typically: "Landmark Name, Street, City, Country"
-      if (addressParts.length >= 2) {
-        // Use second-to-last component as city name
-        primaryCityName = addressParts[addressParts.length - 2];
+    // Also check name for landmark keywords (PRIORITY 2 - Fallback if types not available)
+    // Include both English and Spanish keywords for full language support
+    const landmarkKeywords = [
+      // English keywords
+      'basilica', 'basílica', 'cathedral', 'museum', 'palace', 'tower', 'monument', 'church', 'temple', 
+      'mosque', 'synagogue', 'shrine', 'stadium', 'arena', 'coliseum', 'theater', 'theatre', 'opera', 
+      'market', 'park', 'garden', 'bridge', 'fort', 'castle', 'square', 'plaza', 'fountain', 'memorial', 
+      'zoo', 'aquarium', 'library', 'university', 'mestalla',
+      // Spanish keywords (for Spanish-speaking locales)
+      'museo', 'catedral', 'palacio', 'torre', 'monumento', 'iglesia', 'templo', 'mezquita', 'sinagoga', 
+      'santuario', 'estadio', 'estadium', 'coliseo', 'teatro', 'ópera', 'mercado', 'parque', 'jardín', 
+      'puente', 'fuerte', 'castillo', 'plaza', 'fuente', 'memorial', 'zoológico', 'acuario', 'biblioteca', 
+      'universidad', 'campo', 'camp nou', 'estadio camp nou', 'spotify camp nou',
+      // Common Spanish place name patterns
+      'sagrada família', 'sagrada familia', 'la rambla', 'park güell', 'parc güell'
+    ];
+    const isLandmarkName = primaryPlaceDetails?.name && landmarkKeywords.some(keyword => 
+      primaryPlaceDetails.name.toLowerCase().includes(keyword.toLowerCase())
+    );
+    
+    // CRITICAL: If it's a landmark by type OR name, we MUST extract the city
+    const isLandmark = hasLandmarkType || isLandmarkName;
+    
+    // Start with the place name, but we'll validate and extract the actual city
+    let primaryCityName = primaryPlaceDetails?.name || segmentsToCreate[0].cityName;
+    
+    // CRITICAL: If this is a landmark (by type or name), ALWAYS extract the city
+    if (isLandmark) {
+      console.log(`[trip-creation] Detected landmark: "${primaryPlaceDetails?.name}" (types: ${primaryPlaceDetails?.types?.join(', ') || 'none'}). Extracting city...`);
+      
+      // METHOD 1: Try to extract city from formatted_address (fastest and most reliable)
+      if (primaryPlaceDetails?.formatted_address) {
+        const addressParts = primaryPlaceDetails.formatted_address.split(',').map((s: string) => s.trim());
+        // Format is typically: "Landmark Name, Street/Area, City, Country" or "Landmark Name, City, Country"
+        // Country is always last, city is usually second-to-last
+        if (addressParts.length >= 2) {
+          // Start from second-to-last (before country) and work backwards
+          let extractedCity: string | null = null;
+          for (let i = addressParts.length - 2; i >= 0; i--) {
+            const candidate = addressParts[i];
+            // Skip if it's the landmark name itself (usually first part)
+            if (i === 0 && candidate.toLowerCase() === (primaryPlaceDetails.name?.toLowerCase() || '')) {
+              continue;
+            }
+            // Check if candidate is not a landmark, street type, or number
+            if (candidate && candidate.length > 2) {
+              const candidateLower = candidate.toLowerCase();
+              const skipPatterns = [
+                ...landmarkKeywords,
+                ...landmarkTypes.map(t => t.replace('_', ' ')),
+                // English street types
+                'street', 'avenue', 'road', 'boulevard', 'lane', 'way', 'drive',
+                // Spanish street types
+                'calle', 'avenida', 'camino', 'carretera', 'paseo', 'plaza', 'plazoleta',
+                'ronda', 'travesía', 'vía', 'bulevar', 'pasaje', 'carrer', 'carrera',
+                // Catalan/Valencian street types
+                'carrer', 'avinguda', 'plaça', 'passatge',
+                // French/German street types
+                'rue', 'strasse', 'str.',
+                // Common address elements
+                'number', 'num', 'nº', '#', 'numero', 'número', 'núm.', 'via'
+              ];
+              
+              const shouldSkip = skipPatterns.some(pattern => candidateLower.includes(pattern)) || /\d/.test(candidate);
+              
+              if (!shouldSkip && !landmarkTypes.some(type => candidateLower.includes(type.replace('_', ' ')))) {
+                extractedCity = candidate;
+                break;
+              }
+            }
+          }
+          
+          if (extractedCity) {
+            primaryCityName = extractedCity;
+            console.log(`[trip-creation] ✓ Extracted city "${primaryCityName}" from landmark address: "${primaryPlaceDetails.formatted_address}"`);
+          } else {
+            // Fallback: use second-to-last anyway (might be wrong, but better than landmark)
+            primaryCityName = addressParts[addressParts.length - 2];
+            console.warn(`[trip-creation] ⚠ Could not find non-landmark city in address. Using "${primaryCityName}" from address: "${primaryPlaceDetails.formatted_address}"`);
+          }
+        }
+      }
+      
+      // METHOD 2: If still looks like a landmark or extraction failed, try reverse geocoding from coordinates
+      const stillLooksLikeLandmark = landmarkKeywords.some(keyword => 
+        primaryCityName.toLowerCase().includes(keyword.toLowerCase())
+      ) || (primaryPlaceDetails?.types && primaryPlaceDetails.types.some((type: string) => 
+        landmarkTypes.includes(type.toLowerCase())
+      ) && primaryCityName === primaryPlaceDetails.name);
+      
+      if (stillLooksLikeLandmark && primaryPlaceDetails?.geometry?.location && GOOGLE_MAPS_API_KEY) {
+        try {
+          const { getCityFromLatLng } = await import('@/lib/google/places-server');
+          const cityFromCoords = await getCityFromLatLng(
+            primaryPlaceDetails.geometry.location.lat, 
+            primaryPlaceDetails.geometry.location.lng
+          );
+          if (cityFromCoords && !landmarkKeywords.some(keyword => cityFromCoords.toLowerCase().includes(keyword.toLowerCase()))) {
+            console.log(`[trip-creation] ✓ Extracted city "${cityFromCoords}" from coordinates for landmark "${primaryPlaceDetails.name}"`);
+            primaryCityName = cityFromCoords;
+          } else if (cityFromCoords) {
+            console.warn(`[trip-creation] ⚠ Reverse geocoded result "${cityFromCoords}" still looks like a landmark. Keeping extracted city: "${primaryCityName}"`);
+          }
+        } catch (err) {
+          console.error('[trip-creation] Error getting city from coordinates:', err);
+        }
       }
     }
     
-    // Final fallback: Use destinationName if provided and primaryCityName looks like a landmark
-    if (destinationName && isLandmarkName) {
-      primaryCityName = destinationName;
+    // Final validation: Ensure we're not using a landmark as the city name
+    const finalIsLandmark = landmarkKeywords.some(keyword => primaryCityName.toLowerCase().includes(keyword.toLowerCase())) ||
+                            (primaryPlaceDetails?.types && primaryPlaceDetails.types.some((type: string) => 
+                              landmarkTypes.includes(type.toLowerCase())
+                            ) && primaryCityName === primaryPlaceDetails.name);
+    
+    if (finalIsLandmark) {
+      console.error(`[trip-creation] ❌ ERROR: Final city name "${primaryCityName}" is still a landmark! Original: "${primaryPlaceDetails?.name || destinationName}". Attempting emergency extraction.`);
+      // Try one more time with a more aggressive extraction from formatted_address
+      if (primaryPlaceDetails?.formatted_address) {
+        const addressParts = primaryPlaceDetails.formatted_address.split(',').map((s: string) => s.trim());
+        console.log(`[trip-creation] Emergency extraction - address parts:`, addressParts);
+        
+        // Try each part from the end (before country) backwards to find a valid city name
+        // Typically format is: "Landmark, Street, City, Country" or "Landmark, City, Country"
+        // Country is always last, city is usually second-to-last
+        for (let i = addressParts.length - 2; i >= 0; i--) {
+          const candidate = addressParts[i];
+          if (!candidate || candidate.length < 2) continue;
+          
+          const candidateLower = candidate.toLowerCase();
+          // Skip if it's clearly a landmark, street type, or number
+          const skipPatterns = [
+            ...landmarkKeywords,
+            ...landmarkTypes.map(t => t.replace('_', ' ')),
+            // English street types
+            'street', 'avenue', 'road', 'boulevard', 'lane', 'way', 'drive', 'square',
+            // Spanish street types
+            'calle', 'avenida', 'camino', 'carretera', 'paseo', 'plaza', 'plazoleta',
+            'ronda', 'travesía', 'vía', 'bulevar', 'pasaje', 'carrer', 'carrera',
+            // Catalan/Valencian street types
+            'carrer', 'avinguda', 'plaça', 'passatge',
+            // French/German street types
+            'rue', 'strasse', 'str.',
+            // Common address elements
+            'number', 'num', 'nº', '#', 'numero', 'número', 'núm.', 'via'
+          ];
+          
+          const shouldSkip = skipPatterns.some(pattern => candidateLower.includes(pattern)) || /\d/.test(candidate);
+          
+          if (!shouldSkip) {
+            // This looks like a valid city name
+            console.log(`[trip-creation] ✓ Emergency extraction: Using "${candidate}" from address as city name (was: "${primaryCityName}")`);
+            primaryCityName = candidate;
+            break;
+          }
+        }
+        
+        // If still a landmark after emergency extraction, we're in trouble
+        const stillLandmark = landmarkKeywords.some(keyword => primaryCityName.toLowerCase().includes(keyword.toLowerCase()));
+        if (stillLandmark) {
+          console.error(`[trip-creation] ❌ CRITICAL: Emergency extraction failed. City name "${primaryCityName}" is still a landmark. Address: "${primaryPlaceDetails.formatted_address}". Types: ${primaryPlaceDetails?.types?.join(', ') || 'none'}`);
+          
+          // Last resort: Force reverse geocoding if coordinates are available
+          if (primaryPlaceDetails?.geometry?.location && GOOGLE_MAPS_API_KEY) {
+            try {
+              const { getCityFromLatLng } = await import('@/lib/google/places-server');
+              const cityFromCoords = await getCityFromLatLng(
+                primaryPlaceDetails.geometry.location.lat, 
+                primaryPlaceDetails.geometry.location.lng
+              );
+              if (cityFromCoords) {
+                console.log(`[trip-creation] ✓ Last resort: Using city from coordinates: "${cityFromCoords}"`);
+                primaryCityName = cityFromCoords;
+              }
+            } catch (err) {
+              console.error('[trip-creation] ❌ Last resort reverse geocoding failed:', err);
+            }
+          }
+        }
+      } else {
+        console.error(`[trip-creation] ❌ CRITICAL: No formatted_address available for emergency extraction. City name "${primaryCityName}" is still a landmark. Types: ${primaryPlaceDetails?.types?.join(', ') || 'none'}`);
+        
+        // Last resort: Force reverse geocoding if coordinates are available
+        if (primaryPlaceDetails?.geometry?.location && GOOGLE_MAPS_API_KEY) {
+          try {
+            const { getCityFromLatLng } = await import('@/lib/google/places-server');
+            const cityFromCoords = await getCityFromLatLng(
+              primaryPlaceDetails.geometry.location.lat, 
+              primaryPlaceDetails.geometry.location.lng
+            );
+            if (cityFromCoords) {
+              console.log(`[trip-creation] ✓ Last resort: Using city from coordinates: "${cityFromCoords}"`);
+              primaryCityName = cityFromCoords;
+            }
+          } catch (err) {
+            console.error('[trip-creation] ❌ Last resort reverse geocoding failed:', err);
+          }
+        }
+      }
     }
     
     const primaryCountry = primaryPlaceDetails?.formatted_address
@@ -203,9 +444,10 @@ export async function POST(request: NextRequest) {
         start_date: startDate,
         end_date: endDate,
         default_currency: "USD",
-        destination_name: primaryCityName,
+        destination_name: primaryCityName, // This should be the extracted city name, not the landmark
+        destination_city: primaryCityName, // Also save as destination_city for easier access (CRITICAL: must be city, not landmark)
         destination_country: primaryCountry,
-        destination_place_id: segmentsToCreate[0].cityPlaceId,
+        destination_place_id: primaryPlaceId, // Save the original landmark's place_id for reference
         center_lat: primaryPlaceDetails?.geometry?.location?.lat || null,
         center_lng: primaryPlaceDetails?.geometry?.location?.lng || null,
         owner_id: profileId,

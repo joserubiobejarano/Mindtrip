@@ -288,7 +288,7 @@ Based on `docs/monetization.md`, additional Pro features may include:
 
 - **Advanced routing & optimization** - Reduce backtracking, smart grouping
 - **Collaboration & group travel** - Shared editing, polls, voting, comments
-- **Unlimited active trips** - Free: 2 trips, Pro: unlimited
+- **Unlimited active trips** - Free: 1 trip, Pro: unlimited
 - **Version history / undo** - Undo AI changes, view previous versions
 - **AI Concierge+** - Higher chat limits, deeper context, preference memory
 - **Exports** - Google Maps, PDF, Calendar (ICS)

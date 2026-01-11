@@ -63,6 +63,7 @@ export function NewTripDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showProPaywall, setShowProPaywall] = useState(false);
+  const [paywallContext, setPaywallContext] = useState<string>("multi-city");
   const [fieldErrors, setFieldErrors] = useState<{
     destination?: string;
     startDate?: string;
@@ -179,6 +180,7 @@ export function NewTripDialog({
 
     // If user is not Pro, show paywall modal instead of adding a segment
     if (!isPro) {
+      setPaywallContext("multi-city");
       setShowProPaywall(true);
       return;
     }
@@ -220,9 +222,26 @@ export function NewTripDialog({
       return;
     }
 
+    // Free user trip duration limit check
+    const FREE_TRIP_MAX_DAYS = 4;
+    if (!isPro && startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffTime = end.getTime() - start.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+      
+      if (diffDays > FREE_TRIP_MAX_DAYS) {
+        setPaywallContext("trip-duration");
+        setShowProPaywall(true);
+        setLoading(false);
+        return;
+      }
+    }
+
     // Free user trip limit check
-    const FREE_TRIP_LIMIT = 2;
+    const FREE_TRIP_LIMIT = 1;
     if (!isPro && tripCount >= FREE_TRIP_LIMIT) {
+      setPaywallContext("trip-limit");
       setShowProPaywall(true);
       setLoading(false);
       return;
@@ -299,8 +318,48 @@ export function NewTripDialog({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create trip');
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          // If we can't parse JSON, still check status for paywall scenarios
+          if (response.status === 403) {
+            setPaywallContext("trip-duration");
+            setShowProPaywall(true);
+            setError(null); // Clear any error state
+            setLoading(false);
+            return;
+          }
+          throw new Error('Failed to create trip');
+        }
+        
+        // If trip limit reached, show paywall modal (don't set error state)
+        if (response.status === 403 && (errorData.error === 'trip_limit_reached' || errorData.message?.includes('trip limit'))) {
+          setPaywallContext("trip-limit");
+          setShowProPaywall(true);
+          setError(null); // Clear any error state
+          setLoading(false);
+          return;
+        }
+        
+        // If trip duration limit reached, show paywall modal (don't set error state)
+        if (response.status === 403 && (
+          errorData.error === 'trip_duration_limit_reached' || 
+          errorData.error?.includes('trip_duration_limit') ||
+          errorData.message?.includes('trip duration') ||
+          errorData.message?.includes('4 days') ||
+          errorData.message?.toLowerCase().includes('free users are only allowed')
+        )) {
+          setPaywallContext("trip-duration");
+          setShowProPaywall(true);
+          setError(null); // Clear any error state - don't show the ugly message
+          setLoading(false);
+          return;
+        }
+        
+        // For other errors, show a user-friendly message (not the raw error code)
+        const userFriendlyError = errorData.message || 'Failed to create trip. Please try again.';
+        throw new Error(userFriendlyError);
       }
 
       const data = await response.json();
@@ -371,7 +430,16 @@ export function NewTripDialog({
         }
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred");
+      // Never display the raw "trip_duration_limit_reached" error code to users
+      const errorMessage = err.message || "An error occurred";
+      if (errorMessage.includes('trip_duration_limit_reached') || errorMessage.includes('trip_duration_limit')) {
+        // If somehow this error made it here, show paywall instead
+        setPaywallContext("trip-duration");
+        setShowProPaywall(true);
+        setError(null); // Don't show the error message
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -570,7 +638,7 @@ export function NewTripDialog({
               </div>
             </div>
 
-            {error && (
+            {error && !error.includes('trip_duration_limit_reached') && !error.includes('trip_duration_limit') && (
               <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg border border-destructive/20">
                 {error}
               </div>
@@ -597,7 +665,7 @@ export function NewTripDialog({
       <ProPaywallModal
         open={showProPaywall}
         onClose={() => setShowProPaywall(false)}
-        context="multi-city"
+        context={paywallContext}
       />
       </Dialog>
     </>

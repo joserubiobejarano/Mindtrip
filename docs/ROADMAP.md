@@ -72,6 +72,9 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Display name customization
 - [x] Default currency selection (30+ currencies)
 - [x] Profile synchronization with Clerk
+- [x] Settings page with dynamic routing (`/app/settings/[...rest]/page.tsx`)
+- [x] Billing/subscription management integration
+- [x] Language preferences and internationalization support
 
 ### Phase 9 - Advanced Map Features
 - [x] Route visualization on map
@@ -99,6 +102,15 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Past-day lock protection in itinerary editing
 - [x] Activity count limits per day enforcement
 - [x] Accordion-style day headers (`DayAccordionHeader` component)
+- [x] Billing UI Components:
+  - [x] `PaywallModal` component (`components/billing/PaywallModal.tsx`)
+  - [x] `ProPaywallModal` component (`components/pro/ProPaywallModal.tsx`)
+  - [x] `paywall-dialog.tsx` component for paywall dialogs
+  - [x] Context-aware Pro paywall messaging based on accessed feature
+- [x] Internationalization (i18n) System:
+  - [x] Language Provider (`components/providers/language-provider.tsx`)
+  - [x] i18n utility (`lib/i18n.ts`) with translation support
+  - [x] Language switching and preference persistence
 
 ### Phase 11 - AI-Powered Trip Assistant & Smart Features
 - [x] Trip Assistant chat interface (AI-powered conversational assistant)
@@ -439,6 +451,7 @@ For later implementation phases:
 
 ## 📝 Notes
 
+- **Last Updated**: January 2025
 - The application uses Clerk for authentication instead of Supabase Auth
 - Database schema uses TEXT for user IDs to support Clerk's ID format
 - Realtime features require enabling replication in Supabase dashboard
@@ -629,6 +642,7 @@ For later implementation phases:
   - Updates `profiles.is_pro` based on subscription status
   - Updates `trips.has_trip_pro` for trip unlocks
   - Location: `app/api/billing/webhook/route.ts`
+  - **Webhook Configuration Required**: Configure endpoint in Stripe Dashboard to listen for subscription events
 
 ### Image Caching ✅ NEW
 - `POST /api/images/cache-place-image` - Cache a place image in Supabase Storage
@@ -713,6 +727,12 @@ For later implementation phases:
     - ✅ Account-level Pro (`profiles.is_pro`) and trip-level Pro (`trips.has_trip_pro`)
     - ✅ Database migrations: `add-stripe-customer-id-to-profiles.sql`, `add-is-pro-to-profiles.sql`, `add-trip-pro-fields-to-trips.sql`
     - ✅ Automatic subscription status updates via webhook
+  - **Billing UI Components**:
+    - ✅ `PaywallModal` component (`components/billing/PaywallModal.tsx`) - General paywall for Pro features
+    - ✅ `ProPaywallModal` component (`components/pro/ProPaywallModal.tsx`) - Context-aware Pro paywall with feature-specific messaging
+    - ✅ `paywall-dialog.tsx` component - Paywall dialog wrapper for various contexts
+    - ✅ Integrated into: Explore filters, new trip dialog (multi-city), hero section, trip creation flow
+    - ✅ Context-aware messaging based on feature being accessed (multi-city, advanced filters, etc.)
 
 - **2025-01-XX**: Image Caching System ✅ **NEW**
   - **Supabase Storage Integration**:
@@ -729,6 +749,18 @@ For later implementation phases:
     - ✅ Migration file: `supabase-add-regeneration-stats.sql`
     - ✅ Daily limit enforcement: 2 regenerations/day for free tier, 5 for Pro tier
     - ✅ Integration with Smart Itinerary regeneration endpoint
+
+- **2025-01-XX**: User Settings & Internationalization ✅ **NEW**
+  - **Settings Page**:
+    - ✅ Settings page (`/app/settings/[...rest]/page.tsx`) with dynamic routing
+    - ✅ User profile settings section
+    - ✅ Billing/subscription management section (integration with Stripe Customer Portal)
+    - ✅ Language preferences section
+  - **Internationalization (i18n)**:
+    - ✅ Language Provider (`components/providers/language-provider.tsx`) - React context for language management
+    - ✅ i18n utility (`lib/i18n.ts`) - Translation system with language switching
+    - ✅ Translation support throughout UI components (trips list, explore tab, trip members dialog, etc.)
+    - ✅ Language persistence and user preference storage
 
 - **2025-01-XX**: Infrastructure & UX Improvements ✅ **UPDATED**
   - **Trip Deletion Feature**: 

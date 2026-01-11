@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Loader2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export type PaywallModalProps = {
   open: boolean;
@@ -20,14 +21,14 @@ export type PaywallModalProps = {
   tripId?: string;
 };
 
-const BENEFITS = [
-  "Longer trips (more than 14 days)",
-  "Higher swipe limits (100 per trip vs 10 free)",
-  "Multi-city itineraries",
-  "Advanced Explore filters (budget & distance)",
-  "Higher itinerary regeneration limits",
-  "Unlimited active trips",
-  "Future collaboration tools (polls, comments, shared editing)",
+const BENEFIT_KEYS = [
+  "paywall_benefit_longer_trips",
+  "paywall_benefit_swipe_limits",
+  "paywall_benefit_multi_city",
+  "paywall_benefit_advanced_filters",
+  "paywall_benefit_regeneration_limits_alt",
+  "paywall_benefit_unlimited_trips",
+  "paywall_benefit_collaboration_alt",
 ];
 
 type PricingOption = "annual" | "per-trip";
@@ -40,6 +41,7 @@ export function PaywallModal({
   const [selectedPricing, setSelectedPricing] = useState<PricingOption>("annual");
   const [isLoading, setIsLoading] = useState(false);
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   // Get current URL for returnUrl
   const getReturnUrl = () => {
@@ -101,8 +103,8 @@ export function PaywallModal({
       console.error("Error creating checkout:", error);
       addToast({
         variant: "destructive",
-        title: "Failed to start checkout",
-        description: error.message || "Please try again.",
+        title: t("paywall_error_checkout_title"),
+        description: error.message || t("paywall_error_checkout_desc"),
       });
       setIsLoading(false);
     }
@@ -112,26 +114,26 @@ export function PaywallModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Kruno Pro</DialogTitle>
+          <DialogTitle>{t("paywall_modal_title")}</DialogTitle>
           <DialogDescription>
-            Unlock premium features and get the most out of your travel planning.
+            {t("paywall_modal_subtitle")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Feature List */}
           <div className="space-y-2">
-            {BENEFITS.map((benefit, index) => (
+            {BENEFIT_KEYS.map((benefitKey, index) => (
               <div key={index} className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-foreground">{benefit}</span>
+                <span className="text-sm text-foreground">{t(benefitKey as any)}</span>
               </div>
             ))}
           </div>
 
           {/* Pricing Selector */}
           <div className="space-y-4">
-            <Label className="text-base font-semibold">Choose your plan</Label>
+            <Label className="text-base font-semibold">{t("paywall_modal_choose_plan")}</Label>
             <RadioGroup
               value={selectedPricing}
               onValueChange={(value) => setSelectedPricing(value as PricingOption)}
@@ -143,9 +145,9 @@ export function PaywallModal({
                   htmlFor="annual"
                   className="flex-1 cursor-pointer space-y-1"
                 >
-                  <div className="font-semibold">Annual</div>
+                  <div className="font-semibold">{t("paywall_modal_annual")}</div>
                   <div className="text-sm text-muted-foreground">
-                    $49.99/year - Unlock Pro features for all your trips
+                    {t("paywall_modal_annual_desc")}
                   </div>
                 </Label>
               </div>
@@ -157,9 +159,9 @@ export function PaywallModal({
                     htmlFor="per-trip"
                     className="flex-1 cursor-pointer space-y-1"
                   >
-                    <div className="font-semibold">Per trip</div>
+                    <div className="font-semibold">{t("paywall_modal_per_trip")}</div>
                     <div className="text-sm text-muted-foreground">
-                      $6.99 - Unlock Pro features for this trip only
+                      {t("paywall_modal_per_trip_desc")}
                     </div>
                   </Label>
                 </div>
@@ -175,7 +177,7 @@ export function PaywallModal({
               disabled={isLoading}
               className="w-full sm:w-auto"
             >
-              Not now
+              {t("paywall_button_not_now")}
             </Button>
             <Button
               onClick={handleContinue}
@@ -186,10 +188,10 @@ export function PaywallModal({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
+                  {t("paywall_loading")}
                 </>
               ) : (
-                "Continue"
+                t("paywall_button_continue")
               )}
             </Button>
           </div>

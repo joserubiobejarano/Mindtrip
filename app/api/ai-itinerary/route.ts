@@ -224,24 +224,210 @@ export async function POST(request: NextRequest) {
     }
 
     // Build the prompt (use segment data if available)
-    // Determine the primary destination for the prompt
+    // CRITICAL: Priority 1) Use destination_city if available (most reliable)
+    // Priority 2) Use reverse geocoding if destination_name is a landmark
+    // Priority 3) Extract from destination_name if possible
     let primaryDestination = trip.destination_city || trip.destination_name || trip.title;
     let resolvedCity = trip.destination_city;
+    
+    // Comprehensive landmark keywords list (matching trip creation - includes English and Spanish)
+    const landmarkKeywordsList = [
+      // English keywords
+      'market', 'museum', 'palace', 'cathedral', 'church', 'tower', 'bridge', 'park', 'garden', 
+      'basilica', 'basílica', 'monument', 'sagrada', 'stadium', 'arena', 'coliseum', 'theater', 
+      'theatre', 'opera', 'temple', 'mosque', 'synagogue', 'shrine', 'fort', 'castle', 'square',
+      'plaza', 'fountain', 'memorial', 'zoo', 'aquarium', 'library', 'university', 'hospital',
+      'station', 'airport', 'hotel', 'resort', 'mall', 'central market',
+      // Spanish keywords (for Spanish-speaking locales)
+      'museo', 'catedral', 'palacio', 'torre', 'monumento', 'iglesia', 'templo', 'mezquita', 'sinagoga', 
+      'santuario', 'estadio', 'estadium', 'coliseo', 'teatro', 'ópera', 'mercado', 'parque', 'jardín', 
+      'puente', 'fuerte', 'castillo', 'plaza', 'fuente', 'memorial', 'zoológico', 'acuario', 'biblioteca', 
+      'universidad', 'hospital', 'estación', 'aeropuerto', 'hotel', 'resort', 'centro comercial',
+      // Known stadium and landmark names (various languages)
+      'camp nou', 'campo', 'estadio camp nou', 'spotify camp nou', 'sagrada família', 'sagrada familia',
+      'mestalla', 'la rambla', 'park güell', 'parc güell'
+    ];
+    
+    const isLikelyLandmark = (dest: string): boolean => {
+      if (!dest) return false;
+      return landmarkKeywordsList.some(keyword => dest.toLowerCase().includes(keyword));
+    };
 
     // If primaryDestination is a landmark and no city is resolved, attempt to reverse geocode
-    if (!resolvedCity && trip.center_lat && trip.center_lng && (await isLandmark(primaryDestination))) {
-      const cityFromLatLng = await getCityFromLatLng(trip.center_lat, trip.center_lng);
-      if (cityFromLatLng) {
-        resolvedCity = cityFromLatLng;
-        primaryDestination = cityFromLatLng; // Use the resolved city as the primary destination
-        // Update the trip with the resolved city
-        // @ts-expect-error - destination_city exists in schema but types may not be updated
-        await supabase.from('trips').update({ destination_city: cityFromLatLng }).eq('id', tripId);
+    if (!resolvedCity && trip.center_lat && trip.center_lng) {
+      // Use our comprehensive landmark check instead of just isLandmark function
+      if (isLikelyLandmark(primaryDestination) || (await isLandmark(primaryDestination))) {
+        const cityFromLatLng = await getCityFromLatLng(trip.center_lat, trip.center_lng);
+        if (cityFromLatLng) {
+          resolvedCity = cityFromLatLng;
+          primaryDestination = cityFromLatLng; // Use the resolved city as the primary destination
+          // Update the trip with the resolved city
+          // @ts-expect-error - destination_city exists in schema but types may not be updated
+          await supabase.from('trips').update({ destination_city: cityFromLatLng }).eq('id', tripId);
+          console.log(`[ai-itinerary] Extracted city "${cityFromLatLng}" from coordinates for landmark "${trip.destination_name}"`);
+        }
       }
     }
 
-    // Set destination and country for the prompt
-    const destination = segment?.city_name || primaryDestination;
+    // Helper to extract city name from a destination string that might contain landmarks
+    const extractCityName = (dest: string): string => {
+      if (!dest) return dest;
+      
+      const destLower = dest.toLowerCase();
+      
+      // Common patterns: "Landmark Name, City" or "Landmark of City" or "City Landmark"
+      // Try to extract city from patterns like "Central Market of Valencia" -> "Valencia"
+      // Improved pattern to catch "X of Y" or "X of Y Trip" or "X of Y, Country"
+      const ofPattern = /\bof\s+([^,\s]+(?:\s+[^,\s]+)?)(?:\s*,|\s*(?:Trip|trip|$))/i;
+      const match = dest.match(ofPattern);
+      if (match && match[1]) {
+        const city = match[1].trim();
+        // Remove common suffixes that might be part of landmark name
+        return city.replace(/\s*(Trip|trip)$/i, '').trim();
+      }
+      
+      // Check if destination contains a comma (format: "Landmark, City, Country")
+      const parts = dest.split(',').map(s => s.trim());
+      if (parts.length >= 2) {
+        // Usually the city is the second-to-last part before country
+        // But if first part has landmark keywords, skip it
+        const firstPartLower = parts[0].toLowerCase();
+        if (landmarkKeywordsList.some(keyword => firstPartLower.includes(keyword))) {
+          // First part is a landmark, use second part (city)
+          return parts[1] || parts[parts.length - 2];
+        }
+        return parts[parts.length - 2];
+      }
+      
+      // If destination looks like a city name (no landmark keywords), return as-is
+      const hasLandmarkKeyword = landmarkKeywordsList.some(keyword => destLower.includes(keyword));
+      
+      if (!hasLandmarkKeyword) {
+        return dest.replace(/\s*(Trip|trip)$/i, '').trim();
+      }
+      
+      // If we still have a landmark, try to reverse-engineer the city name
+      for (const keyword of landmarkKeywordsList) {
+        if (destLower.includes(keyword)) {
+          // Try to extract what comes after landmark + "of"
+          const afterKeyword = dest.substring(destLower.indexOf(keyword) + keyword.length);
+          const afterOfMatch = afterKeyword.match(/\bof\s+([^,\s]+(?:\s+[^,\s]+)?)/i);
+          if (afterOfMatch && afterOfMatch[1]) {
+            return afterOfMatch[1].trim();
+          }
+        }
+      }
+      
+      // Last resort: if it contains "of", extract everything after "of"
+      const lastOfMatch = dest.match(/\bof\s+([^,\s]+(?:\s+[^,\s]+)?)/i);
+      if (lastOfMatch && lastOfMatch[1]) {
+        return lastOfMatch[1].trim();
+      }
+      
+      // Couldn't extract - return original (will be handled by reverse geocoding or AI prompt instructions)
+      return dest.replace(/\s*(Trip|trip)$/i, '').trim();
+    };
+    
+    // Helper to sanitize and fix itinerary titles
+    const sanitizeItineraryTitle = (title: string, cityName: string): string => {
+      if (!title) return `${cityName} Trip`;
+      
+      const titleLower = title.toLowerCase();
+      const cityLower = cityName.toLowerCase();
+      
+      // Remove "Trip" suffix if present to normalize
+      let normalized = title.replace(/\s*(Trip|trip)$/i, '').trim();
+      
+      // If title already starts with city name, just add "Trip"
+      if (titleLower.startsWith(cityLower)) {
+        return `${cityName} Trip`;
+      }
+      
+      // Check if title contains landmark patterns (comprehensive list including Spanish keywords)
+      const landmarkKeywords = [
+        // English keywords
+        'market', 'museum', 'palace', 'cathedral', 'church', 'tower', 'bridge', 'park', 'garden', 
+        'basilica', 'basílica', 'monument', 'sagrada', 'stadium', 'arena', 'coliseum', 'theater', 
+        'theatre', 'opera', 'temple', 'mosque', 'synagogue', 'shrine', 'fort', 'castle', 'square',
+        'plaza', 'fountain', 'memorial', 'zoo', 'aquarium', 'library', 'university', 'hospital',
+        'station', 'airport', 'hotel', 'resort', 'mall', 'central market',
+        // Spanish keywords (for Spanish-speaking locales)
+        'museo', 'catedral', 'palacio', 'torre', 'monumento', 'iglesia', 'templo', 'mezquita', 'sinagoga', 
+        'santuario', 'estadio', 'estadium', 'coliseo', 'teatro', 'ópera', 'mercado', 'parque', 'jardín', 
+        'puente', 'fuerte', 'castillo', 'fuente', 'zoológico', 'acuario', 'biblioteca', 'universidad',
+        'hospital', 'estación', 'aeropuerto', 'centro comercial',
+        // Known stadium and landmark names (various languages)
+        'camp nou', 'campo', 'estadio camp nou', 'spotify camp nou', 'sagrada família', 'sagrada familia',
+        'mestalla', 'la rambla', 'park güell', 'parc güell'
+      ];
+      const hasLandmarkKeyword = landmarkKeywords.some(keyword => titleLower.includes(keyword));
+      
+      if (hasLandmarkKeyword) {
+        // CRITICAL: If title is a landmark without "of" pattern (e.g., "Spotify Camp Nou Trip", "Mestalla Stadium Trip"),
+        // ALWAYS use the provided cityName directly - it should already be extracted correctly from trip creation
+        // Try to extract city from "X of Y" pattern first (e.g., "Central Market of Valencia" -> "Valencia")
+        const ofPatterns = [
+          /\bof\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)(?:\s*,|\s*$)/i,  // "of Valencia" or "of Valencia, Spain" - after normalization
+          /\bof\s+([^,\s]+(?:\s+[^,\s]+)?)(?:\s*$|,)/i,  // More general: "of [city name]" followed by comma or end
+          /\bof\s+(.+?)(?:\s*$|,)/i,  // Most general: "of [anything]" until end or comma
+        ];
+        
+        let extractedCity: string | null = null;
+        for (const pattern of ofPatterns) {
+          const ofMatch = normalized.match(pattern);
+          if (ofMatch && ofMatch[1]) {
+            let candidate = ofMatch[1].trim();
+            candidate = candidate.replace(/\s*(Trip|trip)$/i, '').trim();
+            const candidateLower = candidate.toLowerCase();
+            // Make sure it's not another landmark keyword
+            if (candidate && !landmarkKeywords.some(keyword => candidateLower.includes(keyword))) {
+              extractedCity = candidate;
+              break;
+            }
+          }
+        }
+        
+        // If no "of" pattern found, check comma-separated format
+        if (!extractedCity && normalized.includes(',')) {
+          const parts = normalized.split(',').map(s => s.trim());
+          if (parts.length > 1) {
+            const firstPartLower = parts[0].toLowerCase();
+            if (landmarkKeywords.some(keyword => firstPartLower.includes(keyword))) {
+              const cityCandidate = parts[1].trim();
+              const cityLower = cityCandidate.toLowerCase();
+              if (!landmarkKeywords.some(keyword => cityLower.includes(keyword))) {
+                extractedCity = cityCandidate;
+              }
+            }
+          }
+        }
+        
+        // CRITICAL: If no extraction worked or title is clearly a landmark (like "Spotify Camp Nou Trip"),
+        // ALWAYS use the provided cityName which should have been correctly extracted during trip creation
+        if (extractedCity && !landmarkKeywords.some(keyword => extractedCity!.toLowerCase().includes(keyword))) {
+          console.log(`[sanitizeItineraryTitle] ✓ Extracted city "${extractedCity}" from title "${title}"`);
+          return `${extractedCity} Trip`;
+        } else {
+          // CRITICAL FALLBACK: Always use provided cityName - it's the most reliable source
+          console.warn(`[sanitizeItineraryTitle] ⚠ Could not safely extract city from landmark title "${title}", using provided cityName: "${cityName}"`);
+          return `${cityName} Trip`;
+        }
+      }
+      
+      // If no landmark detected but title doesn't match city, use city name
+      if (!titleLower.includes(cityLower)) {
+        return `${cityName} Trip`;
+      }
+      
+      // Title looks okay, just ensure "Trip" suffix
+      return `${normalized} Trip`;
+    };
+
+    // Extract city name from destination (handle landmarks like "Central Market of Valencia")
+    const extractedCityName = extractCityName(primaryDestination);
+    
+    // Set destination and country for the prompt - ALWAYS use city name, never landmark
+    const destination = segment?.city_name || extractedCityName || primaryDestination;
     const country = trip.destination_country || "";
     const startDate = segment ? new Date(segment.start_date) : new Date(trip.start_date);
     const endDate = segment ? new Date(segment.end_date) : new Date(trip.end_date);
@@ -273,8 +459,10 @@ ${placesList}`
 
     const prompt = `You are an expert travel planner. Create a detailed, story-like itinerary in JSON format.
 
+CRITICAL: The destination "${destination}" is the CITY you are planning for. If it contains a landmark name (like "Central Market of Valencia"), extract ONLY the city name (Valencia) for the trip title.
+
 Trip Details:
-- Destination: ${destination}
+- Destination CITY: ${destination} (This is the city for the entire trip - plan for the WHOLE city with diverse activities)
 - Trip dates: ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} to ${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
 - Number of days: ${days?.length || 0}${savedPlacesText}
 
@@ -282,6 +470,14 @@ Days to plan:
 ${daysInfo.map(d => `- Day ${d.dayNumber}: ${d.dayOfWeek}, ${d.month} ${d.day}, ${d.year} (${d.date})`).join('\n')}
 
 Requirements:
+- **CRITICAL PRIORITY #1 - Trip Title**: The "tripTitle" field MUST ALWAYS be city-based ONLY (e.g., "Valencia Trip", "Barcelona Trip", "Madrid Trip")
+  - NEVER include landmarks, places, or POI names in the title (e.g., NEVER "Central Market of Valencia Trip", NEVER "Sagrada Família Trip")
+  - ALWAYS extract and use ONLY the city name from "${destination}"
+  - If destination contains "X of Y" format (e.g., "Central Market of Valencia"), extract "Y" (Valencia) and use: "Valencia Trip"
+  - If destination contains "X, Y" format, extract "Y" (the city) and use: "Y Trip"
+  - Format: "[CityName] Trip" - e.g., "Valencia Trip" NOT "Central Market of Valencia Trip"
+  - The title represents the ENTIRE city destination, not any single place within it
+  - Landmarks are just activities in the itinerary - they are NOT the trip destination
 - 1 entry per day of the trip.
 - Each day has:
     - "title": short name for the day.
@@ -299,9 +495,10 @@ Requirements:
               - "alreadyVisited": false (always false for now)
 - **Hard Constraint**: If the trip is 2 or more days, it *must* include at least 3 different areas/neighborhoods of the city. If the trip is 1 day, it *must* include at least 2 different areas/neighborhoods.
 - **Hard Constraint**: Must include category diversity. Each day must feature activities from at least 4 different categories from this list: sightseeing, food, park/nature, culture, viewpoint, local streets/market.
+- **Hard Constraint**: Plan the ENTIRE itinerary for the WHOLE city "${destination}" - include many different areas, neighborhoods, landmarks, and activities across the entire city. Do NOT focus on just one landmark or place.
 - **Hard Constraint**: No single Point of Interest (POI) can appear in more than 1 activity block per day (e.g., if a museum is visited in the morning, it cannot be visited again in the afternoon or evening of the same day). Exceptions for distinctly different experiences (e.g. day/night visit to a major landmark) must be explicitly justified in the activity description.
 - For each time slot (Morning, Afternoon, Evening), target at least 4-6 activities where feasible. This can include major sights, short stops, viewpoints, small walks, etc. Still respect realistic travel time and opening hours.
-- Use the destination city "${destination}" to anchor recommendations, but ensure variety across daily activities rather than dominating with a single "trip title" landmark.
+- Use the destination city "${destination}" to anchor ALL recommendations - plan for the ENTIRE city with diverse activities across different neighborhoods and areas.
 - Prioritize incorporating the saved places listed above - try to include as many as possible in the day-by-day itinerary, organizing them logically by location and timing.
 - Avoid adding the exact same place or landmark more than once to the itinerary, UNLESS it is a significant landmark that offers a distinctly different experience at different times (e.g., day vs. night visit).
 - When a place is suggested multiple times (e.g., a restaurant for lunch and dinner), pick the most suitable slot and do not duplicate. If a place must be visited multiple times, make sure the activity description for each visit is unique and highlights the different experience.
@@ -312,7 +509,7 @@ Requirements:
 
 Return ONLY valid JSON with this exact structure:
 {
-  "tripTitle": "A descriptive title for this trip",
+  "tripTitle": "CRITICAL: MUST be city-based only, e.g., 'Valencia Trip' - NEVER include landmarks in title",
   "summary": "A 2-3 sentence overview of the trip",
   "days": [
     {
@@ -408,6 +605,18 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
       throw new Error('Invalid itinerary structure from OpenAI')
     }
 
+    // POST-PROCESS: Ensure tripTitle is city-based, not landmark-based
+    // Use the sanitizeItineraryTitle function for consistency
+    if (parsedResponse.tripTitle) {
+      const originalTitle = parsedResponse.tripTitle;
+      parsedResponse.tripTitle = sanitizeItineraryTitle(parsedResponse.tripTitle, destination);
+      if (parsedResponse.tripTitle !== originalTitle) {
+        console.warn(`[ai-itinerary] Post-processed title from "${originalTitle}" to "${parsedResponse.tripTitle}"`);
+      }
+    } else {
+      parsedResponse.tripTitle = `${destination} Trip`;
+    }
+
     // Post-process: Enforce food place cap (max 1 per slot)
     // Improved food place detection function
     const isFoodPlace = (activity: RawActivity, types?: string[] | null): boolean => {
@@ -463,6 +672,43 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
           }
         }
       });
+    });
+
+    // POST-PROCESS: Remove duplicate places within the same day
+    // Normalize place names for comparison (case-insensitive, trim whitespace)
+    const normalizePlaceName = (name: string): string => {
+      return name.toLowerCase().trim();
+    };
+
+    parsedResponse.days.forEach(day => {
+      // Track places seen in this day across all time slots
+      const seenPlaces = new Set<string>();
+      const removedDuplicates: Array<{ name: string; fromSection: string }> = [];
+
+      day.sections.forEach(section => {
+        const activities = section.activities || [];
+        const filteredActivities: RawActivity[] = [];
+
+        activities.forEach(activity => {
+          const normalizedName = normalizePlaceName(activity.name);
+          
+          if (seenPlaces.has(normalizedName)) {
+            // This place already appeared in a previous time slot for this day
+            removedDuplicates.push({ name: activity.name, fromSection: section.label });
+          } else {
+            // First time seeing this place in this day
+            seenPlaces.add(normalizedName);
+            filteredActivities.push(activity);
+          }
+        });
+
+        section.activities = filteredActivities;
+      });
+
+      // Log removed duplicates for debugging
+      if (removedDuplicates.length > 0 && process.env.NODE_ENV === 'development') {
+        console.log(`[ai-itinerary] Removed ${removedDuplicates.length} duplicate place(s) from ${day.date}:`, removedDuplicates.map(d => `${d.name} (${d.fromSection})`).join(', '));
+      }
     });
 
     // Initialize sets for deduplication within the current itinerary generation

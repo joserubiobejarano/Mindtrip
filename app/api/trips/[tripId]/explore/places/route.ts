@@ -155,7 +155,10 @@ export async function GET(
     // Get query parameter for including itinerary places
     const includeItineraryPlaces = url.searchParams.get('includeItineraryPlaces') === 'true';
 
-    // Get places already in itinerary (from SmartItinerary, segment-scoped if trip_segment_id provided)
+    // Get places already in itinerary from two sources:
+    // 1. SmartItinerary (segment-scoped if trip_segment_id provided)
+    // 2. Activities table (places added manually or through other flows)
+    
     let itineraryQuery = supabase
       .from('smart_itineraries')
       .select('content')
@@ -217,12 +220,125 @@ export async function GET(
       }
     }
 
+    // Get places already in activities (activities -> places -> external_id)
+    // This covers places added manually through the itinerary tab
+    if (!includeItineraryPlaces) {
+      try {
+        // Get all days for this trip
+        let daysQuery = supabase
+          .from('days')
+          .select('id')
+          .eq('trip_id', tripId);
+        
+        const { data: daysData, error: daysError } = await daysQuery;
+        
+        if (daysError) {
+          console.error('[Explore Places API]', {
+            path: '/api/trips/[tripId]/explore/places',
+            method: 'GET',
+            tripId,
+            profileId,
+            error: daysError?.message || 'Error fetching days',
+            errorCode: daysError?.code,
+            tripSegmentId,
+            context: 'fetching_days_for_activities',
+          });
+        } else if (daysData && daysData.length > 0) {
+          const dayIds = daysData.map(day => day.id);
+          
+          // Get all activities for these days that have place_id
+          const { data: activitiesData, error: activitiesError } = await supabase
+            .from('activities')
+            .select('place_id')
+            .in('day_id', dayIds)
+            .not('place_id', 'is', null);
+          
+          if (activitiesError) {
+            console.error('[Explore Places API]', {
+              path: '/api/trips/[tripId]/explore/places',
+              method: 'GET',
+              tripId,
+              profileId,
+              error: activitiesError?.message || 'Error fetching activities',
+              errorCode: activitiesError?.code,
+              tripSegmentId,
+              context: 'fetching_activities',
+            });
+          } else if (activitiesData && activitiesData.length > 0) {
+            // Get unique place_ids
+            const placeIds = Array.from(new Set(
+              activitiesData
+                .map(activity => activity.place_id)
+                .filter((id): id is string => id !== null)
+            ));
+            
+            if (placeIds.length > 0) {
+              // Get the external_id (Google place_id) from places table
+              // Note: We don't filter by trip_id here because activities are already
+              // scoped to days that belong to this trip, so the relationship chain
+              // (trip -> days -> activities -> places) ensures we get the correct places
+              const { data: placesData, error: placesError } = await supabase
+                .from('places')
+                .select('external_id')
+                .in('id', placeIds)
+                .not('external_id', 'is', null);
+              
+              if (placesError) {
+                console.error('[Explore Places API]', {
+                  path: '/api/trips/[tripId]/explore/places',
+                  method: 'GET',
+                  tripId,
+                  profileId,
+                  error: placesError?.message || 'Error fetching places',
+                  errorCode: placesError?.code,
+                  tripSegmentId,
+                  context: 'fetching_places_external_ids',
+                });
+              } else if (placesData && placesData.length > 0) {
+                // Extract external_id (Google place_id) values
+                const activityPlaceIds = placesData
+                  .map(place => place.external_id)
+                  .filter((id): id is string => id !== null);
+                
+                alreadyPlannedPlaceIds.push(...activityPlaceIds);
+                
+                // DEV-only logging
+                if (process.env.NODE_ENV === 'development') {
+                  console.debug('[Explore Places API] activity places extracted', {
+                    tripId,
+                    tripSegmentId,
+                    activityPlaceIdsCount: activityPlaceIds.length,
+                    totalPlannedPlaceIdsCount: alreadyPlannedPlaceIds.length,
+                  });
+                }
+              }
+            }
+          }
+        }
+      } catch (err: any) {
+        console.error('[Explore Places API]', {
+          path: '/api/trips/[tripId]/explore/places',
+          method: 'GET',
+          tripId,
+          profileId,
+          error: err?.message || 'Error fetching places from activities',
+          errorCode: err?.code,
+          tripSegmentId,
+          context: 'activities_places_lookup',
+        });
+        // Don't throw - continue with existing alreadyPlannedPlaceIds
+      }
+    }
+
+    // Deduplicate alreadyPlannedPlaceIds (combines SmartItinerary + activities places)
+    const uniqueAlreadyPlannedPlaceIds = Array.from(new Set(alreadyPlannedPlaceIds));
+    
     // Combine excluded place IDs
     // Always exclude swiped places, but conditionally exclude itinerary places
     const excludedPlaceIds: string[] = [
       ...(session?.liked_place_ids || []),
       ...(session?.discarded_place_ids || []),
-      ...(includeItineraryPlaces ? [] : alreadyPlannedPlaceIds),
+      ...(includeItineraryPlaces ? [] : uniqueAlreadyPlannedPlaceIds),
     ];
     
     // DEV-only logging
@@ -230,7 +346,7 @@ export async function GET(
       console.debug('[Explore Places API] excluded place IDs', {
         tripId,
         tripSegmentId,
-        itineraryPlaceIdsCount: alreadyPlannedPlaceIds.length,
+        itineraryPlaceIdsCount: uniqueAlreadyPlannedPlaceIds.length,
         likedPlaceIdsCount: session?.liked_place_ids?.length || 0,
         discardedPlaceIdsCount: session?.discarded_place_ids?.length || 0,
         totalExcludedCount: excludedPlaceIds.length,

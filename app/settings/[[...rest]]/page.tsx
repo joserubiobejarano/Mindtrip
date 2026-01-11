@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
 import { Sparkles, Check } from "lucide-react";
+import { NewNavbar } from "@/components/new-navbar";
 
 const CURRENCIES = [
   "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR", "MXN",
@@ -196,9 +197,12 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
 
   if (!isLoaded || isLoading) {
     return (
-      <div className="min-h-screen bg-background p-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-background">
+        <NewNavbar />
+        <div className="p-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-muted-foreground">Loading...</div>
+          </div>
         </div>
       </div>
     );
@@ -212,14 +216,16 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account preferences and billing.
-          </p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <NewNavbar />
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Settings</h1>
+            <p className="text-muted-foreground">
+              Manage your account preferences and billing.
+            </p>
+          </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Mobile: Horizontal tabs */}
@@ -471,6 +477,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
             </div>
           </div>
         </Tabs>
+        </div>
       </div>
     </div>
   );
@@ -479,9 +486,12 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
 export default function SettingsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-background p-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-background">
+        <NewNavbar />
+        <div className="p-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-muted-foreground">Loading...</div>
+          </div>
         </div>
       </div>
     }>
@@ -496,4 +506,3 @@ function SettingsPageContent() {
   
   return <SettingsContent showUpgrade={showUpgrade} />;
 }
-

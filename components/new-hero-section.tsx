@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { usePaywall } from "@/hooks/usePaywall";
 import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
 import { useLanguage } from "@/components/providers/language-provider";
+import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
 
 const suggestionTagKeys = [
   "home_hero_suggestion_weekend",
@@ -49,6 +50,8 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isPro, setIsPro] = useState(false);
   const [showMultiCity, setShowMultiCity] = useState(false);
+  const [showProPaywall, setShowProPaywall] = useState(false);
+  const [paywallContext, setPaywallContext] = useState<string>("multi-city");
 
   // Chat input state
   const [chatInput, setChatInput] = useState("");
@@ -215,6 +218,22 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       return;
     }
 
+    // Free user trip duration limit check (client-side before API call)
+    const FREE_TRIP_MAX_DAYS = 4;
+    if (!isPro && startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffTime = end.getTime() - start.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+      
+      if (diffDays > FREE_TRIP_MAX_DAYS) {
+        setPaywallContext("trip-duration");
+        setShowProPaywall(true);
+        setSearchError(null); // Don't show error message
+        return;
+      }
+    }
+
     // Convert AutocompleteDestinationOption to DestinationOption format
     const destinationObj: DestinationOption = {
       id: selectedDestination.placeId,
@@ -232,7 +251,42 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
         endDate,
       });
     } catch (error: any) {
-      setSearchError(error.message || "Failed to create trip. Please try again.");
+      // Check if it's a trip limit error - show paywall instead of error message
+      if (error.status === 403 && (error.errorData?.error === 'trip_limit_reached' || error.errorData?.message?.includes('trip limit') || error.message?.includes('trip_limit_reached'))) {
+        setPaywallContext("trip-limit");
+        setShowProPaywall(true);
+        setSearchError(null); // Don't show error message
+        return;
+      }
+      
+      // Check if it's a trip duration limit error - show paywall instead of error message
+      if (error.status === 403 && (
+        error.errorData?.error === 'trip_duration_limit_reached' || 
+        error.errorData?.error?.includes('trip_duration_limit') ||
+        error.errorData?.message?.includes('trip duration') ||
+        error.errorData?.message?.includes('4 days') ||
+        error.errorData?.message?.toLowerCase().includes('free users are only allowed') ||
+        error.message?.includes('trip_duration_limit_reached') ||
+        error.message?.includes('trip_duration_limit') ||
+        error.message?.includes('trip duration') ||
+        error.message?.includes('4 days') ||
+        error.message?.toLowerCase().includes('free users are only allowed')
+      )) {
+        setPaywallContext("trip-duration");
+        setShowProPaywall(true);
+        setSearchError(null); // Don't show the ugly raw error message
+        return;
+      }
+      
+      // For other errors, show the error message (but never show trip_duration_limit_reached)
+      const errorMessage = error.message || "Failed to create trip. Please try again.";
+      if (errorMessage.includes('trip_duration_limit_reached') || errorMessage.includes('trip_duration_limit')) {
+        setPaywallContext("trip-duration");
+        setShowProPaywall(true);
+        setSearchError(null); // Don't show the ugly raw error message
+        return;
+      }
+      setSearchError(errorMessage);
     }
   };
 
@@ -336,7 +390,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
             </div>
           </form>
 
-          {searchError && (
+          {searchError && !searchError.includes('trip_duration_limit_reached') && !searchError.includes('trip_duration_limit') && (
             <div className="mb-6 text-sm text-destructive text-center">{searchError}</div>
           )}
 
@@ -383,6 +437,12 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
           )}
           </div>
         </div>
+
+      <ProPaywallModal
+        open={showProPaywall}
+        onClose={() => setShowProPaywall(false)}
+        context={paywallContext}
+      />
 
         {/* Testimonial - positioned below search box */}
         <div className="mt-20 bg-card shadow-lg rounded-lg p-3 transform -rotate-6 animate-float hidden md:block mx-auto w-fit">

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/providers/language-provider";
 
 export function AppHeader() {
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <header className="border-b border-border bg-background">

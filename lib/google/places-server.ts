@@ -180,6 +180,25 @@ export async function getPlaceDetails(placeId: string): Promise<{
 }
 
 /**
+ * Validate that a Google Maps place_id exists and is valid
+ * Returns true if the place_id is valid, false otherwise
+ */
+export async function validatePlaceId(placeId: string): Promise<boolean> {
+  if (!placeId || !GOOGLE_MAPS_API_KEY) {
+    return false;
+  }
+
+  try {
+    const placeDetails = await getPlaceDetails(placeId);
+    // If getPlaceDetails returns a result, the place_id is valid
+    return placeDetails !== null;
+  } catch (error) {
+    console.error(`[validatePlaceId] Error validating place_id ${placeId}:`, error);
+    return false;
+  }
+}
+
+/**
  * Get photo_reference from place_id using Google Places Details API
  * This is the most reliable way to get photos - returns the photo_reference, not the URL
  * @param placeId - Google Places place_id

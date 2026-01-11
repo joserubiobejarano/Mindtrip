@@ -16,6 +16,7 @@ export const maxDuration = 300;
 /**
  * Helper to extract complete JSON objects from streaming text
  * Uses bracket/brace counting to find complete objects
+ * Deduplicates days by index to prevent duplicate Day 1 entries
  */
 function extractCompleteObjects(text: string): {
   title?: string;
@@ -38,7 +39,14 @@ function extractCompleteObjects(text: string): {
     if (parsed.title) result.title = parsed.title;
     if (parsed.summary) result.summary = parsed.summary;
     if (parsed.days && Array.isArray(parsed.days)) {
-      result.days = parsed.days;
+      // Deduplicate days by index - keep the last occurrence of each index
+      const indexMap = new Map<number, any>();
+      for (const day of parsed.days) {
+        if (day.id && day.index !== undefined && day.slots && Array.isArray(day.slots)) {
+          indexMap.set(day.index, day);
+        }
+      }
+      result.days = Array.from(indexMap.values()).sort((a, b) => a.index - b.index);
     }
     if (parsed.tripTips) result.tripTips = parsed.tripTips;
     result.isComplete = true;
@@ -53,7 +61,8 @@ function extractCompleteObjects(text: string): {
     const arrayStart = afterDaysLabel.indexOf('[');
     if (arrayStart === -1) return result;
     
-    // Extract the days array content
+    // Extract the days array content - deduplicate by index as we parse
+    const indexMap = new Map<number, any>();
     let braceCount = 0;
     let bracketCount = 1; // We're inside the array
     let currentDayStart = -1;
@@ -75,7 +84,8 @@ function extractCompleteObjects(text: string): {
             const dayJson = afterDaysLabel.substring(currentDayStart, i + 1);
             const day = JSON.parse(dayJson);
             if (day.id && day.index !== undefined && day.slots && Array.isArray(day.slots)) {
-              result.days.push(day);
+              // Deduplicate by index - keep the most recent occurrence
+              indexMap.set(day.index, day);
             }
           } catch {
             // Skip invalid day JSON
@@ -90,6 +100,9 @@ function extractCompleteObjects(text: string): {
       
       i++;
     }
+    
+    // Convert map to sorted array
+    result.days = Array.from(indexMap.values()).sort((a, b) => a.index - b.index);
     
     // Try to extract title and summary using regex (simpler approach)
     const titleMatch = text.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/);
@@ -367,10 +380,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       // Body parsing failed, continue with defaults
     }
 
-    // 1. Load Trip Details (including personalization fields)
+    // 1. Load Trip Details (including personalization fields and place_id)
     const { data: tripDetailsData, error: tripDetailsError } = await supabase
       .from('trips')
-      .select('id, title, start_date, end_date, destination_name, destination_country, travelers, origin_city_name, has_accommodation, accommodation_name, accommodation_address, arrival_transport_mode, arrival_time_local, interests')
+      .select('id, title, start_date, end_date, destination_name, destination_city, destination_country, destination_place_id, center_lat, center_lng, travelers, origin_city_name, has_accommodation, accommodation_name, accommodation_address, arrival_transport_mode, arrival_time_local, interests')
       .eq('id', tripId)
       .single();
 
@@ -384,7 +397,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       start_date: string
       end_date: string
       destination_name: string | null
+      destination_city: string | null
       destination_country: string | null
+      destination_place_id: string | null
+      center_lat: number | null
+      center_lng: number | null
       travelers: number | null
       origin_city_name: string | null
       has_accommodation: boolean | null
@@ -478,8 +495,293 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
         : 'Interests: not specified',
     ].join('\n');
 
+    // Extract city name from destination - ensure it's city-based, not landmark-based
+    // CRITICAL: Priority 1) Use destination_city if available AND valid (not a landmark)
+    // Priority 2) Use reverse geocoding if destination_name is a landmark
+    // Priority 3) Extract from destination_name or title if possible
+    let cityName = tripDetails.destination_city || tripDetails.destination_name || tripDetails.title;
+    
+    // Comprehensive landmark keywords list (including stadium, arena, etc.)
+    const landmarkKeywords = [
+      'market', 'museum', 'palace', 'cathedral', 'church', 'tower', 'bridge', 'park', 'garden', 
+      'basilica', 'monument', 'basílica', 'sagrada', 'stadium', 'arena', 'coliseum', 'theater', 
+      'theatre', 'opera', 'temple', 'mosque', 'synagogue', 'shrine', 'fort', 'castle', 'square',
+      'plaza', 'fountain', 'memorial', 'zoo', 'aquarium', 'library', 'university', 'hospital',
+      'station', 'airport', 'hotel', 'resort', 'mall', 'central market', 'sagrada família', 'mestalla'
+    ];
+    
+    // Helper to check if a string is likely a landmark
+    const isLikelyLandmark = (dest: string): boolean => {
+      if (!dest) return false;
+      const destLower = dest.toLowerCase();
+      return landmarkKeywords.some(keyword => destLower.includes(keyword));
+    };
+    
+    // Validate destination_city - if it's a landmark, ignore it and extract fresh
+    if (tripDetails.destination_city && isLikelyLandmark(tripDetails.destination_city)) {
+      console.warn(`[smart-itinerary] destination_city "${tripDetails.destination_city}" is a landmark. Will extract fresh city name.`);
+      cityName = tripDetails.destination_name || tripDetails.title; // Fall back to destination_name or title
+    }
+    
+    // If cityName is still a landmark (destination_city was a landmark OR destination_name is a landmark), try multiple extraction methods
+    if (isLikelyLandmark(cityName) && (cityName === tripDetails.destination_name || cityName === tripDetails.destination_city)) {
+      let extractedCity: string | null = null;
+      
+      // Method 1: Try reverse geocoding from coordinates (most reliable)
+      if (tripDetails.center_lat && tripDetails.center_lng && GOOGLE_MAPS_API_KEY) {
+        try {
+          const { getCityFromLatLng } = await import('@/lib/google/places-server');
+          extractedCity = await getCityFromLatLng(tripDetails.center_lat, tripDetails.center_lng);
+          if (extractedCity && !isLikelyLandmark(extractedCity)) {
+            console.log(`[smart-itinerary] Extracted city "${extractedCity}" from coordinates for landmark "${tripDetails.destination_name}"`);
+            cityName = extractedCity;
+            // Update the trip's destination_city in the database for future use
+            await supabase
+              .from('trips')
+              .update({ destination_city: extractedCity })
+              .eq('id', tripId);
+          } else if (extractedCity) {
+            console.warn(`[smart-itinerary] Reverse geocoding returned landmark "${extractedCity}". Trying place details method.`);
+            extractedCity = null; // Reset to try next method
+          }
+        } catch (err) {
+          console.error('[smart-itinerary] Error getting city from coordinates:', err);
+        }
+      }
+      
+      // Method 2: If reverse geocoding failed, try getting place details from destination_place_id
+      if (!extractedCity && tripDetails.destination_place_id && GOOGLE_MAPS_API_KEY) {
+        try {
+          const { getPlaceDetails } = await import('@/lib/google/places-server');
+          const placeDetails = await getPlaceDetails(tripDetails.destination_place_id);
+          if (placeDetails?.formatted_address) {
+            // Extract city from formatted_address (usually second-to-last component before country)
+            const addressParts = placeDetails.formatted_address.split(',').map((s: string) => s.trim());
+            if (addressParts.length >= 2) {
+              // Try each part from the end, looking for one that's not a landmark
+              for (let i = addressParts.length - 2; i >= 0; i--) {
+                const candidate = addressParts[i];
+                if (candidate && !isLikelyLandmark(candidate) && candidate.length > 2) {
+                  extractedCity = candidate;
+                  console.log(`[smart-itinerary] Extracted city "${extractedCity}" from place details address: "${placeDetails.formatted_address}"`);
+                  cityName = extractedCity;
+                  // Update the trip's destination_city
+                  await supabase
+                    .from('trips')
+                    .update({ destination_city: extractedCity })
+                    .eq('id', tripId);
+                  break;
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[smart-itinerary] Error getting place details:', err);
+        }
+      }
+      
+      // Method 3: Final fallback - if still a landmark, try reverse geocoding from center_lat/lng one more time
+      if (!extractedCity && isLikelyLandmark(cityName) && tripDetails.center_lat && tripDetails.center_lng && GOOGLE_MAPS_API_KEY) {
+        try {
+          const { getCityFromLatLng } = await import('@/lib/google/places-server');
+          const cityFromCoords = await getCityFromLatLng(tripDetails.center_lat, tripDetails.center_lng);
+          if (cityFromCoords && !isLikelyLandmark(cityFromCoords)) {
+            console.log(`[smart-itinerary] Final attempt: Extracted city "${cityFromCoords}" from coordinates`);
+            cityName = cityFromCoords;
+            await supabase
+              .from('trips')
+              .update({ destination_city: cityFromCoords })
+              .eq('id', tripId);
+          }
+        } catch (err) {
+          console.error('[smart-itinerary] Error in final reverse geocoding attempt:', err);
+        }
+      }
+      
+      // CRITICAL: If we STILL have a landmark after all attempts, this is a critical error
+      if (isLikelyLandmark(cityName)) {
+        console.error(`[smart-itinerary] CRITICAL ERROR: Could not extract city from landmark "${cityName}" after all extraction methods. This will result in incorrect itinerary titles. Trip ID: ${tripId}`);
+        // At this point, we'll have to rely on the AI prompt and title sanitization
+        // But we should NOT pass a landmark to the AI - it will generate landmark-based titles
+        // However, without a city name, we can't proceed. So we'll pass it anyway and rely on sanitization
+      }
+    }
+    
+    // Final validation: Ensure cityName is not still a landmark (should have been fixed above)
+    if (isLikelyLandmark(cityName) && cityName === tripDetails.destination_name) {
+      console.error(`[smart-itinerary] VALIDATION FAILED: cityName "${cityName}" is still a landmark. All extraction methods failed.`);
+    }
+    
+    // Helper to sanitize and fix itinerary titles
+    const sanitizeItineraryTitle = (title: string, cityName: string): string => {
+      if (!title) return `${cityName} Trip`;
+      
+      const titleLower = title.toLowerCase();
+      const cityLower = cityName.toLowerCase();
+      
+      // Remove "Trip" suffix if present to normalize
+      let normalized = title.replace(/\s*(Trip|trip)$/i, '').trim();
+      
+      // If title already starts with city name, just add "Trip"
+      if (titleLower.startsWith(cityLower) && !isLikelyLandmark(cityName)) {
+        return `${cityName} Trip`;
+      }
+      
+      // Check if title contains landmark patterns (use the same comprehensive list)
+      const hasLandmarkKeyword = landmarkKeywords.some(keyword => titleLower.includes(keyword));
+      
+      if (hasLandmarkKeyword) {
+        // CRITICAL: If title is a landmark without "of" pattern (e.g., "Mestalla Stadium Trip"),
+        // just use the provided cityName directly - it should already be extracted from coordinates
+        // Try to extract city from "X of Y" pattern first (e.g., "Central Market of Valencia" -> "Valencia")
+        const ofPatterns = [
+          /\bof\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)(?:\s*,|\s*$)/i,  // "of Valencia" or "of Valencia, Spain" - after normalization
+          /\bof\s+([^,\s]+(?:\s+[^,\s]+)?)(?:\s*$|,)/i,  // More general: "of [city name]" followed by comma or end
+          /\bof\s+(.+?)(?:\s*$|,)/i,  // Most general: "of [anything]" until end or comma
+        ];
+        
+        let extractedCity: string | null = null;
+        for (const pattern of ofPatterns) {
+          const ofMatch = normalized.match(pattern);
+          if (ofMatch && ofMatch[1]) {
+            let candidate = ofMatch[1].trim();
+            candidate = candidate.replace(/\s*(Trip|trip)$/i, '').trim();
+            const candidateLower = candidate.toLowerCase();
+            // Make sure it's not another landmark keyword
+            if (candidate && !isLikelyLandmark(candidate)) {
+              extractedCity = candidate;
+              break;
+            }
+          }
+        }
+        
+        // If no "of" pattern found, check comma-separated format
+        if (!extractedCity && normalized.includes(',')) {
+          const parts = normalized.split(',').map(s => s.trim());
+          if (parts.length > 1) {
+            const firstPartLower = parts[0].toLowerCase();
+            if (isLikelyLandmark(parts[0])) {
+              const cityCandidate = parts[1].trim();
+              if (!isLikelyLandmark(cityCandidate)) {
+                extractedCity = cityCandidate;
+              }
+            }
+          }
+        }
+        
+        // If we still couldn't extract, use the provided cityName (should be from reverse geocoding)
+        if (extractedCity) {
+          console.log(`[sanitizeItineraryTitle] Extracted city "${extractedCity}" from title "${title}"`);
+          return `${extractedCity} Trip`;
+        } else {
+          // CRITICAL FALLBACK: If provided cityName is also a landmark, we can't use it
+          // Try one more time to extract from the title itself
+          if (isLikelyLandmark(cityName)) {
+            // If the provided cityName is also a landmark, we're in trouble
+            // Try to find any city name pattern in the normalized title
+            // For patterns like "Mestalla Stadium", we need to know it's in Valencia
+            // Since we can't extract without context, log error and use a safe fallback
+            console.error(`[sanitizeItineraryTitle] CRITICAL: Both title "${title}" and cityName "${cityName}" are landmarks. Cannot extract city.`);
+            
+            // Try reverse geocoding from coordinates if available (but we should have done this already)
+            // For now, if title contains known city patterns, try to extract
+            // Otherwise, we'll have to rely on the AI not generating this title in the first place
+            // The real fix is to ensure cityName is ALWAYS a valid city before calling this function
+            
+            // Emergency fallback: If title is "X Stadium Trip" or similar, try to extract context
+            // But without coordinates or more context, we can't reliably extract the city
+            // So we'll return the cityName anyway, but log a critical error
+            return `${cityName} Trip`; // This will be wrong, but better than crashing
+          } else {
+            // Provided cityName is valid, use it
+            console.warn(`[sanitizeItineraryTitle] Could not extract city from landmark title "${title}", using provided cityName: "${cityName}"`);
+            return `${cityName} Trip`;
+          }
+        }
+      }
+      
+      // If no landmark detected but title doesn't match city, use city name
+      if (!titleLower.includes(cityLower)) {
+        return `${cityName} Trip`;
+      }
+      
+      // Title looks okay, just ensure "Trip" suffix
+      return `${normalized} Trip`;
+    };
+    
+    // cityName already extracted above with async extractCityName
+
+    // CRITICAL VALIDATION: Ensure cityName is not a landmark before passing to AI
+    // If it's still a landmark after all extraction attempts, try one final extraction method
+    if (isLikelyLandmark(cityName)) {
+      console.error(`[smart-itinerary] CRITICAL: cityName "${cityName}" is still a landmark after all extraction attempts. Attempting final extraction.`);
+      
+      // Final attempt 1: If we have destination_place_id, get place details and extract city from formatted_address
+      if (tripDetails.destination_place_id && GOOGLE_MAPS_API_KEY && !cityName.includes('Valencia')) {
+        try {
+          const { getPlaceDetails } = await import('@/lib/google/places-server');
+          const placeDetails = await getPlaceDetails(tripDetails.destination_place_id);
+          if (placeDetails?.formatted_address) {
+            const addressParts = placeDetails.formatted_address.split(',').map((s: string) => s.trim());
+            console.log(`[smart-itinerary] Final extraction - address parts from place_id:`, addressParts);
+            // Try each part from second-to-last backwards
+            for (let i = addressParts.length - 2; i >= 0; i--) {
+              const candidate = addressParts[i];
+              if (candidate && candidate.length > 2 && !isLikelyLandmark(candidate)) {
+                // Skip street names and numbers
+                const hasNumber = /\d/.test(candidate);
+                const streetKeywords = ['avenida', 'calle', 'street', 'avenue', 'road', 'boulevard', 'lane', 'plaza', 'square'];
+                const isStreet = streetKeywords.some(keyword => candidate.toLowerCase().includes(keyword));
+                
+                if (!hasNumber && !isStreet) {
+                  cityName = candidate;
+                  console.log(`[smart-itinerary] Final extraction: Using "${cityName}" from place details formatted_address`);
+                  // Update destination_city
+                  await supabase
+                    .from('trips')
+                    .update({ destination_city: cityName })
+                    .eq('id', tripId);
+                  break;
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[smart-itinerary] Error in final place details extraction:', err);
+        }
+      }
+      
+      // Final attempt 2: If still a landmark and we have coordinates, try reverse geocoding ONE MORE TIME
+      if (isLikelyLandmark(cityName) && tripDetails.center_lat && tripDetails.center_lng && GOOGLE_MAPS_API_KEY) {
+        try {
+          const { getCityFromLatLng } = await import('@/lib/google/places-server');
+          const cityFromCoords = await getCityFromLatLng(tripDetails.center_lat, tripDetails.center_lng);
+          if (cityFromCoords && !isLikelyLandmark(cityFromCoords)) {
+            console.log(`[smart-itinerary] FINAL FINAL extraction: Using "${cityFromCoords}" from coordinates (was: "${cityName}")`);
+            cityName = cityFromCoords;
+            // Update destination_city
+            await supabase
+              .from('trips')
+              .update({ destination_city: cityName })
+              .eq('id', tripId);
+          } else if (cityFromCoords) {
+            console.error(`[smart-itinerary] FINAL FINAL extraction failed: Reverse geocoding returned landmark "${cityFromCoords}"`);
+          }
+        } catch (err) {
+          console.error('[smart-itinerary] Error in final final reverse geocoding:', err);
+        }
+      }
+      
+      // If STILL a landmark after ALL attempts, this is a critical error
+      if (isLikelyLandmark(cityName)) {
+        console.error(`[smart-itinerary] CRITICAL ERROR: Could not extract city from landmark "${cityName}" after ALL extraction methods including final attempts. Trip ID: ${tripId}. This will likely result in an incorrect itinerary title.`);
+        // At this point, we cannot proceed safely - we'll rely on AI prompt instructions and post-processing
+        // But we should NOT use the landmark as the destination - we need a valid city name
+      }
+    }
+
     const tripMeta = {
-      destination: tripDetails.destination_name || tripDetails.title,
+      destination: cityName, // Use extracted city name (WARNING: May still be landmark if ALL extraction methods failed)
       dates: `${new Date(tripDetails.start_date).toDateString()} - ${new Date(tripDetails.end_date).toDateString()}`,
       personalization: personalizationContext,
       savedPlaces: savedPlaces?.map(p => p.name) || [],
@@ -530,12 +832,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       ${structureInstructions}
       
       1. Trip Title:
-         - CRITICAL: The trip title MUST be city-based (e.g., "Barcelona Trip", "Madrid Trip", "Paris Trip")
-         - NEVER anchor the title around a single POI/landmark unless the user explicitly requested it
-         - Use the destination city name from the trip data (destination_name field)
-         - If dates exist, you may optionally format as: "Barcelona Trip" or "Barcelona · Dec 19–20"
-         - Plan for the city as a whole; do not anchor the entire itinerary around one landmark
-         - The title should reflect the entire trip destination, not the first activity
+         - CRITICAL PRIORITY #1 - ABSOLUTE REQUIREMENT: The trip title MUST ALWAYS be city-based ONLY (e.g., "Valencia Trip", "Barcelona Trip", "Madrid Trip", "Paris Trip")
+         - NEVER EVER use a landmark, place, POI, stadium, arena, market, museum, or any specific location name in the title - THIS IS FORBIDDEN
+         - NEVER use titles like "Central Market of Valencia Trip", "Mestalla Stadium Trip", "Sagrada Família Trip", "Basílica Trip", "Stadium Trip", or ANY landmark-based title
+         - The destination provided in tripMeta ("${cityName}") might be a landmark or place - you MUST determine the city it's located in and use ONLY that city name
+         - CRITICAL: If the destination is "Mestalla Stadium", you MUST use "Valencia Trip" (Mestalla Stadium is in Valencia)
+         - CRITICAL: If the destination is "Central Market of Valencia", you MUST use "Valencia Trip" (extract the city name)
+         - CRITICAL: If the destination is "Sagrada Família", you MUST use "Barcelona Trip" (Sagrada Família is in Barcelona)
+         - The format MUST ALWAYS be: "[CityName] Trip" (e.g., "Valencia Trip", NEVER "Mestalla Stadium Trip", NEVER "Central Market of Valencia Trip")
+         - If dates exist, you may optionally format as: "Valencia Trip" or "Valencia · Dec 19–20" (ALWAYS city-based, NEVER landmark-based)
+         - Plan the ENTIRE itinerary for the WHOLE city - include many different areas, neighborhoods, landmarks, markets, museums, parks, and activities across the entire city
+         - The itinerary must show diverse activities from across the entire city, not focus on one single landmark
+         - Landmarks and places (like Mestalla Stadium, Central Market, etc.) are just individual activities within the larger city itinerary - they are NOT the trip destination
+         - The title must reflect the ENTIRE city destination, not any single place or activity within it
+         - CRITICAL: Even if the destination provided is a landmark (like "Mestalla Stadium"), you must create an itinerary for the entire city (Valencia), with that landmark being just one of many diverse activities across the city
       
       2. Trip Context & Personalization:
          - Use the following personalization information to tailor the itinerary:
@@ -585,7 +895,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       
       3. EXACT JSON SCHEMA (you MUST return exactly this structure):
       {
-        "title": string (city-based, e.g., "Barcelona Trip"),
+        "title": string (CRITICAL: MUST be city-based only, e.g., "Valencia Trip" - NEVER include landmarks/places in title),
         "summary": string,
         "days": [
           {
@@ -649,11 +959,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       userPrompt += `Preserve the above day structure. Only reshuffle places/activities within days to accommodate the new mustIncludePlaces. Keep the same themes, area clusters, and day-by-day flow.\n\n`;
     }
     
+    // CRITICAL: Add explicit instruction if destination might still be a landmark
+    if (isLikelyLandmark(cityName)) {
+      userPrompt += `\n\nCRITICAL WARNING: The destination "${cityName}" appears to be a landmark, not a city. You MUST determine which city this landmark is located in and use ONLY that city name for the trip title. For example:\n`;
+      userPrompt += `- If destination is "Mestalla Stadium", use "Valencia Trip" (Mestalla Stadium is in Valencia, Spain)\n`;
+      userPrompt += `- If destination is "Central Market of Valencia", use "Valencia Trip" (extract the city name)\n`;
+      userPrompt += `- If destination is "Sagrada Família", use "Barcelona Trip" (Sagrada Família is in Barcelona, Spain)\n`;
+      userPrompt += `- If destination is "Eiffel Tower", use "Paris Trip" (Eiffel Tower is in Paris, France)\n`;
+      userPrompt += `NEVER use the landmark name in the title. ALWAYS use the city name only.\n\n`;
+    }
+    
     userPrompt += `Generate the full itinerary.`;
 
     console.log('[smart-itinerary] generating itinerary for trip', tripId);
 
-    const destination = tripDetails.destination_name || tripDetails.title;
+    // Use the extracted city name (already processed above)
+    const destination = cityName; // Use extracted cityName from tripMeta
     const cityOrArea = destination;
 
     // Create a streaming response using Server-Sent Events
@@ -662,6 +983,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
         try {
           let accumulatedText = '';
           let lastSentDayIndex = -1;
+          let sentDayIndices = new Set<number>(); // Track sent day indices to prevent duplicates
           let validatedItinerary: SmartItinerary | null = null;
           let titleSent = false;
           let summarySent = false;
@@ -681,12 +1003,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
           for await (const chunk of result.textStream) {
             accumulatedText += chunk;
             
-            // Try to parse what we have so far
+            // Try to parse what we have so far (already deduplicated by index)
             const partial = extractCompleteObjects(accumulatedText);
             
             // Send title if we have it and haven't sent it
+            // CRITICAL: Validate and sanitize title BEFORE sending to ensure it's city-based
             if (partial.title && !titleSent) {
-              sendSSE(controller, 'title', partial.title);
+              const sanitizedTitle = sanitizeItineraryTitle(partial.title, destination);
+              if (sanitizedTitle !== partial.title) {
+                console.warn(`[smart-itinerary] Sanitized title from "${partial.title}" to "${sanitizedTitle}"`);
+              }
+              sendSSE(controller, 'title', sanitizedTitle);
+              // Update partial.title so final validation also uses sanitized version
+              partial.title = sanitizedTitle;
               titleSent = true;
             }
             
@@ -696,15 +1025,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               summarySent = true;
             }
             
-            // Send days as they become complete
+            // Send days as they become complete - deduplicate by index to prevent duplicate Day 1
             for (let i = lastSentDayIndex + 1; i < partial.days.length; i++) {
               const day = partial.days[i];
               // Check if day looks complete (has all required fields)
+              // CRITICAL: Also check if we've already sent a day with this index
               if (day.id && day.index !== undefined && day.slots && Array.isArray(day.slots) && day.slots.length > 0) {
+                // Skip if we've already sent a day with this index (prevents duplicate Day 1)
+                if (sentDayIndices.has(day.index)) {
+                  console.warn(`[smart-itinerary] Skipping duplicate day with index ${day.index} (ID: ${day.id})`);
+                  lastSentDayIndex = i; // Still advance to avoid reprocessing
+                  continue;
+                }
+                
                 // Validate the day structure
                 try {
                   // Send the day immediately (without photos for now)
                   sendSSE(controller, 'day', day);
+                  sentDayIndices.add(day.index); // Track that we've sent this index
                   lastSentDayIndex = i;
                   
                   // Start fetching photos asynchronously in background
@@ -755,11 +1093,39 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             if (partial.isComplete) {
               try {
                 const parsed = JSON.parse(accumulatedText);
+                
+                // POST-PROCESS: Ensure title is city-based, not landmark-based
+                // POST-PROCESS: Ensure title is city-based, not landmark-based
+                // Use the sanitizeItineraryTitle function for consistency
+                if (parsed.title) {
+                  const originalTitle = parsed.title;
+                  parsed.title = sanitizeItineraryTitle(parsed.title, destination);
+                  if (parsed.title !== originalTitle) {
+                    console.warn(`[smart-itinerary] Post-processed title from "${originalTitle}" to "${parsed.title}"`);
+                  }
+                } else {
+                  // If no title, set default city-based title
+                  parsed.title = `${destination} Trip`;
+                }
+                
                 validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
                 
-                // Ensure all days were sent
-                for (let i = lastSentDayIndex + 1; i < validatedItinerary.days.length; i++) {
-                  sendSSE(controller, 'day', validatedItinerary.days[i]);
+                // Deduplicate days by index before sending (safety check)
+                const deduplicatedDays = new Map<number, any>();
+                for (const day of validatedItinerary.days) {
+                  if (day.index !== undefined) {
+                    // Keep the last occurrence of each index
+                    deduplicatedDays.set(day.index, day);
+                  }
+                }
+                validatedItinerary.days = Array.from(deduplicatedDays.values()).sort((a, b) => a.index - b.index);
+                
+                // Ensure all days were sent - check by index, not array position
+                for (const day of validatedItinerary.days) {
+                  if (day.index !== undefined && !sentDayIndices.has(day.index)) {
+                    sendSSE(controller, 'day', day);
+                    sentDayIndices.add(day.index);
+                  }
                 }
                 
                 // Send tripTips if we have them
@@ -878,6 +1244,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             let parsed: any = null;
             try {
               parsed = JSON.parse(accumulatedText);
+              
+              // POST-PROCESS: Ensure title is city-based (use sanitizeItineraryTitle for consistency)
+              if (parsed.title) {
+                const originalTitle = parsed.title;
+                parsed.title = sanitizeItineraryTitle(parsed.title, destination);
+                if (parsed.title !== originalTitle) {
+                  console.warn(`[smart-itinerary] Fallback post-processed title from "${originalTitle}" to "${parsed.title}"`);
+                }
+              } else {
+                parsed.title = `${destination} Trip`;
+              }
+              
+              // Deduplicate days by index before validation
+              if (parsed.days && Array.isArray(parsed.days)) {
+                const indexMap = new Map<number, any>();
+                for (const day of parsed.days) {
+                  if (day.index !== undefined) {
+                    indexMap.set(day.index, day);
+                  }
+                }
+                parsed.days = Array.from(indexMap.values()).sort((a, b) => a.index - b.index);
+              }
+              
               validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
               
               // Enrich photos
@@ -1111,11 +1500,130 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
       return NextResponse.json({ error: 'not-found' }, { status: 404 });
     }
 
-    console.log('[smart-itinerary] loaded from DB:', JSON.stringify(dataTyped.content, null, 2));
+    const itinerary = dataTyped.content as SmartItinerary;
 
-    // Return bare SmartItinerary directly (data.content is already the SmartItinerary object)
+    // Merge activities from activities table into the smart itinerary
+    // Get all days in the itinerary
+    const dayIds = itinerary.days.map(day => day.id);
+
+    if (dayIds.length > 0) {
+      // Load all activities for these days
+      const { data: activitiesData, error: activitiesError } = await supabase
+        .from('activities')
+        .select(`
+          id,
+          day_id,
+          title,
+          image_url,
+          place:places(
+            id,
+            name,
+            address,
+            lat,
+            lng,
+            external_id
+          )
+        `)
+        .in('day_id', dayIds)
+        .order('order_number', { ascending: true });
+
+      if (!activitiesError && activitiesData) {
+        type ActivityWithPlace = {
+          id: string;
+          day_id: string;
+          title: string;
+          image_url: string | null;
+          place: {
+            id: string;
+            name: string;
+            address: string | null;
+            lat: number | null;
+            lng: number | null;
+            external_id: string | null;
+          } | null;
+        };
+
+        const activities = activitiesData as ActivityWithPlace[];
+
+        // Group activities by day_id
+        const activitiesByDay = new Map<string, ActivityWithPlace[]>();
+        for (const activity of activities) {
+          if (!activitiesByDay.has(activity.day_id)) {
+            activitiesByDay.set(activity.day_id, []);
+          }
+          activitiesByDay.get(activity.day_id)!.push(activity);
+        }
+
+        // Add activities to the appropriate day and slot in the itinerary
+        for (const day of itinerary.days) {
+          const dayActivities = activitiesByDay.get(day.id) || [];
+          
+          if (dayActivities.length > 0) {
+            // Find or create the "afternoon" slot (default slot for manually added activities)
+            let afternoonSlot = day.slots.find(slot => slot.label.toLowerCase() === 'afternoon');
+            
+            // If no afternoon slot, use the first available slot or create one
+            if (!afternoonSlot && day.slots.length > 0) {
+              afternoonSlot = day.slots[0];
+            } else if (!afternoonSlot) {
+              // Create afternoon slot if no slots exist
+              afternoonSlot = {
+                label: 'afternoon',
+                summary: '',
+                places: [],
+              };
+              day.slots.push(afternoonSlot);
+            }
+
+            // Convert activities to ItineraryPlace format and add to slot
+            for (const activity of dayActivities) {
+              const place = activity.place;
+              
+              // Extract area from address (second-to-last component before country)
+              let area = 'Unknown';
+              let neighborhood: string | null = null;
+              if (place?.address) {
+                const addressParts = place.address.split(',').map(p => p.trim());
+                if (addressParts.length > 1) {
+                  area = addressParts[addressParts.length - 2] || 'Unknown';
+                  if (addressParts.length > 2) {
+                    neighborhood = addressParts[addressParts.length - 3] || null;
+                  }
+                } else {
+                  area = addressParts[0] || 'Unknown';
+                }
+              }
+
+              // Convert activity to ItineraryPlace
+              const itineraryPlace: ItineraryPlace = {
+                id: activity.id, // Use activity ID as the place ID
+                name: activity.title, // Use activity title as the place name
+                description: place?.name || activity.title, // Use place name or activity title as description
+                area,
+                neighborhood,
+                photos: activity.image_url ? [activity.image_url] : [],
+                visited: false,
+                tags: [],
+                place_id: place?.external_id || undefined, // Google Places place_id if available
+                image_url: activity.image_url || null, // Stable image URL from Supabase Storage
+              };
+
+              // Check if this place already exists in the slot (by activity ID to avoid duplicates)
+              const exists = afternoonSlot.places.some(p => p.id === activity.id);
+              if (!exists) {
+                afternoonSlot.places.push(itineraryPlace);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log('[smart-itinerary] loaded from DB with merged activities');
+
+    // Return the merged SmartItinerary
     return NextResponse.json(
-      dataTyped.content,
+      itinerary,
       { status: 200 }
     );
   } catch (err) {

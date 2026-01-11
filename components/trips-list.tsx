@@ -196,12 +196,6 @@ export function TripsList() {
       setTrips((prev) => prev.filter((t) => t.id !== tripToDelete.id));
       setTripToDelete(null);
       setDeleteDialogOpen(false);
-      
-      addToast({
-        title: 'Trip removed',
-        description: `"${tripToDelete.title}" has been deleted successfully.`,
-        variant: 'default',
-      });
     } catch (error: any) {
       console.error("Error deleting trip:", error);
       addToast({

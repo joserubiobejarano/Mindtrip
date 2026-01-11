@@ -5,43 +5,44 @@ import { Language, TranslationKey, translate } from '@/lib/i18n';
 
 type LanguageContextValue = {
   language: Language;
-  setLanguage: (lang: Language) => void;
   t: (key: TranslationKey) => string;
 };
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
-const STORAGE_KEY = 'kruno_language';
+/**
+ * Detects browser language and determines if it's Spanish or English.
+ * Always uses browser language detection - does not persist preferences.
+ */
+function detectBrowserLanguage(): Language {
+  if (typeof window === 'undefined') {
+    return 'en'; // Default for SSR
+  }
+  
+  // Get browser language (e.g., 'es', 'es-ES', 'es-MX', 'en', 'en-US', etc.)
+  const browserLang = navigator.language.split('-')[0];
+  
+  // If browser is in Spanish, return Spanish, otherwise return English
+  return browserLang === 'es' ? 'es' : 'en';
+}
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem(STORAGE_KEY) as Language;
-    
-    if (savedLanguage === 'en' || savedLanguage === 'es') {
-      setLanguageState(savedLanguage);
-    } else {
-      const browserLang = navigator.language.split('-')[0];
-      const defaultLang: Language = browserLang === 'es' ? 'es' : 'en';
-      setLanguageState(defaultLang);
-      localStorage.setItem(STORAGE_KEY, defaultLang);
-    }
+    // Always detect browser language on mount
+    const detectedLang = detectBrowserLanguage();
+    setLanguageState(detectedLang);
     setIsInitialized(true);
   }, []);
-
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem(STORAGE_KEY, lang);
-  };
 
   const t = (key: TranslationKey) => {
     return translate(language, key);
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, t }}>
       {/* Optional: could wrap with a div that has lang attribute */}
       <div lang={language} className="h-full">
         {children}

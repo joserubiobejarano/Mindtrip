@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
 import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 import { assertStripeEnv, getStripePriceIds } from '@/lib/billing/stripe-env';
+import { getProfileId } from '@/lib/auth/getProfileId';
 import { randomUUID } from 'crypto';
 
 type TripQueryResult = {
@@ -36,6 +37,10 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient();
 
+    // Get profileId (UUID) to compare with trip.owner_id
+    // Trips are created with owner_id set to profileId, not Clerk userId
+    const { profileId } = await getProfileId(supabase);
+
     // Validate trip exists and belongs to user
     const { data: tripData, error: tripError } = await supabase
       .from('trips')
@@ -49,7 +54,8 @@ export async function POST(req: NextRequest) {
 
     const trip = tripData as TripQueryResult;
 
-    if (trip.owner_id !== userId) {
+    // Compare with profileId (UUID) instead of Clerk userId
+    if (trip.owner_id !== profileId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

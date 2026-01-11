@@ -312,7 +312,6 @@ kruno/
   - ✅ **Google Places Server Utilities** (`lib/google/places-server.ts`) - Enhanced photo fetching, city resolution, landmark detection
 
 - ✅ **Billing & Subscriptions System** - Complete Stripe integration
-- ✅ **Billing & Subscriptions System** - Complete Stripe integration
   - ✅ Subscription checkout API (`/api/billing/checkout/subscription`) for account-level Pro
   - ✅ Trip Pro unlock checkout API (`/api/billing/checkout/trip`) for trip-level Pro
   - ✅ Stripe webhook handler (`/api/billing/webhook`) for automatic status updates
@@ -320,6 +319,11 @@ kruno/
   - ✅ Account-level Pro (`profiles.is_pro`) and trip-level Pro (`trips.has_trip_pro`)
   - ✅ Database migrations: `add-stripe-customer-id-to-profiles.sql`, `add-is-pro-to-profiles.sql`, `add-trip-pro-fields-to-trips.sql`
   - ✅ Automatic subscription status updates via webhook events
+  - ✅ **Billing UI Components**:
+    - ✅ `PaywallModal` component (`components/billing/PaywallModal.tsx`) - General paywall for Pro features
+    - ✅ `ProPaywallModal` component (`components/pro/ProPaywallModal.tsx`) - Context-aware Pro paywall
+    - ✅ `paywall-dialog.tsx` component - Paywall dialog wrapper
+    - ✅ Integrated into Explore filters, new trip dialog (multi-city), hero section, trip creation flow
 - ✅ **Image Caching System** - Production-proof image storage
   - ✅ API endpoint: `/api/images/cache-place-image` for caching place images
   - ✅ Health check endpoint: `/api/debug/image-cache-health`
@@ -343,6 +347,13 @@ kruno/
   - ✅ Clerk user ID migration improvements (profile lookup enhancements)
   - ✅ Enhanced trip list UI with past trips section and delete functionality
   - ✅ Automatic trip invitation linking on trips list load
+  - ✅ **Internationalization (i18n)** - Multi-language support
+    - ✅ Language Provider (`components/providers/language-provider.tsx`)
+    - ✅ i18n utility (`lib/i18n.ts`) with translation support
+    - ✅ Language persistence and user preference storage
+  - ✅ **Settings Page** - User settings and preferences management
+    - ✅ Settings page (`/app/settings/[...rest]/page.tsx`) with dynamic routing
+    - ✅ User profile settings, billing management, language preferences
   - ✅ **City Autocomplete Feature** - Enhanced destination search with Google Places Autocomplete
     - ✅ New API endpoint: `/api/places/city-autocomplete` (GET and POST)
     - ✅ New component: `DestinationAutocomplete` for improved destination selection
@@ -429,10 +440,11 @@ kruno/
 - Web mobile optimization
 
 **Important Notes:**
-- **Billing System**: Stripe integration is fully implemented. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` environment variables and configure webhook endpoint in Stripe Dashboard.
+- **Billing System**: Stripe integration is fully implemented. Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_YEARLY_PRICE_ID`, and `STRIPE_TRIP_PRO_PRICE_ID` environment variables. Configure webhook endpoint in Stripe Dashboard to listen for subscription events (`checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`). Create products and prices in Stripe Dashboard before use.
 - **Image Caching**: Requires `SUPABASE_SERVICE_ROLE_KEY` and manual creation of `place-images` bucket in Supabase Storage (set to PUBLIC).
 - **Security**: All API routes now use centralized auth helpers and input validation. See [SECURITY.md](./SECURITY.md) for details.
 - **Usage Limits**: Updated limits - Free tier: 10 swipes/trip, 5 changes/trip, 5 search adds/trip. Pro tier: 100 swipes/trip, unlimited changes and search adds.
+- **Internationalization**: Language Provider and i18n utility are set up automatically. Translation keys are defined in `lib/i18n.ts`. Language preference is persisted in user settings.
 
 ## 📱 Mobile App
 

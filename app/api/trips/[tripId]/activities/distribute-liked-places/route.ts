@@ -6,6 +6,7 @@ import { getPlaceDetails } from '@/lib/google/places-server';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { isPastDay } from '@/lib/utils/date-helpers';
 import { getDayActivityCount, MAX_ACTIVITIES_PER_DAY, findAvailableSlot } from '@/lib/supabase/smart-itineraries';
+import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
 
 export async function POST(
   req: NextRequest,
@@ -135,11 +136,17 @@ export async function POST(
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Distribute each liked place across days
-    for (const placeId of likedPlaceIds) {
-      let placed = false;
+    // Helper function to find the best slot across all days (least crowded)
+    const findBestSlotAcrossDays = (): { day: typeof days[0]; slot: typeof days[0]['slots'][0]; slotLabel: string } | null => {
+      const availableSlots: Array<{
+        day: typeof days[0];
+        slot: typeof days[0]['slots'][0];
+        slotLabel: string;
+        activityCount: number;
+        dayActivityCount: number;
+      }> = [];
 
-      // Try to find an available day (not past, not at capacity)
+      // Collect all available slots across all days
       for (const day of days) {
         // Skip past days
         if (isPastDay(day.date)) {
@@ -147,15 +154,74 @@ export async function POST(
         }
 
         // Check if day is at capacity
-        const activityCount = getDayActivityCount(itinerary, day.id);
-        if (activityCount >= MAX_ACTIVITIES_PER_DAY) {
+        const dayActivityCount = getDayActivityCount(itinerary, day.id);
+        if (dayActivityCount >= MAX_ACTIVITIES_PER_DAY) {
           continue;
         }
 
-        // Find an available slot in this day
-        const availableSlot = findAvailableSlot(day);
-        if (!availableSlot) {
+        // Get all slots for this day
+        if (!day.slots || day.slots.length === 0) {
           continue;
+        }
+
+        for (const slot of day.slots) {
+          const slotLabel = slot.label.toLowerCase();
+          if (!['morning', 'afternoon', 'evening'].includes(slotLabel)) {
+            continue;
+          }
+
+          const slotActivityCount = slot.places?.length || 0;
+          availableSlots.push({
+            day,
+            slot,
+            slotLabel: slotLabel as 'morning' | 'afternoon' | 'evening',
+            activityCount: slotActivityCount,
+            dayActivityCount,
+          });
+        }
+      }
+
+      if (availableSlots.length === 0) {
+        return null;
+      }
+
+      // Sort by: 1) day activity count (fewest first), 2) slot activity count (fewest first), 3) slot preference (morning > afternoon > evening)
+      const slotOrder: Record<string, number> = { morning: 0, afternoon: 1, evening: 2 };
+      availableSlots.sort((a, b) => {
+        // First, sort by day activity count (fewest first)
+        if (a.dayActivityCount !== b.dayActivityCount) {
+          return a.dayActivityCount - b.dayActivityCount;
+        }
+        // Then, sort by slot activity count (fewest first)
+        if (a.activityCount !== b.activityCount) {
+          return a.activityCount - b.activityCount;
+        }
+        // Finally, sort by slot preference (morning > afternoon > evening)
+        return (slotOrder[a.slotLabel] || 99) - (slotOrder[b.slotLabel] || 99);
+      });
+
+      const best = availableSlots[0];
+      return {
+        day: best.day,
+        slot: best.slot,
+        slotLabel: best.slotLabel,
+      };
+    };
+
+    // Distribute each liked place across days
+    for (const placeId of likedPlaceIds) {
+      let placed = false;
+
+      // Find the best slot across all days (least crowded)
+      const bestSlot = findBestSlotAcrossDays();
+
+      if (bestSlot) {
+        // Check if place already exists in this slot (avoid duplicates)
+        const placeExists = bestSlot.slot.places?.some(p => p.id === placeId);
+        if (placeExists) {
+          placed = true; // Already there, count as placed
+          distributedCount++;
+          continue; // Skip to next place
         }
 
         // Fetch place details
@@ -197,36 +263,21 @@ export async function POST(
           // Extract tags from types
           const tags = (placeDetails.types || []).slice(0, 3).map(t => t.replace(/_/g, ' '));
 
-          // Find the slot in the day and add the place
-          const slotIndex = day.slots.findIndex(s => s.label.toLowerCase() === availableSlot);
-          if (slotIndex !== -1) {
-            const slot = day.slots[slotIndex];
-            
-            // Check if place already exists in this slot (avoid duplicates)
-            const placeExists = slot.places?.some(p => p.id === placeId);
-            if (placeExists) {
-              placed = true; // Already there, count as placed
-              distributedCount++;
-              break;
-            }
+          // Add place to the selected slot
+          bestSlot.slot.places = bestSlot.slot.places || [];
+          bestSlot.slot.places.push({
+            id: placeId,
+            name: placeDetails.name || 'Unknown Place',
+            description,
+            area,
+            neighborhood,
+            photos,
+            visited: false,
+            tags,
+          });
 
-            // Add place to slot
-            slot.places = slot.places || [];
-            slot.places.push({
-              id: placeId,
-              name: placeDetails.name || 'Unknown Place',
-              description,
-              area,
-              neighborhood,
-              photos,
-              visited: false,
-              tags,
-            });
-
-            placed = true;
-            distributedCount++;
-            break;
-          }
+          placed = true;
+          distributedCount++;
 
           // Small delay to avoid rate limits
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -320,6 +371,18 @@ export async function POST(
     if (updateError) {
       console.error('Error updating itinerary:', updateError);
       return NextResponse.json({ error: 'Failed to update itinerary' }, { status: 500 });
+    }
+
+    // Clear liked places after successful distribution
+    // Only clear if we actually distributed at least one place
+    if (distributedCount > 0 && profileId) {
+      try {
+        await clearLikedPlacesAfterRegeneration(tripId, profileId);
+        console.log('[distribute-liked-places] cleared liked places after distribution');
+      } catch (err) {
+        console.error('[distribute-liked-places] error clearing liked places:', err);
+        // Don't fail the request if clearing fails - places are already added to itinerary
+      }
     }
 
     return NextResponse.json({

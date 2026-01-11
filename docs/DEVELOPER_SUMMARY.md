@@ -600,10 +600,21 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
 
 # Google Maps API
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_client_side
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_server_side
+
+# Supabase Service Role (for image caching)
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 # OpenAI
 OPENAI_API_KEY=your_openai_api_key
+
+# Stripe (Billing/Subscriptions)
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+STRIPE_PRO_YEARLY_PRICE_ID=your_stripe_pro_yearly_price_id
+STRIPE_TRIP_PRO_PRICE_ID=your_stripe_trip_pro_price_id
+STRIPE_SUCCESS_URL=https://your-domain.com/settings/billing
 ```
 
 ### Required API Keys
@@ -612,6 +623,7 @@ OPENAI_API_KEY=your_openai_api_key
    - Sign up at [supabase.com](https://supabase.com)
    - Create a new project
    - Get URL and anon key from Project Settings > API
+   - Get Service Role Key from Project Settings > API (required for image caching)
 
 2. **Clerk**
    - Sign up at [clerk.com](https://clerk.com)
@@ -626,11 +638,23 @@ OPENAI_API_KEY=your_openai_api_key
      - Places API (New)
      - Geocoding API (if needed)
    - Create API key and restrict it
+   - Create separate keys for client-side (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`) and server-side (`GOOGLE_MAPS_API_KEY`)
 
 4. **OpenAI**
    - Sign up at [platform.openai.com](https://platform.openai.com)
    - Create API key
    - Add billing (required for API usage)
+
+5. **Stripe** (Required for billing/subscriptions)
+   - Sign up at [dashboard.stripe.com](https://dashboard.stripe.com)
+   - Create account and get API keys
+   - Get Secret Key (`STRIPE_SECRET_KEY`) and Webhook Secret (`STRIPE_WEBHOOK_SECRET`)
+   - Configure webhook endpoint in Stripe Dashboard:
+     - Endpoint URL: `https://your-domain.com/api/billing/webhook`
+     - Events to listen for: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+   - Create products and prices in Stripe Dashboard:
+     - Pro Yearly Subscription (price ID required in `STRIPE_PRO_YEARLY_PRICE_ID`)
+     - Trip Pro Unlock (price ID required in `STRIPE_TRIP_PRO_PRICE_ID`)
 
 ---
 
@@ -963,6 +987,14 @@ Check `database/migrations/` for SQL scripts. All migrations listed above are av
 - Optimistic updates for better UX
 - Real-time subscriptions via Supabase
 
+### Internationalization (i18n)
+
+- **Language Provider** (`components/providers/language-provider.tsx`) - React context for language state
+- **i18n Utility** (`lib/i18n.ts`) - Translation system with language switching
+- Translation support throughout UI components
+- Language persistence and user preference storage
+- Multi-language support for key UI elements (trips, explore, settings, etc.)
+
 ### Type Safety
 
 - Full TypeScript coverage
@@ -1227,6 +1259,19 @@ For questions or issues:
   - ✅ **Enhanced Itinerary Tab** (`components/itinerary-tab.tsx`) - Day-level Explore integration, usage limits, photo resolution, past-day lock
   - ✅ **AI Itinerary Route Enhancements** (`app/api/ai-itinerary/route.ts`) - Segment support, food limits, better photo matching
   - ✅ **Google Places Server Utilities** (`lib/google/places-server.ts`) - Enhanced photo fetching, city resolution, landmark detection
+  - ✅ **Billing UI Components**:
+    - ✅ `PaywallModal` component (`components/billing/PaywallModal.tsx`) - General paywall for Pro features
+    - ✅ `ProPaywallModal` component (`components/pro/ProPaywallModal.tsx`) - Context-aware Pro paywall with feature-specific messaging
+    - ✅ `paywall-dialog.tsx` component - Paywall dialog wrapper for various contexts
+    - ✅ Integrated into Explore filters, new trip dialog (multi-city), hero section, trip creation flow
+  - ✅ **Internationalization (i18n) System**:
+    - ✅ Language Provider (`components/providers/language-provider.tsx`) - React context for language management
+    - ✅ i18n utility (`lib/i18n.ts`) - Translation system with language switching
+    - ✅ Translation support throughout UI components
+    - ✅ Language persistence and user preference storage
+  - ✅ **Settings Page**:
+    - ✅ Settings page (`/app/settings/[...rest]/page.tsx`) with dynamic routing
+    - ✅ User profile settings, billing management, language preferences
 
 - **Billing & Subscriptions**:
 - **Billing & Subscriptions**: Complete Stripe integration for Pro subscriptions and trip-level unlocks
@@ -1269,14 +1314,15 @@ For questions or issues:
 6. ~~Monetization implementation~~ ✅ **COMPLETE** - Billing system fully implemented
 
 **Important Setup Notes:**
-- **Billing**: Requires Stripe account and webhook configuration. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` environment variables.
+- **Billing**: Requires Stripe account and webhook configuration. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` environment variables. Create products and prices in Stripe Dashboard and set price IDs in environment variables (`STRIPE_PRO_YEARLY_PRICE_ID`, `STRIPE_TRIP_PRO_PRICE_ID`). Configure webhook endpoint in Stripe Dashboard to listen for subscription events.
 - **Image Caching**: Requires `SUPABASE_SERVICE_ROLE_KEY` and manual creation of `place-images` bucket in Supabase Storage (set to PUBLIC).
 - **Security**: All API routes now use centralized auth helpers. See [SECURITY.md](./SECURITY.md) for implementation details.
+- **Internationalization**: Language Provider and i18n utility are set up automatically. Translation keys are defined in `lib/i18n.ts`. Language preference is persisted in user settings.
 
 The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phases 17-21 are complete - Day-level Explore integration, multi-city trips, trip personalization, enhanced assistant, Travel Advisor, billing system, and image caching are fully functional.**
 
 ---
 
 **Last Updated**: January 2025  
-**Document Version**: 1.0
+**Document Version**: 2.0 - Updated with billing setup, internationalization, and settings page
 

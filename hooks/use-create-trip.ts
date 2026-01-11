@@ -89,7 +89,11 @@ export function useCreateTrip() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create trip');
+        // Create error with status code and error data for better handling
+        const error = new Error(errorData.error || errorData.message || 'Failed to create trip');
+        (error as any).status = response.status;
+        (error as any).errorData = errorData;
+        throw error;
       }
 
       const data = await response.json();
