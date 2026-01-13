@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from 'react';
 import Image from 'next/image';
-import { Star, MapPin, Plus, Check, Lock, ExternalLink } from 'lucide-react';
+import { Star, MapPin, Check, Lock, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useExplorePlaces } from '@/hooks/use-explore';
 import { useTripActivities } from '@/hooks/use-trip-activities';
@@ -17,14 +17,12 @@ interface ExplorePlaceListProps {
   tripId: string;
   filters?: ExploreFilters;
   tripSegmentId?: string;
-  onAddToItinerary: (place: ExplorePlace) => void;
 }
 
 export function ExplorePlaceList({
   tripId,
   filters = {},
   tripSegmentId,
-  onAddToItinerary,
 }: ExplorePlaceListProps) {
   const { data, isLoading, error } = useExplorePlaces(
     tripId,
@@ -168,8 +166,18 @@ export function ExplorePlaceList({
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto">
         <div className="space-y-4 p-4 lg:p-6 lg:max-w-4xl lg:mx-auto">
+          <div className="px-1">
+            <h2 className="text-xl font-semibold text-foreground">
+              Most touristic places
+            </h2>
+          </div>
           {visiblePlaces.map((place) => {
             const isInItinerary = isPlaceInItinerary(place);
+            const mapUrl = place.place_id
+              ? `https://www.google.com/maps/place/?q=place_id:${place.place_id}`
+              : place.lat && place.lng
+                ? `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`
+                : undefined;
             return (
               <div
                 key={place.place_id}
@@ -197,9 +205,20 @@ export function ExplorePlaceList({
                     <div className="space-y-2">
                       {/* Name and Category */}
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground line-clamp-1">
-                          {place.name}
-                        </h3>
+                        {mapUrl ? (
+                          <a
+                            href={mapUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-lg font-semibold text-foreground line-clamp-1 hover:text-coral transition-colors"
+                          >
+                            {place.name}
+                          </a>
+                        ) : (
+                          <h3 className="text-lg font-semibold text-foreground line-clamp-1">
+                            {place.name}
+                          </h3>
+                        )}
                         {place.category && (
                           <span className="inline-block text-xs uppercase tracking-wider text-sage bg-sage/10 px-2 py-1 rounded-full mt-1">
                             {place.category}
@@ -241,41 +260,17 @@ export function ExplorePlaceList({
 
                     {/* Action buttons */}
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {place.lat && place.lng && (
+                      {mapUrl && (
                         <Button
                           variant="outline"
                           size="sm"
                           asChild
                           className="w-full sm:w-auto"
                         >
-                          <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
+                          <a href={mapUrl} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="w-4 h-4 mr-2" />
                             {t('explore_button_open_maps')}
                           </a>
-                        </Button>
-                      )}
-                      {isInItinerary ? (
-                        <Button
-                          disabled
-                          variant="outline"
-                          size="sm"
-                          className="w-full sm:w-auto"
-                        >
-                          <Check className="w-4 h-4 mr-2" />
-                          {t('explore_already_added')}
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => onAddToItinerary(place)}
-                          size="sm"
-                          className="w-full sm:w-auto bg-coral hover:bg-coral/90 text-white"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          {t('explore_button_add_to_itinerary')}
                         </Button>
                       )}
                     </div>

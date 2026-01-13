@@ -24,8 +24,8 @@ export async function ensureOwnerMember(
   const displayName = user.fullName || user.firstName || null;
   const profileId = user.id;
 
-  // Use upsert to idempotently ensure owner member
-  // This prevents 409 errors if the member already exists
+  // Use upsert to idempotently ensure owner member.
+  // Conflict target must match the table's unique constraint (trip_id, user_id).
   const { error } = await (supabase
     .from("trip_members") as any)
     .upsert({
@@ -35,7 +35,7 @@ export async function ensureOwnerMember(
       display_name: displayName,
       role: "owner",
     }, {
-      onConflict: 'trip_id,email'
+      onConflict: "trip_id,user_id",
     });
 
   if (error) {

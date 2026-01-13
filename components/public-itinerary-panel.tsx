@@ -32,6 +32,53 @@ function textToBulletPoints(text: string): string[] {
     });
 }
 
+// Replace mdash ranges with worded connectors and avoid mdash characters
+function formatMdashText(text: string): string {
+  if (!text) return text;
+  let formatted = text;
+
+  // Convert numeric/currency/time ranges connected by mdash to "between X and Y"
+  formatted = formatted.replace(
+    /(\b(?:€|\$|£)?\s*\d{1,3}(?:[:.]\d{2})?(?:[.,]\d+)?)(\s*)–(\s*)(\d{1,3}(?:[:.]\d{2})?(?:[.,]\d+)?(?:\s*(?:€|\$|£))?)/g,
+    (_, start, pre, post, end) => {
+      const left = (start as string).trim();
+      const right = (end as string).trim();
+      return `between ${left} and ${right}`;
+    }
+  );
+
+  // For any remaining mdash, replace with a comma separator
+  formatted = formatted.replace(/–/g, ", ");
+
+  // Clean up extra whitespace introduced by replacements while preserving paragraph breaks
+  return formatted
+    // Collapse repeated spaces/tabs but keep newlines intact
+    .replace(/[ \t]{2,}/g, " ")
+    // Trim stray spaces around newlines so paragraph breaks stay
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]+/g, "\n")
+    .trim();
+}
+
+// Render slot summaries with paragraph spacing preserved
+const renderSlotSummary = (summary?: string) => {
+  if (!summary) return null;
+  const formattedSummary = formatMdashText(summary);
+  const paragraphs = formattedSummary
+    .split(/\n\s*\n/)
+    .map(p => p.trim())
+    .filter(Boolean);
+  const content = paragraphs.length > 0 ? paragraphs : [formattedSummary.trim()];
+
+  return (
+    <div className="mt-6 mb-9 space-y-6 text-base md:text-lg text-slate-800 leading-8 text-center md:text-left">
+      {content.map((p, idx) => (
+        <p key={idx}>{p}</p>
+      ))}
+    </div>
+  );
+};
+
 interface PublicItineraryPanelProps {
   tripId: string;
   selectedDayId: string | null;
@@ -51,6 +98,7 @@ export function PublicItineraryPanel({
   const [smartItinerary, setSmartItinerary] = useState<SmartItinerary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const [hasInitializedExpanded, setHasInitializedExpanded] = useState(false);
 
   useEffect(() => {
     const loadItinerary = async () => {
@@ -82,12 +130,13 @@ export function PublicItineraryPanel({
     }
   }, [tripId, slug]);
 
-  // Initialize expanded days with first day expanded
+  // Initialize expanded days with first day expanded (only once per load)
   useEffect(() => {
-    if (smartItinerary?.days && smartItinerary.days.length > 0 && expandedDays.size === 0) {
+    if (!hasInitializedExpanded && smartItinerary?.days && smartItinerary.days.length > 0) {
       setExpandedDays(new Set([smartItinerary.days[0].id]));
+      setHasInitializedExpanded(true);
     }
-  }, [smartItinerary, expandedDays.size]);
+  }, [smartItinerary, hasInitializedExpanded]);
 
   const handleExportPDF = () => {
     window.print();
@@ -265,28 +314,31 @@ export function PublicItineraryPanel({
                         {day.slots.map((slot, slotIdx) => (
                           <div key={slotIdx} className="space-y-4">
                             <div className="pt-4 border-t border-gray-200">
-                              {/* Moment of day label and summary */}
-                              <div className="flex flex-col gap-2 pb-4">
-                                <div className="flex justify-center md:justify-center">
-                                  <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                    {slot.label}
-                                  </span>
-                                </div>
-                                <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
-                                  {slot.summary}
-                                </p>
+                              {/* Moment of day label */}
+                              <div className="flex justify-center md:justify-center">
+                                <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                  {slot.label}
+                                </span>
                               </div>
                               
-                              {/* Activities */}
-                              <div className="grid gap-4">
+                              {/* Enhanced summary text - more prominent */}
+                              {renderSlotSummary(slot.summary)}
+                              
+                              {/* Places section header */}
+                              {slot.places.length > 0 && (
+                                <div className="mb-4">
+                                  <h3 className="text-sm font-semibold text-slate-600 tracking-wide">
+                                    Places to see in this area
+                                  </h3>
+                                </div>
+                              )}
+                              
+                              {/* Simplified place cards */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {slot.places.map((place) => (
                                   <div 
                                     key={place.id} 
                                     className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border bg-white"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onActivitySelect?.(place.id);
-                                    }}
                                   >
                                     <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
                                       {(() => {

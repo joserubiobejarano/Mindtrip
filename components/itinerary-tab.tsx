@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, Check, X, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Share2, Users, MoreVertical, Trash2, Loader2, MapPin, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTrip } from "@/hooks/use-trip";
 import { useTripSegments } from "@/hooks/use-trip-segments";
 import { format, addDays, differenceInDays } from "date-fns";
@@ -136,6 +136,24 @@ export function ItineraryTab({
     if (normalized === 'afternoon') return t('itinerary_afternoon');
     if (normalized === 'evening') return t('itinerary_evening');
     return slotLabel; // Fallback to original if unknown
+  };
+
+  // Render slot summaries with paragraph spacing preserved
+  const renderSlotSummary = (summary?: string) => {
+    if (!summary) return null;
+    const paragraphs = summary
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(Boolean);
+    const content = paragraphs.length > 0 ? paragraphs : [summary.trim()];
+
+    return (
+      <div className="mt-5 mb-8 space-y-5 text-base md:text-lg text-slate-800 leading-7 text-center md:text-left">
+        {content.map((p, idx) => (
+          <p key={idx}>{p}</p>
+        ))}
+      </div>
+    );
   };
 
   // Fetch subscription status
@@ -582,13 +600,37 @@ export function ItineraryTab({
                     
                   case 'error':
                     const errorData = data.data;
-                    const errorMessage = errorData?.message || errorData || 'Failed to generate itinerary';
+                    
+                    // Safely extract error message - ensure it's always a string
+                    let errorMessage: string;
+                    if (typeof errorData === 'string') {
+                      errorMessage = errorData;
+                    } else if (errorData?.message && typeof errorData.message === 'string') {
+                      errorMessage = errorData.message;
+                    } else if (errorData && typeof errorData === 'object') {
+                      // Try to stringify if it's an object, but provide fallback
+                      try {
+                        const stringified = JSON.stringify(errorData);
+                        // If it's an empty object, use default message
+                        errorMessage = stringified === '{}' 
+                          ? 'Failed to generate itinerary' 
+                          : `Error: ${stringified}`;
+                      } catch {
+                        errorMessage = 'Failed to generate itinerary';
+                      }
+                    } else {
+                      errorMessage = 'Failed to generate itinerary';
+                    }
+                    
                     const errorDetails = errorData?.details || errorData?.zodIssues;
                     
+                    // Log with better structure for debugging
                     console.error('[itinerary-tab] SSE error:', {
                       message: errorMessage,
                       details: errorDetails,
-                      fullError: errorData
+                      rawErrorData: errorData,
+                      errorDataType: typeof errorData,
+                      errorDataStringified: typeof errorData === 'object' ? JSON.stringify(errorData) : String(errorData)
                     });
                     
                     // If we have partial data, show it but also show the error
@@ -1439,20 +1481,27 @@ export function ItineraryTab({
                             return (
                               <div key={slotIdx} className="space-y-4">
                                 <div className="pt-4 border-t border-gray-200">
-                                  {/* Moment of day label and summary */}
-                                  <div className="flex flex-col gap-2 pb-4">
-                                    <div className="flex justify-center md:justify-center">
-                                      <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                        {translateSlotLabel(slot.label)}
-                                      </span>
-                                    </div>
-                                    <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
-                                      {slot.summary}
-                                    </p>
+                                  {/* Moment of day label */}
+                                  <div className="flex justify-center md:justify-center">
+                                    <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                      {translateSlotLabel(slot.label)}
+                                    </span>
                                   </div>
                                   
-                                  {/* Activities */}
-                                  <div className="grid gap-4">
+                                  {/* Enhanced summary text - more prominent */}
+                                  {renderSlotSummary(slot.summary)}
+                                  
+                                  {/* Places section header */}
+                                  {slot.places.length > 0 && (
+                                    <div className="mb-4">
+                                      <h3 className="text-sm font-semibold text-slate-600 tracking-wide">
+                                        Places to see in this area
+                                      </h3>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Simplified place cards */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {slot.places.map((place, placeIndex) => {
                                       // Use shared photo resolver
                                       const photoSrc = resolvePlacePhotoSrc(place);
@@ -1461,10 +1510,7 @@ export function ItineraryTab({
                                       return (
                                       <div 
                                         key={`${day.id}:${slotIdx}:${placeIndex}`} 
-                                        className={`flex items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
-                                        onClick={(e) => {
-                                          onActivitySelect?.(place.id);
-                                        }}
+                                        className="flex items-start gap-4 p-4 rounded-lg border bg-white"
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
                                           {photoSrc && !failedImages.has(imageKey) ? (() => {
@@ -1509,65 +1555,8 @@ export function ItineraryTab({
                                           )}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                            <h4 className={`font-bold text-lg text-slate-900 ${place.visited ? 'line-through' : ''}`} style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
-                                            <div className="shrink-0 flex flex-col sm:flex-row items-end sm:items-center gap-2">
-                                              <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  handleUpdatePlace(day.id, place.id, { visited: !place.visited });
-                                                }}
-                                                className={`rounded-full gap-1.5 whitespace-nowrap ${
-                                                  place.visited
-                                                    ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                                    : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                                }`}
-                                              >
-                                                {place.visited && <Check className="h-3 w-3" />}
-                                                <span className="hidden xs:inline">{place.visited ? t('itinerary_visited') : t('itinerary_mark_visited')}</span>
-                                                <span className="xs:hidden">{place.visited ? t('itinerary_visited') : t('itinerary_mark_visited')}</span>
-                                              </Button>
-                                              <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  if (dayIsPast) return;
-                                                  handleUpdatePlace(day.id, place.id, { remove: true });
-                                                }}
-                                                disabled={dayIsPast}
-                                                title={dayIsPast ? t('itinerary_tooltip_day_passed') : undefined}
-                                                className={`rounded-full whitespace-nowrap ${
-                                                  dayIsPast
-                                                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
-                                                    : place.visited
-                                                    ? "border-gray-200 text-gray-400 bg-gray-50"
-                                                    : "border-red-200 text-red-700 bg-red-50 hover:bg-red-100"
-                                                }`}
-                                              >
-                                                {t('itinerary_remove')}
-                                              </Button>
-                                              <Button
-                                                type="button"
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.place_id}`, "_blank");
-                                                }}
-                                                className={`whitespace-nowrap ${
-                                                  place.visited
-                                                    ? "border-gray-200 text-gray-400 bg-gray-50"
-                                                    : ""
-                                                }`}
-                                              >
-                                                {t('itinerary_open_in_google_maps')}
-                                              </Button>
-                                            </div>
-                                          </div>
-                                          <p className={`text-slate-700 text-sm mt-2 leading-relaxed break-words ${place.visited ? 'line-through' : ''}`}>
+                                          <h4 className="font-bold text-lg text-slate-900" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                          <p className="text-slate-700 text-sm mt-2 leading-relaxed break-words">
                                             {place.description}
                                           </p>
                                           {place.area && (
@@ -1579,50 +1568,6 @@ export function ItineraryTab({
                                       </div>
                                       )
                                     })}
-                                  </div>
-                                  
-                                  {/* Add activities button - moved below activities */}
-                                  <div className="mt-4 flex w-full sm:w-auto justify-start">
-                                    <Button
-                                      type="button"
-                                      variant="default"
-                                      size="sm"
-                                      onClick={() => {
-                                        console.log('[Itinerary] Add clicked', { dayId: day.id, slot: slotType });
-                                        // Remove dayIsAtCapacity check - capacity should NOT block adding activities
-                                        const isDisabled = dayIsPast || searchAddCount >= usageLimits.searchAdd.limit;
-                                        if (isDisabled) return;
-                                        router.push(`/trips/${tripId}?tab=explore&mode=add&day=${day.id}&slot=${slotType}`);
-                                      }}
-                                      disabled={dayIsPast || searchAddCount >= usageLimits.searchAdd.limit}
-                                      title={
-                                        (() => {
-                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
-                                          if (reasons.length > 0) {
-                                            return `Disabled: ${reasons.join(', ')}`;
-                                          }
-                                          return dayIsPast
-                                            ? t('itinerary_tooltip_day_passed')
-                                            : searchAddCount >= usageLimits.searchAdd.limit
-                                            ? t('itinerary_tooltip_add_limit')
-                                              .replace('{count}', searchAddCount.toString())
-                                              .replace('{limit}', usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit.toString())
-                                              .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
-                                            : dayIsAtCapacity
-                                            ? t('itinerary_tooltip_day_full').replace('{max}', MAX_ACTIVITIES_PER_DAY.toString())
-                                            : undefined;
-                                        })()
-                                      }
-                                      className={`text-xs min-h-[44px] touch-manipulation ${
-                                        dayIsPast || searchAddCount >= usageLimits.searchAdd.limit
-                                          ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
-                                          : "bg-primary hover:bg-primary/90 text-white"
-                                      }`}
-                                    >
-                                      <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', translateSlotLabel(slot.label).toLowerCase())}</span>
-                                      <span className="sm:hidden">{t('itinerary_add')}</span>
-                                    </Button>
                                   </div>
                                 </div>
                               </div>
@@ -1800,20 +1745,27 @@ export function ItineraryTab({
                             return (
                               <div key={slotIdx} className="space-y-4">
                                 <div className="pt-4 border-t border-gray-200">
-                                  {/* Moment of day label and summary */}
-                                  <div className="flex flex-col gap-2 pb-4">
-                                    <div className="flex justify-center md:justify-center">
-                                      <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
-                                        {translateSlotLabel(slot.label)}
-                                      </span>
-                                    </div>
-                                    <p className="text-sm md:text-base text-slate-800 leading-relaxed text-center md:text-left">
-                                      {slot.summary}
-                                    </p>
+                                  {/* Moment of day label */}
+                                  <div className="flex justify-center md:justify-center">
+                                    <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                      {translateSlotLabel(slot.label)}
+                                    </span>
                                   </div>
                                   
-                                  {/* Activities */}
-                                  <div className="grid gap-4">
+                                  {/* Enhanced summary text - more prominent */}
+                                  {renderSlotSummary(slot.summary)}
+                                  
+                                  {/* Places section header */}
+                                  {slot.places.length > 0 && (
+                                    <div className="mb-4">
+                                      <h3 className="text-sm font-semibold text-slate-600 tracking-wide">
+                                        Places to see in this area
+                                      </h3>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Simplified place cards */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {slot.places.map((place, placeIndex) => {
                                       // Use shared photo resolver
                                       const photoSrc = resolvePlacePhotoSrc(place);
@@ -1822,10 +1774,7 @@ export function ItineraryTab({
                                       return (
                                       <div 
                                         key={`${day.id}:${slotIdx}:${placeIndex}`} 
-                                        className={`flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border hover:bg-slate-50 transition-colors cursor-pointer ${place.visited ? 'bg-slate-50 opacity-75' : 'bg-white'}`}
-                                        onClick={(e) => {
-                                          onActivitySelect?.(place.id);
-                                        }}
+                                        className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-white"
                                       >
                                         <div className="flex-shrink-0 relative w-full sm:w-24 h-48 sm:h-24 rounded-md overflow-hidden bg-gray-200">
                                           {photoSrc && !failedImages.has(imageKey) ? (() => {
@@ -1870,71 +1819,8 @@ export function ItineraryTab({
                                           )}
                                         </div>
                                         <div className="min-w-0 flex-1 w-full sm:w-auto">
-                                          <div className="flex flex-col gap-2 mb-2">
-                                            <h4 className={`font-bold text-lg text-slate-900 break-words ${place.visited ? 'line-through' : ''}`} style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
-                                            <div className="flex flex-wrap items-center gap-2">
-                                              <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  handleUpdatePlace(day.id, place.id, { visited: !place.visited });
-                                                }}
-                                                className={`rounded-lg whitespace-nowrap ${
-                                                  place.visited
-                                                    ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                                    : "bg-green-100 text-green-700 hover:bg-green-200"
-                                                }`}
-                                              >
-                                                {place.visited ? (
-                                                  <>
-                                                    <Check className="h-3 w-3 inline mr-1" />
-                                                    {t('itinerary_visited')}
-                                                  </>
-                                                ) : (
-                                                  t('itinerary_mark_visited_alt')
-                                                )}
-                                              </Button>
-                                              <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  if (dayIsPast) return;
-                                                  handleUpdatePlace(day.id, place.id, { remove: true });
-                                                }}
-                                                disabled={dayIsPast}
-                                                title={dayIsPast ? t('itinerary_tooltip_day_passed') : undefined}
-                                                className={`rounded-lg whitespace-nowrap ${
-                                                  dayIsPast
-                                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                    : place.visited
-                                                    ? "bg-gray-100 text-gray-400 border-gray-200"
-                                                    : "bg-red-100 text-red-700 hover:bg-red-200"
-                                                }`}
-                                              >
-                                                <X className="h-3 w-3 inline mr-1" />
-                                                {t('itinerary_remove')}
-                                              </Button>
-                                              <Button
-                                                type="button"
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  window.open(`https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.place_id}`, "_blank");
-                                                }}
-                                                className={`whitespace-nowrap ${
-                                                  place.visited
-                                                    ? "bg-gray-100 text-gray-400 border-gray-200"
-                                                    : ""
-                                                }`}
-                                              >
-                                                {t('itinerary_open_in_google_maps')}
-                                              </Button>
-                                            </div>
-                                          </div>
-                                          <p className={`text-sm text-slate-600 mt-1 break-words ${place.visited ? 'line-through' : ''}`}>{place.description}</p>
+                                          <h4 className="font-bold text-lg text-slate-900 break-words" style={{ fontFamily: "'Patrick Hand', cursive" }}>{place.name}</h4>
+                                          <p className="text-sm text-slate-700 mt-2 break-words leading-relaxed">{place.description}</p>
                                           {place.area && (
                                             <span className="inline-block mt-2 px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
                                               {place.area}
@@ -1944,50 +1830,6 @@ export function ItineraryTab({
                                       </div>
                                       )
                                     })}
-                                  </div>
-                                  
-                                  {/* Add activities button - moved below activities */}
-                                  <div className="mt-4 flex w-full sm:w-auto justify-start">
-                                    <Button
-                                      type="button"
-                                      variant="default"
-                                      size="sm"
-                                      onClick={() => {
-                                        console.log('[Itinerary] Add clicked', { dayId: day.id, slot: slotType });
-                                        // Remove dayIsAtCapacity check - capacity should NOT block adding activities
-                                        const isDisabled = dayIsPast || searchAddCount >= usageLimits.searchAdd.limit;
-                                        if (isDisabled) return;
-                                        router.push(`/trips/${tripId}?tab=explore&mode=add&day=${day.id}&slot=${slotType}`);
-                                      }}
-                                      disabled={dayIsPast || searchAddCount >= usageLimits.searchAdd.limit}
-                                      title={
-                                        (() => {
-                                          const reasons = getButtonDisabledReason('add', dayIsPast, dayIsAtCapacity, dayActivityCount, tripLoading, day.id);
-                                          if (reasons.length > 0) {
-                                            return `Disabled: ${reasons.join(', ')}`;
-                                          }
-                                          return dayIsPast
-                                            ? t('itinerary_tooltip_day_passed')
-                                            : searchAddCount >= usageLimits.searchAdd.limit
-                                            ? t('itinerary_tooltip_add_limit')
-                                              .replace('{count}', searchAddCount.toString())
-                                              .replace('{limit}', usageLimits.searchAdd.limit === Infinity ? '∞' : usageLimits.searchAdd.limit.toString())
-                                              .replace('{hint}', isPro ? t('itinerary_tooltip_hint_pro') : t('itinerary_tooltip_hint_upgrade'))
-                                            : dayIsAtCapacity
-                                            ? t('itinerary_tooltip_day_full').replace('{max}', MAX_ACTIVITIES_PER_DAY.toString())
-                                            : undefined;
-                                        })()
-                                      }
-                                      className={`text-xs min-h-[44px] touch-manipulation ${
-                                        dayIsPast || searchAddCount >= usageLimits.searchAdd.limit
-                                          ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
-                                          : "bg-primary hover:bg-primary/90 text-white"
-                                      }`}
-                                    >
-                                      <Plus className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">{t('itinerary_add_activities').replace('{slot}', translateSlotLabel(slot.label).toLowerCase())}</span>
-                                      <span className="sm:hidden">{t('itinerary_add')}</span>
-                                    </Button>
                                   </div>
                                 </div>
                               </div>

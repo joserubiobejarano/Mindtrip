@@ -243,6 +243,100 @@ function applyPhotoReferenceSafetyGuard(places: ItineraryPlace[]): void {
   }
 }
 
+/**
+ * Ensure every slot summary is multi-paragraph and tip-heavy.
+ * If a slot comes back as a single/empty paragraph, expand it with practical guidance.
+ */
+function ensureRichSlotSummaries(itinerary: SmartItinerary, destination?: string): void {
+  if (!itinerary?.days?.length) return;
+
+  const toParagraphs = (text?: string | null): string[] => {
+    if (!text) return [];
+    return text
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(Boolean);
+  };
+
+  for (const day of itinerary.days) {
+    for (const slot of day.slots) {
+      const paragraphs = toParagraphs(slot.summary);
+      if (paragraphs.length >= 2) continue; // already rich enough
+
+      const primary = slot.places?.[0];
+      const area =
+        primary?.area ||
+        primary?.neighborhood ||
+        day.areaCluster ||
+        destination ||
+        "the area";
+      const placeName = primary?.name || `this ${slot.label.toLowerCase()}`;
+
+      const paragraph1 = [
+        `Start your ${slot.label.toLowerCase()} around ${placeName} and give yourself time to soak in the vibe of ${area}.`,
+        `Expect most sights to run roughly 09:00 to 19:00 with last entry about an hour before close; double-check exact hours and timed-entry rules online.`,
+        `If tickets are needed, book ahead and budget common ranges of €10 to €30 for headline stops; carry a digital copy and ID for scans.`,
+      ].join(" ");
+
+      const paragraph2 = [
+        `Move between stops with clear routes: lean on nearby metro/bus/tram lines and note both origin and destination stations; single rides are often about €2 to €3 and walks of 10 to 20 minutes are common in ${area}.`,
+        `Watch for peak crowds at mid-morning and late afternoon; earlier entry windows or late slots can shorten queues.`,
+        `Keep a small buffer for bag checks and security at major landmarks.`,
+      ].join(" ");
+
+      const paragraph3 = [
+        `Refuel close by: look for a bakery or café for a coffee and pastry before noon, or a menu del día around €12 to €20 if you're near local streets.`,
+        `Ask for house specials and check if reservations are needed for terraces during weekends.`,
+        `Add one wow moment, whether it's a viewpoint, a local market detour, or a quick stop for gelato while you walk.`,
+      ].join(" ");
+
+      slot.summary = [paragraph1, paragraph2, paragraph3].join("\n\n");
+    }
+  }
+}
+
+const replaceMdashes = (value: string): string =>
+  value.replace(/[\u2013\u2014]/g, ' to ');
+
+function replaceTilde(value: string): string {
+  const withoutMdashes = replaceMdashes(value);
+  const withoutTilde = withoutMdashes.replace(/~/g, 'about ');
+  // Preserve paragraph breaks while tidying spacing around punctuation.
+  return withoutTilde
+    // Collapse repeated spaces/tabs but keep newlines intact
+    .replace(/[ \t]{2,}/g, ' ')
+    // Trim stray spaces before newlines to avoid accidental paragraph collapse
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    // Remove spaces before punctuation
+    .replace(/[ \t]+([.,;:!?])/g, '$1');
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return Object.prototype.toString.call(value) === '[object Object]';
+}
+
+function sanitizeNoTilde<T>(input: T): T {
+  if (typeof input === 'string') {
+    return replaceTilde(input) as unknown as T;
+  }
+  if (Array.isArray(input)) {
+    return input.map(item => sanitizeNoTilde(item)) as unknown as T;
+  }
+  if (input instanceof Date) {
+    return input;
+  }
+  if (input && typeof input === 'object' && isPlainObject(input)) {
+    const sanitized: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(input)) {
+      sanitized[key] = sanitizeNoTilde(value as any);
+    }
+    return sanitized as unknown as T;
+  }
+  return input;
+}
+
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ tripId: string }> }) {
   let profileId: string | undefined;
   let tripId: string | undefined;
@@ -845,7 +939,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
          - CRITICAL: If the destination is "Central Market of Valencia", you MUST use "Valencia Trip" (extract the city name)
          - CRITICAL: If the destination is "Sagrada Família", you MUST use "Barcelona Trip" (Sagrada Família is in Barcelona)
          - The format MUST ALWAYS be: "[CityName] Trip" (e.g., "Valencia Trip", NEVER "Mestalla Stadium Trip", NEVER "Central Market of Valencia Trip")
-         - If dates exist, you may optionally format as: "Valencia Trip" or "Valencia · Dec 19–20" (ALWAYS city-based, NEVER landmark-based)
+         - If dates exist, you may optionally format as: "Valencia Trip" or "Valencia · Dec 19 to 20" (ALWAYS city-based, NEVER landmark-based)
          - Plan the ENTIRE itinerary for the WHOLE city - include many different areas, neighborhoods, landmarks, markets, museums, parks, and activities across the entire city
          - The itinerary must show diverse activities from across the entire city, not focus on one single landmark
          - Landmarks and places (like Mestalla Stadium, Central Market, etc.) are just individual activities within the larger city itinerary - they are NOT the trip destination
@@ -863,6 +957,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
       
       3. Content & Writing Style:
          - Write in a warm, friendly, personal tone - like a knowledgeable friend giving recommendations, not a generic travel guide.
+         - Never use the tilde character "~" for approximations; write "about" or "around" instead.
          - CRITICAL: The "summary" field is the most important briefing text. It must include ALL of the following information in a comprehensive, detailed paragraph (not bullet points):
            * Airport-to-city transportation: Provide EXACT details including the specific train/bus line name or number, departure station name and location, destination station name, duration, frequency, and approximate cost. Example: "From Madrid-Barajas Airport (Terminal 4), take the Cercanías C1 train (departs every 20 minutes) to Atocha Station in the city center. The journey takes approximately 30 minutes and costs around €2.60. Tickets can be purchased at the airport station or via the Renfe app."
            * Weather conditions and clothing recommendations: Describe the typical weather during the trip dates (temperature ranges, precipitation, sunshine hours) and what clothing/accessories travelers should pack. Example: "During December in Madrid, expect daytime temperatures of 8-15°C (46-59°F) with occasional rain. Pack warm layers, a waterproof jacket, comfortable walking shoes, and a scarf for the cooler evenings."
@@ -877,11 +972,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
            * Personal recommendations and insider tips
            * What makes this day special and what travelers will see, feel, and experience
            Format: Each sentence should be a separate bullet point. The overview should be a string with sentences separated by periods, which will be displayed as bullet points.
-         - In each slot's "summary" (3-6 sentences): Provide detailed, personal descriptions of what to do during this time. Be specific about:
+        - In each slot's "summary": ALWAYS write 2 to 3 paragraphs (separated by blank lines), each 3 to 5 sentences, for EVERY destination and EVERY slot; never collapse to a single paragraph. Be specific about:
            * The atmosphere and what makes this time special
-           * Practical tips for navigating between places in this slot
-           * Transportation recommendations between places (e.g., "Take subway line 10 to X station", "These places are all within walking distance", "Best to walk from Place A to Place B")
+           * Exact movement guidance between places in the slot: call out metro/bus/tram line numbers, station names, walking cues, typical durations, frequencies, and approximate one-way costs; say when walking is best
+           * Opening/closing hours windows and reservation/ticket tips for the key stop in the slot (e.g., "opens 10:00, last entry 18:00, book skip-the-line online")
+           * Nearby food/coffee picks (by area or street) with what to try and expected price range
            * What travelers will experience and why it's worth doing
+          * A vivid wow/fact or insider micro-tip tied to the area
+           * Keep everything concise but packed with specifics that feel like insider tips, not generic filler
          - Day trip prioritization: CRITICAL - Prioritize attractions and places within the main destination city before suggesting day trips. Only suggest day trips if:
            * The trip is 4+ days long, OR
            * The main destination is very small and doesn't have enough attractions for the full trip duration
@@ -894,7 +992,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
              - Approximate cost (e.g., "around €10-15 round trip")
              Example: "Take a day trip to Toledo by catching the Renfe Cercanías C3 train from Atocha Station in central Madrid. The train departs every 30 minutes, takes approximately 35 minutes, and costs around €10-15 for a round trip ticket. Purchase tickets at Atocha Station or via the Renfe app."
          - In "tripTips", include any additional helpful tips that don't fit in the summary (optional, can be empty if all information is in summary).
-         - In each place's "description" (2-4 sentences): Be specific and helpful with practical info, what makes it special, opening hours, tips, and what to expect.
+         - In each place's "description" (2-4 sentences): Be specific and helpful with practical info, what makes it special, opening hours (with peak/quiet times), typical ticket/entry cost or free info, nearby food or coffee suggestions, and quick movement guidance (walk vs metro/bus with line/station names when relevant).
          - Use "visited" = false for all places.
          - Fill "tags" with relevant keywords.
       
@@ -1018,15 +1116,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               if (sanitizedTitle !== partial.title) {
                 console.warn(`[smart-itinerary] Sanitized title from "${partial.title}" to "${sanitizedTitle}"`);
               }
-              sendSSE(controller, 'title', sanitizedTitle);
+              const cleanTitle = sanitizeNoTilde(sanitizedTitle);
+              sendSSE(controller, 'title', cleanTitle);
               // Update partial.title so final validation also uses sanitized version
-              partial.title = sanitizedTitle;
+              partial.title = cleanTitle;
               titleSent = true;
             }
             
             // Send summary if we have it and haven't sent it
             if (partial.summary && !summarySent) {
-              sendSSE(controller, 'summary', partial.summary);
+              const cleanSummary = sanitizeNoTilde(partial.summary);
+              sendSSE(controller, 'summary', cleanSummary);
+              partial.summary = cleanSummary;
               summarySent = true;
             }
             
@@ -1046,7 +1147,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 // Validate the day structure
                 try {
                   // Send the day immediately (without photos for now)
-                  sendSSE(controller, 'day', day);
+                  const sanitizedDay = sanitizeNoTilde(day);
+                  sendSSE(controller, 'day', sanitizedDay);
                   sentDayIndices.add(day.index); // Track that we've sent this index
                   lastSentDayIndex = i;
                   
@@ -1054,7 +1156,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   // Don't await - let it happen in parallel
                   (async () => {
                     try {
-                      const enrichedDay = { ...day };
+                      const enrichedDay = { ...sanitizeNoTilde(day) };
                       const allPlaces = enrichedDay.slots.flatMap((slot: ItinerarySlot) => slot.places);
                       
                       // Step 1: Resolve missing place_ids
@@ -1083,7 +1185,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       enrichedDay.photos = deduplicateAndBuildPhotoUrls(allPlaces, 4);
                       
                       // Send updated day with photos
-                      sendSSE(controller, 'day-updated', enrichedDay);
+                      sendSSE(controller, 'day-updated', sanitizeNoTilde(enrichedDay));
                     } catch (err) {
                       console.error('[smart-itinerary] Error enriching day photos:', err);
                     }
@@ -1124,18 +1226,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   }
                 }
                 validatedItinerary.days = Array.from(deduplicatedDays.values()).sort((a, b) => a.index - b.index);
+                validatedItinerary = sanitizeNoTilde(validatedItinerary) as SmartItinerary;
                 
                 // Ensure all days were sent - check by index, not array position
                 for (const day of validatedItinerary.days) {
                   if (day.index !== undefined && !sentDayIndices.has(day.index)) {
-                    sendSSE(controller, 'day', day);
+                    sendSSE(controller, 'day', sanitizeNoTilde(day));
                     sentDayIndices.add(day.index);
                   }
                 }
                 
                 // Send tripTips if we have them
                 if (validatedItinerary.tripTips && validatedItinerary.tripTips.length > 0) {
-                  sendSSE(controller, 'tripTips', validatedItinerary.tripTips);
+                  sendSSE(controller, 'tripTips', sanitizeNoTilde(validatedItinerary.tripTips));
                 }
                 
                 // Final enrichment pass for any remaining photos
@@ -1143,6 +1246,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   day.slots.flatMap(slot => slot.places)
                 );
                 
+                // Enforce rich multi-paragraph slot summaries
+                ensureRichSlotSummaries(validatedItinerary, destination);
+
                 // Step 1: Resolve missing place_ids
                 await resolveMissingPlaceIds(allPlaces, cityOrArea);
                 
@@ -1180,6 +1286,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   const dayPlaces = day.slots.flatMap(slot => slot.places);
                   day.photos = deduplicateAndBuildPhotoUrls(dayPlaces, 4);
                 }
+                validatedItinerary = sanitizeNoTilde(validatedItinerary) as SmartItinerary;
                 
                 // Save to Supabase
                 const { error: saveError } = await (supabase
@@ -1222,7 +1329,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   }
                   
                   // Send final complete message
-                  sendSSE(controller, 'complete', validatedItinerary);
+                  sendSSE(controller, 'complete', sanitizeNoTilde(validatedItinerary));
                 }
               } catch (parseError: any) {
                 // Log detailed error information for debugging
@@ -1273,12 +1380,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               }
               
               validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
+              validatedItinerary = sanitizeNoTilde(validatedItinerary);
               
               // Enrich photos
               const allPlaces = validatedItinerary.days.flatMap(day => 
                 day.slots.flatMap(slot => slot.places)
               );
               
+              // Enforce rich multi-paragraph slot summaries
+              ensureRichSlotSummaries(validatedItinerary, destination);
+
               // Step 1: Resolve missing place_ids
               await resolveMissingPlaceIds(allPlaces, cityOrArea);
               
@@ -1342,7 +1453,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                     { onConflict: 'trip_id,date' }
                   );
                 
-                sendSSE(controller, 'complete', validatedItinerary);
+                sendSSE(controller, 'complete', sanitizeNoTilde(validatedItinerary));
               } else {
                 sendSSE(controller, 'error', { message: 'Failed to save itinerary' });
               }

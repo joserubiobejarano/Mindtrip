@@ -1,16 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { ExplorePlaceList } from "./explore/ExplorePlaceList";
 import { ExploreFilters } from "./explore/ExploreFilters";
-import { ExploreAddToDayDialog } from "./explore/ExploreAddToDayDialog";
 import { HotelSearchBanner } from "./hotel-search-banner";
 import { ErrorBoundary } from "./error-boundary";
 import { useTrip } from "@/hooks/use-trip";
 import { useTripSegments } from "@/hooks/use-trip-segments";
 import { useToast } from "@/components/ui/toast";
-import type { ExploreFilters as ExploreFiltersType, ExplorePlace } from "@/lib/google/explore-places";
+import type { ExploreFilters as ExploreFiltersType } from "@/lib/google/explore-places";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/providers/language-provider";
@@ -20,20 +18,13 @@ interface ExploreTabProps {
   onActivePlaceChange?: (place: { placeId: string; lat: number; lng: number }) => void;
 }
 
-export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+export function ExploreTab({ tripId, onActivePlaceChange: _onActivePlaceChange }: ExploreTabProps) {
   const { data: trip, isLoading: tripLoading, error: tripError } = useTrip(tripId);
   const { data: segments = [], isLoading: segmentsLoading, error: segmentsError } = useTripSegments(tripId);
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
   const { addToast } = useToast();
   const { t } = useLanguage();
   const [filters, setFilters] = useState<ExploreFiltersType>({});
-  const [selectedPlace, setSelectedPlace] = useState<ExplorePlace | null>(null);
-  const [dayDialogOpen, setDayDialogOpen] = useState(false);
-  
-  // Replace mode state (for replacing activities from itinerary)
-  const [replaceTarget, setReplaceTarget] = useState<{ tripId: string; dayId: string; activityId: string; activityName?: string } | null>(null);
   
   // Gate for showing affiliate promo boxes (currently disabled)
   const showAffiliates = false;
@@ -77,139 +68,6 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
       setActiveSegmentId(null);
     }
   }, [segments, activeSegmentId]);
-
-  // Handle URL params for replace mode (for replacing activities from itinerary)
-  useEffect(() => {
-    const mode = searchParams.get('mode');
-    const day = searchParams.get('day');
-    const activity = searchParams.get('activity');
-
-    if (mode === 'replace' && day && activity) {
-      // Set replace target from URL params
-      const newReplaceTarget = {
-        tripId,
-        dayId: day,
-        activityId: activity,
-      };
-      setReplaceTarget(newReplaceTarget);
-      
-      // Fetch activity name for label
-      const fetchActivityName = async () => {
-        try {
-          const response = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
-          if (response.ok) {
-            const itinerary = await response.json();
-            // Find the activity in the itinerary
-            for (const itineraryDay of itinerary.days || []) {
-              if (itineraryDay.id === day) {
-                for (const slot of itineraryDay.slots || []) {
-                  const place = slot.places?.find((p: any) => p.id === activity);
-                  if (place) {
-                    setReplaceTarget(prev => prev ? { ...prev, activityName: place.name } : null);
-                    break;
-                  }
-                }
-                break;
-              }
-            }
-          }
-        } catch (error) {
-          console.error('[ReplaceMode] Failed to fetch activity name:', error);
-          // Continue without activity name - not critical
-        }
-      };
-      fetchActivityName();
-    } else {
-      setReplaceTarget(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, tripId]);
-
-  // Handle adding place to itinerary - opens day selection dialog
-  const handleAddToItinerary = (place: ExplorePlace) => {
-    // Handle replace mode
-    if (replaceTarget) {
-      handleReplacePlace(place);
-      return;
-    }
-
-    // Normal mode: open day selection dialog
-    setSelectedPlace(place);
-    setDayDialogOpen(true);
-  };
-
-  // Handle replacing an activity with a new place
-  const handleReplacePlace = async (place: ExplorePlace) => {
-    if (!replaceTarget || !place.place_id) {
-      addToast({
-        title: t('explore_toast_no_place_selected'),
-        description: t('explore_toast_select_replace'),
-        variant: 'default',
-      });
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/trips/${tripId}/activities/${replaceTarget.activityId}/replace`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          place: {
-            place_id: place.place_id,
-            name: place.name,
-            address: place.address,
-            lat: place.lat,
-            lng: place.lng,
-            neighborhood: place.neighborhood,
-            district: place.district,
-            types: place.types,
-            photo_url: place.photo_url,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        
-        // Handle 409 (duplicate) error
-        if (response.status === 409) {
-          addToast({
-            title: t('explore_toast_already_in_itinerary'),
-            description: error.message || t('explore_toast_already_in_itinerary_desc'),
-            variant: 'destructive',
-          });
-          return;
-        }
-        
-        throw new Error(error.error || error.message || t('explore_toast_failed_replace'));
-      }
-
-      // Show success toast
-      addToast({
-        title: t('explore_toast_replaced'),
-        description: t('explore_toast_replaced_desc'),
-        variant: 'success',
-      });
-
-      // Clear URL params and navigate to itinerary tab
-      setReplaceTarget(null);
-      router.push(`/trips/${tripId}?tab=itinerary`);
-    } catch (error: any) {
-      addToast({
-        title: t('explore_toast_error'),
-        description: error.message || t('explore_toast_failed_replace'),
-        variant: 'destructive',
-      });
-    }
-  };
-
-  // Handle day dialog close
-  const handleDayDialogClose = (open: boolean) => {
-    setDayDialogOpen(open);
-    if (!open) {
-      setSelectedPlace(null);
-    }
-  };
 
   // Show loading state
   if ((tripLoading || segmentsLoading) && !trip) {
@@ -289,15 +147,6 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
         </div>
       )}
 
-      {/* Replace mode banner */}
-      {replaceTarget && replaceTarget.activityName && (
-        <div className="px-6 py-3 border-b border-sage/20 bg-peach/20 flex-shrink-0">
-          <p className="text-sm text-muted-foreground">
-            {t('explore_replace_mode_replacing').replace('{name}', replaceTarget.activityName)}
-          </p>
-        </div>
-      )}
-
       {/* Main Content - 2-column layout on desktop, single column on mobile */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left Sidebar - Desktop only (Filters) */}
@@ -317,19 +166,10 @@ export function ExploreTab({ tripId, onActivePlaceChange }: ExploreTabProps) {
               tripId={tripId}
               filters={filters}
               tripSegmentId={activeSegmentId || undefined}
-              onAddToItinerary={handleAddToItinerary}
             />
           </ErrorBoundary>
         </div>
       </div>
-
-      {/* Day Selection Dialog */}
-      <ExploreAddToDayDialog
-        open={dayDialogOpen}
-        onOpenChange={handleDayDialogClose}
-        place={selectedPlace}
-        tripId={tripId}
-      />
     </div>
   );
 }

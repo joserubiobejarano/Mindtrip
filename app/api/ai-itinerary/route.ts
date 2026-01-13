@@ -134,7 +134,8 @@ export async function POST(request: NextRequest) {
     }
     
     if (existingItinerary) {
-      return NextResponse.json({ itinerary: existingItinerary, fromCache: true })
+      const sanitizedCached = sanitizeNoMdash(existingItinerary);
+      return NextResponse.json({ itinerary: sanitizedCached, fromCache: true })
     }
 
     // Load trip data
@@ -487,7 +488,7 @@ Requirements:
     - "heroImages": 4-6 photo search terms for that day (for a horizontal gallery), e.g. ["Madrid Royal Palace", "Retiro Park Madrid", "Tapas bar Madrid"].
     - "sections": morning / afternoon / evening. Each section has:
          - "label": "Morning", "Afternoon", or "Evening"
-         - "description": 3-4 sentences describing what to do during this part of the day
+         - "description": ALWAYS 2-3 paragraphs (blank-line separated), each 3-5 sentences, packed with specifics for EVERY destination and EVERY slot. Include: exact transit (metro/bus/tram line numbers, station names, walking cues, durations, frequencies, one-way cost), opening/closing windows and reservation/ticket tips, nearby food/coffee picks with price ranges, and a wow/fact or micro-tip tied to the area. Never collapse to a single paragraph.
          - "activities": array of activities. Each activity has:
               - "name": activity name
               - "description": 2-3 sentences with practical info (opening hours, tips, what to expect)
@@ -506,6 +507,7 @@ Requirements:
 - Provide realistic timing and themes for each day
 - Include seasonal considerations (weather, local events, etc.)
 - Make the text rich, descriptive, and engaging - like a travel blog post
+- Do not use mdash characters (em dash or en dash). Write ranges with words such as "to", "and", or commas (e.g., "around €12 and €20", "09:00 to 19:00").
 
 Return ONLY valid JSON with this exact structure:
 {
@@ -521,7 +523,7 @@ Return ONLY valid JSON with this exact structure:
       "sections": [
         {
           "label": "Morning",
-          "description": "3-4 sentences describing what to do during this part of the day",
+          "description": "2-3 paragraphs (blank-line separated), each 3-5 sentences, with transit lines/stations, walking cues, durations/costs, opening/closing windows, reservation/ticket tips, nearby food/coffee with price ranges, and a wow/fact or micro-tip. Never single-paragraph.",
           "activities": [
             {
               "name": "Activity name",
@@ -589,6 +591,112 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
       }[]
     }
 
+// Ensure each section description is multi-paragraph and practical
+function ensureRichSectionDescriptions(itinerary: RawAiItinerary, destination?: string) {
+  if (!itinerary?.days?.length) return;
+
+  const normalizeMdashes = (text?: string | null): string =>
+    (text || '')
+      .replace(/[\u2013\u2014]/g, ' to ')
+      // Collapse repeated spaces/tabs but preserve newlines for paragraph breaks
+      .replace(/[ \t]{2,}/g, ' ')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n[ \t]+/g, '\n')
+      .trim();
+
+  const toParagraphs = (text?: string | null): string[] =>
+    normalizeMdashes(text)
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(Boolean);
+
+  const MIN_PARAGRAPHS = 3;
+
+  for (const day of itinerary.days) {
+    for (const section of day.sections || []) {
+      const paragraphs = toParagraphs(section.description);
+
+      const primary = section.activities?.[0];
+      const activityName = primary?.name || section.label || 'this slot';
+      const areaHint = destination ? `around ${destination}` : 'nearby';
+      // If the model already produced 3+ paragraphs, just normalize spacing
+      if (paragraphs.length >= MIN_PARAGRAPHS) {
+        section.description = paragraphs.join('\n\n');
+        continue;
+      }
+
+      // Build safety net paragraphs packed with tips and specifics
+      const safetyParagraphs: string[] = [];
+
+      const transitParagraph = [
+        `Start your ${section.label.toLowerCase()} near ${activityName} and keep legs fresh by chaining stops ${areaHint}.`,
+        `Lock in exact metro, bus, or tram lines by name and direction, keep single rides around €2 to €3, and expect 10 to 20 minute walks between clustered sights.`,
+        `If you need to cross neighborhoods, budget 20 to 35 minutes door to door and confirm the return frequency before you leave.`,
+      ].join(' ');
+
+      const timingParagraph = [
+        `Most headline sights run roughly 09:00 to 19:00 with last entry about an hour before close; confirm ticket rules and reserve online to skip queues.`,
+        `Carry a digital copy and ID for scans, and keep a small buffer for bag checks or timed entry windows.`,
+        `Have a backup nearby stop so you can pivot quickly if a queue balloons or a venue closes early.`,
+      ].join(' ');
+
+      const foodParagraph = [
+        `Refuel nearby: grab coffee or a pastry before noon, or a menu del día between €12 and €20 on quieter side streets; check if terraces need reservations on weekends.`,
+        `Ask for house specials, watch for cover charges, and keep small coins handy for bakeries or markets.`,
+        `Add one wow detail such as a lookout, a local market detour, or a quick gelato stop to cap the slot.`,
+      ].join(' ');
+
+      safetyParagraphs.push(transitParagraph, timingParagraph, foodParagraph);
+
+      // Seed with any AI-provided paragraphs, then append safety net until we hit 3
+      const composed: string[] = [...paragraphs];
+      while (composed.length < MIN_PARAGRAPHS && safetyParagraphs.length) {
+        composed.push(safetyParagraphs.shift()!);
+      }
+
+      // If still short (unlikely), reuse the last safety paragraph to meet the minimum
+      while (composed.length < MIN_PARAGRAPHS) {
+        composed.push(foodParagraph);
+      }
+
+      section.description = normalizeMdashes(composed.join('\n\n'));
+    }
+  }
+}
+
+const replaceMdashes = (value: string): string =>
+  (value || '')
+    .replace(/[\u2013\u2014]/g, ' to ')
+    // Preserve newlines when cleaning whitespace
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/[ \t]+([.,;:!?])/g, '$1');
+
+function sanitizeNoMdash<T>(input: T): T {
+  if (typeof input === 'string') {
+    return replaceMdashes(input) as unknown as T;
+  }
+
+  if (Array.isArray(input)) {
+    return input.map(item => sanitizeNoMdash(item)) as unknown as T;
+  }
+
+  if (input instanceof Date) {
+    return input;
+  }
+
+  if (input && typeof input === 'object') {
+    const sanitized: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+      sanitized[key] = sanitizeNoMdash(value as any);
+    }
+    return sanitized as unknown as T;
+  }
+
+  return input;
+}
+
     let parsedResponse: RawAiItinerary
     try {
       const parsed = JSON.parse(responseContent)
@@ -616,6 +724,9 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
     } else {
       parsedResponse.tripTitle = `${destination} Trip`;
     }
+
+    // Enforce multi-paragraph, tip-heavy slot descriptions
+    ensureRichSectionDescriptions(parsedResponse, destination);
 
     // Post-process: Enforce food place cap (max 1 per slot)
     // Improved food place detection function
@@ -748,6 +859,9 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
              photoUrl = await findPlacePhoto(query, { usedImageUrls, usedPlaceIds, placeId: activityPlaceId, allowDedupedFallback: true, destinationCity: destination });
           }
 
+          const cleanActivityName = replaceMdashes(activity.name);
+          const cleanActivityDescription = replaceMdashes(activity.description);
+
           // Prepare activity record
           if (dbDay) {
             let startTime = "09:00";
@@ -764,7 +878,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
             activitiesToInsert.push({
               trip_id: tripId,
               day_id: dbDay.id,
-              title: activity.name,
+              title: cleanActivityName,
               start_time: startTime,
               end_time: endTime,
               photo_url: photoUrl,
@@ -774,8 +888,8 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
           }
 
           return {
-            title: activity.name,
-            description: activity.description,
+            title: cleanActivityName,
+            description: cleanActivityDescription,
             photoUrl: photoUrl,
             goodFor: match?.goodFor,
             placeId: activityPlaceId, // Return the resolved placeId
@@ -804,8 +918,10 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
       days: enrichedDays,
     };
 
+    const sanitizedItinerary = sanitizeNoMdash(enrichedItinerary);
+
     // Save enriched itinerary JSON to smart_itineraries table
-    const { error: saveError } = await upsertSmartItinerary(tripId, enrichedItinerary, trip_segment_id);
+    const { error: saveError } = await upsertSmartItinerary(tripId, sanitizedItinerary, trip_segment_id);
     if (saveError) {
       console.error('Error saving smart itinerary:', saveError);
       // Continue even if save fails - we still return the itinerary
@@ -828,7 +944,7 @@ Make sure each day has sections for Morning, Afternoon, and Evening with approxi
       }
     }
 
-    return NextResponse.json({ itinerary: enrichedItinerary, fromCache: false })
+    return NextResponse.json({ itinerary: sanitizedItinerary, fromCache: false })
   } catch (error) {
     console.error('Error in /api/ai-itinerary:', error)
     const errorMessage =
