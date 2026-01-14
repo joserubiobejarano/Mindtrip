@@ -219,7 +219,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     }
 
     // Free user trip duration limit check (client-side before API call)
-    const FREE_TRIP_MAX_DAYS = 4;
+    const FREE_TRIP_MAX_DAYS = 5;
     if (!isPro && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -264,12 +264,12 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
         error.errorData?.error === 'trip_duration_limit_reached' || 
         error.errorData?.error?.includes('trip_duration_limit') ||
         error.errorData?.message?.includes('trip duration') ||
-        error.errorData?.message?.includes('4 days') ||
+        error.errorData?.message?.includes('5 days') ||
         error.errorData?.message?.toLowerCase().includes('free users are only allowed') ||
         error.message?.includes('trip_duration_limit_reached') ||
         error.message?.includes('trip_duration_limit') ||
         error.message?.includes('trip duration') ||
-        error.message?.includes('4 days') ||
+        error.message?.includes('5 days') ||
         error.message?.toLowerCase().includes('free users are only allowed')
       )) {
         setPaywallContext("trip-duration");
@@ -301,7 +301,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
       <div className="w-[70%] max-w-6xl mx-auto text-center relative mt-8">
         {/* Main Title */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal md:solid-underline inline-block text-foreground mb-20" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-normal md:solid-underline inline-block text-foreground mb-20" style={{ fontFamily: "'Patrick Hand', cursive" }}>
           {t('home_hero_title')}
         </h1>
 

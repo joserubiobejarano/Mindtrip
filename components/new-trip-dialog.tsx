@@ -223,7 +223,7 @@ export function NewTripDialog({
     }
 
     // Free user trip duration limit check
-    const FREE_TRIP_MAX_DAYS = 4;
+    const FREE_TRIP_MAX_DAYS = 5;
     if (!isPro && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -239,7 +239,7 @@ export function NewTripDialog({
     }
 
     // Free user trip limit check
-    const FREE_TRIP_LIMIT = 1;
+    const FREE_TRIP_LIMIT = 2;
     if (!isPro && tripCount >= FREE_TRIP_LIMIT) {
       setPaywallContext("trip-limit");
       setShowProPaywall(true);
@@ -347,7 +347,7 @@ export function NewTripDialog({
           errorData.error === 'trip_duration_limit_reached' || 
           errorData.error?.includes('trip_duration_limit') ||
           errorData.message?.includes('trip duration') ||
-          errorData.message?.includes('4 days') ||
+          errorData.message?.includes('5 days') ||
           errorData.message?.toLowerCase().includes('free users are only allowed')
         )) {
           setPaywallContext("trip-duration");

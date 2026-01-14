@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const { isPro } = await getUserSubscriptionStatus(authResult.clerkUserId);
 
     // Enforce trip limit for free users
-    const FREE_TRIP_LIMIT = 1;
+    const FREE_TRIP_LIMIT = 2;
     if (!isPro) {
       // Count existing trips owned by this user
       const { count: tripCount, error: countError } = await supabase
@@ -98,14 +98,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { 
             error: "trip_limit_reached",
-            message: "Free users can only create 1 trip. Upgrade to Pro to create unlimited trips.",
+            message: "Free users can create up to 2 trips. Upgrade to Pro to create unlimited trips.",
           },
           { status: 403 }
         );
       }
 
-      // Enforce trip duration limit for free users (4 days max)
-      const FREE_TRIP_MAX_DAYS = 4;
+      // Enforce trip duration limit for free users (5 days max)
+      const FREE_TRIP_MAX_DAYS = 5;
       const tripStart = new Date(startDate);
       const tripEnd = new Date(endDate);
       const diffTime = tripEnd.getTime() - tripStart.getTime();
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { 
             error: "trip_duration_limit_reached",
-            message: "Free users are only allowed to create trips up to 4 days. Please select dates within that range or upgrade to Pro to create longer trips.",
+            message: "Free users are only allowed to create trips up to 5 days. Please select dates within that range or upgrade to Pro to create longer trips.",
           },
           { status: 403 }
         );

@@ -393,7 +393,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                             </li>
                             <li className="flex items-start gap-2">
                               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                              <span>Higher swipe limits (100 per trip vs 10 free)</span>
+                              <span>Bigger touristic places list (100 per trip vs 10 free)</span>
                             </li>
                             <li className="flex items-start gap-2">
                               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />

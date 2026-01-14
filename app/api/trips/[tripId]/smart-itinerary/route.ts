@@ -3,13 +3,15 @@ import { createClient } from '@/lib/supabase/server';
 import { getProfileId } from '@/lib/auth/getProfileId';
 import { SmartItinerary, ItinerarySlot, ItineraryPlace } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
-import { findPlacePhoto, getPlaceDetails, getPlacePhotoByPlaceId, getPlacePhotoReference, findGooglePlaceId } from '@/lib/google/places-server';
+import { getPlaceDetails, getPlacePhotoReference, findGooglePlaceId, validatePlaceId } from '@/lib/google/places-server';
 import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
 import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 import type { Language } from '@/lib/i18n';
+import { findPhotoRefForActivity } from '@/lib/google/places-backfill';
+import { cachePlaceImageWithDetails } from '@/lib/images/cache-place-image';
 
 export const maxDuration = 300;
 
@@ -120,7 +122,16 @@ function extractCompleteObjects(text: string): {
  */
 function sendSSE(controller: ReadableStreamDefaultController, type: string, data: any) {
   const message = JSON.stringify({ type, data });
-  controller.enqueue(new TextEncoder().encode(`data: ${message}\n\n`));
+  try {
+    controller.enqueue(new TextEncoder().encode(`data: ${message}\n\n`));
+  } catch (err: any) {
+    // Most commonly happens if the stream was already closed by the client
+    if (err?.code === 'ERR_INVALID_STATE' || err instanceof TypeError) {
+      console.warn('[smart-itinerary] SSE send skipped: stream already closed', { type });
+      return;
+    }
+    throw err;
+  }
 }
 
 /**
@@ -130,10 +141,22 @@ function sendSSE(controller: ReadableStreamDefaultController, type: string, data
 async function resolveMissingPlaceIds(
   places: ItineraryPlace[],
   cityOrArea: string
-): Promise<void> {
-  if (!GOOGLE_MAPS_API_KEY) return;
+): Promise<{ refreshed: number; invalidated: number }> {
+  if (!GOOGLE_MAPS_API_KEY) return { refreshed: 0, invalidated: 0 };
+
+  let refreshed = 0;
+  let invalidated = 0;
 
   for (const place of places) {
+    // Validate existing place_id to avoid NOT_FOUND errors
+    if (place.place_id) {
+      const isValid = await validatePlaceId(place.place_id);
+      if (!isValid) {
+        place.place_id = undefined;
+        invalidated++;
+      }
+    }
+
     if (!place.place_id) {
       // Try to resolve place_id using name + city
       const query = place.area || place.neighborhood 
@@ -143,29 +166,14 @@ async function resolveMissingPlaceIds(
       const placeId = await findGooglePlaceId(query);
       if (placeId) {
         place.place_id = placeId;
+        refreshed++;
       }
       // Small delay to avoid rate limits
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
-}
 
-/**
- * Enrich place with photo_reference using place_id
- * Returns photo_reference or null
- */
-async function enrichPlacePhotoReference(place: ItineraryPlace): Promise<string | null> {
-  if (!place.place_id) {
-    return null;
-  }
-
-  try {
-    const photoRef = await getPlacePhotoReference(place.place_id);
-    return photoRef;
-  } catch (error) {
-    console.error(`[smart-itinerary] Error fetching photo_reference for place ${place.name} (place_id: ${place.place_id}):`, error);
-    return null;
-  }
+  return { refreshed, invalidated };
 }
 
 /**
@@ -186,14 +194,39 @@ function deduplicateAndBuildPhotoUrls(
   places: ItineraryPlace[],
   maxCount: number = 4
 ): string[] {
-  const seenRefs = new Set<string>();
+  const seen = new Set<string>();
   const photoUrls: string[] = [];
 
+  const tryAdd = (url: string | undefined | null) => {
+    if (!url) return;
+    if (seen.has(url)) return;
+    seen.add(url);
+    photoUrls.push(url);
+  };
+
   for (const place of places) {
-    if (place.photo_reference && !seenRefs.has(place.photo_reference)) {
-      seenRefs.add(place.photo_reference);
-      photoUrls.push(buildPhotoUrl(place.photo_reference));
-      if (photoUrls.length >= maxCount) break;
+    // Prefer stable cached image_url first
+    tryAdd(place.image_url || null);
+    if (photoUrls.length >= maxCount) break;
+
+    // Then check any pre-existing photo URLs on the place
+    if (place.photos && Array.isArray(place.photos)) {
+      for (const photo of place.photos) {
+        if (typeof photo === 'string') {
+          tryAdd(photo);
+        }
+        if (photoUrls.length >= maxCount) break;
+      }
+    }
+    if (photoUrls.length >= maxCount) break;
+
+    // Finally, build from photo_reference
+    if (place.photo_reference) {
+      tryAdd(buildPhotoUrl(place.photo_reference));
+    }
+
+    if (photoUrls.length >= maxCount) {
+      break;
     }
   }
 
@@ -241,6 +274,88 @@ function applyPhotoReferenceSafetyGuard(places: ItineraryPlace[]): void {
       }
     }
   }
+}
+
+type PlaceMediaContext = {
+  cityOrArea: string;
+  tripId: string;
+  destinationCountry?: string | null;
+  centerLat?: number | null;
+  centerLng?: number | null;
+};
+
+/**
+ * Ensure a place has either a valid photo_reference (preferred) or a cached image_url.
+ * Attempts:
+ * 1) Use existing photo_reference/image_url.
+ * 2) Fetch photo_reference via place_id.
+ * 3) Fallback to text search photo reference (Find Place + Details).
+ * 4) Final fallback: cache stable image via cachePlaceImageWithDetails (Google/Unsplash/Mapbox).
+ */
+async function enrichPlaceMedia(
+  place: ItineraryPlace,
+  context: PlaceMediaContext
+): Promise<{ photoRef: string | null; imageUrl: string | null }> {
+  // If we already have a cached image, prefer it
+  if (place.image_url) {
+    if (!place.photos || place.photos.length === 0) {
+      place.photos = [place.image_url];
+    }
+    return { photoRef: place.photo_reference || null, imageUrl: place.image_url };
+  }
+
+  // If an existing photo_reference is present, respect it but ensure photos array is populated
+  if (place.photo_reference) {
+    if (!place.photos || place.photos.length === 0) {
+      place.photos = [buildPhotoUrl(place.photo_reference)];
+    }
+    return { photoRef: place.photo_reference, imageUrl: null };
+  }
+
+  // Attempt to fetch photo_reference using place_id
+  if (place.place_id) {
+    const photoRef = await getPlacePhotoReference(place.place_id);
+    if (photoRef) {
+      place.photo_reference = photoRef;
+      place.photos = [buildPhotoUrl(photoRef)];
+      return { photoRef, imageUrl: null };
+    }
+  }
+
+  // Try to find a photo_reference via text search (aligns with backfill helper)
+  const backfillPhotoRef = await findPhotoRefForActivity({
+    title: place.name,
+    city: context.cityOrArea,
+    country: context.destinationCountry || undefined,
+    lat: context.centerLat || undefined,
+    lng: context.centerLng || undefined,
+  });
+
+  if (backfillPhotoRef) {
+    place.photo_reference = backfillPhotoRef;
+    place.photos = [buildPhotoUrl(backfillPhotoRef)];
+    return { photoRef: backfillPhotoRef, imageUrl: null };
+  }
+
+  // Final fallback: fetch and cache a stable image URL
+  const cacheResult = await cachePlaceImageWithDetails({
+    tripId: context.tripId,
+    placeId: place.id,
+    title: place.name,
+    city: context.cityOrArea,
+    country: context.destinationCountry || undefined,
+    photoRef: undefined,
+    lat: context.centerLat || undefined,
+    lng: context.centerLng || undefined,
+  });
+
+  if (cacheResult.publicUrl) {
+    place.image_url = cacheResult.publicUrl;
+    place.photos = [cacheResult.publicUrl];
+    return { photoRef: null, imageUrl: cacheResult.publicUrl };
+  }
+
+  return { photoRef: null, imageUrl: null };
 }
 
 /**
@@ -507,6 +622,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     }
 
     const tripDetails = tripDetailsData as TripDetailsQueryResult;
+    const destinationCountry = tripDetails.destination_country;
+    const centerLat = tripDetails.center_lat;
+    const centerLng = tripDetails.center_lng;
 
     // 2. Load existing itinerary if regenerating
     let existingItinerary: SmartItinerary | null = null;
@@ -1159,23 +1277,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       const enrichedDay = { ...sanitizeNoTilde(day) };
                       const allPlaces = enrichedDay.slots.flatMap((slot: ItinerarySlot) => slot.places);
                       
-                      // Step 1: Resolve missing place_ids
-                      await resolveMissingPlaceIds(allPlaces, cityOrArea);
+                      // Step 1: Resolve/refresh place_ids (including invalid ones)
+                      const idStats = await resolveMissingPlaceIds(allPlaces, cityOrArea);
                       
-                      // Step 2: Enrich with photo_reference using place_id
+                      // Step 2: Enrich media (photo_reference or cached image)
+                      let photoRefAdds = 0;
+                      let cachedImages = 0;
                       for (const place of allPlaces) {
-                        if (!place.photo_reference && place.place_id) {
-                          const photoRef = await enrichPlacePhotoReference(place);
-                          place.photo_reference = photoRef || undefined;
-                        }
-                        
-                        // Build photo URL from photo_reference if available
-                        if (place.photo_reference) {
-                          place.photos = [buildPhotoUrl(place.photo_reference)];
-                        } else {
-                          // No photo available - will show placeholder in UI
-                          place.photos = [];
-                        }
+                        const result = await enrichPlaceMedia(place, {
+                          cityOrArea,
+                          tripId: tripId as string,
+                          destinationCountry,
+                          centerLat,
+                          centerLng,
+                        });
+                        if (result.photoRef) photoRefAdds++;
+                        if (result.imageUrl) cachedImages++;
                       }
                       
                       // Step 3: Apply safety guard to prevent duplicate photos for different places
@@ -1186,6 +1303,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       
                       // Send updated day with photos
                       sendSSE(controller, 'day-updated', sanitizeNoTilde(enrichedDay));
+                      console.log('[smart-itinerary] day-updated media stats', {
+                        tripId,
+                        dayIndex: enrichedDay.index,
+                        refreshedPlaceIds: idStats.refreshed,
+                        invalidPlaceIds: idStats.invalidated,
+                        photoRefsAdded: photoRefAdds,
+                        cachedImages,
+                      });
                     } catch (err) {
                       console.error('[smart-itinerary] Error enriching day photos:', err);
                     }
@@ -1249,39 +1374,44 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 // Enforce rich multi-paragraph slot summaries
                 ensureRichSlotSummaries(validatedItinerary, destination);
 
-                // Step 1: Resolve missing place_ids
-                await resolveMissingPlaceIds(allPlaces, cityOrArea);
+                // Step 1: Resolve/refresh place_ids (includes invalid ones)
+                const idStats = await resolveMissingPlaceIds(allPlaces, cityOrArea);
                 
-                // Step 2: Enrich with photo_reference using place_id
-                await Promise.all(allPlaces.map(async (place) => {
-                  if (!place.photo_reference && place.place_id) {
-                    const photoRef = await enrichPlacePhotoReference(place);
-                    place.photo_reference = photoRef || undefined;
-                  }
-                  
-                  // Build photo URL from photo_reference if available
-                  if (place.photo_reference) {
-                    place.photos = [buildPhotoUrl(place.photo_reference)];
-                  } else {
-                    // No photo available - will show placeholder in UI
-                    place.photos = [];
-                  }
-                }));
+                // Step 2: Enrich media (photo_reference or cached image)
+                let photoRefAdds = 0;
+                let cachedImages = 0;
+                for (const place of allPlaces) {
+                  const result = await enrichPlaceMedia(place, {
+                    cityOrArea,
+                    tripId: tripId as string,
+                    destinationCountry,
+                    centerLat,
+                    centerLng,
+                  });
+                  if (result.photoRef) photoRefAdds++;
+                  if (result.imageUrl) cachedImages++;
+                }
                 
                 // Step 3: Apply safety guard to prevent duplicate photos for different places
                 applyPhotoReferenceSafetyGuard(allPlaces);
                 
-                // DIAGNOSTIC LOGGING: Count items with place_id and photo_reference
+                // DIAGNOSTIC LOGGING: Count items with place_id and photo_reference/image_url
                 const placeIdCount = allPlaces.filter(p => p.place_id).length;
                 const photoRefCount = allPlaces.filter(p => p.photo_reference).length;
+                const cachedImageCount = allPlaces.filter(p => p.image_url).length;
                 console.log('[smart-itinerary] Diagnostic counts:', {
                   totalPlaces: allPlaces.length,
                   placesWithPlaceId: placeIdCount,
                   placesWithPhotoReference: photoRefCount,
+                  placesWithCachedImage: cachedImageCount,
+                  refreshedPlaceIds: idStats.refreshed,
+                  invalidPlaceIds: idStats.invalidated,
+                  photoRefsAdded: photoRefAdds,
+                  cachedImagesAdded: cachedImages,
                   tripId
                 });
                 
-                // Step 4: Build day photos from unique photo_references
+                // Step 4: Build day photos from unique media (cached URL preferred)
                 for (const day of validatedItinerary.days) {
                   const dayPlaces = day.slots.flatMap(slot => slot.places);
                   day.photos = deduplicateAndBuildPhotoUrls(dayPlaces, 4);
@@ -1390,24 +1520,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               // Enforce rich multi-paragraph slot summaries
               ensureRichSlotSummaries(validatedItinerary, destination);
 
-              // Step 1: Resolve missing place_ids
-              await resolveMissingPlaceIds(allPlaces, cityOrArea);
+              // Step 1: Resolve/refresh place_ids
+              const idStats = await resolveMissingPlaceIds(allPlaces, cityOrArea);
               
-              // Step 2: Enrich with photo_reference using place_id
-              await Promise.all(allPlaces.map(async (place) => {
-                if (!place.photo_reference && place.place_id) {
-                  const photoRef = await enrichPlacePhotoReference(place);
-                  place.photo_reference = photoRef || undefined;
-                }
-                
-                // Build photo URL from photo_reference if available
-                if (place.photo_reference) {
-                  place.photos = [buildPhotoUrl(place.photo_reference)];
-                } else {
-                  // No photo available - will show placeholder in UI
-                  place.photos = [];
-                }
-              }));
+              // Step 2: Enrich media (photo_reference or cached image)
+              let photoRefAdds = 0;
+              let cachedImages = 0;
+              for (const place of allPlaces) {
+                const result = await enrichPlaceMedia(place, {
+                  cityOrArea,
+                  tripId: tripId as string,
+                  destinationCountry,
+                  centerLat,
+                  centerLng,
+                });
+                if (result.photoRef) photoRefAdds++;
+                if (result.imageUrl) cachedImages++;
+              }
               
               // Step 3: Apply safety guard to prevent duplicate photos for different places
               applyPhotoReferenceSafetyGuard(allPlaces);
@@ -1415,14 +1544,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               // DIAGNOSTIC LOGGING: Count items with place_id and photo_reference
               const placeIdCount = allPlaces.filter(p => p.place_id).length;
               const photoRefCount = allPlaces.filter(p => p.photo_reference).length;
+              const cachedImageCount = allPlaces.filter(p => p.image_url).length;
               console.log('[smart-itinerary] Diagnostic counts (fallback parse):', {
                 totalPlaces: allPlaces.length,
                 placesWithPlaceId: placeIdCount,
                 placesWithPhotoReference: photoRefCount,
+                placesWithCachedImage: cachedImageCount,
+                refreshedPlaceIds: idStats.refreshed,
+                invalidPlaceIds: idStats.invalidated,
+                photoRefsAdded: photoRefAdds,
+                cachedImagesAdded: cachedImages,
                 tripId
               });
               
-              // Step 4: Build day photos from unique photo_references
+              // Step 4: Build day photos from unique media (cached URL preferred)
               for (const day of validatedItinerary.days) {
                 const dayPlaces = day.slots.flatMap(slot => slot.places);
                 day.photos = deduplicateAndBuildPhotoUrls(dayPlaces, 4);
