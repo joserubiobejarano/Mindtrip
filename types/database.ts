@@ -21,6 +21,7 @@ export interface Database {
           is_pro: boolean
           default_currency: string
           stripe_customer_id: string | null
+          trips_created_count: number
         }
         Insert: {
           id: string
@@ -33,6 +34,7 @@ export interface Database {
           is_pro?: boolean
           default_currency?: string
           stripe_customer_id?: string | null
+          trips_created_count?: number
         }
         Update: {
           id?: string
@@ -45,6 +47,7 @@ export interface Database {
           is_pro?: boolean
           default_currency?: string
           stripe_customer_id?: string | null
+          trips_created_count?: number
         }
       }
       trips: {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { SmartItinerary } from '@/types/itinerary';
 
 /**
@@ -17,7 +17,8 @@ export async function GET(
       return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    // Use service role for anonymous public access to shared itineraries
+    const supabase = createSupabaseAdmin();
 
     // Get trip_id from share slug
     const { data: tripShare, error: shareError } = await supabase

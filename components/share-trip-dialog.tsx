@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLanguage } from "@/components/providers/language-provider";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ export function ShareTripDialog({
   const [publicSlug, setPublicSlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { t } = useLanguage();
   const supabase = createClient();
 
   const generateSlug = () => {
@@ -98,19 +100,20 @@ export function ShareTripDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Share Trip</DialogTitle>
-          <DialogDescription>
-            Create a public link to share your trip. Anyone with the link can view it.
+          <DialogTitle>{t("share_dialog_title")}</DialogTitle>
+          <DialogDescription className="space-y-0.5">
+            <p>{t("share_dialog_description_line1")}</p>
+            <p>{t("share_dialog_description_line2")}</p>
           </DialogDescription>
         </DialogHeader>
         {loading ? (
           <div className="py-4 text-center text-muted-foreground">
-            Creating share link...
+            {t("share_dialog_creating")}
           </div>
         ) : publicSlug ? (
           <div className="py-4 space-y-4">
             <div className="space-y-2">
-              <Label>Public URL</Label>
+              <Label>{t("share_dialog_public_url")}</Label>
               <div className="flex gap-2">
                 <Input
                   value={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/p/${publicSlug}`}
@@ -121,7 +124,7 @@ export function ShareTripDialog({
                   variant="outline"
                   size="icon"
                   onClick={copyToClipboard}
-                  title="Copy to clipboard"
+                  title={t("share_dialog_copy_title")}
                 >
                   {copied ? (
                     <Check className="h-4 w-4 text-green-600" />
@@ -135,13 +138,13 @@ export function ShareTripDialog({
         ) : (
           <div className="py-4 text-center">
             <Button onClick={createShareLink} disabled={loading}>
-              {loading ? "Creating..." : "Create Share Link"}
+              {loading ? t("share_dialog_creating") : t("share_dialog_create")}
             </Button>
           </div>
         )}
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("common_close")}
           </Button>
         </DialogFooter>
       </DialogContent>

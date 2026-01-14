@@ -75,21 +75,16 @@ export function NewTripDialog({
   const { addToast } = useToast();
   const { t } = useLanguage();
 
-  // Fetch subscription status on mount
+  // Fetch subscription status and trip count on mount
   useEffect(() => {
     if (open && userId) {
-      const fetchSubscriptionStatus = fetch('/api/user/subscription-status')
+      fetch('/api/user/subscription-status')
         .then(res => res.json())
-        .then(data => data.isPro || false);
-
-      const fetchTripCount = fetch('/api/trips')
-        .then(res => res.json())
-        .then(data => data.trips.length || 0);
-
-      Promise.all([fetchSubscriptionStatus, fetchTripCount])
-        .then(([isProUser, tripCount]) => {
-          setIsPro(isProUser);
-          setTripCount(tripCount);
+        .then(data => {
+          setIsPro(data.isPro || false);
+          // Use trips_created_count from profile instead of counting current trips
+          // This prevents the exploit where users delete trips to create more
+          setTripCount(data.trips_created_count || 0);
           setLoadingSubscription(false);
         })
         .catch((err) => {

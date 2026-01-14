@@ -69,32 +69,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check subscription status
+    // Check subscription status and trip count
     // Note: getUserSubscriptionStatus expects clerkUserId
     const authResult = await getProfileId(supabase);
-    const { isPro } = await getUserSubscriptionStatus(authResult.clerkUserId);
+    const { isPro, trips_created_count } = await getUserSubscriptionStatus(authResult.clerkUserId);
 
     // Enforce trip limit for free users
     const FREE_TRIP_LIMIT = 2;
     if (!isPro) {
-      // Count existing trips owned by this user
-      const { count: tripCount, error: countError } = await supabase
-        .from("trips")
-        .select("*", { count: "exact", head: true })
-        .eq("owner_id", profileId);
-
-      if (countError) {
-        console.error('[Trips API] Error counting trips:', {
-          profileId,
-          error: countError.message,
-        });
-        return NextResponse.json(
-          { error: "Failed to check trip limit" },
-          { status: 500 }
-        );
-      }
-
-      if ((tripCount || 0) >= FREE_TRIP_LIMIT) {
+      // Check total trips ever created (not just currently existing trips)
+      // This prevents the exploit where users delete trips to create more
+      if ((trips_created_count || 0) >= FREE_TRIP_LIMIT) {
         return NextResponse.json(
           { 
             error: "trip_limit_reached",
@@ -563,6 +548,37 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('[trip-members]', { tripId: trip.id, email: null, profileId, action: 'create_trip_owner_member' });
+
+    // Increment trips_created_count in profiles table after successful trip creation
+    // First get current count, then update atomically
+    const { data: currentProfile, error: fetchError } = await supabase
+      .from("profiles")
+      .select("trips_created_count")
+      .eq("id", profileId)
+      .single();
+
+    if (!fetchError && currentProfile) {
+      const currentCount = currentProfile.trips_created_count ?? 0;
+      const { error: incrementError } = await supabase
+        .from("profiles")
+        .update({ trips_created_count: currentCount + 1 })
+        .eq("id", profileId);
+
+      if (incrementError) {
+        // Log error but don't fail the request - trip was successfully created
+        // The counter will be corrected on next trip creation attempt
+        console.error('[Trips API] Error incrementing trips_created_count:', {
+          profileId,
+          error: incrementError.message,
+        });
+      }
+    } else {
+      // If we can't fetch the profile, log but don't fail
+      console.error('[Trips API] Error fetching profile for trips_created_count increment:', {
+        profileId,
+        error: fetchError?.message,
+      });
+    }
 
     console.log('[trip-create] returning trip id', trip.id);
 
