@@ -7,6 +7,7 @@ import { createTripSegment } from "@/lib/supabase/trip-segments";
 import { getPlaceDetails, findGooglePlaceId, GOOGLE_MAPS_API_KEY } from "@/lib/google/places-server";
 import { eachDayOfInterval, format, addDays } from "date-fns";
 import type { TripPersonalizationPayload } from "@/types/trip-personalization";
+import type { Database } from "@/types/database";
 
 interface NewTripPayload {
   destinationPlaceId: string;
@@ -551,17 +552,26 @@ export async function POST(request: NextRequest) {
 
     // Increment trips_created_count in profiles table after successful trip creation
     // First get current count, then update atomically
+    type ProfileTripsCreatedCount = Pick<
+      Database["public"]["Tables"]["profiles"]["Row"],
+      "trips_created_count"
+    >;
+
     const { data: currentProfile, error: fetchError } = await supabase
       .from("profiles")
       .select("trips_created_count")
       .eq("id", profileId)
-      .single();
+      .single<ProfileTripsCreatedCount>();
 
     if (!fetchError && currentProfile) {
       const currentCount = currentProfile.trips_created_count ?? 0;
-      const { error: incrementError } = await supabase
-        .from("profiles")
-        .update({ trips_created_count: currentCount + 1 })
+      const profileUpdate: Database["public"]["Tables"]["profiles"]["Update"] = {
+        trips_created_count: currentCount + 1,
+      };
+
+      const { error: incrementError } = await (supabase
+        .from("profiles") as any)
+        .update(profileUpdate)
         .eq("id", profileId);
 
       if (incrementError) {
