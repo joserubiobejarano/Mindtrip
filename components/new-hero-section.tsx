@@ -293,23 +293,23 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
   return (
     <section className="relative min-h-[90vh] flex items-start pt-16 pb-20 px-6 overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute right-4 md:right-20 top-1/4">
+      <div className="absolute right-4 md:right-20 top-1/4 hidden md:block">
         <svg className="w-16 h-16 text-muted-foreground/20" viewBox="0 0 64 64" fill="currentColor">
           <path d="M32 8 L40 24 L56 24 L44 36 L48 52 L32 44 L16 52 L20 36 L8 24 L24 24 Z" />
         </svg>
       </div>
 
-      <div className="w-[70%] max-w-6xl mx-auto text-center relative mt-8">
+      <div className="w-full md:w-[70%] max-w-6xl mx-auto text-center relative mt-8">
         {/* Main Title */}
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-normal md:solid-underline inline-block text-foreground mb-20" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-normal solid-underline inline-block text-foreground mb-20 font-[var(--font-hand)]">
           {t('home_hero_title')}
         </h1>
 
         {/* Search Card */}
         <div id="search-section" className="bg-card rounded-2xl shadow-xl p-6 md:p-8 pt-20 relative overflow-visible">
           {/* Solid Border on Top - Higher */}
-          <div className="absolute top-0 left-0 right-0 h-[60px] bg-primary rounded-t-2xl"></div>
-          <div className="mt-[60px]">
+          <div className="absolute top-0 left-0 right-0 h-[80px] md:h-[72px] bg-primary rounded-t-2xl"></div>
+          <div className="mt-[60px] md:mt-[90px]">
           <form onSubmit={handleStartPlanning}>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-10">
               {/* Where to */}
@@ -395,7 +395,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
           )}
 
           {/* Suggestion Tags */}
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide flex-nowrap">
+          <div className="hidden md:flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide flex-nowrap">
             {suggestionTagKeys.map((tagKey) => (
               <button
                 key={tagKey}
@@ -409,7 +409,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
           </div>
 
           {/* AI Input */}
-          <form onSubmit={handleChatSubmit} className="relative">
+          <form onSubmit={handleChatSubmit} className="relative hidden md:block">
             <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               ref={chatInputRef}
@@ -433,7 +433,7 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
             </button>
           </form>
           {intentError && (
-            <p className="mt-2 text-sm text-destructive text-center">{intentError}</p>
+            <p className="mt-2 text-sm text-destructive text-center hidden md:block">{intentError}</p>
           )}
           </div>
         </div>

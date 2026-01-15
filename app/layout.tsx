@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Patrick_Hand } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const patrickHand = Patrick_Hand({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-patrick-hand",
+});
 
 export const metadata: Metadata = {
   title: "Kruno - Travel Planner",
@@ -31,7 +36,7 @@ export default function RootLayout({
   if (!publishableKey) {
     return (
       <html lang="en">
-        <body className={inter.className}>
+        <body className={`${inter.className} ${patrickHand.variable}`}>
           <Providers>{children}</Providers>
           <CookieConsentBanner />
           {/* TODO: Load analytics scripts only if consent === 'all' */}
@@ -43,7 +48,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${patrickHand.variable}`}>
         <ClerkProvider publishableKey={publishableKey}>
           <Providers>{children}</Providers>
           <CookieConsentBanner />
