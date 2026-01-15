@@ -312,6 +312,10 @@ kruno/
 - Trip deletion with cascade cleanup
 - Route helper utilities (`lib/routes.ts`)
 - Clerk user ID migration improvements
+- Trip creation limit tracking (trips_created_count for free tier limit of 2 trips)
+- Welcome email tracking (welcome_email_sent_at)
+- Activity image URL support (image_url column)
+- Mobile push notification tokens table (user_push_tokens)
 
 **Phase 3 - Itinerary Builder & Map Integration** ✅
 - Activity CRUD operations
@@ -745,6 +749,8 @@ If migrations fail or are incomplete, these tables may need manual creation:
   - `database/migrations/add-unique-index-clerk-user-id.sql` - Adds unique index
 - **`trip_segments`** - ✅ **NEW** For multi-city trips (Pro tier) - Migration file: `database/migrations/supabase-add-trip-segments.sql`
   - **`advisor_messages`** - ✅ **NEW** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
+  - **`user_push_tokens`** - ✅ **NEW** For mobile push notifications - Migration file: `database/migrations/add-user-push-tokens-table.sql`
+  - **`trip_regeneration_stats`** - ✅ **NEW** For tracking daily regeneration limits - Migration file: `database/migrations/supabase-add-regeneration-stats.sql`
   - **Segment support columns** - ✅ **NEW**:
   - `days.trip_segment_id` - Migration: `supabase-add-segment-id-to-days.sql`
   - `smart_itineraries.trip_segment_id` - Migration: `supabase-add-trip-segment-to-itineraries.sql`
@@ -754,6 +760,11 @@ If migrations fail or are incomplete, these tables may need manual creation:
   - Adds `swipe_count`, `change_count`, `search_add_count` columns
   - Tracks per-user-per-trip usage for Explore features
   - Used to enforce Pro/free tier limits
+- **Profile tracking fields** - ✅ **NEW**:
+  - `profiles.trips_created_count` - Tracks total trips ever created (for free tier limit of 2 trips) - Migration: `add-trips-created-count-to-profiles.sql`
+  - `profiles.welcome_email_sent_at` - Tracks welcome email sending - Migration: `add-welcome-email-sent-at-to-profiles.sql`
+- **Activity image support** - ✅ **NEW**:
+  - `activities.image_url` - Stores image URL for activities - Migration: `add-image-url-to-activities.sql`
 
 Check `database/migrations/` for SQL scripts. All migrations listed above are available and should be run manually in the Supabase SQL Editor.
 

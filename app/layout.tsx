@@ -35,8 +35,8 @@ export default function RootLayout({
   // If no publishable key, render without Clerk (for build time)
   if (!publishableKey) {
     return (
-      <html lang="en">
-        <body className={`${inter.className} ${patrickHand.variable}`}>
+      <html lang="en" className={patrickHand.variable}>
+        <body className={inter.className}>
           <Providers>{children}</Providers>
           <CookieConsentBanner />
           {/* TODO: Load analytics scripts only if consent === 'all' */}
@@ -47,8 +47,8 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en">
-      <body className={`${inter.className} ${patrickHand.variable}`}>
+    <html lang="en" className={patrickHand.variable}>
+      <body className={inter.className}>
         <ClerkProvider publishableKey={publishableKey}>
           <Providers>{children}</Providers>
           <CookieConsentBanner />

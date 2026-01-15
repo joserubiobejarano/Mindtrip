@@ -67,6 +67,10 @@ npm run dev
 - Clerk user ID migration improvements ✅ **NEW**
 - City autocomplete for destination search ✅ **NEW**
 - Usage limits tracking (swipe_count, change_count, search_add_count) ✅ **NEW**
+- Trip creation limit tracking (trips_created_count for free tier limit of 2 trips) ✅ **NEW**
+- Welcome email tracking (welcome_email_sent_at) ✅ **NEW**
+- Activity image URL support (image_url column) ✅ **NEW**
+- Mobile push notification tokens table (user_push_tokens) ✅ **NEW**
 
 ### Phase 3 - Itinerary Builder & Map ✅
 - Day selector with date display

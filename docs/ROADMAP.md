@@ -27,6 +27,10 @@ This document tracks the development progress of the Kruno travel planning appli
 - [x] Clerk user ID migration and profile lookup improvements
 - [x] City autocomplete for destination search (Google Places Autocomplete)
 - [x] Usage limits tracking system (swipe_count, change_count, search_add_count)
+- [x] Trip creation limit tracking (trips_created_count for free tier limit of 2 trips)
+- [x] Welcome email tracking (welcome_email_sent_at)
+- [x] Activity image URL support (image_url column)
+- [x] Mobile push notification tokens table (user_push_tokens)
 
 ### Phase 3 - Itinerary Builder & Map Integration
 - [x] Day selector with date display
@@ -467,6 +471,8 @@ For later implementation phases:
     - `database/migrations/add-clerk-user-id-to-profiles.sql` - Adds column and backfills data
     - `database/migrations/add-unique-index-clerk-user-id.sql` - Adds unique index
   - **`trip_segments`** - ✅ **IMPLEMENTED** For multi-city trips (Pro tier) - Migration file: `database/migrations/supabase-add-trip-segments.sql`
+  - **`user_push_tokens`** - ✅ **IMPLEMENTED** For mobile push notifications - Migration file: `database/migrations/add-user-push-tokens-table.sql`
+  - **`trip_regeneration_stats`** - ✅ **IMPLEMENTED** For tracking daily regeneration limits - Migration file: `database/migrations/supabase-add-regeneration-stats.sql`
 - **Database Schema** (`database/supabase-schema.sql`) - ✅ **UPDATED** with Clerk authentication support (TEXT for user IDs instead of UUID)
   - **`advisor_messages`** - ✅ **IMPLEMENTED** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
   - **Segment support columns** - ✅ **IMPLEMENTED**:
@@ -478,6 +484,11 @@ For later implementation phases:
       - `travelers`, `origin_city_place_id`, `origin_city_name`
       - `has_accommodation`, `accommodation_place_id`, `accommodation_name`, `accommodation_address`
       - `arrival_transport_mode`, `arrival_time_local`, `interests`
+  - **Profile tracking fields** - ✅ **IMPLEMENTED**:
+    - `profiles.trips_created_count` - Tracks total trips ever created (for free tier limit of 2 trips) - Migration: `add-trips-created-count-to-profiles.sql`
+    - `profiles.welcome_email_sent_at` - Tracks welcome email sending - Migration: `add-welcome-email-sent-at-to-profiles.sql`
+  - **Activity image support** - ✅ **IMPLEMENTED**:
+    - `activities.image_url` - Stores image URL for activities - Migration: `add-image-url-to-activities.sql`
 - Two itinerary systems are supported:
   - Legacy: `/api/ai-itinerary` - returns AiItinerary format (simpler structure)
   - New: `/api/trips/[tripId]/smart-itinerary` - returns SmartItinerary format (structured with slots, area clusters, trip tips)

@@ -60,6 +60,7 @@ const config: Config = {
         display: ["var(--font-display)", "Georgia", "serif"],
         mono: ["var(--font-mono)", "monospace"],
         body: ["var(--font-body)", "system-ui", "sans-serif"],
+        hand: ["var(--font-hand)", '"Patrick Hand"', "cursive"],
       },
       keyframes: {
         float: {

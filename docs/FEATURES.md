@@ -985,6 +985,37 @@ Comprehensive security architecture with centralized auth helpers, input validat
   - Sanitization functions for different content types
 - **See [SECURITY.md](./SECURITY.md) for complete documentation**
 
+## Infrastructure & Tracking Features ✅ **NEW** (January 2025)
+
+### Trip Creation Limit Tracking
+- **Database Field**: `profiles.trips_created_count` - Tracks total number of trips ever created by a user
+- **Purpose**: Enforces free tier limit of 2 trips (does not decrease when trips are deleted)
+- **Migration File**: `database/migrations/add-trips-created-count-to-profiles.sql`
+- **Usage**: Prevents free users from creating more than 2 trips even if they delete existing trips
+
+### Welcome Email Tracking
+- **Database Field**: `profiles.welcome_email_sent_at` - Timestamp when welcome email was sent
+- **Purpose**: Enables idempotency checking for welcome email sending
+- **Migration File**: `database/migrations/add-welcome-email-sent-at-to-profiles.sql`
+- **Usage**: Prevents duplicate welcome emails from being sent
+
+### Activity Image Support
+- **Database Field**: `activities.image_url` - Stores image URL for activities
+- **Purpose**: Allows activities to have associated images
+- **Migration File**: `database/migrations/add-image-url-to-activities.sql`
+- **Usage**: Display images for activities in itinerary view
+
+### Mobile Push Notification Tokens
+- **Database Table**: `user_push_tokens` - Stores Expo push notification tokens for mobile devices
+- **Purpose**: Supports push notifications for mobile app
+- **Schema**: `id`, `user_id`, `token`, `platform` ('ios' | 'android'), `created_at`, `last_seen_at`
+- **Features**: 
+  - Supports multiple devices per user (multiple tokens)
+  - Platform-specific tokens (iOS/Android)
+  - Last seen tracking for token cleanup
+- **Migration File**: `database/migrations/add-user-push-tokens-table.sql`
+- **Usage**: Mobile app push notification registration and delivery
+
 **Last Updated:** January 2025
 
 ## Recent Changes Summary (January 2025)

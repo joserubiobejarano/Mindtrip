@@ -361,6 +361,25 @@ User Clicks "Add to Itinerary"
 - Used to enforce daily regeneration limits (2 for free tier, 5 for Pro tier)
 - Migration file: `database/migrations/supabase-add-regeneration-stats.sql`
 
+**user_push_tokens** ✅ **NEW**
+- Stores Expo push notification tokens for mobile devices
+- Schema: `id`, `user_id`, `token`, `platform` ('ios' | 'android'), `created_at`, `last_seen_at`
+- Supports multiple devices per user (multiple tokens)
+- Indexes: `idx_user_push_tokens_user_id`, `idx_user_push_tokens_token`
+- Migration file: `database/migrations/add-user-push-tokens-table.sql`
+- Used for mobile app push notifications
+
+**profiles** ✅ **UPDATED**
+- **Trip creation tracking**: `trips_created_count` - Total trips ever created (for free tier limit of 2 trips)
+- **Welcome email tracking**: `welcome_email_sent_at` - Timestamp when welcome email was sent
+- Migration files:
+  - `add-trips-created-count-to-profiles.sql` - Adds trips_created_count column
+  - `add-welcome-email-sent-at-to-profiles.sql` - Adds welcome_email_sent_at column
+
+**activities** ✅ **UPDATED**
+- **Image URL support**: `image_url` - Stores image URL for activities
+- Migration file: `add-image-url-to-activities.sql`
+
 **trip_segments** ✅ **NEW**
 - Multi-city trip segments
 - Each segment represents a city/portion of trip with date range
@@ -462,6 +481,7 @@ explore_sessions
 activities
   ├─► days (N:1)
   └─► places (N:1)
+  └─► image_url (stored directly) ✅ NEW
 
 days
   ├─► trips (N:1)
@@ -470,6 +490,19 @@ days
 smart_itineraries
   ├─► trips (N:1)
   └─► trip_segments (N:1) ✅ NEW (NULL for single-city trips)
+
+profiles ✅ UPDATED
+  ├─► trips (1:N via owner_id)
+  ├─► trip_members (1:N)
+  ├─► trips_created_count (stored directly) ✅ NEW
+  ├─► welcome_email_sent_at (stored directly) ✅ NEW
+  └─► user_push_tokens (1:N) ✅ NEW
+
+user_push_tokens ✅ NEW
+  └─► profiles (N:1 via user_id)
+
+trip_regeneration_stats ✅ NEW
+  └─► trips (N:1 via trip_id)
 ```
 
 ---
