@@ -389,7 +389,7 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                           <ul className="space-y-2 text-sm mb-4">
                             <li className="flex items-start gap-2">
                               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                              <span>Longer trips (more than 14 days)</span>
+                              <span>Longer trips (more than 6 days)</span>
                             </li>
                             <li className="flex items-start gap-2">
                               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />

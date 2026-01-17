@@ -41,11 +41,9 @@ const BENEFIT_KEYS = [
 export function ProPaywallModal({
   open,
   onClose,
-  tripId,
   context,
 }: ProPaywallModalProps) {
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
-  const [isLoadingTrip, setIsLoadingTrip] = useState(false);
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
   const { addToast } = useToast();
   const { t } = useLanguage();
@@ -81,39 +79,6 @@ export function ProPaywallModal({
     }
   };
 
-  const handleTripUnlock = async () => {
-    if (!tripId) return;
-
-    setIsLoadingTrip(true);
-    try {
-      const response = await fetch("/api/billing/checkout/trip", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tripId }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to create checkout session");
-      }
-
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
-      }
-    } catch (error: any) {
-      console.error("Error creating trip unlock checkout:", error);
-      addToast({
-        variant: "destructive",
-        title: t("paywall_error_checkout_title"),
-        description: error.message || t("paywall_error_checkout_desc"),
-      });
-      setIsLoadingTrip(false);
-    }
-  };
-
   const handleManageSubscription = async () => {
     setIsLoadingPortal(true);
     try {
@@ -141,7 +106,7 @@ export function ProPaywallModal({
     }
   };
 
-  const isLoading = isLoadingSubscription || isLoadingTrip || isLoadingPortal;
+  const isLoading = isLoadingSubscription || isLoadingPortal;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -179,24 +144,6 @@ export function ProPaywallModal({
                 t("paywall_button_upgrade")
               )}
             </Button>
-
-            {tripId && (
-              <Button
-                onClick={handleTripUnlock}
-                disabled={isLoading}
-                variant="outline"
-                className="w-full"
-              >
-                {isLoadingTrip ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t("paywall_loading")}
-                  </>
-                ) : (
-                  t("paywall_button_unlock_trip")
-                )}
-              </Button>
-            )}
           </div>
 
           {/* Manage Subscription Link */}
