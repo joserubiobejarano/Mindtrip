@@ -8,6 +8,7 @@ import type { TripSegment } from '@/types/trip-segments'
 import { clerkClient } from '@clerk/nextjs/server'
 import { sendTripReadyEmail } from '@/lib/email/resend'
 import { getFirstNameFromFullName, normalizeEmailLanguage } from '@/lib/email/language'
+import type { Database } from '@/types/database'
 
 interface TripDetails {
   title: string;
@@ -96,8 +97,9 @@ async function trySendTripReadyEmail(params: {
     language: recipient.language,
   });
 
-  const { error: updateError } = await params.supabase
-    .from('trips')
+  // Type assertion needed because Supabase type inference fails when client is passed as function parameter
+  const { error: updateError } = await (params.supabase
+    .from('trips') as any)
     .update({ trip_ready_email_sent_at: new Date().toISOString() })
     .eq('id', params.tripId);
 

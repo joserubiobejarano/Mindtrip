@@ -54,7 +54,14 @@ async function trySendTripReadyEmail(params: {
     .from('trips')
     .select('id, title, destination_city, destination_name, owner_id, trip_ready_email_sent_at')
     .eq('id', params.tripId)
-    .maybeSingle();
+    .maybeSingle<{
+      id: string;
+      title: string;
+      destination_city: string | null;
+      destination_name: string | null;
+      owner_id: string;
+      trip_ready_email_sent_at: string | null;
+    }>();
 
   if (tripError || !trip) {
     console.error('[smart-itinerary] Failed to load trip for trip ready email:', tripError);
@@ -100,8 +107,9 @@ async function trySendTripReadyEmail(params: {
     language: recipient.language,
   });
 
-  const { error: updateError } = await params.supabase
-    .from('trips')
+  // Type assertion needed because Supabase type inference fails for update when passed as function parameter
+  const { error: updateError } = await (params.supabase
+    .from('trips') as any)
     .update({ trip_ready_email_sent_at: new Date().toISOString() })
     .eq('id', params.tripId);
 

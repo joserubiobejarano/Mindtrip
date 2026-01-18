@@ -263,7 +263,7 @@ export async function POST(req: NextRequest) {
 
       // Send welcome email
       try {
-        let language = 'en' as const;
+        let language: 'en' | 'es' = 'en';
         try {
           const client = await clerkClient();
           const user = await client.users.getUser(clerkUserId);

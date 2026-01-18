@@ -114,8 +114,9 @@ export async function POST(req: NextRequest) {
         language,
       });
 
-      const { error: updateError } = await supabase
-        .from('profiles')
+      // Type assertion needed because Supabase type inference can fail for update calls
+      const { error: updateError } = await (supabase
+        .from('profiles') as any)
         .update({ pro_upgrade_email_sent_at: new Date().toISOString() })
         .eq('id', profile.id);
 
@@ -149,8 +150,9 @@ export async function POST(req: NextRequest) {
         language,
       });
 
-      const { error: updateError } = await supabase
-        .from('profiles')
+      // Type assertion needed because Supabase type inference can fail for update calls
+      const { error: updateError } = await (supabase
+        .from('profiles') as any)
         .update({ subscription_canceled_email_sent_at: new Date().toISOString() })
         .eq('id', profile.id);
 

@@ -82,7 +82,8 @@ export async function POST(req: NextRequest) {
   const { data: itineraryRows, error: itineraryError } = await supabase
     .from('smart_itineraries')
     .select('trip_id')
-    .in('trip_id', tripIds);
+    .in('trip_id', tripIds)
+    .returns<Array<{ trip_id: string }>>();
 
   if (itineraryError) {
     console.error('[trip-reminders] Error checking smart itineraries:', itineraryError);
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
   }
 
   const tripIdsWithItinerary = new Set(
-    (itineraryRows || []).map(row => row.trip_id as string)
+    (itineraryRows || []).map(row => row.trip_id)
   );
 
   const tripsToNotify = tripRows.filter(trip => tripIdsWithItinerary.has(trip.id));
@@ -102,14 +103,15 @@ export async function POST(req: NextRequest) {
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
     .select('id, email, full_name, clerk_user_id')
-    .in('id', ownerIds);
+    .in('id', ownerIds)
+    .returns<ProfileRow[]>();
 
   if (profilesError) {
     console.error('[trip-reminders] Error fetching profiles:', profilesError);
     return NextResponse.json({ error: 'Failed to load profiles' }, { status: 500 });
   }
 
-  const profilesById = new Map((profiles || []).map(profile => [profile.id, profile as ProfileRow]));
+  const profilesById = new Map((profiles || []).map(profile => [profile.id, profile]));
   const appUrl = process.env.APP_URL || 'https://kruno.app';
 
   let sentCount = 0;
@@ -140,8 +142,9 @@ export async function POST(req: NextRequest) {
         language: recipient.language,
       });
 
-      const { error: updateError } = await supabase
-        .from('trips')
+      // Type assertion needed because Supabase type inference can fail for update calls
+      const { error: updateError } = await (supabase
+        .from('trips') as any)
         .update({ trip_reminder_email_sent_at: new Date().toISOString() })
         .eq('id', trip.id);
 

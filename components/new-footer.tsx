@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Instagram, Twitter, Facebook, Youtube } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { Logo } from "@/components/ui/logo";
 
@@ -20,20 +19,6 @@ export function NewFooter() {
             <p className="text-sm text-muted-foreground">
               {t('footer_tagline')}
             </p>
-            <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 border-2 border-foreground rounded-lg flex items-center justify-center hover:bg-foreground hover:text-background transition-colors">
-                <Instagram className="w-5 h-5" strokeWidth={2} />
-              </a>
-              <a href="#" className="w-10 h-10 border-2 border-foreground rounded-lg flex items-center justify-center hover:bg-foreground hover:text-background transition-colors">
-                <Twitter className="w-5 h-5" strokeWidth={2} />
-              </a>
-              <a href="#" className="w-10 h-10 border-2 border-foreground rounded-lg flex items-center justify-center hover:bg-foreground hover:text-background transition-colors">
-                <Facebook className="w-5 h-5" strokeWidth={2} />
-              </a>
-              <a href="#" className="w-10 h-10 border-2 border-foreground rounded-lg flex items-center justify-center hover:bg-foreground hover:text-background transition-colors">
-                <Youtube className="w-5 h-5" strokeWidth={2} />
-              </a>
-            </div>
           </div>
 
           {/* Explore Column */}
@@ -115,7 +100,15 @@ export function NewFooter() {
         {/* Bottom Section */}
         <div className="border-t border-dashed border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            {t('footer_copyright_made')}
+            Made for travelers, with ❤️ by{" "}
+            <a
+              href="https://x.com/jrubiobejarano_"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground transition-colors"
+            >
+              Jose Bejarano
+            </a>
           </p>
           <p className="text-sm text-muted-foreground">
             {t('footer_copyright_year')}
