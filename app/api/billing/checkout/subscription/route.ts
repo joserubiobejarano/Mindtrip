@@ -25,7 +25,11 @@ const normalizeString = (value: unknown, maxLength: number) => {
 };
 
 const buildMetadata = (entries: Record<string, string | undefined>) =>
-  Object.fromEntries(Object.entries(entries).filter(([, value]) => value !== undefined && value !== ''));
+  Object.fromEntries(
+    Object.entries(entries).filter(
+      (entry): entry is [string, string] => entry[1] !== undefined && entry[1] !== ''
+    )
+  );
 
 export async function POST(req: NextRequest) {
   try {

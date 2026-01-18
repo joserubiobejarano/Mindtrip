@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { DiscoverKrunoPage } from "@/components/landing/discover-kruno-page";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function DiscoverKrunoRoute() {
-  return <DiscoverKrunoPage />;
+  return (
+    <Suspense fallback={null}>
+      <DiscoverKrunoPage />
+    </Suspense>
+  );
 }

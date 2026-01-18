@@ -10,6 +10,15 @@ type AttributionPayload = {
   coupon_code?: string;
 };
 
+type ProfileAttributionRow = {
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  coupon_code: string | null;
+  attribution_set_at: string | null;
+};
+
 const normalizeString = (value: unknown, maxLength: number) => {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
@@ -31,15 +40,20 @@ export async function POST(request: NextRequest) {
       coupon_code: normalizeString(body?.coupon_code, 32),
     };
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .select("utm_source, utm_medium, utm_campaign, utm_content, coupon_code, attribution_set_at")
       .eq("id", authResult.profileId)
       .single();
+    const profile = profileData as ProfileAttributionRow | null;
 
     if (profileError) {
       console.error("[attribution] Failed to fetch profile:", profileError);
       return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
+    }
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
     if (profile.attribution_set_at) {
@@ -66,7 +80,7 @@ export async function POST(request: NextRequest) {
       updateData.coupon_code = payload.coupon_code;
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from("profiles")
       .update(updateData)
       .eq("id", authResult.profileId);
