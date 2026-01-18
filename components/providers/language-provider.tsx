@@ -26,16 +26,23 @@ function detectBrowserLanguage(): Language {
   return browserLang === 'es' ? 'es' : 'en';
 }
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
-  const [isInitialized, setIsInitialized] = useState(false);
+export function LanguageProvider({
+  children,
+  initialLanguage,
+}: {
+  children: React.ReactNode;
+  initialLanguage?: Language;
+}) {
+  const [language, setLanguageState] = useState<Language>(initialLanguage ?? 'en');
+  const [isInitialized, setIsInitialized] = useState(Boolean(initialLanguage));
 
   useEffect(() => {
+    if (initialLanguage) return;
     // Always detect browser language on mount
     const detectedLang = detectBrowserLanguage();
     setLanguageState(detectedLang);
     setIsInitialized(true);
-  }, []);
+  }, [initialLanguage]);
 
   const t = (key: TranslationKey) => {
     return translate(language, key);

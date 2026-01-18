@@ -387,7 +387,43 @@ _See "Recently Completed" section above for full details. All features have been
 - [x] Test endpoints for all email types (`/api/test/*`)
 - [x] Idempotency checking (prevents duplicate emails)
 
-**Future Enhancements (Not in Phase 17):**
+### Phase 23 - SEO & Programmatic Marketing ✅ **NEW**
+- [x] Core SEO infrastructure:
+  - [x] `app/robots.ts` - Dynamic robots.txt generation with proper disallow rules
+  - [x] `app/sitemap.ts` - Dynamic sitemap with all marketing pages, cities, and influencers
+  - [x] `app/manifest.ts` - Web app manifest for PWA support
+- [x] SEO utility library (`lib/seo/`):
+  - [x] `urls.ts` - Canonical URL builder with UTM/tracking parameter stripping
+  - [x] `metadata.ts` - Shared metadata builder with OpenGraph/Twitter defaults
+  - [x] `site.ts` - Site configuration and base URL helper
+  - [x] `cities.ts` - City pages data for programmatic SEO
+  - [x] `influencers.ts` - Influencer pages data for programmatic SEO
+- [x] Structured Data (JSON-LD):
+  - [x] `components/seo/StructuredData.tsx` - WebSite and Organization schema on homepage
+  - [x] TouristTrip and BreadcrumbList schemas on city pages
+  - [x] ProfilePage schema on influencer pages
+- [x] Bilingual Marketing Routes (`/en` and `/es`):
+  - [x] Localized homepage (`app/(marketing)/[lang]/page.tsx`)
+  - [x] Localized cities hub (`app/(marketing)/[lang]/cities/page.tsx`)
+  - [x] Localized city detail pages (`app/(marketing)/[lang]/cities/[slug]/page.tsx`)
+  - [x] Localized influencers hub (`app/(marketing)/[lang]/influencers/page.tsx`)
+  - [x] Localized influencer detail pages (`app/(marketing)/[lang]/influencers/[slug]/page.tsx`)
+  - [x] Localized discover pages (`app/(marketing)/[lang]/discover-kruno/page.tsx`)
+- [x] Marketing i18n system (`lib/i18n/marketing.ts`):
+  - [x] Bilingual copy for all marketing pages (English and Spanish)
+  - [x] Type-safe translation keys
+  - [x] Locale detection and routing
+- [x] Hreflang alternates for all localized pages (en, es, x-default)
+- [x] Canonical URL strategy with tracking parameter stripping
+- [x] Private/auth routes blocked from indexing (`noindex` directives)
+- [x] Internal links fixed in footer (removed `nofollow` and `href="#"`)
+- [x] Programmatic SEO pages:
+  - [x] Cities hub with city cards and internal linking
+  - [x] City detail pages with highlights, CTA, and related cities
+  - [x] Influencers hub with creator cards and internal linking
+  - [x] Influencer detail pages with profile, CTA, and related creators
+
+**Future Enhancements (Post-Phase 23):**
 - [ ] AI suggestions for specific day/time slot
 - [ ] Additional advanced filters for Explore (Pro tier):
   - Vibe filters (romantic, family-friendly, adventurous, etc.)
@@ -399,7 +435,7 @@ _See "Recently Completed" section above for full details. All features have been
 - [ ] Offline mode for Explore (Pro tier)
 - [ ] Priority itinerary generation (Pro tier)
 
-### Phase 23 - Enhanced User Experience
+### Phase 24 - Enhanced User Experience
 - [ ] Trip templates and presets
 - [ ] Weather integration for trip dates
 - [ ] Photo uploads and galleries (user-uploaded photos)
@@ -407,34 +443,34 @@ _See "Recently Completed" section above for full details. All features have been
 - [ ] Trip statistics and analytics
 - [ ] Activity photo uploads
 
-### Phase 24 - Advanced Collaboration
+### Phase 25 - Advanced Collaboration
 - [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-### Phase 25 - Mobile App Development
+### Phase 26 - Mobile App Development
 - [ ] Native iOS and Android app (see [mobile-roadmap.md](./mobile-roadmap.md))
 - [ ] Expo React Native implementation
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 
-### Phase 26 - Web Mobile Optimization
+### Phase 27 - Web Mobile Optimization
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-### Phase 27 - Advanced Features
+### Phase 28 - Advanced Features
 - [ ] Budget tracking and alerts
 - [ ] Enhanced booking service integrations (beyond Booking.com links)
 - [ ] Calendar sync (Google Calendar, iCal)
 - [ ] Export to various formats (CSV, JSON - PDF already implemented)
 - [ ] Flight search and booking (placeholder page exists)
 
-### Phase 28 - Performance & Scalability
+### Phase 29 - Performance & Scalability
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -477,7 +513,7 @@ For later implementation phases:
 
 ## 📝 Notes
 
-- **Last Updated**: January 2025
+- **Last Updated**: January 2025 (Phase 23 SEO complete)
 - The application uses Clerk for authentication instead of Supabase Auth
 - Database schema uses TEXT for user IDs to support Clerk's ID format
 - Realtime features require enabling replication in Supabase dashboard
@@ -714,6 +750,32 @@ For later implementation phases:
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates (January 2025)
+
+- **2025-01-XX**: SEO & Programmatic Marketing ✅ **NEW**
+  - **Complete SEO Infrastructure**:
+    - ✅ Dynamic `robots.txt` via `app/robots.ts` with proper disallow rules
+    - ✅ Dynamic `sitemap.xml` via `app/sitemap.ts` with all marketing pages
+    - ✅ Web app manifest via `app/manifest.ts`
+    - ✅ SEO utility library (`lib/seo/`) with canonical URL builder, metadata helper, site config
+  - **Bilingual Marketing Pages**:
+    - ✅ Localized routes under `/en` and `/es` for all marketing surfaces
+    - ✅ Homepage, cities hub, city details, influencers hub, influencer details, discover pages
+    - ✅ Hreflang alternates (en, es, x-default) on all localized pages
+    - ✅ Marketing i18n system (`lib/i18n/marketing.ts`) with bilingual copy
+  - **Structured Data (JSON-LD)**:
+    - ✅ WebSite and Organization schema on homepage
+    - ✅ TouristTrip and BreadcrumbList on city pages
+    - ✅ ProfilePage on influencer pages
+  - **Programmatic SEO Pages**:
+    - ✅ Cities hub (`/cities`) with city cards and internal linking
+    - ✅ City detail pages (`/cities/[slug]`) with highlights, CTA, related cities
+    - ✅ Influencers hub (`/influencers`) with creator cards
+    - ✅ Influencer detail pages (`/influencers/[slug]`) with profile, CTA, related creators
+  - **SEO Fixes**:
+    - ✅ Private routes (`/trips`, `/settings`, `/sign-in`, `/sign-up`, `/p/`) blocked with `noindex`
+    - ✅ Footer internal links fixed (removed `nofollow` and `href="#"`)
+    - ✅ Canonical URLs with UTM/tracking parameter stripping
+    - ✅ Consistent metadata with OpenGraph/Twitter defaults
 
 - **2025-01-XX**: UI Components & Infrastructure ✅ **NEW**
   - **App Header Component** (`components/app-header.tsx`):

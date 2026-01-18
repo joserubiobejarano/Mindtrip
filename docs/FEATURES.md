@@ -932,6 +932,16 @@ Test endpoints available for all email types (`/api/test/*`):
 
 ### ✅ Recently Completed (January 2025)
 
+**Phase 23: SEO & Programmatic Marketing - COMPLETE** ✅
+- ✅ Dynamic `robots.txt` and `sitemap.xml` via App Router routes
+- ✅ SEO utility library (`lib/seo/`) with canonical URLs, metadata builder
+- ✅ Bilingual marketing routes (`/en`, `/es`) with hreflang alternates
+- ✅ Programmatic city and influencer pages with structured data (JSON-LD)
+- ✅ Marketing i18n system (`lib/i18n/marketing.ts`) for bilingual copy
+- ✅ StructuredData component for WebSite, Organization, TouristTrip, ProfilePage schemas
+- ✅ Private routes blocked from indexing
+- ✅ Footer internal links fixed
+
 **Infrastructure & UX Improvements - COMPLETE** ✅
 - ✅ Trip deletion feature with DELETE API endpoint
 - ✅ Route helper utilities (`lib/routes.ts` with `getTripUrl()`)
@@ -1042,7 +1052,7 @@ Test endpoints available for all email types (`/api/test/*`):
 
 ### 🚧 In Development
 
-**Future Enhancements (Post-Phase 22)**
+**Future Enhancements (Post-Phase 23)**
 - Additional advanced filters (vibe, theme, accessibility) for Pro tier
 - Multi-city Explore support
 - Travel stats and badges system
@@ -1118,6 +1128,44 @@ Comprehensive security architecture with centralized auth helpers, input validat
   - DOMPurify sanitization for user-generated content
   - Sanitization functions for different content types
 - **See [SECURITY.md](./SECURITY.md) for complete documentation**
+
+## SEO & Programmatic Marketing ✅ **NEW** (January 2025)
+
+**Overview:**
+Complete SEO infrastructure with programmatic marketing pages, bilingual support, and structured data for improved search engine visibility.
+
+**Features:**
+- **Core SEO Infrastructure**:
+  - `app/robots.ts` - Dynamic robots.txt generation with proper disallow rules
+  - `app/sitemap.ts` - Dynamic sitemap with all marketing pages, cities, and influencers
+  - `app/manifest.ts` - Web app manifest for PWA support
+- **SEO Utility Library** (`lib/seo/`):
+  - `urls.ts` - Canonical URL builder with UTM/tracking parameter stripping
+  - `metadata.ts` - Shared metadata builder with OpenGraph/Twitter defaults
+  - `site.ts` - Site configuration and base URL helper
+  - `cities.ts` - City pages data for programmatic SEO
+  - `influencers.ts` - Influencer pages data for programmatic SEO
+- **Structured Data (JSON-LD)**:
+  - WebSite and Organization schema on homepage
+  - TouristTrip and BreadcrumbList on city pages
+  - ProfilePage on influencer pages
+  - Implemented via `components/seo/StructuredData.tsx`
+- **Bilingual Marketing Routes**:
+  - Localized routes under `/en` and `/es`
+  - Hreflang alternates for all localized pages (en, es, x-default)
+  - Marketing i18n system (`lib/i18n/marketing.ts`) with bilingual copy
+  - Pages: Homepage, cities hub, city details, influencers hub, influencer details, discover
+- **Programmatic SEO Pages**:
+  - Cities hub with city cards and internal linking
+  - City detail pages with highlights, CTA, and related cities
+  - Influencers hub with creator cards and internal linking
+  - Influencer detail pages with profile, CTA, and related creators
+- **SEO Fixes**:
+  - Private routes blocked from indexing (`noindex` directives)
+  - Footer internal links fixed (removed `nofollow` and `href="#"`)
+  - Canonical URLs with tracking parameter stripping
+  - Consistent metadata with OpenGraph/Twitter defaults
+- **See [SEO_AUDIT.md](./SEO_AUDIT.md) for audit details and fixes**
 
 ## Infrastructure & Tracking Features ✅ **NEW** (January 2025)
 
@@ -1216,6 +1264,12 @@ Comprehensive security architecture with centralized auth helpers, input validat
 - Place details fetching with comprehensive field support
 
 ### Added
+- **SEO & Programmatic Marketing** (Phase 23):
+  - Dynamic `robots.txt` and `sitemap.xml` via App Router routes
+  - SEO utility library with canonical URL builder, metadata helper
+  - Bilingual marketing routes (`/en`, `/es`) with hreflang alternates
+  - Programmatic city and influencer pages with structured data (JSON-LD)
+  - Marketing i18n system for bilingual copy
 - **Email System & Notifications**: Complete email infrastructure with Resend
 - **Billing & Subscriptions System**: Complete Stripe integration
 - **Image Caching System**: Production-proof image storage in Supabase Storage
@@ -1230,6 +1284,8 @@ Comprehensive security architecture with centralized auth helpers, input validat
 - **Change Limits**: Added (5 for free, unlimited for Pro)
 - **Search Add Limits**: Added (5 for free, unlimited for Pro)
 - **Security**: All API routes now use centralized auth helpers and Zod validation
+- **Footer Links**: Fixed internal links (removed `nofollow` and `href="#"`)
+- **Private Routes**: Added `noindex` directives to auth and private pages
 
 ### Removed
 - None (no features removed in this update)

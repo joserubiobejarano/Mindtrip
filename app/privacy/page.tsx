@@ -1,26 +1,17 @@
-import type { Metadata } from "next";
 import { PrivacyContent } from "./privacy-content";
+import { buildMetadata } from "@/lib/seo/metadata";
+import type { Metadata } from "next";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Privacy Policy – Kruno",
-  description: "Learn how Kruno collects, uses, and protects your personal information. Your privacy is important to us.",
-  openGraph: {
-    title: "Privacy Policy – Kruno",
-    description: "Learn how Kruno collects, uses, and protects your personal information.",
-    url: "https://kruno.app/privacy",
-    siteName: "Kruno",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Privacy Policy – Kruno",
-    description: "Learn how Kruno protects your privacy.",
-  },
+  description:
+    "Learn how Kruno collects, uses, and protects your personal information. Your privacy is important to us.",
+  path: "/privacy",
   robots: {
     index: true,
     follow: true,
   },
-};
+});
 
 export default function PrivacyPage() {
   return <PrivacyContent />;

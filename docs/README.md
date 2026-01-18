@@ -222,7 +222,40 @@ npm run dev
 - Integration with homepage search (routes to advisor for travel queries)
 - Database table `advisor_messages` for chat history
 
-### Phase 22 - Email System & Notifications ✅ **NEW**
+### Phase 22 - Email System & Notifications ✅
+- Complete email infrastructure with Resend integration
+- Email template system with 7 email types (welcome, trip ready, Pro upgrade, subscription canceled, trip reminder, trip invite, expenses summary)
+- Multi-language email support (English and Spanish)
+- Automated trip reminder emails via cron job (1 day before trip start)
+- Email integration with itinerary generation (trip ready email)
+- Email integration with billing webhook (Pro upgrade/cancellation emails)
+- Database tracking fields for email sent timestamps (idempotency)
+- Test endpoints for all email types
+
+### Phase 23 - SEO & Programmatic Marketing ✅ **NEW**
+- Core SEO infrastructure:
+  - Dynamic `robots.txt` via `app/robots.ts`
+  - Dynamic `sitemap.xml` via `app/sitemap.ts`
+  - Web app manifest via `app/manifest.ts`
+- SEO utility library (`lib/seo/`):
+  - Canonical URL builder with tracking param stripping
+  - Shared metadata builder with OG/Twitter defaults
+  - Site configuration and base URL helper
+  - City and influencer pages data
+- Structured Data (JSON-LD):
+  - WebSite and Organization schema on homepage
+  - TouristTrip and BreadcrumbList on city pages
+  - ProfilePage on influencer pages
+- Bilingual Marketing Routes (`/en`, `/es`):
+  - Localized homepage, cities hub, city details
+  - Localized influencers hub, influencer details
+  - Localized discover pages
+  - Hreflang alternates (en, es, x-default)
+- Marketing i18n system (`lib/i18n/marketing.ts`)
+- Programmatic SEO pages (cities, influencers hubs and details)
+- Private routes blocked from indexing
+- Footer internal links fixed
+
 - Complete email infrastructure with Resend integration
 - Email template system with 7 email types (welcome, trip ready, Pro upgrade, subscription canceled, trip reminder, trip invite, expenses summary)
 - Multi-language email support (English and Spanish)
@@ -283,13 +316,14 @@ kruno/
 ## 📝 Documentation
 
 - **[DEVELOPER_SUMMARY.md](./DEVELOPER_SUMMARY.md)** - ⭐ **Start here!** Comprehensive project overview for developers
-- **[ROADMAP.md](./ROADMAP.md)** - ⚠️ **UPDATED** Development roadmap with new Explore feature phases
-- **[NEXT_STEPS.md](./NEXT_STEPS.md)** - 🆕 **NEW** Explore feature implementation plan
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - 🆕 **NEW** System architecture and data flow
-- **[FEATURES.md](./FEATURES.md)** - 🆕 **NEW** Complete feature list and specifications
-- **[PRO_VS_FREE.md](./PRO_VS_FREE.md)** - ⚠️ **UPDATED** Pro vs Free feature comparison and usage limits
-- **[SECURITY.md](./SECURITY.md)** - ⚠️ **UPDATED** Security architecture, rate limiting, and best practices
-- **[images.md](./images.md)** - 🆕 **NEW** Image caching system documentation (Supabase Storage)
+- **[ROADMAP.md](./ROADMAP.md)** - ⚠️ **UPDATED** Development roadmap with all phases including SEO
+- **[NEXT_STEPS.md](./NEXT_STEPS.md)** - Implementation plan and current priorities
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture and data flow
+- **[FEATURES.md](./FEATURES.md)** - Complete feature list and specifications
+- **[PRO_VS_FREE.md](./PRO_VS_FREE.md)** - Pro vs Free feature comparison and usage limits
+- **[SECURITY.md](./SECURITY.md)** - Security architecture, rate limiting, and best practices
+- **[SEO_AUDIT.md](./SEO_AUDIT.md)** - 🆕 **NEW** SEO audit and implementation notes
+- **[images.md](./images.md)** - Image caching system documentation (Supabase Storage)
 - [mobile-roadmap.md](./mobile-roadmap.md) - Mobile app development roadmap
 - [monetization.md](./monetization.md) - Monetization strategy and revenue plans
 - [COMMANDS.md](./COMMANDS.md) - All commands to run (if exists)
@@ -319,10 +353,20 @@ kruno/
 
 ## 📊 Current Status
 
-**Completed Phases:** 21 out of 27 planned phases (~78% complete)
-**Phase 21:** ✅ Complete - Travel Advisor (Pre-Trip Planning) fully implemented
+**Completed Phases:** 23 out of 29 planned phases (~79% complete)
+**Phase 23:** ✅ Complete - SEO & Programmatic Marketing fully implemented
 
 **Recent Updates (January 2025):**
+
+- ✅ **SEO & Programmatic Marketing** - **NEW** (Phase 23)
+  - ✅ Dynamic `robots.txt` and `sitemap.xml` via App Router routes
+  - ✅ SEO utility library (`lib/seo/`) with canonical URLs, metadata builder
+  - ✅ Bilingual marketing routes (`/en`, `/es`) with hreflang alternates
+  - ✅ Programmatic city and influencer pages with structured data (JSON-LD)
+  - ✅ Marketing i18n system (`lib/i18n/marketing.ts`) for bilingual copy
+  - ✅ StructuredData component for WebSite, Organization, TouristTrip, ProfilePage
+  - ✅ Private routes blocked from indexing
+  - ✅ Footer internal links fixed
 
 - ✅ **Email System & Notifications** - **NEW**
   - ✅ Complete email infrastructure with Resend integration
@@ -462,9 +506,9 @@ kruno/
   - ✅ **Food Place Limits** - Max 1 food place per time slot in AI-generated itineraries
 
 **Next Priorities:**
-- Phase 22: Enhanced user experience features (templates, weather, photos)
-- Phase 22: Notes and journaling features
-- Phase 23: Advanced collaboration (member chat, voting, comments)
+- Phase 24: Enhanced user experience features (templates, weather, photos)
+- Phase 24: Notes and journaling features
+- Phase 25: Advanced collaboration (member chat, voting, comments)
 - Future: Additional advanced filters (vibe, theme, accessibility)
 - Future: Multi-city Explore support and travel stats/badges
 - Mobile app development

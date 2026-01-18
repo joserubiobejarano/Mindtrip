@@ -6,13 +6,25 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/p(.*)',
+  '/discover-kruno(.*)',
+  '/discover(.*)',
   '/api/webhooks/clerk(.*)',
   '/api/debug(.*)',
 ])
 
+const isProtectedRoute = createRouteMatcher([
+  '/trips(.*)',
+  '/settings(.*)',
+  '/api(.*)',
+])
+
 export default clerkMiddleware(async (auth, request) => {
-  // Only protect non-public routes
-  if (!isPublicRoute(request)) {
+  if (isPublicRoute(request)) {
+    return NextResponse.next()
+  }
+
+  // Only protect routes that are explicitly protected
+  if (isProtectedRoute(request)) {
     try {
       await auth.protect()
     } catch (error) {

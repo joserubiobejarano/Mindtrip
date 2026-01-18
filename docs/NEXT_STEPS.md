@@ -1,11 +1,73 @@
 # Kruno - Next Steps & Implementation Plan
 
-> **Last Updated:** January 2025  
-> **Focus:** Explore Feature Implementation
+> **Last Updated:** January 2025 (Phase 23 SEO complete)  
+> **Focus:** Next Priorities After SEO Implementation
 
-## 🎯 Current Priority: Phase 17 - Day-Level Integration & Advanced Filters
+## 🎯 Current Priority: Phase 24 - Enhanced User Experience
 
-Phases 15 and 16 of the Explore feature have been completed! Phase 17 backend is also complete. This document outlines what's been implemented and what remains.
+Phases 15-23 are complete! This document outlines what's been implemented and what remains.
+
+---
+
+## ✅ Phase 23: SEO & Programmatic Marketing (COMPLETE)
+
+**Status:** ✅ **COMPLETE** - All SEO features implemented and functional.
+
+### What Was Implemented:
+
+#### ✅ 1. Core SEO Infrastructure
+
+**Completed:**
+- `app/robots.ts` - Dynamic robots.txt generation with proper disallow rules
+- `app/sitemap.ts` - Dynamic sitemap with all marketing pages, cities, and influencers
+- `app/manifest.ts` - Web app manifest for PWA support
+
+#### ✅ 2. SEO Utility Library (`lib/seo/`)
+
+**Completed:**
+- `urls.ts` - Canonical URL builder with UTM/tracking parameter stripping
+- `metadata.ts` - Shared metadata builder with OpenGraph/Twitter defaults
+- `site.ts` - Site configuration and base URL helper
+- `cities.ts` - City pages data for programmatic SEO
+- `influencers.ts` - Influencer pages data for programmatic SEO
+
+#### ✅ 3. Structured Data (JSON-LD)
+
+**Completed:**
+- `components/seo/StructuredData.tsx` - Reusable structured data component
+- WebSite and Organization schema on homepage
+- TouristTrip and BreadcrumbList on city pages
+- ProfilePage on influencer pages
+
+#### ✅ 4. Bilingual Marketing Routes
+
+**Completed:**
+- Localized routes under `/en` and `/es` for all marketing surfaces
+- Homepage (`app/(marketing)/[lang]/page.tsx`)
+- Cities hub (`app/(marketing)/[lang]/cities/page.tsx`)
+- City detail pages (`app/(marketing)/[lang]/cities/[slug]/page.tsx`)
+- Influencers hub (`app/(marketing)/[lang]/influencers/page.tsx`)
+- Influencer detail pages (`app/(marketing)/[lang]/influencers/[slug]/page.tsx`)
+- Discover pages (`app/(marketing)/[lang]/discover-kruno/page.tsx`)
+- Hreflang alternates (en, es, x-default) on all localized pages
+
+#### ✅ 5. Marketing i18n System
+
+**Location:** `lib/i18n/marketing.ts`
+**Status:** ✅ Implemented
+
+**Features:**
+- Bilingual copy for all marketing pages (English and Spanish)
+- Type-safe translation keys (`MarketingCopy` type)
+- `getMarketingCopy(locale)` function for accessing translations
+
+#### ✅ 6. SEO Fixes
+
+**Completed:**
+- Private routes blocked from indexing (`noindex` directives)
+- Footer internal links fixed (removed `nofollow` and `href="#"`)
+- Canonical URLs with tracking parameter stripping
+- Consistent metadata with OpenGraph/Twitter defaults
 
 ---
 
@@ -382,63 +444,85 @@ CREATE TABLE user_badges (
 
 ---
 
-## ✅ Implementation Timeline (Phases 15-16 Complete)
+## ✅ Implementation Timeline (Phases 15-23 Complete)
 
-### ✅ Week 1-2: Database & API Foundation (COMPLETE)
-- [x] Create explore_sessions table migration
-- [x] Implement GET /api/trips/[tripId]/explore/places endpoint
-- [x] Implement POST /api/trips/[tripId]/explore/swipe endpoint
-- [x] Implement GET /api/trips/[tripId]/explore/session endpoint
-- [x] Test API endpoints
+### ✅ Phases 15-17: Explore Feature (COMPLETE)
+- [x] Database schema (explore_sessions table)
+- [x] API endpoints (places, swipe, session)
+- [x] Frontend components (SwipeableCard, ExploreDeck, ExploreFilters)
+- [x] Google Places integration
+- [x] Itinerary regeneration with liked places
+- [x] Day-level integration
+- [x] User subscription system
+- [x] Advanced filters for Pro tier
 
-### ✅ Week 3-4: Frontend Components (COMPLETE)
-- [x] Create SwipeableCard component
-- [x] Create ExploreDeck component
-- [x] Update ExploreTab with swipe functionality
-- [x] Implement swipe gestures with Framer Motion
-- [x] Add button alternatives
-- [x] Test swipe interactions
+### ✅ Phases 18-20: Multi-City & Enhanced Features (COMPLETE)
+- [x] Trip segments for multi-city trips
+- [x] Trip personalization
+- [x] Enhanced Trip Assistant with moderation
 
-### ✅ Week 5-6: Google Places Integration (COMPLETE)
-- [x] Create explore-places service
-- [x] Implement place fetching logic
-- [x] Add tag enrichment ("Locals love this", etc.)
-- [x] Implement filtering logic
-- [x] Add caching for performance (React Query)
+### ✅ Phase 21: Travel Advisor (COMPLETE)
+- [x] Pre-trip planning chat interface
+- [x] Daily message limits
+- [x] Chat moderation
 
-### ✅ Week 7-8: Itinerary Regeneration (COMPLETE)
-- [x] Update smart itinerary generator API
-- [x] Implement must_include_place_ids logic
-- [x] Implement re-clustering with new places
-- [x] Add place integration service
-- [x] Test regeneration flow
+### ✅ Phase 22: Email System (COMPLETE)
+- [x] Resend integration
+- [x] 7 email types
+- [x] Multi-language support
+- [x] Cron job for reminders
 
-### ✅ Week 9-10: Day-Level Integration (COMPLETE)
-- [x] Day-level bulk add API endpoint ✅
-- [x] Day-level filtering in Explore API ✅
-- [x] User subscription system (is_pro column) ✅
-- [x] Subscription status API endpoint ✅
-- [x] Daily swipe limit logic (50 for free, unlimited for Pro) ✅
-- [x] Advanced filters for Pro tier (budget, maxDistance) ✅
-- [x] Add "Add activities" button to days (UI component) ✅
-- [x] Create drawer/sheet for day-specific Explore ✅
-- [x] Test day-level flow end-to-end ✅
-- [x] Trip invitation linking feature ✅
+### ✅ Phase 23: SEO & Programmatic Marketing (COMPLETE)
+- [x] robots.txt and sitemap.xml
+- [x] SEO utility library
+- [x] Structured data (JSON-LD)
+- [x] Bilingual marketing routes (/en, /es)
+- [x] Marketing i18n system
+- [x] Programmatic city and influencer pages
+- [x] Hreflang alternates
+- [x] Private route noindex
 
-### ✅ Week 11-12: Day-Level Integration & Polish (COMPLETE)
-- [x] Implement advanced filters (Pro tier) - Budget and maxDistance ✅
-- [x] Add swipe limit logic ✅
-- [x] Day-level "Add activities" button in itinerary UI ✅
-- [x] Day-level Explore drawer/sheet integration ✅
-- [x] Pre-filtering by day's neighborhood and time slot ✅
-- [x] Immediate add-to-day on swipe right in day mode ✅
-- [x] Full ExploreDeck day mode integration ✅
-- [x] Trip invitation linking API and UI integration ✅
-- [ ] Implement travel stats tracking (Future)
-- [ ] Add badges system (Future)
-- [ ] Additional advanced filters (vibe, theme, accessibility) (Future)
-- [ ] Performance optimization
-- [ ] Testing and bug fixes
+## 📋 Remaining Phases
+
+### Phase 24: Enhanced User Experience (NEXT PRIORITY)
+- [ ] Trip templates and presets
+- [ ] Weather integration for trip dates
+- [ ] Photo uploads and galleries
+- [ ] Notes and journaling features
+- [ ] Trip statistics and analytics
+
+### Phase 25: Advanced Collaboration
+- [ ] Member-to-member chat
+- [ ] Activity voting/polling
+- [ ] Comment threads
+- [ ] Notification system
+
+### Phase 26: Mobile App Development
+- [ ] Native iOS and Android app
+- [ ] Offline mode
+- [ ] Push notifications
+- [ ] Deep linking
+
+### Phase 27: Web Mobile Optimization
+- [ ] Responsive design improvements
+- [ ] Mobile-first itinerary view
+- [ ] PWA features
+
+### Phase 28: Advanced Features
+- [ ] Budget tracking and alerts
+- [ ] Calendar sync
+- [ ] Flight search
+
+### Phase 29: Performance & Scalability
+- [ ] Image optimization and CDN
+- [ ] Database optimization
+- [ ] Caching strategies
+
+## Future Enhancements (Post-MVP)
+- [ ] Additional advanced filters (vibe, theme, accessibility)
+- [ ] Travel stats and badges system
+- [ ] Multi-city Explore support
+- [ ] Better clustering with advanced routing
 
 ---
 
@@ -518,5 +602,5 @@ CREATE TABLE user_badges (
 
 ---
 
-**Next Action:** Start with database schema and API endpoints (Week 1-2)
+**Next Action:** Phase 24 - Enhanced User Experience (trip templates, weather, photos)
 

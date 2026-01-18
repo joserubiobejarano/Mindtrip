@@ -4,6 +4,18 @@ import { TripsList } from "@/components/trips-list";
 import { NewNavbar } from "@/components/new-navbar";
 import { NewFooter } from "@/components/new-footer";
 import { TripsPageHeader } from "@/components/trips-page-header";
+import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo/metadata";
+
+export const metadata: Metadata = buildMetadata({
+  title: "My Trips – Kruno",
+  description: "Manage your trips and itineraries in Kruno.",
+  path: "/trips",
+  robots: {
+    index: false,
+    follow: false,
+  },
+});
 
 export default async function TripsPage() {
   const { userId } = await auth();

@@ -514,48 +514,70 @@ trip_regeneration_stats ✅ NEW
 ```
 /app/api/
 ├── trips/
-│   ├── route.ts                      # ✅ NEW: GET (list trips), POST (create trip)
+│   ├── route.ts                      # ✅ GET (list trips), POST (create trip)
 │   └── [tripId]/
-│       ├── route.ts                  # ✅ NEW: DELETE (delete trip with cascade cleanup)
-│       ├── assistant/                # ✅ NEW: Enhanced Trip Assistant (with moderation)
+│       ├── route.ts                  # ✅ DELETE (delete trip with cascade cleanup)
+│       ├── assistant/                # ✅ Enhanced Trip Assistant (with moderation)
 │       ├── chat/                     # Trip Assistant (legacy)
-│       ├── segments/                 # ✅ NEW: Trip segments API (multi-city trips, Pro tier)
+│       ├── segments/                 # ✅ Trip segments API (multi-city trips, Pro tier)
 │       ├── itinerary-chat/           # Itinerary editing
 │       ├── smart-itinerary/          # Itinerary generation
 │       │   └── place/                # Place updates
-│       ├── activities/               # ✅ NEW: Activity management
+│       ├── activities/               # ✅ Activity management
 │       │   └── [activityId]/
-│       │       └── replace/         # ✅ NEW: Replace activity with usage limits
-│       └── explore/                  # ✅ IMPLEMENTED: Explore feature
+│       │       └── replace/         # ✅ Replace activity with usage limits
+│       └── explore/                  # ✅ Explore feature
 │           ├── places/               # ✅ GET: Fetch places
 │           ├── swipe/                # ✅ POST: Record swipe (like/dislike/undo)
 │           └── session/              # ✅ GET/DELETE: Session management
-│       └── days/                     # ✅ IMPLEMENTED: Day-level integration (Backend Complete)
+│       └── days/                     # ✅ Day-level integration
 │           └── [dayId]/
 │               └── activities/
-│                   └── bulk-add-from-swipes/  # ✅ POST: Add places to day/slot (morning/afternoon/evening)
-├── places/                           # ✅ NEW: Places API
-│   └── city-autocomplete/            # ✅ NEW: City autocomplete (GET/POST)
+│                   └── bulk-add-from-swipes/  # ✅ POST: Add places to day/slot
+├── places/                           # ✅ Places API
+│   └── city-autocomplete/            # ✅ City autocomplete (GET/POST)
 ├── user/
-│   ├── subscription-status/          # ✅ GET: User subscription status (checks is_pro column)
+│   ├── subscription-status/          # ✅ GET: User subscription status
 │   └── link-trip-invitations/        # ✅ POST: Link email invitations to user accounts
-├── advisor/                          # ✅ NEW: Travel Advisor (pre-trip planning)
+├── advisor/                          # ✅ Travel Advisor (pre-trip planning)
 │   └── route.ts                      # ✅ GET/POST: Advisor chat history and messages
-├── billing/                          # ✅ NEW: Billing and subscription management
+├── billing/                          # ✅ Billing and subscription management
 │   ├── checkout/
 │   │   ├── subscription/            # ✅ POST: Create Stripe checkout for Pro subscription
 │   │   └── trip/                    # ✅ POST: Create Stripe checkout for trip Pro unlock
 │   ├── portal/                      # ✅ GET: Stripe customer portal session
 │   └── webhook/                     # ✅ POST: Stripe webhook handler for subscription events
-├── images/                           # ✅ NEW: Image caching system
+├── images/                           # ✅ Image caching system
 │   └── cache-place-image/           # ✅ POST: Cache place images in Supabase Storage
 ├── ai/
 │   └── plan-day/                    # AI day planning
 ├── ai-itinerary/                    # Legacy itinerary (updated with segment support)
 ├── accommodation/
 │   └── find/                        # Hotel search
+├── cron/
+│   └── trip-reminders/              # ✅ Trip reminder email cron job
 └── intent/
     └── travel/                      # Future: Intent detection
+
+/app/(marketing)/                     # ✅ NEW: Marketing/SEO routes
+├── layout.tsx                        # Marketing layout
+├── [lang]/                           # ✅ Localized routes (/en, /es)
+│   ├── page.tsx                     # Localized homepage
+│   ├── layout.tsx                   # Language layout
+│   ├── cities/
+│   │   ├── page.tsx                 # Localized cities hub
+│   │   └── [slug]/page.tsx          # Localized city detail
+│   ├── influencers/
+│   │   ├── page.tsx                 # Localized influencers hub
+│   │   └── [slug]/page.tsx          # Localized influencer detail
+│   └── discover-kruno/page.tsx      # Localized discover page
+├── cities/
+│   ├── page.tsx                     # Cities hub (non-localized)
+│   └── [slug]/page.tsx              # City detail (non-localized)
+├── influencers/
+│   ├── page.tsx                     # Influencers hub (non-localized)
+│   └── [slug]/page.tsx              # Influencer detail (non-localized)
+└── discover-kruno/page.tsx          # Discover page (non-localized)
 ```
 
 ### API Response Patterns
@@ -592,6 +614,12 @@ trip_regeneration_stats ✅ NEW
 ```
 app/
 ├── (auth)/                          # Auth pages
+├── (marketing)/                     # ✅ NEW: Marketing/SEO pages
+│   ├── [lang]/                      # Localized routes (/en, /es)
+│   │   ├── cities/                  # City pages
+│   │   └── influencers/             # Influencer pages
+│   ├── cities/                      # Non-localized city pages
+│   └── influencers/                 # Non-localized influencer pages
 ├── trips/
 │   └── [tripId]/
 │       └── page.tsx                 # Trip detail page
@@ -601,13 +629,19 @@ app/
 │                   ├── ExploreTab (updated) ✅
 │                   ├── ExpensesTab
 │                   └── ChecklistsTab
+├── robots.ts                        # ✅ NEW: Dynamic robots.txt
+├── sitemap.ts                       # ✅ NEW: Dynamic sitemap.xml
+└── manifest.ts                      # ✅ NEW: Web app manifest
 └── components/
-    ├── app-header.tsx                # ✅ NEW: Unified app header with Logo
+    ├── app-header.tsx                # ✅ Unified app header with Logo
     ├── ui/
-    │   └── logo.tsx                  # ✅ NEW: Reusable Logo component
+    │   └── logo.tsx                  # ✅ Reusable Logo component
+    ├── seo/                          # ✅ NEW: SEO components
+    │   ├── StructuredData.tsx       # JSON-LD structured data
+    │   └── LocaleSwitcher.tsx       # Language switcher
     ├── itinerary-tab.tsx             # ✅ ENHANCED: Day-level Explore integration
-    ├── day-accordion-header.tsx      # ✅ NEW: Accordion-style day headers
-    ├── explore/                      # ✅ IMPLEMENTED: Explore components
+    ├── day-accordion-header.tsx      # ✅ Accordion-style day headers
+    ├── explore/                      # ✅ Explore components
     │   ├── SwipeableCard.tsx ✅
     │   ├── ExploreDeck.tsx ✅
     │   ├── ExploreFilters.tsx ✅
@@ -654,7 +688,15 @@ hooks/
 
 ```
 lib/
-├── routes.ts                        # ✅ NEW: Route helper utilities (getTripUrl)
+├── routes.ts                        # ✅ Route helper utilities (getTripUrl)
+├── seo/                             # ✅ NEW: SEO utilities
+│   ├── urls.ts                      # Canonical URL builder, tracking param stripping
+│   ├── metadata.ts                  # Shared metadata builder
+│   ├── site.ts                      # Site configuration and base URL
+│   ├── cities.ts                    # City pages data for programmatic SEO
+│   └── influencers.ts               # Influencer pages data for programmatic SEO
+├── i18n/                            # ✅ NEW: Internationalization
+│   └── marketing.ts                 # Marketing copy for bilingual pages
 ├── supabase/                        # Supabase clients and helpers
 │   ├── user-subscription.ts         # Subscription status checking
 │   └── explore-integration.ts       # Explore feature integration
@@ -1009,6 +1051,13 @@ lib/
 ## Recent Changes Summary (January 2025)
 
 ### Added
+- **SEO & Programmatic Marketing** (Phase 23):
+  - Dynamic `robots.txt` and `sitemap.xml` via App Router routes
+  - SEO utility library (`lib/seo/`) with canonical URL builder, metadata helper
+  - Bilingual marketing routes (`/en`, `/es`) with hreflang alternates
+  - Programmatic city and influencer pages with structured data (JSON-LD)
+  - Marketing i18n system (`lib/i18n/marketing.ts`) for bilingual copy
+  - StructuredData component for WebSite, Organization, TouristTrip, ProfilePage schemas
 - **Billing & Subscriptions System**: Complete Stripe integration with subscription and trip-level Pro unlocks
 - **Image Caching System**: Production-proof image storage in Supabase Storage with multi-provider fallback
 - **Trip Regeneration Stats**: Daily regeneration limit tracking per trip
@@ -1023,9 +1072,11 @@ lib/
 - **Search Add Limits**: Added search_add_count limits (5 for free, unlimited for Pro)
 - **Security**: All API routes now use centralized auth helpers and Zod validation
 - **AI Itinerary**: Enhanced with food place limits (max 1 per time slot) and better detection
+- **Footer Links**: Fixed internal links (removed `nofollow` and `href="#"`)
+- **Private Routes**: Added `noindex` directives to auth and private pages
 
 ### Removed
 - None (no features removed in this update)
 
-**Last Updated:** January 2025
+**Last Updated:** January 2025 (Phase 23 SEO complete)
 

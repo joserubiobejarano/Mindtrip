@@ -2,6 +2,25 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { HotelSearchWrapper } from "@/components/hotel-search-wrapper";
+import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo/metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ tripId: string }>;
+}): Promise<Metadata> {
+  const { tripId } = await params;
+  return buildMetadata({
+    title: "Trip Stay – Kruno",
+    description: "Plan where to stay for your trip in Kruno.",
+    path: `/trips/${tripId}/stay`,
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
 
 export default async function StayPage({
   params,

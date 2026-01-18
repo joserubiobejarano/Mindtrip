@@ -1,4 +1,16 @@
 import { SignUp } from "@clerk/nextjs";
+import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo/metadata";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Sign Up – Kruno",
+  description: "Create a Kruno account to start planning your next trip.",
+  path: "/sign-up",
+  robots: {
+    index: false,
+    follow: false,
+  },
+});
 
 type SignUpPageProps = {
   searchParams?: Promise<{ redirect_url?: string | string[] }>;

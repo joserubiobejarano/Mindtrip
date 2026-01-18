@@ -1,7 +1,7 @@
 # Kruno - Developer Summary & Project Overview
 
-> **Last Updated:** January 2025  
-> **Project Status:** Active Development - 14 of 20 phases completed (70%)
+> **Last Updated:** January 2025 (Phase 23 SEO complete)  
+> **Project Status:** Active Development - 23 of 29 phases completed (~79%)
 
 ## 📋 Table of Contents
 
@@ -294,7 +294,7 @@ kruno/
 
 ## What Has Been Done
 
-### ✅ Completed Phases (22 of 28)
+### ✅ Completed Phases (23 of 29)
 
 **Phase 1 - Project Setup & Foundation** ✅
 - Next.js 15 with App Router
@@ -433,7 +433,7 @@ kruno/
 - ✅ Helper functions in `lib/supabase/advisor-messages.ts`
 - ✅ Migration file: `database/migrations/supabase-add-advisor-messages.sql`
 
-**Phase 22 - Email System & Notifications** ✅ **COMPLETE** **NEW**
+**Phase 22 - Email System & Notifications** ✅ **COMPLETE**
 - ✅ Complete email infrastructure with Resend integration
 - ✅ Email template system with 7 email types (`lib/email-copy.ts`)
 - ✅ Multi-language email support (English and Spanish) (`lib/email/language.ts`)
@@ -452,13 +452,47 @@ kruno/
 - ✅ Test endpoints for all email types (`/api/test/*`)
 - ✅ Migration file: `database/migrations/add-email-sent-fields.sql`
 
+**Phase 23 - SEO & Programmatic Marketing** ✅ **COMPLETE** **NEW**
+- ✅ Core SEO infrastructure:
+  - `app/robots.ts` - Dynamic robots.txt generation
+  - `app/sitemap.ts` - Dynamic sitemap with all pages
+  - `app/manifest.ts` - Web app manifest for PWA
+- ✅ SEO utility library (`lib/seo/`):
+  - `urls.ts` - Canonical URL builder with tracking param stripping
+  - `metadata.ts` - Shared metadata builder with OG/Twitter defaults
+  - `site.ts` - Site configuration and base URL
+  - `cities.ts` - City pages data
+  - `influencers.ts` - Influencer pages data
+- ✅ Structured Data (JSON-LD):
+  - WebSite and Organization on homepage
+  - TouristTrip and BreadcrumbList on city pages
+  - ProfilePage on influencer pages
+  - `components/seo/StructuredData.tsx`
+- ✅ Bilingual Marketing Routes (`/en`, `/es`):
+  - Localized homepage, cities hub, city details
+  - Localized influencers hub, influencer details
+  - Localized discover pages
+  - Hreflang alternates (en, es, x-default)
+- ✅ Marketing i18n system (`lib/i18n/marketing.ts`):
+  - Bilingual copy for all marketing pages
+  - Type-safe translation keys
+- ✅ Programmatic SEO pages:
+  - Cities hub with city cards
+  - City detail pages with highlights and CTA
+  - Influencers hub with creator cards
+  - Influencer detail pages with profile and CTA
+- ✅ SEO fixes:
+  - Private routes blocked with `noindex`
+  - Footer links fixed (removed `nofollow`)
+  - Canonical URLs with param stripping
+
 ### 📊 Progress Summary
 
-- **Completed**: 22 phases (Phases 1-17, 18-22)
+- **Completed**: 23 phases (Phases 1-23)
 - **In Progress**: None
-- **Planned**: 6 phases remaining (Phases 23-28)
+- **Planned**: 6 phases remaining (Phases 24-29)
 - **Completion**: ~79%
-- **Next Priority**: Phase 23 - Enhanced User Experience (templates, weather, photos)
+- **Next Priority**: Phase 24 - Enhanced User Experience (templates, weather, photos)
 
 ---
 
@@ -466,30 +500,14 @@ kruno/
 
 ### 🚧 Planned Features (6 phases remaining)
 
-### 🆕 NEXT PRIORITY: Enhanced User Experience - Phase 23
+### 🆕 NEXT PRIORITY: Enhanced User Experience - Phase 24
 
-**Phase 15 - Explore Feature: Tinder-Style Place Discovery** ✅ **COMPLETE**
+**Phase 23 - SEO & Programmatic Marketing** ✅ **COMPLETE**
 _See completed phases section above for details._
 
-**Phase 16 - Explore Feature: Itinerary Regeneration with Liked Places** ✅ **COMPLETE**
-_See completed phases section above for details._
+### Remaining Planned Features (6 phases remaining)
 
-**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** ✅ **COMPLETE**
-- ✅ Day-level bulk add API endpoint
-- ✅ Day-level filtering in Explore API
-- ✅ User subscription system (is_pro column)
-- ✅ Advanced filters for Pro tier (budget, maxDistance)
-- ✅ Daily swipe limit logic
-- ✅ "Add activities" button on each time slot (UI component)
-- ✅ Pre-filter Explore by day's neighborhood/time of day (UI integration)
-- ✅ Day-level Explore drawer/sheet with filtered places
-- ✅ Immediate add-to-day on swipe right in day mode
-- ✅ Full ExploreDeck day mode integration
-- ✅ Trip invitation linking feature (new API endpoint)
-
-### Other Planned Features (6 phases remaining)
-
-**Phase 23 - Enhanced User Experience**
+**Phase 24 - Enhanced User Experience**
 - [ ] Trip templates and presets
 - [ ] Weather integration for trip dates
 - [ ] Photo uploads and galleries (user-uploaded photos)
@@ -497,34 +515,34 @@ _See completed phases section above for details._
 - [ ] Trip statistics and analytics
 - [ ] Activity photo uploads
 
-**Phase 24 - Advanced Collaboration**
+**Phase 25 - Advanced Collaboration**
 - [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-**Phase 25 - Mobile App Development**
+**Phase 26 - Mobile App Development**
 - [ ] Native iOS and Android app (Expo + React Native)
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 - See [mobile-roadmap.md](./mobile-roadmap.md) for detailed plan
 
-**Phase 26 - Web Mobile Optimization**
+**Phase 27 - Web Mobile Optimization**
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-**Phase 27 - Advanced Features**
+**Phase 28 - Advanced Features**
 - [ ] Budget tracking and alerts
 - [ ] Enhanced booking service integrations
 - [ ] Calendar sync (Google Calendar, iCal)
 - [ ] Export to various formats (CSV, JSON)
 - [ ] Flight search and booking (placeholder page exists)
 
-**Phase 28 - Performance & Scalability**
+**Phase 29 - Performance & Scalability**
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -536,20 +554,14 @@ _See completed phases section above for details._
 
 ### Immediate Priorities (Next 1-2 Months)
 
-1. **🚀 Phase 23: Enhanced User Experience**
+1. **🚀 Phase 24: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
    - Notes and journaling features
    - Trip statistics and analytics
 
-2. **Phase 23: Enhanced User Experience**
-   - Weather integration for trip dates
-   - Trip templates and presets
-   - User photo uploads
-   - Notes and journaling features
-
-3. **Polish & Bug Fixes**
+2. **Polish & Bug Fixes**
    - Fix any existing bugs
    - Improve error handling
    - Enhance user experience
@@ -557,7 +569,7 @@ _See completed phases section above for details._
 
 ### Short-term Goals (3-6 Months)
 
-1. **Phase 23: Enhanced User Experience**
+1. **Phase 24: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
@@ -565,12 +577,12 @@ _See completed phases section above for details._
    - Additional advanced filters for Pro tier (vibe, theme, accessibility) - Future
    - Travel stats and badges - Future
 
-2. **Phase 24: Advanced Collaboration**
+2. **Phase 25: Advanced Collaboration**
    - Member-to-member chat
    - Activity voting
    - Email invitations
 
-4. **Mobile App Planning**
+3. **Mobile App Planning**
    - Finalize mobile app architecture
    - Begin Phase 0 (backend hardening)
 
@@ -581,7 +593,7 @@ _See completed phases section above for details._
    - App Store and Play Store launch
 
 2. **Monetization**
-   - Implement free vs Pro tiers
+   - Implement free vs Pro tiers ✅ **DONE**
    - Travel affiliate revenue
    - See [monetization.md](./monetization.md) for strategy
 
@@ -589,6 +601,7 @@ _See completed phases section above for details._
    - Performance optimization
    - Infrastructure scaling
    - Marketing and user acquisition
+   - SEO optimization ✅ **DONE** (Phase 23)
 
 ---
 
@@ -1253,7 +1266,7 @@ For questions or issues:
 
 ## Summary
 
-**Kruno** is a feature-rich, AI-powered travel planning application that's approximately **77% complete**. The core functionality is working, including:
+**Kruno** is a feature-rich, AI-powered travel planning application that's approximately **79% complete**. The core functionality is working, including:
 
 - ✅ Trip management and collaboration
 - ✅ AI-powered itinerary generation
@@ -1294,6 +1307,16 @@ For questions or issues:
 - **NEW**: Billing system requires Stripe account and webhook configuration
 
 **Recent Additions (January 2025):**
+
+- **SEO & Programmatic Marketing** (Phase 23):
+  - ✅ Dynamic `robots.txt` and `sitemap.xml` via App Router routes
+  - ✅ SEO utility library (`lib/seo/`) with canonical URLs, metadata builder
+  - ✅ Bilingual marketing routes (`/en`, `/es`) with hreflang alternates
+  - ✅ Programmatic city and influencer pages with structured data (JSON-LD)
+  - ✅ Marketing i18n system (`lib/i18n/marketing.ts`) for bilingual copy
+  - ✅ StructuredData component for WebSite, Organization, TouristTrip, ProfilePage schemas
+  - ✅ Private routes blocked from indexing (`noindex`)
+  - ✅ Footer internal links fixed (removed `nofollow` and `href="#"`)
 
 - **Email System & Notifications**:
   - ✅ Complete email infrastructure with Resend integration
@@ -1360,12 +1383,13 @@ For questions or issues:
   - Limits: 10 swipes/trip (free), 100 (Pro); 5 changes/trip (free), unlimited (Pro); 5 search adds/trip (free), unlimited (Pro)
 
 **Next Steps:**
-1. **🚀 Phase 23: Enhanced User Experience** - Weather integration, trip templates, photo uploads
-2. Continue with remaining phases (23-27)
+1. **🚀 Phase 24: Enhanced User Experience** - Weather integration, trip templates, photo uploads
+2. Continue with remaining phases (24-29)
 3. Polish and bug fixes
 4. User testing and feedback
 5. Mobile app development
 6. ~~Monetization implementation~~ ✅ **COMPLETE** - Billing system fully implemented
+7. ~~SEO & Programmatic Marketing~~ ✅ **COMPLETE** - Phase 23 complete
 
 **Important Setup Notes:**
 - **Billing**: Requires Stripe account and webhook configuration. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` environment variables. Create products and prices in Stripe Dashboard and set price IDs in environment variables (`STRIPE_PRO_YEARLY_PRICE_ID`, `STRIPE_TRIP_PRO_PRICE_ID`). Configure webhook endpoint in Stripe Dashboard to listen for subscription events.
@@ -1373,10 +1397,10 @@ For questions or issues:
 - **Security**: All API routes now use centralized auth helpers. See [SECURITY.md](./SECURITY.md) for implementation details.
 - **Internationalization**: Language Provider and i18n utility are set up automatically. Translation keys are defined in `lib/i18n.ts`. Language preference is persisted in user settings.
 
-The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phases 17-21 are complete - Day-level Explore integration, multi-city trips, trip personalization, enhanced assistant, Travel Advisor, billing system, and image caching are fully functional.**
+The project is well-structured, documented, and ready for continued development. All critical information is documented in the referenced files. **Phases 17-23 are complete - Day-level Explore integration, multi-city trips, trip personalization, enhanced assistant, Travel Advisor, billing system, image caching, and SEO/programmatic marketing are fully functional.**
 
 ---
 
-**Last Updated**: January 2025  
-**Document Version**: 2.0 - Updated with billing setup, internationalization, and settings page
+**Last Updated**: January 2025 (Phase 23 SEO complete)  
+**Document Version**: 3.0 - Updated with SEO, bilingual marketing, and programmatic pages
 

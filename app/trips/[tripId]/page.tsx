@@ -6,6 +6,25 @@ import { Suspense } from "react";
 import { getProfileId } from "@/lib/auth/getProfileId";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo/metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ tripId: string }>;
+}): Promise<Metadata> {
+  const { tripId } = await params;
+  return buildMetadata({
+    title: "Trip – Kruno",
+    description: "View your trip itinerary and details in Kruno.",
+    path: `/trips/${tripId}`,
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
 
 export default async function TripDetailPage({
   params,

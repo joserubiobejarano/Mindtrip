@@ -9,8 +9,13 @@ import { NewCTASection } from "@/components/new-cta-section";
 import { NewNewsletterSection } from "@/components/new-newsletter-section";
 import { NewFooter } from "@/components/new-footer";
 import { type DestinationOption } from "@/hooks/use-create-trip";
+import { ExploreLinksSection } from "@/components/seo/ExploreLinksSection";
 
-export function HomePageClient() {
+export function HomePageClient({
+  showChrome = true,
+}: {
+  showChrome?: boolean;
+}) {
   const [destination, setDestination] = useState<DestinationOption | null>(null);
 
   const handleCityClick = async (cityName: string) => {
@@ -29,16 +34,25 @@ export function HomePageClient() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const content = (
+    <>
+      <NewHeroSection destination={destination} setDestination={setDestination} />
+      <NewWhyChooseSection />
+      <NewExperiencesSection onCityClick={handleCityClick} />
+      <ExploreLinksSection />
+      <NewCTASection />
+      <NewNewsletterSection />
+    </>
+  );
+
+  if (!showChrome) {
+    return content;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <NewNavbar />
-      <main>
-        <NewHeroSection destination={destination} setDestination={setDestination} />
-        <NewWhyChooseSection />
-        <NewExperiencesSection onCityClick={handleCityClick} />
-        <NewCTASection />
-        <NewNewsletterSection />
-      </main>
+      <main>{content}</main>
       <NewFooter />
     </div>
   );
