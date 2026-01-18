@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/components/providers/language-provider";
-import { Logo } from "@/components/ui/logo";
 
 export function NewFooter() {
   const { t } = useLanguage();
@@ -10,17 +9,7 @@ export function NewFooter() {
     <footer className="py-12 px-6" style={{ backgroundColor: 'hsl(var(--cream))' }}>
       <div className="max-w-6xl mx-auto">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          {/* Brand Column */}
-          <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo size="md" />
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              {t('footer_tagline')}
-            </p>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Explore Column */}
           <div>
             <h3 
@@ -39,10 +28,8 @@ export function NewFooter() {
             </h3>
             <ul className="space-y-2">
               <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_destinations')}</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_experiences')}</Link></li>
               <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_travel_guides')}</Link></li>
               <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_trip_planner')}</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_community')}</Link></li>
             </ul>
           </div>
 
@@ -64,10 +51,8 @@ export function NewFooter() {
             </h3>
             <ul className="space-y-2">
               <li><Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_about')}</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_careers')}</Link></li>
               <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_press')}</Link></li>
               <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_blog')}</Link></li>
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_partners')}</Link></li>
             </ul>
           </div>
 
@@ -88,10 +73,8 @@ export function NewFooter() {
               ></span>
             </h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_help')}</Link></li>
               <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_contact')}</Link></li>
               <li><Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_privacy')}</Link></li>
-              <li><Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_terms')}</Link></li>
               <li><Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground transition-colors" rel="nofollow">{t('footer_link_cookies')}</Link></li>
             </ul>
           </div>

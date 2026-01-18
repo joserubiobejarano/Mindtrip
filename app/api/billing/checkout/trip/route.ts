@@ -20,6 +20,23 @@ type ProfileQueryResult = {
   stripe_customer_id: string | null
 }
 
+type UtmPayload = {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+};
+
+const normalizeString = (value: unknown, maxLength: number) => {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > maxLength) return undefined;
+  return trimmed;
+};
+
+const buildMetadata = (entries: Record<string, string | undefined>) =>
+  Object.fromEntries(Object.entries(entries).filter(([, value]) => value !== undefined && value !== ''));
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -29,11 +46,24 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { tripId, returnUrl } = body;
+    const { tripId, returnUrl, couponCode: rawCouponCode, utm: rawUtm } = body as {
+      tripId?: string;
+      returnUrl?: string;
+      couponCode?: string;
+      utm?: UtmPayload;
+    };
 
     if (!tripId) {
       return NextResponse.json({ error: 'tripId is required' }, { status: 400 });
     }
+
+    const couponCode = normalizeString(rawCouponCode, 32);
+    const utm = {
+      utm_source: normalizeString(rawUtm?.utm_source, 100),
+      utm_medium: normalizeString(rawUtm?.utm_medium, 100),
+      utm_campaign: normalizeString(rawUtm?.utm_campaign, 100),
+      utm_content: normalizeString(rawUtm?.utm_content, 100),
+    };
 
     const supabase = await createClient();
 
@@ -148,6 +178,33 @@ export async function POST(req: NextRequest) {
     const successUrl = `${process.env.STRIPE_SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}&return_url=${encodeURIComponent(baseReturnUrl)}`;
     const cancelUrl = baseReturnUrl;
 
+    let discounts: Array<{ promotion_code: string }> | undefined;
+    if (couponCode) {
+      try {
+        const promotions = await stripe.promotionCodes.list({
+          code: couponCode,
+          active: true,
+          limit: 1,
+        });
+        const promotion = promotions.data[0];
+        if (promotion) {
+          discounts = [{ promotion_code: promotion.id }];
+        }
+      } catch (error) {
+        console.warn("Failed to lookup promotion code:", error);
+      }
+    }
+
+    const attributionMetadata = buildMetadata({
+      app: 'kruno',
+      user_id: userId,
+      coupon_code: couponCode,
+      utm_source: utm.utm_source,
+      utm_medium: utm.utm_medium,
+      utm_campaign: utm.utm_campaign,
+      utm_content: utm.utm_content,
+    });
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer: stripeCustomerId,
@@ -159,7 +216,10 @@ export async function POST(req: NextRequest) {
       ],
       success_url: successUrl,
       cancel_url: cancelUrl,
+      allow_promotion_codes: true,
+      discounts,
       metadata: {
+        ...attributionMetadata,
         kruno_checkout_type: 'trip_unlock',
         kruno_trip_id: tripId,
         kruno_user_id: userId,

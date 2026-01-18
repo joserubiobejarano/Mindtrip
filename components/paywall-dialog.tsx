@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
+import { getStoredCoupon } from "@/lib/attribution/client";
 
 interface PaywallDialogProps {
   open: boolean;
@@ -33,8 +34,14 @@ export function PaywallDialog({
   const handleSubscriptionCheckout = async () => {
     setIsLoadingSubscription(true);
     try {
+      const couponCode = getStoredCoupon();
+      const body = couponCode ? { couponCode } : {};
       const response = await fetch("/api/billing/checkout/subscription", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {

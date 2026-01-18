@@ -16,6 +16,12 @@ export interface Database {
           full_name: string | null
           avatar_url: string | null
           created_at: string
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          coupon_code: string | null
+          attribution_set_at: string | null
           welcome_email_sent_at: string | null
           pro_upgrade_email_sent_at: string | null
           subscription_canceled_email_sent_at: string | null
@@ -31,6 +37,12 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           created_at?: string
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          coupon_code?: string | null
+          attribution_set_at?: string | null
           welcome_email_sent_at?: string | null
           pro_upgrade_email_sent_at?: string | null
           subscription_canceled_email_sent_at?: string | null
@@ -46,6 +58,12 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           created_at?: string
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          coupon_code?: string | null
+          attribution_set_at?: string | null
           welcome_email_sent_at?: string | null
           pro_upgrade_email_sent_at?: string | null
           subscription_canceled_email_sent_at?: string | null

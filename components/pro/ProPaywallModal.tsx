@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useLanguage } from "@/components/providers/language-provider";
+import { getStoredCoupon } from "@/lib/attribution/client";
 
 export type ProPaywallModalProps = {
   open: boolean;
@@ -55,8 +56,14 @@ export function ProPaywallModal({
   const handleSubscriptionCheckout = async () => {
     setIsLoadingSubscription(true);
     try {
+      const couponCode = getStoredCoupon();
+      const body = couponCode ? { couponCode } : {};
       const response = await fetch("/api/billing/checkout/subscription", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {

@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useLanguage } from "@/components/providers/language-provider";
+import { getStoredCoupon } from "@/lib/attribution/client";
 
 export type PaywallModalProps = {
   open: boolean;
@@ -50,6 +51,7 @@ export function PaywallModal({
   const handleContinue = async () => {
     setIsLoading(true);
     const returnUrl = getReturnUrl();
+    const couponCode = getStoredCoupon();
 
     try {
       const response = await fetch("/api/billing/checkout/subscription", {
@@ -57,7 +59,7 @@ export function PaywallModal({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ returnUrl }),
+        body: JSON.stringify({ returnUrl, couponCode: couponCode || undefined }),
       });
 
       if (!response.ok) {

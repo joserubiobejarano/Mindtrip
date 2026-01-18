@@ -20,6 +20,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
 import { Sparkles, Check } from "lucide-react";
 import { NewNavbar } from "@/components/new-navbar";
+import { clearStoredCoupon, getStoredCoupon } from "@/lib/attribution/client";
 
 const CURRENCIES = [
   "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR", "MXN",
@@ -83,6 +84,12 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
   });
 
   const isPro = subscriptionStatus?.isPro || false;
+
+  useEffect(() => {
+    if (isPro) {
+      clearStoredCoupon();
+    }
+  }, [isPro]);
 
   // Update local state when profile loads
   useEffect(() => {
@@ -423,8 +430,13 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                           className="w-full"
                           onClick={async () => {
                             try {
+                                const couponCode = getStoredCoupon();
                               const response = await fetch("/api/billing/checkout/subscription", {
                                 method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                  },
+                                  body: JSON.stringify({ couponCode: couponCode || undefined }),
                               });
 
                               if (!response.ok) {
