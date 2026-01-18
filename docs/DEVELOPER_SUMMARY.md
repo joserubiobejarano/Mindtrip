@@ -294,7 +294,7 @@ kruno/
 
 ## What Has Been Done
 
-### ✅ Completed Phases (21 of 27)
+### ✅ Completed Phases (22 of 28)
 
 **Phase 1 - Project Setup & Foundation** ✅
 - Next.js 15 with App Router
@@ -433,13 +433,32 @@ kruno/
 - ✅ Helper functions in `lib/supabase/advisor-messages.ts`
 - ✅ Migration file: `database/migrations/supabase-add-advisor-messages.sql`
 
+**Phase 22 - Email System & Notifications** ✅ **COMPLETE** **NEW**
+- ✅ Complete email infrastructure with Resend integration
+- ✅ Email template system with 7 email types (`lib/email-copy.ts`)
+- ✅ Multi-language email support (English and Spanish) (`lib/email/language.ts`)
+- ✅ Email sending infrastructure (`lib/email/resend.ts`)
+- ✅ Welcome email (sent on user signup)
+- ✅ Trip ready email (sent when itinerary is generated)
+- ✅ Pro upgrade email (sent when user upgrades to Pro subscription)
+- ✅ Subscription canceled email (sent when user cancels Pro subscription)
+- ✅ Trip reminder email (sent 1 day before trip starts via cron job)
+- ✅ Trip invitation email (sent when inviting someone to a trip)
+- ✅ Expenses summary email (for expense tracking)
+- ✅ Cron job for trip reminders (`/api/cron/trip-reminders`)
+- ✅ Email integration with itinerary generation (smart-itinerary and ai-itinerary routes)
+- ✅ Email integration with billing webhook (Pro upgrade/cancellation emails)
+- ✅ Database tracking fields for email sent timestamps (idempotency)
+- ✅ Test endpoints for all email types (`/api/test/*`)
+- ✅ Migration file: `database/migrations/add-email-sent-fields.sql`
+
 ### 📊 Progress Summary
 
-- **Completed**: 21 phases (Phases 1-17, 18-21)
+- **Completed**: 22 phases (Phases 1-17, 18-22)
 - **In Progress**: None
-- **Planned**: 6 phases remaining (Phases 22-27)
-- **Completion**: ~78%
-- **Next Priority**: Phase 22 - Enhanced User Experience (templates, weather, photos)
+- **Planned**: 6 phases remaining (Phases 23-28)
+- **Completion**: ~79%
+- **Next Priority**: Phase 23 - Enhanced User Experience (templates, weather, photos)
 
 ---
 
@@ -447,7 +466,7 @@ kruno/
 
 ### 🚧 Planned Features (6 phases remaining)
 
-### 🆕 NEXT PRIORITY: Enhanced User Experience - Phase 22
+### 🆕 NEXT PRIORITY: Enhanced User Experience - Phase 23
 
 **Phase 15 - Explore Feature: Tinder-Style Place Discovery** ✅ **COMPLETE**
 _See completed phases section above for details._
@@ -470,7 +489,7 @@ _See completed phases section above for details._
 
 ### Other Planned Features (6 phases remaining)
 
-**Phase 21 - Enhanced User Experience**
+**Phase 23 - Enhanced User Experience**
 - [ ] Trip templates and presets
 - [ ] Weather integration for trip dates
 - [ ] Photo uploads and galleries (user-uploaded photos)
@@ -478,34 +497,34 @@ _See completed phases section above for details._
 - [ ] Trip statistics and analytics
 - [ ] Activity photo uploads
 
-**Phase 23 - Advanced Collaboration**
+**Phase 24 - Advanced Collaboration**
 - [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-**Phase 24 - Mobile App Development**
+**Phase 25 - Mobile App Development**
 - [ ] Native iOS and Android app (Expo + React Native)
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 - See [mobile-roadmap.md](./mobile-roadmap.md) for detailed plan
 
-**Phase 25 - Web Mobile Optimization**
+**Phase 26 - Web Mobile Optimization**
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-**Phase 26 - Advanced Features**
+**Phase 27 - Advanced Features**
 - [ ] Budget tracking and alerts
 - [ ] Enhanced booking service integrations
 - [ ] Calendar sync (Google Calendar, iCal)
 - [ ] Export to various formats (CSV, JSON)
 - [ ] Flight search and booking (placeholder page exists)
 
-**Phase 27 - Performance & Scalability**
+**Phase 28 - Performance & Scalability**
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -517,26 +536,20 @@ _See completed phases section above for details._
 
 ### Immediate Priorities (Next 1-2 Months)
 
-1. **🚀 Phase 21: Enhanced User Experience**
+1. **🚀 Phase 23: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
    - Notes and journaling features
    - Trip statistics and analytics
 
-2. **Phase 21: Enhanced User Experience**
+2. **Phase 23: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
    - Notes and journaling features
 
-3. **Phase 21: Enhanced User Experience**
-   - Weather integration for trip dates
-   - Trip templates and presets
-   - User photo uploads
-   - Notes and journaling features
-
-4. **Polish & Bug Fixes**
+3. **Polish & Bug Fixes**
    - Fix any existing bugs
    - Improve error handling
    - Enhance user experience
@@ -544,7 +557,7 @@ _See completed phases section above for details._
 
 ### Short-term Goals (3-6 Months)
 
-1. **Phase 21: Enhanced User Experience**
+1. **Phase 23: Enhanced User Experience**
    - Weather integration for trip dates
    - Trip templates and presets
    - User photo uploads
@@ -552,12 +565,7 @@ _See completed phases section above for details._
    - Additional advanced filters for Pro tier (vibe, theme, accessibility) - Future
    - Travel stats and badges - Future
 
-2. **Phase 21 - Enhanced User Experience**
-   - Weather integration
-   - Trip templates
-   - User photo uploads
-
-3. **Phase 22 - Advanced Collaboration**
+2. **Phase 24: Advanced Collaboration**
    - Member-to-member chat
    - Activity voting
    - Email invitations
@@ -619,6 +627,13 @@ STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 STRIPE_PRO_YEARLY_PRICE_ID=your_stripe_pro_yearly_price_id
 STRIPE_TRIP_PRO_PRICE_ID=your_stripe_trip_pro_price_id
 STRIPE_SUCCESS_URL=https://your-domain.com/settings/billing
+
+# Resend (Email)
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=no-reply@kruno.app
+
+# Cron Jobs
+CRON_SECRET=your_cron_secret
 ```
 
 ### Required API Keys
@@ -659,6 +674,17 @@ STRIPE_SUCCESS_URL=https://your-domain.com/settings/billing
    - Create products and prices in Stripe Dashboard:
      - Pro Yearly Subscription (price ID required in `STRIPE_PRO_YEARLY_PRICE_ID`)
      - Trip Pro Unlock (price ID required in `STRIPE_TRIP_PRO_PRICE_ID`)
+
+6. **Resend** (Required for email sending)
+   - Sign up at [resend.com](https://resend.com)
+   - Create API key (`RESEND_API_KEY`)
+   - Configure from address (`EMAIL_FROM`, default: `no-reply@kruno.app`)
+   - Verify domain for production use (optional for development)
+
+7. **Cron Jobs** (Optional for trip reminder emails)
+   - Set `CRON_SECRET` environment variable for cron job authentication
+   - Configure cron job to call `/api/cron/trip-reminders` daily
+   - Pass `x-cron-secret` header matching `CRON_SECRET` value
 
 ---
 
@@ -751,6 +777,11 @@ If migrations fail or are incomplete, these tables may need manual creation:
   - **`advisor_messages`** - ✅ **NEW** For Travel Advisor chat history (pre-trip planning) - Migration file: `database/migrations/supabase-add-advisor-messages.sql`
   - **`user_push_tokens`** - ✅ **NEW** For mobile push notifications - Migration file: `database/migrations/add-user-push-tokens-table.sql`
   - **`trip_regeneration_stats`** - ✅ **NEW** For tracking daily regeneration limits - Migration file: `database/migrations/supabase-add-regeneration-stats.sql`
+  - **Email tracking fields** - ✅ **NEW**:
+    - `profiles.pro_upgrade_email_sent_at` - Tracks Pro upgrade email - Migration: `add-email-sent-fields.sql`
+    - `profiles.subscription_canceled_email_sent_at` - Tracks cancellation email - Migration: `add-email-sent-fields.sql`
+    - `trips.trip_ready_email_sent_at` - Tracks trip ready email - Migration: `add-email-sent-fields.sql`
+    - `trips.trip_reminder_email_sent_at` - Tracks trip reminder email - Migration: `add-email-sent-fields.sql`
   - **Segment support columns** - ✅ **NEW**:
   - `days.trip_segment_id` - Migration: `supabase-add-segment-id-to-days.sql`
   - `smart_itineraries.trip_segment_id` - Migration: `supabase-add-trip-segment-to-itineraries.sql`
@@ -1264,6 +1295,18 @@ For questions or issues:
 
 **Recent Additions (January 2025):**
 
+- **Email System & Notifications**:
+  - ✅ Complete email infrastructure with Resend integration
+  - ✅ Email template system with 7 email types (`lib/email-copy.ts`)
+  - ✅ Multi-language email support (English and Spanish) (`lib/email/language.ts`)
+  - ✅ Email sending infrastructure (`lib/email/resend.ts`)
+  - ✅ Cron job for trip reminder emails (`/api/cron/trip-reminders`)
+  - ✅ Email integration with itinerary generation (trip ready email)
+  - ✅ Email integration with billing webhook (Pro upgrade/cancellation emails)
+  - ✅ Database tracking fields for email sent timestamps (idempotency)
+  - ✅ Test endpoints for all email types (`/api/test/*`)
+  - ✅ Migration: `database/migrations/add-email-sent-fields.sql`
+
 - **UI Components & Infrastructure**:
   - ✅ **App Header Component** (`components/app-header.tsx`) - Unified header with Logo, navigation, sign in/up buttons, settings link
   - ✅ **Logo Component** (`components/ui/logo.tsx`) - Reusable Logo component with "Kruno" branding
@@ -1317,7 +1360,7 @@ For questions or issues:
   - Limits: 10 swipes/trip (free), 100 (Pro); 5 changes/trip (free), unlimited (Pro); 5 search adds/trip (free), unlimited (Pro)
 
 **Next Steps:**
-1. **🚀 Phase 22: Enhanced User Experience** - Weather integration, trip templates, photo uploads
+1. **🚀 Phase 23: Enhanced User Experience** - Weather integration, trip templates, photo uploads
 2. Continue with remaining phases (23-27)
 3. Polish and bug fixes
 4. User testing and feedback

@@ -13,6 +13,8 @@ import { Webhook } from 'svix';
 import { createClient } from '@/lib/supabase/server';
 import { sendWelcomeEmail } from '@/lib/email/resend';
 import { randomUUID } from 'crypto';
+import { clerkClient } from '@clerk/nextjs/server';
+import { normalizeEmailLanguage } from '@/lib/email/language';
 
 // Disable body parsing for webhook - we need raw body for signature verification
 export const runtime = 'nodejs';
@@ -261,10 +263,24 @@ export async function POST(req: NextRequest) {
 
       // Send welcome email
       try {
+        let language = 'en' as const;
+        try {
+          const client = await clerkClient();
+          const user = await client.users.getUser(clerkUserId);
+          language = normalizeEmailLanguage(
+            (user.publicMetadata as { locale?: string } | undefined)?.locale || null
+          );
+        } catch (languageError: any) {
+          console.warn('[Clerk Webhook] Failed to resolve language preference from Clerk:', {
+            message: languageError.message,
+          });
+        }
+
         console.log(`[Clerk Webhook] Sending welcome email to ${primaryEmail} for clerk_user_id: ${clerkUserId}`);
         await sendWelcomeEmail({
           to: primaryEmail,
           firstName: firstName || null,
+          language,
         });
 
         const now = new Date().toISOString();

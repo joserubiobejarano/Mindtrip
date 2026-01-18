@@ -12,8 +12,103 @@ import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 import type { Language } from '@/lib/i18n';
 import { findPhotoRefForActivity } from '@/lib/google/places-backfill';
 import { cachePlaceImageWithDetails } from '@/lib/images/cache-place-image';
+import { clerkClient } from '@clerk/nextjs/server';
+import { sendTripReadyEmail } from '@/lib/email/resend';
+import { getFirstNameFromFullName, normalizeEmailLanguage } from '@/lib/email/language';
 
 export const maxDuration = 300;
+
+async function resolveRecipientFromProfile(profile: {
+  clerk_user_id: string | null;
+  email: string;
+  full_name: string | null;
+}) {
+  if (profile.clerk_user_id) {
+    try {
+      const client = await clerkClient();
+      const user = await client.users.getUser(profile.clerk_user_id);
+      return {
+        email: user.primaryEmailAddress?.emailAddress || profile.email,
+        firstName: user.firstName || getFirstNameFromFullName(user.fullName) || getFirstNameFromFullName(profile.full_name),
+        language: normalizeEmailLanguage(
+          (user.publicMetadata as { locale?: string } | undefined)?.locale || null
+        ),
+      };
+    } catch (error) {
+      console.warn('[smart-itinerary] Failed to load Clerk user for email details:', error);
+    }
+  }
+
+  return {
+    email: profile.email,
+    firstName: getFirstNameFromFullName(profile.full_name),
+    language: 'en' as const,
+  };
+}
+
+async function trySendTripReadyEmail(params: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  tripId: string;
+}) {
+  const { data: trip, error: tripError } = await params.supabase
+    .from('trips')
+    .select('id, title, destination_city, destination_name, owner_id, trip_ready_email_sent_at')
+    .eq('id', params.tripId)
+    .maybeSingle();
+
+  if (tripError || !trip) {
+    console.error('[smart-itinerary] Failed to load trip for trip ready email:', tripError);
+    return;
+  }
+
+  if (trip.trip_ready_email_sent_at) {
+    return;
+  }
+
+  const { data: profile, error: profileError } = await params.supabase
+    .from('profiles')
+    .select('id, email, full_name, clerk_user_id')
+    .eq('id', trip.owner_id)
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    console.error('[smart-itinerary] Failed to load owner profile for trip ready email:', profileError);
+    return;
+  }
+
+  const recipient = await resolveRecipientFromProfile(profile as {
+    clerk_user_id: string | null;
+    email: string;
+    full_name: string | null;
+  });
+
+  if (!recipient.email) {
+    console.warn('[smart-itinerary] Missing recipient email for trip ready email.');
+    return;
+  }
+
+  const tripCity = trip.destination_city || trip.destination_name || trip.title;
+  const appUrl = process.env.APP_URL || 'https://kruno.app';
+  const tripUrl = `${appUrl}/trips/${params.tripId}`;
+
+  await sendTripReadyEmail({
+    userEmail: recipient.email,
+    firstName: recipient.firstName,
+    tripName: trip.title,
+    tripCity,
+    tripUrl,
+    language: recipient.language,
+  });
+
+  const { error: updateError } = await params.supabase
+    .from('trips')
+    .update({ trip_ready_email_sent_at: new Date().toISOString() })
+    .eq('id', params.tripId);
+
+  if (updateError) {
+    console.error('[smart-itinerary] Failed to update trip_ready_email_sent_at:', updateError);
+  }
+}
 
 /**
  * Helper to extract complete JSON objects from streaming text
@@ -1435,6 +1530,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   sendSSE(controller, 'error', { message: 'Failed to save itinerary' });
                 } else {
                   console.log('[smart-itinerary] saved itinerary row for trip', tripId);
+
+                  try {
+                    await trySendTripReadyEmail({
+                      supabase,
+                      tripId: tripId as string,
+                    });
+                  } catch (emailError) {
+                    console.error('[smart-itinerary] Failed to send trip ready email:', emailError);
+                  }
                   
                   // Increment regeneration counter (only after successful save)
                   await (supabase
@@ -1576,6 +1680,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 );
               
               if (!saveError) {
+                try {
+                  await trySendTripReadyEmail({
+                    supabase,
+                    tripId: tripId as string,
+                  });
+                } catch (emailError) {
+                  console.error('[smart-itinerary] Failed to send trip ready email:', emailError);
+                }
+
                 // Increment regeneration counter (only after successful save)
                 await (supabase
                   .from('trip_regeneration_stats') as any)

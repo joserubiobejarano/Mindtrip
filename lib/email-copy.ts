@@ -7,6 +7,29 @@ type WelcomeParams = {
   appName?: string;
 };
 
+type TripReadyParams = {
+  firstName?: string | null;
+  tripName: string;
+  tripCity: string;
+  tripUrl: string;
+};
+
+type ProUpgradeParams = {
+  firstName?: string | null;
+  billingUrl: string;
+};
+
+type SubscriptionCanceledParams = {
+  firstName?: string | null;
+};
+
+type TripReminderParams = {
+  firstName?: string | null;
+  tripCity: string;
+  tripStartDate: string;
+  tripUrl: string;
+};
+
 type TripInviteParams = {
   tripName: string;
   inviterName: string;
@@ -32,6 +55,26 @@ export function getEmailCopy(
   params: WelcomeParams
 ): EmailCopyResult;
 export function getEmailCopy(
+  template: 'trip_ready',
+  language: EmailLanguage,
+  params: TripReadyParams
+): EmailCopyResult;
+export function getEmailCopy(
+  template: 'pro_upgrade',
+  language: EmailLanguage,
+  params: ProUpgradeParams
+): EmailCopyResult;
+export function getEmailCopy(
+  template: 'subscription_canceled',
+  language: EmailLanguage,
+  params: SubscriptionCanceledParams
+): EmailCopyResult;
+export function getEmailCopy(
+  template: 'trip_reminder',
+  language: EmailLanguage,
+  params: TripReminderParams
+): EmailCopyResult;
+export function getEmailCopy(
   template: 'trip_invite',
   language: EmailLanguage,
   params: TripInviteParams
@@ -42,15 +85,37 @@ export function getEmailCopy(
   params: ExpensesSummaryParams
 ): EmailCopyResult;
 export function getEmailCopy(
-  template: 'welcome' | 'trip_invite' | 'expenses_summary',
+  template:
+    | 'welcome'
+    | 'trip_ready'
+    | 'pro_upgrade'
+    | 'subscription_canceled'
+    | 'trip_reminder'
+    | 'trip_invite'
+    | 'expenses_summary',
   language: EmailLanguage,
-  params: WelcomeParams | TripInviteParams | ExpensesSummaryParams
+  params:
+    | WelcomeParams
+    | TripReadyParams
+    | ProUpgradeParams
+    | SubscriptionCanceledParams
+    | TripReminderParams
+    | TripInviteParams
+    | ExpensesSummaryParams
 ): EmailCopyResult {
   const lang = language || 'en';
 
   switch (template) {
     case 'welcome':
       return getWelcomeCopy(lang, params as WelcomeParams);
+    case 'trip_ready':
+      return getTripReadyCopy(lang, params as TripReadyParams);
+    case 'pro_upgrade':
+      return getProUpgradeCopy(lang, params as ProUpgradeParams);
+    case 'subscription_canceled':
+      return getSubscriptionCanceledCopy(lang, params as SubscriptionCanceledParams);
+    case 'trip_reminder':
+      return getTripReminderCopy(lang, params as TripReminderParams);
     case 'trip_invite':
       return getTripInviteCopy(lang, params as TripInviteParams);
     case 'expenses_summary':
@@ -58,16 +123,17 @@ export function getEmailCopy(
   }
 }
 
+function buildGreeting(language: EmailLanguage, firstName?: string | null): string {
+  if (firstName) {
+    return language === 'es' ? `Hola ${firstName},` : `Hey ${firstName},`;
+  }
+
+  return language === 'es' ? 'Hola,' : 'Hey there,';
+}
+
 function getWelcomeCopy(language: EmailLanguage, params: WelcomeParams): EmailCopyResult {
   const appName = params.appName || 'Kruno';
-  const firstName = params.firstName || null;
-  const greeting = firstName
-    ? language === 'es'
-      ? `Hola ${firstName},`
-      : `Hey ${firstName},`
-    : language === 'es'
-    ? 'Hola,'
-    : 'Hey there,';
+  const greeting = buildGreeting(language, params.firstName);
 
   if (language === 'es') {
     return {
@@ -79,7 +145,7 @@ Bienvenido a Kruno! Estamos emocionados de ayudarte a planificar tu próxima ave
 Con Kruno, puedes enfocarte en lo que más importa: disfrutar de tu viaje. Nosotros nos encargamos de la planificación, para que puedas vivir la experiencia.
 
 Comienza creando tu primer itinerario en:
-${process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://kruno.app'}
+${process.env.APP_URL || 'https://kruno.app'}
 
 ¡Felices viajes!
 
@@ -97,12 +163,163 @@ Welcome to Kruno! We're excited to help you plan your next adventure with less s
 With Kruno, you can focus on what matters most: enjoying your trip. We handle the planning, so you can experience the journey.
 
 Get started by creating your first itinerary at:
-${process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://kruno.app'}
+${process.env.APP_URL || 'https://kruno.app'}
 
 Happy travels!
 
 Jose
 Founder, Kruno`,
+  };
+}
+
+function getTripReadyCopy(language: EmailLanguage, params: TripReadyParams): EmailCopyResult {
+  const greeting = buildGreeting(language, params.firstName);
+  const { tripCity, tripUrl } = params;
+
+  if (language === 'es') {
+    return {
+      subject: `Tu viaje a ${tripCity} ya está listo ✈️`,
+      text: `${greeting}
+
+Tu viaje a ${tripCity} ya está listo!
+
+Hemos preparado un itinerario claro con qué ver, cómo moverte y consejos prácticos para que disfrutes el viaje sin complicaciones.
+
+Puedes ver tu itinerario aquí:
+${tripUrl}
+
+¡Buen viaje!
+Jose
+Fundador de Kruno`,
+    };
+  }
+
+  return {
+    subject: `Your trip to ${tripCity} is ready ✈️`,
+    text: `${greeting}
+
+Your trip to ${tripCity} is ready.
+
+We've put together a clear itinerary with what to see, how to move around, and practical tips to help you enjoy the trip with less stress.
+
+You can view your itinerary here:
+${tripUrl}
+
+Have a great trip,
+Jose
+Founder of Kruno`,
+  };
+}
+
+function getProUpgradeCopy(language: EmailLanguage, params: ProUpgradeParams): EmailCopyResult {
+  const greeting = buildGreeting(language, params.firstName);
+
+  if (language === 'es') {
+    return {
+      subject: 'Ahora eres un viajero Pro 🎉',
+      text: `${greeting}
+
+Te confirmamos tu suscripción a Kruno Pro.
+
+Ahora puedes crear y gestionar todos los viajes que quieras y aprovechar al máximo la planificación.
+
+Puedes gestionar tu suscripción aquí:
+${params.billingUrl}
+
+Gracias por confiar en nosotros,
+Jose
+Fundador de Kruno`,
+    };
+  }
+
+  return {
+    subject: "You're now a Pro Traveller 🎉",
+    text: `${greeting}
+
+Your upgrade to Kruno Pro is confirmed.
+
+You can now create and manage as many trips as you like and make the most out of your travel planning.
+
+You can manage your subscription here:
+${params.billingUrl}
+
+Thanks for supporting us,
+Jose
+Founder of Kruno`,
+  };
+}
+
+function getSubscriptionCanceledCopy(
+  language: EmailLanguage,
+  params: SubscriptionCanceledParams
+): EmailCopyResult {
+  const greeting = buildGreeting(language, params.firstName);
+
+  if (language === 'es') {
+    return {
+      subject: 'Tu suscripción a Kruno Pro ha sido cancelada',
+      text: `${greeting}
+
+Este correo confirma que tu suscripción a Kruno Pro ha sido cancelada.
+
+Seguirás teniendo acceso a las funciones Pro hasta el final de tu periodo de facturación actual.
+
+Si algún día decides volver, seguiremos aquí.
+
+Gracias por probar la app,
+Jose
+Fundador de Kruno`,
+    };
+  }
+
+  return {
+    subject: 'Your Kruno Pro subscription has been canceled',
+    text: `${greeting}
+
+This email confirms that your Kruno Pro subscription has been canceled.
+
+You'll continue to have access to Pro features until the end of your current billing period.
+
+If you ever decide to come back, Kruno will be here.
+
+Thanks for trying the app,
+Jose
+Founder of Kruno`,
+  };
+}
+
+function getTripReminderCopy(language: EmailLanguage, params: TripReminderParams): EmailCopyResult {
+  const greeting = buildGreeting(language, params.firstName);
+  const { tripCity, tripUrl } = params;
+
+  if (language === 'es') {
+    return {
+      subject: `Tu viaje a ${tripCity} empieza mañana ✈️`,
+      text: `${greeting}
+
+Te recordamos que tu viaje a ${tripCity} empieza mañana.
+
+Aquí tienes tu itinerario por si quieres echarle un vistazo antes de salir:
+${tripUrl}
+
+¡Que tengas un viaje increíble!
+Jose
+Fundador de Kruno`,
+    };
+  }
+
+  return {
+    subject: `Your trip to ${tripCity} starts tomorrow ✈️`,
+    text: `${greeting}
+
+Just a quick reminder that your trip to ${tripCity} starts tomorrow.
+
+Here's your itinerary in case you want to take a look before you go:
+${tripUrl}
+
+Have an amazing trip
+Jose
+Founder of Kruno`,
   };
 }
 

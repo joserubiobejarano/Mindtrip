@@ -5,6 +5,9 @@ import { findPlacePhoto, getCityFromLatLng, isLandmark } from '@/lib/google/plac
 import { resolvePlacePhotoSrc } from '@/lib/placePhotos' // Import resolvePlacePhotoSrc
 import { getSmartItinerary, upsertSmartItinerary } from '@/lib/supabase/smart-itineraries-server'
 import type { TripSegment } from '@/types/trip-segments'
+import { clerkClient } from '@clerk/nextjs/server'
+import { sendTripReadyEmail } from '@/lib/email/resend'
+import { getFirstNameFromFullName, normalizeEmailLanguage } from '@/lib/email/language'
 
 interface TripDetails {
   title: string;
@@ -15,6 +18,92 @@ interface TripDetails {
   destination_name: string | null;
   destination_country: string | null;
   destination_city: string | null;
+  owner_id: string;
+  trip_ready_email_sent_at: string | null;
+}
+
+async function resolveRecipientFromProfile(profile: {
+  clerk_user_id: string | null;
+  email: string;
+  full_name: string | null;
+}) {
+  if (profile.clerk_user_id) {
+    try {
+      const client = await clerkClient();
+      const user = await client.users.getUser(profile.clerk_user_id);
+      return {
+        email: user.primaryEmailAddress?.emailAddress || profile.email,
+        firstName: user.firstName || getFirstNameFromFullName(user.fullName) || getFirstNameFromFullName(profile.full_name),
+        language: normalizeEmailLanguage(
+          (user.publicMetadata as { locale?: string } | undefined)?.locale || null
+        ),
+      };
+    } catch (error) {
+      console.warn('[ai-itinerary] Failed to load Clerk user for email details:', error);
+    }
+  }
+
+  return {
+    email: profile.email,
+    firstName: getFirstNameFromFullName(profile.full_name),
+    language: 'en' as const,
+  };
+}
+
+async function trySendTripReadyEmail(params: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  tripId: string;
+  tripTitle: string;
+  tripCity: string;
+  ownerProfileId: string;
+  tripReadyEmailSentAt: string | null;
+}) {
+  if (params.tripReadyEmailSentAt) {
+    return;
+  }
+
+  const { data: profile, error: profileError } = await params.supabase
+    .from('profiles')
+    .select('id, email, full_name, clerk_user_id')
+    .eq('id', params.ownerProfileId)
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    console.error('[ai-itinerary] Failed to load owner profile for trip ready email:', profileError);
+    return;
+  }
+
+  const recipient = await resolveRecipientFromProfile(profile as {
+    clerk_user_id: string | null;
+    email: string;
+    full_name: string | null;
+  });
+
+  if (!recipient.email) {
+    console.warn('[ai-itinerary] Missing recipient email for trip ready email.');
+    return;
+  }
+
+  const appUrl = process.env.APP_URL || 'https://kruno.app';
+  const tripUrl = `${appUrl}/trips/${params.tripId}`;
+
+  await sendTripReadyEmail({
+    userEmail: recipient.email,
+    firstName: recipient.firstName,
+    tripName: params.tripTitle,
+    tripCity: params.tripCity,
+    tripUrl,
+    language: recipient.language,
+  });
+
+  const { error: updateError } = await params.supabase
+    .from('trips')
+    .update({ trip_ready_email_sent_at: new Date().toISOString() })
+    .eq('id', params.tripId);
+
+  if (updateError) {
+    console.error('[ai-itinerary] Failed to update trip_ready_email_sent_at:', updateError);
+  }
 }
 
 /**
@@ -141,7 +230,7 @@ export async function POST(request: NextRequest) {
     // Load trip data
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country, destination_city')
+      .select('title, start_date, end_date, center_lat, center_lng, destination_name, destination_country, destination_city, owner_id, trip_ready_email_sent_at')
       .eq('id', tripId)
       .single<{
         title: string;
@@ -152,6 +241,8 @@ export async function POST(request: NextRequest) {
         destination_name: string | null;
         destination_country: string | null;
         destination_city: string | null;
+        owner_id: string;
+        trip_ready_email_sent_at: string | null;
       }>()
 
     if (tripError || !trip) {
@@ -941,6 +1032,24 @@ function sanitizeNoMdash<T>(input: T): T {
       
       if (insertError) {
         console.error("Error inserting generated activities:", insertError);
+      }
+    }
+
+    if (!saveError) {
+      const tripCity =
+        trip.destination_city || trip.destination_name || trip.title;
+
+      try {
+        await trySendTripReadyEmail({
+          supabase,
+          tripId,
+          tripTitle: trip.title,
+          tripCity,
+          ownerProfileId: trip.owner_id,
+          tripReadyEmailSentAt: trip.trip_ready_email_sent_at,
+        });
+      } catch (emailError) {
+        console.error('[ai-itinerary] Failed to send trip ready email:', emailError);
       }
     }
 

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
+import { clerkClient } from '@clerk/nextjs/server';
+import {
+  sendProUpgradeEmail,
+  sendSubscriptionCanceledEmail,
+} from '@/lib/email/resend';
+import { getFirstNameFromFullName, normalizeEmailLanguage } from '@/lib/email/language';
 
 // Disable body parsing for webhook - we need raw body for signature verification
 export const runtime = 'nodejs';
@@ -39,6 +45,119 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createClient();
+
+    type ProfileEmailInfo = {
+      id: string;
+      email: string;
+      full_name: string | null;
+      clerk_user_id: string | null;
+      pro_upgrade_email_sent_at: string | null;
+      subscription_canceled_email_sent_at: string | null;
+    };
+
+    async function loadProfileByCustomerId(customerId: string) {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, clerk_user_id, pro_upgrade_email_sent_at, subscription_canceled_email_sent_at')
+        .eq('stripe_customer_id', customerId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile by stripe_customer_id:', error);
+        return null;
+      }
+
+      return profile as ProfileEmailInfo | null;
+    }
+
+    async function loadClerkEmailDetails(clerkUserId: string | null) {
+      if (!clerkUserId) return null;
+      try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(clerkUserId);
+        return {
+          email: user.primaryEmailAddress?.emailAddress || null,
+          firstName: user.firstName || getFirstNameFromFullName(user.fullName),
+          locale: (user.publicMetadata as { locale?: string } | undefined)?.locale || null,
+        };
+      } catch (error) {
+        console.warn('Failed to load Clerk user for email details:', error);
+        return null;
+      }
+    }
+
+    async function sendProUpgradeIfNeeded(customerId: string) {
+      const profile = await loadProfileByCustomerId(customerId);
+      if (!profile) return;
+
+      if (profile.pro_upgrade_email_sent_at) {
+        console.log(`Pro upgrade email already sent for customer ${customerId}`);
+        return;
+      }
+
+      const clerkDetails = await loadClerkEmailDetails(profile.clerk_user_id);
+      const language = normalizeEmailLanguage(clerkDetails?.locale);
+      const firstName = clerkDetails?.firstName || getFirstNameFromFullName(profile.full_name);
+      const userEmail = clerkDetails?.email || profile.email;
+      const appUrl = process.env.APP_URL ?? 'https://kruno.app';
+      const billingUrl = `${appUrl}/settings/billing`;
+
+      if (!userEmail) {
+        console.warn(`No email available for customer ${customerId}. Skipping pro upgrade email.`);
+        return;
+      }
+
+      await sendProUpgradeEmail({
+        userEmail,
+        firstName,
+        billingUrl,
+        language,
+      });
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ pro_upgrade_email_sent_at: new Date().toISOString() })
+        .eq('id', profile.id);
+
+      if (updateError) {
+        console.error('Error updating pro_upgrade_email_sent_at:', updateError);
+      }
+    }
+
+    async function sendSubscriptionCanceledIfNeeded(customerId: string) {
+      const profile = await loadProfileByCustomerId(customerId);
+      if (!profile) return;
+
+      if (profile.subscription_canceled_email_sent_at) {
+        console.log(`Subscription canceled email already sent for customer ${customerId}`);
+        return;
+      }
+
+      const clerkDetails = await loadClerkEmailDetails(profile.clerk_user_id);
+      const language = normalizeEmailLanguage(clerkDetails?.locale);
+      const firstName = clerkDetails?.firstName || getFirstNameFromFullName(profile.full_name);
+      const userEmail = clerkDetails?.email || profile.email;
+
+      if (!userEmail) {
+        console.warn(`No email available for customer ${customerId}. Skipping cancellation email.`);
+        return;
+      }
+
+      await sendSubscriptionCanceledEmail({
+        userEmail,
+        firstName,
+        language,
+      });
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ subscription_canceled_email_sent_at: new Date().toISOString() })
+        .eq('id', profile.id);
+
+      if (updateError) {
+        console.error('Error updating subscription_canceled_email_sent_at:', updateError);
+      }
+    }
 
     // Handle different event types
     switch (event.type) {
@@ -86,6 +205,14 @@ export async function POST(req: NextRequest) {
           console.log(`Trip ${tripId} unlocked for user ${userId}`);
         }
         // For subscription checkouts, the customer.subscription.* events will handle is_pro
+        if (session.mode === 'subscription' && session.customer) {
+          const customerId = session.customer as string;
+          try {
+            await sendProUpgradeIfNeeded(customerId);
+          } catch (error) {
+            console.error('Error sending pro upgrade email from checkout.session.completed:', error);
+          }
+        }
         break;
       }
 
@@ -110,6 +237,13 @@ export async function POST(req: NextRequest) {
         }
 
         console.log(`Updated profile is_pro=${isPro} for customer ${customerId}`);
+        if (event.type === 'customer.subscription.created' && isPro) {
+          try {
+            await sendProUpgradeIfNeeded(customerId);
+          } catch (error) {
+            console.error('Error sending pro upgrade email from subscription.created:', error);
+          }
+        }
         break;
       }
 
@@ -129,6 +263,11 @@ export async function POST(req: NextRequest) {
         }
 
         console.log(`Set profile is_pro=false for customer ${customerId}`);
+        try {
+          await sendSubscriptionCanceledIfNeeded(customerId);
+        } catch (error) {
+          console.error('Error sending subscription canceled email:', error);
+        }
         break;
       }
 

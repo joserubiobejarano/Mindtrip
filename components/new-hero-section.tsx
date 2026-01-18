@@ -99,12 +99,44 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
     chatInputRef.current?.focus();
   };
 
+  const applyDestinationFromText = (destinationText: string) => {
+    setDestinationInput(destinationText);
+    // Note: User will need to select from autocomplete dropdown for proper placeId
+    // Clear any previously selected destination since we're using text input
+    setSelectedDestination(null);
+    // Create a basic destination object from the input
+    const foundDestination: DestinationOption = {
+      id: `city-${destinationText.toLowerCase().replace(/\s+/g, '-')}`,
+      placeName: destinationText,
+      region: "",
+      type: "City",
+      center: [0, 0],
+    };
+    setDestination(foundDestination);
+  };
+
+  const extractDestinationFromMessage = (message: string) => {
+    const match = message.match(/\b(?:to|in|for)\s+([A-Za-z][A-Za-z\s'-]*)(?:\b|$)/i);
+    if (!match) return "";
+    const rawDestination = match[1].trim();
+    if (!rawDestination) return "";
+    const stopWords = ["from", "on", "at", "next", "this", "during", "with", "for", "to", "in", "and"];
+    const parts = rawDestination.split(/\s+/);
+    const trimmedParts = [];
+    for (const part of parts) {
+      if (stopWords.includes(part.toLowerCase())) break;
+      trimmedParts.push(part);
+    }
+    return trimmedParts.join(" ").replace(/[.,!?;:]+$/, "");
+  };
+
 
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim() || parsingIntent) return;
 
     const message = chatInput.trim();
+    const localDestination = extractDestinationFromMessage(message);
     setChatInput("");
     setIntentError(null);
     setParsingIntent(true);
@@ -147,19 +179,9 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
       // Auto-fill destination if available
       if (hasDestination) {
-        setDestinationInput(data.destination);
-        // Note: User will need to select from autocomplete dropdown for proper placeId
-        // Clear any previously selected destination since we're using text input
-        setSelectedDestination(null);
-        // Create a basic destination object from the input
-        const foundDestination: DestinationOption = {
-          id: `city-${data.destination.toLowerCase().replace(/\s+/g, '-')}`,
-          placeName: data.destination,
-          region: "",
-          type: "City",
-          center: [0, 0],
-        };
-        setDestination(foundDestination);
+        applyDestinationFromText(data.destination);
+      } else if (localDestination) {
+        applyDestinationFromText(localDestination);
       } else {
         setIntentError(t('home_hero_error_no_destination'));
         setParsingIntent(false);

@@ -207,7 +207,7 @@ This document tracks the development progress of the Kruno travel planning appli
 
 ## 🚧 In Progress
 
-**Phase 17 - Explore Feature: Day-Level Integration & Advanced Filters** ✅ **COMPLETE**
+_No features currently in progress. All planned features have been completed._
 - ✅ Backend API endpoints fully implemented
 - ✅ Day-level filtering and bulk add working
 - ✅ Pro tier filters (budget, maxDistance) implemented
@@ -365,6 +365,28 @@ _See "Recently Completed" section above for full details. All features have been
 - [x] Transport guidance for multi-city and regional trips
 - [x] Trip creation suggestion after helpful exchanges
 
+### Phase 22 - Email System & Notifications ✅ **NEW**
+- [x] Email infrastructure with Resend integration (`lib/email/resend.ts`)
+- [x] Email template system (`lib/email-copy.ts`) with 7 email types
+- [x] Multi-language email support (English and Spanish) (`lib/email/language.ts`)
+- [x] Welcome email (sent on user signup)
+- [x] Trip ready email (sent when itinerary is generated)
+- [x] Pro upgrade email (sent when user upgrades to Pro subscription)
+- [x] Subscription canceled email (sent when user cancels Pro subscription)
+- [x] Trip reminder email (sent 1 day before trip starts via cron job)
+- [x] Trip invitation email (sent when inviting someone to a trip)
+- [x] Expenses summary email (for expense tracking)
+- [x] Database tracking fields for email sent timestamps:
+  - `profiles.pro_upgrade_email_sent_at` - Tracks Pro upgrade email
+  - `profiles.subscription_canceled_email_sent_at` - Tracks cancellation email
+  - `trips.trip_ready_email_sent_at` - Tracks trip ready email
+  - `trips.trip_reminder_email_sent_at` - Tracks trip reminder email
+- [x] Cron job for trip reminders (`/api/cron/trip-reminders`)
+- [x] Email integration with itinerary generation (smart-itinerary and ai-itinerary routes)
+- [x] Email integration with billing webhook (Pro upgrade and cancellation)
+- [x] Test endpoints for all email types (`/api/test/*`)
+- [x] Idempotency checking (prevents duplicate emails)
+
 **Future Enhancements (Not in Phase 17):**
 - [ ] AI suggestions for specific day/time slot
 - [ ] Additional advanced filters for Explore (Pro tier):
@@ -377,7 +399,7 @@ _See "Recently Completed" section above for full details. All features have been
 - [ ] Offline mode for Explore (Pro tier)
 - [ ] Priority itinerary generation (Pro tier)
 
-### Phase 22 - Enhanced User Experience
+### Phase 23 - Enhanced User Experience
 - [ ] Trip templates and presets
 - [ ] Weather integration for trip dates
 - [ ] Photo uploads and galleries (user-uploaded photos)
@@ -385,34 +407,34 @@ _See "Recently Completed" section above for full details. All features have been
 - [ ] Trip statistics and analytics
 - [ ] Activity photo uploads
 
-### Phase 23 - Advanced Collaboration
+### Phase 24 - Advanced Collaboration
 - [ ] Real-time chat for trip members (member-to-member chat, not AI)
 - [ ] Activity voting/polling system
 - [ ] Comment threads on activities
 - [ ] Notification system
 - [ ] Email invitations for trip members
 
-### Phase 24 - Mobile App Development
+### Phase 25 - Mobile App Development
 - [ ] Native iOS and Android app (see [mobile-roadmap.md](./mobile-roadmap.md))
 - [ ] Expo React Native implementation
 - [ ] Offline mode support
 - [ ] Push notifications
 - [ ] Deep linking
 
-### Phase 25 - Web Mobile Optimization
+### Phase 26 - Web Mobile Optimization
 - [ ] Responsive design improvements
 - [ ] Mobile-first itinerary view
 - [ ] Offline mode support
 - [ ] Progressive Web App (PWA) features
 
-### Phase 26 - Advanced Features
+### Phase 27 - Advanced Features
 - [ ] Budget tracking and alerts
 - [ ] Enhanced booking service integrations (beyond Booking.com links)
 - [ ] Calendar sync (Google Calendar, iCal)
 - [ ] Export to various formats (CSV, JSON - PDF already implemented)
 - [ ] Flight search and booking (placeholder page exists)
 
-### Phase 27 - Performance & Scalability
+### Phase 28 - Performance & Scalability
 - [ ] Image optimization and CDN
 - [ ] Database query optimization
 - [ ] Caching strategies
@@ -489,6 +511,11 @@ For later implementation phases:
     - `profiles.welcome_email_sent_at` - Tracks welcome email sending - Migration: `add-welcome-email-sent-at-to-profiles.sql`
   - **Activity image support** - ✅ **IMPLEMENTED**:
     - `activities.image_url` - Stores image URL for activities - Migration: `add-image-url-to-activities.sql`
+  - **Email tracking fields** - ✅ **IMPLEMENTED**:
+    - `profiles.pro_upgrade_email_sent_at` - Tracks Pro upgrade email sending - Migration: `add-email-sent-fields.sql`
+    - `profiles.subscription_canceled_email_sent_at` - Tracks cancellation email sending - Migration: `add-email-sent-fields.sql`
+    - `trips.trip_ready_email_sent_at` - Tracks trip ready email sending - Migration: `add-email-sent-fields.sql`
+    - `trips.trip_reminder_email_sent_at` - Tracks trip reminder email sending - Migration: `add-email-sent-fields.sql`
 - Two itinerary systems are supported:
   - Legacy: `/api/ai-itinerary` - returns AiItinerary format (simpler structure)
   - New: `/api/trips/[tripId]/smart-itinerary` - returns SmartItinerary format (structured with slots, area clusters, trip tips)
@@ -654,6 +681,21 @@ For later implementation phases:
   - Updates `trips.has_trip_pro` for trip unlocks
   - Location: `app/api/billing/webhook/route.ts`
   - **Webhook Configuration Required**: Configure endpoint in Stripe Dashboard to listen for subscription events
+
+### Email System ✅ NEW
+- `POST /api/cron/trip-reminders` - Cron job endpoint for sending trip reminder emails
+  - Requires `x-cron-secret` header matching `CRON_SECRET` environment variable
+  - Sends reminder emails to trip owners 1 day before trip start date
+  - Only sends to trips with generated smart itineraries
+  - Updates `trip_reminder_email_sent_at` timestamp
+  - Returns: `{ ok: boolean, sent: number }`
+  - Location: `app/api/cron/trip-reminders/route.ts`
+- Test endpoints for email functionality (`/api/test/*`):
+  - `POST /api/test/welcome-email` - Test welcome email
+  - `POST /api/test/trip-ready-email` - Test trip ready email
+  - `POST /api/test/pro-upgrade-email` - Test Pro upgrade email
+  - `POST /api/test/subscription-canceled-email` - Test subscription canceled email
+  - `POST /api/test/trip-reminder-email` - Test trip reminder email
 
 ### Image Caching ✅ NEW
 - `POST /api/images/cache-place-image` - Cache a place image in Supabase Storage
@@ -822,6 +864,21 @@ For later implementation phases:
     - ✅ Improved food place detection using Google Places types
     - ✅ Better photo matching with saved places
     - ✅ Enhanced food place filtering logic
+
+- **2025-01-XX**: Phase 22 Complete - Email System & Notifications ✅
+  - **Phase 22 Complete**: Complete email infrastructure with Resend integration
+    - ✅ Email template system with 7 email types (welcome, trip ready, Pro upgrade, subscription canceled, trip reminder, trip invite, expenses summary)
+    - ✅ Multi-language email support (English and Spanish)
+    - ✅ Email sending infrastructure using Resend API (`lib/email/resend.ts`)
+    - ✅ Email copy management (`lib/email-copy.ts`)
+    - ✅ Language normalization and first name extraction (`lib/email/language.ts`)
+    - ✅ Cron job for trip reminder emails (`/api/cron/trip-reminders`)
+    - ✅ Email integration with itinerary generation (sends trip ready email)
+    - ✅ Email integration with billing webhook (sends Pro upgrade/cancellation emails)
+    - ✅ Database tracking fields for email sent timestamps
+    - ✅ Idempotency checking to prevent duplicate emails
+    - ✅ Test endpoints for all email types (`/api/test/*`)
+    - ✅ Migration file: `database/migrations/add-email-sent-fields.sql`
 
 - **2025-01-XX**: Phase 21 Complete - Travel Advisor (Pre-Trip Planning) ✅
   - **Phase 21 Complete**: Travel Advisor feature for pre-trip planning

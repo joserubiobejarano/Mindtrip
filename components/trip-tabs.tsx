@@ -53,8 +53,8 @@ export function TripTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
-      {/* Tabs - Hidden on mobile when on explore tab for full-screen experience */}
-      <div className={`flex items-center justify-end p-4 ${activeTab === 'explore' ? 'hidden lg:flex' : ''}`}>
+      {/* Tabs */}
+      <div className="flex items-center justify-end p-4">
         <div className="bg-white rounded-full p-1.5 shadow-lg flex gap-1">
           {tabs.map((tab) => {
             const isActive = tab.slug === activeTab;

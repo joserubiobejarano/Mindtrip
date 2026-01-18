@@ -22,6 +22,8 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_server_side
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 STRIPE_SECRET_KEY=your_stripe_secret_key
 STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+RESEND_API_KEY=your_resend_api_key
+CRON_SECRET=your_cron_secret
 OPENAI_API_KEY=your_openai_api_key
 ```
 
@@ -30,6 +32,8 @@ OPENAI_API_KEY=your_openai_api_key
 - `GOOGLE_MAPS_API_KEY` is used for server-side API routes only (never exposed to client)
 - `SUPABASE_SERVICE_ROLE_KEY` is **REQUIRED** for image caching in Supabase Storage (never exposed to client)
 - `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are required for billing/subscription features
+- `RESEND_API_KEY` is required for email sending (welcome, trip ready, Pro upgrade, etc.)
+- `CRON_SECRET` is required for cron job authentication (trip reminder emails)
 - `OPENAI_API_KEY` is required for AI features (itinerary generation, Trip Assistant, Travel Advisor)
 - **Restart your dev server** after changing environment variables
 
@@ -218,6 +222,16 @@ npm run dev
 - Integration with homepage search (routes to advisor for travel queries)
 - Database table `advisor_messages` for chat history
 
+### Phase 22 - Email System & Notifications ✅ **NEW**
+- Complete email infrastructure with Resend integration
+- Email template system with 7 email types (welcome, trip ready, Pro upgrade, subscription canceled, trip reminder, trip invite, expenses summary)
+- Multi-language email support (English and Spanish)
+- Automated trip reminder emails via cron job (1 day before trip start)
+- Email integration with itinerary generation (trip ready email)
+- Email integration with billing webhook (Pro upgrade/cancellation emails)
+- Database tracking fields for email sent timestamps (idempotency)
+- Test endpoints for all email types
+
 ## 📁 Project Structure
 
 ```
@@ -295,11 +309,13 @@ kruno/
    - `saved_places`, `trip_chat_messages`, `smart_itineraries` tables
    - `explore_sessions`, `trip_segments`, `advisor_messages` tables
    - `trip_regeneration_stats` table
+   - Email tracking fields (`add-email-sent-fields.sql`)
    - Trip Pro fields, usage limits, subscription status, etc.
 8. Enable Realtime for required tables
 9. Create `place-images` bucket in Supabase Storage (PUBLIC) for image caching (optional, see [images.md](./images.md))
-10. Install dependencies: `npm install`
-11. Start developing!
+10. Set up cron job for trip reminders (optional, requires `CRON_SECRET` environment variable)
+11. Install dependencies: `npm install`
+12. Start developing!
 
 ## 📊 Current Status
 
@@ -307,6 +323,17 @@ kruno/
 **Phase 21:** ✅ Complete - Travel Advisor (Pre-Trip Planning) fully implemented
 
 **Recent Updates (January 2025):**
+
+- ✅ **Email System & Notifications** - **NEW**
+  - ✅ Complete email infrastructure with Resend integration
+  - ✅ Email template system with 7 email types (welcome, trip ready, Pro upgrade, subscription canceled, trip reminder, trip invite, expenses summary)
+  - ✅ Multi-language email support (English and Spanish)
+  - ✅ Cron job for trip reminder emails (`/api/cron/trip-reminders`)
+  - ✅ Email integration with itinerary generation (trip ready email)
+  - ✅ Email integration with billing webhook (Pro upgrade/cancellation emails)
+  - ✅ Database tracking fields for email sent timestamps (idempotency)
+  - ✅ Test endpoints for all email types (`/api/test/*`)
+  - ✅ Migration file: `database/migrations/add-email-sent-fields.sql`
 
 - ✅ **UI Components & Infrastructure** - **NEW**
   - ✅ **App Header Component** (`components/app-header.tsx`) - Unified header with Logo, navigation, and user controls

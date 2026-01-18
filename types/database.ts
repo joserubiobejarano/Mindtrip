@@ -17,6 +17,8 @@ export interface Database {
           avatar_url: string | null
           created_at: string
           welcome_email_sent_at: string | null
+          pro_upgrade_email_sent_at: string | null
+          subscription_canceled_email_sent_at: string | null
           clerk_user_id: string | null
           is_pro: boolean
           default_currency: string
@@ -30,6 +32,8 @@ export interface Database {
           avatar_url?: string | null
           created_at?: string
           welcome_email_sent_at?: string | null
+          pro_upgrade_email_sent_at?: string | null
+          subscription_canceled_email_sent_at?: string | null
           clerk_user_id?: string | null
           is_pro?: boolean
           default_currency?: string
@@ -43,6 +47,8 @@ export interface Database {
           avatar_url?: string | null
           created_at?: string
           welcome_email_sent_at?: string | null
+          pro_upgrade_email_sent_at?: string | null
+          subscription_canceled_email_sent_at?: string | null
           clerk_user_id?: string | null
           is_pro?: boolean
           default_currency?: string
@@ -71,6 +77,8 @@ export interface Database {
           destination_city: string | null
           destination_place_id: string | null
           created_at: string
+          trip_ready_email_sent_at: string | null
+          trip_reminder_email_sent_at: string | null
         }
         Insert: {
           id?: string
@@ -92,6 +100,8 @@ export interface Database {
           destination_city?: string | null
           destination_place_id?: string | null
           created_at?: string
+          trip_ready_email_sent_at?: string | null
+          trip_reminder_email_sent_at?: string | null
         }
         Update: {
           id?: string
@@ -113,6 +123,8 @@ export interface Database {
           destination_city?: string | null
           destination_place_id?: string | null
           created_at?: string
+          trip_ready_email_sent_at?: string | null
+          trip_reminder_email_sent_at?: string | null
         }
       }
       trip_members: {

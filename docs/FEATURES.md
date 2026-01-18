@@ -618,6 +618,125 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 
 ---
 
+## Email System & Notifications ✅ **NEW** (January 2025)
+
+### Email Infrastructure
+
+**Overview:**
+Complete email system using Resend API for transactional and notification emails. Supports multiple languages (English and Spanish) and prevents duplicate emails through idempotency tracking.
+
+**Components:**
+- **Email Template System** (`lib/email-copy.ts`):
+  - Centralized email copy management
+  - 7 email types with multi-language support
+  - Type-safe email parameters
+- **Email Sending Infrastructure** (`lib/email/resend.ts`):
+  - Resend API integration
+  - Email sending functions for all email types
+  - Unified email configuration (from address, reply-to, unsubscribe headers)
+- **Language Support** (`lib/email/language.ts`):
+  - Email language normalization (English/Spanish)
+  - First name extraction from full names
+  - Integration with Clerk user metadata
+
+### Email Types
+
+**1. Welcome Email**
+- Sent on user signup
+- Personalized greeting with user's first name
+- Introduction to Kruno features
+- Call-to-action to create first trip
+
+**2. Trip Ready Email**
+- Sent when itinerary is generated (smart-itinerary or ai-itinerary routes)
+- Includes trip city name and link to view itinerary
+- Only sent once per trip (tracked via `trip_ready_email_sent_at`)
+- Automatically triggered after successful itinerary generation
+
+**3. Pro Upgrade Email**
+- Sent when user upgrades to Pro subscription
+- Confirmed via Stripe webhook (`customer.subscription.updated` event)
+- Includes billing portal link for subscription management
+- Only sent once per upgrade (tracked via `pro_upgrade_email_sent_at`)
+
+**4. Subscription Canceled Email**
+- Sent when user cancels Pro subscription
+- Confirmed via Stripe webhook (`customer.subscription.deleted` event)
+- Information about continued access until end of billing period
+- Only sent once per cancellation (tracked via `subscription_canceled_email_sent_at`)
+
+**5. Trip Reminder Email**
+- Sent 1 day before trip start date
+- Automated via cron job (`/api/cron/trip-reminders`)
+- Only sent for trips with generated smart itineraries
+- Includes trip city and link to view itinerary
+- Only sent once per trip (tracked via `trip_reminder_email_sent_at`)
+
+**6. Trip Invitation Email**
+- Sent when inviting someone to a trip
+- Includes trip name, inviter name, and invitation link
+- Supports deep linking for mobile app (`kruno://link?invitedTripId=...`)
+- HTML email with styled buttons for better UX
+- Triggered via trip member invitation API
+
+**7. Expenses Summary Email**
+- Sent for expense tracking and balances
+- Includes trip name, total expenses, and balance summary
+- Shows who owes money and who is owed money
+- Useful for group trip expense management
+
+### Automated Notifications
+
+**Cron Job for Trip Reminders:**
+- Endpoint: `POST /api/cron/trip-reminders`
+- Requires `x-cron-secret` header for security
+- Runs daily to find trips starting tomorrow
+- Only sends to trips with generated smart itineraries
+- Updates `trip_reminder_email_sent_at` timestamp after sending
+
+**Integration Points:**
+- **Itinerary Generation**: Automatically sends trip ready email after itinerary generation
+- **Billing Webhook**: Automatically sends Pro upgrade/cancellation emails on subscription changes
+- **Trip Invitations**: Sends invitation email when adding trip members
+
+### Database Tracking
+
+**Email Sent Timestamps:**
+- `profiles.pro_upgrade_email_sent_at` - Tracks Pro upgrade email
+- `profiles.subscription_canceled_email_sent_at` - Tracks cancellation email
+- `trips.trip_ready_email_sent_at` - Tracks trip ready email
+- `trips.trip_reminder_email_sent_at` - Tracks trip reminder email
+
+**Idempotency:**
+- Email sent timestamps prevent duplicate emails
+- Each email type checks if email was already sent before sending
+- Ensures users receive each email only once
+
+### Test Endpoints
+
+Test endpoints available for all email types (`/api/test/*`):
+- `POST /api/test/welcome-email` - Test welcome email
+- `POST /api/test/trip-ready-email` - Test trip ready email
+- `POST /api/test/pro-upgrade-email` - Test Pro upgrade email
+- `POST /api/test/subscription-canceled-email` - Test subscription canceled email
+- `POST /api/test/trip-reminder-email` - Test trip reminder email
+
+### Migration File
+
+**Database Migration:**
+- `database/migrations/add-email-sent-fields.sql`
+- Adds email tracking fields to `profiles` and `trips` tables
+
+### Environment Variables
+
+**Required:**
+- `RESEND_API_KEY` - Resend API key for email sending
+- `EMAIL_FROM` - Email from address (default: `no-reply@kruno.app`)
+- `APP_URL` or `NEXT_PUBLIC_APP_URL` - App URL for email links
+- `CRON_SECRET` - Secret for cron job authentication
+
+---
+
 ## Future Features
 
 ### Enhanced User Experience
@@ -824,6 +943,21 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 - ✅ **Activity Replace Feature** - Smart replacement with context-aware suggestions and usage limits
 - ✅ **AI Itinerary Enhancements** - Segment support and food place limits
 
+**Phase 22: Email System & Notifications - COMPLETE** ✅
+- ✅ Complete email infrastructure with Resend integration
+- ✅ Email template system with 7 email types (welcome, trip ready, Pro upgrade, subscription canceled, trip reminder, trip invite, expenses summary)
+- ✅ Multi-language email support (English and Spanish)
+- ✅ Email sending infrastructure (`lib/email/resend.ts`)
+- ✅ Email copy management (`lib/email-copy.ts`)
+- ✅ Language normalization (`lib/email/language.ts`)
+- ✅ Cron job for trip reminder emails (`/api/cron/trip-reminders`)
+- ✅ Email integration with itinerary generation
+- ✅ Email integration with billing webhook
+- ✅ Database tracking fields for email sent timestamps
+- ✅ Idempotency checking to prevent duplicate emails
+- ✅ Test endpoints for all email types (`/api/test/*`)
+- ✅ Migration file: `database/migrations/add-email-sent-fields.sql`
+
 **Phase 21: Travel Advisor (Pre-Trip Planning) - COMPLETE** ✅
 - ✅ Travel Advisor page (`/advisor`) with chat interface
 - ✅ API endpoint (`/api/advisor`) with GET and POST methods
@@ -908,7 +1042,7 @@ The Travel Advisor is a pre-trip planning assistant that helps users explore des
 
 ### 🚧 In Development
 
-**Future Enhancements (Post-Phase 17)**
+**Future Enhancements (Post-Phase 22)**
 - Additional advanced filters (vibe, theme, accessibility) for Pro tier
 - Multi-city Explore support
 - Travel stats and badges system
@@ -1020,6 +1154,21 @@ Comprehensive security architecture with centralized auth helpers, input validat
 
 ## Recent Changes Summary (January 2025)
 
+### Email System & Notifications ✅ **NEW**
+**Complete Email Infrastructure:**
+- ✅ Email template system with 7 email types (`lib/email-copy.ts`)
+- ✅ Multi-language email support (English and Spanish) (`lib/email/language.ts`)
+- ✅ Resend integration for email delivery (`lib/email/resend.ts`)
+- ✅ Email types: Welcome, Trip Ready, Pro Upgrade, Subscription Canceled, Trip Reminder, Trip Invite, Expenses Summary
+- ✅ Cron job for trip reminder emails (`/api/cron/trip-reminders`)
+- ✅ Email integration with itinerary generation (smart-itinerary and ai-itinerary routes)
+- ✅ Email integration with billing webhook (Pro upgrade and cancellation)
+- ✅ Database tracking fields for email sent timestamps (idempotency)
+- ✅ Test endpoints for all email types (`/api/test/*`)
+- ✅ Migration: `database/migrations/add-email-sent-fields.sql`
+
+### Added
+
 ### UI Components & Infrastructure ✅ **NEW**
 
 **App Header Component** (`components/app-header.tsx`):
@@ -1067,6 +1216,7 @@ Comprehensive security architecture with centralized auth helpers, input validat
 - Place details fetching with comprehensive field support
 
 ### Added
+- **Email System & Notifications**: Complete email infrastructure with Resend
 - **Billing & Subscriptions System**: Complete Stripe integration
 - **Image Caching System**: Production-proof image storage in Supabase Storage
 - **Trip Regeneration Stats**: Daily regeneration limit tracking
