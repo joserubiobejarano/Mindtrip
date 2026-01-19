@@ -178,23 +178,6 @@ export async function POST(req: NextRequest) {
     const successUrl = `${process.env.STRIPE_SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}&return_url=${encodeURIComponent(baseReturnUrl)}`;
     const cancelUrl = baseReturnUrl;
 
-    let discounts: Array<{ promotion_code: string }> | undefined;
-    if (couponCode) {
-      try {
-        const promotions = await stripe.promotionCodes.list({
-          code: couponCode,
-          active: true,
-          limit: 1,
-        });
-        const promotion = promotions.data[0];
-        if (promotion) {
-          discounts = [{ promotion_code: promotion.id }];
-        }
-      } catch (error) {
-        console.warn("Failed to lookup promotion code:", error);
-      }
-    }
-
     const attributionMetadata = buildMetadata({
       app: 'kruno',
       user_id: userId,
@@ -205,7 +188,7 @@ export async function POST(req: NextRequest) {
       utm_content: utm.utm_content,
     });
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       mode: 'payment',
       customer: stripeCustomerId,
       line_items: [
@@ -216,15 +199,36 @@ export async function POST(req: NextRequest) {
       ],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      allow_promotion_codes: true,
-      discounts,
       metadata: {
         ...attributionMetadata,
         kruno_checkout_type: 'trip_unlock',
         kruno_trip_id: tripId,
         kruno_user_id: userId,
       },
-    });
+    };
+
+    if (couponCode) {
+      try {
+        const promotions = await stripe.promotionCodes.list({
+          code: couponCode,
+          active: true,
+          limit: 1,
+        });
+        const promotion = promotions.data[0];
+        if (promotion) {
+          sessionParams.discounts = [{ promotion_code: promotion.id }];
+        } else {
+          sessionParams.allow_promotion_codes = true;
+        }
+      } catch (error) {
+        console.warn('Failed to lookup promotion code:', error);
+        sessionParams.allow_promotion_codes = true;
+      }
+    } else {
+      sessionParams.allow_promotion_codes = true;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
