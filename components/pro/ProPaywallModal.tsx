@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import { Loader2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useLanguage } from "@/components/providers/language-provider";
 import { getStoredCoupon } from "@/lib/attribution/client";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 export type ProPaywallModalProps = {
   open: boolean;
@@ -48,10 +49,21 @@ export function ProPaywallModal({
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
   const { addToast } = useToast();
   const { t } = useLanguage();
+  const wasOpenRef = useRef(false);
 
   const subtitle = context && CONTEXT_KEYS[context]
     ? t(CONTEXT_KEYS[context] as any)
     : t("paywall_default_subtitle");
+
+  useEffect(() => {
+    if (open && !wasOpenRef.current) {
+      trackUmamiEvent("upgrade_clicked", {
+        source: "pro_paywall_modal",
+        context,
+      });
+    }
+    wasOpenRef.current = open;
+  }, [open, context]);
 
   const handleSubscriptionCheckout = async () => {
     setIsLoadingSubscription(true);
@@ -73,6 +85,7 @@ export function ProPaywallModal({
 
       const { url } = await response.json();
       if (url) {
+        trackUmamiEvent("checkout_started", { source: "pro_paywall_modal", context });
         window.location.href = url;
       }
     } catch (error: any) {

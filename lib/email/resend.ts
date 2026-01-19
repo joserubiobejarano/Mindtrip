@@ -35,6 +35,7 @@ export async function sendWelcomeEmail(params: {
     from,
     to: params.to,
     subject: emailCopy.subject,
+    html: emailCopy.html,
     text: emailCopy.text,
     replyTo: "hello@kruno.app",
     headers: {
@@ -100,6 +101,7 @@ export async function sendExpensesSummaryEmail(params: {
     from,
     to: params.to,
     subject: emailCopy.subject,
+    html: emailCopy.html,
     text: emailCopy.text,
     replyTo: "hello@kruno.app",
     headers: {
@@ -131,6 +133,7 @@ export async function sendTripReadyEmail(params: {
     from,
     to: params.userEmail,
     subject: emailCopy.subject,
+    html: emailCopy.html,
     text: emailCopy.text,
     replyTo: "hello@kruno.app",
     headers: {
@@ -158,6 +161,7 @@ export async function sendProUpgradeEmail(params: {
     from,
     to: params.userEmail,
     subject: emailCopy.subject,
+    html: emailCopy.html,
     text: emailCopy.text,
     replyTo: "hello@kruno.app",
     headers: {
@@ -183,6 +187,7 @@ export async function sendSubscriptionCanceledEmail(params: {
     from,
     to: params.userEmail,
     subject: emailCopy.subject,
+    html: emailCopy.html,
     text: emailCopy.text,
     replyTo: "hello@kruno.app",
     headers: {
@@ -272,6 +277,7 @@ export async function sendNewsletterUnsubscribedEmail(params: {
     from,
     to: params.email,
     subject: emailCopy.subject,
+    html: emailCopy.html,
     text: emailCopy.text,
     replyTo,
     headers: {
@@ -303,6 +309,7 @@ export async function sendTripReminderEmail(params: {
     from,
     to: params.userEmail,
     subject: emailCopy.subject,
+    html: emailCopy.html,
     text: emailCopy.text,
     replyTo: "hello@kruno.app",
     headers: {

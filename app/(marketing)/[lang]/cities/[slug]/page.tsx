@@ -13,6 +13,17 @@ import {
   SUPPORTED_LOCALES,
 } from "@/lib/seo/urls";
 import { getMarketingCopy } from "@/lib/i18n/marketing";
+import { getItineraryCopy } from "@/lib/i18n/itinerary";
+import { getCityItinerary } from "@/lib/itinerary/city-itineraries";
+import { ItineraryHero } from "@/components/itinerary/Hero";
+import { QuickFacts } from "@/components/itinerary/QuickFacts";
+import { DayOverviewTable } from "@/components/itinerary/DayOverviewTable";
+import { DayBlock } from "@/components/itinerary/DayBlock";
+import { LogisticsTable } from "@/components/itinerary/LogisticsTable";
+import { Checklist } from "@/components/itinerary/Checklist";
+import { FAQAccordion } from "@/components/itinerary/FAQAccordion";
+import { RelatedItineraries } from "@/components/itinerary/RelatedItineraries";
+import { PrimaryCTA } from "@/components/itinerary/PrimaryCTA";
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.flatMap((lang) =>
@@ -79,6 +90,8 @@ export default async function LocalizedCityItineraryPage({
   }
 
   const copy = getMarketingCopy(lang);
+  const itineraryCopy = getItineraryCopy(lang);
+  const itinerary = getCityItinerary(lang, slug);
   const siteUrl = getSiteUrl();
   const basePath = getLocalizedPath("", lang);
   const itineraryLabel =
@@ -127,56 +140,170 @@ export default async function LocalizedCityItineraryPage({
     },
   ];
 
-  return (
-    <div className="max-w-5xl mx-auto px-6 py-16 space-y-10">
-      <StructuredData data={structuredData} id={`kruno-city-ld-${lang}`} />
-      <div className="space-y-4">
-        <div className="text-sm uppercase tracking-wide text-muted-foreground">
-          {city.country}
+  if (!itinerary) {
+    return (
+      <div className="max-w-5xl mx-auto px-6 py-16 space-y-10">
+        <StructuredData data={structuredData} id={`kruno-city-ld-${lang}`} />
+        <div className="space-y-4">
+          <div className="text-sm uppercase tracking-wide text-muted-foreground">
+            {city.country}
+          </div>
+          <h1 className="text-4xl font-bold">{itineraryLabel}</h1>
+          <p className="text-lg text-muted-foreground">{city.description}</p>
         </div>
-        <h1 className="text-4xl font-bold">{itineraryLabel}</h1>
-        <p className="text-lg text-muted-foreground">{city.description}</p>
-      </div>
-      <div>
-        <h2 className="text-2xl font-semibold">{copy.cityDetailHighlightsTitle}</h2>
-        <ul className="mt-4 grid gap-3 md:grid-cols-2">
-          {city.highlights.map((highlight) => (
-            <li key={highlight} className="rounded-xl border border-border/40 p-4">
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="rounded-2xl border border-border/40 p-6 bg-background">
-        <h3 className="text-xl font-semibold">{copy.cityDetailPlanTitle}</h3>
-        <p className="mt-2 text-muted-foreground">{copy.cityDetailPlanBody}</p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link
-            href={basePath || "/"}
-            className="inline-flex items-center rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground"
-          >
-            {copy.cityDetailPlanCta}
-          </Link>
-          <Link
-            href={`${basePath}/cities`}
-            className="inline-flex items-center rounded-full border border-border px-6 py-2 text-sm font-medium"
-          >
-            {copy.cityDetailBrowseAll}
-          </Link>
-        </div>
-      </div>
-      <div>
-        <h3 className="text-xl font-semibold">{copy.cityDetailExploreMore}</h3>
-        <div className="mt-4 flex flex-wrap gap-3">
-          {cityPages
-            .filter((other) => other.slug !== city.slug)
-            .map((other) => (
-              <Link key={other.slug} href={`${basePath}/cities/${other.slug}`} className="text-sm text-primary">
-                {other.name}
-              </Link>
+        <div>
+          <h2 className="text-2xl font-semibold">{copy.cityDetailHighlightsTitle}</h2>
+          <ul className="mt-4 grid gap-3 md:grid-cols-2">
+            {city.highlights.map((highlight) => (
+              <li key={highlight} className="rounded-xl border border-border/40 p-4">
+                {highlight}
+              </li>
             ))}
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-border/40 p-6 bg-background">
+          <h3 className="text-xl font-semibold">{copy.cityDetailPlanTitle}</h3>
+          <p className="mt-2 text-muted-foreground">{copy.cityDetailPlanBody}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href={basePath || "/"}
+              className="inline-flex items-center rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground"
+            >
+              {copy.cityDetailPlanCta}
+            </Link>
+            <Link
+              href={`${basePath}/cities`}
+              className="inline-flex items-center rounded-full border border-border px-6 py-2 text-sm font-medium"
+            >
+              {copy.cityDetailBrowseAll}
+            </Link>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold">{copy.cityDetailExploreMore}</h3>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {cityPages
+              .filter((other) => other.slug !== city.slug)
+              .map((other) => (
+                <Link
+                  key={other.slug}
+                  href={`${basePath}/cities/${other.slug}`}
+                  className="text-sm text-primary"
+                >
+                  {other.name}
+                </Link>
+              ))}
+          </div>
         </div>
       </div>
+    );
+  }
+
+  const localizedPrimaryCtaHref = getLocalizedPath(itinerary.primaryCtaHref, lang);
+  const localizedSecondaryCtaHref = itinerary.secondaryCtaHref
+    ? getLocalizedPath(itinerary.secondaryCtaHref, lang)
+    : undefined;
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: itinerary.faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto px-6 py-16 space-y-12">
+      <StructuredData data={[...structuredData, faqStructuredData]} id={`kruno-city-ld-${lang}`} />
+      <ItineraryHero
+        eyebrow={itinerary.hero.eyebrow ?? itineraryCopy.heroEyebrowLabel}
+        title={itinerary.hero.title}
+        subtitle={itinerary.hero.subtitle}
+      />
+      <QuickFacts
+        title={itineraryCopy.quickFactsTitle}
+        labels={itineraryCopy.quickFactsLabels}
+        duration={`${itinerary.days} ${
+          itinerary.days === 1 ? itineraryCopy.dayUnit.singular : itineraryCopy.dayUnit.plural
+        }`}
+        pace={itinerary.pace}
+        idealFor={itinerary.idealFor}
+        style={itinerary.style}
+      />
+      <section className="rounded-2xl border border-border/60 bg-background p-6 space-y-4">
+        <h2 className="text-2xl font-semibold">{itineraryCopy.fitTitle}</h2>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              {itineraryCopy.fitGoodLabel}
+            </h3>
+            <ul className="mt-3 space-y-2 text-sm">
+              {itinerary.fit.forYou.map((item) => (
+                <li key={item} className="rounded-lg border border-border/50 px-3 py-2">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              {itineraryCopy.fitNotLabel}
+            </h3>
+            <ul className="mt-3 space-y-2 text-sm">
+              {itinerary.fit.notForYou.map((item) => (
+                <li key={item} className="rounded-lg border border-border/50 px-3 py-2">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+      <DayOverviewTable
+        title={itineraryCopy.dayOverviewTitle}
+        labels={itineraryCopy.dayOverviewTable}
+        plans={itinerary.dayPlans}
+      />
+      <section className="space-y-5">
+        <h2 className="text-2xl font-semibold">{itineraryCopy.dayBreakdownTitle}</h2>
+        <div className="space-y-5">
+          {itinerary.dayPlans.map((plan) => (
+            <DayBlock key={plan.day} plan={plan} labels={itineraryCopy.dayBlockLabels} />
+          ))}
+        </div>
+      </section>
+      <LogisticsTable title={itineraryCopy.logisticsTitle} items={itinerary.logistics} />
+      <Checklist
+        title={itineraryCopy.checklistTitle}
+        subtitle={itineraryCopy.checklistSubtitle}
+        items={itinerary.checklist}
+      />
+      <FAQAccordion title={itineraryCopy.faqTitle} items={itinerary.faqs} />
+      <RelatedItineraries
+        title={itineraryCopy.relatedTitle}
+        items={itinerary.relatedItineraries}
+        basePath={basePath}
+        dayUnit={itineraryCopy.dayUnit}
+      />
+      <PrimaryCTA
+        title={itineraryCopy.primaryCtaTitle}
+        body={itineraryCopy.primaryCtaBody}
+        buttonText={itineraryCopy.primaryCtaButton}
+        href={localizedPrimaryCtaHref}
+      />
+      {localizedSecondaryCtaHref ? (
+        <PrimaryCTA
+          title={itineraryCopy.secondaryCtaTitle}
+          body={itineraryCopy.secondaryCtaBody}
+          buttonText={itineraryCopy.secondaryCtaButton}
+          href={localizedSecondaryCtaHref}
+          variant="secondary"
+        />
+      ) : null}
     </div>
   );
 }

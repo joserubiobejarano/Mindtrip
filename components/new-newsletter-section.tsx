@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Mail, Send, Star } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/components/providers/language-provider";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 export function NewNewsletterSection() {
   const [email, setEmail] = useState("");
@@ -40,6 +41,10 @@ export function NewNewsletterSection() {
 
       setStatus(data?.status === "subscribed" ? "subscribed" : "pending");
       setEmail("");
+      trackUmamiEvent("newsletter_subscribed", {
+        source: "homepage_form",
+        status: data?.status,
+      });
     } catch (error) {
       console.error("Newsletter subscription error:", error);
       setStatus("error");

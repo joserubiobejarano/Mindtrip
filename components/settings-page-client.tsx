@@ -2,7 +2,7 @@
 
 import { useUser, UserProfile } from "@clerk/nextjs";
 import { createClient } from "@/lib/supabase/client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import { Sparkles, Check } from "lucide-react";
 import { NewNavbar } from "@/components/new-navbar";
 import { clearStoredCoupon, getStoredCoupon } from "@/lib/attribution/client";
 import { Checkbox } from "@/components/ui/checkbox";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 const CURRENCIES = [
   "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR", "MXN",
@@ -45,6 +46,7 @@ function SettingsContent({ showUpgrade, showNewsletterOptIn }: { showUpgrade: bo
     "idle" | "pending" | "subscribed" | "unsubscribed" | "error"
   >("idle");
   const [isNewsletterSaving, setIsNewsletterSaving] = useState(false);
+  const signupTrackedRef = useRef(false);
 
   // Fetch profile and subscription status
   const { data: profile, isLoading } = useQuery({
@@ -122,6 +124,13 @@ function SettingsContent({ showUpgrade, showNewsletterOptIn }: { showUpgrade: bo
       setActiveTab("account");
     }
   }, [showNewsletterOptIn]);
+
+  useEffect(() => {
+    if (!signupTrackedRef.current && showNewsletterOptIn && user?.id) {
+      trackUmamiEvent("signup", { source: "settings" });
+      signupTrackedRef.current = true;
+    }
+  }, [showNewsletterOptIn, user?.id]);
 
   const saveProfile = useMutation({
     mutationFn: async () => {
@@ -272,6 +281,10 @@ function SettingsContent({ showUpgrade, showNewsletterOptIn }: { showUpgrade: bo
 
         setNewsletterOptIn(true);
         setNewsletterStatus(data?.status === "subscribed" ? "subscribed" : "pending");
+        trackUmamiEvent("newsletter_subscribed", {
+          source: "settings",
+          status: data?.status,
+        });
         addToast({
           variant: "success",
           title: "Newsletter updated",
@@ -568,6 +581,7 @@ function SettingsContent({ showUpgrade, showNewsletterOptIn }: { showUpgrade: bo
                             className="w-full"
                             onClick={async () => {
                               try {
+                                trackUmamiEvent("upgrade_clicked", { source: "settings_billing" });
                                 const couponCode = getStoredCoupon();
                                 const response = await fetch("/api/billing/checkout/subscription", {
                                   method: "POST",
@@ -584,6 +598,7 @@ function SettingsContent({ showUpgrade, showNewsletterOptIn }: { showUpgrade: bo
 
                                 const { url } = await response.json();
                                 if (url) {
+                                  trackUmamiEvent("checkout_started", { source: "settings_billing" });
                                   window.location.href = url;
                                 }
                               } catch (error) {

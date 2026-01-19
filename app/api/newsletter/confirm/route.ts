@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import type { Database } from '@/types/database';
-import { sendNewsletterWelcomeEmail } from '@/lib/email/resend';
-import { upsertResendContact } from '@/lib/email/audience';
+import { syncNewsletterSubscriber } from '@/lib/email/newsletter';
 
 type NewsletterSubscriber = Database['public']['Tables']['newsletter_subscribers']['Row'];
 
@@ -63,46 +62,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/newsletter/confirmed?status=error', appUrl));
   }
 
-  const audienceId =
-    updated.language === 'es'
-      ? process.env.RESEND_AUDIENCE_ID_ES
-      : process.env.RESEND_AUDIENCE_ID_EN;
-
-  const providerContactId = await upsertResendContact({
-    audienceId,
-    email: updated.email,
-    firstName: updated.name,
-    language: updated.language,
-    externalId: updated.id,
-    providerContactId: updated.provider_contact_id,
-  });
-
-  if (providerContactId && providerContactId !== updated.provider_contact_id) {
-    const { error: providerError } = await newsletterTable
-      .update({
-        provider_contact_id: providerContactId,
-        provider: 'resend',
-        updated_at: now,
-      })
-      .eq('id', updated.id);
-
-    if (providerError) {
-      console.warn('Newsletter provider contact update failed:', providerError);
-    }
-  }
-
-  const manageUrl = `${appUrl}/api/newsletter/unsubscribe?token=${updated.manage_token}`;
-
-  try {
-    await sendNewsletterWelcomeEmail({
-      email: updated.email,
-      name: updated.name,
-      language: updated.language,
-      manageUrl,
-    });
-  } catch (error) {
-    console.warn('Newsletter welcome email failed:', error);
-  }
+  await syncNewsletterSubscriber({ subscriber: updated, appUrl });
 
   return NextResponse.redirect(new URL('/newsletter/confirmed', appUrl));
 }

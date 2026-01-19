@@ -67,6 +67,74 @@ type EmailCopyResult = {
   html?: string;
 };
 
+const EMAIL_BRAND = {
+  primary: 'hsl(6, 85%, 67%)',
+  background: 'hsl(30, 50%, 96%)',
+  border: 'hsl(30, 20%, 90%)',
+  text: '#2f2f2f',
+  muted: '#6b6b6b',
+  radius: '16px',
+  font:
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+};
+
+const EMAIL_LOGO_URL = process.env.EMAIL_LOGO_URL || 'https://www.kruno.app/logo-email.png';
+
+function buildEmailLayout(params: {
+  subject: string;
+  contentHtml: string;
+  footerHtml?: string;
+  align?: 'left' | 'center';
+}): string {
+  const { subject, contentHtml, footerHtml, align = 'left' } = params;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: ${EMAIL_BRAND.background}; font-family: ${EMAIL_BRAND.font}; color: ${EMAIL_BRAND.text};">
+  <div style="max-width: 600px; margin: 0 auto; padding: 24px;">
+    <div style="text-align: center; margin-bottom: 16px;">
+      <img src="${EMAIL_LOGO_URL}" alt="Kruno" style="display: block; margin: 0 auto; max-width: 120px; width: 100%; height: auto;">
+    </div>
+    <div style="background-color: #ffffff; border-radius: ${EMAIL_BRAND.radius}; padding: 28px; border: 1px solid ${EMAIL_BRAND.border};">
+      <div style="text-align: ${align};">
+        <h1 style="margin: 0 0 16px 0; font-size: 24px; line-height: 1.3; color: ${EMAIL_BRAND.text};">${subject}</h1>
+        ${contentHtml}
+      </div>
+    </div>
+    ${footerHtml ? `<p style="font-size: 12px; color: ${EMAIL_BRAND.muted}; text-align: center; margin: 18px 0 0;">${footerHtml}</p>` : ''}
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+function buildParagraphs(lines: string[], align: 'left' | 'center' = 'left'): string {
+  return lines
+    .map(
+      (line) =>
+        `<p style="font-size: 16px; line-height: 1.6; margin: 16px 0; color: ${EMAIL_BRAND.text}; text-align: ${align};">${line}</p>`
+    )
+    .join('');
+}
+
+function buildPrimaryButton(label: string, url: string): string {
+  return `<a href="${url}" style="display: inline-block; background-color: ${EMAIL_BRAND.primary}; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: ${EMAIL_BRAND.radius}; font-weight: 600; font-size: 16px;">${label}</a>`;
+}
+
+function buildSecondaryButton(label: string, url: string): string {
+  return `<a href="${url}" style="display: inline-block; background-color: transparent; color: ${EMAIL_BRAND.primary}; text-decoration: none; padding: 12px 24px; border-radius: ${EMAIL_BRAND.radius}; font-weight: 600; font-size: 16px; border: 2px solid ${EMAIL_BRAND.primary};">${label}</a>`;
+}
+
+function buildInlineLink(label: string, url: string): string {
+  return `<a href="${url}" style="color: ${EMAIL_BRAND.primary}; text-decoration: none; font-weight: 600;">${label}</a>`;
+}
+
 export function getEmailCopy(
   template: 'welcome',
   language: EmailLanguage,
@@ -179,41 +247,82 @@ function buildGreeting(language: EmailLanguage, firstName?: string | null): stri
 function getWelcomeCopy(language: EmailLanguage, params: WelcomeParams): EmailCopyResult {
   const appName = params.appName || 'Kruno';
   const greeting = buildGreeting(language, params.firstName);
+  const appUrl = process.env.APP_URL || 'https://kruno.app';
 
   if (language === 'es') {
+    const subject = 'Bienvenido a Kruno ✈️';
+    const contentHtml = `
+      <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+      ${buildParagraphs(
+        [
+          `¡Bienvenido a ${appName}! Estamos emocionados de ayudarte a planificar tu próxima aventura con menos estrés, menos decisiones y más confianza.`,
+          `Con ${appName}, puedes enfocarte en lo que más importa: disfrutar de tu viaje. Nosotros nos encargamos de la planificación, para que puedas vivir la experiencia.`,
+        ],
+        'left'
+      )}
+      <div style="margin: 24px 0;">
+        ${buildPrimaryButton('Crear itinerario', appUrl)}
+      </div>
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">¡Felices viajes!<br>Jose<br>Fundador, ${appName}</p>
+    `;
+
     return {
-      subject: 'Bienvenido a Kruno ✈️',
+      subject,
       text: `${greeting}
 
-Bienvenido a Kruno! Estamos emocionados de ayudarte a planificar tu próxima aventura con menos estrés, menos decisiones y más confianza.
+¡Bienvenido a ${appName}! Estamos emocionados de ayudarte a planificar tu próxima aventura con menos estrés, menos decisiones y más confianza.
 
-Con Kruno, puedes enfocarte en lo que más importa: disfrutar de tu viaje. Nosotros nos encargamos de la planificación, para que puedas vivir la experiencia.
+Con ${appName}, puedes enfocarte en lo que más importa: disfrutar de tu viaje. Nosotros nos encargamos de la planificación, para que puedas vivir la experiencia.
 
 Comienza creando tu primer itinerario en:
-${process.env.APP_URL || 'https://kruno.app'}
+${appUrl}
 
 ¡Felices viajes!
 
 Jose
-Fundador, Kruno`,
+Fundador, ${appName}`,
+      html: buildEmailLayout({
+        subject,
+        contentHtml,
+      }),
     };
   }
 
+  const subject = 'Welcome to Kruno ✈️';
+  const contentHtml = `
+    <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+    ${buildParagraphs(
+      [
+        `Welcome to ${appName}! We're excited to help you plan your next adventure with less stress, fewer decisions, and more confidence.`,
+        `With ${appName}, you can focus on what matters most: enjoying your trip. We handle the planning, so you can experience the journey.`,
+      ],
+      'left'
+    )}
+    <div style="margin: 24px 0;">
+      ${buildPrimaryButton('Create your itinerary', appUrl)}
+    </div>
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Happy travels!<br>Jose<br>Founder, ${appName}</p>
+  `;
+
   return {
-    subject: 'Welcome to Kruno ✈️',
+    subject,
     text: `${greeting}
 
-Welcome to Kruno! We're excited to help you plan your next adventure with less stress, fewer decisions, and more confidence.
+Welcome to ${appName}! We're excited to help you plan your next adventure with less stress, fewer decisions, and more confidence.
 
-With Kruno, you can focus on what matters most: enjoying your trip. We handle the planning, so you can experience the journey.
+With ${appName}, you can focus on what matters most: enjoying your trip. We handle the planning, so you can experience the journey.
 
 Get started by creating your first itinerary at:
-${process.env.APP_URL || 'https://kruno.app'}
+${appUrl}
 
 Happy travels!
 
 Jose
-Founder, Kruno`,
+Founder, ${appName}`,
+    html: buildEmailLayout({
+      subject,
+      contentHtml,
+    }),
   };
 }
 
@@ -222,8 +331,24 @@ function getTripReadyCopy(language: EmailLanguage, params: TripReadyParams): Ema
   const { tripCity, tripUrl } = params;
 
   if (language === 'es') {
+    const subject = `Tu viaje a ${tripCity} ya está listo ✈️`;
+    const contentHtml = `
+      <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+      ${buildParagraphs(
+        [
+          `Tu viaje a ${tripCity} ya está listo.`,
+          'Hemos preparado un itinerario claro con qué ver, cómo moverte y consejos prácticos para que disfrutes el viaje sin complicaciones.',
+        ],
+        'left'
+      )}
+      <div style="margin: 24px 0;">
+        ${buildPrimaryButton('Ver itinerario', tripUrl)}
+      </div>
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">¡Buen viaje!<br>Jose<br>Fundador de Kruno</p>
+    `;
+
     return {
-      subject: `Tu viaje a ${tripCity} ya está listo ✈️`,
+      subject,
       text: `${greeting}
 
 Tu viaje a ${tripCity} ya está listo!
@@ -236,11 +361,31 @@ ${tripUrl}
 ¡Buen viaje!
 Jose
 Fundador de Kruno`,
+      html: buildEmailLayout({
+        subject,
+        contentHtml,
+      }),
     };
   }
 
+  const subject = `Your trip to ${tripCity} is ready ✈️`;
+  const contentHtml = `
+    <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+    ${buildParagraphs(
+      [
+        `Your trip to ${tripCity} is ready.`,
+        "We've put together a clear itinerary with what to see, how to move around, and practical tips to help you enjoy the trip with less stress.",
+      ],
+      'left'
+    )}
+    <div style="margin: 24px 0;">
+      ${buildPrimaryButton('View itinerary', tripUrl)}
+    </div>
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Have a great trip,<br>Jose<br>Founder of Kruno</p>
+  `;
+
   return {
-    subject: `Your trip to ${tripCity} is ready ✈️`,
+    subject,
     text: `${greeting}
 
 Your trip to ${tripCity} is ready.
@@ -253,6 +398,10 @@ ${tripUrl}
 Have a great trip,
 Jose
 Founder of Kruno`,
+    html: buildEmailLayout({
+      subject,
+      contentHtml,
+    }),
   };
 }
 
@@ -260,8 +409,24 @@ function getProUpgradeCopy(language: EmailLanguage, params: ProUpgradeParams): E
   const greeting = buildGreeting(language, params.firstName);
 
   if (language === 'es') {
+    const subject = 'Ahora eres un viajero Pro 🎉';
+    const contentHtml = `
+      <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+      ${buildParagraphs(
+        [
+          'Te confirmamos tu suscripción a Kruno Pro.',
+          'Ahora puedes crear y gestionar todos los viajes que quieras y aprovechar al máximo la planificación.',
+        ],
+        'left'
+      )}
+      <div style="margin: 24px 0;">
+        ${buildPrimaryButton('Gestionar suscripción', params.billingUrl)}
+      </div>
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Gracias por confiar en nosotros,<br>Jose<br>Fundador de Kruno</p>
+    `;
+
     return {
-      subject: 'Ahora eres un viajero Pro 🎉',
+      subject,
       text: `${greeting}
 
 Te confirmamos tu suscripción a Kruno Pro.
@@ -274,11 +439,31 @@ ${params.billingUrl}
 Gracias por confiar en nosotros,
 Jose
 Fundador de Kruno`,
+      html: buildEmailLayout({
+        subject,
+        contentHtml,
+      }),
     };
   }
 
+  const subject = "You're now a Pro Traveller 🎉";
+  const contentHtml = `
+    <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+    ${buildParagraphs(
+      [
+        'Your upgrade to Kruno Pro is confirmed.',
+        'You can now create and manage as many trips as you like and make the most out of your travel planning.',
+      ],
+      'left'
+    )}
+    <div style="margin: 24px 0;">
+      ${buildPrimaryButton('Manage subscription', params.billingUrl)}
+    </div>
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Thanks for supporting us,<br>Jose<br>Founder of Kruno</p>
+  `;
+
   return {
-    subject: "You're now a Pro Traveller 🎉",
+    subject,
     text: `${greeting}
 
 Your upgrade to Kruno Pro is confirmed.
@@ -291,6 +476,10 @@ ${params.billingUrl}
 Thanks for supporting us,
 Jose
 Founder of Kruno`,
+    html: buildEmailLayout({
+      subject,
+      contentHtml,
+    }),
   };
 }
 
@@ -301,8 +490,22 @@ function getSubscriptionCanceledCopy(
   const greeting = buildGreeting(language, params.firstName);
 
   if (language === 'es') {
+    const subject = 'Tu suscripción a Kruno Pro ha sido cancelada';
+    const contentHtml = `
+      <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+      ${buildParagraphs(
+        [
+          'Este correo confirma que tu suscripción a Kruno Pro ha sido cancelada.',
+          'Seguirás teniendo acceso a las funciones Pro hasta el final de tu periodo de facturación actual.',
+          'Si algún día decides volver, seguiremos aquí.',
+        ],
+        'left'
+      )}
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Gracias por probar la app,<br>Jose<br>Fundador de Kruno</p>
+    `;
+
     return {
-      subject: 'Tu suscripción a Kruno Pro ha sido cancelada',
+      subject,
       text: `${greeting}
 
 Este correo confirma que tu suscripción a Kruno Pro ha sido cancelada.
@@ -314,11 +517,29 @@ Si algún día decides volver, seguiremos aquí.
 Gracias por probar la app,
 Jose
 Fundador de Kruno`,
+      html: buildEmailLayout({
+        subject,
+        contentHtml,
+      }),
     };
   }
 
+  const subject = 'Your Kruno Pro subscription has been canceled';
+  const contentHtml = `
+    <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+    ${buildParagraphs(
+      [
+        'This email confirms that your Kruno Pro subscription has been canceled.',
+        "You'll continue to have access to Pro features until the end of your current billing period.",
+        'If you ever decide to come back, Kruno will be here.',
+      ],
+      'left'
+    )}
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Thanks for trying the app,<br>Jose<br>Founder of Kruno</p>
+  `;
+
   return {
-    subject: 'Your Kruno Pro subscription has been canceled',
+    subject,
     text: `${greeting}
 
 This email confirms that your Kruno Pro subscription has been canceled.
@@ -330,6 +551,10 @@ If you ever decide to come back, Kruno will be here.
 Thanks for trying the app,
 Jose
 Founder of Kruno`,
+    html: buildEmailLayout({
+      subject,
+      contentHtml,
+    }),
   };
 }
 
@@ -338,8 +563,24 @@ function getTripReminderCopy(language: EmailLanguage, params: TripReminderParams
   const { tripCity, tripUrl } = params;
 
   if (language === 'es') {
+    const subject = `Tu viaje a ${tripCity} empieza mañana ✈️`;
+    const contentHtml = `
+      <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+      ${buildParagraphs(
+        [
+          `Te recordamos que tu viaje a ${tripCity} empieza mañana.`,
+          'Aquí tienes tu itinerario por si quieres echarle un vistazo antes de salir:',
+        ],
+        'left'
+      )}
+      <div style="margin: 24px 0;">
+        ${buildPrimaryButton('Ver itinerario', tripUrl)}
+      </div>
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">¡Que tengas un viaje increíble!<br>Jose<br>Fundador de Kruno</p>
+    `;
+
     return {
-      subject: `Tu viaje a ${tripCity} empieza mañana ✈️`,
+      subject,
       text: `${greeting}
 
 Te recordamos que tu viaje a ${tripCity} empieza mañana.
@@ -350,11 +591,31 @@ ${tripUrl}
 ¡Que tengas un viaje increíble!
 Jose
 Fundador de Kruno`,
+      html: buildEmailLayout({
+        subject,
+        contentHtml,
+      }),
     };
   }
 
+  const subject = `Your trip to ${tripCity} starts tomorrow ✈️`;
+  const contentHtml = `
+    <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+    ${buildParagraphs(
+      [
+        `Just a quick reminder that your trip to ${tripCity} starts tomorrow.`,
+        "Here's your itinerary in case you want to take a look before you go:",
+      ],
+      'left'
+    )}
+    <div style="margin: 24px 0;">
+      ${buildPrimaryButton('View itinerary', tripUrl)}
+    </div>
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Have an amazing trip<br>Jose<br>Founder of Kruno</p>
+  `;
+
   return {
-    subject: `Your trip to ${tripCity} starts tomorrow ✈️`,
+    subject,
     text: `${greeting}
 
 Just a quick reminder that your trip to ${tripCity} starts tomorrow.
@@ -365,6 +626,10 @@ ${tripUrl}
 Have an amazing trip
 Jose
 Founder of Kruno`,
+    html: buildEmailLayout({
+      subject,
+      contentHtml,
+    }),
   };
 }
 
@@ -374,42 +639,30 @@ function getTripInviteCopy(language: EmailLanguage, params: TripInviteParams): E
 
   if (language === 'es') {
     const subject = 'Has sido invitado a planificar un viaje en Kruno';
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${subject}</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background-color: #f8f9fa; border-radius: 8px; padding: 30px; text-align: center;">
-    <h1 style="color: #2563eb; margin-top: 0;">¡Has sido invitado! ✈️</h1>
-    <p style="font-size: 16px; margin: 20px 0;">
-      <strong>${inviterName}</strong> te ha invitado a colaborar en <strong>${tripName}</strong> en Kruno.
-    </p>
-    <p style="font-size: 16px; margin: 20px 0;">
-      ¡Únete a este viaje para comenzar a planificar tu aventura juntos!
-    </p>
-    <div style="margin: 30px 0;">
-      <a href="${ctaUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 16px; margin-bottom: ${hasDeepLink ? '12px' : '0'};">Unirse a este viaje</a>
-      ${hasDeepLink ? `<a href="${deepLinkUrl}" style="display: inline-block; background-color: transparent; color: #2563eb; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 16px; border: 2px solid #2563eb;">Abrir en la app</a>` : ''}
-    </div>
-    <p style="font-size: 14px; color: #666; margin-top: 30px;">
-      Si el botón no funciona, copia y pega este enlace en tu navegador:<br>
-      <a href="${ctaUrl}" style="color: #2563eb; word-break: break-all;">${ctaUrl}</a>
-    </p>
-    ${hasDeepLink ? `<p style="font-size: 14px; color: #666; margin-top: 12px;">
-      O abre en la app móvil:<br>
-      <a href="${deepLinkUrl}" style="color: #2563eb; word-break: break-all;">${deepLinkUrl}</a>
-    </p>` : ''}
-  </div>
-  <p style="font-size: 12px; color: #999; text-align: center; margin-top: 30px;">
-    Esta invitación fue enviada por ${inviterName}. Si no esperabas esta invitación, puedes ignorar este correo de forma segura.
-  </p>
-</body>
-</html>
-    `.trim();
+    const contentHtml = `
+      ${buildParagraphs(
+        [
+          `<strong>${inviterName}</strong> te ha invitado a colaborar en <strong>${tripName}</strong> en Kruno.`,
+          '¡Únete a este viaje para comenzar a planificar tu aventura juntos!',
+        ],
+        'center'
+      )}
+      <div style="margin: 24px 0;">
+        ${buildPrimaryButton('Unirse a este viaje', ctaUrl)}
+      </div>
+      ${hasDeepLink ? `<div style="margin: 12px 0;">${buildSecondaryButton('Abrir en la app', deepLinkUrl!)}</div>` : ''}
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 20px 0 0; text-align: center;">
+        Si el botón no funciona, ${buildInlineLink('ábrelo en el navegador', ctaUrl)}.
+      </p>
+      ${hasDeepLink ? `<p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 8px 0 0; text-align: center;">O ${buildInlineLink('abre la app', deepLinkUrl!)}.</p>` : ''}
+    `;
+    const html = buildEmailLayout({
+      subject,
+      contentHtml,
+      align: 'center',
+      footerHtml:
+        `Esta invitación fue enviada por ${inviterName}. Si no esperabas esta invitación, puedes ignorar este correo de forma segura.`,
+    });
 
     const text = `¡Has sido invitado!
 
@@ -427,42 +680,30 @@ Esta invitación fue enviada por ${inviterName}. Si no esperabas esta invitació
   }
 
   const subject = "You've been invited to plan a trip on Kruno";
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${subject}</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background-color: #f8f9fa; border-radius: 8px; padding: 30px; text-align: center;">
-    <h1 style="color: #2563eb; margin-top: 0;">You've been invited! ✈️</h1>
-    <p style="font-size: 16px; margin: 20px 0;">
-      <strong>${inviterName}</strong> has invited you to collaborate on <strong>${tripName}</strong> in Kruno.
-    </p>
-    <p style="font-size: 16px; margin: 20px 0;">
-      Join this trip to start planning your adventure together!
-    </p>
-    <div style="margin: 30px 0;">
-      <a href="${ctaUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 16px; margin-bottom: ${hasDeepLink ? '12px' : '0'};">Join this trip</a>
-      ${hasDeepLink ? `<a href="${deepLinkUrl}" style="display: inline-block; background-color: transparent; color: #2563eb; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 16px; border: 2px solid #2563eb;">Open in app</a>` : ''}
+  const contentHtml = `
+    ${buildParagraphs(
+      [
+        `<strong>${inviterName}</strong> has invited you to collaborate on <strong>${tripName}</strong> in Kruno.`,
+        'Join this trip to start planning your adventure together!',
+      ],
+      'center'
+    )}
+    <div style="margin: 24px 0;">
+      ${buildPrimaryButton('Join this trip', ctaUrl)}
     </div>
-    <p style="font-size: 14px; color: #666; margin-top: 30px;">
-      If the button doesn't work, copy and paste this link into your browser:<br>
-      <a href="${ctaUrl}" style="color: #2563eb; word-break: break-all;">${ctaUrl}</a>
+    ${hasDeepLink ? `<div style="margin: 12px 0;">${buildSecondaryButton('Open in app', deepLinkUrl!)}</div>` : ''}
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 20px 0 0; text-align: center;">
+      If the button doesn't work, ${buildInlineLink('open it in your browser', ctaUrl)}.
     </p>
-    ${hasDeepLink ? `<p style="font-size: 14px; color: #666; margin-top: 12px;">
-      Or open in the mobile app:<br>
-      <a href="${deepLinkUrl}" style="color: #2563eb; word-break: break-all;">${deepLinkUrl}</a>
-    </p>` : ''}
-  </div>
-  <p style="font-size: 12px; color: #999; text-align: center; margin-top: 30px;">
-    This invitation was sent by ${inviterName}. If you didn't expect this invitation, you can safely ignore this email.
-  </p>
-</body>
-</html>
-  `.trim();
+    ${hasDeepLink ? `<p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 8px 0 0; text-align: center;">Or ${buildInlineLink('open the app', deepLinkUrl!)}.</p>` : ''}
+  `;
+  const html = buildEmailLayout({
+    subject,
+    contentHtml,
+    align: 'center',
+    footerHtml:
+      `This invitation was sent by ${inviterName}. If you didn't expect this invitation, you can safely ignore this email.`,
+  });
 
   const text = `You've been invited!
 
@@ -486,23 +727,59 @@ function getExpensesSummaryCopy(
   const { tripName, totalText, summaryText } = params;
 
   if (language === 'es') {
+    const subject = `Balance de gastos para "${tripName}"`;
+    const contentHtml = `
+      ${buildParagraphs(
+        ['Balance de gastos', totalText],
+        'left'
+      )}
+      <div style="font-size: 14px; color: ${EMAIL_BRAND.text}; white-space: pre-line; margin: 16px 0;">
+        ${summaryText}
+      </div>
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">
+        Este resumen muestra quién debe dinero y a quién se le debe dinero basado en los gastos registrados para este viaje.
+      </p>
+    `;
+
     return {
-      subject: `Balance de gastos para "${tripName}"`,
+      subject,
       text: `Balance de gastos
 
 ${summaryText}
 
 Este resumen muestra quién debe dinero y a quién se le debe dinero basado en los gastos registrados para este viaje.`,
+      html: buildEmailLayout({
+        subject,
+        contentHtml,
+      }),
     };
   }
 
+  const subject = `Balances for "${tripName}"`;
+  const contentHtml = `
+    ${buildParagraphs(
+      ['Expense Balance Summary', totalText],
+      'left'
+    )}
+    <div style="font-size: 14px; color: ${EMAIL_BRAND.text}; white-space: pre-line; margin: 16px 0;">
+      ${summaryText}
+    </div>
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">
+      This summary shows who owes money and who is owed money based on the expenses recorded for this trip.
+    </p>
+  `;
+
   return {
-    subject: `Balances for "${tripName}"`,
+    subject,
     text: `Expense Balance Summary
 
 ${summaryText}
 
 This summary shows who owes money and who is owed money based on the expenses recorded for this trip.`,
+    html: buildEmailLayout({
+      subject,
+      contentHtml,
+    }),
   };
 }
 
@@ -512,9 +789,9 @@ function buildNewsletterHtml(params: {
   bodyLines: string[];
   ctaLabel: string;
   ctaUrl: string;
-  fallbackLabel: string;
+  fallbackLabel?: string;
+  fallbackLinkLabel?: string;
   manageUrl: string;
-  footerLine: string;
 }): string {
   const {
     subject,
@@ -523,37 +800,30 @@ function buildNewsletterHtml(params: {
     ctaLabel,
     ctaUrl,
     fallbackLabel,
+    fallbackLinkLabel,
     manageUrl,
-    footerLine,
   } = params;
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${subject}</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background-color: #f8f9fa; border-radius: 8px; padding: 30px; text-align: left;">
-    <h1 style="color: #2563eb; margin-top: 0; font-size: 24px;">${subject}</h1>
-    <p style="font-size: 16px; margin: 16px 0;">${greeting}</p>
-    ${bodyLines.map((line) => `<p style="font-size: 16px; margin: 16px 0;">${line}</p>`).join('')}
-    <div style="margin: 28px 0;">
-      <a href="${ctaUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 16px;">${ctaLabel}</a>
+  const contentHtml = `
+    <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+    ${buildParagraphs(bodyLines, 'left')}
+    <div style="margin: 24px 0;">
+      ${buildPrimaryButton(ctaLabel, ctaUrl)}
     </div>
-    <p style="font-size: 14px; color: #666; margin-top: 20px;">
-      ${fallbackLabel}<br>
-      <a href="${ctaUrl}" style="color: #2563eb; word-break: break-all;">${ctaUrl}</a>
-    </p>
-  </div>
-  <p style="font-size: 12px; color: #999; text-align: center; margin-top: 24px;">
-    ${footerLine} <a href="${manageUrl}" style="color: #2563eb;">${manageUrl}</a>
-  </p>
-</body>
-</html>
-  `.trim();
+    ${
+      fallbackLabel
+        ? `<p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin-top: 16px;">
+            ${fallbackLabel} ${buildInlineLink(fallbackLinkLabel || 'Confirm here', ctaUrl)}
+          </p>`
+        : ''
+    }
+  `;
+
+  return buildEmailLayout({
+    subject,
+    contentHtml,
+    footerHtml: buildInlineLink('Unsubscribe', manageUrl),
+  });
 }
 
 function getNewsletterConfirmCopy(
@@ -564,17 +834,17 @@ function getNewsletterConfirmCopy(
   const greeting = buildGreeting(language, params.firstName);
 
   if (language === 'es') {
-    const subject = `Confirma tu suscripcion a ${appName}`;
+    const subject = `Confirma tu suscripción a ${appName}`;
     const text = `${greeting}
 
-Gracias por suscribirte al newsletter de ${appName}.
+Gracias por unirte a las novedades de ${appName}.
 
-Confirma tu suscripcion haciendo clic aqui:
+Confirma tu suscripción aquí:
 ${params.confirmUrl}
 
 Si no solicitaste esto, ignora este correo.
 
-Para darte de baja en cualquier momento:
+Unsubscribe:
 ${params.manageUrl}
     `.trim();
 
@@ -585,29 +855,29 @@ ${params.manageUrl}
         subject,
         greeting,
         bodyLines: [
-          `Gracias por suscribirte al newsletter de ${appName}.`,
-          'Confirma tu suscripcion para empezar a recibir novedades y tips de viaje.',
+          `Gracias por unirte a las novedades de ${appName}.`,
+          'Confirma tu suscripción para empezar a recibir inspiración de viaje, itinerarios y actualizaciones.',
         ],
-        ctaLabel: 'Confirmar suscripcion',
+        ctaLabel: 'Confirmar suscripción',
         ctaUrl: params.confirmUrl,
-        fallbackLabel: 'Si el boton no funciona, copia y pega este enlace:',
+        fallbackLabel: 'Si el botón no funciona, confirma aquí:',
+        fallbackLinkLabel: 'Confirma aquí',
         manageUrl: params.manageUrl,
-        footerLine: 'Puedes darte de baja cuando quieras:',
       }),
     };
   }
 
-  const subject = `Confirm your ${appName} newsletter subscription`;
+  const subject = `Confirm your ${appName} subscription`;
   const text = `${greeting}
 
-Thanks for subscribing to the ${appName} newsletter.
+Thanks for joining ${appName} updates.
 
 Please confirm your subscription here:
 ${params.confirmUrl}
 
 If you did not request this, you can ignore this email.
 
-Unsubscribe any time:
+Unsubscribe:
 ${params.manageUrl}
   `.trim();
 
@@ -618,14 +888,14 @@ ${params.manageUrl}
       subject,
       greeting,
       bodyLines: [
-        `Thanks for subscribing to the ${appName} newsletter.`,
-        'Confirm your subscription to start receiving updates and travel tips.',
+        `Thanks for joining ${appName} updates.`,
+        'Confirm your subscription to start receiving travel inspiration, itineraries, and product news.',
       ],
       ctaLabel: 'Confirm subscription',
       ctaUrl: params.confirmUrl,
-      fallbackLabel: "If the button doesn't work, copy and paste this link:",
+      fallbackLabel: "If the button doesn't work, confirm here:",
+      fallbackLinkLabel: 'Confirm here',
       manageUrl: params.manageUrl,
-      footerLine: 'Unsubscribe any time:',
     }),
   };
 }
@@ -638,16 +908,16 @@ function getNewsletterWelcomeCopy(
   const greeting = buildGreeting(language, params.firstName);
 
   if (language === 'es') {
-    const subject = `Ya estas suscrito a ${appName}`;
+    const subject = `¡Listo! Ya estás suscrito a ${appName}`;
     const text = `${greeting}
 
-Tu suscripcion esta confirmada. A partir de ahora recibirás ideas de destinos, itinerarios y novedades de ${appName}.
+¡Tu suscripción está confirmada! A partir de ahora recibirás ideas de destinos, itinerarios y novedades de ${appName}.
 
 Gracias por estar aqui,
 Jose
 Fundador de ${appName}
 
-Gestiona tu suscripcion aqui:
+Unsubscribe:
 ${params.manageUrl}
     `.trim();
 
@@ -658,19 +928,17 @@ ${params.manageUrl}
         subject,
         greeting,
         bodyLines: [
-          `Tu suscripcion esta confirmada.`,
-          `A partir de ahora recibiras ideas de destinos, itinerarios y novedades de ${appName}.`,
+          '¡Tu suscripción está confirmada!',
+          `A partir de ahora recibirás ideas de destinos, itinerarios y novedades de ${appName}.`,
         ],
-        ctaLabel: 'Ver novedades',
+        ctaLabel: 'Explorar Kruno',
         ctaUrl: process.env.APP_URL || 'https://www.kruno.app',
-        fallbackLabel: 'Si el boton no funciona, copia y pega este enlace:',
         manageUrl: params.manageUrl,
-        footerLine: 'Puedes darte de baja cuando quieras:',
       }),
     };
   }
 
-  const subject = `You're subscribed to ${appName} updates`;
+  const subject = `You're in! Welcome to ${appName}`;
   const text = `${greeting}
 
 Your subscription is confirmed. You'll now receive destination ideas, itineraries, and ${appName} updates.
@@ -679,7 +947,7 @@ Thanks for being here,
 Jose
 Founder, ${appName}
 
-Manage your subscription here:
+Unsubscribe:
 ${params.manageUrl}
   `.trim();
 
@@ -690,14 +958,12 @@ ${params.manageUrl}
       subject,
       greeting,
       bodyLines: [
-        'Your subscription is confirmed.',
+        "You're officially subscribed.",
         `You'll now receive destination ideas, itineraries, and ${appName} updates.`,
       ],
       ctaLabel: 'Explore Kruno',
       ctaUrl: process.env.APP_URL || 'https://www.kruno.app',
-      fallbackLabel: "If the button doesn't work, copy and paste this link:",
       manageUrl: params.manageUrl,
-      footerLine: 'Unsubscribe any time:',
     }),
   };
 }
@@ -710,33 +976,67 @@ function getNewsletterUnsubscribedCopy(
   const greeting = buildGreeting(language, params.firstName);
 
   if (language === 'es') {
+    const subject = `Te has dado de baja de ${appName}`;
+    const contentHtml = `
+      <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+      ${buildParagraphs(
+        [
+          `Ya no recibirás correos del newsletter de ${appName}.`,
+          'Te vamos a extrañar. Si fue un error, puedes volver a suscribirte cuando quieras desde nuestra web.',
+        ],
+        'left'
+      )}
+      <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Gracias,<br>Jose<br>Fundador de ${appName}</p>
+    `;
+
     return {
-      subject: `Te has dado de baja de ${appName}`,
+      subject,
       text: `${greeting}
 
-Tu suscripcion al newsletter de ${appName} ha sido cancelada.
+Tu suscripción al newsletter de ${appName} ha sido cancelada.
 
-Si fue un error, puedes volver a suscribirte en cualquier momento desde nuestra web.
+Te vamos a extrañar. Si fue un error, puedes volver a suscribirte cuando quieras desde nuestra web.
 
 Gracias,
 Jose
 Fundador de ${appName}
       `.trim(),
+      html: buildEmailLayout({
+        subject,
+        contentHtml,
+      }),
     };
   }
 
+  const subject = `You're unsubscribed from ${appName}`;
+  const contentHtml = `
+    <p style="font-size: 16px; margin: 16px 0; color: ${EMAIL_BRAND.text};">${greeting}</p>
+    ${buildParagraphs(
+      [
+        `You're no longer receiving the ${appName} newsletter.`,
+        "We'll miss you. If it was a mistake, you can resubscribe anytime on our website.",
+      ],
+      'left'
+    )}
+    <p style="font-size: 14px; color: ${EMAIL_BRAND.muted}; margin: 16px 0 0;">Thanks,<br>Jose<br>Founder, ${appName}</p>
+  `;
+
   return {
-    subject: `You're unsubscribed from ${appName}`,
+    subject,
     text: `${greeting}
 
 You have been unsubscribed from the ${appName} newsletter.
 
-If this was a mistake, you can resubscribe anytime on our website.
+We'll miss you. If it was a mistake, you can resubscribe anytime on our website.
 
 Thanks,
 Jose
 Founder, ${appName}
     `.trim(),
+    html: buildEmailLayout({
+      subject,
+      contentHtml,
+    }),
   };
 }
 

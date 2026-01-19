@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { NewNavbar } from "@/components/new-navbar";
-import { NewFooter } from "@/components/new-footer";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -45,7 +44,7 @@ export default async function NewsletterConfirmedPage({
   return (
     <div className="min-h-screen bg-background">
       <NewNavbar />
-      <main className="px-6 py-16">
+      <main className="px-6 pt-24 pb-16">
         <div className="max-w-xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-semibold mb-4">
             {copy.title}
@@ -59,7 +58,6 @@ export default async function NewsletterConfirmedPage({
           </Link>
         </div>
       </main>
-      <NewFooter />
     </div>
   );
 }

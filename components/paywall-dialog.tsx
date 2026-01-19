@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { getStoredCoupon } from "@/lib/attribution/client";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 interface PaywallDialogProps {
   open: boolean;
@@ -30,6 +31,17 @@ export function PaywallDialog({
 }: PaywallDialogProps) {
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
   const { t } = useLanguage();
+  const wasOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (open && !wasOpenRef.current) {
+      trackUmamiEvent("upgrade_clicked", {
+        source: "paywall_dialog",
+        feature: featureName,
+      });
+    }
+    wasOpenRef.current = open;
+  }, [open, featureName]);
 
   const handleSubscriptionCheckout = async () => {
     setIsLoadingSubscription(true);
@@ -51,6 +63,7 @@ export function PaywallDialog({
 
       const { url } = await response.json();
       if (url) {
+        trackUmamiEvent("checkout_started", { source: "paywall_dialog", feature: featureName });
         window.location.href = url;
       }
     } catch (error) {

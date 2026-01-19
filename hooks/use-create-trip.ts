@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 import { getTripUrl } from "@/lib/routes";
 import { useToast } from "@/components/ui/toast";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 export interface DestinationOption {
   id: string;
@@ -130,6 +131,8 @@ export function useCreateTrip() {
         });
         throw new Error(errorMsg);
       }
+
+      trackUmamiEvent("trip_created", { trip_id: tripId });
 
       // Bulletproof navigation: use replace + refresh + fallback
       const targetUrl = getTripUrl(tripId, 'itinerary');

@@ -14,6 +14,7 @@ import { Loader2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useLanguage } from "@/components/providers/language-provider";
 import { getStoredCoupon } from "@/lib/attribution/client";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 export type PaywallModalProps = {
   open: boolean;
@@ -69,6 +70,7 @@ export function PaywallModal({
 
       const { url } = await response.json();
       if (url) {
+        trackUmamiEvent("checkout_started", { source: "paywall_modal", trip_id: tripId });
         window.location.href = url;
       }
     } catch (error: any) {

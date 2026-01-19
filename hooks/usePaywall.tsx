@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { PaywallModal } from "@/components/billing/PaywallModal";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 interface PaywallContextType {
   openPaywall: (options?: PaywallOptions) => void;
@@ -36,6 +37,12 @@ export function PaywallProvider({ children }: { children: ReactNode }) {
       reason,
       source,
       tripId,
+    });
+
+    trackUmamiEvent("upgrade_clicked", {
+      source,
+      reason,
+      trip_id: tripId,
     });
 
     // Log paywall opening
