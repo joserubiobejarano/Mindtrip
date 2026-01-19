@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { auth } from '@clerk/nextjs/server';
 import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { sendNewsletterConfirmEmail } from '@/lib/email/resend';
 
@@ -42,7 +41,7 @@ export async function POST(request: Request) {
     const language = resolveLanguage(request, body?.language);
 
     const supabase = createSupabaseAdmin() as any;
-    const { userId } = await auth();
+    const userId = request.headers.get('x-clerk-user-id')?.trim() || null;
 
     let profileId: string | null = null;
     if (userId) {

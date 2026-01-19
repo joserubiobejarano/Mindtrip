@@ -9,7 +9,6 @@ import { NewCTASection } from "@/components/new-cta-section";
 import { NewNewsletterSection } from "@/components/new-newsletter-section";
 import { NewFooter } from "@/components/new-footer";
 import { type DestinationOption } from "@/hooks/use-create-trip";
-import { ExploreLinksSection } from "@/components/seo/ExploreLinksSection";
 
 export function HomePageClient({
   showChrome = true,
@@ -29,7 +28,7 @@ export function HomePageClient({
     };
 
     setDestination(foundDestination);
-    
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -39,7 +38,6 @@ export function HomePageClient({
       <NewHeroSection destination={destination} setDestination={setDestination} />
       <NewWhyChooseSection />
       <NewExperiencesSection onCityClick={handleCityClick} />
-      <ExploreLinksSection />
       <NewCTASection />
       <NewNewsletterSection />
     </>

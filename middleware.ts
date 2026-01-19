@@ -8,6 +8,9 @@ const isPublicRoute = createRouteMatcher([
   '/p(.*)',
   '/discover-kruno(.*)',
   '/discover(.*)',
+  '/api/newsletter/subscribe(.*)',
+  '/api/newsletter/confirm(.*)',
+  '/api/newsletter/unsubscribe(.*)',
   '/api/webhooks/clerk(.*)',
   '/api/debug(.*)',
 ])
