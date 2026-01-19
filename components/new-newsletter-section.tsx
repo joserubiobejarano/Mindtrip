@@ -8,13 +8,44 @@ import { useLanguage } from "@/components/providers/language-provider";
 
 export function NewNewsletterSection() {
   const [email, setEmail] = useState("");
-  const { t } = useLanguage();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<"idle" | "pending" | "subscribed" | "error">("idle");
+  const { t, language } = useLanguage();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement newsletter subscription
-    console.log("Newsletter subscription:", email);
-    setEmail("");
+    if (!email) return;
+
+    setIsSubmitting(true);
+    setStatus("idle");
+
+    try {
+      const response = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          source: "homepage_form",
+          language,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Subscription failed");
+      }
+
+      setStatus(data?.status === "subscribed" ? "subscribed" : "pending");
+      setEmail("");
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+      setStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -56,15 +87,32 @@ export function NewNewsletterSection() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-14 border-2 border-foreground rounded-full px-6 flex-1 font-mono text-sm bg-background focus:border-primary transition-colors"
                 required
+                disabled={isSubmitting}
               />
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-14 border-2 border-foreground font-mono text-xs tracking-wider uppercase shadow-md hover:shadow-lg transition-all"
               >
                 <Send className="mr-2 h-4 w-4" />
-                {t('home_newsletter_subscribe')}
+                {isSubmitting ? t('home_newsletter_loading') : t('home_newsletter_subscribe')}
               </Button>
             </form>
+            {status === "pending" && (
+              <p className="text-sm text-muted-foreground">
+                {t('home_newsletter_pending')}
+              </p>
+            )}
+            {status === "subscribed" && (
+              <p className="text-sm text-muted-foreground">
+                {t('home_newsletter_already_subscribed')}
+              </p>
+            )}
+            {status === "error" && (
+              <p className="text-sm text-destructive">
+                {t('home_newsletter_error')}
+              </p>
+            )}
           </div>
         </div>
       </div>

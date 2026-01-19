@@ -21,6 +21,7 @@ import { useToast } from "@/components/ui/toast";
 import { Sparkles, Check } from "lucide-react";
 import { NewNavbar } from "@/components/new-navbar";
 import { clearStoredCoupon, getStoredCoupon } from "@/lib/attribution/client";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const CURRENCIES = [
   "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR", "MXN",
@@ -28,7 +29,7 @@ const CURRENCIES = [
   "NZD", "KRW", "THB", "IDR", "PHP", "MYR", "VND", "AED", "SAR", "ILS"
 ];
 
-function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
+function SettingsContent({ showUpgrade, showNewsletterOptIn }: { showUpgrade: boolean; showNewsletterOptIn: boolean }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const { addToast } = useToast();
@@ -39,6 +40,11 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
   const [defaultCurrency, setDefaultCurrency] = useState("USD");
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("account");
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+  const [newsletterStatus, setNewsletterStatus] = useState<
+    "idle" | "pending" | "subscribed" | "unsubscribed" | "error"
+  >("idle");
+  const [isNewsletterSaving, setIsNewsletterSaving] = useState(false);
 
   // Fetch profile and subscription status
   const { data: profile, isLoading } = useQuery({
@@ -110,6 +116,12 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
       setActiveTab("billing");
     }
   }, [showUpgrade]);
+
+  useEffect(() => {
+    if (showNewsletterOptIn) {
+      setActiveTab("account");
+    }
+  }, [showNewsletterOptIn]);
 
   const saveProfile = useMutation({
     mutationFn: async () => {
@@ -222,6 +234,85 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
     return null;
   }
 
+  const handleNewsletterToggle = async (checked: boolean) => {
+    if (!user?.primaryEmailAddress?.emailAddress) {
+      addToast({
+        variant: "destructive",
+        title: "Missing email",
+        description: "Please add an email to your account first.",
+      });
+      return;
+    }
+
+    const email = user.primaryEmailAddress.emailAddress;
+    const language = typeof navigator !== "undefined" && navigator.language.toLowerCase().startsWith("es")
+      ? "es"
+      : "en";
+
+    setIsNewsletterSaving(true);
+    setNewsletterStatus("idle");
+
+    try {
+      if (checked) {
+        const response = await fetch("/api/newsletter/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            name: displayName || user.fullName,
+            source: "settings",
+            language,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.error || "Subscription failed");
+        }
+
+        setNewsletterOptIn(true);
+        setNewsletterStatus(data?.status === "subscribed" ? "subscribed" : "pending");
+        addToast({
+          variant: "success",
+          title: "Newsletter updated",
+          description:
+            data?.status === "subscribed"
+              ? "You're already subscribed."
+              : "Check your inbox to confirm your subscription.",
+        });
+      } else {
+        const response = await fetch("/api/newsletter/unsubscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.error || "Unsubscribe failed");
+        }
+
+        setNewsletterOptIn(false);
+        setNewsletterStatus("unsubscribed");
+        addToast({
+          variant: "success",
+          title: "Unsubscribed",
+          description: "You have been unsubscribed from the newsletter.",
+        });
+      }
+    } catch (error) {
+      console.error("Newsletter preference error:", error);
+      setNewsletterStatus("error");
+      addToast({
+        variant: "destructive",
+        title: "Newsletter update failed",
+        description: "Please try again.",
+      });
+    } finally {
+      setIsNewsletterSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <NewNavbar />
@@ -277,6 +368,17 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                     </CardContent>
                   </Card>
 
+                  {showNewsletterOptIn && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Stay in the loop</CardTitle>
+                        <CardDescription>
+                          Opt in to receive travel tips and product updates. We&apos;ll ask you to confirm by email.
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  )}
+
                   {/* Preferences Card */}
                   <Card>
                     <CardHeader>
@@ -315,6 +417,42 @@ function SettingsContent({ showUpgrade }: { showUpgrade: boolean }) {
                         <p className="text-xs text-muted-foreground">
                           Default currency for new trips
                         </p>
+                      </div>
+                      <div className="space-y-3 border-t pt-4">
+                        <div className="flex items-start gap-3">
+                          <Checkbox
+                            id="newsletterOptIn"
+                            checked={newsletterOptIn}
+                            disabled={isNewsletterSaving}
+                            onCheckedChange={(checked) => handleNewsletterToggle(Boolean(checked))}
+                          />
+                          <div className="space-y-1">
+                            <Label htmlFor="newsletterOptIn">Newsletter</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Send me travel tips and product updates from Kruno.
+                            </p>
+                            {newsletterStatus === "pending" && (
+                              <p className="text-xs text-muted-foreground">
+                                Check your inbox to confirm your subscription.
+                              </p>
+                            )}
+                            {newsletterStatus === "unsubscribed" && (
+                              <p className="text-xs text-muted-foreground">
+                                You are unsubscribed from marketing emails.
+                              </p>
+                            )}
+                            {newsletterStatus === "subscribed" && (
+                              <p className="text-xs text-muted-foreground">
+                                You&apos;re already subscribed.
+                              </p>
+                            )}
+                            {newsletterStatus === "error" && (
+                              <p className="text-xs text-destructive">
+                                Something went wrong. Please try again.
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       <div className="pt-4">
                         <Button
@@ -515,6 +653,7 @@ export default function SettingsPageClient() {
 function SettingsPageContent() {
   const searchParams = useSearchParams();
   const showUpgrade = searchParams?.get("upgrade") === "true";
+  const showNewsletterOptIn = searchParams?.get("newsletter") === "optin";
   
-  return <SettingsContent showUpgrade={showUpgrade} />;
+  return <SettingsContent showUpgrade={showUpgrade} showNewsletterOptIn={showNewsletterOptIn} />;
 }

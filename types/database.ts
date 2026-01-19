@@ -74,6 +74,65 @@ export interface Database {
           trips_created_count?: number
         }
       }
+      newsletter_subscribers: {
+        Row: {
+          id: string
+          user_id: string | null
+          email: string
+          name: string | null
+          source: string
+          language: string
+          status: string
+          interests: Json | null
+          provider: string | null
+          provider_contact_id: string | null
+          confirm_token: string
+          manage_token: string
+          confirm_sent_at: string | null
+          confirmed_at: string | null
+          unsubscribed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          email: string
+          name?: string | null
+          source?: string
+          language?: string
+          status?: string
+          interests?: Json | null
+          provider?: string | null
+          provider_contact_id?: string | null
+          confirm_token: string
+          manage_token?: string
+          confirm_sent_at?: string | null
+          confirmed_at?: string | null
+          unsubscribed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          email?: string
+          name?: string | null
+          source?: string
+          language?: string
+          status?: string
+          interests?: Json | null
+          provider?: string | null
+          provider_contact_id?: string | null
+          confirm_token?: string
+          manage_token?: string
+          confirm_sent_at?: string | null
+          confirmed_at?: string | null
+          unsubscribed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       trips: {
         Row: {
           id: string

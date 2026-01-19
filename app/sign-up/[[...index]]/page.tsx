@@ -18,7 +18,7 @@ type SignUpPageProps = {
 
 const getSafeRedirectUrl = (value?: string | string[]) => {
   const redirectValue = Array.isArray(value) ? value[0] : value;
-  if (!redirectValue) return "/";
+  if (!redirectValue) return "/settings?newsletter=optin";
   return redirectValue.startsWith("/") ? redirectValue : "/";
 };
 

@@ -3,7 +3,7 @@ import { getEmailCopy, type EmailLanguage } from '../email-copy';
 
 let resendClient: Resend | null = null;
 
-function getResendClient(): Resend {
+export function getResendClient(): Resend {
   if (resendClient) {
     return resendClient;
   }
@@ -187,6 +187,95 @@ export async function sendSubscriptionCanceledEmail(params: {
     replyTo: "hello@kruno.app",
     headers: {
       "List-Unsubscribe": "<mailto:unsubscribe@kruno.app>",
+    },
+  });
+}
+
+export async function sendNewsletterConfirmEmail(params: {
+  email: string;
+  name?: string | null;
+  language?: EmailLanguage;
+  confirmUrl: string;
+  manageUrl: string;
+}) {
+  const resend = getResendClient();
+  const from = process.env.MARKETING_EMAIL_FROM ?? 'Jose from Kruno <jose@kruno.app>';
+  const replyTo = process.env.MARKETING_EMAIL_REPLY_TO ?? 'hello@kruno.app';
+  const language = params.language || 'en';
+
+  const emailCopy = getEmailCopy('newsletter_confirm', language, {
+    firstName: params.name,
+    confirmUrl: params.confirmUrl,
+    manageUrl: params.manageUrl,
+    appName: 'Kruno',
+  });
+
+  return resend.emails.send({
+    from,
+    to: params.email,
+    subject: emailCopy.subject,
+    html: emailCopy.html,
+    text: emailCopy.text,
+    replyTo,
+    headers: {
+      "List-Unsubscribe": `<mailto:${replyTo}>, <${params.manageUrl}>`,
+    },
+  });
+}
+
+export async function sendNewsletterWelcomeEmail(params: {
+  email: string;
+  name?: string | null;
+  language?: EmailLanguage;
+  manageUrl: string;
+}) {
+  const resend = getResendClient();
+  const from = process.env.MARKETING_EMAIL_FROM ?? 'Jose from Kruno <jose@kruno.app>';
+  const replyTo = process.env.MARKETING_EMAIL_REPLY_TO ?? 'hello@kruno.app';
+  const language = params.language || 'en';
+
+  const emailCopy = getEmailCopy('newsletter_welcome', language, {
+    firstName: params.name,
+    manageUrl: params.manageUrl,
+    appName: 'Kruno',
+  });
+
+  return resend.emails.send({
+    from,
+    to: params.email,
+    subject: emailCopy.subject,
+    html: emailCopy.html,
+    text: emailCopy.text,
+    replyTo,
+    headers: {
+      "List-Unsubscribe": `<mailto:${replyTo}>, <${params.manageUrl}>`,
+    },
+  });
+}
+
+export async function sendNewsletterUnsubscribedEmail(params: {
+  email: string;
+  name?: string | null;
+  language?: EmailLanguage;
+}) {
+  const resend = getResendClient();
+  const from = process.env.MARKETING_EMAIL_FROM ?? 'Jose from Kruno <jose@kruno.app>';
+  const replyTo = process.env.MARKETING_EMAIL_REPLY_TO ?? 'hello@kruno.app';
+  const language = params.language || 'en';
+
+  const emailCopy = getEmailCopy('newsletter_unsubscribed', language, {
+    firstName: params.name,
+    appName: 'Kruno',
+  });
+
+  return resend.emails.send({
+    from,
+    to: params.email,
+    subject: emailCopy.subject,
+    text: emailCopy.text,
+    replyTo,
+    headers: {
+      "List-Unsubscribe": `<mailto:${replyTo}>`,
     },
   });
 }

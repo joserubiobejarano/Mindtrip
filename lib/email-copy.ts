@@ -43,6 +43,24 @@ type ExpensesSummaryParams = {
   summaryText: string;
 };
 
+type NewsletterConfirmParams = {
+  firstName?: string | null;
+  confirmUrl: string;
+  manageUrl: string;
+  appName?: string;
+};
+
+type NewsletterWelcomeParams = {
+  firstName?: string | null;
+  manageUrl: string;
+  appName?: string;
+};
+
+type NewsletterUnsubscribedParams = {
+  firstName?: string | null;
+  appName?: string;
+};
+
 type EmailCopyResult = {
   subject: string;
   text: string;
@@ -85,6 +103,21 @@ export function getEmailCopy(
   params: ExpensesSummaryParams
 ): EmailCopyResult;
 export function getEmailCopy(
+  template: 'newsletter_confirm',
+  language: EmailLanguage,
+  params: NewsletterConfirmParams
+): EmailCopyResult;
+export function getEmailCopy(
+  template: 'newsletter_welcome',
+  language: EmailLanguage,
+  params: NewsletterWelcomeParams
+): EmailCopyResult;
+export function getEmailCopy(
+  template: 'newsletter_unsubscribed',
+  language: EmailLanguage,
+  params: NewsletterUnsubscribedParams
+): EmailCopyResult;
+export function getEmailCopy(
   template:
     | 'welcome'
     | 'trip_ready'
@@ -92,7 +125,10 @@ export function getEmailCopy(
     | 'subscription_canceled'
     | 'trip_reminder'
     | 'trip_invite'
-    | 'expenses_summary',
+    | 'expenses_summary'
+    | 'newsletter_confirm'
+    | 'newsletter_welcome'
+    | 'newsletter_unsubscribed',
   language: EmailLanguage,
   params:
     | WelcomeParams
@@ -102,6 +138,9 @@ export function getEmailCopy(
     | TripReminderParams
     | TripInviteParams
     | ExpensesSummaryParams
+    | NewsletterConfirmParams
+    | NewsletterWelcomeParams
+    | NewsletterUnsubscribedParams
 ): EmailCopyResult {
   const lang = language || 'en';
 
@@ -120,6 +159,12 @@ export function getEmailCopy(
       return getTripInviteCopy(lang, params as TripInviteParams);
     case 'expenses_summary':
       return getExpensesSummaryCopy(lang, params as ExpensesSummaryParams);
+    case 'newsletter_confirm':
+      return getNewsletterConfirmCopy(lang, params as NewsletterConfirmParams);
+    case 'newsletter_welcome':
+      return getNewsletterWelcomeCopy(lang, params as NewsletterWelcomeParams);
+    case 'newsletter_unsubscribed':
+      return getNewsletterUnsubscribedCopy(lang, params as NewsletterUnsubscribedParams);
   }
 }
 
@@ -458,6 +503,240 @@ Este resumen muestra quién debe dinero y a quién se le debe dinero basado en l
 ${summaryText}
 
 This summary shows who owes money and who is owed money based on the expenses recorded for this trip.`,
+  };
+}
+
+function buildNewsletterHtml(params: {
+  subject: string;
+  greeting: string;
+  bodyLines: string[];
+  ctaLabel: string;
+  ctaUrl: string;
+  fallbackLabel: string;
+  manageUrl: string;
+  footerLine: string;
+}): string {
+  const {
+    subject,
+    greeting,
+    bodyLines,
+    ctaLabel,
+    ctaUrl,
+    fallbackLabel,
+    manageUrl,
+    footerLine,
+  } = params;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background-color: #f8f9fa; border-radius: 8px; padding: 30px; text-align: left;">
+    <h1 style="color: #2563eb; margin-top: 0; font-size: 24px;">${subject}</h1>
+    <p style="font-size: 16px; margin: 16px 0;">${greeting}</p>
+    ${bodyLines.map((line) => `<p style="font-size: 16px; margin: 16px 0;">${line}</p>`).join('')}
+    <div style="margin: 28px 0;">
+      <a href="${ctaUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 16px;">${ctaLabel}</a>
+    </div>
+    <p style="font-size: 14px; color: #666; margin-top: 20px;">
+      ${fallbackLabel}<br>
+      <a href="${ctaUrl}" style="color: #2563eb; word-break: break-all;">${ctaUrl}</a>
+    </p>
+  </div>
+  <p style="font-size: 12px; color: #999; text-align: center; margin-top: 24px;">
+    ${footerLine} <a href="${manageUrl}" style="color: #2563eb;">${manageUrl}</a>
+  </p>
+</body>
+</html>
+  `.trim();
+}
+
+function getNewsletterConfirmCopy(
+  language: EmailLanguage,
+  params: NewsletterConfirmParams
+): EmailCopyResult {
+  const appName = params.appName || 'Kruno';
+  const greeting = buildGreeting(language, params.firstName);
+
+  if (language === 'es') {
+    const subject = `Confirma tu suscripcion a ${appName}`;
+    const text = `${greeting}
+
+Gracias por suscribirte al newsletter de ${appName}.
+
+Confirma tu suscripcion haciendo clic aqui:
+${params.confirmUrl}
+
+Si no solicitaste esto, ignora este correo.
+
+Para darte de baja en cualquier momento:
+${params.manageUrl}
+    `.trim();
+
+    return {
+      subject,
+      text,
+      html: buildNewsletterHtml({
+        subject,
+        greeting,
+        bodyLines: [
+          `Gracias por suscribirte al newsletter de ${appName}.`,
+          'Confirma tu suscripcion para empezar a recibir novedades y tips de viaje.',
+        ],
+        ctaLabel: 'Confirmar suscripcion',
+        ctaUrl: params.confirmUrl,
+        fallbackLabel: 'Si el boton no funciona, copia y pega este enlace:',
+        manageUrl: params.manageUrl,
+        footerLine: 'Puedes darte de baja cuando quieras:',
+      }),
+    };
+  }
+
+  const subject = `Confirm your ${appName} newsletter subscription`;
+  const text = `${greeting}
+
+Thanks for subscribing to the ${appName} newsletter.
+
+Please confirm your subscription here:
+${params.confirmUrl}
+
+If you did not request this, you can ignore this email.
+
+Unsubscribe any time:
+${params.manageUrl}
+  `.trim();
+
+  return {
+    subject,
+    text,
+    html: buildNewsletterHtml({
+      subject,
+      greeting,
+      bodyLines: [
+        `Thanks for subscribing to the ${appName} newsletter.`,
+        'Confirm your subscription to start receiving updates and travel tips.',
+      ],
+      ctaLabel: 'Confirm subscription',
+      ctaUrl: params.confirmUrl,
+      fallbackLabel: "If the button doesn't work, copy and paste this link:",
+      manageUrl: params.manageUrl,
+      footerLine: 'Unsubscribe any time:',
+    }),
+  };
+}
+
+function getNewsletterWelcomeCopy(
+  language: EmailLanguage,
+  params: NewsletterWelcomeParams
+): EmailCopyResult {
+  const appName = params.appName || 'Kruno';
+  const greeting = buildGreeting(language, params.firstName);
+
+  if (language === 'es') {
+    const subject = `Ya estas suscrito a ${appName}`;
+    const text = `${greeting}
+
+Tu suscripcion esta confirmada. A partir de ahora recibirás ideas de destinos, itinerarios y novedades de ${appName}.
+
+Gracias por estar aqui,
+Jose
+Fundador de ${appName}
+
+Gestiona tu suscripcion aqui:
+${params.manageUrl}
+    `.trim();
+
+    return {
+      subject,
+      text,
+      html: buildNewsletterHtml({
+        subject,
+        greeting,
+        bodyLines: [
+          `Tu suscripcion esta confirmada.`,
+          `A partir de ahora recibiras ideas de destinos, itinerarios y novedades de ${appName}.`,
+        ],
+        ctaLabel: 'Ver novedades',
+        ctaUrl: process.env.APP_URL || 'https://www.kruno.app',
+        fallbackLabel: 'Si el boton no funciona, copia y pega este enlace:',
+        manageUrl: params.manageUrl,
+        footerLine: 'Puedes darte de baja cuando quieras:',
+      }),
+    };
+  }
+
+  const subject = `You're subscribed to ${appName} updates`;
+  const text = `${greeting}
+
+Your subscription is confirmed. You'll now receive destination ideas, itineraries, and ${appName} updates.
+
+Thanks for being here,
+Jose
+Founder, ${appName}
+
+Manage your subscription here:
+${params.manageUrl}
+  `.trim();
+
+  return {
+    subject,
+    text,
+    html: buildNewsletterHtml({
+      subject,
+      greeting,
+      bodyLines: [
+        'Your subscription is confirmed.',
+        `You'll now receive destination ideas, itineraries, and ${appName} updates.`,
+      ],
+      ctaLabel: 'Explore Kruno',
+      ctaUrl: process.env.APP_URL || 'https://www.kruno.app',
+      fallbackLabel: "If the button doesn't work, copy and paste this link:",
+      manageUrl: params.manageUrl,
+      footerLine: 'Unsubscribe any time:',
+    }),
+  };
+}
+
+function getNewsletterUnsubscribedCopy(
+  language: EmailLanguage,
+  params: NewsletterUnsubscribedParams
+): EmailCopyResult {
+  const appName = params.appName || 'Kruno';
+  const greeting = buildGreeting(language, params.firstName);
+
+  if (language === 'es') {
+    return {
+      subject: `Te has dado de baja de ${appName}`,
+      text: `${greeting}
+
+Tu suscripcion al newsletter de ${appName} ha sido cancelada.
+
+Si fue un error, puedes volver a suscribirte en cualquier momento desde nuestra web.
+
+Gracias,
+Jose
+Fundador de ${appName}
+      `.trim(),
+    };
+  }
+
+  return {
+    subject: `You're unsubscribed from ${appName}`,
+    text: `${greeting}
+
+You have been unsubscribed from the ${appName} newsletter.
+
+If this was a mistake, you can resubscribe anytime on our website.
+
+Thanks,
+Jose
+Founder, ${appName}
+    `.trim(),
   };
 }
 
