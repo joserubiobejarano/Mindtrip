@@ -2,6 +2,18 @@ export type ItineraryLocale = "en" | "es";
 
 type ItineraryCopy = {
   heroEyebrowLabel: string;
+  iconNav: {
+    overview: string;
+    facts: string;
+    top: string;
+    attractions: string;
+    history: string;
+    food: string;
+    logistics: string;
+    checklist: string;
+    tips: string;
+  };
+  cityStatsTitle: string;
   quickFactsTitle: string;
   quickFactsLabels: {
     duration: string;
@@ -36,6 +48,8 @@ type ItineraryCopy = {
   checklistSubtitle: string;
   faqTitle: string;
   relatedTitle: string;
+  imageInfoTitle: string;
+  imageInfoSubtitle: string;
   primaryCtaTitle: string;
   primaryCtaBody: string;
   primaryCtaButton: string;
@@ -47,6 +61,18 @@ type ItineraryCopy = {
 const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
   en: {
     heroEyebrowLabel: "City itinerary",
+    iconNav: {
+      overview: "Overview",
+      facts: "Quick facts",
+      top: "Top",
+      attractions: "Attractions",
+      history: "History",
+      food: "Food",
+      logistics: "Logistics",
+      checklist: "Checklist",
+      tips: "Tips / FAQ",
+    },
+    cityStatsTitle: "City by numbers",
     quickFactsTitle: "Quick facts",
     quickFactsLabels: {
       duration: "Duration",
@@ -81,6 +107,9 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
     checklistSubtitle: "Tap items as you prepare. No sign-in needed.",
     faqTitle: "Frequently asked questions",
     relatedTitle: "Related itineraries",
+    imageInfoTitle: "City stories & context",
+    imageInfoSubtitle:
+      "Short editorial snapshots that highlight neighborhoods, themes, and the city's everyday rhythm.",
     primaryCtaTitle: "Build this trip in Kruno",
     primaryCtaBody:
       "Turn this itinerary into a personalized plan with dates, preferences, and AI recommendations.",
@@ -91,6 +120,18 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
   },
   es: {
     heroEyebrowLabel: "Itinerario por ciudad",
+    iconNav: {
+      overview: "Resumen",
+      facts: "Datos",
+      top: "Top",
+      attractions: "Atracciones",
+      history: "Historia",
+      food: "Comida",
+      logistics: "Logistica",
+      checklist: "Lista",
+      tips: "Consejos / FAQ",
+    },
+    cityStatsTitle: "La ciudad en cifras",
     quickFactsTitle: "Datos rapidos",
     quickFactsLabels: {
       duration: "Duracion",
@@ -125,6 +166,9 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
     checklistSubtitle: "Marca los puntos mientras preparas el viaje.",
     faqTitle: "Preguntas frecuentes",
     relatedTitle: "Itinerarios relacionados",
+    imageInfoTitle: "Historias y contexto",
+    imageInfoSubtitle:
+      "Notas editoriales breves para destacar barrios, temas y el ritmo cotidiano de la ciudad.",
     primaryCtaTitle: "Crea este viaje en Kruno",
     primaryCtaBody:
       "Convierte este itinerario en un plan personalizado con fechas, preferencias y recomendaciones de IA.",

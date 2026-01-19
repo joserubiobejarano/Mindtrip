@@ -1,7 +1,7 @@
 # Kruno - Developer Summary & Project Overview
 
-> **Last Updated:** January 2025 (Phase 23 SEO complete)  
-> **Project Status:** Active Development - 23 of 29 phases completed (~79%)
+> **Last Updated:** January 2025 (Phase 23.5 City Itinerary Pages complete)  
+> **Project Status:** Active Development - 23.5 of 29 phases completed (~81%)
 
 ## 📋 Table of Contents
 
@@ -452,6 +452,23 @@ kruno/
 - ✅ Test endpoints for all email types (`/api/test/*`)
 - ✅ Migration file: `database/migrations/add-email-sent-fields.sql`
 
+**Phase 23.5 - City Itinerary Pages** ✅ **COMPLETE** **NEW**
+- ✅ City itinerary data system (`lib/itinerary/city-itineraries.ts`):
+  - Type-safe `CityItinerary` data structure
+  - 6 English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+  - 6 Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+  - Day plans with morning/afternoon/evening activities
+  - City stats, logistics, checklists, FAQs
+  - Related itineraries for cross-linking
+- ✅ Itinerary i18n system (`lib/i18n/itinerary.ts`):
+  - Complete bilingual UI copy (English and Spanish)
+  - Icon navigation labels, section titles, CTA buttons
+  - Type-safe `ItineraryCopy` interface
+- ✅ 14 itinerary UI components (`components/itinerary/`):
+  - Hero, IconNav, CityStats, QuickFacts, DayOverviewTable, DayBlock
+  - ImageInfoCards, LogisticsTable, Checklist (interactive, no login)
+  - FAQAccordion, RelatedItineraries, PrimaryCTA, SectionBand, SafeImage
+
 **Phase 23 - SEO & Programmatic Marketing** ✅ **COMPLETE** **NEW**
 - ✅ Core SEO infrastructure:
   - `app/robots.ts` - Dynamic robots.txt generation
@@ -488,10 +505,10 @@ kruno/
 
 ### 📊 Progress Summary
 
-- **Completed**: 23 phases (Phases 1-23)
+- **Completed**: 23.5 phases (Phases 1-23.5, including City Itinerary Pages)
 - **In Progress**: None
-- **Planned**: 6 phases remaining (Phases 24-29)
-- **Completion**: ~79%
+- **Planned**: 5.5 phases remaining (Phases 24-29)
+- **Completion**: ~81%
 - **Next Priority**: Phase 24 - Enhanced User Experience (templates, weather, photos)
 
 ---
@@ -1308,6 +1325,16 @@ For questions or issues:
 
 **Recent Additions (January 2025):**
 
+- **City Itinerary Pages** (Phase 23.5):
+  - ✅ Rich city itinerary data system (`lib/itinerary/city-itineraries.ts`)
+  - ✅ 6 English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+  - ✅ 6 Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+  - ✅ Itinerary i18n system (`lib/i18n/itinerary.ts`) for bilingual UI
+  - ✅ 14 itinerary UI components (`components/itinerary/`)
+  - ✅ Day plans, city stats, logistics, checklists, FAQs
+  - ✅ Interactive checklist (no sign-in required)
+  - ✅ Related itineraries for cross-linking
+
 - **SEO & Programmatic Marketing** (Phase 23):
   - ✅ Dynamic `robots.txt` and `sitemap.xml` via App Router routes
   - ✅ SEO utility library (`lib/seo/`) with canonical URLs, metadata builder
@@ -1401,6 +1428,6 @@ The project is well-structured, documented, and ready for continued development.
 
 ---
 
-**Last Updated**: January 2025 (Phase 23 SEO complete)  
-**Document Version**: 3.0 - Updated with SEO, bilingual marketing, and programmatic pages
+**Last Updated**: January 2025 (Phase 23.5 City Itinerary Pages complete)  
+**Document Version**: 3.1 - Updated with city itinerary pages, itinerary i18n, and 14 new components
 

@@ -646,8 +646,21 @@ app/
     │   ├── ExploreDeck.tsx ✅
     │   ├── ExploreFilters.tsx ✅
     │   └── SwipeCounter.tsx ✅
-    └── itinerary/
-        └── (day-level integration now in itinerary-tab.tsx) ✅
+    └── itinerary/                    # ✅ NEW: City itinerary page components
+        ├── Hero.tsx                  # Hero section with city image
+        ├── IconNav.tsx               # Horizontal section navigation
+        ├── CityStats.tsx             # City statistics grid
+        ├── QuickFacts.tsx            # Trip quick facts display
+        ├── DayOverviewTable.tsx      # At-a-glance day plan table
+        ├── DayBlock.tsx              # Day-by-day breakdown
+        ├── ImageInfoCards.tsx        # Editorial image cards
+        ├── LogisticsTable.tsx        # Practical tips table
+        ├── Checklist.tsx             # Interactive checklist (no login)
+        ├── FAQAccordion.tsx          # Collapsible FAQs
+        ├── RelatedItineraries.tsx    # Related city cards
+        ├── PrimaryCTA.tsx            # Trip creation CTA
+        ├── SectionBand.tsx           # Section wrapper
+        └── SafeImage.tsx             # Error-handled images
 ```
 
 ### State Management
@@ -696,7 +709,10 @@ lib/
 │   ├── cities.ts                    # City pages data for programmatic SEO
 │   └── influencers.ts               # Influencer pages data for programmatic SEO
 ├── i18n/                            # ✅ NEW: Internationalization
-│   └── marketing.ts                 # Marketing copy for bilingual pages
+│   ├── marketing.ts                 # Marketing copy for bilingual pages
+│   └── itinerary.ts                 # ✅ NEW: Itinerary UI copy (en/es)
+├── itinerary/                       # ✅ NEW: Itinerary content
+│   └── city-itineraries.ts          # City itinerary data (6 en + 6 es cities)
 ├── supabase/                        # Supabase clients and helpers
 │   ├── user-subscription.ts         # Subscription status checking
 │   └── explore-integration.ts       # Explore feature integration
@@ -1051,6 +1067,13 @@ lib/
 ## Recent Changes Summary (January 2025)
 
 ### Added
+- **City Itinerary Pages** (Phase 23.5):
+  - Rich city itinerary data system (`lib/itinerary/city-itineraries.ts`) with 6 English and 6 Spanish cities
+  - Itinerary i18n system (`lib/i18n/itinerary.ts`) for bilingual UI copy
+  - 14 new itinerary UI components (`components/itinerary/`) for content display
+  - City stats, day plans, logistics, checklists, FAQs, related itineraries
+  - Interactive checklist feature (no sign-in required)
+  - Editorial image info cards for city context
 - **SEO & Programmatic Marketing** (Phase 23):
   - Dynamic `robots.txt` and `sitemap.xml` via App Router routes
   - SEO utility library (`lib/seo/`) with canonical URL builder, metadata helper
@@ -1078,5 +1101,5 @@ lib/
 ### Removed
 - None (no features removed in this update)
 
-**Last Updated:** January 2025 (Phase 23 SEO complete)
+**Last Updated:** January 2025 (Phase 23.5 City Itinerary Pages complete)
 

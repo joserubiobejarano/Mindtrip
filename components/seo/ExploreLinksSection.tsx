@@ -5,12 +5,17 @@ import { usePathname } from "next/navigation";
 import { cityPages } from "@/lib/seo/cities";
 import { influencerPages } from "@/lib/seo/influencers";
 import { getMarketingCopy } from "@/lib/i18n/marketing";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function ExploreLinksSection() {
+  const { language } = useLanguage();
   const pathname = usePathname();
-  const basePath =
-    pathname?.startsWith("/es") ? "/es" : pathname?.startsWith("/en") ? "/en" : "";
-  const locale = pathname?.startsWith("/es") ? "es" : "en";
+  const locale = pathname?.startsWith("/es")
+    ? "es"
+    : pathname?.startsWith("/en")
+      ? "en"
+      : language;
+  const basePath = locale ? `/${locale}` : "";
   const copy = getMarketingCopy(locale);
   const withBasePath = (path: string) => `${basePath}${path}`;
 

@@ -423,6 +423,34 @@ _See "Recently Completed" section above for full details. All features have been
   - [x] Influencers hub with creator cards and internal linking
   - [x] Influencer detail pages with profile, CTA, and related creators
 
+### Phase 23.5 - City Itinerary Pages ✅ **NEW**
+- [x] City itinerary data system (`lib/itinerary/city-itineraries.ts`):
+  - [x] Type-safe `CityItinerary` data structure with full trip details
+  - [x] Bilingual city data for Rome, Paris, Barcelona, Amsterdam, London (en)
+  - [x] Bilingual city data for Rome, Madrid, Paris, Barcelona, Lisbon (es)
+  - [x] Day plans with morning/afternoon/evening activities
+  - [x] City stats, logistics, checklists, FAQs, related itineraries
+  - [x] Hero images and image info cards for visual richness
+- [x] Itinerary i18n system (`lib/i18n/itinerary.ts`):
+  - [x] Complete bilingual copy for itinerary UI elements
+  - [x] Icon navigation labels, section titles, CTA buttons
+  - [x] Type-safe `ItineraryCopy` interface
+- [x] Itinerary UI Components (`components/itinerary/`):
+  - [x] `Hero.tsx` - Hero section with city image and eyebrow label
+  - [x] `IconNav.tsx` - Horizontal icon navigation for sections
+  - [x] `CityStats.tsx` - City statistics display grid
+  - [x] `QuickFacts.tsx` - Duration, pace, ideal for, style facts
+  - [x] `DayOverviewTable.tsx` - At-a-glance day plan table
+  - [x] `DayBlock.tsx` - Day-by-day breakdown with morning/afternoon/evening
+  - [x] `ImageInfoCards.tsx` - Editorial image cards with descriptions
+  - [x] `LogisticsTable.tsx` - Practical logistics and tips table
+  - [x] `Checklist.tsx` - Interactive pre-trip checklist (no sign-in needed)
+  - [x] `FAQAccordion.tsx` - Collapsible FAQ section
+  - [x] `RelatedItineraries.tsx` - Related city itinerary cards
+  - [x] `PrimaryCTA.tsx` - Call-to-action section for trip creation
+  - [x] `SectionBand.tsx` - Reusable section wrapper with styling
+  - [x] `SafeImage.tsx` - Image component with error handling
+
 **Future Enhancements (Post-Phase 23):**
 - [ ] AI suggestions for specific day/time slot
 - [ ] Additional advanced filters for Explore (Pro tier):
@@ -513,7 +541,7 @@ For later implementation phases:
 
 ## 📝 Notes
 
-- **Last Updated**: January 2025 (Phase 23 SEO complete)
+- **Last Updated**: January 2025 (Phase 23.5 City Itinerary Pages complete)
 - The application uses Clerk for authentication instead of Supabase Auth
 - Database schema uses TEXT for user IDs to support Clerk's ID format
 - Realtime features require enabling replication in Supabase dashboard
@@ -750,6 +778,35 @@ For later implementation phases:
 - `POST /api/intent/travel` - Travel intent detection (placeholder for future use)
 
 ## 🔄 Recent Updates (January 2025)
+
+- **2025-01-XX**: City Itinerary Pages ✅ **NEW**
+  - **Rich City Itinerary Content System**:
+    - ✅ Complete city itinerary data structure (`lib/itinerary/city-itineraries.ts`)
+    - ✅ 6 cities with English content: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+    - ✅ 6 cities with Spanish content: Rome, Madrid, Paris, Barcelona, Lisbon
+    - ✅ Day plans with morning/afternoon/evening activities
+    - ✅ City stats, logistics, checklists, FAQs for each city
+    - ✅ Related itineraries for cross-linking
+    - ✅ Hero images and editorial image info cards
+  - **Itinerary i18n System** (`lib/i18n/itinerary.ts`):
+    - ✅ Complete bilingual UI copy (English and Spanish)
+    - ✅ Icon navigation labels, section titles, CTA buttons
+    - ✅ Type-safe `ItineraryCopy` interface
+  - **14 New Itinerary UI Components** (`components/itinerary/`):
+    - ✅ `Hero.tsx` - Hero section with city image
+    - ✅ `IconNav.tsx` - Horizontal section navigation
+    - ✅ `CityStats.tsx` - City statistics grid
+    - ✅ `QuickFacts.tsx` - Trip quick facts
+    - ✅ `DayOverviewTable.tsx` - At-a-glance day table
+    - ✅ `DayBlock.tsx` - Day-by-day breakdown
+    - ✅ `ImageInfoCards.tsx` - Editorial image cards
+    - ✅ `LogisticsTable.tsx` - Practical tips table
+    - ✅ `Checklist.tsx` - Interactive checklist (no login)
+    - ✅ `FAQAccordion.tsx` - Collapsible FAQs
+    - ✅ `RelatedItineraries.tsx` - Related city cards
+    - ✅ `PrimaryCTA.tsx` - Trip creation CTA
+    - ✅ `SectionBand.tsx` - Section wrapper
+    - ✅ `SafeImage.tsx` - Error-handled images
 
 - **2025-01-XX**: SEO & Programmatic Marketing ✅ **NEW**
   - **Complete SEO Infrastructure**:

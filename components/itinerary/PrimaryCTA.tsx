@@ -17,8 +17,8 @@ export function PrimaryCTA({
 }: PrimaryCTAProps) {
   const containerClass =
     variant === "primary"
-      ? "rounded-3xl bg-primary text-primary-foreground"
-      : "rounded-3xl border border-border bg-muted/40";
+      ? "rounded-3xl bg-primary text-primary-foreground shadow-lg"
+      : "rounded-3xl border border-border bg-muted/30";
   const buttonClass =
     variant === "primary"
       ? "bg-primary-foreground text-primary"

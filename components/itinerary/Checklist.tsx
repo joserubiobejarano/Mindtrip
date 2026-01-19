@@ -14,14 +14,17 @@ export function Checklist({ title, subtitle, items }: ChecklistProps) {
   const [checked, setChecked] = useState(initialState);
 
   return (
-    <section className="rounded-2xl border border-border/60 bg-background p-6 space-y-4">
+    <section className="rounded-3xl border border-border/70 bg-background p-6 shadow-md md:p-8 space-y-4">
       <div>
         <h2 className="text-2xl font-semibold">{title}</h2>
-        {subtitle ? <p className="text-muted-foreground">{subtitle}</p> : null}
+        {subtitle ? <p className="mt-2 text-muted-foreground">{subtitle}</p> : null}
       </div>
       <div className="space-y-3">
         {items.map((item, index) => (
-          <label key={item} className="flex items-start gap-3 text-sm">
+          <label
+            key={item}
+            className="flex items-start gap-3 rounded-2xl border border-border/60 bg-muted/10 px-4 py-3 text-sm shadow-sm"
+          >
             <Checkbox
               checked={checked[index]}
               onCheckedChange={(value) => {

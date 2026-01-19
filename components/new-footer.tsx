@@ -5,10 +5,14 @@ import { usePathname } from "next/navigation";
 import { useLanguage } from "@/components/providers/language-provider";
 
 export function NewFooter() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const pathname = usePathname();
-  const basePath =
-    pathname?.startsWith("/es") ? "/es" : pathname?.startsWith("/en") ? "/en" : "";
+  const resolvedLocale = pathname?.startsWith("/es")
+    ? "es"
+    : pathname?.startsWith("/en")
+      ? "en"
+      : language;
+  const basePath = resolvedLocale ? `/${resolvedLocale}` : "";
   const withBasePath = (path: string) => `${basePath}${path}`;
   return (
     <footer className="py-12 px-6" style={{ backgroundColor: 'hsl(var(--cream))' }}>
@@ -55,8 +59,8 @@ export function NewFooter() {
               ></span>
             </h3>
             <ul className="space-y-2">
-              <li><Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_about')}</Link></li>
-              <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_press')}</Link></li>
+              <li><Link href={withBasePath("/about")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_about')}</Link></li>
+              <li><Link href={withBasePath("/contact")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_press')}</Link></li>
               <li><Link href={withBasePath("/cities")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_blog')}</Link></li>
             </ul>
           </div>
@@ -78,9 +82,9 @@ export function NewFooter() {
               ></span>
             </h3>
             <ul className="space-y-2">
-              <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_contact')}</Link></li>
-              <li><Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_privacy')}</Link></li>
-              <li><Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_cookies')}</Link></li>
+              <li><Link href={withBasePath("/contact")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_contact')}</Link></li>
+              <li><Link href={withBasePath("/privacy")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_privacy')}</Link></li>
+              <li><Link href={withBasePath("/cookies")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer_link_cookies')}</Link></li>
             </ul>
           </div>
         </div>

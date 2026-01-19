@@ -1,11 +1,67 @@
 # Kruno - Next Steps & Implementation Plan
 
-> **Last Updated:** January 2025 (Phase 23 SEO complete)  
-> **Focus:** Next Priorities After SEO Implementation
+> **Last Updated:** January 2025 (Phase 23.5 City Itinerary Pages complete)  
+> **Focus:** Next Priorities After City Itinerary Pages Implementation
 
 ## 🎯 Current Priority: Phase 24 - Enhanced User Experience
 
-Phases 15-23 are complete! This document outlines what's been implemented and what remains.
+Phases 15-23.5 are complete! This document outlines what's been implemented and what remains.
+
+---
+
+## ✅ Phase 23.5: City Itinerary Pages (COMPLETE)
+
+**Status:** ✅ **COMPLETE** - Rich city itinerary content pages implemented.
+
+### What Was Implemented:
+
+#### ✅ 1. City Itinerary Data System
+
+**Location:** `lib/itinerary/city-itineraries.ts`
+**Status:** ✅ Implemented
+
+**Features:**
+- Type-safe `CityItinerary` data structure with comprehensive trip details
+- Bilingual city content (English and Spanish)
+- English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+- Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+- Day plans with morning/afternoon/evening activities
+- City stats, logistics tips, pre-trip checklists, FAQs
+- Related itineraries for cross-linking
+- Hero images and editorial image info cards
+- `getCityItinerary(locale, slug)` function for data retrieval
+
+#### ✅ 2. Itinerary i18n System
+
+**Location:** `lib/i18n/itinerary.ts`
+**Status:** ✅ Implemented
+
+**Features:**
+- Complete bilingual UI copy (English and Spanish)
+- Icon navigation labels, section titles, CTA buttons
+- Type-safe `ItineraryCopy` interface
+- `getItineraryCopy(locale)` function for translation retrieval
+
+#### ✅ 3. Itinerary UI Components
+
+**Location:** `components/itinerary/`
+**Status:** ✅ All 14 components implemented
+
+**Components:**
+- `Hero.tsx` - Hero section with city image and eyebrow label
+- `IconNav.tsx` - Horizontal icon navigation for page sections
+- `CityStats.tsx` - City statistics grid (population, history, landmarks)
+- `QuickFacts.tsx` - Trip facts: duration, pace, ideal for, style
+- `DayOverviewTable.tsx` - At-a-glance day plan table
+- `DayBlock.tsx` - Day-by-day breakdown with morning/afternoon/evening
+- `ImageInfoCards.tsx` - Editorial image cards with city context
+- `LogisticsTable.tsx` - Practical logistics and tips table
+- `Checklist.tsx` - Interactive pre-trip checklist (no sign-in required)
+- `FAQAccordion.tsx` - Collapsible FAQ section
+- `RelatedItineraries.tsx` - Related city itinerary cards
+- `PrimaryCTA.tsx` - Call-to-action section for trip creation
+- `SectionBand.tsx` - Reusable section wrapper with styling
+- `SafeImage.tsx` - Image component with error handling
 
 ---
 
@@ -444,7 +500,7 @@ CREATE TABLE user_badges (
 
 ---
 
-## ✅ Implementation Timeline (Phases 15-23 Complete)
+## ✅ Implementation Timeline (Phases 15-23.5 Complete)
 
 ### ✅ Phases 15-17: Explore Feature (COMPLETE)
 - [x] Database schema (explore_sessions table)
@@ -481,6 +537,16 @@ CREATE TABLE user_badges (
 - [x] Programmatic city and influencer pages
 - [x] Hreflang alternates
 - [x] Private route noindex
+
+### ✅ Phase 23.5: City Itinerary Pages (COMPLETE)
+- [x] City itinerary data system (`lib/itinerary/city-itineraries.ts`)
+- [x] 6 English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+- [x] 6 Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+- [x] Itinerary i18n system (`lib/i18n/itinerary.ts`)
+- [x] 14 itinerary UI components (`components/itinerary/`)
+- [x] Day plans, city stats, logistics, checklists, FAQs
+- [x] Interactive checklist (no login required)
+- [x] Related itineraries for cross-linking
 
 ## 📋 Remaining Phases
 
@@ -599,6 +665,20 @@ CREATE TABLE user_badges (
 - AI-powered place recommendations based on swipe patterns
 - Swipe analytics dashboard
 - Social features (see what friends liked)
+
+---
+
+## 🎯 Future City Additions
+
+The city itinerary system is designed for easy expansion. To add more cities:
+
+1. Add city data to `lib/itinerary/city-itineraries.ts` following the `CityItinerary` interface
+2. City pages are automatically rendered at `/cities/[slug]` and `/[lang]/cities/[slug]`
+3. Add city to sitemap by including in the cities data export
+
+**Suggested next cities to add:**
+- English: Tokyo, New York, Berlin, Prague, Vienna, Lisbon
+- Spanish: London, Amsterdam, Sevilla, Valencia, Granada
 
 ---
 

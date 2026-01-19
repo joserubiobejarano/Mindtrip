@@ -16,14 +16,18 @@ import { getMarketingCopy } from "@/lib/i18n/marketing";
 import { getItineraryCopy } from "@/lib/i18n/itinerary";
 import { getCityItinerary } from "@/lib/itinerary/city-itineraries";
 import { ItineraryHero } from "@/components/itinerary/Hero";
+import { IconNav, type IconNavItem } from "@/components/itinerary/IconNav";
+import { CityStats } from "@/components/itinerary/CityStats";
 import { QuickFacts } from "@/components/itinerary/QuickFacts";
 import { DayOverviewTable } from "@/components/itinerary/DayOverviewTable";
 import { DayBlock } from "@/components/itinerary/DayBlock";
+import { ImageInfoCards } from "@/components/itinerary/ImageInfoCards";
 import { LogisticsTable } from "@/components/itinerary/LogisticsTable";
 import { Checklist } from "@/components/itinerary/Checklist";
 import { FAQAccordion } from "@/components/itinerary/FAQAccordion";
 import { RelatedItineraries } from "@/components/itinerary/RelatedItineraries";
 import { PrimaryCTA } from "@/components/itinerary/PrimaryCTA";
+import { SectionBand } from "@/components/itinerary/SectionBand";
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.flatMap((lang) =>
@@ -216,94 +220,147 @@ export default async function LocalizedCityItineraryPage({
     })),
   };
 
+  const iconNavItems: IconNavItem[] = [
+    { id: "overview", label: itineraryCopy.iconNav.overview, icon: "Compass" },
+    { id: "facts", label: itineraryCopy.iconNav.facts, icon: "Star" },
+    { id: "top", label: itineraryCopy.iconNav.top, icon: "MapPinned" },
+    { id: "attractions", label: itineraryCopy.iconNav.attractions, icon: "Landmark" },
+    { id: "history", label: itineraryCopy.iconNav.history, icon: "BookOpen" },
+    { id: "food", label: itineraryCopy.iconNav.food, icon: "UtensilsCrossed" },
+    { id: "logistics", label: itineraryCopy.iconNav.logistics, icon: "MapPin" },
+    { id: "checklist", label: itineraryCopy.iconNav.checklist, icon: "CheckSquare" },
+    { id: "tips", label: itineraryCopy.iconNav.tips, icon: "HelpCircle" },
+  ];
+
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16 space-y-12">
+    <div className="bg-background">
       <StructuredData data={[...structuredData, faqStructuredData]} id={`kruno-city-ld-${lang}`} />
-      <ItineraryHero
-        eyebrow={itinerary.hero.eyebrow ?? itineraryCopy.heroEyebrowLabel}
-        title={itinerary.hero.title}
-        subtitle={itinerary.hero.subtitle}
-      />
-      <QuickFacts
-        title={itineraryCopy.quickFactsTitle}
-        labels={itineraryCopy.quickFactsLabels}
-        duration={`${itinerary.days} ${
-          itinerary.days === 1 ? itineraryCopy.dayUnit.singular : itineraryCopy.dayUnit.plural
-        }`}
-        pace={itinerary.pace}
-        idealFor={itinerary.idealFor}
-        style={itinerary.style}
-      />
-      <section className="rounded-2xl border border-border/60 bg-background p-6 space-y-4">
-        <h2 className="text-2xl font-semibold">{itineraryCopy.fitTitle}</h2>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {itineraryCopy.fitGoodLabel}
-            </h3>
-            <ul className="mt-3 space-y-2 text-sm">
-              {itinerary.fit.forYou.map((item) => (
-                <li key={item} className="rounded-lg border border-border/50 px-3 py-2">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {itineraryCopy.fitNotLabel}
-            </h3>
-            <ul className="mt-3 space-y-2 text-sm">
-              {itinerary.fit.notForYou.map((item) => (
-                <li key={item} className="rounded-lg border border-border/50 px-3 py-2">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-      <DayOverviewTable
-        title={itineraryCopy.dayOverviewTitle}
-        labels={itineraryCopy.dayOverviewTable}
-        plans={itinerary.dayPlans}
-      />
-      <section className="space-y-5">
-        <h2 className="text-2xl font-semibold">{itineraryCopy.dayBreakdownTitle}</h2>
-        <div className="space-y-5">
-          {itinerary.dayPlans.map((plan) => (
-            <DayBlock key={plan.day} plan={plan} labels={itineraryCopy.dayBlockLabels} />
-          ))}
-        </div>
-      </section>
-      <LogisticsTable title={itineraryCopy.logisticsTitle} items={itinerary.logistics} />
-      <Checklist
-        title={itineraryCopy.checklistTitle}
-        subtitle={itineraryCopy.checklistSubtitle}
-        items={itinerary.checklist}
-      />
-      <FAQAccordion title={itineraryCopy.faqTitle} items={itinerary.faqs} />
-      <RelatedItineraries
-        title={itineraryCopy.relatedTitle}
-        items={itinerary.relatedItineraries}
-        basePath={basePath}
-        dayUnit={itineraryCopy.dayUnit}
-      />
-      <PrimaryCTA
-        title={itineraryCopy.primaryCtaTitle}
-        body={itineraryCopy.primaryCtaBody}
-        buttonText={itineraryCopy.primaryCtaButton}
-        href={localizedPrimaryCtaHref}
-      />
-      {localizedSecondaryCtaHref ? (
-        <PrimaryCTA
-          title={itineraryCopy.secondaryCtaTitle}
-          body={itineraryCopy.secondaryCtaBody}
-          buttonText={itineraryCopy.secondaryCtaButton}
-          href={localizedSecondaryCtaHref}
-          variant="secondary"
+      <SectionBand id="overview" variant="base" padding="lg" className="scroll-mt-24">
+        <ItineraryHero
+          eyebrow={itinerary.hero.eyebrow ?? itineraryCopy.heroEyebrowLabel}
+          title={itinerary.hero.title}
+          subtitle={itinerary.hero.subtitle}
+          image={itinerary.hero.image}
         />
-      ) : null}
+      </SectionBand>
+
+      <SectionBand variant="accent" innerClassName="flex justify-center">
+        <IconNav items={iconNavItems} />
+      </SectionBand>
+
+      <SectionBand id="facts" variant="soft" className="scroll-mt-24" innerClassName="space-y-10">
+        <QuickFacts
+          title={itineraryCopy.quickFactsTitle}
+          labels={itineraryCopy.quickFactsLabels}
+          duration={`${itinerary.days} ${
+            itinerary.days === 1 ? itineraryCopy.dayUnit.singular : itineraryCopy.dayUnit.plural
+          }`}
+          pace={itinerary.pace}
+          idealFor={itinerary.idealFor}
+          style={itinerary.style}
+        />
+        <section className="rounded-3xl border border-border/70 bg-background p-6 shadow-md md:p-8">
+          <h2 className="text-2xl font-semibold">{itineraryCopy.fitTitle}</h2>
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                {itineraryCopy.fitGoodLabel}
+              </h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                {itinerary.fit.forYou.map((item) => (
+                  <li key={item} className="rounded-xl border border-border/60 bg-muted/10 px-4 py-3">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                {itineraryCopy.fitNotLabel}
+              </h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                {itinerary.fit.notForYou.map((item) => (
+                  <li key={item} className="rounded-xl border border-border/60 bg-muted/10 px-4 py-3">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      </SectionBand>
+
+      <SectionBand id="top" variant="highlight" className="scroll-mt-24">
+        <CityStats title={itineraryCopy.cityStatsTitle} items={itinerary.cityStats ?? []} />
+      </SectionBand>
+
+      <SectionBand id="attractions" variant="base" className="scroll-mt-24" innerClassName="space-y-10">
+        <DayOverviewTable
+          title={itineraryCopy.dayOverviewTitle}
+          labels={itineraryCopy.dayOverviewTable}
+          plans={itinerary.dayPlans}
+        />
+      </SectionBand>
+
+      <SectionBand id="history" variant="soft" className="scroll-mt-24" innerClassName="space-y-10">
+        <section className="space-y-5">
+          <h2 className="text-2xl font-semibold">{itineraryCopy.dayBreakdownTitle}</h2>
+          <div className="space-y-5">
+            {itinerary.dayPlans.map((plan) => (
+              <DayBlock key={plan.day} plan={plan} labels={itineraryCopy.dayBlockLabels} />
+            ))}
+          </div>
+        </section>
+      </SectionBand>
+
+      <SectionBand id="food" variant="base" className="scroll-mt-24" innerClassName="space-y-10">
+        <ImageInfoCards
+          title={itineraryCopy.imageInfoTitle}
+          subtitle={itineraryCopy.imageInfoSubtitle}
+          items={itinerary.imageInfoCards ?? []}
+        />
+      </SectionBand>
+
+      <SectionBand variant="highlight" innerClassName="space-y-10">
+        <section id="logistics" className="scroll-mt-24">
+          <LogisticsTable title={itineraryCopy.logisticsTitle} items={itinerary.logistics} />
+        </section>
+        <section id="checklist" className="scroll-mt-24">
+          <Checklist
+            title={itineraryCopy.checklistTitle}
+            subtitle={itineraryCopy.checklistSubtitle}
+            items={itinerary.checklist}
+          />
+        </section>
+      </SectionBand>
+
+      <SectionBand id="tips" variant="soft" className="scroll-mt-24" innerClassName="space-y-10">
+        <FAQAccordion title={itineraryCopy.faqTitle} items={itinerary.faqs} />
+        <RelatedItineraries
+          title={itineraryCopy.relatedTitle}
+          items={itinerary.relatedItineraries}
+          basePath={basePath}
+          dayUnit={itineraryCopy.dayUnit}
+        />
+      </SectionBand>
+
+      <SectionBand variant="accent" innerClassName="space-y-6">
+        <PrimaryCTA
+          title={itineraryCopy.primaryCtaTitle}
+          body={itineraryCopy.primaryCtaBody}
+          buttonText={itineraryCopy.primaryCtaButton}
+          href={localizedPrimaryCtaHref}
+        />
+        {localizedSecondaryCtaHref ? (
+          <PrimaryCTA
+            title={itineraryCopy.secondaryCtaTitle}
+            body={itineraryCopy.secondaryCtaBody}
+            buttonText={itineraryCopy.secondaryCtaButton}
+            href={localizedSecondaryCtaHref}
+            variant="secondary"
+          />
+        ) : null}
+      </SectionBand>
     </div>
   );
 }

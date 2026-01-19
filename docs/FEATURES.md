@@ -932,6 +932,17 @@ Test endpoints available for all email types (`/api/test/*`):
 
 ### ✅ Recently Completed (January 2025)
 
+**Phase 23.5: City Itinerary Pages - COMPLETE** ✅
+- ✅ City itinerary data system (`lib/itinerary/city-itineraries.ts`)
+- ✅ 6 English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+- ✅ 6 Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+- ✅ Itinerary i18n system (`lib/i18n/itinerary.ts`) for bilingual UI
+- ✅ 14 itinerary UI components (`components/itinerary/`)
+- ✅ Day plans, city stats, logistics, checklists, FAQs
+- ✅ Interactive checklist (no sign-in required)
+- ✅ Editorial image info cards
+- ✅ Related itineraries for cross-linking
+
 **Phase 23: SEO & Programmatic Marketing - COMPLETE** ✅
 - ✅ Dynamic `robots.txt` and `sitemap.xml` via App Router routes
 - ✅ SEO utility library (`lib/seo/`) with canonical URLs, metadata builder
@@ -1129,6 +1140,72 @@ Comprehensive security architecture with centralized auth helpers, input validat
   - Sanitization functions for different content types
 - **See [SECURITY.md](./SECURITY.md) for complete documentation**
 
+## City Itinerary Pages ✅ **NEW** (January 2025)
+
+**Overview:**
+Rich, pre-built city itinerary pages that serve as programmatic SEO content and showcase the Kruno trip planning experience. Users can browse detailed day-by-day itineraries for popular cities, then convert them into personalized trips with one click.
+
+**Features:**
+- **City Itinerary Data System** (`lib/itinerary/city-itineraries.ts`):
+  - Type-safe `CityItinerary` data structure with comprehensive trip details
+  - Bilingual city content (English and Spanish)
+  - English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+  - Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+  - Day plans with morning/afternoon/evening activities
+  - City stats, logistics tips, pre-trip checklists, FAQs
+  - Related itineraries for cross-linking between cities
+  - Hero images and editorial image info cards
+- **Itinerary i18n System** (`lib/i18n/itinerary.ts`):
+  - Complete bilingual UI copy (English and Spanish)
+  - Icon navigation labels, section titles, CTA buttons
+  - Type-safe `ItineraryCopy` interface with `getItineraryCopy(locale)` function
+- **14 Itinerary UI Components** (`components/itinerary/`):
+  - `Hero.tsx` - Hero section with city image and eyebrow label
+  - `IconNav.tsx` - Horizontal icon navigation for page sections
+  - `CityStats.tsx` - City statistics grid (population, history, landmarks)
+  - `QuickFacts.tsx` - Trip facts: duration, pace, ideal for, style
+  - `DayOverviewTable.tsx` - At-a-glance day plan table
+  - `DayBlock.tsx` - Day-by-day breakdown with morning/afternoon/evening
+  - `ImageInfoCards.tsx` - Editorial image cards with city context
+  - `LogisticsTable.tsx` - Practical logistics and tips table
+  - `Checklist.tsx` - Interactive pre-trip checklist (no sign-in required)
+  - `FAQAccordion.tsx` - Collapsible FAQ section
+  - `RelatedItineraries.tsx` - Related city itinerary cards
+  - `PrimaryCTA.tsx` - Call-to-action section for trip creation
+  - `SectionBand.tsx` - Reusable section wrapper with styling
+  - `SafeImage.tsx` - Image component with error handling
+
+**Content Structure:**
+```typescript
+interface CityItinerary {
+  slug: string;           // URL slug (e.g., "rome", "paris-2-days")
+  city: string;           // City name
+  country: string;        // Country name
+  days: number;           // Trip duration
+  pace: string;           // Trip pace (e.g., "Balanced")
+  idealFor: string[];     // Target traveler types
+  style: string[];        // Trip style tags
+  hero: { title, subtitle, eyebrow, image };
+  cityStats?: Array<{ value, label }>;
+  fit: { forYou: string[], notForYou: string[] };
+  dayPlans: DayPlan[];    // Day-by-day activities
+  imageInfoCards?: Array<{ title, description, image }>;
+  logistics: LogisticsItem[];
+  checklist: string[];
+  faqs: FaqItem[];
+  relatedItineraries: RelatedItinerary[];
+}
+```
+
+**User Flow:**
+1. User visits `/cities/[slug]` (e.g., `/cities/rome`)
+2. Views comprehensive itinerary with all sections
+3. Clicks "Start planning" CTA
+4. Redirected to trip creation with city pre-filled
+5. AI personalizes the itinerary based on user preferences
+
+---
+
 ## SEO & Programmatic Marketing ✅ **NEW** (January 2025)
 
 **Overview:**
@@ -1198,9 +1275,23 @@ Complete SEO infrastructure with programmatic marketing pages, bilingual support
 - **Migration File**: `database/migrations/add-user-push-tokens-table.sql`
 - **Usage**: Mobile app push notification registration and delivery
 
-**Last Updated:** January 2025
+**Last Updated:** January 2025 (Phase 23.5 City Itinerary Pages complete)
 
 ## Recent Changes Summary (January 2025)
+
+### City Itinerary Pages ✅ **NEW**
+**Complete City Itinerary Content System:**
+- ✅ City itinerary data system (`lib/itinerary/city-itineraries.ts`) with type-safe `CityItinerary` structure
+- ✅ 6 English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+- ✅ 6 Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+- ✅ Day plans with morning/afternoon/evening activities
+- ✅ City stats, logistics, checklists, FAQs for each city
+- ✅ Related itineraries for cross-linking
+- ✅ Itinerary i18n system (`lib/i18n/itinerary.ts`) for bilingual UI copy
+- ✅ 14 new itinerary UI components (`components/itinerary/`):
+  - Hero, IconNav, CityStats, QuickFacts, DayOverviewTable, DayBlock
+  - ImageInfoCards, LogisticsTable, Checklist, FAQAccordion
+  - RelatedItineraries, PrimaryCTA, SectionBand, SafeImage
 
 ### Email System & Notifications ✅ **NEW**
 **Complete Email Infrastructure:**
@@ -1264,6 +1355,10 @@ Complete SEO infrastructure with programmatic marketing pages, bilingual support
 - Place details fetching with comprehensive field support
 
 ### Added
+- **City Itinerary Pages** (Phase 23.5):
+  - Rich city itinerary content system with 6 English and 6 Spanish cities
+  - Itinerary i18n system for bilingual UI
+  - 14 new itinerary UI components
 - **SEO & Programmatic Marketing** (Phase 23):
   - Dynamic `robots.txt` and `sitemap.xml` via App Router routes
   - SEO utility library with canonical URL builder, metadata helper

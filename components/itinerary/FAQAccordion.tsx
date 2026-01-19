@@ -13,7 +13,7 @@ export function FAQAccordion({ title, items }: FAQAccordionProps) {
         {items.map((item) => (
           <details
             key={item.question}
-            className="rounded-2xl border border-border/60 bg-background px-5 py-4"
+            className="rounded-3xl border border-border/70 bg-background px-5 py-4 shadow-md"
           >
             <summary className="cursor-pointer text-base font-medium">
               {item.question}

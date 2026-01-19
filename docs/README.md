@@ -232,6 +232,21 @@ npm run dev
 - Database tracking fields for email sent timestamps (idempotency)
 - Test endpoints for all email types
 
+### Phase 23.5 - City Itinerary Pages ✅ **NEW**
+- City itinerary data system (`lib/itinerary/city-itineraries.ts`):
+  - Type-safe `CityItinerary` data structure
+  - 6 English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+  - 6 Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+  - Day plans with morning/afternoon/evening activities
+  - City stats, logistics, checklists, FAQs
+  - Related itineraries for cross-linking
+- Itinerary i18n system (`lib/i18n/itinerary.ts`) for bilingual UI
+- 14 itinerary UI components (`components/itinerary/`):
+  - Hero, IconNav, CityStats, QuickFacts, DayOverviewTable, DayBlock
+  - ImageInfoCards, LogisticsTable, Checklist, FAQAccordion
+  - RelatedItineraries, PrimaryCTA, SectionBand, SafeImage
+- Interactive checklist (no sign-in required)
+
 ### Phase 23 - SEO & Programmatic Marketing ✅ **NEW**
 - Core SEO infrastructure:
   - Dynamic `robots.txt` via `app/robots.ts`
@@ -353,10 +368,20 @@ kruno/
 
 ## 📊 Current Status
 
-**Completed Phases:** 23 out of 29 planned phases (~79% complete)
-**Phase 23:** ✅ Complete - SEO & Programmatic Marketing fully implemented
+**Completed Phases:** 23.5 out of 29 planned phases (~81% complete)
+**Phase 23.5:** ✅ Complete - City Itinerary Pages fully implemented
 
 **Recent Updates (January 2025):**
+
+- ✅ **City Itinerary Pages** - **NEW** (Phase 23.5)
+  - ✅ City itinerary data system (`lib/itinerary/city-itineraries.ts`)
+  - ✅ 6 English cities: Rome (2 and 3 days), Paris, Barcelona, Amsterdam, London
+  - ✅ 6 Spanish cities: Rome, Madrid, Paris, Barcelona, Lisbon
+  - ✅ Itinerary i18n system (`lib/i18n/itinerary.ts`) for bilingual UI
+  - ✅ 14 itinerary UI components (`components/itinerary/`)
+  - ✅ Day plans, city stats, logistics, checklists, FAQs
+  - ✅ Interactive checklist (no sign-in required)
+  - ✅ Related itineraries for cross-linking
 
 - ✅ **SEO & Programmatic Marketing** - **NEW** (Phase 23)
   - ✅ Dynamic `robots.txt` and `sitemap.xml` via App Router routes

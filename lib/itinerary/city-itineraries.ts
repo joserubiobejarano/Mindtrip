@@ -38,12 +38,28 @@ export type CityItinerary = {
     title: string;
     subtitle: string;
     eyebrow?: string;
+    image?: {
+      src: string;
+      alt: string;
+    };
   };
+  cityStats?: Array<{
+    value: string;
+    label: string;
+  }>;
   fit: {
     forYou: string[];
     notForYou: string[];
   };
   dayPlans: DayPlan[];
+  imageInfoCards?: Array<{
+    title: string;
+    description: string;
+    image: {
+      src: string;
+      alt: string;
+    };
+  }>;
   logistics: LogisticsItem[];
   checklist: string[];
   faqs: FaqItem[];
@@ -67,7 +83,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Hit the essentials with room to breathe, focusing on ancient icons, piazzas, and easy food stops.",
         eyebrow: "City itinerary",
+        image: {
+          src: "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=1600&q=80",
+          alt: "Warm golden light over Rome rooftops and domes at sunset.",
+        },
       },
+      cityStats: [
+        { value: "2,700+", label: "Years of recorded history" },
+        { value: "900+", label: "Churches and basilicas" },
+        { value: "280", label: "Public fountains" },
+        { value: "10M+", label: "Annual visitors" },
+      ],
       fit: {
         forYou: ["A first trip with iconic landmarks", "A mix of history and cafes", "Short walking routes"],
         notForYou: ["A packed schedule of museums only", "Day trips outside the city", "Late-night nightlife focus"],
@@ -96,6 +122,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Trevi Fountain, Spanish Steps, shopping streets",
           afternoon: "Piazza Navona and Campo de' Fiori",
           evening: "Gelato loop and sunset at Pincio Terrace",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The grand piazzas",
+          description:
+            "Rome's public squares are outdoor living rooms. Expect fountains, morning espresso rituals, and a steady hum of conversation.",
+          image: {
+            src: "https://images.unsplash.com/photo-1526481280695-3c687fd643ed?auto=format&fit=crop&w=1200&q=80",
+            alt: "Crowd gathered around a grand Rome piazza fountain.",
+          },
+        },
+        {
+          title: "Layers of ancient history",
+          description:
+            "Streets stack centuries at once. A short walk can take you from imperial forums to baroque churches.",
+          image: {
+            src: "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?auto=format&fit=crop&w=1200&q=80",
+            alt: "View of the Roman Forum with ruins and columns.",
+          },
+        },
+        {
+          title: "Food-first neighborhoods",
+          description:
+            "Trastevere and Monti set the tone for long lunches, aperitivo hours, and unhurried evenings.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Outdoor dining with pasta and wine on a Rome street.",
+          },
         },
       ],
       logistics: [
@@ -171,6 +226,10 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Cover the essentials with calm pacing, focusing on ancient landmarks, piazzas, and short walks.",
         eyebrow: "City itinerary",
+        image: {
+          src: "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=1600&q=80",
+          alt: "Warm golden light over Rome rooftops and domes at sunset.",
+        },
       },
       fit: {
         forYou: ["A short visit focused on the core sights", "Easy walks with breaks", "A clear, simple plan"],
@@ -267,7 +326,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "See the essentials with short walks between sights, mixing museums with relaxed neighborhood time.",
         eyebrow: "City itinerary",
+        image: {
+          src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=80",
+          alt: "The Eiffel Tower viewed across Paris rooftops at golden hour.",
+        },
       },
+      cityStats: [
+        { value: "37", label: "Bridges crossing the Seine" },
+        { value: "20", label: "Arrondissements to explore" },
+        { value: "130+", label: "Museums and galleries" },
+        { value: "30M+", label: "Annual visitors" },
+      ],
       fit: {
         forYou: ["A clear plan with breathing room", "A mix of art and city walks", "Simple metro hops"],
         notForYou: ["Day trips outside the city", "A packed museum-only schedule", "Late-night nightlife focus"],
@@ -296,6 +365,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Montmartre and Sacre-Coeur",
           afternoon: "Le Marais lanes and Place des Vosges",
           evening: "Canal Saint-Martin or a short Seine walk",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Riverfront rhythm",
+          description:
+            "The Seine stitches neighborhoods together. Expect gentle walks, frequent bridges, and a steady, unhurried pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "A calm Seine riverside path with stone bridges in the distance.",
+          },
+        },
+        {
+          title: "Museum mornings",
+          description:
+            "Paris rewards early starts. A focused museum visit in the morning leaves the rest of the day light and flexible.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Paris skyline with the Eiffel Tower rising above the city.",
+          },
+        },
+        {
+          title: "Neighborhood cafes",
+          description:
+            "Small squares and cafe terraces shape the day. Plan for one long pause rather than rushing between stops.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Outdoor cafe tables along a Paris street.",
+          },
         },
       ],
       logistics: [
@@ -371,7 +469,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Blend Gaudi icons with walkable neighborhoods and a relaxed coastal rhythm.",
         eyebrow: "City itinerary",
+        image: {
+          src: "https://images.unsplash.com/photo-1505739778031-2b9d8f4097e5?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful rooftops and spires of Park Guell in Barcelona.",
+        },
       },
+      cityStats: [
+        { value: "10", label: "Districts across the city" },
+        { value: "4.5 km", label: "Urban beach coastline" },
+        { value: "1.6M", label: "Residents in the city proper" },
+        { value: "2,000+", label: "Years of recorded history" },
+      ],
       fit: {
         forYou: ["A mix of architecture and easy walks", "Clear, simple days", "Time by the sea"],
         notForYou: ["A packed museum schedule", "Late-night nightlife focus", "Day trips outside the city"],
@@ -400,6 +508,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Park Guell early entry",
           afternoon: "Montjuic gardens and viewpoints",
           evening: "Placa d'Espanya fountains and an easy stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Modernist city blocks",
+          description:
+            "Eixample's wide grid keeps walks easy. The modernist facades feel best in the softer morning light.",
+          image: {
+            src: "https://images.unsplash.com/photo-1473186578172-c141e6798cf4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Modernist building facades along a Barcelona boulevard.",
+          },
+        },
+        {
+          title: "Old town lanes",
+          description:
+            "The Gothic Quarter and El Born are compact and layered. Expect short blocks and shaded streets.",
+          image: {
+            src: "https://images.unsplash.com/photo-1464790719320-516ecd75af6c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Narrow stone street in Barcelona's old town.",
+          },
+        },
+        {
+          title: "Coastal breathing room",
+          description:
+            "The waterfront offers a clear reset between big sights. A late-day walk keeps the rhythm calm.",
+          image: {
+            src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+            alt: "Barcelona beach promenade near sunset.",
+          },
         },
       ],
       logistics: [
@@ -475,7 +612,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Keep it easy with canal walks, compact museum time, and a calm neighborhood rhythm.",
         eyebrow: "City itinerary",
+        image: {
+          src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80",
+          alt: "Canal houses and a bridge reflected in Amsterdam water.",
+        },
       },
+      cityStats: [
+        { value: "165", label: "Canals in the city" },
+        { value: "1,500", label: "Bridges to cross" },
+        { value: "50+", label: "Museums and galleries" },
+        { value: "800k+", label: "Residents in the city" },
+      ],
       fit: {
         forYou: ["A walkable city with short distances", "A mix of museums and parks", "Easy, quiet evenings"],
         notForYou: ["A packed schedule of tours", "Long day trips", "Late-night nightlife focus"],
@@ -504,6 +651,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "De Pijp and Albert Cuyp Market",
           afternoon: "Amstel River walk and quiet canals",
           evening: "Eastern Docklands or canal-side sunset",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Canal ring mornings",
+          description:
+            "Early hours are calm on the canals. Short loops keep the city feel intimate and unhurried.",
+          image: {
+            src: "https://images.unsplash.com/photo-1505843795480-5cfb3c03f6ff?auto=format&fit=crop&w=1200&q=80",
+            alt: "Bicycles parked along a quiet Amsterdam canal.",
+          },
+        },
+        {
+          title: "Compact museum time",
+          description:
+            "Plan one main museum a day. The Museum District is concentrated, so transitions stay simple.",
+          image: {
+            src: "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&fit=crop&w=1200&q=80",
+            alt: "Amsterdam museum building along a tree-lined street.",
+          },
+        },
+        {
+          title: "Neighborhood markets",
+          description:
+            "De Pijp and nearby streets add texture without heavy planning. A short market stop fits easily.",
+          image: {
+            src: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1200&q=80",
+            alt: "Outdoor market stalls in Amsterdam.",
+          },
         },
       ],
       logistics: [
@@ -579,7 +755,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Cover the essentials with short walks and easy transit, mixing landmarks with relaxed neighborhoods.",
         eyebrow: "City itinerary",
+        image: {
+          src: "https://images.unsplash.com/photo-1471623432079-b009d30b6729?auto=format&fit=crop&w=1600&q=80",
+          alt: "London skyline with the Thames and Tower Bridge.",
+        },
       },
+      cityStats: [
+        { value: "32", label: "Boroughs across the city" },
+        { value: "35+", label: "Bridges over the Thames" },
+        { value: "170+", label: "Museums and galleries" },
+        { value: "9M", label: "Residents in Greater London" },
+      ],
       fit: {
         forYou: ["A clear plan with short transfers", "A mix of museums and landmarks", "Walkable river routes"],
         notForYou: ["Day trips outside London", "A packed schedule of shows", "Late-night nightlife focus"],
@@ -608,6 +794,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "British Museum",
           afternoon: "Bloomsbury squares and Covent Garden",
           evening: "Soho and Piccadilly Circus walk",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Riverside routes",
+          description:
+            "The Thames makes navigation easy. A riverside walk links major sights without constant Tube hops.",
+          image: {
+            src: "https://images.unsplash.com/photo-1486299267070-83823f5448dd?auto=format&fit=crop&w=1200&q=80",
+            alt: "People walking along the South Bank beside the Thames.",
+          },
+        },
+        {
+          title: "Museum balance",
+          description:
+            "London's museums are dense and free. Keep visits focused so afternoons stay flexible.",
+          image: {
+            src: "https://images.unsplash.com/photo-1473959383414-b0b2d6b04504?auto=format&fit=crop&w=1200&q=80",
+            alt: "A quiet museum hall with tall windows.",
+          },
+        },
+        {
+          title: "Neighborhood resets",
+          description:
+            "Short walks through squares and parks break up landmark days and keep the pace steady.",
+          image: {
+            src: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=80",
+            alt: "London park path lined with trees.",
+          },
         },
       ],
       logistics: [
@@ -685,7 +900,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Recorre lo esencial con tiempo para respirar, centrado en iconos antiguos, plazas y comidas faciles.",
         eyebrow: "Itinerario por ciudad",
+        image: {
+          src: "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=1600&q=80",
+          alt: "Luz dorada sobre los tejados y cupulas de Roma al atardecer.",
+        },
       },
+      cityStats: [
+        { value: "2.700+", label: "Anios de historia registrada" },
+        { value: "900+", label: "Iglesias y basilicas" },
+        { value: "280", label: "Fuentes publicas" },
+        { value: "10M+", label: "Visitantes al ano" },
+      ],
       fit: {
         forYou: ["Un primer viaje con iconos", "Mezcla de historia y cafe", "Rutas a pie sin prisa"],
         notForYou: ["Solo museos todo el dia", "Excursiones fuera de la ciudad", "Plan de vida nocturna"],
@@ -714,6 +939,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Fontana di Trevi, Plaza de Espana, tiendas",
           afternoon: "Piazza Navona y Campo de' Fiori",
           evening: "Ruta de gelato y atardecer en Pincio",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Las grandes plazas",
+          description:
+            "Las plazas de Roma son salas de estar al aire libre. Espera fuentes, espresso matutino y conversaciones constantes.",
+          image: {
+            src: "https://images.unsplash.com/photo-1526481280695-3c687fd643ed?auto=format&fit=crop&w=1200&q=80",
+            alt: "Gente reunida junto a una fuente en una gran plaza de Roma.",
+          },
+        },
+        {
+          title: "Capas de historia antigua",
+          description:
+            "Las calles mezclan siglos en pocos pasos. En una caminata pasas del foro imperial a iglesias barrocas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Vista del Foro Romano con ruinas y columnas.",
+          },
+        },
+        {
+          title: "Barrios para comer bien",
+          description:
+            "Trastevere y Monti marcan el ritmo de almuerzos largos, aperitivos y noches sin prisa.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cena al aire libre con pasta y vino en una calle de Roma.",
+          },
         },
       ],
       logistics: [
@@ -756,7 +1010,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       relatedItineraries: [
         {
           slug: "paris",
-          city: "Paris",
+          city: "París",
           days: 3,
           description: "Monumentos clasicos, museos y barrios con cafe.",
         },
@@ -789,7 +1043,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Recorre lo esencial con traslados cortos, combinando museos, plazas y parques.",
         eyebrow: "Itinerario por ciudad",
+        image: {
+          src: "https://images.unsplash.com/photo-1506806732259-39c2d0268443?auto=format&fit=crop&w=1600&q=80",
+          alt: "Vista amplia de Madrid con edificios historicos y cielo claro.",
+        },
       },
+      cityStats: [
+        { value: "3.4M", label: "Habitantes en la ciudad" },
+        { value: "21", label: "Distritos para recorrer" },
+        { value: "60+", label: "Museos y galerias" },
+        { value: "300", label: "Dias de sol al ano" },
+      ],
       fit: {
         forYou: ["Un plan claro y caminable", "Museos y parques en equilibrio", "Ritmo realista"],
         notForYou: ["Excursiones fuera de la ciudad", "Plan muy cargado", "Vida nocturna como prioridad"],
@@ -810,6 +1074,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Palacio Real y Catedral de la Almudena",
           afternoon: "Plaza de Espana y Templo de Debod",
           evening: "Barrio de las Letras y paseo tranquilo",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Paseos por el eje central",
+          description:
+            "El centro historico se recorre bien a pie. Las plazas se enlazan con calles cortas y claras.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506806732259-39c2d0268443?auto=format&fit=crop&w=1200&q=80",
+            alt: "Plaza amplia en Madrid con arquitectura clasica.",
+          },
+        },
+        {
+          title: "Ritmo de museo",
+          description:
+            "Un museo principal al dia es suficiente. Deja la tarde libre para parques y barrios.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504805572947-34fad45aed93?auto=format&fit=crop&w=1200&q=80",
+            alt: "Entrada de un museo en Madrid.",
+          },
+        },
+        {
+          title: "Parques como pausa",
+          description:
+            "El Retiro y sus alrededores sirven para resetear el ritmo sin salir del centro.",
+          image: {
+            src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
+            alt: "Sendero arbolado en un parque de Madrid.",
+          },
         },
       ],
       logistics: [
@@ -874,18 +1167,28 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
     },
     paris: {
       slug: "paris",
-      city: "Paris",
+      city: "París",
       country: "Francia",
       days: 2,
       pace: "Equilibrado",
       idealFor: ["Primer viaje", "Amantes de arte", "Viajeros tranquilos"],
       style: ["Monumentos clasicos", "Paseos por el rio", "Barrios caminables"],
       hero: {
-        title: "Paris en 2 dias",
+        title: "París en 2 dias",
         subtitle:
           "Veras lo esencial con distancias cortas, combinando arte, plazas y paseos por el Sena.",
         eyebrow: "Itinerario por ciudad",
+        image: {
+          src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=80",
+          alt: "La Torre Eiffel al fondo sobre los tejados de París.",
+        },
       },
+      cityStats: [
+        { value: "37", label: "Puentes sobre el Sena" },
+        { value: "20", label: "Distritos de la ciudad" },
+        { value: "130+", label: "Museos y galerias" },
+        { value: "30M+", label: "Visitantes al ano" },
+      ],
       fit: {
         forYou: ["Un fin de semana con lo basico", "Rutas a pie sin prisa", "Pocas conexiones en Metro"],
         notForYou: ["Excursiones fuera de la ciudad", "Un plan solo de museos", "Vida nocturna como prioridad"],
@@ -906,6 +1209,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Torre Eiffel y Campo de Marte",
           afternoon: "Invalides y paseo por la orilla",
           evening: "Arco del Triunfo al atardecer",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Ribera serena",
+          description:
+            "El Sena ayuda a orientarte y a bajar el ritmo. Un paseo corto conecta lo esencial sin prisa.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Camino junto al Sena con puentes de piedra.",
+          },
+        },
+        {
+          title: "Mañanas de museo",
+          description:
+            "Visita un museo temprano y deja la tarde libre. Asi evitas filas y mantienes el plan ligero.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Vista de Paris con la Torre Eiffel.",
+          },
+        },
+        {
+          title: "Cafes de barrio",
+          description:
+            "Pequenas plazas y terrazas marcan el ritmo. Una pausa larga vale mas que varias cortas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mesas de un cafe al aire libre en Paris.",
+          },
         },
       ],
       logistics: [
@@ -981,7 +1313,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Combina iconos de Gaudi con paseos por barrios y un ritmo relajado junto al mar.",
         eyebrow: "Itinerario por ciudad",
+        image: {
+          src: "https://images.unsplash.com/photo-1505739778031-2b9d8f4097e5?auto=format&fit=crop&w=1600&q=80",
+          alt: "Tejados y mosaicos de Park Guell en Barcelona.",
+        },
       },
+      cityStats: [
+        { value: "10", label: "Distritos en la ciudad" },
+        { value: "4,5 km", label: "Litoral urbano de playa" },
+        { value: "1,6M", label: "Habitantes en la ciudad" },
+        { value: "2.000+", label: "Anios de historia" },
+      ],
       fit: {
         forYou: ["Arquitectura y paseos faciles", "Plan claro por dias", "Tiempo de playa sin prisa"],
         notForYou: ["Solo museos todo el dia", "Vida nocturna como prioridad", "Excursiones fuera de la ciudad"],
@@ -1010,6 +1352,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Park Guell temprano",
           afternoon: "Jardines de Montjuic y miradores",
           evening: "Placa d'Espanya y paseo corto",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Modernismo a pie",
+          description:
+            "El Eixample es llano y amplio. Las fachadas se disfrutan mejor en caminatas lentas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1473186578172-c141e6798cf4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Fachadas modernistas en una avenida de Barcelona.",
+          },
+        },
+        {
+          title: "Calles del casco antiguo",
+          description:
+            "Gótico y El Born concentran historia en pocas manzanas. Son recorridos cortos y sombreados.",
+          image: {
+            src: "https://images.unsplash.com/photo-1464790719320-516ecd75af6c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle estrecha del casco antiguo de Barcelona.",
+          },
+        },
+        {
+          title: "Pausa junto al mar",
+          description:
+            "El paseo marítimo ayuda a bajar el ritmo. Ideal para una caminata al final del dia.",
+          image: {
+            src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+            alt: "Paseo marítimo de Barcelona con el mar al atardecer.",
+          },
         },
       ],
       logistics: [
@@ -1085,7 +1456,17 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         subtitle:
           "Un plan sereno por barrios historicos, miradores y paseos junto al Tajo.",
         eyebrow: "Itinerario por ciudad",
+        image: {
+          src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+          alt: "Vista de Lisboa con el rio y tejados al atardecer.",
+        },
       },
+      cityStats: [
+        { value: "7", label: "Colinas en la ciudad" },
+        { value: "20+", label: "Miradores con vistas" },
+        { value: "550k", label: "Habitantes en el centro urbano" },
+        { value: "2.000+", label: "Anios de historia" },
+      ],
       fit: {
         forYou: ["Caminatas con vistas y descansos", "Barrios con ambiente local", "Ritmo realista"],
         notForYou: ["Plan muy cargado", "Excursiones fuera de la ciudad", "Vida nocturna como prioridad"],
@@ -1114,6 +1495,35 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           morning: "Chiado y Bairro Alto",
           afternoon: "Mirador de Sao Pedro de Alcantara",
           evening: "Cais do Sodre y paseo junto al agua",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Vistas y cuestas",
+          description:
+            "Lisboa se disfruta mejor en tramos cortos. Las cuestas son frecuentes, pero las vistas compensan.",
+          image: {
+            src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mirador sobre los tejados de Lisboa y el Tajo.",
+          },
+        },
+        {
+          title: "Ribera del Tajo",
+          description:
+            "El paseo junto al río es llano y aireado. Es un buen cierre de dia tras barrios con pendientes.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506459225024-1428097a7e18?auto=format&fit=crop&w=1200&q=80",
+            alt: "Tranvia clasico de Lisboa junto al rio.",
+          },
+        },
+        {
+          title: "Barrios con ritmo lento",
+          description:
+            "Alfama y Chiado se exploran sin prisas. Callejones y plazas pequeñas invitan a parar.",
+          image: {
+            src: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle empedrada en un barrio tradicional de Lisboa.",
+          },
         },
       ],
       logistics: [
@@ -1168,7 +1578,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         },
         {
           slug: "paris",
-          city: "Paris",
+          city: "París",
           days: 2,
           description: "Monumentos clasicos y paseos junto al rio.",
         },

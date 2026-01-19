@@ -25,12 +25,12 @@ export function RelatedItineraries({
           <Link
             key={item.slug}
             href={`${basePath}/cities/${item.slug}`}
-            className="rounded-2xl border border-border/60 bg-background p-5 transition hover:border-primary/40"
+            className="group rounded-3xl border border-border/70 bg-background p-5 shadow-md transition hover:border-primary/40 hover:-translate-y-0.5"
           >
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               {item.city} · {item.days} {item.days === 1 ? dayUnit.singular : dayUnit.plural}
             </div>
-            <div className="mt-2 text-lg font-semibold">{item.city}</div>
+            <div className="mt-3 text-lg font-semibold">{item.city}</div>
             <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
           </Link>
         ))}

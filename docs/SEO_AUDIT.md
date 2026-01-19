@@ -1,7 +1,7 @@
 # Kruno SEO Audit
 
 > **Last Updated:** January 2025  
-> **Status:** ✅ **ALL ISSUES RESOLVED** - Phase 23 SEO Complete
+> **Status:** ✅ **ALL ISSUES RESOLVED** - Phase 23.5 City Itinerary Pages Complete
 
 ## Summary of Current State
 
@@ -14,6 +14,7 @@ All high-priority SEO issues have been resolved. The codebase now includes:
 - ✅ Programmatic city and influencer pages with structured data and internal linking
 - ✅ Bilingual SEO with `/en` and `/es` routes plus hreflang alternates
 - ✅ Footer internal links fixed (removed `nofollow` and `href="#"`)
+- ✅ **NEW:** Rich city itinerary pages with comprehensive content (6 en + 6 es cities)
 
 ## Resolved Issues
 
@@ -118,13 +119,47 @@ All high-priority SEO issues have been resolved. The codebase now includes:
 - Influencer pages (localized): `/en/influencers/[slug]`, `/es/influencers/[slug]`
 - Private routes excluded: `/trips`, `/settings`, `/sign-in`, `/sign-up`, `/p/`
 
+## City Itinerary Content (Phase 23.5)
+
+Rich city itinerary pages provide comprehensive content for SEO:
+
+### English Cities
+- Rome (3 days) - `/en/cities/rome`
+- Rome (2 days) - `/en/cities/rome-2-days`
+- Paris (3 days) - `/en/cities/paris`
+- Barcelona (3 days) - `/en/cities/barcelona`
+- Amsterdam (3 days) - `/en/cities/amsterdam`
+- London (3 days) - `/en/cities/london`
+
+### Spanish Cities
+- Roma (3 days) - `/es/cities/rome`
+- Madrid (2 days) - `/es/cities/madrid`
+- París (2 days) - `/es/cities/paris`
+- Barcelona (3 days) - `/es/cities/barcelona`
+- Lisboa (3 days) - `/es/cities/lisbon`
+
+### Content Structure per City
+- Hero section with city image
+- City statistics (population, landmarks, history)
+- Quick facts (duration, pace, ideal for, style)
+- Fit analysis (who it's for / not for)
+- Day-by-day overview table
+- Detailed day breakdown (morning/afternoon/evening)
+- Editorial image cards with city context
+- Logistics and practical tips
+- Pre-trip checklist
+- FAQ section
+- Related itineraries
+
+---
+
 ## Next Steps (Future Optimization)
 
 While all critical issues are resolved, consider for future optimization:
-- [ ] Add more cities to programmatic SEO pages
+- [ ] Add more cities to programmatic SEO pages (Tokyo, New York, Berlin, Prague, etc.)
 - [ ] Add more influencers/creators
 - [ ] Implement breadcrumb navigation UI (JSON-LD already present)
 - [ ] Monitor Core Web Vitals
 - [ ] Set up Google Search Console and Bing Webmaster Tools
 - [ ] Implement image sitemap for place images
-- [ ] Add FAQ schema to relevant pages
+- [ ] Add FAQ schema to city itinerary pages (content already present)
