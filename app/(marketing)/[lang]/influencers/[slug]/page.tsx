@@ -48,8 +48,8 @@ export async function generateMetadata({
 
   const title =
     lang === "es"
-      ? `Itinerarios de viaje de ${influencer.name} | Kruno`
-      : `${influencer.name} Travel Itineraries | Kruno`;
+      ? `Guías de viaje de ${influencer.name} | Kruno`
+      : `${influencer.name} Travel Guides | Kruno`;
 
   return buildMetadata({
     title,

@@ -13,7 +13,7 @@ export const influencerPages: InfluencerSeo[] = [
     name: "Lena Escapes",
     niche: "City breaks & cafe culture",
     description:
-      "Short, stylish itineraries for travelers who love local cafes, walkable neighborhoods, and boutique stays.",
+      "Short, stylish travel guides for travelers who love local cafes, walkable neighborhoods, and boutique stays.",
     locationFocus: "Europe",
     profileUrl: "https://instagram.com",
   },
@@ -31,7 +31,7 @@ export const influencerPages: InfluencerSeo[] = [
     name: "Mina Goes",
     niche: "Family travel",
     description:
-      "Family-friendly itineraries with easy pacing, playgrounds, and flexible dining spots.",
+      "Family-friendly travel guides with easy pacing, playgrounds, and flexible dining spots.",
     locationFocus: "Global",
     profileUrl: "https://instagram.com",
   },

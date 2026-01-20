@@ -15,28 +15,22 @@ export function PrimaryCTA({
   href,
   variant = "primary",
 }: PrimaryCTAProps) {
-  const containerClass =
-    variant === "primary"
-      ? "rounded-3xl bg-primary text-primary-foreground shadow-lg"
-      : "rounded-3xl border border-border bg-muted/30";
   const buttonClass =
     variant === "primary"
-      ? "bg-primary-foreground text-primary"
-      : "bg-primary text-primary-foreground";
+      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+      : "bg-foreground text-background hover:bg-foreground/90";
 
   return (
-    <section className={`${containerClass} px-8 py-10`}>
-      <div className="max-w-2xl space-y-4">
-        <h2 className="text-2xl font-semibold">{title}</h2>
-        <p className={variant === "primary" ? "text-primary-foreground/90" : "text-muted-foreground"}>
-          {body}
-        </p>
+    <section className="mx-auto w-full max-w-4xl rounded-3xl border-[3px] border-[#F27263] bg-white px-8 py-10 text-center shadow-md">
+      <div className="mx-auto max-w-xl space-y-4">
+        <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
         <Link
           href={href}
-          className={`inline-flex items-center rounded-full px-6 py-2 text-sm font-medium ${buttonClass}`}
+          className={`inline-flex items-center justify-center rounded-full px-8 py-3 text-xs font-semibold uppercase tracking-wider shadow-sm ${buttonClass}`}
         >
           {buttonText}
         </Link>
+        <p className="text-xs text-muted-foreground">{body}</p>
       </div>
     </section>
   );

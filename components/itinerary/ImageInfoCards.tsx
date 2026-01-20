@@ -13,9 +13,10 @@ type ImageInfoCardsProps = {
   title: string;
   subtitle?: string;
   items: ImageInfoCard[];
+  fallbackSrc?: string;
 };
 
-export function ImageInfoCards({ title, subtitle, items }: ImageInfoCardsProps) {
+export function ImageInfoCards({ title, subtitle, items, fallbackSrc }: ImageInfoCardsProps) {
   if (items.length === 0) {
     return null;
   }
@@ -36,6 +37,7 @@ export function ImageInfoCards({ title, subtitle, items }: ImageInfoCardsProps) 
               <SafeImage
                 src={item.image.src}
                 alt={item.image.alt || item.title}
+                fallbackSrc={fallbackSrc}
                 fallbackTitle={item.title}
                 aspectClassName="aspect-[4/3]"
                 imageClassName="transition duration-500 group-hover:scale-105"

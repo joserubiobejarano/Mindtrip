@@ -7,8 +7,8 @@ import { getSiteUrl } from "@/lib/seo/site";
 import { buildCanonicalUrl, buildLanguageAlternates, getLocalizedPath } from "@/lib/seo/urls";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Influencer Itineraries – Kruno",
-  description: "Discover travel itineraries curated by influencers and creators on Kruno.",
+  title: "Influencer Guides – Kruno",
+  description: "Discover travel guides curated by influencers and creators on Kruno.",
   path: "/influencers",
   alternates: {
     canonical: buildCanonicalUrl(getLocalizedPath("/influencers", "en")),
@@ -21,7 +21,7 @@ export default function InfluencersPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Influencer itineraries",
+    name: "Influencer guides",
     itemListElement: influencerPages.map((influencer, index) => ({
       "@type": "ListItem",
       position: index + 1,
@@ -34,9 +34,9 @@ export default function InfluencersPage() {
     <div className="max-w-5xl mx-auto px-6 py-16">
       <StructuredData data={structuredData} id="kruno-influencers-list" />
       <div className="space-y-4">
-        <h1 className="text-4xl font-bold">Influencer itineraries</h1>
+        <h1 className="text-4xl font-bold">Influencer guides</h1>
         <p className="text-lg text-muted-foreground">
-          Hand-picked itinerary frameworks and travel styles from creators you can trust.
+          Hand-picked guide frameworks and travel styles from creators you can trust.
         </p>
       </div>
       <div className="mt-10 grid gap-6 md:grid-cols-2">

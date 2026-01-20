@@ -59,8 +59,8 @@ export default async function LocalizedCitiesPage({
       url: `${siteUrl}${basePath}/cities/${city.slug}`,
       name:
         lang === "es"
-          ? `Itinerario de ${city.days} días en ${city.name}`
-          : `${city.name} ${city.days}-day itinerary`,
+          ? `Guía de ${city.name} en ${city.days} días`
+          : `${city.name} ${city.days}-day travel guide`,
     })),
   };
 
@@ -84,8 +84,8 @@ export default async function LocalizedCitiesPage({
             <h2 className="text-2xl font-semibold mt-2">
               {city.name} ·{" "}
               {lang === "es"
-                ? `itinerario de ${city.days} días`
-                : `${city.days}-day itinerary`}
+                ? `guía de ${city.days} días`
+                : `${city.days}-day travel guide`}
             </h2>
             <p className="mt-3 text-muted-foreground">{city.description}</p>
             <div className="mt-4 text-sm text-primary">{copy.cityCardCta}</div>

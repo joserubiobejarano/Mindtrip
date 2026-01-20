@@ -6,6 +6,7 @@ import { ImageOff } from "lucide-react";
 
 type SafeImageProps = {
   src?: string;
+  fallbackSrc?: string;
   alt?: string;
   fallbackTitle?: string;
   aspectClassName?: string;
@@ -17,6 +18,7 @@ type SafeImageProps = {
 
 export function SafeImage({
   src,
+  fallbackSrc,
   alt,
   fallbackTitle,
   aspectClassName = "aspect-[4/3]",
@@ -25,10 +27,13 @@ export function SafeImage({
   sizes = "(min-width: 1024px) 50vw, 100vw",
   priority = false,
 }: SafeImageProps) {
-  const [hasError, setHasError] = useState(false);
+  const [hasPrimaryError, setHasPrimaryError] = useState(false);
+  const [hasFallbackError, setHasFallbackError] = useState(false);
   const normalizedSrc = useMemo(() => (src ?? "").trim(), [src]);
+  const normalizedFallbackSrc = useMemo(() => (fallbackSrc ?? "").trim(), [fallbackSrc]);
   const resolvedAlt = alt?.trim() || fallbackTitle?.trim() || "Itinerary image";
-  const showFallback = !normalizedSrc || hasError;
+  const activeSrc = normalizedSrc && !hasPrimaryError ? normalizedSrc : normalizedFallbackSrc;
+  const showFallback = !activeSrc || (hasPrimaryError && (!normalizedFallbackSrc || hasFallbackError));
 
   return (
     <div className={`relative ${aspectClassName} ${className ?? ""}`}>
@@ -47,13 +52,21 @@ export function SafeImage({
         </div>
       ) : (
         <Image
-          src={normalizedSrc}
+          src={activeSrc}
           alt={resolvedAlt}
           fill
           sizes={sizes}
           priority={priority}
           className={`object-cover ${imageClassName ?? ""}`}
-          onError={() => setHasError(true)}
+          onError={() => {
+            if (!hasPrimaryError && normalizedSrc) {
+              setHasPrimaryError(true);
+              return;
+            }
+            if (!hasFallbackError && normalizedFallbackSrc) {
+              setHasFallbackError(true);
+            }
+          }}
         />
       )}
     </div>

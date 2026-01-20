@@ -14,16 +14,16 @@ export function Checklist({ title, subtitle, items }: ChecklistProps) {
   const [checked, setChecked] = useState(initialState);
 
   return (
-    <section className="rounded-3xl border border-border/70 bg-background p-6 shadow-md md:p-8 space-y-4">
+    <section className="space-y-4 font-sans">
       <div>
         <h2 className="text-2xl font-semibold">{title}</h2>
-        {subtitle ? <p className="mt-2 text-muted-foreground">{subtitle}</p> : null}
+        {subtitle ? <p className="mt-2 text-slate-600">{subtitle}</p> : null}
       </div>
       <div className="space-y-3">
         {items.map((item, index) => (
           <label
             key={item}
-            className="flex items-start gap-3 rounded-2xl border border-border/60 bg-muted/10 px-4 py-3 text-sm shadow-sm"
+            className="flex items-start gap-3 rounded-2xl border border-[#F6B14A]/70 bg-[#FFF2C2] px-4 py-3 text-sm text-[#7B2B04] md:max-w-3xl"
           >
             <Checkbox
               checked={checked[index]}
@@ -32,9 +32,13 @@ export function Checklist({ title, subtitle, items }: ChecklistProps) {
                 next[index] = Boolean(value);
                 setChecked(next);
               }}
-              className="mt-0.5"
+              className="mt-0.5 border-[#F27263] data-[state=checked]:bg-[#F27263] data-[state=checked]:border-[#F27263]"
             />
-            <span className={checked[index] ? "line-through text-muted-foreground" : ""}>
+            <span
+              className={`font-medium ${
+                checked[index] ? "line-through text-[#7B2B04]/60" : undefined
+              }`}
+            >
               {item}
             </span>
           </label>

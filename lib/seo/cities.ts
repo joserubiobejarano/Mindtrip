@@ -14,7 +14,7 @@ export const cityPages: CitySeo[] = [
     country: "France",
     days: 3,
     description:
-      "A 3-day Paris itinerary focused on classic landmarks, cafe culture, and walkable neighborhoods.",
+      "A 3-day Paris travel guide focused on classic landmarks, cafe culture, and walkable neighborhoods.",
     highlights: ["Eiffel Tower", "Louvre Museum", "Montmartre"],
   },
   {
@@ -23,7 +23,7 @@ export const cityPages: CitySeo[] = [
     country: "Spain",
     days: 4,
     description:
-      "A 4-day Barcelona itinerary packed with Gaudi architecture, beaches, and food markets.",
+      "A 4-day Barcelona travel guide packed with Gaudi architecture, beaches, and food markets.",
     highlights: ["Sagrada Familia", "Gothic Quarter", "La Boqueria"],
   },
   {
@@ -32,7 +32,7 @@ export const cityPages: CitySeo[] = [
     country: "United Kingdom",
     days: 3,
     description:
-      "A 3-day London itinerary with iconic sights, museums, and neighborhoods across the Thames.",
+      "A 3-day London travel guide with iconic sights, museums, and neighborhoods across the Thames.",
     highlights: ["Westminster", "British Museum", "Tower Bridge"],
   },
   {
@@ -41,7 +41,7 @@ export const cityPages: CitySeo[] = [
     country: "Italy",
     days: 3,
     description:
-      "A 3-day Rome itinerary highlighting ancient history, piazzas, and Italian cuisine.",
+      "A 3-day Rome travel guide highlighting ancient history, piazzas, and Italian cuisine.",
     highlights: ["Colosseum", "Vatican Museums", "Trevi Fountain"],
   },
 ];

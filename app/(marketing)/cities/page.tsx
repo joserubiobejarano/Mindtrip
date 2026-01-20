@@ -7,8 +7,8 @@ import { getSiteUrl } from "@/lib/seo/site";
 import { buildCanonicalUrl, buildLanguageAlternates, getLocalizedPath } from "@/lib/seo/urls";
 
 export const metadata: Metadata = buildMetadata({
-  title: "City Itineraries – Kruno",
-  description: "Browse AI-generated city itineraries and travel guides from Kruno.",
+  title: "City Travel Guides – Kruno",
+  description: "Browse AI-generated city travel guides from Kruno.",
   path: "/cities",
   alternates: {
     canonical: buildCanonicalUrl(getLocalizedPath("/cities", "en")),
@@ -21,12 +21,12 @@ export default function CitiesPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "City itineraries",
+    name: "City travel guides",
     itemListElement: cityPages.map((city, index) => ({
       "@type": "ListItem",
       position: index + 1,
       url: `${siteUrl}/cities/${city.slug}`,
-      name: `${city.name} ${city.days}-day itinerary`,
+      name: `${city.name} ${city.days}-day travel guide`,
     })),
   };
 
@@ -34,9 +34,9 @@ export default function CitiesPage() {
     <div className="max-w-5xl mx-auto px-6 py-16">
       <StructuredData data={structuredData} id="kruno-cities-list" />
       <div className="space-y-4">
-        <h1 className="text-4xl font-bold">City itineraries</h1>
+        <h1 className="text-4xl font-bold">City travel guides</h1>
         <p className="text-lg text-muted-foreground">
-          Pick a city to explore a ready-to-use itinerary and plan faster with Kruno.
+          Pick a city to explore a ready-to-use travel guide and plan faster with Kruno.
         </p>
       </div>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
@@ -50,10 +50,10 @@ export default function CitiesPage() {
               {city.country}
             </div>
             <h2 className="text-2xl font-semibold mt-2">
-              {city.name} · {city.days}-day itinerary
+              {city.name} · {city.days}-day travel guide
             </h2>
             <p className="mt-3 text-muted-foreground">{city.description}</p>
-            <div className="mt-4 text-sm text-primary">View itinerary →</div>
+            <div className="mt-4 text-sm text-primary">View guide →</div>
           </Link>
         ))}
       </div>

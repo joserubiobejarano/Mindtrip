@@ -7,20 +7,22 @@ type FAQAccordionProps = {
 
 export function FAQAccordion({ title, items }: FAQAccordionProps) {
   return (
-    <section className="space-y-4">
-      <h2 className="text-2xl font-semibold">{title}</h2>
-      <div className="space-y-3">
+    <section className="space-y-4 font-sans">
+      <div className="space-y-4 flex flex-col items-center">
+        <h2 className="text-2xl font-semibold md:max-w-3xl w-full">{title}</h2>
+        <div className="space-y-3 flex flex-col items-center w-full">
         {items.map((item) => (
           <details
             key={item.question}
-            className="rounded-3xl border border-border/70 bg-background px-5 py-4 shadow-md"
+            className="rounded-2xl border border-[#F6B14A]/70 bg-[#FFEDD5] px-4 py-3 text-[#7B2B04] md:max-w-3xl w-full"
           >
-            <summary className="cursor-pointer text-base font-medium">
+            <summary className="cursor-pointer text-sm font-medium">
               {item.question}
             </summary>
-            <div className="mt-3 text-sm text-muted-foreground">{item.answer}</div>
+            <div className="mt-2 text-sm text-[#7B2B04]/80">{item.answer}</div>
           </details>
         ))}
+        </div>
       </div>
     </section>
   );

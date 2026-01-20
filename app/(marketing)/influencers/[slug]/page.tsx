@@ -21,8 +21,8 @@ export async function generateMetadata({
   if (!influencer) {
     const canonicalPath = getLocalizedPath(`/influencers/${slug}`, "en");
     return buildMetadata({
-      title: "Influencer Itineraries – Kruno",
-      description: "Discover travel itineraries curated by creators on Kruno.",
+      title: "Influencer Guides – Kruno",
+      description: "Discover travel guides curated by creators on Kruno.",
       path: `/influencers/${slug}`,
       alternates: {
         canonical: buildCanonicalUrl(canonicalPath),
@@ -33,7 +33,7 @@ export async function generateMetadata({
 
   const canonicalPath = getLocalizedPath(`/influencers/${influencer.slug}`, "en");
   return buildMetadata({
-    title: `${influencer.name} Travel Itineraries | Kruno`,
+    title: `${influencer.name} Travel Guides | Kruno`,
     description: influencer.description,
     path: `/influencers/${influencer.slug}`,
     alternates: {
@@ -69,7 +69,7 @@ export default async function InfluencerPage({
         {
           "@type": "ListItem",
           position: 2,
-          name: "Influencer itineraries",
+          name: "Influencer guides",
           item: `${siteUrl}/influencers`,
         },
         {
@@ -111,7 +111,7 @@ export default async function InfluencerPage({
       <div className="rounded-2xl border border-border/40 p-6 bg-background">
         <h2 className="text-xl font-semibold">Plan a trip with this style</h2>
         <p className="mt-2 text-muted-foreground">
-          Use this creator-inspired style to build a custom itinerary with Kruno&apos;s AI planner.
+          Use this creator-inspired style to build a custom travel guide with Kruno&apos;s AI planner.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link

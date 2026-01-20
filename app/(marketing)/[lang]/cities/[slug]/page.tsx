@@ -15,13 +15,12 @@ import {
 import { getMarketingCopy } from "@/lib/i18n/marketing";
 import { getItineraryCopy } from "@/lib/i18n/itinerary";
 import { getCityItinerary } from "@/lib/itinerary/city-itineraries";
+import { getDayImageCards } from "@/lib/itinerary/day-images";
 import { ItineraryHero } from "@/components/itinerary/Hero";
 import { IconNav, type IconNavItem } from "@/components/itinerary/IconNav";
 import { CityStats } from "@/components/itinerary/CityStats";
-import { QuickFacts } from "@/components/itinerary/QuickFacts";
 import { DayOverviewTable } from "@/components/itinerary/DayOverviewTable";
-import { DayBlock } from "@/components/itinerary/DayBlock";
-import { ImageInfoCards } from "@/components/itinerary/ImageInfoCards";
+import { DayPlanSlider } from "@/components/itinerary/DayPlanSlider";
 import { LogisticsTable } from "@/components/itinerary/LogisticsTable";
 import { Checklist } from "@/components/itinerary/Checklist";
 import { FAQAccordion } from "@/components/itinerary/FAQAccordion";
@@ -47,6 +46,7 @@ export async function generateMetadata({
   const city = getCityBySlug(slug);
   const path = getLocalizedPath(`/cities/${slug}`, lang);
   const copy = getMarketingCopy(lang);
+  const itinerary = getCityItinerary(lang, slug);
   if (!city) {
     return buildMetadata({
       title: copy.citiesMetaTitle,
@@ -61,14 +61,17 @@ export async function generateMetadata({
     });
   }
 
+  const cityName = itinerary?.city ?? city.name;
+  const cityDays = itinerary?.days ?? city.days;
   const title =
     lang === "es"
-      ? `Itinerario de ${city.days} días en ${city.name} | Kruno`
-      : `${city.name} ${city.days}-Day Itinerary | Kruno`;
+      ? `Guía de ${cityName} en ${cityDays} días – Planifica tu viaje con Kruno`
+      : `${cityName} Travel Guide (${cityDays} Days) – Plan a Calm Trip with Kruno`;
+  const description = itinerary?.hero.subtitle ?? city.description;
 
   return buildMetadata({
     title,
-    description: city.description,
+    description,
     path,
     alternates: {
       canonical: buildCanonicalUrl(path),
@@ -98,10 +101,13 @@ export default async function LocalizedCityItineraryPage({
   const itinerary = getCityItinerary(lang, slug);
   const siteUrl = getSiteUrl();
   const basePath = getLocalizedPath("", lang);
-  const itineraryLabel =
+  const displayCityName = itinerary?.city ?? city.name;
+  const displayCityCountry = itinerary?.country ?? city.country;
+  const displayCityDays = itinerary?.days ?? city.days;
+  const travelGuideLabel =
     lang === "es"
-      ? `Itinerario de ${city.days} días en ${city.name}`
-      : `${city.name} ${city.days}-day itinerary`;
+      ? `Guía de ${displayCityName} en ${displayCityDays} días`
+      : `${displayCityName} ${displayCityDays}-day travel guide`;
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -122,7 +128,7 @@ export default async function LocalizedCityItineraryPage({
         {
           "@type": "ListItem",
           position: 3,
-          name: lang === "es" ? `Itinerario de ${city.name}` : `${city.name} itinerary`,
+          name: travelGuideLabel,
           item: `${siteUrl}${basePath}/cities/${city.slug}`,
         },
       ],
@@ -130,8 +136,8 @@ export default async function LocalizedCityItineraryPage({
     {
       "@context": "https://schema.org",
       "@type": "TouristTrip",
-      name: itineraryLabel,
-      description: city.description,
+      name: travelGuideLabel,
+      description: itinerary?.hero.subtitle ?? city.description,
       touristType: "Leisure",
       itinerary: {
         "@type": "ItemList",
@@ -150,9 +156,9 @@ export default async function LocalizedCityItineraryPage({
         <StructuredData data={structuredData} id={`kruno-city-ld-${lang}`} />
         <div className="space-y-4">
           <div className="text-sm uppercase tracking-wide text-muted-foreground">
-            {city.country}
+            {displayCityCountry}
           </div>
-          <h1 className="text-4xl font-bold">{itineraryLabel}</h1>
+          <h1 className="text-4xl font-bold">{travelGuideLabel}</h1>
           <p className="text-lg text-muted-foreground">{city.description}</p>
         </div>
         <div>
@@ -219,9 +225,20 @@ export default async function LocalizedCityItineraryPage({
       },
     })),
   };
+  const relatedItemsWithImages = itinerary.relatedItineraries.map((item) => ({
+    ...item,
+    image: getCityItinerary(lang, item.slug)?.hero.image,
+  }));
+  const dayImageCards = await getDayImageCards({
+    slug: itinerary.slug,
+    city: itinerary.city,
+    country: itinerary.country,
+    dayPlans: itinerary.dayPlans,
+    fallbackImage: itinerary.hero.image,
+  });
 
   const iconNavItems: IconNavItem[] = [
-    { id: "overview", label: itineraryCopy.iconNav.overview, icon: "Compass" },
+    { id: "overview", label: displayCityName, icon: "Compass" },
     { id: "facts", label: itineraryCopy.iconNav.facts, icon: "Star" },
     { id: "top", label: itineraryCopy.iconNav.top, icon: "MapPinned" },
     { id: "attractions", label: itineraryCopy.iconNav.attractions, icon: "Landmark" },
@@ -235,132 +252,200 @@ export default async function LocalizedCityItineraryPage({
   return (
     <div className="bg-background">
       <StructuredData data={[...structuredData, faqStructuredData]} id={`kruno-city-ld-${lang}`} />
-      <SectionBand id="overview" variant="base" padding="lg" className="scroll-mt-24">
-        <ItineraryHero
-          eyebrow={itinerary.hero.eyebrow ?? itineraryCopy.heroEyebrowLabel}
-          title={itinerary.hero.title}
-          subtitle={itinerary.hero.subtitle}
-          image={itinerary.hero.image}
+      <SectionBand
+        variant="base"
+        className="!bg-background"
+        innerClassName="flex justify-center py-4 md:py-6"
+      >
+        <div className="w-full max-w-6xl">
+          <IconNav items={iconNavItems} />
+        </div>
+      </SectionBand>
+      <SectionBand
+        id="overview"
+        variant="base"
+        padding="md"
+        className="scroll-mt-24 !bg-background"
+        innerClassName="max-w-7xl pt-10 pb-14 md:pt-12 md:pb-20"
+      >
+        <div className="rounded-[2.75rem] border border-border/40 bg-white p-6 shadow-[0_30px_90px_-60px_rgba(15,23,42,0.6)] md:p-10">
+          <ItineraryHero
+            eyebrow={itinerary.hero.eyebrow ?? itineraryCopy.heroEyebrowLabel}
+            title={itinerary.hero.title}
+            subtitle={itinerary.hero.subtitle}
+            image={itinerary.hero.image}
+          />
+        </div>
+      </SectionBand>
+
+      <SectionBand
+        id="top"
+        variant="base"
+        className="scroll-mt-24 !bg-background"
+        innerClassName="pt-10 pb-14 md:pt-12 md:pb-20"
+      >
+        <CityStats
+          title={itineraryCopy.cityStatsTitle}
+          cityName={displayCityName}
+          items={itinerary.cityStats ?? []}
         />
       </SectionBand>
 
-      <SectionBand variant="accent" innerClassName="flex justify-center">
-        <IconNav items={iconNavItems} />
-      </SectionBand>
-
-      <SectionBand id="facts" variant="soft" className="scroll-mt-24" innerClassName="space-y-10">
-        <QuickFacts
-          title={itineraryCopy.quickFactsTitle}
-          labels={itineraryCopy.quickFactsLabels}
-          duration={`${itinerary.days} ${
-            itinerary.days === 1 ? itineraryCopy.dayUnit.singular : itineraryCopy.dayUnit.plural
-          }`}
-          pace={itinerary.pace}
-          idealFor={itinerary.idealFor}
-          style={itinerary.style}
-        />
-        <section className="rounded-3xl border border-border/70 bg-background p-6 shadow-md md:p-8">
-          <h2 className="text-2xl font-semibold">{itineraryCopy.fitTitle}</h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                {itineraryCopy.fitGoodLabel}
-              </h3>
-              <ul className="mt-3 space-y-2 text-sm">
-                {itinerary.fit.forYou.map((item) => (
-                  <li key={item} className="rounded-xl border border-border/60 bg-muted/10 px-4 py-3">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                {itineraryCopy.fitNotLabel}
-              </h3>
-              <ul className="mt-3 space-y-2 text-sm">
-                {itinerary.fit.notForYou.map((item) => (
-                  <li key={item} className="rounded-xl border border-border/60 bg-muted/10 px-4 py-3">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-      </SectionBand>
-
-      <SectionBand id="top" variant="highlight" className="scroll-mt-24">
-        <CityStats title={itineraryCopy.cityStatsTitle} items={itinerary.cityStats ?? []} />
-      </SectionBand>
-
-      <SectionBand id="attractions" variant="base" className="scroll-mt-24" innerClassName="space-y-10">
+      <SectionBand
+        id="attractions"
+        variant="base"
+        className="scroll-mt-24 !bg-background"
+        innerClassName="pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
+      >
         <DayOverviewTable
-          title={itineraryCopy.dayOverviewTitle}
+          title={`The plan for these ${itinerary.days} days in ${displayCityName}`}
           labels={itineraryCopy.dayOverviewTable}
           plans={itinerary.dayPlans}
         />
       </SectionBand>
 
-      <SectionBand id="history" variant="soft" className="scroll-mt-24" innerClassName="space-y-10">
-        <section className="space-y-5">
-          <h2 className="text-2xl font-semibold">{itineraryCopy.dayBreakdownTitle}</h2>
-          <div className="space-y-5">
-            {itinerary.dayPlans.map((plan) => (
-              <DayBlock key={plan.day} plan={plan} labels={itineraryCopy.dayBlockLabels} />
-            ))}
+      <SectionBand
+        id="facts"
+        variant="base"
+        className="scroll-mt-24 !bg-background"
+        innerClassName="pt-10 pb-14 md:pt-12 md:pb-20"
+      >
+        <section className="space-y-8 font-sans">
+          <h2 className="text-center text-2xl font-semibold">{itineraryCopy.fitTitle}</h2>
+          <div className="grid gap-8 md:grid-cols-2">
+            {/* Great Fit Column */}
+            <div className="rounded-3xl border-2 border-emerald-300 bg-emerald-50/70 p-6 md:p-8">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-emerald-700">
+                  {itineraryCopy.fitGoodLabel}
+                </h3>
+              </div>
+              <ul className="space-y-3 text-sm">
+                {itinerary.fit.forYou.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 text-emerald-800"
+                  >
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Not Ideal Column */}
+            <div className="rounded-3xl border-2 border-rose-300 bg-rose-50/70 p-6 md:p-8">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-500 text-white">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-rose-700">
+                  {itineraryCopy.fitNotLabel}
+                </h3>
+              </div>
+              <ul className="space-y-3 text-sm">
+                {itinerary.fit.notForYou.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 text-rose-800"
+                  >
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-rose-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
       </SectionBand>
 
-      <SectionBand id="food" variant="base" className="scroll-mt-24" innerClassName="space-y-10">
-        <ImageInfoCards
-          title={itineraryCopy.imageInfoTitle}
-          subtitle={itineraryCopy.imageInfoSubtitle}
-          items={itinerary.imageInfoCards ?? []}
-        />
+      <SectionBand
+        id="history"
+        variant="base"
+        className="scroll-mt-24 !bg-background"
+        innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20"
+      >
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">{itineraryCopy.dayBreakdownTitle}</h2>
+          <DayPlanSlider
+            plans={itinerary.dayPlans}
+            labels={itineraryCopy.dayBlockLabels}
+            imageCards={dayImageCards ?? itinerary.imageInfoCards}
+            heroImage={itinerary.hero.image}
+          />
+        </section>
       </SectionBand>
 
-      <SectionBand variant="highlight" innerClassName="space-y-10">
+      <SectionBand
+        variant="base"
+        className="!bg-background"
+        innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
+      >
         <section id="logistics" className="scroll-mt-24">
-          <LogisticsTable title={itineraryCopy.logisticsTitle} items={itinerary.logistics} />
+          <LogisticsTable
+            title={`${itineraryCopy.logisticsTitle} for ${displayCityName}`}
+            items={itinerary.logistics}
+          />
         </section>
+      </SectionBand>
+
+
+      <SectionBand
+        variant="base"
+        className="!bg-background"
+        innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
+      >
         <section id="checklist" className="scroll-mt-24">
           <Checklist
-            title={itineraryCopy.checklistTitle}
-            subtitle={itineraryCopy.checklistSubtitle}
+            title={`${itineraryCopy.checklistTitle} to ${displayCityName}`}
+            subtitle="Tap items as you prepare."
             items={itinerary.checklist}
           />
         </section>
       </SectionBand>
 
-      <SectionBand id="tips" variant="soft" className="scroll-mt-24" innerClassName="space-y-10">
+      <SectionBand
+        id="tips"
+        variant="base"
+        className="scroll-mt-24 !bg-background"
+        innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20"
+      >
         <FAQAccordion title={itineraryCopy.faqTitle} items={itinerary.faqs} />
-        <RelatedItineraries
-          title={itineraryCopy.relatedTitle}
-          items={itinerary.relatedItineraries}
-          basePath={basePath}
-          dayUnit={itineraryCopy.dayUnit}
-        />
       </SectionBand>
 
-      <SectionBand variant="accent" innerClassName="space-y-6">
+      <SectionBand
+        variant="base"
+        className="!bg-background"
+        innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20"
+      >
         <PrimaryCTA
           title={itineraryCopy.primaryCtaTitle}
           body={itineraryCopy.primaryCtaBody}
           buttonText={itineraryCopy.primaryCtaButton}
           href={localizedPrimaryCtaHref}
         />
-        {localizedSecondaryCtaHref ? (
-          <PrimaryCTA
-            title={itineraryCopy.secondaryCtaTitle}
-            body={itineraryCopy.secondaryCtaBody}
-            buttonText={itineraryCopy.secondaryCtaButton}
-            href={localizedSecondaryCtaHref}
-            variant="secondary"
-          />
-        ) : null}
       </SectionBand>
+
+      <SectionBand
+        variant="base"
+        className="!bg-background"
+        innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20"
+      >
+        <RelatedItineraries
+          title={itineraryCopy.relatedTitle}
+          items={relatedItemsWithImages}
+          basePath={basePath}
+          dayUnit={itineraryCopy.dayUnit}
+          buttonText={itineraryCopy.secondaryCtaButton}
+        />
+      </SectionBand>
+
     </div>
   );
 }

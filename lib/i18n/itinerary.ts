@@ -60,7 +60,7 @@ type ItineraryCopy = {
 
 const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
   en: {
-    heroEyebrowLabel: "City itinerary",
+    heroEyebrowLabel: "Travel guide",
     iconNav: {
       overview: "Overview",
       facts: "Quick facts",
@@ -80,7 +80,7 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
       idealFor: "Ideal for",
       style: "Style",
     },
-    fitTitle: "Is this itinerary for you?",
+    fitTitle: "Is this travel guide for you?",
     fitGoodLabel: "Great fit if you want",
     fitNotLabel: "Not ideal if you want",
     dayOverviewTitle: "At-a-glance plan",
@@ -106,20 +106,20 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
     checklistTitle: "Checklist before you go",
     checklistSubtitle: "Tap items as you prepare. No sign-in needed.",
     faqTitle: "Frequently asked questions",
-    relatedTitle: "Related itineraries",
+    relatedTitle: "Need a different pace?",
     imageInfoTitle: "City stories & context",
     imageInfoSubtitle:
       "Short editorial snapshots that highlight neighborhoods, themes, and the city's everyday rhythm.",
     primaryCtaTitle: "Build this trip in Kruno",
     primaryCtaBody:
-      "Turn this itinerary into a personalized plan with dates, preferences, and AI recommendations.",
+      "Turn this travel guide into a personalized plan with dates and preferences.",
     primaryCtaButton: "Start planning",
     secondaryCtaTitle: "Need a different pace?",
     secondaryCtaBody: "Try another city template or customize the days in minutes.",
     secondaryCtaButton: "Browse all cities",
   },
   es: {
-    heroEyebrowLabel: "Itinerario por ciudad",
+    heroEyebrowLabel: "Guía de viaje",
     iconNav: {
       overview: "Resumen",
       facts: "Datos",
@@ -139,7 +139,7 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
       idealFor: "Ideal para",
       style: "Estilo",
     },
-    fitTitle: "Este itinerario es para ti?",
+    fitTitle: "Esta guía de viaje es para ti?",
     fitGoodLabel: "Ideal si buscas",
     fitNotLabel: "No es ideal si buscas",
     dayOverviewTitle: "Plan de un vistazo",
@@ -165,13 +165,13 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
     checklistTitle: "Lista de preparativos",
     checklistSubtitle: "Marca los puntos mientras preparas el viaje.",
     faqTitle: "Preguntas frecuentes",
-    relatedTitle: "Itinerarios relacionados",
+    relatedTitle: "Quieres otro ritmo?",
     imageInfoTitle: "Historias y contexto",
     imageInfoSubtitle:
       "Notas editoriales breves para destacar barrios, temas y el ritmo cotidiano de la ciudad.",
     primaryCtaTitle: "Crea este viaje en Kruno",
     primaryCtaBody:
-      "Convierte este itinerario en un plan personalizado con fechas, preferencias y recomendaciones de IA.",
+      "Convierte esta guía de viaje en un plan personalizado con fechas y preferencias.",
     primaryCtaButton: "Empezar a planificar",
     secondaryCtaTitle: "Quieres otro ritmo?",
     secondaryCtaBody: "Explora otra ciudad o ajusta los dias en minutos.",

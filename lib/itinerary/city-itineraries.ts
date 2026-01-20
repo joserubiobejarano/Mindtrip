@@ -82,7 +82,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Rome in 3 days",
         subtitle:
           "Hit the essentials with room to breathe, focusing on ancient icons, piazzas, and easy food stops.",
-        eyebrow: "City itinerary",
+        eyebrow: "Travel guide",
         image: {
           src: "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=1600&q=80",
           alt: "Warm golden light over Rome rooftops and domes at sunset.",
@@ -95,8 +95,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "10M+", label: "Annual visitors" },
       ],
       fit: {
-        forYou: ["A first trip with iconic landmarks", "A mix of history and cafes", "Short walking routes"],
-        notForYou: ["A packed schedule of museums only", "Day trips outside the city", "Late-night nightlife focus"],
+        forYou: ["A first trip with iconic landmarks", "A mix of history and cafes", "Short walking routes", "Flexible pace with time to relax", "Classic photo opportunities"],
+        notForYou: ["A packed schedule of museums only", "Day trips outside the city", "Late-night nightlife focus", "Extremely detailed art tours", "Budget backpacker style"],
       },
       dayPlans: [
         {
@@ -185,6 +185,11 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
             "Most sights are walkable. A 24- or 48-hour pass helps for Vatican day and longer hops.",
         },
         {
+          question: "Is Rome walkable?",
+          answer:
+            "Yes. The historic center is compact, so most days can be done on foot with short Metro rides when needed.",
+        },
+        {
           question: "Where should I stay?",
           answer:
             "Centro Storico keeps you central, while Monti offers a local feel with easy access to the Colosseum.",
@@ -225,15 +230,15 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Rome in 2 days",
         subtitle:
           "Cover the essentials with calm pacing, focusing on ancient landmarks, piazzas, and short walks.",
-        eyebrow: "City itinerary",
+        eyebrow: "Travel guide",
         image: {
           src: "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=1600&q=80",
           alt: "Warm golden light over Rome rooftops and domes at sunset.",
         },
       },
       fit: {
-        forYou: ["A short visit focused on the core sights", "Easy walks with breaks", "A clear, simple plan"],
-        notForYou: ["A deep museum-only itinerary", "Day trips outside Rome", "Late-night nightlife focus"],
+        forYou: ["A short visit focused on the core sights", "Easy walks with breaks", "A clear, simple plan", "First-time visitors to Rome", "Scenic viewpoints and piazzas"],
+        notForYou: ["A deep museum-only travel guide", "Day trips outside Rome", "Late-night nightlife focus", "Extensive shopping time", "Off-the-beaten-path exploration"],
       },
       dayPlans: [
         {
@@ -325,7 +330,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Paris in 3 days",
         subtitle:
           "See the essentials with short walks between sights, mixing museums with relaxed neighborhood time.",
-        eyebrow: "City itinerary",
+        eyebrow: "Travel guide",
         image: {
           src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=80",
           alt: "The Eiffel Tower viewed across Paris rooftops at golden hour.",
@@ -338,8 +343,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "30M+", label: "Annual visitors" },
       ],
       fit: {
-        forYou: ["A clear plan with breathing room", "A mix of art and city walks", "Simple metro hops"],
-        notForYou: ["Day trips outside the city", "A packed museum-only schedule", "Late-night nightlife focus"],
+        forYou: ["A clear plan with breathing room", "A mix of art and city walks", "Simple metro hops", "World-class museum highlights", "Charming neighborhood strolls"],
+        notForYou: ["Day trips outside the city", "A packed museum-only schedule", "Late-night nightlife focus", "Extensive wine tasting tours", "Adventure or hiking activities"],
       },
       dayPlans: [
         {
@@ -468,9 +473,9 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Barcelona in 3 days",
         subtitle:
           "Blend Gaudi icons with walkable neighborhoods and a relaxed coastal rhythm.",
-        eyebrow: "City itinerary",
+        eyebrow: "Travel guide",
         image: {
-          src: "https://images.unsplash.com/photo-1505739778031-2b9d8f4097e5?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYXJjZWxvbmElMjBzYWdyYWRhJTIwZmFtaWxpYXxlbnwxfHx8fDE3NjQwNTU2NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
           alt: "Colorful rooftops and spires of Park Guell in Barcelona.",
         },
       },
@@ -481,8 +486,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "2,000+", label: "Years of recorded history" },
       ],
       fit: {
-        forYou: ["A mix of architecture and easy walks", "Clear, simple days", "Time by the sea"],
-        notForYou: ["A packed museum schedule", "Late-night nightlife focus", "Day trips outside the city"],
+        forYou: ["A mix of architecture and easy walks", "Clear, simple days", "Time by the sea", "Gaudi masterpieces up close", "Mediterranean vibes and beaches"],
+        notForYou: ["A packed museum schedule", "Late-night nightlife focus", "Day trips outside the city", "Mountain hiking excursions", "Heavy nightclub scene"],
       },
       dayPlans: [
         {
@@ -611,7 +616,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Amsterdam in 3 days",
         subtitle:
           "Keep it easy with canal walks, compact museum time, and a calm neighborhood rhythm.",
-        eyebrow: "City itinerary",
+        eyebrow: "Travel guide",
         image: {
           src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80",
           alt: "Canal houses and a bridge reflected in Amsterdam water.",
@@ -624,8 +629,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "800k+", label: "Residents in the city" },
       ],
       fit: {
-        forYou: ["A walkable city with short distances", "A mix of museums and parks", "Easy, quiet evenings"],
-        notForYou: ["A packed schedule of tours", "Long day trips", "Late-night nightlife focus"],
+        forYou: ["A walkable city with short distances", "A mix of museums and parks", "Easy, quiet evenings", "Canal-side cafe culture", "Bike-friendly exploration"],
+        notForYou: ["A packed schedule of tours", "Long day trips", "Late-night nightlife focus", "Beach or coastal activities", "Luxury shopping focus"],
       },
       dayPlans: [
         {
@@ -754,7 +759,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "London in 3 days",
         subtitle:
           "Cover the essentials with short walks and easy transit, mixing landmarks with relaxed neighborhoods.",
-        eyebrow: "City itinerary",
+        eyebrow: "Travel guide",
         image: {
           src: "https://images.unsplash.com/photo-1471623432079-b009d30b6729?auto=format&fit=crop&w=1600&q=80",
           alt: "London skyline with the Thames and Tower Bridge.",
@@ -767,8 +772,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "9M", label: "Residents in Greater London" },
       ],
       fit: {
-        forYou: ["A clear plan with short transfers", "A mix of museums and landmarks", "Walkable river routes"],
-        notForYou: ["Day trips outside London", "A packed schedule of shows", "Late-night nightlife focus"],
+        forYou: ["A clear plan with short transfers", "A mix of museums and landmarks", "Walkable river routes", "Historic royal attractions", "Diverse food scene sampling"],
+        notForYou: ["Day trips outside London", "A packed schedule of shows", "Late-night nightlife focus", "Countryside escapes", "Budget hostel backpacking"],
       },
       dayPlans: [
         {
@@ -899,7 +904,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Roma en 3 dias",
         subtitle:
           "Recorre lo esencial con tiempo para respirar, centrado en iconos antiguos, plazas y comidas faciles.",
-        eyebrow: "Itinerario por ciudad",
+        eyebrow: "Guía de viaje",
         image: {
           src: "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=1600&q=80",
           alt: "Luz dorada sobre los tejados y cupulas de Roma al atardecer.",
@@ -912,8 +917,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "10M+", label: "Visitantes al ano" },
       ],
       fit: {
-        forYou: ["Un primer viaje con iconos", "Mezcla de historia y cafe", "Rutas a pie sin prisa"],
-        notForYou: ["Solo museos todo el dia", "Excursiones fuera de la ciudad", "Plan de vida nocturna"],
+        forYou: ["Un primer viaje con iconos", "Mezcla de historia y cafe", "Rutas a pie sin prisa", "Ritmo flexible con tiempo libre", "Oportunidades de fotos clasicas"],
+        notForYou: ["Solo museos todo el dia", "Excursiones fuera de la ciudad", "Plan de vida nocturna", "Tours de arte muy detallados", "Estilo mochilero economico"],
       },
       dayPlans: [
         {
@@ -1002,6 +1007,11 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
             "Muchas zonas son caminables. Un pase de 24 o 48 horas ayuda para el Vaticano y trayectos largos.",
         },
         {
+          question: "Roma es caminable?",
+          answer:
+            "Si. El centro historico es compacto y puedes hacer la mayoria a pie con pocos trayectos en Metro.",
+        },
+        {
           question: "Donde hospedarse?",
           answer:
             "Centro Storico te deja en el centro. Monti es mas local y cerca del Coliseo.",
@@ -1042,7 +1052,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Madrid en 2 dias",
         subtitle:
           "Recorre lo esencial con traslados cortos, combinando museos, plazas y parques.",
-        eyebrow: "Itinerario por ciudad",
+        eyebrow: "Guía de viaje",
         image: {
           src: "https://images.unsplash.com/photo-1506806732259-39c2d0268443?auto=format&fit=crop&w=1600&q=80",
           alt: "Vista amplia de Madrid con edificios historicos y cielo claro.",
@@ -1055,8 +1065,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "300", label: "Dias de sol al ano" },
       ],
       fit: {
-        forYou: ["Un plan claro y caminable", "Museos y parques en equilibrio", "Ritmo realista"],
-        notForYou: ["Excursiones fuera de la ciudad", "Plan muy cargado", "Vida nocturna como prioridad"],
+        forYou: ["Un plan claro y caminable", "Museos y parques en equilibrio", "Ritmo realista", "Lo mejor de los museos del mundo", "Paseos por barrios encantadores"],
+        notForYou: ["Excursiones fuera de la ciudad", "Plan muy cargado", "Vida nocturna como prioridad", "Tours extensos de vinos", "Actividades de aventura o senderismo"],
       },
       dayPlans: [
         {
@@ -1177,7 +1187,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "París en 2 dias",
         subtitle:
           "Veras lo esencial con distancias cortas, combinando arte, plazas y paseos por el Sena.",
-        eyebrow: "Itinerario por ciudad",
+        eyebrow: "Guía de viaje",
         image: {
           src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=80",
           alt: "La Torre Eiffel al fondo sobre los tejados de París.",
@@ -1190,8 +1200,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "30M+", label: "Visitantes al ano" },
       ],
       fit: {
-        forYou: ["Un fin de semana con lo basico", "Rutas a pie sin prisa", "Pocas conexiones en Metro"],
-        notForYou: ["Excursiones fuera de la ciudad", "Un plan solo de museos", "Vida nocturna como prioridad"],
+        forYou: ["Un fin de semana con lo basico", "Rutas a pie sin prisa", "Pocas conexiones en Metro", "Visitantes primerizos a Roma", "Miradores y plazas escenicas"],
+        notForYou: ["Excursiones fuera de la ciudad", "Un plan solo de museos", "Vida nocturna como prioridad", "Tiempo extenso de compras", "Exploracion fuera de lo tipico"],
       },
       dayPlans: [
         {
@@ -1312,9 +1322,9 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Barcelona en 3 dias",
         subtitle:
           "Combina iconos de Gaudi con paseos por barrios y un ritmo relajado junto al mar.",
-        eyebrow: "Itinerario por ciudad",
+        eyebrow: "Guía de viaje",
         image: {
-          src: "https://images.unsplash.com/photo-1505739778031-2b9d8f4097e5?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYXJjZWxvbmElMjBzYWdyYWRhJTIwZmFtaWxpYXxlbnwxfHx8fDE3NjQwNTU2NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
           alt: "Tejados y mosaicos de Park Guell en Barcelona.",
         },
       },
@@ -1325,8 +1335,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "2.000+", label: "Anios de historia" },
       ],
       fit: {
-        forYou: ["Arquitectura y paseos faciles", "Plan claro por dias", "Tiempo de playa sin prisa"],
-        notForYou: ["Solo museos todo el dia", "Vida nocturna como prioridad", "Excursiones fuera de la ciudad"],
+        forYou: ["Arquitectura y paseos faciles", "Plan claro por dias", "Tiempo de playa sin prisa", "Obras maestras de Gaudi de cerca", "Ambiente mediterraneo y playas"],
+        notForYou: ["Solo museos todo el dia", "Vida nocturna como prioridad", "Excursiones fuera de la ciudad", "Excursiones de montana", "Escena de discotecas intensas"],
       },
       dayPlans: [
         {
@@ -1455,7 +1465,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         title: "Lisboa en 3 dias",
         subtitle:
           "Un plan sereno por barrios historicos, miradores y paseos junto al Tajo.",
-        eyebrow: "Itinerario por ciudad",
+        eyebrow: "Guía de viaje",
         image: {
           src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
           alt: "Vista de Lisboa con el rio y tejados al atardecer.",
@@ -1468,8 +1478,8 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { value: "2.000+", label: "Anios de historia" },
       ],
       fit: {
-        forYou: ["Caminatas con vistas y descansos", "Barrios con ambiente local", "Ritmo realista"],
-        notForYou: ["Plan muy cargado", "Excursiones fuera de la ciudad", "Vida nocturna como prioridad"],
+        forYou: ["Caminatas con vistas y descansos", "Barrios con ambiente local", "Ritmo realista", "Cultura de cafes junto al canal", "Exploracion amigable en bici"],
+        notForYou: ["Plan muy cargado", "Excursiones fuera de la ciudad", "Vida nocturna como prioridad", "Actividades de playa o costa", "Enfoque en compras de lujo"],
       },
       dayPlans: [
         {
