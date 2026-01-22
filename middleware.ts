@@ -48,6 +48,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/newsletter/unsubscribe(.*)',
   '/api/webhooks/clerk(.*)',
   '/api/debug(.*)',
+  '/api/wikimedia(.*)',
 ])
 
 const isProtectedRoute = createRouteMatcher([

@@ -35,7 +35,7 @@ export function buildLanguageAlternates(pathname: string): Record<string, string
   return {
     en: buildCanonicalUrl(getLocalizedPath(pathname, "en")),
     es: buildCanonicalUrl(getLocalizedPath(pathname, "es")),
-    "x-default": buildCanonicalUrl("/"),
+    "x-default": buildCanonicalUrl(getLocalizedPath(pathname, "en")),
   };
 }
 

@@ -8,8 +8,8 @@ export const metadata: Metadata = buildMetadata({
     "Get in touch with the Kruno team. We're here to help with questions, feedback, or support requests.",
   path: "/contact",
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 });
 

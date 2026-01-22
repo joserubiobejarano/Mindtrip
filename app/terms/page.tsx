@@ -8,8 +8,8 @@ export const metadata: Metadata = buildMetadata({
     "Read Kruno's Terms of Service to understand the rules and guidelines for using our platform.",
   path: "/terms",
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 });
 

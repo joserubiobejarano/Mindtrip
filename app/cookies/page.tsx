@@ -8,8 +8,8 @@ export const metadata: Metadata = buildMetadata({
     "Learn about how Kruno uses cookies and similar technologies to improve your experience.",
   path: "/cookies",
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 });
 

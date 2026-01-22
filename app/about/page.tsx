@@ -8,8 +8,8 @@ export const metadata: Metadata = buildMetadata({
     "Learn about Kruno, the AI-powered travel planning platform that helps you create smart, personalized itineraries and discover amazing places.",
   path: "/about",
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 });
 

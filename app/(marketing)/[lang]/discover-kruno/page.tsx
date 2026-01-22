@@ -26,6 +26,10 @@ export async function generateMetadata({
     title: copy.discoverMetaTitle,
     description: copy.discoverMetaDescription,
     path,
+    robots: {
+      index: false,
+      follow: false,
+    },
     alternates: {
       canonical: buildCanonicalUrl(path),
       languages: buildLanguageAlternates("/discover-kruno"),

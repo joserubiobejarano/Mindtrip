@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { ImageOff } from "lucide-react";
+import { normalizeWikimediaSrc } from "@/lib/images/wikimedia";
 
 type SafeImageProps = {
   src?: string;
@@ -29,8 +30,11 @@ export function SafeImage({
 }: SafeImageProps) {
   const [hasPrimaryError, setHasPrimaryError] = useState(false);
   const [hasFallbackError, setHasFallbackError] = useState(false);
-  const normalizedSrc = useMemo(() => (src ?? "").trim(), [src]);
-  const normalizedFallbackSrc = useMemo(() => (fallbackSrc ?? "").trim(), [fallbackSrc]);
+  const normalizedSrc = useMemo(() => normalizeWikimediaSrc(src ?? ""), [src]);
+  const normalizedFallbackSrc = useMemo(
+    () => normalizeWikimediaSrc(fallbackSrc ?? ""),
+    [fallbackSrc]
+  );
   const resolvedAlt = alt?.trim() || fallbackTitle?.trim() || "Itinerary image";
   const activeSrc = normalizedSrc && !hasPrimaryError ? normalizedSrc : normalizedFallbackSrc;
   const showFallback = !activeSrc || (hasPrimaryError && (!normalizedFallbackSrc || hasFallbackError));

@@ -21,6 +21,7 @@ import { FAQAccordion } from "@/components/itinerary/FAQAccordion";
 import { RelatedItineraries } from "@/components/itinerary/RelatedItineraries";
 import { PrimaryCTA } from "@/components/itinerary/PrimaryCTA";
 import { SectionBand } from "@/components/itinerary/SectionBand";
+import { collectInvalidImageUrls, validateGuide } from "@/lib/guides/validateGuide";
 
 export function generateStaticParams() {
   return cityPages.map((city) => ({ slug: city.slug }));
@@ -81,6 +82,7 @@ export default async function CityItineraryPage({
   const displayCityCountry = itinerary?.country ?? city.country;
   const displayCityDays = itinerary?.days ?? city.days;
   const travelGuideLabel = `${displayCityName} ${displayCityDays}-day travel guide`;
+  const pacingTitle = `How to enjoy ${displayCityName} in ${displayCityDays} days`;
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -207,6 +209,23 @@ export default async function CityItineraryPage({
     dayPlans: itinerary.dayPlans,
     fallbackImage: itinerary.hero.image,
   });
+  if (process.env.NODE_ENV !== "production") {
+    const missingP0 = validateGuide(itinerary);
+    const invalidImageUrls = collectInvalidImageUrls(itinerary, relatedItemsWithImages);
+    const missingRelatedLinks = itinerary.relatedItineraries.length
+      ? itinerary.relatedItineraries
+          .filter((item) => !item.slug || !getCityItinerary("en", item.slug))
+          .map((item) => item.slug || item.city || "unknown")
+      : ["No related itineraries configured"];
+
+    if (missingP0.length || invalidImageUrls.length || missingRelatedLinks.length) {
+      console.warn(`[Guide QA] ${itinerary.slug} has issues`, {
+        missingP0,
+        invalidImageUrls,
+        missingRelatedLinks,
+      });
+    }
+  }
 
   const iconNavItems: IconNavItem[] = [
     { id: "overview", label: displayCityName, icon: "Compass" },
@@ -351,6 +370,23 @@ export default async function CityItineraryPage({
         </section>
       </SectionBand>
 
+      {itinerary.pacing?.length ? (
+        <SectionBand
+          variant="base"
+          className="!bg-background"
+          innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
+        >
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">{pacingTitle}</h2>
+            <div className="space-y-4 rounded-3xl border border-[#7b2b04]/20 bg-[#ffedd5] p-6 text-sm text-[#7b2b04] md:p-8 md:text-base">
+              {itinerary.pacing.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </section>
+        </SectionBand>
+      ) : null}
+
       <SectionBand
         variant="base"
         className="!bg-background"
@@ -363,6 +399,18 @@ export default async function CityItineraryPage({
           />
         </section>
       </SectionBand>
+
+      {itinerary.goodToKnow?.length ? (
+        <SectionBand
+          variant="base"
+          className="!bg-background"
+          innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
+        >
+          <section className="scroll-mt-24">
+            <LogisticsTable title="Good to know before you go" items={itinerary.goodToKnow} />
+          </section>
+        </SectionBand>
+      ) : null}
 
       <SectionBand
         variant="base"

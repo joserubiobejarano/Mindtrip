@@ -291,7 +291,7 @@ export function ExplorePlaceList({
                   {t('explore_upgrade_title')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {t('explore_upgrade_message').replace('{count}', hiddenCount.toString())}
+                  {t('explore_upgrade_message').replace('{count}', '100')}
                 </p>
               </div>
               <Button

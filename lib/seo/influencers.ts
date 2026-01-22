@@ -9,15 +9,6 @@ export type InfluencerSeo = {
 
 export const influencerPages: InfluencerSeo[] = [
   {
-    slug: "lena-escapes",
-    name: "Lena Escapes",
-    niche: "City breaks & cafe culture",
-    description:
-      "Short, stylish travel guides for travelers who love local cafes, walkable neighborhoods, and boutique stays.",
-    locationFocus: "Europe",
-    profileUrl: "https://instagram.com",
-  },
-  {
     slug: "atlas-once",
     name: "Atlas Once",
     niche: "Outdoor adventures",

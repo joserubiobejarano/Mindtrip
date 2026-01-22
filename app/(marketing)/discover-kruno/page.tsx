@@ -8,6 +8,10 @@ export const metadata: Metadata = buildMetadata({
   title: "Discover Kruno – AI Travel Planner",
   description: "Create a clear trip plan in minutes with Kruno's AI travel planner.",
   path: "/discover-kruno",
+  robots: {
+    index: false,
+    follow: false,
+  },
   alternates: {
     canonical: buildCanonicalUrl(getLocalizedPath("/discover-kruno", "en")),
     languages: buildLanguageAlternates("/discover-kruno"),

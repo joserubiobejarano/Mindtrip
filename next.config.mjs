@@ -24,9 +24,14 @@ const nextConfig = {
 
       // Unsplash fallback images
       { protocol: "https", hostname: "images.unsplash.com" },
+
+      // Wikimedia Commons
+      { protocol: "https", hostname: "upload.wikimedia.org" },
+      { protocol: "https", hostname: "commons.wikimedia.org" },
     ],
     localPatterns: [
       { pathname: "/api/places/photo" },
+      { pathname: "/api/wikimedia" },
       { pathname: "/brand/**" },
     ],
   },

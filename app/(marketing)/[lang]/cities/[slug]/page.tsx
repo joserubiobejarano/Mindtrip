@@ -27,6 +27,7 @@ import { FAQAccordion } from "@/components/itinerary/FAQAccordion";
 import { RelatedItineraries } from "@/components/itinerary/RelatedItineraries";
 import { PrimaryCTA } from "@/components/itinerary/PrimaryCTA";
 import { SectionBand } from "@/components/itinerary/SectionBand";
+import { collectInvalidImageUrls, validateGuide } from "@/lib/guides/validateGuide";
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.flatMap((lang) =>
@@ -65,9 +66,12 @@ export async function generateMetadata({
   const cityDays = itinerary?.days ?? city.days;
   const title =
     lang === "es"
-      ? `Guía de ${cityName} en ${cityDays} días – Planifica tu viaje con Kruno`
-      : `${cityName} Travel Guide (${cityDays} Days) – Plan a Calm Trip with Kruno`;
-  const description = itinerary?.hero.subtitle ?? city.description;
+      ? `Cómo pasar ${cityDays} días en ${cityName} sin ir muy apurado.`
+      : `How to spend ${cityDays} days in ${cityName} without Rushing`;
+  const description =
+    lang === "es"
+      ? `Una guía de viaje completa de ${cityName}, día a día y diseñada para quienes la visitan por primera vez. Visita lo esencial, disfruta de una excelente comida y evita planificar demasiado.`
+      : `A full day-by-day ${cityName} travel guide designed for first-time visitors. See the essentials, enjoy great food, and avoid overplanning.`;
 
   return buildMetadata({
     title,
@@ -108,6 +112,22 @@ export default async function LocalizedCityItineraryPage({
     lang === "es"
       ? `Guía de ${displayCityName} en ${displayCityDays} días`
       : `${displayCityName} ${displayCityDays}-day travel guide`;
+  const pacingTitle =
+    lang === "es"
+      ? `Cómo disfrutar ${displayCityName} en ${displayCityDays} días`
+      : `How to enjoy ${displayCityName} in ${displayCityDays} days`;
+  const dayOverviewTitle =
+    lang === "es"
+      ? `El plan para estos ${displayCityDays} días en ${displayCityName}`
+      : `The plan for these ${displayCityDays} days in ${displayCityName}`;
+  const logisticsTitle =
+    lang === "es"
+      ? `${itineraryCopy.logisticsTitle} en ${displayCityName}`
+      : `${itineraryCopy.logisticsTitle} for ${displayCityName}`;
+  const checklistTitle =
+    lang === "es"
+      ? `${itineraryCopy.checklistTitle} para ${displayCityName}`
+      : `${itineraryCopy.checklistTitle} to ${displayCityName}`;
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -236,6 +256,23 @@ export default async function LocalizedCityItineraryPage({
     dayPlans: itinerary.dayPlans,
     fallbackImage: itinerary.hero.image,
   });
+  if (process.env.NODE_ENV !== "production") {
+    const missingP0 = validateGuide(itinerary);
+    const invalidImageUrls = collectInvalidImageUrls(itinerary, relatedItemsWithImages);
+    const missingRelatedLinks = itinerary.relatedItineraries.length
+      ? itinerary.relatedItineraries
+          .filter((item) => !item.slug || !getCityItinerary(lang, item.slug))
+          .map((item) => item.slug || item.city || "unknown")
+      : ["No related itineraries configured"];
+
+    if (missingP0.length || invalidImageUrls.length || missingRelatedLinks.length) {
+      console.warn(`[Guide QA] ${itinerary.slug} has issues`, {
+        missingP0,
+        invalidImageUrls,
+        missingRelatedLinks,
+      });
+    }
+  }
 
   const iconNavItems: IconNavItem[] = [
     { id: "overview", label: displayCityName, icon: "Compass" },
@@ -298,7 +335,7 @@ export default async function LocalizedCityItineraryPage({
         innerClassName="pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
       >
         <DayOverviewTable
-          title={`The plan for these ${itinerary.days} days in ${displayCityName}`}
+          title={dayOverviewTitle}
           labels={itineraryCopy.dayOverviewTable}
           plans={itinerary.dayPlans}
         />
@@ -382,6 +419,23 @@ export default async function LocalizedCityItineraryPage({
         </section>
       </SectionBand>
 
+      {itinerary.pacing?.length ? (
+        <SectionBand
+          variant="base"
+          className="!bg-background"
+          innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
+        >
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">{pacingTitle}</h2>
+            <div className="space-y-4 rounded-3xl border border-[#7b2b04]/20 bg-[#ffedd5] p-6 text-sm text-[#7b2b04] md:p-8 md:text-base">
+              {itinerary.pacing.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </section>
+        </SectionBand>
+      ) : null}
+
       <SectionBand
         variant="base"
         className="!bg-background"
@@ -389,12 +443,23 @@ export default async function LocalizedCityItineraryPage({
       >
         <section id="logistics" className="scroll-mt-24">
           <LogisticsTable
-            title={`${itineraryCopy.logisticsTitle} for ${displayCityName}`}
+            title={logisticsTitle}
             items={itinerary.logistics}
           />
         </section>
       </SectionBand>
 
+      {itinerary.goodToKnow?.length ? (
+        <SectionBand
+          variant="base"
+          className="!bg-background"
+          innerClassName="space-y-8 pt-10 pb-14 md:pt-12 md:pb-20 max-w-7xl"
+        >
+          <section className="scroll-mt-24">
+            <LogisticsTable title={itineraryCopy.goodToKnowTitle} items={itinerary.goodToKnow} />
+          </section>
+        </SectionBand>
+      ) : null}
 
       <SectionBand
         variant="base"
@@ -403,8 +468,8 @@ export default async function LocalizedCityItineraryPage({
       >
         <section id="checklist" className="scroll-mt-24">
           <Checklist
-            title={`${itineraryCopy.checklistTitle} to ${displayCityName}`}
-            subtitle="Tap items as you prepare."
+            title={checklistTitle}
+            subtitle={itineraryCopy.checklistSubtitle}
             items={itinerary.checklist}
           />
         </section>

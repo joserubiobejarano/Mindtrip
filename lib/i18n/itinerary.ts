@@ -46,6 +46,7 @@ type ItineraryCopy = {
   logisticsTitle: string;
   checklistTitle: string;
   checklistSubtitle: string;
+  goodToKnowTitle: string;
   faqTitle: string;
   relatedTitle: string;
   imageInfoTitle: string;
@@ -105,6 +106,7 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
     logisticsTitle: "Logistics & practical tips",
     checklistTitle: "Checklist before you go",
     checklistSubtitle: "Tap items as you prepare. No sign-in needed.",
+    goodToKnowTitle: "Good to know before you go",
     faqTitle: "Frequently asked questions",
     relatedTitle: "Need a different pace?",
     imageInfoTitle: "City stories & context",
@@ -127,45 +129,46 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
       attractions: "Atracciones",
       history: "Historia",
       food: "Comida",
-      logistics: "Logistica",
+      logistics: "Logística",
       checklist: "Lista",
       tips: "Consejos / FAQ",
     },
     cityStatsTitle: "La ciudad en cifras",
-    quickFactsTitle: "Datos rapidos",
+    quickFactsTitle: "Datos rápidos",
     quickFactsLabels: {
-      duration: "Duracion",
+      duration: "Duración",
       pace: "Ritmo",
       idealFor: "Ideal para",
       style: "Estilo",
     },
-    fitTitle: "Esta guía de viaje es para ti?",
+    fitTitle: "¿Esta guía de viaje es para ti?",
     fitGoodLabel: "Ideal si buscas",
     fitNotLabel: "No es ideal si buscas",
     dayOverviewTitle: "Plan de un vistazo",
     dayOverviewTable: {
-      day: "Dia",
+      day: "Día",
       focus: "Enfoque",
-      morning: "Manana",
+      morning: "Mañana",
       afternoon: "Tarde",
       evening: "Noche",
     },
     dayBlockLabels: {
-      day: "Dia",
-      morning: "Manana",
+      day: "Día",
+      morning: "Mañana",
       afternoon: "Tarde",
       evening: "Noche",
     },
     dayUnit: {
-      singular: "dia",
-      plural: "dias",
+      singular: "día",
+      plural: "días",
     },
-    dayBreakdownTitle: "Dia por dia",
-    logisticsTitle: "Logistica y consejos practicos",
+    dayBreakdownTitle: "Día por día",
+    logisticsTitle: "Logística y consejos prácticos",
     checklistTitle: "Lista de preparativos",
     checklistSubtitle: "Marca los puntos mientras preparas el viaje.",
+    goodToKnowTitle: "Consejos antes de viajar",
     faqTitle: "Preguntas frecuentes",
-    relatedTitle: "Quieres otro ritmo?",
+    relatedTitle: "¿Quieres otro ritmo?",
     imageInfoTitle: "Historias y contexto",
     imageInfoSubtitle:
       "Notas editoriales breves para destacar barrios, temas y el ritmo cotidiano de la ciudad.",
@@ -173,8 +176,8 @@ const itineraryCopy: Record<ItineraryLocale, ItineraryCopy> = {
     primaryCtaBody:
       "Convierte esta guía de viaje en un plan personalizado con fechas y preferencias.",
     primaryCtaButton: "Empezar a planificar",
-    secondaryCtaTitle: "Quieres otro ritmo?",
-    secondaryCtaBody: "Explora otra ciudad o ajusta los dias en minutos.",
+    secondaryCtaTitle: "¿Quieres otro ritmo?",
+    secondaryCtaBody: "Explora otra ciudad o ajusta los días en minutos.",
     secondaryCtaButton: "Ver todas las ciudades",
   },
 };

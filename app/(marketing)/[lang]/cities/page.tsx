@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { cityPages } from "@/lib/seo/cities";
+import { getCityItinerary } from "@/lib/itinerary/city-itineraries";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { getSiteUrl } from "@/lib/seo/site";
 import {
@@ -49,11 +50,21 @@ export default async function LocalizedCitiesPage({
   const copy = getMarketingCopy(lang);
   const siteUrl = getSiteUrl();
   const basePath = getLocalizedPath("", lang);
+  const cityCards = cityPages.map((city) => {
+    const itinerary = lang === "es" ? getCityItinerary(lang, city.slug) : undefined;
+    return {
+      ...city,
+      name: itinerary?.city ?? city.name,
+      country: itinerary?.country ?? city.country,
+      days: itinerary?.days ?? city.days,
+      description: itinerary?.hero.subtitle ?? city.description,
+    };
+  });
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: copy.citiesHubTitle,
-    itemListElement: cityPages.map((city, index) => ({
+    itemListElement: cityCards.map((city, index) => ({
       "@type": "ListItem",
       position: index + 1,
       url: `${siteUrl}${basePath}/cities/${city.slug}`,
@@ -72,7 +83,7 @@ export default async function LocalizedCitiesPage({
         <p className="text-lg text-muted-foreground">{copy.citiesHubSubtitle}</p>
       </div>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
-        {cityPages.map((city) => (
+        {cityCards.map((city) => (
           <Link
             key={city.slug}
             href={`${basePath}/cities/${city.slug}`}
