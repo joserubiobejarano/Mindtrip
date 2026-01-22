@@ -76,18 +76,18 @@ export default async function LocalizedCitiesPage({
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
+    <div className="max-w-[1400px] mx-auto px-6 py-16">
       <StructuredData data={structuredData} id={`kruno-cities-list-${lang}`} />
       <div className="space-y-4">
         <h1 className="text-4xl font-bold">{copy.citiesHubTitle}</h1>
         <p className="text-lg text-muted-foreground">{copy.citiesHubSubtitle}</p>
       </div>
-      <div className="mt-10 grid gap-6 md:grid-cols-2">
+      <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
         {cityCards.map((city) => (
           <Link
             key={city.slug}
             href={`${basePath}/cities/${city.slug}`}
-            className="rounded-2xl border border-border/40 p-6 hover:border-primary/60 transition-colors"
+            className="rounded-2xl border-[3px] border-foreground p-6 hover:border-primary/60 transition-colors"
           >
             <div className="text-sm uppercase tracking-wide text-muted-foreground">
               {city.country}

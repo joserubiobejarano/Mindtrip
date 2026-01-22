@@ -21,6 +21,7 @@ import { useToast } from "@/components/ui/toast";
 import { getTripUrl } from "@/lib/routes";
 import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
 import { useLanguage } from "@/components/providers/language-provider";
+import { addDays, startOfDay, format } from "date-fns";
 
 interface NewTripDialogProps {
   open: boolean;
@@ -95,6 +96,19 @@ export function NewTripDialog({
         });
     }
   }, [open, userId]);
+
+  // Prefill default date range when dialog opens and dates are empty
+  // Default: start date = today + 7 days, end date = start + 2 days
+  // This reduces friction for users trying the app quickly
+  useEffect(() => {
+    if (open && !startDate && !endDate) {
+      const today = startOfDay(new Date());
+      const defaultStartDate = addDays(today, 7);
+      const defaultEndDate = addDays(defaultStartDate, 2);
+      setStartDate(format(defaultStartDate, "yyyy-MM-dd"));
+      setEndDate(format(defaultEndDate, "yyyy-MM-dd"));
+    }
+  }, [open, startDate, endDate]);
 
   // Reset form when dialog closes
   useEffect(() => {

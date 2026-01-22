@@ -269,6 +269,51 @@ export const cityPages: CitySeo[] = [
       "A 3-day Nice travel guide centered on old town lanes, seaside promenades, and scenic viewpoints.",
     highlights: ["Promenade des Anglais", "Old Town", "Castle Hill"],
   },
+  {
+    slug: "warsaw",
+    name: "Warsaw",
+    country: "Poland",
+    days: 3,
+    description:
+      "A 3-day Warsaw travel guide blending historic old town, modern districts, and river walks.",
+    highlights: ["Old Town Square", "Royal Castle", "Lazienki Park"],
+  },
+  {
+    slug: "granada",
+    name: "Granada",
+    country: "Spain",
+    days: 3,
+    description:
+      "A 3-day Granada travel guide focused on the Alhambra, historic quarters, and mountain views.",
+    highlights: ["Alhambra", "Albaicin", "Generalife"],
+  },
+  {
+    slug: "lyon",
+    name: "Lyon",
+    country: "France",
+    days: 3,
+    description:
+      "A 3-day Lyon travel guide pairing Roman history, gastronomy, and riverside neighborhoods.",
+    highlights: ["Vieux Lyon", "Fourviere Basilica", "Presqu'ile"],
+  },
+  {
+    slug: "salzburg",
+    name: "Salzburg",
+    country: "Austria",
+    days: 3,
+    description:
+      "A 3-day Salzburg travel guide with baroque architecture, mountain views, and music heritage.",
+    highlights: ["Hohensalzburg Fortress", "Mirabell Palace", "Old Town"],
+  },
+  {
+    slug: "rotterdam",
+    name: "Rotterdam",
+    country: "Netherlands",
+    days: 3,
+    description:
+      "A 3-day Rotterdam travel guide featuring modern architecture, waterfront walks, and cultural districts.",
+    highlights: ["Erasmus Bridge", "Markthal", "Cube Houses"],
+  },
 ];
 
 export function getCityBySlug(slug: string): CitySeo | undefined {

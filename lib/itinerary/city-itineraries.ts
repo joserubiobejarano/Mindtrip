@@ -5038,6 +5038,881 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    warsaw: {
+      slug: "warsaw",
+      city: "Warsaw",
+      country: "Poland",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History enthusiasts", "City walkers"],
+      style: ["Historic old town", "Modern districts", "River walks"],
+      pacing: [
+        "Warsaw rewards a measured pace. The rebuilt Old Town anchors the first day, then spread out to modern neighborhoods and riverside paths that show the city's layered history.",
+        "Group sights by area to minimize transit. The Old Town and Royal Castle work as one walk, while the modern center and Vistula riverfront offer a different rhythm with parks and contemporary architecture.",
+        "Save time for Lazienki Park and the Palace of Culture area, where you can slow down with green spaces, quiet cafes, and views that span from historic to modern Warsaw.",
+      ],
+      hero: {
+        title: "Warsaw in 3 days",
+        subtitle:
+          "Explore the rebuilt Old Town, modern districts, and riverside walks with a calm, practical pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful historic buildings in Warsaw Old Town Square.",
+        },
+      },
+      cityStats: [
+        { value: "1.8M", label: "Residents in the metro area" },
+        { value: "18", label: "Districts across the city" },
+        { value: "85%", label: "City rebuilt after WWII" },
+        { value: "30+", label: "Museums and galleries" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with historic and modern contrasts",
+          "Walkable routes with clear neighborhoods",
+          "A mix of history and contemporary culture",
+          "Riverside walks and park time",
+          "Clear, practical planning",
+        ],
+        notForYou: [
+          "Day trips outside the city",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Adventure or hiking activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old Town and Royal Castle",
+          summary: "Rebuilt historic center and castle grounds.",
+          morning: "Old Town Square and Market Square",
+          afternoon: "Royal Castle and Castle Square",
+          evening: "Vistula riverfront walk",
+        },
+        {
+          day: 2,
+          title: "Modern center and culture",
+          summary: "Contemporary districts and cultural sites.",
+          morning: "Palace of Culture area and modern center",
+          afternoon: "Warsaw Uprising Museum or POLIN Museum",
+          evening: "Nowy Swiat street and cafe stop",
+        },
+        {
+          day: 3,
+          title: "Parks and viewpoints",
+          summary: "Green spaces and city views.",
+          morning: "Lazienki Park and Palace on the Water",
+          afternoon: "Wilanow Palace or continued park time",
+          evening: "Vistula boulevards and sunset views",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The rebuilt Old Town",
+          description:
+            "Warsaw's historic center was meticulously reconstructed after WWII. The colorful facades and cobblestone squares feel authentic despite being rebuilt.",
+          image: {
+            src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic buildings and cobblestone streets in Warsaw Old Town.",
+          },
+        },
+        {
+          title: "Modern and historic layers",
+          description:
+            "The city blends reconstructed history with contemporary architecture. Short walks reveal both eras side by side.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Warsaw skyline showing modern and historic buildings.",
+          },
+        },
+        {
+          title: "Riverside and parks",
+          description:
+            "The Vistula riverfront and Lazienki Park offer calm breaks from city streets, with easy walks and green spaces.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Lazienki Park with palace and gardens in Warsaw.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Train to Central Station or taxi" },
+        { label: "Transit tips", value: "Walk Old Town; use trams for modern center" },
+        { label: "Ticketing", value: "Book Royal Castle and major museums in advance" },
+        { label: "Neighborhood stay", value: "Old Town area or modern center" },
+      ],
+      checklist: [
+        "Reserve Royal Castle time slot",
+        "Book Warsaw Uprising Museum if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Warsaw",
+        "Plan one park or riverside break daily",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Warsaw?",
+          answer:
+            "Yes for the main highlights. This plan covers the Old Town, modern center, and key parks with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book museums?",
+          answer:
+            "For the Royal Castle and popular museums like the Warsaw Uprising Museum, yes. Pre-booking helps avoid lines and keeps your schedule on track.",
+        },
+        {
+          question: "Is Warsaw walkable?",
+          answer:
+            "The Old Town is very walkable, and the modern center connects well on foot. Use trams or metro for longer hops to Lazienki Park or Wilanow.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The Old Town area keeps you close to historic sights and evening walks, while the modern center offers more contemporary options with easy transit links.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for museum days to beat crowds. The Old Town is pleasant in the morning, and you can slow down with a long lunch and relaxed afternoon.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, especially in the Old Town, yes—particularly on weekends. Keep one or two reservations, then leave the rest flexible.",
+        },
+        {
+          question: "Is the Old Town really rebuilt?",
+          answer:
+            "Yes, the Old Town was reconstructed after WWII using historical documents and paintings. It's now a UNESCO World Heritage site and feels authentic despite being rebuilt.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "krakow",
+          city: "Krakow",
+          days: 3,
+          description: "Historic old town and castle hill.",
+        },
+        {
+          slug: "prague",
+          city: "Prague",
+          days: 3,
+          description: "Old Town Square and castle views.",
+        },
+        {
+          slug: "budapest",
+          city: "Budapest",
+          days: 3,
+          description: "Danube views and historic hills.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    granada: {
+      slug: "granada",
+      city: "Granada",
+      country: "Spain",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Mountain views"],
+      style: ["Alhambra palace", "Historic quarters", "Moorish architecture"],
+      pacing: [
+        "Granada rewards a focused approach. The Alhambra deserves a full morning, then spread out to the Albaicin and Sacromonte for historic neighborhoods and mountain views.",
+        "Book Alhambra tickets well in advance—this is essential. Plan one day entirely around the palace complex, then use the other days for the old quarters and relaxed walks.",
+        "The Albaicin's narrow lanes and viewpoints pair well with slow afternoons. Save time for tapas in the evening, where Granada's food culture shines.",
+      ],
+      hero: {
+        title: "Granada in 3 days",
+        subtitle:
+          "Explore the Alhambra, historic Albaicin quarter, and mountain views with a calm, practical pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1759434613657-422a87ff991a?auto=format&fit=crop&w=1600&q=80",
+          alt: "The Alhambra palace complex with mountains in the background.",
+        },
+      },
+      cityStats: [
+        { value: "230K", label: "Residents in the city" },
+        { value: "800+", label: "Years of Moorish history" },
+        { value: "3M+", label: "Annual visitors" },
+        { value: "1", label: "UNESCO World Heritage site" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit focused on the Alhambra",
+          "Historic neighborhoods and viewpoints",
+          "Mountain views and easy walks",
+          "Moorish architecture and culture",
+          "A clear plan with advance booking",
+        ],
+        notForYou: [
+          "Day trips outside Granada",
+          "Late-night nightlife focus",
+          "A packed schedule without Alhambra booking",
+          "Beach or coastal activities",
+          "Extensive shopping time",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "The Alhambra",
+          summary: "Full day exploring the palace complex.",
+          morning: "Alhambra entry and Nasrid Palaces",
+          afternoon: "Generalife gardens and Alcazaba",
+          evening: "Albaicin viewpoint and tapas",
+        },
+        {
+          day: 2,
+          title: "Albaicin and Sacromonte",
+          summary: "Historic quarters and mountain views.",
+          morning: "Albaicin quarter and narrow lanes",
+          afternoon: "Mirador de San Nicolas and viewpoints",
+          evening: "Sacromonte area or continued Albaicin exploration",
+        },
+        {
+          day: 3,
+          title: "Cathedral and city center",
+          summary: "Historic center and relaxed walks.",
+          morning: "Granada Cathedral and Royal Chapel",
+          afternoon: "Alcaiceria market and shopping streets",
+          evening: "Final tapas tour and evening stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The Alhambra complex",
+          description:
+            "The palace, gardens, and fortress form one of Spain's most visited sites. Book tickets weeks in advance for your preferred time slot.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555993536-48e0c8b73fd4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Intricate Moorish architecture in the Nasrid Palaces of the Alhambra.",
+          },
+        },
+        {
+          title: "Albaicin viewpoints",
+          description:
+            "The historic quarter offers narrow lanes and viewpoints that frame the Alhambra against the Sierra Nevada mountains.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic Albaicin quarter with white houses and narrow streets.",
+          },
+        },
+        {
+          title: "Mountain backdrop",
+          description:
+            "Granada sits at the foot of the Sierra Nevada, creating dramatic views from the Albaicin and Alhambra grounds.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Granada city with Sierra Nevada mountains in the background.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Bus to city center or taxi" },
+        { label: "Transit tips", value: "Walk the historic center; use buses for Alhambra" },
+        { label: "Ticketing", value: "Book Alhambra tickets weeks in advance" },
+        { label: "Neighborhood stay", value: "City center or Albaicin area" },
+      ],
+      checklist: [
+        "Book Alhambra tickets weeks in advance",
+        "Reserve Nasrid Palaces time slot",
+        "Pack comfortable walking shoes for hills",
+        "Save offline maps for Granada",
+        "Plan one viewpoint stop daily",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Granada?",
+          answer:
+            "Yes for the Alhambra and main historic quarters. This plan dedicates one full day to the palace, then covers the Albaicin and city center with a calm pace.",
+        },
+        {
+          question: "Do I need to book the Alhambra in advance?",
+          answer:
+            "Absolutely yes. Book tickets weeks ahead, especially for peak season. The Nasrid Palaces require a specific time slot that sells out quickly.",
+        },
+        {
+          question: "Is Granada walkable?",
+          answer:
+            "The historic center is walkable, but the Albaicin has steep hills. Wear comfortable shoes and take breaks. The Alhambra requires a bus or taxi from the center.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The city center keeps you close to the cathedral and restaurants, while the Albaicin offers historic atmosphere and views, though with steeper walks.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for the Alhambra to make the most of your time slot. For the Albaicin, mornings are cooler and less crowded.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular tapas spots, yes—especially in the evening. Granada's tapas culture is strong, so plan a few stops but leave room for spontaneity.",
+        },
+        {
+          question: "Can I visit the Alhambra without advance booking?",
+          answer:
+            "It's very difficult, especially in peak season. Same-day tickets are rare. Book well in advance to secure your preferred date and time slot.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "seville",
+          city: "Seville",
+          days: 3,
+          description: "Historic plazas and riverside walks.",
+        },
+        {
+          slug: "barcelona",
+          city: "Barcelona",
+          days: 3,
+          description: "Gaudi architecture and walkable neighborhoods.",
+        },
+        {
+          slug: "madrid",
+          city: "Madrid",
+          days: 3,
+          description: "Museums, parks, and classic squares.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    lyon: {
+      slug: "lyon",
+      city: "Lyon",
+      country: "France",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Food lovers", "History enthusiasts", "Riverside walkers"],
+      style: ["Roman history", "Gastronomy", "Riverside neighborhoods"],
+      pacing: [
+        "Lyon rewards a food-first approach. The historic Vieux Lyon anchors the first day, then spread out to the Presqu'ile and Fourviere for Roman sites and riverside walks.",
+        "Group time by neighborhood to keep travel simple. Vieux Lyon pairs with Fourviere Hill for history, while the Presqu'ile offers shopping, markets, and easy river views.",
+        "Save time for long meals and market visits. Lyon's bouchons and food markets are part of the experience, so plan relaxed lunches and evening dinners.",
+      ],
+      hero: {
+        title: "Lyon in 3 days",
+        subtitle:
+          "Explore Roman history, gastronomy, and riverside neighborhoods with a calm, food-focused pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1530282279139-9cfdae52582f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Historic Vieux Lyon with Renaissance buildings and narrow streets.",
+        },
+      },
+      cityStats: [
+        { value: "500K", label: "Residents in the city" },
+        { value: "2,000+", label: "Years of history" },
+        { value: "4,000+", label: "Restaurants and bouchons" },
+        { value: "2", label: "Rivers: Rhone and Saone" },
+      ],
+      fit: {
+        forYou: [
+          "A food-focused visit with history",
+          "Riverside walks and Roman sites",
+          "Historic neighborhoods and markets",
+          "A mix of culture and gastronomy",
+          "Clear, practical planning",
+        ],
+        notForYou: [
+          "Day trips outside Lyon",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Beach or coastal activities",
+          "Extensive shopping time",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Vieux Lyon and Fourviere",
+          summary: "Historic quarter and hilltop basilica.",
+          morning: "Vieux Lyon and traboules",
+          afternoon: "Fourviere Basilica and Roman theaters",
+          evening: "Riverside walk and bouchon dinner",
+        },
+        {
+          day: 2,
+          title: "Presqu'ile and markets",
+          summary: "City center and food markets.",
+          morning: "Presqu'ile and Place Bellecour",
+          afternoon: "Les Halles market or shopping streets",
+          evening: "Rhone riverfront and evening lights",
+        },
+        {
+          day: 3,
+          title: "Museums and riverside",
+          summary: "Cultural sites and relaxed walks.",
+          morning: "Musee des Beaux-Arts or Confluence Museum",
+          afternoon: "Saone riverfront walk",
+          evening: "Final bouchon meal and old town stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic traboules",
+          description:
+            "Vieux Lyon's hidden passageways connect streets and courtyards. These Renaissance-era shortcuts are unique to Lyon.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic traboule passageway in Vieux Lyon.",
+          },
+        },
+        {
+          title: "Riverside views",
+          description:
+            "The Rhone and Saone rivers frame the city. Riverside walks offer views of historic and modern architecture.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Lyon cityscape with the Rhone and Saone rivers.",
+          },
+        },
+        {
+          title: "Food markets and bouchons",
+          description:
+            "Lyon's food culture centers on bouchons and markets. Plan time for long meals and market visits.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colorful food market in Lyon with fresh produce.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Rhonexpress tram or taxi" },
+        { label: "Transit tips", value: "Walk Vieux Lyon; use metro for Fourviere" },
+        { label: "Ticketing", value: "Book major museums in advance if visiting" },
+        { label: "Neighborhood stay", value: "Vieux Lyon or Presqu'ile" },
+      ],
+      checklist: [
+        "Reserve restaurant tables for bouchons",
+        "Book major museums if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Lyon",
+        "Plan one long meal daily",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Lyon?",
+          answer:
+            "Yes for the main highlights. This plan covers Vieux Lyon, Fourviere, and the Presqu'ile with time for food markets and relaxed meals.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular bouchons, yes—especially on weekends. Lyon's food scene is busy, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Lyon walkable?",
+          answer:
+            "Vieux Lyon and the Presqu'ile are very walkable. Fourviere Hill requires a climb or funicular, but the historic center is flat and easy.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Vieux Lyon keeps you in the historic heart, while the Presqu'ile offers central location with easy access to markets and shopping.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Fourviere to avoid crowds and heat. Vieux Lyon is pleasant in the morning, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book museums?",
+          answer:
+            "For popular museums like the Musee des Beaux-Arts, booking helps in peak season. Check ahead for special exhibitions.",
+        },
+        {
+          question: "What are traboules?",
+          answer:
+            "Traboules are hidden passageways that connect streets through buildings and courtyards. They're unique to Lyon and worth exploring in Vieux Lyon.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "paris",
+          city: "Paris",
+          days: 3,
+          description: "Classic landmarks and cafe culture.",
+        },
+        {
+          slug: "nice",
+          city: "Nice",
+          days: 3,
+          description: "Seaside promenades and old town lanes.",
+        },
+        {
+          slug: "barcelona",
+          city: "Barcelona",
+          days: 3,
+          description: "Gaudi architecture and walkable neighborhoods.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    salzburg: {
+      slug: "salzburg",
+      city: "Salzburg",
+      country: "Austria",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Music lovers", "Mountain views", "Historic architecture"],
+      style: ["Baroque buildings", "Mountain backdrop", "Music heritage"],
+      pacing: [
+        "Salzburg rewards a calm rhythm. The Old Town and fortress anchor the first day, then spread out to palace gardens and mountain viewpoints that show the city's baroque elegance.",
+        "Group sights by area to minimize walking. The compact Old Town connects easily, while the Mirabell Palace and gardens offer a different pace with green spaces and river views.",
+        "Save time for slow walks along the Salzach River and quiet moments in the Old Town squares. The city's baroque architecture and mountain backdrop create a peaceful atmosphere.",
+      ],
+      hero: {
+        title: "Salzburg in 3 days",
+        subtitle:
+          "Explore the baroque Old Town, fortress, and mountain views with a calm, practical pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1750419594123-c2623bab7320?auto=format&fit=crop&w=1600&q=80",
+          alt: "Salzburg Old Town with baroque buildings and mountains in the background.",
+        },
+      },
+      cityStats: [
+        { value: "150K", label: "Residents in the city" },
+        { value: "1,000+", label: "Years of history" },
+        { value: "7", label: "Hills surrounding the city" },
+        { value: "1", label: "UNESCO World Heritage site" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with baroque architecture",
+          "Mountain views and easy walks",
+          "Music heritage and historic sites",
+          "Compact, walkable Old Town",
+          "Clear, practical planning",
+        ],
+        notForYou: [
+          "Day trips outside Salzburg",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Beach or coastal activities",
+          "Extensive shopping time",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old Town and fortress",
+          summary: "Historic center and hilltop castle.",
+          morning: "Hohensalzburg Fortress and funicular",
+          afternoon: "Old Town squares and Getreidegasse",
+          evening: "Salzach River walk and dinner",
+        },
+        {
+          day: 2,
+          title: "Palaces and gardens",
+          summary: "Baroque palaces and green spaces.",
+          morning: "Mirabell Palace and gardens",
+          afternoon: "Hellbrunn Palace or continued garden time",
+          evening: "Riverside promenade and evening lights",
+        },
+        {
+          day: 3,
+          title: "Music heritage and views",
+          summary: "Mozart sites and mountain viewpoints.",
+          morning: "Mozart's Birthplace or Residence",
+          afternoon: "Kapuzinerberg viewpoint or Old Town stroll",
+          evening: "Final Old Town walk and cafe stop",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Baroque Old Town",
+          description:
+            "Salzburg's historic center features baroque architecture, narrow lanes, and squares that feel like stepping into another era.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Salzburg Cathedral with baroque architecture.",
+          },
+        },
+        {
+          title: "Mountain backdrop",
+          description:
+            "The city sits at the foot of the Alps, creating dramatic views from the fortress and riverfront that frame the baroque architecture.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Salzburg with mountains in the background.",
+          },
+        },
+        {
+          title: "Fortress views",
+          description:
+            "Hohensalzburg Fortress offers panoramic views of the city and mountains. The funicular makes the climb easy.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Hohensalzburg Fortress overlooking Salzburg.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Bus to city center or taxi" },
+        { label: "Transit tips", value: "Walk Old Town; use funicular for fortress" },
+        { label: "Ticketing", value: "Book fortress and major museums in advance" },
+        { label: "Neighborhood stay", value: "Old Town area or near Mirabell" },
+      ],
+      checklist: [
+        "Reserve Hohensalzburg Fortress tickets",
+        "Book major museums if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Salzburg",
+        "Plan one viewpoint stop daily",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Salzburg?",
+          answer:
+            "Yes for the main highlights. This plan covers the Old Town, fortress, and palaces with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book the fortress?",
+          answer:
+            "Booking helps avoid lines, especially in peak season. The funicular and fortress tickets can be purchased in advance or on arrival.",
+        },
+        {
+          question: "Is Salzburg walkable?",
+          answer:
+            "The Old Town is very compact and walkable. The fortress requires a funicular ride, but the historic center is flat and easy to navigate.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The Old Town area keeps you close to historic sights and evening walks, while areas near Mirabell offer quieter streets with easy access to gardens.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for the fortress to beat crowds and get the best views. The Old Town is pleasant in the morning, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Salzburg's dining scene is busy, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Salzburg good for music lovers?",
+          answer:
+            "Yes. The city is Mozart's birthplace and offers several music-related sites, concerts, and a strong musical heritage throughout the Old Town.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "vienna",
+          city: "Vienna",
+          days: 3,
+          description: "Classic museums and palace gardens.",
+        },
+        {
+          slug: "prague",
+          city: "Prague",
+          days: 3,
+          description: "Old Town Square and castle views.",
+        },
+        {
+          slug: "munich",
+          city: "Munich",
+          days: 3,
+          description: "Historic squares and garden breaks.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    rotterdam: {
+      slug: "rotterdam",
+      city: "Rotterdam",
+      country: "Netherlands",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Architecture fans", "Modern design", "Waterfront walkers"],
+      style: ["Modern architecture", "Waterfront walks", "Cultural districts"],
+      pacing: [
+        "Rotterdam rewards a modern approach. The rebuilt city center showcases innovative architecture, then spread out to waterfront districts and cultural areas that show the city's contemporary character.",
+        "Group sights by area to keep travel simple. The modern center and Markthal work as one walk, while the waterfront and Cube Houses offer a different rhythm with bridges and contemporary design.",
+        "Save time for slow walks along the Maas River and quiet moments in the parks. The city's modern architecture and waterfront create a peaceful, forward-looking atmosphere.",
+      ],
+      hero: {
+        title: "Rotterdam in 3 days",
+        subtitle:
+          "Explore modern architecture, waterfront walks, and cultural districts with a calm, practical pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1619768708936-2fce8c74cd04?auto=format&fit=crop&w=1600&q=80",
+          alt: "Modern Rotterdam skyline with innovative architecture and bridges.",
+        },
+      },
+      cityStats: [
+        { value: "650K", label: "Residents in the city" },
+        { value: "85%", label: "City rebuilt after WWII" },
+        { value: "1,000+", label: "Modern architectural landmarks" },
+        { value: "1", label: "Largest port in Europe" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with modern architecture",
+          "Waterfront walks and bridges",
+          "Contemporary design and culture",
+          "Compact, walkable center",
+          "Clear, practical planning",
+        ],
+        notForYou: [
+          "Day trips outside Rotterdam",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Historic old town atmosphere",
+          "Extensive shopping time",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Modern center and Markthal",
+          summary: "Contemporary architecture and food market.",
+          morning: "Markthal and modern center",
+          afternoon: "Cube Houses and Overblaak area",
+          evening: "Maas River waterfront walk",
+        },
+        {
+          day: 2,
+          title: "Waterfront and bridges",
+          summary: "Erasmus Bridge and riverside districts.",
+          morning: "Erasmus Bridge and Kop van Zuid",
+          afternoon: "Maritime Museum or continued waterfront",
+          evening: "Riverside promenade and evening lights",
+        },
+        {
+          day: 3,
+          title: "Museums and parks",
+          summary: "Cultural sites and green spaces.",
+          morning: "Museum Boijmans Van Beuningen or Kunsthal",
+          afternoon: "Het Park or Euromast viewpoint",
+          evening: "Final waterfront walk and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Modern architecture",
+          description:
+            "Rotterdam's rebuilt city center features innovative buildings, bridges, and contemporary design that sets it apart from other Dutch cities.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Iconic Cube Houses in Rotterdam with modern architecture.",
+          },
+        },
+        {
+          title: "Waterfront walks",
+          description:
+            "The Maas River and waterfront districts offer calm walks with views of modern architecture and bridges.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Erasmus Bridge spanning the Maas River in Rotterdam.",
+          },
+        },
+        {
+          title: "Cultural districts",
+          description:
+            "The city's museums and cultural areas blend with modern architecture, creating a forward-looking cultural scene.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Modern Markthal food market in Rotterdam.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Train to Central Station or taxi" },
+        { label: "Transit tips", value: "Walk the center; use trams for waterfront" },
+        { label: "Ticketing", value: "Book major museums in advance if visiting" },
+        { label: "Neighborhood stay", value: "City center or near Markthal" },
+      ],
+      checklist: [
+        "Reserve major museum tickets if visiting",
+        "Book restaurants for popular spots",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Rotterdam",
+        "Plan one waterfront walk daily",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Rotterdam?",
+          answer:
+            "Yes for the main highlights. This plan covers the modern center, waterfront, and key cultural sites with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book museums?",
+          answer:
+            "For popular museums like Museum Boijmans Van Beuningen, booking helps in peak season. Check ahead for special exhibitions.",
+        },
+        {
+          question: "Is Rotterdam walkable?",
+          answer:
+            "The modern center is very walkable, and the waterfront connects well on foot. Use trams or metro for longer hops to museums or Euromast.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The city center keeps you close to the Markthal and modern architecture, while areas near the waterfront offer riverside views and easy access to bridges.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for museum days to beat crowds. The Markthal is pleasant in the morning, and you can slow down with a long lunch and relaxed afternoon.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Rotterdam's dining scene is busy, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Rotterdam different from Amsterdam?",
+          answer:
+            "Yes. Rotterdam is more modern and architectural, rebuilt after WWII with contemporary design. Amsterdam has more historic canals and old buildings.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "amsterdam",
+          city: "Amsterdam",
+          days: 3,
+          description: "Canals, museums, and historic neighborhoods.",
+        },
+        {
+          slug: "copenhagen",
+          city: "Copenhagen",
+          days: 3,
+          description: "Waterfront strolls and design.",
+        },
+        {
+          slug: "berlin",
+          city: "Berlin",
+          days: 3,
+          description: "History and creative neighborhoods.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
   }),
   es: withDefaults("es", {
     rome: {
@@ -9839,6 +10714,881 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           city: "Barcelona",
           days: 3,
           description: "Paseos junto al mar con ritmo relajado.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    warsaw: {
+      slug: "warsaw",
+      city: "Varsovia",
+      country: "Polonia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de historia", "Caminantes urbanos"],
+      style: ["Casco viejo histórico", "Distritos modernos", "Paseos junto al río"],
+      pacing: [
+        "Varsovia recompensa un ritmo calmado. El casco viejo reconstruido centra el primer día, luego explora barrios modernos y paseos junto al río que muestran la historia en capas de la ciudad.",
+        "Agrupa los lugares por zona para minimizar el transporte. El casco viejo y el Castillo Real funcionan como una caminata, mientras el centro moderno y el frente del Vístula ofrecen un ritmo diferente con parques y arquitectura contemporánea.",
+        "Reserva tiempo para el Parque Lazienki y la zona del Palacio de la Cultura, donde puedes relajarte con espacios verdes, cafés tranquilos y vistas que abarcan desde Varsovia histórica hasta moderna.",
+      ],
+      hero: {
+        title: "Varsovia en 3 días",
+        subtitle:
+          "Explora el casco viejo reconstruido, distritos modernos y paseos junto al río con un ritmo calmado y práctico.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1600&q=80",
+          alt: "Edificios históricos coloridos en la Plaza del Casco Viejo de Varsovia.",
+        },
+      },
+      cityStats: [
+        { value: "1,8M", label: "Habitantes en el área metropolitana" },
+        { value: "18", label: "Distritos en la ciudad" },
+        { value: "85%", label: "Ciudad reconstruida tras la Segunda Guerra Mundial" },
+        { value: "30+", label: "Museos y galerías" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con contrastes históricos y modernos",
+          "Rutas caminables con barrios claros",
+          "Mezcla de historia y cultura contemporánea",
+          "Paseos junto al río y tiempo en parques",
+          "Planificación clara y práctica",
+        ],
+        notForYou: [
+          "Excursiones fuera de la ciudad",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades de aventura o senderismo",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco viejo y Castillo Real",
+          summary: "Centro histórico reconstruido y terrenos del castillo.",
+          morning: "Plaza del Casco Viejo y Plaza del Mercado",
+          afternoon: "Castillo Real y Plaza del Castillo",
+          evening: "Paseo junto al río Vístula",
+        },
+        {
+          day: 2,
+          title: "Centro moderno y cultura",
+          summary: "Distritos contemporáneos y sitios culturales.",
+          morning: "Zona del Palacio de la Cultura y centro moderno",
+          afternoon: "Museo del Alzamiento de Varsovia o Museo POLIN",
+          evening: "Calle Nowy Swiat y parada en café",
+        },
+        {
+          day: 3,
+          title: "Parques y miradores",
+          summary: "Espacios verdes y vistas de la ciudad.",
+          morning: "Parque Lazienki y Palacio sobre el Agua",
+          afternoon: "Palacio de Wilanow o más tiempo en el parque",
+          evening: "Bulevares del Vístula y vistas al atardecer",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "El casco viejo reconstruido",
+          description:
+            "El centro histórico de Varsovia fue meticulosamente reconstruido tras la Segunda Guerra Mundial. Las fachadas coloridas y las plazas adoquinadas se sienten auténticas a pesar de estar reconstruidas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80",
+            alt: "Edificios históricos y calles adoquinadas en el Casco Viejo de Varsovia.",
+          },
+        },
+        {
+          title: "Capas modernas e históricas",
+          description:
+            "La ciudad combina historia reconstruida con arquitectura contemporánea. Caminatas cortas revelan ambas épocas lado a lado.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Horizonte de Varsovia mostrando edificios modernos e históricos.",
+          },
+        },
+        {
+          title: "Ribera y parques",
+          description:
+            "El frente del río Vístula y el Parque Lazienki ofrecen pausas tranquilas de las calles de la ciudad, con caminatas fáciles y espacios verdes.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Parque Lazienki con palacio y jardines en Varsovia.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Tren a Estación Central o taxi" },
+        { label: "Consejos de transporte", value: "Camina el casco viejo; usa tranvías para el centro moderno" },
+        { label: "Entradas", value: "Reserva el Castillo Real y museos principales con antelación" },
+        { label: "Zona para alojarse", value: "Área del casco viejo o centro moderno" },
+      ],
+      checklist: [
+        "Reserva horario para el Castillo Real",
+        "Reserva el Museo del Alzamiento de Varsovia si visitas",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Varsovia",
+        "Planifica una pausa diaria en parque o ribera",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Varsovia?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el casco viejo, centro moderno y parques clave con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar museos?",
+          answer:
+            "Para el Castillo Real y museos populares como el Museo del Alzamiento de Varsovia, sí. Reservar con antelación ayuda a evitar filas y mantener tu plan.",
+        },
+        {
+          question: "¿Es Varsovia caminable?",
+          answer:
+            "El casco viejo es muy caminable, y el centro moderno se conecta bien a pie. Usa tranvías o metro para trayectos más largos al Parque Lazienki o Wilanow.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El área del casco viejo te mantiene cerca de lugares históricos y paseos nocturnos, mientras el centro moderno ofrece opciones más contemporáneas con buenas conexiones de transporte.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano en días de museos para evitar multitudes. El casco viejo es agradable por la mañana, y puedes relajarte con un almuerzo largo y tarde tranquila.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Mantén una o dos reservas, luego deja el resto flexible.",
+        },
+        {
+          question: "¿El casco viejo realmente está reconstruido?",
+          answer:
+            "Sí, el casco viejo fue reconstruido tras la Segunda Guerra Mundial usando documentos históricos y pinturas. Ahora es Patrimonio de la Humanidad de la UNESCO y se siente auténtico a pesar de estar reconstruido.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "krakow",
+          city: "Cracovia",
+          days: 3,
+          description: "Casco viejo histórico y colina del castillo.",
+        },
+        {
+          slug: "prague",
+          city: "Praga",
+          days: 3,
+          description: "Plaza del Casco Viejo y vistas del castillo.",
+        },
+        {
+          slug: "budapest",
+          city: "Budapest",
+          days: 3,
+          description: "Vistas del Danubio y colinas históricas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    granada: {
+      slug: "granada",
+      city: "Granada",
+      country: "España",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de historia", "Vistas de montaña"],
+      style: ["Palacio de la Alhambra", "Barrios históricos", "Arquitectura morisca"],
+      pacing: [
+        "Granada recompensa un enfoque centrado. La Alhambra merece una mañana completa, luego explora el Albaicín y Sacromonte para barrios históricos y vistas de montaña.",
+        "Reserva entradas para la Alhambra con mucha antelación—esto es esencial. Planifica un día completo alrededor del complejo del palacio, luego usa los otros días para los barrios antiguos y paseos relajados.",
+        "Los callejones estrechos y miradores del Albaicín combinan bien con tardes tranquilas. Reserva tiempo para tapas por la noche, donde brilla la cultura gastronómica de Granada.",
+      ],
+      hero: {
+        title: "Granada en 3 días",
+        subtitle:
+          "Explora la Alhambra, el barrio histórico del Albaicín y vistas de montaña con un ritmo calmado y práctico.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1759434613657-422a87ff991a?auto=format&fit=crop&w=1600&q=80",
+          alt: "El complejo del palacio de la Alhambra con montañas al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "230K", label: "Habitantes en la ciudad" },
+        { value: "800+", label: "Años de historia morisca" },
+        { value: "3M+", label: "Visitantes al año" },
+        { value: "1", label: "Sitio Patrimonio de la Humanidad UNESCO" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje centrado en la Alhambra",
+          "Barrios históricos y miradores",
+          "Vistas de montaña y caminatas fáciles",
+          "Arquitectura y cultura morisca",
+          "Un plan claro con reserva anticipada",
+        ],
+        notForYou: [
+          "Excursiones fuera de Granada",
+          "Plan de vida nocturna",
+          "Un plan sin reserva para la Alhambra",
+          "Actividades de playa o costa",
+          "Tiempo extenso de compras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "La Alhambra",
+          summary: "Día completo explorando el complejo del palacio.",
+          morning: "Entrada a la Alhambra y Palacios Nazaríes",
+          afternoon: "Jardines del Generalife y Alcazaba",
+          evening: "Mirador del Albaicín y tapas",
+        },
+        {
+          day: 2,
+          title: "Albaicín y Sacromonte",
+          summary: "Barrios históricos y vistas de montaña.",
+          morning: "Barrio del Albaicín y callejones estrechos",
+          afternoon: "Mirador de San Nicolás y miradores",
+          evening: "Área de Sacromonte o más exploración del Albaicín",
+        },
+        {
+          day: 3,
+          title: "Catedral y centro de la ciudad",
+          summary: "Centro histórico y paseos relajados.",
+          morning: "Catedral de Granada y Capilla Real",
+          afternoon: "Mercado de la Alcaicería y calles comerciales",
+          evening: "Última ruta de tapas y paseo nocturno",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "El complejo de la Alhambra",
+          description:
+            "El palacio, jardines y fortaleza forman uno de los sitios más visitados de España. Reserva entradas semanas antes para tu horario preferido.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555993536-48e0c8b73fd4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Arquitectura morisca intrincada en los Palacios Nazaríes de la Alhambra.",
+          },
+        },
+        {
+          title: "Miradores del Albaicín",
+          description:
+            "El barrio histórico ofrece callejones estrechos y miradores que enmarcan la Alhambra contra las montañas de Sierra Nevada.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Barrio histórico del Albaicín con casas blancas y calles estrechas.",
+          },
+        },
+        {
+          title: "Fondo de montaña",
+          description:
+            "Granada se sitúa al pie de Sierra Nevada, creando vistas dramáticas desde el Albaicín y los terrenos de la Alhambra.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Ciudad de Granada con las montañas de Sierra Nevada al fondo.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "Autobús al centro de la ciudad o taxi" },
+        { label: "Consejos de transporte", value: "Camina el centro histórico; usa autobuses para la Alhambra" },
+        { label: "Entradas", value: "Reserva entradas para la Alhambra semanas antes" },
+        { label: "Zona para alojarse", value: "Centro de la ciudad o área del Albaicín" },
+      ],
+      checklist: [
+        "Reserva entradas para la Alhambra semanas antes",
+        "Reserva horario para los Palacios Nazaríes",
+        "Empaca zapatos cómodos para colinas",
+        "Guarda mapas offline para Granada",
+        "Planifica una parada diaria en mirador",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Granada?",
+          answer:
+            "Sí para la Alhambra y los barrios históricos principales. Este plan dedica un día completo al palacio, luego cubre el Albaicín y el centro de la ciudad con un ritmo calmado.",
+        },
+        {
+          question: "¿Necesito reservar la Alhambra con antelación?",
+          answer:
+            "Absolutamente sí. Reserva entradas semanas antes, especialmente en temporada alta. Los Palacios Nazaríes requieren un horario específico que se agota rápidamente.",
+        },
+        {
+          question: "¿Es Granada caminable?",
+          answer:
+            "El centro histórico es caminable, pero el Albaicín tiene colinas empinadas. Usa zapatos cómodos y toma descansos. La Alhambra requiere autobús o taxi desde el centro.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro de la ciudad te mantiene cerca de la catedral y restaurantes, mientras el Albaicín ofrece ambiente histórico y vistas, aunque con caminatas más empinadas.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para la Alhambra para aprovechar al máximo tu horario. Para el Albaicín, las mañanas son más frescas y menos concurridas.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para lugares de tapas populares, sí—especialmente por la noche. La cultura de tapas de Granada es fuerte, así que planifica algunas paradas pero deja margen para espontaneidad.",
+        },
+        {
+          question: "¿Puedo visitar la Alhambra sin reserva anticipada?",
+          answer:
+            "Es muy difícil, especialmente en temporada alta. Las entradas del mismo día son raras. Reserva con mucha antelación para asegurar tu fecha y horario preferidos.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "seville",
+          city: "Sevilla",
+          days: 3,
+          description: "Plazas históricas y paseos junto al río.",
+        },
+        {
+          slug: "barcelona",
+          city: "Barcelona",
+          days: 3,
+          description: "Arquitectura de Gaudi y barrios caminables.",
+        },
+        {
+          slug: "madrid",
+          city: "Madrid",
+          days: 3,
+          description: "Museos, parques y plazas clásicas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    lyon: {
+      slug: "lyon",
+      city: "Lyon",
+      country: "Francia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de la comida", "Entusiastas de historia", "Caminantes junto al río"],
+      style: ["Historia romana", "Gastronomía", "Barrios junto al río"],
+      pacing: [
+        "Lyon recompensa un enfoque centrado en la comida. El histórico Vieux Lyon centra el primer día, luego explora la Presqu'ile y Fourviere para sitios romanos y paseos junto al río.",
+        "Agrupa el tiempo por barrio para mantener el viaje simple. Vieux Lyon combina con la Colina de Fourviere para historia, mientras la Presqu'ile ofrece compras, mercados y vistas fáciles del río.",
+        "Reserva tiempo para comidas largas y visitas a mercados. Los bouchons y mercados de comida de Lyon son parte de la experiencia, así que planifica almuerzos y cenas relajados.",
+      ],
+      hero: {
+        title: "Lyon en 3 días",
+        subtitle:
+          "Explora historia romana, gastronomía y barrios junto al río con un ritmo calmado centrado en la comida.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1530282279139-9cfdae52582f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Vieux Lyon histórico con edificios renacentistas y calles estrechas.",
+        },
+      },
+      cityStats: [
+        { value: "500K", label: "Habitantes en la ciudad" },
+        { value: "2.000+", label: "Años de historia" },
+        { value: "4.000+", label: "Restaurantes y bouchons" },
+        { value: "2", label: "Ríos: Ródano y Saona" },
+      ],
+      fit: {
+        forYou: [
+          "Una visita centrada en la comida con historia",
+          "Paseos junto al río y sitios romanos",
+          "Barrios históricos y mercados",
+          "Mezcla de cultura y gastronomía",
+          "Planificación clara y práctica",
+        ],
+        notForYou: [
+          "Excursiones fuera de Lyon",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Actividades de playa o costa",
+          "Tiempo extenso de compras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Vieux Lyon y Fourviere",
+          summary: "Barrio histórico y basílica en la colina.",
+          morning: "Vieux Lyon y traboules",
+          afternoon: "Basílica de Fourviere y teatros romanos",
+          evening: "Paseo junto al río y cena en bouchon",
+        },
+        {
+          day: 2,
+          title: "Presqu'ile y mercados",
+          summary: "Centro de la ciudad y mercados de comida.",
+          morning: "Presqu'ile y Plaza Bellecour",
+          afternoon: "Mercado Les Halles o calles comerciales",
+          evening: "Frente del Ródano y luces nocturnas",
+        },
+        {
+          day: 3,
+          title: "Museos y ribera",
+          summary: "Sitios culturales y paseos relajados.",
+          morning: "Museo de Bellas Artes o Museo Confluence",
+          afternoon: "Paseo junto al río Saona",
+          evening: "Última comida en bouchon y paseo por el casco viejo",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Traboules históricos",
+          description:
+            "Los pasadizos ocultos de Vieux Lyon conectan calles y patios. Estos atajos de la era renacentista son únicos de Lyon.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pasadizo traboule histórico en Vieux Lyon.",
+          },
+        },
+        {
+          title: "Vistas junto al río",
+          description:
+            "Los ríos Ródano y Saona enmarcan la ciudad. Los paseos junto al río ofrecen vistas de arquitectura histórica y moderna.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Paisaje urbano de Lyon con los ríos Ródano y Saona.",
+          },
+        },
+        {
+          title: "Mercados de comida y bouchons",
+          description:
+            "La cultura gastronómica de Lyon se centra en bouchons y mercados. Planifica tiempo para comidas largas y visitas a mercados.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mercado de comida colorido en Lyon con productos frescos.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "Tranvía Rhonexpress o taxi" },
+        { label: "Consejos de transporte", value: "Camina Vieux Lyon; usa metro para Fourviere" },
+        { label: "Entradas", value: "Reserva museos principales con antelación si visitas" },
+        { label: "Zona para alojarse", value: "Vieux Lyon o Presqu'ile" },
+      ],
+      checklist: [
+        "Reserva mesas en restaurantes para bouchons",
+        "Reserva museos principales si visitas",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Lyon",
+        "Planifica una comida larga diaria",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Lyon?",
+          answer:
+            "Sí para lo esencial. Este plan cubre Vieux Lyon, Fourviere y la Presqu'ile con tiempo para mercados de comida y comidas relajadas.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "Para bouchons populares, sí—especialmente en fines de semana. La escena gastronómica de Lyon está ocupada, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Es Lyon caminable?",
+          answer:
+            "Vieux Lyon y la Presqu'ile son muy caminables. La Colina de Fourviere requiere una subida o funicular, pero el centro histórico es plano y fácil.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Vieux Lyon te mantiene en el corazón histórico, mientras la Presqu'ile ofrece ubicación central con fácil acceso a mercados y compras.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Fourviere para evitar multitudes y calor. Vieux Lyon es agradable por la mañana, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar museos?",
+          answer:
+            "Para museos populares como el Museo de Bellas Artes, reservar ayuda en temporada alta. Verifica con antelación para exposiciones especiales.",
+        },
+        {
+          question: "¿Qué son los traboules?",
+          answer:
+            "Los traboules son pasadizos ocultos que conectan calles a través de edificios y patios. Son únicos de Lyon y vale la pena explorarlos en Vieux Lyon.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "paris",
+          city: "París",
+          days: 3,
+          description: "Monumentos clásicos y cultura de café.",
+        },
+        {
+          slug: "nice",
+          city: "Niza",
+          days: 3,
+          description: "Paseos junto al mar y callejones del casco viejo.",
+        },
+        {
+          slug: "barcelona",
+          city: "Barcelona",
+          days: 3,
+          description: "Arquitectura de Gaudi y barrios caminables.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    salzburg: {
+      slug: "salzburg",
+      city: "Salzburgo",
+      country: "Austria",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de música", "Vistas de montaña", "Arquitectura histórica"],
+      style: ["Edificios barrocos", "Fondo de montaña", "Patrimonio musical"],
+      pacing: [
+        "Salzburgo recompensa un ritmo calmado. El casco viejo y la fortaleza centran el primer día, luego explora jardines de palacios y miradores de montaña que muestran la elegancia barroca de la ciudad.",
+        "Agrupa los lugares por área para minimizar caminar. El compacto casco viejo se conecta fácilmente, mientras el Palacio Mirabell y jardines ofrecen un ritmo diferente con espacios verdes y vistas del río.",
+        "Reserva tiempo para paseos lentos junto al río Salzach y momentos tranquilos en las plazas del casco viejo. La arquitectura barroca y el fondo de montaña de la ciudad crean una atmósfera pacífica.",
+      ],
+      hero: {
+        title: "Salzburgo en 3 días",
+        subtitle:
+          "Explora el casco viejo barroco, fortaleza y vistas de montaña con un ritmo calmado y práctico.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1750419594123-c2623bab7320?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casco viejo de Salzburgo con edificios barrocos y montañas al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "150K", label: "Habitantes en la ciudad" },
+        { value: "1.000+", label: "Años de historia" },
+        { value: "7", label: "Colinas que rodean la ciudad" },
+        { value: "1", label: "Sitio Patrimonio de la Humanidad UNESCO" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con arquitectura barroca",
+          "Vistas de montaña y caminatas fáciles",
+          "Patrimonio musical y sitios históricos",
+          "Casco viejo compacto y caminable",
+          "Planificación clara y práctica",
+        ],
+        notForYou: [
+          "Excursiones fuera de Salzburgo",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Actividades de playa o costa",
+          "Tiempo extenso de compras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco viejo y fortaleza",
+          summary: "Centro histórico y castillo en la colina.",
+          morning: "Fortaleza Hohensalzburg y funicular",
+          afternoon: "Plazas del casco viejo y Getreidegasse",
+          evening: "Paseo junto al río Salzach y cena",
+        },
+        {
+          day: 2,
+          title: "Palacios y jardines",
+          summary: "Palacios barrocos y espacios verdes.",
+          morning: "Palacio Mirabell y jardines",
+          afternoon: "Palacio Hellbrunn o más tiempo en jardines",
+          evening: "Paseo junto al río y luces nocturnas",
+        },
+        {
+          day: 3,
+          title: "Patrimonio musical y vistas",
+          summary: "Sitios de Mozart y miradores de montaña.",
+          morning: "Casa Natal de Mozart o Residencia",
+          afternoon: "Mirador Kapuzinerberg o paseo por el casco viejo",
+          evening: "Último paseo por el casco viejo y parada en café",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Casco viejo barroco",
+          description:
+            "El centro histórico de Salzburgo presenta arquitectura barroca, callejones estrechos y plazas que se sienten como entrar a otra época.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Catedral de Salzburgo con arquitectura barroca.",
+          },
+        },
+        {
+          title: "Fondo de montaña",
+          description:
+            "La ciudad se sitúa al pie de los Alpes, creando vistas dramáticas desde la fortaleza y el frente del río que enmarcan la arquitectura barroca.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Salzburgo con montañas al fondo.",
+          },
+        },
+        {
+          title: "Vistas de la fortaleza",
+          description:
+            "La Fortaleza Hohensalzburg ofrece vistas panorámicas de la ciudad y montañas. El funicular hace la subida fácil.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Fortaleza Hohensalzburg con vista a Salzburgo.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Autobús al centro de la ciudad o taxi" },
+        { label: "Consejos de transporte", value: "Camina el casco viejo; usa funicular para la fortaleza" },
+        { label: "Entradas", value: "Reserva la fortaleza y museos principales con antelación" },
+        { label: "Zona para alojarse", value: "Área del casco viejo o cerca de Mirabell" },
+      ],
+      checklist: [
+        "Reserva entradas para la Fortaleza Hohensalzburg",
+        "Reserva museos principales si visitas",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Salzburgo",
+        "Planifica una parada diaria en mirador",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Salzburgo?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el casco viejo, fortaleza y palacios con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar la fortaleza?",
+          answer:
+            "Reservar ayuda a evitar filas, especialmente en temporada alta. Las entradas para el funicular y la fortaleza se pueden comprar con antelación o al llegar.",
+        },
+        {
+          question: "¿Es Salzburgo caminable?",
+          answer:
+            "El casco viejo es muy compacto y caminable. La fortaleza requiere un viaje en funicular, pero el centro histórico es plano y fácil de navegar.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El área del casco viejo te mantiene cerca de lugares históricos y paseos nocturnos, mientras áreas cerca de Mirabell ofrecen calles más tranquilas con fácil acceso a jardines.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para la fortaleza para evitar multitudes y obtener las mejores vistas. El casco viejo es agradable por la mañana, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Salzburgo está ocupada, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Es Salzburgo bueno para amantes de música?",
+          answer:
+            "Sí. La ciudad es el lugar de nacimiento de Mozart y ofrece varios sitios relacionados con música, conciertos y un fuerte patrimonio musical en todo el casco viejo.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "vienna",
+          city: "Viena",
+          days: 3,
+          description: "Museos clásicos y jardines de palacios.",
+        },
+        {
+          slug: "prague",
+          city: "Praga",
+          days: 3,
+          description: "Plaza del Casco Viejo y vistas del castillo.",
+        },
+        {
+          slug: "munich",
+          city: "Múnich",
+          days: 3,
+          description: "Plazas históricas y pausas en jardines.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    rotterdam: {
+      slug: "rotterdam",
+      city: "Róterdam",
+      country: "Países Bajos",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Aficionados a arquitectura", "Diseño moderno", "Caminantes junto al agua"],
+      style: ["Arquitectura moderna", "Paseos junto al agua", "Distritos culturales"],
+      pacing: [
+        "Róterdam recompensa un enfoque moderno. El centro de la ciudad reconstruido muestra arquitectura innovadora, luego explora distritos junto al agua y áreas culturales que muestran el carácter contemporáneo de la ciudad.",
+        "Agrupa los lugares por área para mantener el viaje simple. El centro moderno y el Markthal funcionan como una caminata, mientras el frente del agua y las Casas Cubo ofrecen un ritmo diferente con puentes y diseño contemporáneo.",
+        "Reserva tiempo para paseos lentos junto al río Maas y momentos tranquilos en los parques. La arquitectura moderna y el frente del agua de la ciudad crean una atmósfera pacífica y con visión de futuro.",
+      ],
+      hero: {
+        title: "Róterdam en 3 días",
+        subtitle:
+          "Explora arquitectura moderna, paseos junto al agua y distritos culturales con un ritmo calmado y práctico.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1619768708936-2fce8c74cd04?auto=format&fit=crop&w=1600&q=80",
+          alt: "Horizonte moderno de Róterdam con arquitectura innovadora y puentes.",
+        },
+      },
+      cityStats: [
+        { value: "650K", label: "Habitantes en la ciudad" },
+        { value: "85%", label: "Ciudad reconstruida tras la Segunda Guerra Mundial" },
+        { value: "1.000+", label: "Puntos de referencia arquitectónicos modernos" },
+        { value: "1", label: "Puerto más grande de Europa" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con arquitectura moderna",
+          "Paseos junto al agua y puentes",
+          "Diseño y cultura contemporáneos",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+        ],
+        notForYou: [
+          "Excursiones fuera de Róterdam",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Ambiente de casco viejo histórico",
+          "Tiempo extenso de compras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Centro moderno y Markthal",
+          summary: "Arquitectura contemporánea y mercado de comida.",
+          morning: "Markthal y centro moderno",
+          afternoon: "Casas Cubo y área Overblaak",
+          evening: "Paseo junto al río Maas",
+        },
+        {
+          day: 2,
+          title: "Frente del agua y puentes",
+          summary: "Puente Erasmus y distritos junto al río.",
+          morning: "Puente Erasmus y Kop van Zuid",
+          afternoon: "Museo Marítimo o más frente del agua",
+          evening: "Paseo junto al río y luces nocturnas",
+        },
+        {
+          day: 3,
+          title: "Museos y parques",
+          summary: "Sitios culturales y espacios verdes.",
+          morning: "Museo Boijmans Van Beuningen o Kunsthal",
+          afternoon: "Het Park o mirador Euromast",
+          evening: "Último paseo junto al agua y cena",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arquitectura moderna",
+          description:
+            "El centro de la ciudad reconstruido de Róterdam presenta edificios innovadores, puentes y diseño contemporáneo que lo distingue de otras ciudades holandesas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80",
+            alt: "Casas Cubo icónicas en Róterdam con arquitectura moderna.",
+          },
+        },
+        {
+          title: "Paseos junto al agua",
+          description:
+            "El río Maas y los distritos junto al agua ofrecen paseos tranquilos con vistas de arquitectura moderna y puentes.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Puente Erasmus cruzando el río Maas en Róterdam.",
+          },
+        },
+        {
+          title: "Distritos culturales",
+          description:
+            "Los museos y áreas culturales de la ciudad se combinan con arquitectura moderna, creando una escena cultural con visión de futuro.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mercado de comida moderno Markthal en Róterdam.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Tren a Estación Central o taxi" },
+        { label: "Consejos de transporte", value: "Camina el centro; usa tranvías para el frente del agua" },
+        { label: "Entradas", value: "Reserva museos principales con antelación si visitas" },
+        { label: "Zona para alojarse", value: "Centro de la ciudad o cerca del Markthal" },
+      ],
+      checklist: [
+        "Reserva entradas para museos principales si visitas",
+        "Reserva restaurantes para lugares populares",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Róterdam",
+        "Planifica un paseo diario junto al agua",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Róterdam?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el centro moderno, frente del agua y sitios culturales clave con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar museos?",
+          answer:
+            "Para museos populares como el Museo Boijmans Van Beuningen, reservar ayuda en temporada alta. Verifica con antelación para exposiciones especiales.",
+        },
+        {
+          question: "¿Es Róterdam caminable?",
+          answer:
+            "El centro moderno es muy caminable, y el frente del agua se conecta bien a pie. Usa tranvías o metro para trayectos más largos a museos o Euromast.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro de la ciudad te mantiene cerca del Markthal y arquitectura moderna, mientras áreas cerca del frente del agua ofrecen vistas del río y fácil acceso a puentes.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano en días de museos para evitar multitudes. El Markthal es agradable por la mañana, y puedes relajarte con un almuerzo largo y tarde tranquila.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Róterdam está ocupada, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Róterdam es diferente de Ámsterdam?",
+          answer:
+            "Sí. Róterdam es más moderna y arquitectónica, reconstruida tras la Segunda Guerra Mundial con diseño contemporáneo. Ámsterdam tiene más canales históricos y edificios antiguos.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "amsterdam",
+          city: "Ámsterdam",
+          days: 3,
+          description: "Canales, museos y barrios históricos.",
+        },
+        {
+          slug: "copenhagen",
+          city: "Copenhague",
+          days: 3,
+          description: "Paseos junto al agua y diseño.",
+        },
+        {
+          slug: "berlin",
+          city: "Berlín",
+          days: 3,
+          description: "Historia y barrios creativos.",
         },
       ],
       primaryCtaHref: "/",

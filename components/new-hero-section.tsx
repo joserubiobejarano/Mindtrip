@@ -13,6 +13,7 @@ import { usePaywall } from "@/hooks/usePaywall";
 import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
 import { useLanguage } from "@/components/providers/language-provider";
 import { ProPaywallModal } from "@/components/pro/ProPaywallModal";
+import { addDays, startOfDay, format } from "date-fns";
 
 const suggestionTagKeys = [
   "home_hero_suggestion_weekend",
@@ -88,6 +89,19 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
       }
     }
   }, [destination]);
+
+  // Prefill default date range when dates are empty
+  // Default: start date = today + 7 days, end date = start + 2 days
+  // This reduces friction for users trying the app quickly
+  useEffect(() => {
+    if (!startDate && !endDate) {
+      const today = startOfDay(new Date());
+      const defaultStartDate = addDays(today, 7);
+      const defaultEndDate = addDays(defaultStartDate, 2);
+      setStartDate(format(defaultStartDate, "yyyy-MM-dd"));
+      setEndDate(format(defaultEndDate, "yyyy-MM-dd"));
+    }
+  }, [startDate, endDate]);
 
   const handleSuggestionClick = (tagKey: string) => {
     const promptKey = suggestionPromptKeys[tagKey];
