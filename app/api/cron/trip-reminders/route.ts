@@ -119,14 +119,15 @@ export async function POST(req: NextRequest) {
   const adminSupabase = createSupabaseAdmin();
   
   // Fetch existing shares for all trips
-  const tripIds = tripsToNotify.map(t => t.id);
+  const tripIdsForShares = tripsToNotify.map(t => t.id);
   const { data: existingShares } = await adminSupabase
     .from('trip_shares')
     .select('trip_id, public_slug')
-    .in('trip_id', tripIds);
+    .in('trip_id', tripIdsForShares);
 
+  const shares = (existingShares || []) as Array<{ trip_id: string; public_slug: string }>;
   const sharesByTripId = new Map(
-    (existingShares || []).map(share => [share.trip_id, share.public_slug])
+    shares.map(share => [share.trip_id, share.public_slug])
   );
 
   // Generate slug helper
@@ -144,8 +145,8 @@ export async function POST(req: NextRequest) {
     }));
 
   if (sharesToCreate.length > 0) {
-    const { data: newShares, error: createError } = await adminSupabase
-      .from('trip_shares')
+    const { data: newShares, error: createError } = await (adminSupabase
+      .from('trip_shares') as any)
       .insert(sharesToCreate)
       .select('trip_id, public_slug');
 
@@ -153,7 +154,8 @@ export async function POST(req: NextRequest) {
       console.error('[trip-reminders] Failed to create share links:', createError);
     } else {
       // Add new shares to the map
-      (newShares || []).forEach(share => {
+      const newSharesTyped = (newShares || []) as Array<{ trip_id: string; public_slug: string }>;
+      newSharesTyped.forEach(share => {
         sharesByTripId.set(share.trip_id, share.public_slug);
       });
     }

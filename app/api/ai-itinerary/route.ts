@@ -95,11 +95,13 @@ async function trySendTripReadyEmail(params: {
     .select('public_slug')
     .eq('trip_id', params.tripId)
     .maybeSingle();
+  
+  const share = existingShare as { public_slug: string } | null;
 
   let publicSlug: string;
   
-  if (existingShare?.public_slug) {
-    publicSlug = existingShare.public_slug;
+  if (share?.public_slug) {
+    publicSlug = share.public_slug;
   } else {
     // Generate a new slug and create share
     const generateSlug = () => {
@@ -108,8 +110,8 @@ async function trySendTripReadyEmail(params: {
     };
     
     publicSlug = generateSlug();
-    const { error: shareError } = await adminSupabase
-      .from('trip_shares')
+    const { error: shareError } = await (adminSupabase
+      .from('trip_shares') as any)
       .insert({
         trip_id: params.tripId,
         public_slug: publicSlug,
