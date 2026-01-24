@@ -26,6 +26,7 @@ Use this checklist before shipping any new city guide. The bar is "Rome quality.
 
 ## SEO
 - Follow the "SEO Copy Rules" in `docs/ADDING_A_CITY_GUIDE.md`, including fully localized Spanish metadata.
+- Set `intent`, `contentLevel`, and `primaryKeyword` on each city in `cityPages` per `docs/ADDING_A_CITY_GUIDE.md`. `primaryKeyword` must not duplicate any other indexed city guide.
 
 ## Ship / No-Ship rule
 - Ship only if all P0 checks pass and there are no missing sections or broken images in dev.

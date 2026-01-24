@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { resolvePlacePhotoSrc } from "@/lib/placePhotos";
 import { DayAccordionHeader } from "@/components/day-accordion-header";
+import { CityOverviewCards } from "@/components/city-overview-cards";
 
 // Helper to check if image src is a places proxy that needs unoptimized rendering
 const isPlacesProxy = (src?: string | null): boolean => {
@@ -225,6 +226,11 @@ export function PublicItineraryPanel({
           </div>
         )}
 
+        {/* City Overview Cards */}
+        {smartItinerary.cityOverview && (
+          <CityOverviewCards cityOverview={smartItinerary.cityOverview} />
+        )}
+
         {/* Days */}
         <div className="space-y-12">
           {smartItinerary.days.map((day) => {
@@ -316,7 +322,7 @@ export function PublicItineraryPanel({
                             <div className="pt-4 border-t border-gray-200">
                               {/* Moment of day label */}
                               <div className="flex justify-center md:justify-center">
-                                <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                <span className="text-base uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                                   {slot.label}
                                 </span>
                               </div>

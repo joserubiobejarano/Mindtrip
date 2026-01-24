@@ -128,6 +128,7 @@ function extractCompleteObjects(text: string): {
   summary?: string;
   days: any[];
   tripTips?: string[];
+  cityOverview?: any;
   isComplete: boolean;
 } {
   const result: {
@@ -135,6 +136,7 @@ function extractCompleteObjects(text: string): {
     summary?: string;
     days: any[];
     tripTips?: string[];
+    cityOverview?: any;
     isComplete: boolean;
   } = { days: [] as any[], isComplete: false };
   
@@ -154,6 +156,7 @@ function extractCompleteObjects(text: string): {
       result.days = Array.from(indexMap.values()).sort((a, b) => a.index - b.index);
     }
     if (parsed.tripTips) result.tripTips = parsed.tripTips;
+    if (parsed.cityOverview) result.cityOverview = parsed.cityOverview;
     result.isComplete = true;
     return result;
   } catch {
@@ -215,6 +218,71 @@ function extractCompleteObjects(text: string): {
     
     const summaryMatch = text.match(/"summary"\s*:\s*"((?:[^"\\]|\\.)*)"/);
     if (summaryMatch) result.summary = summaryMatch[1];
+    
+    // Try to extract cityOverview if present - use brace counting for nested objects
+    const cityOverviewStart = text.indexOf('"cityOverview"');
+    if (cityOverviewStart !== -1) {
+      const afterLabel = text.substring(cityOverviewStart + '"cityOverview"'.length);
+      // Skip whitespace, colon, and newlines
+      let i = 0;
+      while (i < afterLabel.length && (afterLabel[i] === ' ' || afterLabel[i] === ':' || afterLabel[i] === '\n' || afterLabel[i] === '\r' || afterLabel[i] === '\t')) {
+        i++;
+      }
+      if (afterLabel[i] === '{') {
+        let braceCount = 0;
+        let objStart = i;
+        let inString = false;
+        let escapeNext = false;
+        while (i < afterLabel.length) {
+          const char = afterLabel[i];
+          
+          // Handle string escaping
+          if (escapeNext) {
+            escapeNext = false;
+            i++;
+            continue;
+          }
+          
+          if (char === '\\') {
+            escapeNext = true;
+            i++;
+            continue;
+          }
+          
+          if (char === '"') {
+            inString = !inString;
+            i++;
+            continue;
+          }
+          
+          // Only count braces when not inside a string
+          if (!inString) {
+            if (char === '{') {
+              braceCount++;
+            } else if (char === '}') {
+              braceCount--;
+              if (braceCount === 0) {
+                // Found complete object
+                try {
+                  const cityOverviewJson = afterLabel.substring(objStart, i + 1);
+                  result.cityOverview = JSON.parse(cityOverviewJson);
+                } catch (parseError) {
+                  // Skip if parsing fails
+                  console.warn('[smart-itinerary] Failed to parse cityOverview:', parseError);
+                }
+                break;
+              }
+            }
+          }
+          i++;
+        }
+      }
+    }
+    
+    // Debug logging for cityOverview extraction
+    if (result.cityOverview) {
+      console.log('[smart-itinerary] Extracted cityOverview:', JSON.stringify(result.cityOverview).substring(0, 200) + '...');
+    }
   }
   
   return result;
@@ -1216,6 +1284,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
          - In each place's "description" (2-4 sentences): Be specific and helpful with practical info, what makes it special, opening hours (with peak/quiet times), typical ticket/entry cost or free info, nearby food or coffee suggestions, and quick movement guidance (walk vs metro/bus with line/station names when relevant).
          - Use "visited" = false for all places.
          - Fill "tags" with relevant keywords.
+         - CRITICAL: You MUST include the "cityOverview" field with structured practical information. This is a REQUIRED field, not optional.
+         - The cityOverview should contain the same information as the summary but in a structured format for quick reference.
+         - Extract information about airports, transportation, budget, best time to visit, neighborhoods, and advance planning from your knowledge of the destination.
+         - Fill in all relevant sections of cityOverview based on the destination. If some information is not available, you may omit specific fields, but the cityOverview object itself must be present.
       
       3. EXACT JSON SCHEMA (you MUST return exactly this structure):
       {
@@ -1252,7 +1324,40 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             ]
           }
         ],
-        "tripTips": string[]
+        "tripTips": string[],
+        "cityOverview": {
+          "gettingThere": {
+            "airports": string[] (main airport names),
+            "distanceToCity": string (e.g., "15 km from city center"),
+            "transferOptions": string[] (e.g., ["AirTrain + Subway", "Taxi", "Airport Shuttle"])
+          },
+          "gettingAround": {
+            "publicTransport": string (e.g., "Metro system with 12 lines, single ride €2.40"),
+            "walkability": string (e.g., "Highly walkable, most attractions within 2-3 km"),
+            "taxiRideshare": string (e.g., "Taxis available, Uber/Lyft operate, typical ride €10-20")
+          },
+          "budgetGuide": {
+            "budgetDaily": string (e.g., "€40-60 per person"),
+            "midRangeDaily": string (e.g., "€80-120 per person"),
+            "luxuryDaily": string (e.g., "€200+ per person"),
+            "transportPass": string (e.g., "7-day Metro pass €35")
+          },
+          "bestTimeToVisit": {
+            "bestMonths": string (e.g., "April-June, September-October"),
+            "shoulderSeason": string (e.g., "March, November"),
+            "peakLowSeason": string (e.g., "Peak: July-August, Low: January-February")
+          },
+          "whereToStay": [
+            {
+              "neighborhood": string (e.g., "Gothic Quarter"),
+              "description": string (e.g., "Historic center, walkable to major sights, vibrant nightlife")
+            }
+          ],
+          "advancePlanning": {
+            "bookEarly": string[] (e.g., ["Popular museums", "Restaurant reservations", "Day trips"]),
+            "spontaneous": string[] (e.g., ["Local markets", "Street food", "Neighborhood walks"])
+          }
+        } (REQUIRED - extract structured practical info from the summary and your knowledge of the destination)
       }
       
       3a. Place Identification:
@@ -1311,6 +1416,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
           let validatedItinerary: SmartItinerary | null = null;
           let titleSent = false;
           let summarySent = false;
+          let cityOverviewSent = false;
 
           // Stream the text from OpenAI
           // Note: response_format: 'json_object' doesn't work with streaming in the same way
@@ -1350,6 +1456,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               sendSSE(controller, 'summary', cleanSummary);
               partial.summary = cleanSummary;
               summarySent = true;
+            }
+            
+            // Send cityOverview if we have it and haven't sent it
+            if (partial.cityOverview && !cityOverviewSent) {
+              console.log('[smart-itinerary] Sending cityOverview via SSE');
+              const cleanCityOverview = sanitizeNoTilde(partial.cityOverview);
+              sendSSE(controller, 'cityOverview', cleanCityOverview);
+              cityOverviewSent = true;
             }
             
             // Send days as they become complete - deduplicate by index to prevent duplicate Day 1
@@ -1467,6 +1581,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 // Send tripTips if we have them
                 if (validatedItinerary.tripTips && validatedItinerary.tripTips.length > 0) {
                   sendSSE(controller, 'tripTips', sanitizeNoTilde(validatedItinerary.tripTips));
+                }
+                
+                // Send cityOverview if we have it
+                if (validatedItinerary.cityOverview) {
+                  console.log('[smart-itinerary] Sending cityOverview in complete message');
+                  sendSSE(controller, 'cityOverview', sanitizeNoTilde(validatedItinerary.cityOverview));
+                } else {
+                  console.warn('[smart-itinerary] cityOverview missing in validated itinerary');
                 }
                 
                 // Final enrichment pass for any remaining photos
@@ -1873,6 +1995,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
     }
 
     const itinerary = dataTyped.content as SmartItinerary;
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[smart-itinerary GET] cityOverview check:', {
+        hasCityOverview: !!itinerary.cityOverview,
+        needsRegeneration: !itinerary.cityOverview
+      });
+    }
 
     // Merge activities from activities table into the smart itinerary
     // Get all days in the itinerary

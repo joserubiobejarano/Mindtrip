@@ -31,10 +31,43 @@ export const itineraryDaySchema = z.object({
   slots: z.array(itinerarySlotSchema).describe("Morning, afternoon, evening slots"),
 });
 
+export const cityOverviewSchema = z.object({
+  gettingThere: z.object({
+    airports: z.array(z.string()).optional(),
+    distanceToCity: z.string().optional(),
+    transferOptions: z.array(z.string()).optional(),
+  }).optional(),
+  gettingAround: z.object({
+    publicTransport: z.string().optional(),
+    walkability: z.string().optional(),
+    taxiRideshare: z.string().optional(),
+  }).optional(),
+  budgetGuide: z.object({
+    budgetDaily: z.string().optional(),
+    midRangeDaily: z.string().optional(),
+    luxuryDaily: z.string().optional(),
+    transportPass: z.string().optional(),
+  }).optional(),
+  bestTimeToVisit: z.object({
+    bestMonths: z.string().optional(),
+    shoulderSeason: z.string().optional(),
+    peakLowSeason: z.string().optional(),
+  }).optional(),
+  whereToStay: z.array(z.object({
+    neighborhood: z.string(),
+    description: z.string(),
+  })).optional(),
+  advancePlanning: z.object({
+    bookEarly: z.array(z.string()).optional(),
+    spontaneous: z.array(z.string()).optional(),
+  }).optional(),
+});
+
 export const smartItinerarySchema = z.object({
   title: z.string(),
   summary: z.string(),
   days: z.array(itineraryDaySchema),
   tripTips: z.array(z.string()).optional().default([]).describe("Trip-wide tips (season, holidays, packing)"),
+  cityOverview: cityOverviewSchema.optional().describe("Structured city overview with practical information"),
 });
 

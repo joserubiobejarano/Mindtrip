@@ -5913,6 +5913,4634 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    bergen: {
+      slug: "bergen",
+      city: "Bergen",
+      country: "Norway",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Fjord lovers", "First-timers", "Mountain walkers"],
+      style: ["Historic wharves", "Mountain views", "Waterfront strolls"],
+      pacing: [
+        "Bergen rewards a calm pace. Anchor each day with one main area—the historic Bryggen, a mountain viewpoint, or a waterfront walk—then leave room for cafes, markets, and slow exploration.",
+        "Group sights by proximity to keep travel simple. The historic center and Bryggen work as one walk, while Fløyen mountain offers a different rhythm with views and nature.",
+        "Save time for the fish market and quiet moments along the harbor. The city's compact size and fjord setting create a peaceful, manageable atmosphere.",
+      ],
+      hero: {
+        title: "Bergen in 3 days",
+        subtitle:
+          "Explore historic wharves, mountain viewpoints, and fjord views with a calm, walkable pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bryggen_in_Bergen.jpg",
+          alt: "Historic Bryggen wharves in Bergen with colorful wooden buildings.",
+        },
+      },
+      cityStats: [
+        { value: "280K", label: "Residents in the city" },
+        { value: "7", label: "Mountains surrounding the city" },
+        { value: "900+", label: "Years of history" },
+        { value: "1.2M", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with fjord views",
+          "Historic wharves and mountain walks",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Waterfront and market time",
+        ],
+        notForYou: [
+          "Day trips outside Bergen",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Long hiking expeditions",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic Bryggen and center",
+          summary: "Colorful wharves and old town walks.",
+          morning: "Bryggen wharves and historic buildings",
+          afternoon: "Fish Market and harbor area",
+          evening: "Waterfront walk and dinner",
+        },
+        {
+          day: 2,
+          title: "Fløyen mountain",
+          summary: "Mountain views and nature walks.",
+          morning: "Fløyen funicular and summit views",
+          afternoon: "Mountain trails or return to center",
+          evening: "Old town stroll and cafes",
+        },
+        {
+          day: 3,
+          title: "Museums and waterfront",
+          summary: "Cultural sites and harbor views.",
+          morning: "Hanseatic Museum or Bergenhus Fortress",
+          afternoon: "Waterfront promenade and parks",
+          evening: "Final harbor walk and sunset views",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic wharves",
+          description:
+            "Bryggen's colorful wooden buildings are UNESCO World Heritage, offering a glimpse into Bergen's trading past.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bryggen_bergen_2005_2.jpg",
+            alt: "Colorful wooden buildings of Bryggen wharves in Bergen.",
+          },
+        },
+        {
+          title: "Mountain viewpoints",
+          description:
+            "Fløyen and other surrounding mountains offer easy access to panoramic fjord and city views.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bergen_from_Floyen.jpg",
+            alt: "View of Bergen city and fjord from Fløyen mountain.",
+          },
+        },
+        {
+          title: "Waterfront life",
+          description:
+            "The harbor and fish market create a lively, authentic atmosphere with fresh seafood and local culture.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bergen_fish_market.jpg",
+            alt: "Bergen fish market with vendors and fresh seafood.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Airport bus or taxi to city center" },
+        { label: "Transit tips", value: "Walk the center; funicular for Fløyen" },
+        { label: "Ticketing", value: "Book Fløyen funicular in advance if needed" },
+        { label: "Neighborhood stay", value: "City center near Bryggen" },
+      ],
+      checklist: [
+        "Book Fløyen funicular tickets",
+        "Pack layers for mountain weather",
+        "Save offline maps for Bergen",
+        "Plan one mountain walk",
+        "Visit the fish market",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Bergen?",
+          answer:
+            "Yes for the main highlights. This plan covers Bryggen, Fløyen, and key cultural sites with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book the Fløyen funicular?",
+          answer:
+            "Booking helps in peak season to avoid waits. The funicular runs frequently, but advance tickets can save time.",
+        },
+        {
+          question: "Is Bergen walkable?",
+          answer:
+            "The historic center is very walkable, and the waterfront connects well on foot. Use the funicular for Fløyen mountain access.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The city center near Bryggen keeps you close to historic sites and the harbor, with easy access to restaurants and cafes.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Fløyen to beat crowds and get clear views. The fish market is pleasant in the morning, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Bergen's dining scene focuses on fresh seafood, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Bergen good for fjord views?",
+          answer:
+            "Yes. The city sits on a fjord, and Fløyen mountain offers excellent panoramic views of the harbor and surrounding fjords.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "oslo",
+          city: "Oslo",
+          days: 3,
+          description: "Waterfront walks and compact museums.",
+        },
+        {
+          slug: "stockholm",
+          city: "Stockholm",
+          days: 3,
+          description: "Old town charm and island hopping.",
+        },
+        {
+          slug: "copenhagen",
+          city: "Copenhagen",
+          days: 3,
+          description: "Waterfront strolls and design.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bologna: {
+      slug: "bologna",
+      city: "Bologna",
+      country: "Italy",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["Food lovers", "First-timers", "University town fans"],
+      style: ["Medieval towers", "Food markets", "Historic squares"],
+      pacing: [
+        "Bologna rewards a food-first approach. Anchor each day with one main area—the historic center with its towers, or the university quarter—then leave room for long meals, market stops, and slow walks.",
+        "The compact center makes it easy to group sights. Pair the Two Towers with Piazza Maggiore for classic sights, then explore the food markets and university area for a different rhythm.",
+        "Save time for the food markets and quiet moments in the porticoes. The city's medieval architecture and food culture create a relaxed, authentic atmosphere.",
+      ],
+      hero: {
+        title: "Bologna in 2 days",
+        subtitle:
+          "Explore medieval towers, food markets, and historic squares with a calm, walkable pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bologna_-_Due_Torri.jpg",
+          alt: "Two Towers of Bologna rising above the historic city center.",
+        },
+      },
+      cityStats: [
+        { value: "390K", label: "Residents in the city" },
+        { value: "900+", label: "Years of history" },
+        { value: "38KM", label: "Porticoes throughout the city" },
+        { value: "1", label: "Oldest university in Europe" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with medieval architecture",
+          "Food markets and authentic cuisine",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "University town atmosphere",
+        ],
+        notForYou: [
+          "Day trips outside Bologna",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Beach or coastal activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic center and towers",
+          summary: "Two Towers and Piazza Maggiore.",
+          morning: "Two Towers and historic center",
+          afternoon: "Piazza Maggiore and Basilica di San Petronio",
+          evening: "Food market area and dinner",
+        },
+        {
+          day: 2,
+          title: "University quarter and markets",
+          summary: "University area and food markets.",
+          morning: "University quarter and porticoes",
+          afternoon: "Food markets and local shops",
+          evening: "Historic center stroll and aperitivo",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Medieval towers",
+          description:
+            "Bologna's Two Towers are iconic symbols of the city, offering views and a glimpse into medieval architecture.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Asinelli_e_Garisenda.jpg",
+            alt: "The Two Towers of Bologna, Asinelli and Garisenda, in the historic center.",
+          },
+        },
+        {
+          title: "Food markets",
+          description:
+            "Bologna's food markets showcase the city's culinary heritage with fresh produce, pasta, and local specialties.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Mercato_di_Mezzo_Bologna.jpg",
+            alt: "Food market in Bologna with fresh produce and local specialties.",
+          },
+        },
+        {
+          title: "Historic porticoes",
+          description:
+            "The city's extensive portico system provides covered walks throughout the historic center, unique to Bologna.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Portici_di_Bologna.jpg",
+            alt: "Historic porticoes in Bologna providing covered walkways.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Airport bus or train to city center" },
+        { label: "Transit tips", value: "Walk the center; everything is close" },
+        { label: "Ticketing", value: "Book tower climb in advance if visiting" },
+        { label: "Neighborhood stay", value: "Historic center near Piazza Maggiore" },
+      ],
+      checklist: [
+        "Book Two Towers climb if interested",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Bologna",
+        "Plan time for food markets",
+        "Try local pasta specialties",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Bologna?",
+          answer:
+            "Yes for the main highlights. This plan covers the historic center, towers, and food markets with a calm pace that leaves room for meals and unplanned stops.",
+        },
+        {
+          question: "Do I need to book the Two Towers?",
+          answer:
+            "Booking helps in peak season to avoid waits. The tower climb offers great views but requires advance planning.",
+        },
+        {
+          question: "Is Bologna walkable?",
+          answer:
+            "The historic center is very walkable and compact. Everything is within easy walking distance, and the porticoes provide covered walks.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The historic center near Piazza Maggiore keeps you close to the main sights, food markets, and restaurants.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for the towers to beat crowds and get clear views. The food markets are pleasant in the morning, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Bologna is known for its food, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Bologna good for food?",
+          answer:
+            "Yes. Bologna is considered the food capital of Italy, with excellent markets, pasta, and authentic cuisine throughout the city.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "florence",
+          city: "Florence",
+          days: 3,
+          description: "Renaissance art and river walks.",
+        },
+        {
+          slug: "venice",
+          city: "Venice",
+          days: 3,
+          description: "Canal walks and classic churches.",
+        },
+        {
+          slug: "rome",
+          city: "Rome",
+          days: 3,
+          description: "Ancient landmarks and piazzas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bruges: {
+      slug: "bruges",
+      city: "Bruges",
+      country: "Belgium",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["Romantic breaks", "First-timers", "Slow walkers"],
+      style: ["Medieval squares", "Canal strolls", "Historic churches"],
+      pacing: [
+        "Bruges rewards a slow, romantic pace. Anchor each day with one main area—the historic Markt square, or the quieter canal districts—then leave room for cafes, chocolate shops, and slow walks.",
+        "The compact center makes it easy to explore on foot. Pair the Markt with the Belfry for classic sights, then explore the canals and quieter neighborhoods for a different rhythm.",
+        "Save time for canal boat tours and quiet moments in the squares. The city's medieval architecture and peaceful canals create a relaxed, timeless atmosphere.",
+      ],
+      hero: {
+        title: "Bruges in 2 days",
+        subtitle:
+          "Explore medieval squares, canal strolls, and historic churches with a calm, romantic pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Brugge_grote_markt.jpg",
+          alt: "Historic Markt square in Bruges with medieval buildings and the Belfry tower.",
+        },
+      },
+      cityStats: [
+        { value: "118K", label: "Residents in the city" },
+        { value: "800+", label: "Years of history" },
+        { value: "50+", label: "Bridges over canals" },
+        { value: "UNESCO", label: "World Heritage Site" },
+      ],
+      fit: {
+        forYou: [
+          "A romantic, slow-paced visit",
+          "Medieval architecture and canals",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Cafe and chocolate shop time",
+        ],
+        notForYou: [
+          "Day trips outside Bruges",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Modern city atmosphere",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic center and Markt",
+          summary: "Markt square and Belfry tower.",
+          morning: "Markt square and Belfry tower",
+          afternoon: "Burg square and historic buildings",
+          evening: "Canal walk and dinner",
+        },
+        {
+          day: 2,
+          title: "Canals and quiet districts",
+          summary: "Canal tours and quieter neighborhoods.",
+          morning: "Canal boat tour",
+          afternoon: "Quieter canal districts and churches",
+          evening: "Final square stroll and cafes",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Medieval squares",
+          description:
+            "Bruges' Markt and Burg squares showcase medieval architecture with colorful facades and historic buildings.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bruges_Burg.jpg",
+            alt: "Historic Burg square in Bruges with medieval architecture.",
+          },
+        },
+        {
+          title: "Canal network",
+          description:
+            "The city's canals create a peaceful, romantic atmosphere with bridges, swans, and quiet waterfront walks.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bruges_canals.jpg",
+            alt: "Peaceful canals in Bruges with historic buildings reflected in the water.",
+          },
+        },
+        {
+          title: "Historic churches",
+          description:
+            "Bruges' churches and bell towers add to the medieval atmosphere, with quiet interiors and historic art.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Church_of_Our_Lady_Bruges.jpg",
+            alt: "Church of Our Lady in Bruges with historic architecture.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Train from Brussels or Ghent" },
+        { label: "Transit tips", value: "Walk everywhere; center is compact" },
+        { label: "Ticketing", value: "Book canal tours in advance if needed" },
+        { label: "Neighborhood stay", value: "Historic center near Markt" },
+      ],
+      checklist: [
+        "Book canal boat tour",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Bruges",
+        "Plan time for cafes and chocolate",
+        "Visit the Belfry if interested",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Bruges?",
+          answer:
+            "Yes for the main highlights. This plan covers the historic center, canals, and key sights with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book canal tours?",
+          answer:
+            "Booking helps in peak season to avoid waits. Canal tours are popular and offer great views of the city from the water.",
+        },
+        {
+          question: "Is Bruges walkable?",
+          answer:
+            "The historic center is very walkable and compact. Everything is within easy walking distance, and the canals create natural walking routes.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The historic center near Markt keeps you close to the main sights, restaurants, and cafes, with easy access to everything.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early to beat crowds at the Markt and Belfry. The canals are pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Bruges' dining scene focuses on Belgian cuisine, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Bruges crowded?",
+          answer:
+            "Bruges can be busy, especially in peak season. Starting early and exploring quieter canal districts helps avoid the biggest crowds.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "brussels",
+          city: "Brussels",
+          days: 3,
+          description: "Grand squares and museum districts.",
+        },
+        {
+          slug: "amsterdam",
+          city: "Amsterdam",
+          days: 3,
+          description: "Canals and historic neighborhoods.",
+        },
+        {
+          slug: "prague",
+          city: "Prague",
+          days: 3,
+          description: "Old town and castle views.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    dubrovnik: {
+      slug: "dubrovnik",
+      city: "Dubrovnik",
+      country: "Croatia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["History lovers", "First-timers", "Coastal walkers"],
+      style: ["Historic walls", "Adriatic views", "Old town walks"],
+      pacing: [
+        "Dubrovnik rewards a calm, coastal pace. Anchor each day with one main area—the historic old town, the city walls, or a nearby island—then leave room for cafes, viewpoints, and slow walks.",
+        "The compact old town makes it easy to explore on foot. Pair the city walls with the main street for classic sights, then explore quieter lanes and viewpoints for a different rhythm.",
+        "Save time for Lokrum Island and quiet moments along the walls. The city's historic architecture and Adriatic setting create a relaxed, scenic atmosphere.",
+      ],
+      hero: {
+        title: "Dubrovnik in 3 days",
+        subtitle:
+          "Explore historic walls, Adriatic views, and old town walks with a calm, coastal pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubrovnik_Old_Town.jpg",
+          alt: "Historic old town of Dubrovnik with stone buildings and red roofs overlooking the Adriatic Sea.",
+        },
+      },
+      cityStats: [
+        { value: "42K", label: "Residents in the city" },
+        { value: "1,940M", label: "City walls length" },
+        { value: "UNESCO", label: "World Heritage Site" },
+        { value: "1.2M", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with historic walls",
+          "Adriatic views and coastal walks",
+          "Compact, walkable old town",
+          "Clear, practical planning",
+          "Island day trips",
+        ],
+        notForYou: [
+          "Day trips far outside Dubrovnik",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Beach-only activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and main street",
+          summary: "Historic center and Stradun.",
+          morning: "Old town entrance and Stradun",
+          afternoon: "Historic buildings and churches",
+          evening: "Waterfront walk and dinner",
+        },
+        {
+          day: 2,
+          title: "City walls walk",
+          summary: "Walls circuit and viewpoints.",
+          morning: "City walls walk and viewpoints",
+          afternoon: "Fort Lovrijenac or continued walls",
+          evening: "Old town stroll and cafes",
+        },
+        {
+          day: 3,
+          title: "Lokrum Island",
+          summary: "Island visit and nature.",
+          morning: "Boat to Lokrum Island",
+          afternoon: "Island exploration and beaches",
+          evening: "Return to old town and sunset views",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic walls",
+          description:
+            "Dubrovnik's city walls offer panoramic views of the old town and Adriatic Sea, creating a unique walking experience.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubrovnik_City_Walls.jpg",
+            alt: "Historic city walls of Dubrovnik with views of the old town and sea.",
+          },
+        },
+        {
+          title: "Old town streets",
+          description:
+            "The limestone streets and historic buildings create a timeless atmosphere, perfect for slow exploration.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Stradun_Dubrovnik.jpg",
+            alt: "Stradun, the main street of Dubrovnik's old town with historic buildings.",
+          },
+        },
+        {
+          title: "Adriatic views",
+          description:
+            "The city's coastal setting provides stunning sea views from the walls, fortresses, and waterfront promenades.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubrovnik_Adriatic_View.jpg",
+            alt: "View of the Adriatic Sea from Dubrovnik with the old town in the background.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to June or September to October" },
+        { label: "Airport transfer", value: "Airport bus or taxi to old town" },
+        { label: "Transit tips", value: "Walk the old town; boat for Lokrum" },
+        { label: "Ticketing", value: "Book city walls tickets in advance" },
+        { label: "Neighborhood stay", value: "Old town or nearby" },
+      ],
+      checklist: [
+        "Book city walls tickets",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Dubrovnik",
+        "Plan Lokrum Island visit",
+        "Bring sun protection",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Dubrovnik?",
+          answer:
+            "Yes for the main highlights. This plan covers the old town, city walls, and Lokrum Island with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book city walls tickets?",
+          answer:
+            "Yes, booking in advance is recommended, especially in peak season. The walls walk is popular and offers the best views of the city.",
+        },
+        {
+          question: "Is Dubrovnik walkable?",
+          answer:
+            "The old town is very walkable and compact. Everything is within easy walking distance, though the city walls walk requires good fitness.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The old town keeps you close to the main sights, though nearby areas offer good value and easy access to the historic center.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for the city walls to beat crowds and heat. The old town is pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Dubrovnik's dining scene focuses on seafood, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Lokrum Island worth visiting?",
+          answer:
+            "Yes. Lokrum offers a peaceful escape from the old town crowds, with nature trails, beaches, and historic ruins in a scenic setting.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "split",
+          city: "Split",
+          days: 2,
+          description: "Diocletian's Palace and waterfront.",
+        },
+        {
+          slug: "venice",
+          city: "Venice",
+          days: 3,
+          description: "Canal walks and classic churches.",
+        },
+        {
+          slug: "athens",
+          city: "Athens",
+          days: 3,
+          description: "Ancient sites and neighborhood cafes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    helsinki: {
+      slug: "helsinki",
+      city: "Helsinki",
+      country: "Finland",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Design fans", "First-timers", "Island hoppers"],
+      style: ["Waterfront design", "Island hopping", "Cafe culture"],
+      pacing: [
+        "Helsinki rewards a calm, design-focused pace. Anchor each day with one main area—the design district, Suomenlinna island, or the waterfront—then leave room for cafes, saunas, and slow walks.",
+        "The compact center makes it easy to explore on foot. Pair the design district with the waterfront for modern sights, then explore Suomenlinna or other islands for a different rhythm.",
+        "Save time for sauna culture and quiet moments along the harbor. The city's modern design and island setting create a relaxed, forward-looking atmosphere.",
+      ],
+      hero: {
+        title: "Helsinki in 3 days",
+        subtitle:
+          "Explore waterfront design, island hopping, and relaxed cafe culture with a calm, modern pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Helsinki_Cathedral.jpg",
+          alt: "Helsinki Cathedral and Senate Square with neoclassical architecture.",
+        },
+      },
+      cityStats: [
+        { value: "650K", label: "Residents in the city" },
+        { value: "330", label: "Islands in the archipelago" },
+        { value: "2M+", label: "Saunas in Finland" },
+        { value: "1", label: "Design capital of Finland" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with modern design",
+          "Island hopping and waterfront walks",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Cafe and sauna culture",
+        ],
+        notForYou: [
+          "Day trips far outside Helsinki",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Historic old town atmosphere",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Design district and center",
+          summary: "Design shops and historic center.",
+          morning: "Design district and shops",
+          afternoon: "Senate Square and Helsinki Cathedral",
+          evening: "Waterfront walk and dinner",
+        },
+        {
+          day: 2,
+          title: "Suomenlinna Island",
+          summary: "Fortress island and nature.",
+          morning: "Boat to Suomenlinna",
+          afternoon: "Fortress exploration and island walks",
+          evening: "Return to center and cafes",
+        },
+        {
+          day: 3,
+          title: "Waterfront and markets",
+          summary: "Harbor area and market square.",
+          morning: "Market Square and harbor",
+          afternoon: "Uspenski Cathedral and Katajanokka",
+          evening: "Final waterfront walk and sunset",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Modern design",
+          description:
+            "Helsinki's design district showcases Finnish design with shops, galleries, and contemporary architecture throughout the city.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Helsinki_Design_District.jpg",
+            alt: "Modern design district in Helsinki with contemporary architecture.",
+          },
+        },
+        {
+          title: "Island fortress",
+          description:
+            "Suomenlinna offers a unique island experience with historic fortifications, nature trails, and harbor views.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Suomenlinna_Helsinki.jpg",
+            alt: "Suomenlinna fortress island in Helsinki with historic buildings and harbor views.",
+          },
+        },
+        {
+          title: "Waterfront life",
+          description:
+            "The harbor and Market Square create a lively atmosphere with ferries, markets, and waterfront cafes.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Helsinki_Market_Square.jpg",
+            alt: "Market Square in Helsinki with vendors and harbor views.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Train to city center" },
+        { label: "Transit tips", value: "Walk the center; ferry for Suomenlinna" },
+        { label: "Ticketing", value: "Book Suomenlinna ferry tickets" },
+        { label: "Neighborhood stay", value: "City center near Senate Square" },
+      ],
+      checklist: [
+        "Book Suomenlinna ferry tickets",
+        "Pack layers for island weather",
+        "Save offline maps for Helsinki",
+        "Plan time for sauna if interested",
+        "Visit design shops",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Helsinki?",
+          answer:
+            "Yes for the main highlights. This plan covers the design district, Suomenlinna, and key cultural sites with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book Suomenlinna ferry?",
+          answer:
+            "Ferry tickets are available at the harbor, but booking in advance can save time in peak season. The ferry runs frequently.",
+        },
+        {
+          question: "Is Helsinki walkable?",
+          answer:
+            "The city center is very walkable and compact. Everything is within easy walking distance, and the waterfront connects well on foot.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The city center near Senate Square keeps you close to the main sights, design district, and restaurants, with easy access to the harbor.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Suomenlinna to maximize island time. The design district is pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Helsinki's dining scene focuses on Nordic cuisine, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Helsinki good for design?",
+          answer:
+            "Yes. Helsinki is known as a design capital, with excellent design shops, galleries, and contemporary architecture throughout the city.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "stockholm",
+          city: "Stockholm",
+          days: 3,
+          description: "Old town charm and island hopping.",
+        },
+        {
+          slug: "copenhagen",
+          city: "Copenhagen",
+          days: 3,
+          description: "Waterfront strolls and design.",
+        },
+        {
+          slug: "oslo",
+          city: "Oslo",
+          days: 3,
+          description: "Waterfront walks and compact museums.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    innsbruck: {
+      slug: "innsbruck",
+      city: "Innsbruck",
+      country: "Austria",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["Mountain lovers", "First-timers", "Alpine walkers"],
+      style: ["Alpine views", "Historic old town", "Mountain access"],
+      pacing: [
+        "Innsbruck rewards a calm, alpine pace. Anchor each day with one main area—the historic old town, or the Nordkette mountains—then leave room for cafes, viewpoints, and slow walks.",
+        "The compact center makes it easy to explore on foot. Pair the old town with the Golden Roof for classic sights, then explore the mountains or nearby areas for a different rhythm.",
+        "Save time for mountain viewpoints and quiet moments in the old town. The city's alpine setting and historic architecture create a relaxed, scenic atmosphere.",
+      ],
+      hero: {
+        title: "Innsbruck in 2 days",
+        subtitle:
+          "Explore alpine views, historic old town, and easy mountain access with a calm, scenic pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Innsbruck_Altstadt_10.jpg",
+          alt: "Historic old town of Innsbruck with colorful buildings and mountain backdrop.",
+        },
+      },
+      cityStats: [
+        { value: "132K", label: "Residents in the city" },
+        { value: "574M", label: "Nordkette cable car elevation" },
+        { value: "800+", label: "Years of history" },
+        { value: "2", label: "Winter Olympics hosted" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with alpine views",
+          "Historic old town and mountains",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Mountain cable car experience",
+        ],
+        notForYou: [
+          "Day trips far outside Innsbruck",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Beach or coastal activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic old town",
+          summary: "Golden Roof and old town walks.",
+          morning: "Golden Roof and historic center",
+          afternoon: "Old town streets and churches",
+          evening: "Riverside walk and dinner",
+        },
+        {
+          day: 2,
+          title: "Nordkette mountains",
+          summary: "Mountain cable car and views.",
+          morning: "Nordkette cable car and summit",
+          afternoon: "Mountain walks or return to center",
+          evening: "Old town stroll and cafes",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Alpine setting",
+          description:
+            "Innsbruck's mountain backdrop creates stunning views from the old town, with easy access to the Nordkette range via cable car.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Innsbruck_Nordkette.jpg",
+            alt: "Nordkette mountains above Innsbruck with cable car and alpine views.",
+          },
+        },
+        {
+          title: "Historic old town",
+          description:
+            "The colorful old town with the Golden Roof showcases Tyrolean architecture and history in a compact, walkable center.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Golden_Roof_Innsbruck.jpg",
+            alt: "Golden Roof in Innsbruck's historic old town with colorful buildings.",
+          },
+        },
+        {
+          title: "Mountain access",
+          description:
+            "The Nordkette cable car provides easy access to alpine viewpoints and nature, just minutes from the city center.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Innsbruck_Cable_Car.jpg",
+            alt: "Cable car ascending to Nordkette mountains from Innsbruck.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Airport bus or taxi to city center" },
+        { label: "Transit tips", value: "Walk the old town; cable car for mountains" },
+        { label: "Ticketing", value: "Book Nordkette cable car in advance" },
+        { label: "Neighborhood stay", value: "Old town center" },
+      ],
+      checklist: [
+        "Book Nordkette cable car tickets",
+        "Pack layers for mountain weather",
+        "Save offline maps for Innsbruck",
+        "Plan time for mountain views",
+        "Wear comfortable walking shoes",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Innsbruck?",
+          answer:
+            "Yes for the main highlights. This plan covers the old town and Nordkette mountains with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book the Nordkette cable car?",
+          answer:
+            "Booking in advance is recommended, especially in peak season. The cable car offers stunning alpine views and is a popular attraction.",
+        },
+        {
+          question: "Is Innsbruck walkable?",
+          answer:
+            "The old town is very walkable and compact. Everything is within easy walking distance, and the cable car station is close to the center.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The old town center keeps you close to the main sights, restaurants, and cafes, with easy access to the cable car.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for the Nordkette to get clear mountain views. The old town is pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Innsbruck's dining scene focuses on Tyrolean cuisine, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Innsbruck good for mountain views?",
+          answer:
+            "Yes. The city sits in a valley surrounded by mountains, and the Nordkette cable car provides easy access to stunning alpine viewpoints.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "vienna",
+          city: "Vienna",
+          days: 3,
+          description: "Classic museums and palace gardens.",
+        },
+        {
+          slug: "salzburg",
+          city: "Salzburg",
+          days: 3,
+          description: "Baroque architecture and mountain views.",
+        },
+        {
+          slug: "munich",
+          city: "Munich",
+          days: 3,
+          description: "Historic squares and garden breaks.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    riga: {
+      slug: "riga",
+      city: "Riga",
+      country: "Latvia",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["Architecture fans", "First-timers", "Old town walkers"],
+      style: ["Art nouveau", "Historic squares", "Riverfront walks"],
+      pacing: [
+        "Riga rewards a calm, architectural pace. Anchor each day with one main area—the art nouveau district, or the historic old town—then leave room for cafes, markets, and slow walks.",
+        "The compact center makes it easy to explore on foot. Pair the old town with the art nouveau district for diverse sights, then explore the riverfront or markets for a different rhythm.",
+        "Save time for art nouveau buildings and quiet moments along the Daugava River. The city's diverse architecture and river setting create a relaxed, cultural atmosphere.",
+      ],
+      hero: {
+        title: "Riga in 2 days",
+        subtitle:
+          "Explore art nouveau architecture, old town squares, and riverfront walks with a calm, cultural pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Historic_Centre_of_Riga-112610.jpg",
+          alt: "Historic old town of Riga with medieval buildings and church spires.",
+        },
+      },
+      cityStats: [
+        { value: "632K", label: "Residents in the city" },
+        { value: "800+", label: "Art nouveau buildings" },
+        { value: "800+", label: "Years of history" },
+        { value: "UNESCO", label: "World Heritage Site" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with art nouveau",
+          "Historic old town and architecture",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Cultural and market time",
+        ],
+        notForYou: [
+          "Day trips far outside Riga",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Beach or coastal activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and squares",
+          summary: "Historic center and main squares.",
+          morning: "Old town and Town Hall Square",
+          afternoon: "Dome Cathedral and historic buildings",
+          evening: "Riverfront walk and dinner",
+        },
+        {
+          day: 2,
+          title: "Art nouveau district",
+          summary: "Art nouveau architecture and streets.",
+          morning: "Art nouveau district and buildings",
+          afternoon: "Central Market or continued architecture",
+          evening: "Old town stroll and cafes",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Art nouveau architecture",
+          description:
+            "Riga has one of the world's largest collections of art nouveau buildings, with ornate facades and decorative details throughout the city.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riga_Art_Nouveau.jpg",
+            alt: "Art nouveau building in Riga with ornate facade and decorative details.",
+          },
+        },
+        {
+          title: "Historic old town",
+          description:
+            "The medieval old town with cobblestone streets and historic buildings creates a charming, walkable center.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riga_Dome_Cathedral.jpg",
+            alt: "Dome Cathedral in Riga's old town with historic architecture.",
+          },
+        },
+        {
+          title: "Riverfront setting",
+          description:
+            "The Daugava River provides a peaceful backdrop to the city, with waterfront promenades and scenic views.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riga_Daugava_River.jpg",
+            alt: "Daugava River in Riga with city skyline and waterfront views.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Airport bus or taxi to city center" },
+        { label: "Transit tips", value: "Walk the center; everything is close" },
+        { label: "Ticketing", value: "Book major attractions in advance if needed" },
+        { label: "Neighborhood stay", value: "Old town or art nouveau district" },
+      ],
+      checklist: [
+        "Book major attraction tickets if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Riga",
+        "Plan time for art nouveau buildings",
+        "Visit Central Market",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Riga?",
+          answer:
+            "Yes for the main highlights. This plan covers the old town and art nouveau district with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions?",
+          answer:
+            "For major attractions, booking in advance can help in peak season. The old town and art nouveau district are best explored on foot.",
+        },
+        {
+          question: "Is Riga walkable?",
+          answer:
+            "The city center is very walkable and compact. Everything is within easy walking distance, and the old town connects well to the art nouveau district.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The old town keeps you close to the main sights, though the art nouveau district offers good value and easy access to the center.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early to beat crowds at the old town squares. The art nouveau district is pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Riga's dining scene focuses on Baltic cuisine, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Riga good for art nouveau?",
+          answer:
+            "Yes. Riga has one of the world's largest collections of art nouveau buildings, with over 800 examples throughout the city.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tallinn",
+          city: "Tallinn",
+          days: 2,
+          description: "Medieval old town and city walls.",
+        },
+        {
+          slug: "vilnius",
+          city: "Vilnius",
+          days: 2,
+          description: "Baroque architecture and historic lanes.",
+        },
+        {
+          slug: "stockholm",
+          city: "Stockholm",
+          days: 3,
+          description: "Old town charm and island hopping.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    split: {
+      slug: "split",
+      city: "Split",
+      country: "Croatia",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["History lovers", "First-timers", "Waterfront walkers"],
+      style: ["Roman palace", "Waterfront promenades", "Historic lanes"],
+      pacing: [
+        "Split rewards a calm, historic pace. Anchor each day with one main area—Diocletian's Palace, or the waterfront—then leave room for cafes, viewpoints, and slow walks.",
+        "The compact center makes it easy to explore on foot. Pair the palace with the old town for classic sights, then explore the waterfront or Marjan Hill for a different rhythm.",
+        "Save time for Marjan Hill and quiet moments along the Riva. The city's Roman history and Adriatic setting create a relaxed, scenic atmosphere.",
+      ],
+      hero: {
+        title: "Split in 2 days",
+        subtitle:
+          "Explore Diocletian's Palace, waterfront promenades, and nearby islands with a calm, coastal pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Historical_Complex_of_Split_with_the_Palace_of_Diocletian-108827.jpg",
+          alt: "Diocletian's Palace in Split with Roman architecture and historic buildings.",
+        },
+      },
+      cityStats: [
+        { value: "178K", label: "Residents in the city" },
+        { value: "1,700+", label: "Years of history" },
+        { value: "UNESCO", label: "World Heritage Site" },
+        { value: "30K", label: "Square meters of palace" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with Roman history",
+          "Waterfront walks and palace exploration",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Island day trips",
+        ],
+        notForYou: [
+          "Day trips far outside Split",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Beach-only activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Diocletian's Palace",
+          summary: "Roman palace and old town.",
+          morning: "Diocletian's Palace entrance and Peristyle",
+          afternoon: "Palace streets and Cathedral of St. Domnius",
+          evening: "Riva promenade and dinner",
+        },
+        {
+          day: 2,
+          title: "Marjan Hill and waterfront",
+          summary: "Hill viewpoints and harbor area.",
+          morning: "Marjan Hill walk and viewpoints",
+          afternoon: "Waterfront area and beaches",
+          evening: "Old town stroll and cafes",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Roman palace",
+          description:
+            "Diocletian's Palace is a living Roman monument, with ancient walls, streets, and buildings integrated into the modern city.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Peristyle_Split.jpg",
+            alt: "Peristyle square in Diocletian's Palace, Split, with Roman columns and architecture.",
+          },
+        },
+        {
+          title: "Waterfront promenade",
+          description:
+            "The Riva promenade along the harbor provides a lively atmosphere with cafes, views, and easy access to the old town.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riva_Split.jpg",
+            alt: "Riva waterfront promenade in Split with cafes and harbor views.",
+          },
+        },
+        {
+          title: "Marjan Hill",
+          description:
+            "Marjan Hill offers peaceful nature walks and panoramic views of Split, the harbor, and surrounding islands.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Marjan_Hill_Split.jpg",
+            alt: "View from Marjan Hill in Split showing the city and Adriatic Sea.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to June or September to October" },
+        { label: "Airport transfer", value: "Airport bus or taxi to city center" },
+        { label: "Transit tips", value: "Walk the center; everything is close" },
+        { label: "Ticketing", value: "Book palace attractions in advance if needed" },
+        { label: "Neighborhood stay", value: "Old town or near Riva" },
+      ],
+      checklist: [
+        "Book palace attraction tickets if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Split",
+        "Plan time for Marjan Hill",
+        "Bring sun protection",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Split?",
+          answer:
+            "Yes for the main highlights. This plan covers Diocletian's Palace and Marjan Hill with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book palace attractions?",
+          answer:
+            "For major attractions within the palace, booking in advance can help in peak season. The palace itself is free to explore.",
+        },
+        {
+          question: "Is Split walkable?",
+          answer:
+            "The old town and palace are very walkable and compact. Everything is within easy walking distance, though Marjan Hill requires some uphill walking.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The old town keeps you close to the palace and main sights, though areas near the Riva offer good value and easy access.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for the palace to beat crowds. Marjan Hill is pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Split's dining scene focuses on seafood, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Split good for Roman history?",
+          answer:
+            "Yes. Diocletian's Palace is one of the best-preserved Roman monuments, with ancient architecture integrated into the modern city center.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "dubrovnik",
+          city: "Dubrovnik",
+          days: 3,
+          description: "Historic walls and Adriatic views.",
+        },
+        {
+          slug: "rome",
+          city: "Rome",
+          days: 3,
+          description: "Ancient landmarks and piazzas.",
+        },
+        {
+          slug: "athens",
+          city: "Athens",
+          days: 3,
+          description: "Ancient sites and neighborhood cafes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tallinn: {
+      slug: "tallinn",
+      city: "Tallinn",
+      country: "Estonia",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["History lovers", "First-timers", "Medieval town fans"],
+      style: ["Medieval walls", "Historic squares", "Harbor views"],
+      pacing: [
+        "Tallinn rewards a calm, medieval pace. Anchor each day with one main area—the old town, or Toompea Hill—then leave room for cafes, viewpoints, and slow walks.",
+        "The compact old town makes it easy to explore on foot. Pair the lower town with Toompea for classic sights, then explore the walls or harbor for a different rhythm.",
+        "Save time for city walls and quiet moments in the squares. The city's medieval architecture and harbor setting create a relaxed, historic atmosphere.",
+      ],
+      hero: {
+        title: "Tallinn in 2 days",
+        subtitle:
+          "Explore medieval old town, city walls, and harbor views with a calm, historic pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_Old_Town.jpg",
+          alt: "Medieval old town of Tallinn with historic buildings and church spires.",
+        },
+      },
+      cityStats: [
+        { value: "437K", label: "Residents in the city" },
+        { value: "800+", label: "Years of history" },
+        { value: "1.9KM", label: "City walls length" },
+        { value: "UNESCO", label: "World Heritage Site" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with medieval architecture",
+          "Historic old town and walls",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Harbor and viewpoint time",
+        ],
+        notForYou: [
+          "Day trips far outside Tallinn",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Beach or coastal activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and Toompea",
+          summary: "Medieval center and hilltop views.",
+          morning: "Old town entrance and Town Hall Square",
+          afternoon: "Toompea Hill and Alexander Nevsky Cathedral",
+          evening: "Harbor walk and dinner",
+        },
+        {
+          day: 2,
+          title: "City walls and districts",
+          summary: "Walls walk and historic districts.",
+          morning: "City walls walk and viewpoints",
+          afternoon: "Historic districts and churches",
+          evening: "Old town stroll and cafes",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Medieval old town",
+          description:
+            "Tallinn's old town is one of Europe's best-preserved medieval centers, with cobblestone streets and historic buildings.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_Town_Hall_Square.jpg",
+            alt: "Town Hall Square in Tallinn's old town with medieval architecture.",
+          },
+        },
+        {
+          title: "City walls",
+          description:
+            "The well-preserved city walls and towers offer views of the old town and create a unique walking experience.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_City_Walls.jpg",
+            alt: "Historic city walls of Tallinn with medieval towers and old town views.",
+          },
+        },
+        {
+          title: "Harbor setting",
+          description:
+            "The harbor provides a scenic backdrop to the old town, with waterfront promenades and views of the Baltic Sea.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_Harbor.jpg",
+            alt: "Harbor in Tallinn with old town and Baltic Sea views.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Airport bus or taxi to city center" },
+        { label: "Transit tips", value: "Walk the old town; everything is close" },
+        { label: "Ticketing", value: "Book city walls walk in advance if needed" },
+        { label: "Neighborhood stay", value: "Old town center" },
+      ],
+      checklist: [
+        "Book city walls walk if interested",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Tallinn",
+        "Plan time for Toompea Hill",
+        "Visit the old town squares",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Tallinn?",
+          answer:
+            "Yes for the main highlights. This plan covers the old town and city walls with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book city walls walk?",
+          answer:
+            "For guided walks, booking in advance can help. The walls can be viewed from various points throughout the old town.",
+        },
+        {
+          question: "Is Tallinn walkable?",
+          answer:
+            "The old town is very walkable and compact. Everything is within easy walking distance, though Toompea Hill requires some uphill walking.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The old town center keeps you close to the main sights, restaurants, and cafes, with easy access to everything.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early to beat crowds at the old town squares. Toompea Hill is pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Tallinn's dining scene focuses on Estonian cuisine, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Tallinn good for medieval history?",
+          answer:
+            "Yes. Tallinn has one of Europe's best-preserved medieval old towns, with intact city walls, historic buildings, and a charming atmosphere.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "riga",
+          city: "Riga",
+          days: 2,
+          description: "Art nouveau and old town squares.",
+        },
+        {
+          slug: "vilnius",
+          city: "Vilnius",
+          days: 2,
+          description: "Baroque architecture and historic lanes.",
+        },
+        {
+          slug: "stockholm",
+          city: "Stockholm",
+          days: 3,
+          description: "Old town charm and island hopping.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    vilnius: {
+      slug: "vilnius",
+      city: "Vilnius",
+      country: "Lithuania",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["Architecture fans", "First-timers", "Baroque town walkers"],
+      style: ["Baroque architecture", "Historic lanes", "Hilltop viewpoints"],
+      pacing: [
+        "Vilnius rewards a calm, baroque pace. Anchor each day with one main area—the old town, or Gediminas Tower—then leave room for cafes, viewpoints, and slow walks.",
+        "The compact center makes it easy to explore on foot. Pair the old town with Gediminas Hill for classic sights, then explore Užupis or quieter districts for a different rhythm.",
+        "Save time for Gediminas Tower and quiet moments in the old town. The city's baroque architecture and hilltop setting create a relaxed, cultural atmosphere.",
+      ],
+      hero: {
+        title: "Vilnius in 2 days",
+        subtitle:
+          "Explore baroque architecture, historic lanes, and hilltop viewpoints with a calm, cultural pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Vilnius_Old_Town.jpg",
+          alt: "Historic old town of Vilnius with baroque architecture and church spires.",
+        },
+      },
+      cityStats: [
+        { value: "588K", label: "Residents in the city" },
+        { value: "700+", label: "Years of history" },
+        { value: "40+", label: "Churches in the old town" },
+        { value: "UNESCO", label: "World Heritage Site" },
+      ],
+      fit: {
+        forYou: [
+          "A first visit with baroque architecture",
+          "Historic old town and hilltop views",
+          "Compact, walkable center",
+          "Clear, practical planning",
+          "Cultural and artistic districts",
+        ],
+        notForYou: [
+          "Day trips far outside Vilnius",
+          "Late-night nightlife focus",
+          "A packed museum-only schedule",
+          "Extensive shopping time",
+          "Beach or coastal activities",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and Gediminas",
+          summary: "Historic center and hilltop tower.",
+          morning: "Old town and Cathedral Square",
+          afternoon: "Gediminas Tower and hilltop views",
+          evening: "Old town stroll and dinner",
+        },
+        {
+          day: 2,
+          title: "Užupis and districts",
+          summary: "Artistic district and historic churches.",
+          morning: "Užupis district and artistic area",
+          afternoon: "Historic churches and quieter lanes",
+          evening: "Final old town walk and cafes",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Baroque architecture",
+          description:
+            "Vilnius' old town showcases baroque architecture with ornate churches, historic buildings, and charming streets throughout.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Vilnius_Cathedral.jpg",
+            alt: "Vilnius Cathedral with baroque architecture in the old town.",
+          },
+        },
+        {
+          title: "Gediminas Tower",
+          description:
+            "The hilltop Gediminas Tower offers panoramic views of Vilnius and the surrounding area, accessible by foot or funicular.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gediminas_Tower_Vilnius.jpg",
+            alt: "Gediminas Tower on the hilltop overlooking Vilnius old town.",
+          },
+        },
+        {
+          title: "Užupis district",
+          description:
+            "The artistic Užupis district adds a creative, bohemian atmosphere to the old town, with galleries, cafes, and unique character.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Uzupis_Vilnius.jpg",
+            alt: "Užupis artistic district in Vilnius with colorful buildings and creative atmosphere.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather" },
+        { label: "Airport transfer", value: "Airport bus or taxi to city center" },
+        { label: "Transit tips", value: "Walk the old town; everything is close" },
+        { label: "Ticketing", value: "Book Gediminas Tower in advance if needed" },
+        { label: "Neighborhood stay", value: "Old town center" },
+      ],
+      checklist: [
+        "Book Gediminas Tower if interested",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Vilnius",
+        "Plan time for Užupis district",
+        "Visit the old town churches",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Vilnius?",
+          answer:
+            "Yes for the main highlights. This plan covers the old town and Gediminas Tower with a calm pace that leaves room for cafes and unplanned stops.",
+        },
+        {
+          question: "Do I need to book Gediminas Tower?",
+          answer:
+            "For the tower climb, booking in advance can help in peak season. The hilltop offers great views even without entering the tower.",
+        },
+        {
+          question: "Is Vilnius walkable?",
+          answer:
+            "The old town is very walkable and compact. Everything is within easy walking distance, though Gediminas Hill requires some uphill walking.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The old town center keeps you close to the main sights, restaurants, and cafes, with easy access to everything.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early to beat crowds at the old town squares. Gediminas Hill is pleasant throughout the day, and you can slow down with a long lunch.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Vilnius' dining scene focuses on Lithuanian cuisine, so reserve a few meals in advance.",
+        },
+        {
+          question: "Is Vilnius good for baroque architecture?",
+          answer:
+            "Yes. Vilnius has one of Europe's largest baroque old towns, with over 40 churches and historic buildings throughout the center.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "riga",
+          city: "Riga",
+          days: 2,
+          description: "Art nouveau and old town squares.",
+        },
+        {
+          slug: "tallinn",
+          city: "Tallinn",
+          days: 2,
+          description: "Medieval old town and city walls.",
+        },
+        {
+          slug: "krakow",
+          city: "Krakow",
+          days: 3,
+          description: "Old town and castle hill.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tokyo: {
+      slug: "tokyo",
+      city: "Tokyo",
+      country: "Japan",
+      days: 4,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Food lovers", "Culture seekers"],
+      style: ["Traditional temples", "Modern districts", "Exceptional food"],
+      pacing: [
+        "Tokyo rewards a calm pace across its diverse neighborhoods. Focus each day on one major area, then leave time for temple visits, local markets, and spontaneous food discoveries.",
+        "Group your time by district clusters. Pair Shibuya with Harajuku for modern energy, dedicate another day to Asakusa and Ueno for traditional culture, then explore Shinjuku and Ginza for contrast.",
+        "Save unhurried time for neighborhood walks, local izakaya dinners, and the quiet moments that reveal Tokyo's character beyond the main sights.",
+      ],
+      hero: {
+        title: "Tokyo in 4 days",
+        subtitle:
+          "Explore the essentials with room to breathe, balancing traditional temples, modern districts, and exceptional food culture.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1600&q=80",
+          alt: "Shibuya Crossing in Tokyo with neon lights and crowds.",
+        },
+      },
+      cityStats: [
+        { value: "13.9M", label: "Residents in the metro area" },
+        { value: "23", label: "Special wards across the city" },
+        { value: "160,000+", label: "Restaurants and food establishments" },
+        { value: "2,000+", label: "Temples and shrines" },
+      ],
+      fit: {
+        forYou: ["Traditional temple visits", "Modern district exploration", "Exceptional food scenes", "Efficient public transit", "Safe, walkable neighborhoods"],
+        notForYou: ["A packed schedule of only temples", "Day trips outside Tokyo", "Late-night party focus", "Beach time", "Budget backpacker style"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Modern Tokyo",
+          summary: "Shibuya, Harajuku, and modern energy.",
+          morning: "Shibuya Crossing and Hachiko Square",
+          afternoon: "Harajuku and Takeshita Street",
+          evening: "Shibuya Sky or neighborhood dinner",
+        },
+        {
+          day: 2,
+          title: "Traditional culture",
+          summary: "Asakusa, Senso-ji, and Ueno Park.",
+          morning: "Senso-ji Temple and Nakamise Street",
+          afternoon: "Ueno Park and museums",
+          evening: "Traditional dinner in Asakusa",
+        },
+        {
+          day: 3,
+          title: "Imperial and shopping",
+          summary: "Imperial Palace, Ginza, and Tsukiji.",
+          morning: "Imperial Palace East Gardens",
+          afternoon: "Ginza district and shopping",
+          evening: "Tsukiji Outer Market area",
+        },
+        {
+          day: 4,
+          title: "Neighborhoods and food",
+          summary: "Shinjuku, local markets, and relaxed time.",
+          morning: "Shinjuku Gyoen or Meiji Shrine",
+          afternoon: "Shinjuku neighborhood exploration",
+          evening: "Izakaya dinner and Golden Gai",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Traditional temples",
+          description:
+            "Senso-ji and Meiji Shrine offer peaceful contrasts to Tokyo's modern energy. Morning visits provide quiet moments before the crowds arrive.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sensoji_Temple_Tokyo.jpg",
+            alt: "Senso-ji Temple in Asakusa with traditional architecture and lanterns.",
+          },
+        },
+        {
+          title: "Modern districts",
+          description:
+            "Shibuya and Shinjuku showcase Tokyo's contemporary side with neon lights, efficient transit, and vibrant street life that feels both organized and energetic.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Shinjuku_Tokyo_Skyline.jpg",
+            alt: "Shinjuku skyline with modern skyscrapers and neon signs.",
+          },
+        },
+        {
+          title: "Exceptional food culture",
+          description:
+            "From Tsukiji fish market to neighborhood izakaya, Tokyo's food scene is world-class. Long meals and local discoveries are part of the experience.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tsukiji_Market_Tokyo.jpg",
+            alt: "Tsukiji Outer Market with fresh seafood and food stalls.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Airport transfer", value: "Narita Express or Skyliner to city center" },
+        { label: "Transit tips", value: "Get a JR Pass or IC card for easy transit" },
+        { label: "Ticketing", value: "Book major attractions like Tokyo Skytree in advance" },
+        { label: "Neighborhood stay", value: "Shibuya, Shinjuku, or Ginza areas" },
+      ],
+      checklist: [
+        "Get a JR Pass or IC card for transit",
+        "Book Tokyo Skytree if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Tokyo",
+        "Plan one traditional meal experience",
+        "Carry cash for smaller establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 4 days enough for Tokyo?",
+          answer:
+            "Yes for the core highlights. This plan balances traditional and modern Tokyo with enough breathing room for food discoveries, neighborhood walks, and unplanned stops.",
+        },
+        {
+          question: "Do I need a JR Pass?",
+          answer:
+            "For city travel, an IC card is more practical. JR Passes are better for longer Japan trips. Both offer easy access to Tokyo's excellent transit system.",
+        },
+        {
+          question: "Is Tokyo walkable?",
+          answer:
+            "Neighborhoods are walkable, but Tokyo is vast. Use the efficient subway and train system to move between districts, then explore on foot within each area.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Shibuya or Shinjuku offer good transit connections and central locations. Ginza provides a more upscale base with easy access to shopping and dining.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for temple visits to avoid crowds. Markets like Tsukiji are best in the morning. Afternoons can be slower with neighborhood exploration.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For high-end restaurants, yes—especially for sushi or kaiseki. For izakaya and casual spots, walk-ins are common, though popular places may have waits.",
+        },
+        {
+          question: "Is English widely spoken?",
+          answer:
+            "In tourist areas, yes. Many restaurants have English menus, and transit signs are bilingual. Learning basic Japanese phrases helps, especially outside central areas.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "seoul",
+          city: "Seoul",
+          days: 3,
+          description: "Ancient palaces, modern neighborhoods, and dynamic food scenes.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Golden temples, floating markets, and vibrant street food.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Skyline views, traditional markets, and easy island escapes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    seoul: {
+      slug: "seoul",
+      city: "Seoul",
+      country: "South Korea",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Food enthusiasts"],
+      style: ["Ancient palaces", "Modern neighborhoods", "Dynamic food scenes"],
+      pacing: [
+        "Seoul rewards a calm pace across its mix of ancient and modern. Anchor each day with one major area, then leave time for palace visits, neighborhood markets, and spontaneous food discoveries.",
+        "Group your time by district. Pair Gyeongbokgung with Bukchon for traditional culture, dedicate another day to Myeongdong and Insadong for shopping and food, then explore Gangnam for modern contrast.",
+        "Save unhurried time for hanok village walks, local market visits, and the relaxed meals that showcase Seoul's exceptional food culture.",
+      ],
+      hero: {
+        title: "Seoul in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, mixing ancient palaces, modern neighborhoods, and dynamic street food scenes.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1758509444769-95567facc5b0?auto=format&fit=crop&w=1600&q=80",
+          alt: "Seoul city skyline with Namsan Tower and modern architecture.",
+        },
+      },
+      cityStats: [
+        { value: "9.7M", label: "Residents in the city" },
+        { value: "5", label: "Grand palaces across Seoul" },
+        { value: "25", label: "Districts (gu) in the city" },
+        { value: "20,000+", label: "Restaurants and food establishments" },
+      ],
+      fit: {
+        forYou: ["Ancient palace visits", "Traditional hanok villages", "Vibrant food markets", "Modern shopping districts", "Efficient public transit"],
+        notForYou: ["A packed schedule of only palaces", "Day trips outside Seoul", "Late-night party focus", "Beach time", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Palaces and tradition",
+          summary: "Gyeongbokgung, Bukchon, and traditional culture.",
+          morning: "Gyeongbokgung Palace and changing of the guard",
+          afternoon: "Bukchon Hanok Village walk",
+          evening: "Insadong area and traditional dinner",
+        },
+        {
+          day: 2,
+          title: "Modern Seoul",
+          summary: "Myeongdong, N Seoul Tower, and shopping.",
+          morning: "Myeongdong shopping district",
+          afternoon: "N Seoul Tower and Namsan Park",
+          evening: "Gangnam area or Hongdae for nightlife",
+        },
+        {
+          day: 3,
+          title: "Markets and neighborhoods",
+          summary: "Gwangjang Market, local areas, and relaxed time.",
+          morning: "Gwangjang Market and street food",
+          afternoon: "Dongdaemun or neighborhood exploration",
+          evening: "Traditional hanjeongsik dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Ancient palaces",
+          description:
+            "Gyeongbokgung and Changdeokgung showcase Korea's royal history. Morning visits offer quieter moments and the chance to see traditional ceremonies.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Changdeokgung_Palace_Seoul.jpg",
+            alt: "Changdeokgung Palace with traditional Korean architecture and gardens.",
+          },
+        },
+        {
+          title: "Hanok villages",
+          description:
+            "Bukchon preserves traditional Korean architecture in a residential setting. Slow walks reveal courtyards, tea houses, and quiet streets that feel removed from modern Seoul.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bukchon_Hanok_Village_Seoul.jpg",
+            alt: "Traditional hanok houses in Bukchon Village with tiled roofs.",
+          },
+        },
+        {
+          title: "Dynamic food culture",
+          description:
+            "From Gwangjang Market to Myeongdong street food, Seoul's food scene is vibrant and accessible. Long meals and local discoveries are central to the experience.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gwangjang_Market_Seoul.jpg",
+            alt: "Gwangjang Market with food stalls and vendors in Seoul.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to November" },
+        { label: "Airport transfer", value: "AREX express train or airport bus to city center" },
+        { label: "Transit tips", value: "Get a T-money card for easy subway and bus access" },
+        { label: "Ticketing", value: "Book palace tours and N Seoul Tower in advance" },
+        { label: "Neighborhood stay", value: "Myeongdong, Insadong, or Gangnam areas" },
+      ],
+      checklist: [
+        "Get a T-money card for transit",
+        "Book Changdeokgung Secret Garden tour if interested",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Seoul",
+        "Plan one traditional meal experience",
+        "Carry cash for markets and street food",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Seoul?",
+          answer:
+            "Yes for the core highlights. This plan balances traditional and modern Seoul with enough breathing room for palace visits, food markets, and neighborhood exploration.",
+        },
+        {
+          question: "Do I need to book palace visits?",
+          answer:
+            "For Gyeongbokgung, no advance booking needed. For Changdeokgung Secret Garden, yes—book in advance as tours are limited. The changing of the guard at Gyeongbokgung is free and worth timing your visit.",
+        },
+        {
+          question: "Is Seoul walkable?",
+          answer:
+            "Neighborhoods are walkable, but Seoul is spread out. Use the efficient subway system to move between districts, then explore on foot within each area.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Myeongdong offers central location and easy access to shopping and food. Insadong provides traditional character, while Gangnam offers modern convenience.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for palace visits to avoid crowds and see the changing of the guard. Markets are best in the morning, and afternoons can be slower with neighborhood walks.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For high-end Korean BBQ or hanjeongsik, yes—especially on weekends. For street food and casual spots, walk-ins are common and part of the experience.",
+        },
+        {
+          question: "Is English widely spoken?",
+          answer:
+            "In tourist areas and with younger people, yes. Many restaurants have English menus, and transit signs are bilingual. Learning basic Korean phrases helps.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokyo",
+          days: 4,
+          description: "Traditional temples, modern districts, and exceptional food culture.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Golden temples, floating markets, and vibrant street food.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Skyline views, traditional markets, and easy island escapes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bangkok: {
+      slug: "bangkok",
+      city: "Bangkok",
+      country: "Thailand",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Temple lovers", "Food enthusiasts"],
+      style: ["Golden temples", "Floating markets", "Vibrant street food"],
+      pacing: [
+        "Bangkok rewards a calm pace despite its energy. Anchor each day with one major temple or area, then leave time for market visits, street food discoveries, and river boat rides.",
+        "Group your time by area. Pair the Grand Palace with Wat Pho for temple culture, dedicate another day to Chatuchak or floating markets, then explore neighborhoods like Chinatown for food and local life.",
+        "Save unhurried time for temple visits, long market walks, and the relaxed meals that showcase Bangkok's exceptional street food culture.",
+      ],
+      hero: {
+        title: "Bangkok in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, featuring golden temples, floating markets, and vibrant street food scenes.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Wat Phra Kaew (Temple of the Emerald Buddha) in Bangkok with golden architecture.",
+        },
+      },
+      cityStats: [
+        { value: "10.5M", label: "Residents in the metro area" },
+        { value: "400+", label: "Temples (wats) across the city" },
+        { value: "50", label: "Districts (khet) in Bangkok" },
+        { value: "20,000+", label: "Street food vendors" },
+      ],
+      fit: {
+        forYou: ["Temple visits and culture", "Floating and street markets", "Vibrant street food", "River boat experiences", "Affordable travel"],
+        notForYou: ["A packed schedule of only temples", "Beach time", "Late-night party focus", "Extensive shopping malls", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Grand temples",
+          summary: "Grand Palace, Wat Pho, and temple culture.",
+          morning: "Grand Palace and Wat Phra Kaew",
+          afternoon: "Wat Pho (Temple of the Reclining Buddha)",
+          evening: "Wat Arun sunset and river views",
+        },
+        {
+          day: 2,
+          title: "Markets and food",
+          summary: "Chatuchak or floating market, street food.",
+          morning: "Chatuchak Weekend Market or Damnoen Saduak",
+          afternoon: "Market exploration and street food",
+          evening: "Chinatown food walk",
+        },
+        {
+          day: 3,
+          title: "Neighborhoods and culture",
+          summary: "Jim Thompson House, local areas, and relaxed time.",
+          morning: "Jim Thompson House or Wat Saket",
+          afternoon: "Siam area or neighborhood walk",
+          evening: "Rooftop bar or traditional dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Golden temples",
+          description:
+            "The Grand Palace and Wat Pho showcase Thailand's royal and religious heritage. Morning visits offer cooler temperatures and fewer crowds before tour groups arrive.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Wat_Pho_Bangkok.jpg",
+            alt: "Wat Pho with the Reclining Buddha and golden architecture.",
+          },
+        },
+        {
+          title: "Floating markets",
+          description:
+            "Damnoen Saduak and other floating markets offer a glimpse into traditional Thai life. Early morning visits provide the best experience before the heat and crowds.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Damnoen_Saduak_Floating_Market.jpg",
+            alt: "Floating market with boats and vendors on the water.",
+          },
+        },
+        {
+          title: "Vibrant street food",
+          description:
+            "From Chinatown to local markets, Bangkok's street food scene is world-class. Long food walks and local discoveries are central to the experience.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bangkok_Street_Food.jpg",
+            alt: "Street food vendors and stalls in Bangkok with colorful displays.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to March for cooler, drier weather" },
+        { label: "Airport transfer", value: "Airport Rail Link or taxi to city center" },
+        { label: "Transit tips", value: "Use BTS Skytrain and MRT for longer distances; tuk-tuks for short hops" },
+        { label: "Ticketing", value: "Buy Grand Palace tickets on-site; book floating market tours in advance" },
+        { label: "Neighborhood stay", value: "Sukhumvit, Silom, or near the river" },
+      ],
+      checklist: [
+        "Book floating market tour if visiting",
+        "Pack light, breathable clothing",
+        "Bring comfortable walking shoes",
+        "Save offline maps for Bangkok",
+        "Plan one street food walk",
+        "Carry cash for markets and street food",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Bangkok?",
+          answer:
+            "Yes for the core highlights. This plan balances temples, markets, and food with enough breathing room for river boat rides, neighborhood walks, and unplanned discoveries.",
+        },
+        {
+          question: "Do I need to book temple visits?",
+          answer:
+            "No advance booking needed for most temples. Buy tickets on-site. For floating markets, book tours in advance as they're outside the city and require transportation.",
+        },
+        {
+          question: "Is Bangkok walkable?",
+          answer:
+            "Neighborhoods are walkable, but Bangkok is spread out and can be hot. Use BTS Skytrain and MRT for longer distances, then explore on foot within each area. River boats offer scenic transit.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Sukhumvit offers good BTS access and modern convenience. Silom provides central location, while areas near the river offer scenic views and easy boat access.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for temple visits to avoid heat and crowds. Floating markets are best at dawn. Afternoons can be slower with indoor stops or air-conditioned breaks.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For high-end restaurants, yes. For street food and casual spots, walk-ins are the norm. Food markets and street vendors don't require reservations.",
+        },
+        {
+          question: "Is street food safe?",
+          answer:
+            "Yes, generally. Look for busy stalls with high turnover. Avoid raw foods if you're sensitive. Stick to cooked items and stay hydrated. Most travelers enjoy street food without issues.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokyo",
+          days: 4,
+          description: "Traditional temples, modern districts, and exceptional food culture.",
+        },
+        {
+          slug: "seoul",
+          city: "Seoul",
+          days: 3,
+          description: "Ancient palaces, modern neighborhoods, and dynamic food scenes.",
+        },
+        {
+          slug: "singapore",
+          city: "Singapore",
+          days: 3,
+          description: "Modern architecture, diverse neighborhoods, and exceptional food.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    singapore: {
+      slug: "singapore",
+      city: "Singapore",
+      country: "Singapore",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Food lovers", "Modern architecture fans"],
+      style: ["Modern architecture", "Diverse neighborhoods", "Exceptional food"],
+      pacing: [
+        "Singapore rewards a calm pace despite its compact size. Focus each day on one major area, then leave time for food discoveries, neighborhood walks, and relaxed garden time.",
+        "Group your time by district. Pair Marina Bay with Gardens by the Bay for modern icons, dedicate another day to Chinatown and Little India for culture and food, then explore Sentosa or neighborhoods for contrast.",
+        "Save unhurried time for food center visits, long garden walks, and the relaxed meals that showcase Singapore's exceptional multicultural cuisine.",
+      ],
+      hero: {
+        title: "Singapore in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, combining modern architecture, diverse neighborhoods, and exceptional food scenes.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1600&q=80",
+          alt: "Marina Bay skyline in Singapore with modern architecture and water.",
+        },
+      },
+      cityStats: [
+        { value: "5.6M", label: "Residents in the city-state" },
+        { value: "4", label: "Official languages" },
+        { value: "350+", label: "Parks and gardens" },
+        { value: "12,000+", label: "Food establishments" },
+      ],
+      fit: {
+        forYou: ["Modern architecture", "Diverse food scenes", "Efficient public transit", "Safe, clean streets", "Garden and park time"],
+        notForYou: ["A packed schedule of only malls", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Marina Bay and modern icons",
+          summary: "Marina Bay, Gardens by the Bay, and skyline views.",
+          morning: "Marina Bay Sands area and Merlion",
+          afternoon: "Gardens by the Bay and Cloud Forest",
+          evening: "Marina Bay light show and dinner",
+        },
+        {
+          day: 2,
+          title: "Cultural neighborhoods",
+          summary: "Chinatown, Little India, and diverse food.",
+          morning: "Chinatown and Buddha Tooth Relic Temple",
+          afternoon: "Little India and Sri Veeramakaliamman Temple",
+          evening: "Food center dinner and neighborhood walk",
+        },
+        {
+          day: 3,
+          title: "Sentosa or neighborhoods",
+          summary: "Sentosa Island, Orchard Road, or relaxed time.",
+          morning: "Sentosa Island or Botanic Gardens",
+          afternoon: "Orchard Road or neighborhood exploration",
+          evening: "Rooftop bar or traditional dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Modern architecture",
+          description:
+            "Marina Bay showcases Singapore's futuristic skyline. The Gardens by the Bay offer a green contrast with innovative design that feels both natural and engineered.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gardens_by_the_Bay_Singapore.jpg",
+            alt: "Gardens by the Bay with Supertree Grove and modern architecture.",
+          },
+        },
+        {
+          title: "Diverse neighborhoods",
+          description:
+            "Chinatown and Little India preserve cultural heritage while offering exceptional food. Slow walks reveal temples, markets, and local life that feels authentic and vibrant.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Chinatown_Singapore.jpg",
+            alt: "Chinatown in Singapore with traditional architecture and colorful buildings.",
+          },
+        },
+        {
+          title: "Exceptional food culture",
+          description:
+            "From hawker centers to fine dining, Singapore's food scene is world-class. Long meals and local discoveries showcase the city's multicultural cuisine.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Hawker_Center_Singapore.jpg",
+            alt: "Hawker center in Singapore with food stalls and diverse cuisine.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "Year-round, though February to April is driest" },
+        { label: "Airport transfer", value: "MRT or taxi to city center" },
+        { label: "Transit tips", value: "Get an EZ-Link card for easy MRT and bus access" },
+        { label: "Ticketing", value: "Book Gardens by the Bay and major attractions in advance" },
+        { label: "Neighborhood stay", value: "Marina Bay, Orchard Road, or Chinatown areas" },
+      ],
+      checklist: [
+        "Get an EZ-Link card for transit",
+        "Book Gardens by the Bay in advance",
+        "Pack light, breathable clothing",
+        "Save offline maps for Singapore",
+        "Plan one hawker center meal",
+        "Carry cash for food centers and markets",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Singapore?",
+          answer:
+            "Yes for the core highlights. This plan balances modern icons, cultural neighborhoods, and food with enough breathing room for garden walks, neighborhood exploration, and unplanned discoveries.",
+        },
+        {
+          question: "Do I need to book attractions in advance?",
+          answer:
+            "For Gardens by the Bay and Marina Bay Sands SkyPark, yes—book in advance for timed entry. Most temples and neighborhoods don't require advance booking.",
+        },
+        {
+          question: "Is Singapore walkable?",
+          answer:
+            "Neighborhoods are walkable, but Singapore is best explored with a mix of walking and efficient MRT transit. The city is compact and well-connected.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Marina Bay offers modern convenience and skyline views. Orchard Road provides shopping and central location, while Chinatown offers cultural character.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Gardens by the Bay to avoid crowds and heat. Temples are pleasant throughout the day. Afternoons can include indoor stops or air-conditioned breaks.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For high-end restaurants, yes—especially on weekends. For hawker centers and casual spots, walk-ins are the norm. Food centers don't require reservations.",
+        },
+        {
+          question: "Is English widely spoken?",
+          answer:
+            "Yes, English is one of the official languages and widely spoken. Signs are in English, and most locals are fluent. This makes Singapore very accessible for English speakers.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokyo",
+          days: 4,
+          description: "Traditional temples, modern districts, and exceptional food culture.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Golden temples, floating markets, and vibrant street food.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Skyline views, traditional markets, and easy island escapes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "hong-kong": {
+      slug: "hong-kong",
+      city: "Hong Kong",
+      country: "China",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Skyline lovers", "Food enthusiasts"],
+      style: ["Skyline views", "Traditional markets", "Easy island escapes"],
+      pacing: [
+        "Hong Kong rewards a calm pace across its mix of urban energy and natural escapes. Focus each day on one major area, then leave time for market visits, island trips, and spontaneous food discoveries.",
+        "Group your time by district. Pair Victoria Peak with Central for skyline views, dedicate another day to Kowloon for markets and culture, then explore an outlying island like Lantau for contrast.",
+        "Save unhurried time for market walks, long island visits, and the relaxed meals that showcase Hong Kong's exceptional food culture.",
+      ],
+      hero: {
+        title: "Hong Kong in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, with skyline views, traditional markets, and easy island escapes.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?auto=format&fit=crop&w=1600&q=80",
+          alt: "Hong Kong skyline with Victoria Harbour and modern skyscrapers.",
+        },
+      },
+      cityStats: [
+        { value: "7.5M", label: "Residents in the city" },
+        { value: "263", label: "Islands in Hong Kong" },
+        { value: "40%", label: "Land designated as country parks" },
+        { value: "11,000+", label: "Restaurants and food establishments" },
+      ],
+      fit: {
+        forYou: ["Iconic skyline views", "Traditional markets", "Island day trips", "Efficient public transit", "Diverse food scenes"],
+        notForYou: ["A packed schedule of only shopping", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Skyline and Peak",
+          summary: "Victoria Peak, Star Ferry, and harbor views.",
+          morning: "Victoria Peak and Sky Terrace",
+          afternoon: "Star Ferry to Kowloon and Tsim Sha Tsui",
+          evening: "Avenue of Stars and Symphony of Lights",
+        },
+        {
+          day: 2,
+          title: "Markets and culture",
+          summary: "Temple Street, markets, and local neighborhoods.",
+          morning: "Temple Street Night Market area",
+          afternoon: "Wong Tai Sin Temple or local markets",
+          evening: "Kowloon food walk and neighborhood exploration",
+        },
+        {
+          day: 3,
+          title: "Island escape",
+          summary: "Lantau Island, Big Buddha, or relaxed time.",
+          morning: "Lantau Island and Ngong Ping",
+          afternoon: "Big Buddha and Po Lin Monastery",
+          evening: "Return to city or island dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Iconic skyline",
+          description:
+            "Victoria Peak offers the classic Hong Kong view. The Star Ferry provides a scenic way to cross the harbor while taking in the skyline from water level.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Victoria_Peak_Hong_Kong.jpg",
+            alt: "View from Victoria Peak showing Hong Kong skyline and harbor.",
+          },
+        },
+        {
+          title: "Traditional markets",
+          description:
+            "Temple Street and other markets showcase local life with food, goods, and evening energy that feels authentic and vibrant.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Temple_Street_Market_Hong_Kong.jpg",
+            alt: "Temple Street Night Market with stalls and evening lights.",
+          },
+        },
+        {
+          title: "Island escapes",
+          description:
+            "Lantau and other outlying islands offer natural contrast to Hong Kong's urban energy. Day trips provide hiking, beaches, and quiet moments.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Big_Buddha_Lantau.jpg",
+            alt: "Big Buddha statue on Lantau Island with mountain backdrop.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for cooler, drier weather" },
+        { label: "Airport transfer", value: "Airport Express train or bus to city center" },
+        { label: "Transit tips", value: "Get an Octopus card for easy MTR, bus, and ferry access" },
+        { label: "Ticketing", value: "Book Peak Tram and major attractions in advance" },
+        { label: "Neighborhood stay", value: "Central, Tsim Sha Tsui, or Causeway Bay" },
+      ],
+      checklist: [
+        "Get an Octopus card for transit",
+        "Book Peak Tram tickets in advance",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Hong Kong",
+        "Plan one island day trip",
+        "Carry cash for markets and street food",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Hong Kong?",
+          answer:
+            "Yes for the core highlights. This plan balances skyline views, markets, and island time with enough breathing room for food discoveries, neighborhood walks, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions in advance?",
+          answer:
+            "For Victoria Peak Tram and major attractions, yes—book in advance for timed entry. Markets and neighborhoods don't require advance booking.",
+        },
+        {
+          question: "Is Hong Kong walkable?",
+          answer:
+            "Neighborhoods are walkable, but Hong Kong is hilly and spread out. Use the efficient MTR system for longer distances, then explore on foot within each area. The Star Ferry offers scenic transit.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Central offers good MTR access and central location. Tsim Sha Tsui provides harbor views and easy access to Kowloon, while Causeway Bay offers shopping and local character.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Victoria Peak to avoid crowds and get clearer views. Markets are best in the evening. Island trips work well as full-day excursions.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For high-end restaurants, yes—especially on weekends. For dim sum and casual spots, walk-ins are common. Food markets don't require reservations.",
+        },
+        {
+          question: "Is English widely spoken?",
+          answer:
+            "Yes, English is widely spoken alongside Cantonese. Signs are bilingual, and most locals in tourist areas speak English. This makes Hong Kong very accessible.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokyo",
+          days: 4,
+          description: "Traditional temples, modern districts, and exceptional food culture.",
+        },
+        {
+          slug: "singapore",
+          city: "Singapore",
+          days: 3,
+          description: "Modern architecture, diverse neighborhoods, and exceptional food.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Golden temples, floating markets, and vibrant street food.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "new-york": {
+      slug: "new-york",
+      city: "New York",
+      country: "USA",
+      days: 4,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Museum lovers", "Neighborhood explorers"],
+      style: ["Iconic neighborhoods", "World-class museums", "Diverse food scenes"],
+      pacing: [
+        "New York rewards a calm pace despite its energy. Focus each day on one major area, then leave time for neighborhood walks, spontaneous food discoveries, and relaxed park time.",
+        "Group your time by borough and neighborhood clusters. Pair Manhattan's museums with Central Park, dedicate another day to Brooklyn for bridges and local life, then explore different Manhattan neighborhoods for contrast.",
+        "Save unhurried time for long park walks, neighborhood exploration, and the relaxed meals that showcase New York's exceptional food diversity.",
+      ],
+      hero: {
+        title: "New York in 4 days",
+        subtitle:
+          "Explore the essentials with room to breathe, covering iconic neighborhoods, world-class museums, and diverse food scenes.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1600&q=80",
+          alt: "New York City skyline with iconic buildings and Central Park.",
+        },
+      },
+      cityStats: [
+        { value: "8.3M", label: "Residents in the city" },
+        { value: "5", label: "Boroughs across the city" },
+        { value: "100+", label: "Museums and galleries" },
+        { value: "24,000+", label: "Restaurants across the city" },
+      ],
+      fit: {
+        forYou: ["Iconic landmarks", "World-class museums", "Diverse neighborhoods", "Efficient public transit", "Park and green space"],
+        notForYou: ["A packed schedule of only shopping", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Manhattan core",
+          summary: "Central Park, museums, and Upper East Side.",
+          morning: "Central Park and reservoir walk",
+          afternoon: "Metropolitan Museum or Museum of Natural History",
+          evening: "Upper East Side or neighborhood dinner",
+        },
+        {
+          day: 2,
+          title: "Midtown and icons",
+          summary: "Times Square, Empire State, and classic sights.",
+          morning: "Times Square and Broadway area",
+          afternoon: "Empire State Building or High Line",
+          evening: "Theater district or neighborhood exploration",
+        },
+        {
+          day: 3,
+          title: "Brooklyn and bridges",
+          summary: "Brooklyn Bridge, DUMBO, and local neighborhoods.",
+          morning: "Brooklyn Bridge walk from Manhattan",
+          afternoon: "DUMBO and Brooklyn Heights",
+          evening: "Brooklyn neighborhood dinner",
+        },
+        {
+          day: 4,
+          title: "Neighborhoods and culture",
+          summary: "SoHo, Greenwich Village, or relaxed time.",
+          morning: "SoHo or Greenwich Village walk",
+          afternoon: "Neighborhood exploration and shopping",
+          evening: "West Village dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Iconic skyline",
+          description:
+            "New York's skyline is instantly recognizable. Views from Brooklyn Bridge, Central Park, or observation decks showcase the city's scale and energy.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Brooklyn_Bridge_New_York.jpg",
+            alt: "Brooklyn Bridge with Manhattan skyline in the background.",
+          },
+        },
+        {
+          title: "World-class museums",
+          description:
+            "The Metropolitan Museum and Museum of Natural History offer world-class collections. Plan one focused visit, then balance it with park time and neighborhood walks.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Metropolitan_Museum_New_York.jpg",
+            alt: "Metropolitan Museum of Art building with grand architecture.",
+          },
+        },
+        {
+          title: "Diverse neighborhoods",
+          description:
+            "From SoHo to Greenwich Village, New York's neighborhoods each have distinct character. Slow walks reveal local shops, cafes, and residential life.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Greenwich_Village_New_York.jpg",
+            alt: "Greenwich Village street with brownstone buildings and tree-lined sidewalks.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to November" },
+        { label: "Airport transfer", value: "AirTrain and subway or taxi to city center" },
+        { label: "Transit tips", value: "Get a MetroCard for easy subway and bus access" },
+        { label: "Ticketing", value: "Book major museums and observation decks in advance" },
+        { label: "Neighborhood stay", value: "Manhattan (Midtown, Upper East/West) or Brooklyn" },
+      ],
+      checklist: [
+        "Get a MetroCard for transit",
+        "Book major museum tickets in advance",
+        "Pack comfortable walking shoes",
+        "Save offline maps for New York",
+        "Plan one long park walk",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 4 days enough for New York?",
+          answer:
+            "Yes for the core highlights. This plan balances iconic landmarks, museums, and neighborhoods with enough breathing room for park time, food discoveries, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions in advance?",
+          answer:
+            "For major museums like the Met and observation decks like Empire State Building, yes—book in advance for timed entry and shorter waits, especially in peak season.",
+        },
+        {
+          question: "Is New York walkable?",
+          answer:
+            "Neighborhoods are walkable, but New York is vast. Use the efficient subway system for longer distances, then explore on foot within each area. Walking between nearby neighborhoods is also enjoyable.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Manhattan offers central location and easy access to major sights. Midtown provides good transit connections, while Upper East/West offers quieter streets near Central Park.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for museums to avoid crowds. Central Park is pleasant throughout the day. Afternoons can include neighborhood walks or indoor stops.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends and for dinner. Many places accept walk-ins for lunch. Food markets and casual spots don't require reservations.",
+        },
+        {
+          question: "Is New York safe?",
+          answer:
+            "Yes, generally very safe, especially in tourist areas. Use common sense, stay aware of your surroundings, and avoid isolated areas late at night. The subway is safe and efficient.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "london",
+          city: "London",
+          days: 3,
+          description: "Iconic sights, museums, and neighborhoods across the Thames.",
+        },
+        {
+          slug: "paris",
+          city: "Paris",
+          days: 3,
+          description: "Classic landmarks, museums, and cafe neighborhoods.",
+        },
+        {
+          slug: "san-francisco",
+          city: "San Francisco",
+          days: 3,
+          description: "Hillside neighborhoods, waterfront walks, and diverse cuisine.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "san-francisco": {
+      slug: "san-francisco",
+      city: "San Francisco",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Food lovers", "Neighborhood explorers"],
+      style: ["Hillside neighborhoods", "Waterfront walks", "Diverse cuisine"],
+      pacing: [
+        "San Francisco rewards a calm pace across its hilly neighborhoods. Focus each day on one major area, then leave time for waterfront walks, spontaneous food discoveries, and relaxed park time.",
+        "Group your time by district. Pair Fisherman's Wharf with North Beach for classic sights, dedicate another day to Golden Gate Bridge and Presidio, then explore neighborhoods like Mission or Haight-Ashbury for local character.",
+        "Save unhurried time for long waterfront walks, neighborhood exploration, and the relaxed meals that showcase San Francisco's exceptional food diversity.",
+      ],
+      hero: {
+        title: "San Francisco in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, featuring hillside neighborhoods, waterfront walks, and diverse cuisine.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1600&q=80",
+          alt: "Golden Gate Bridge in San Francisco with bay and city in background.",
+        },
+      },
+      cityStats: [
+        { value: "875K", label: "Residents in the city" },
+        { value: "43", label: "Hills across the city" },
+        { value: "200+", label: "Parks and green spaces" },
+        { value: "4,500+", label: "Restaurants across the city" },
+      ],
+      fit: {
+        forYou: ["Iconic Golden Gate Bridge", "Hillside neighborhoods", "Waterfront walks", "Diverse food scenes", "Park and green space"],
+        notForYou: ["A packed schedule of only shopping", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Golden Gate and Presidio",
+          summary: "Golden Gate Bridge, Presidio, and waterfront.",
+          morning: "Golden Gate Bridge walk or bike",
+          afternoon: "Presidio and Crissy Field",
+          evening: "Marina District or neighborhood dinner",
+        },
+        {
+          day: 2,
+          title: "Fisherman's Wharf and Alcatraz",
+          summary: "Waterfront, Alcatraz, and classic sights.",
+          morning: "Alcatraz tour (book in advance)",
+          afternoon: "Fisherman's Wharf and Pier 39",
+          evening: "North Beach neighborhood dinner",
+        },
+        {
+          day: 3,
+          title: "Neighborhoods and culture",
+          summary: "Mission, Haight-Ashbury, or relaxed time.",
+          morning: "Mission District and murals",
+          afternoon: "Haight-Ashbury or Golden Gate Park",
+          evening: "Neighborhood dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Iconic Golden Gate",
+          description:
+            "The Golden Gate Bridge is San Francisco's signature. Walking or biking across offers bay views and a sense of the city's scale and natural setting.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Golden_Gate_Bridge_Walk.jpg",
+            alt: "People walking across Golden Gate Bridge with bay views.",
+          },
+        },
+        {
+          title: "Hillside neighborhoods",
+          description:
+            "San Francisco's hills create distinct neighborhoods with character. From North Beach to Mission, each area offers local shops, cafes, and residential charm.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/San_Francisco_Hills.jpg",
+            alt: "San Francisco hillside neighborhood with colorful houses and steep streets.",
+          },
+        },
+        {
+          title: "Waterfront walks",
+          description:
+            "The Embarcadero and Marina offer long waterfront paths. Slow walks provide bay views, park time, and easy access to neighborhoods and food.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Embarcadero_San_Francisco.jpg",
+            alt: "Embarcadero waterfront in San Francisco with bay and city skyline.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for warmer, drier weather" },
+        { label: "Airport transfer", value: "BART train or taxi to city center" },
+        { label: "Transit tips", value: "Get a Clipper card for easy Muni and BART access" },
+        { label: "Ticketing", value: "Book Alcatraz tours well in advance" },
+        { label: "Neighborhood stay", value: "Union Square, Fisherman's Wharf, or Mission areas" },
+      ],
+      checklist: [
+        "Book Alcatraz tour well in advance",
+        "Get a Clipper card for transit",
+        "Pack comfortable walking shoes for hills",
+        "Save offline maps for San Francisco",
+        "Plan one long waterfront walk",
+        "Carry layers for changing weather",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for San Francisco?",
+          answer:
+            "Yes for the core highlights. This plan balances iconic sights, neighborhoods, and waterfront time with enough breathing room for food discoveries, park walks, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book Alcatraz in advance?",
+          answer:
+            "Yes, absolutely. Alcatraz tours sell out weeks in advance, especially in peak season. Book as early as possible through the official National Park Service website.",
+        },
+        {
+          question: "Is San Francisco walkable?",
+          answer:
+            "Neighborhoods are walkable, but San Francisco is hilly. Use Muni and BART for longer distances, then explore on foot within each area. The hills are part of the experience.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Union Square offers central location and good transit. Fisherman's Wharf provides waterfront access, while Mission offers local character and food scenes.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Golden Gate Bridge to avoid crowds and fog. Alcatraz tours have set times. Afternoons can include neighborhood walks or indoor stops.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many places accept walk-ins for lunch. Food markets and casual spots don't require reservations.",
+        },
+        {
+          question: "What about the weather?",
+          answer:
+            "San Francisco has microclimates and can be cool even in summer. Bring layers—fog is common, especially near the water. The city is known for its changeable weather.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "new-york",
+          city: "New York",
+          days: 4,
+          description: "Iconic neighborhoods, world-class museums, and diverse food scenes.",
+        },
+        {
+          slug: "los-angeles",
+          city: "Los Angeles",
+          days: 3,
+          description: "Beaches, iconic neighborhoods, and relaxed coastal vibes.",
+        },
+        {
+          slug: "london",
+          city: "London",
+          days: 3,
+          description: "Iconic sights, museums, and neighborhoods across the Thames.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "los-angeles": {
+      slug: "los-angeles",
+      city: "Los Angeles",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Beach lovers", "Entertainment seekers"],
+      style: ["Beaches", "Iconic neighborhoods", "Relaxed coastal vibes"],
+      pacing: [
+        "Los Angeles rewards a calm pace across its spread-out neighborhoods. Focus each day on one major area, then leave time for beach time, spontaneous food discoveries, and relaxed neighborhood walks.",
+        "Group your time by region. Pair Santa Monica with Venice for beach culture, dedicate another day to Hollywood and Griffith Observatory, then explore neighborhoods like Beverly Hills or Downtown for contrast.",
+        "Save unhurried time for long beach walks, neighborhood exploration, and the relaxed meals that showcase LA's diverse food culture.",
+      ],
+      hero: {
+        title: "Los Angeles in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, balancing beaches, iconic neighborhoods, and relaxed coastal vibes.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1756072226051-f6835aec4f9a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Los Angeles downtown skyline at sunset with city lights.",
+        },
+      },
+      cityStats: [
+        { value: "4M", label: "Residents in the city" },
+        { value: "75", label: "Miles of coastline" },
+        { value: "88", label: "Incorporated cities in LA County" },
+        { value: "10,000+", label: "Restaurants across the metro area" },
+      ],
+      fit: {
+        forYou: ["Beach time and coastal walks", "Iconic neighborhoods", "Entertainment culture", "Diverse food scenes", "Relaxed pace"],
+        notForYou: ["A packed schedule of only theme parks", "Museum-focused only", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Beaches and coast",
+          summary: "Santa Monica, Venice Beach, and coastal walks.",
+          morning: "Santa Monica Pier and beach",
+          afternoon: "Venice Beach boardwalk and canals",
+          evening: "Beach sunset and dinner",
+        },
+        {
+          day: 2,
+          title: "Hollywood and views",
+          summary: "Griffith Observatory, Hollywood, and iconic sights.",
+          morning: "Griffith Observatory and park",
+          afternoon: "Hollywood Walk of Fame and area",
+          evening: "Sunset Boulevard or neighborhood dinner",
+        },
+        {
+          day: 3,
+          title: "Neighborhoods and culture",
+          summary: "Beverly Hills, Downtown, or relaxed time.",
+          morning: "Beverly Hills or Downtown LA",
+          afternoon: "Neighborhood exploration and shopping",
+          evening: "Neighborhood dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Iconic beaches",
+          description:
+            "Santa Monica and Venice Beach showcase LA's coastal culture. Long beach walks, pier visits, and relaxed time by the water are central to the experience.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Venice_Beach_Los_Angeles.jpg",
+            alt: "Venice Beach boardwalk with palm trees and ocean.",
+          },
+        },
+        {
+          title: "Griffith Observatory",
+          description:
+            "Griffith Observatory offers city views and a sense of LA's scale. The park surrounding it provides green space and hiking trails with city panoramas.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Griffith_Observatory_Los_Angeles.jpg",
+            alt: "Griffith Observatory with city skyline in background.",
+          },
+        },
+        {
+          title: "Diverse neighborhoods",
+          description:
+            "From Beverly Hills to Downtown, LA's neighborhoods each have distinct character. Slow drives or walks reveal local shops, cafes, and residential charm.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Beverly_Hills_Los_Angeles.jpg",
+            alt: "Beverly Hills street with palm trees and upscale shops.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "Year-round, though spring and fall are most pleasant" },
+        { label: "Airport transfer", value: "FlyAway bus or taxi to city center" },
+        { label: "Transit tips", value: "Rental car recommended; Metro for some areas" },
+        { label: "Ticketing", value: "Book major attractions like Universal Studios in advance" },
+        { label: "Neighborhood stay", value: "Santa Monica, Hollywood, or Downtown areas" },
+      ],
+      checklist: [
+        "Consider rental car for flexibility",
+        "Book major attractions in advance",
+        "Pack beach essentials and sunscreen",
+        "Save offline maps for Los Angeles",
+        "Plan one long beach walk",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Los Angeles?",
+          answer:
+            "Yes for the core highlights. This plan balances beaches, iconic neighborhoods, and entertainment culture with enough breathing room for food discoveries, relaxed time, and unplanned stops.",
+        },
+        {
+          question: "Do I need a car in LA?",
+          answer:
+            "A rental car provides the most flexibility, as LA is spread out. Public transit exists but is limited. Ride-sharing services are also widely available and convenient.",
+        },
+        {
+          question: "Is Los Angeles walkable?",
+          answer:
+            "Neighborhoods can be walkable, but LA is very spread out. Beach areas like Santa Monica and Venice are more walkable. Most areas require transportation between them.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Santa Monica offers beach access and walkable areas. Hollywood provides central location, while Downtown offers urban character and good transit connections.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for beaches to avoid crowds and get parking. Griffith Observatory is pleasant throughout the day. Afternoons can include neighborhood exploration.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many places accept walk-ins for lunch. Food markets and casual spots don't require reservations.",
+        },
+        {
+          question: "What about traffic?",
+          answer:
+            "LA traffic is real. Plan extra time for driving, especially during rush hours. Consider staying in one area per day to minimize driving time.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "san-francisco",
+          city: "San Francisco",
+          days: 3,
+          description: "Hillside neighborhoods, waterfront walks, and diverse cuisine.",
+        },
+        {
+          slug: "sydney",
+          city: "Sydney",
+          days: 3,
+          description: "Harbor views, coastal walks, and relaxed beach time.",
+        },
+        {
+          slug: "new-york",
+          city: "New York",
+          days: 4,
+          description: "Iconic neighborhoods, world-class museums, and diverse food scenes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sydney: {
+      slug: "sydney",
+      city: "Sydney",
+      country: "Australia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Beach lovers", "Harbor enthusiasts"],
+      style: ["Harbor views", "Coastal walks", "Relaxed beach time"],
+      pacing: [
+        "Sydney rewards a calm pace across its harbor and coastal areas. Focus each day on one major area, then leave time for harbor walks, beach time, and spontaneous food discoveries.",
+        "Group your time by region. Pair the Opera House with Circular Quay for iconic sights, dedicate another day to Bondi Beach and coastal walks, then explore neighborhoods like The Rocks or Surry Hills for local character.",
+        "Save unhurried time for long harbor walks, beach relaxation, and the relaxed meals that showcase Sydney's diverse food culture.",
+      ],
+      hero: {
+        title: "Sydney in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, with harbor views, coastal walks, and relaxed beach time.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1600&q=80",
+          alt: "Sydney Opera House and Harbour Bridge with harbor in foreground.",
+        },
+      },
+      cityStats: [
+        { value: "5.3M", label: "Residents in the metro area" },
+        { value: "100+", label: "Beaches along the coast" },
+        { value: "70", label: "Harbor islands" },
+        { value: "3,000+", label: "Restaurants across the city" },
+      ],
+      fit: {
+        forYou: ["Iconic Opera House and Harbour Bridge", "Harbor walks and ferry rides", "Beach time and coastal walks", "Diverse food scenes", "Relaxed pace"],
+        notForYou: ["A packed schedule of only beaches", "Museum-focused only", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Harbor icons",
+          summary: "Opera House, Harbour Bridge, and Circular Quay.",
+          morning: "Sydney Opera House tour or exterior",
+          afternoon: "Circular Quay and Harbour Bridge walk",
+          evening: "The Rocks area and dinner",
+        },
+        {
+          day: 2,
+          title: "Beaches and coast",
+          summary: "Bondi Beach, coastal walk, and beach time.",
+          morning: "Bondi Beach and promenade",
+          afternoon: "Coastal walk to Coogee or Bronte",
+          evening: "Beach area dinner or return to city",
+        },
+        {
+          day: 3,
+          title: "Neighborhoods and culture",
+          summary: "Royal Botanic Gardens, neighborhoods, or relaxed time.",
+          morning: "Royal Botanic Gardens and Mrs. Macquarie's Chair",
+          afternoon: "Surry Hills or neighborhood exploration",
+          evening: "Neighborhood dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Iconic harbor",
+          description:
+            "The Opera House and Harbour Bridge define Sydney's skyline. Harbor walks and ferry rides provide the best views and a sense of the city's relationship with the water.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sydney_Harbour_Ferry.jpg",
+            alt: "Ferry on Sydney Harbour with Opera House and bridge in background.",
+          },
+        },
+        {
+          title: "Coastal walks",
+          description:
+            "Bondi to Coogee coastal walk showcases Sydney's beach culture. The path offers ocean views, beach access, and a relaxed pace that feels both active and peaceful.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bondi_Beach_Sydney.jpg",
+            alt: "Bondi Beach in Sydney with golden sand and ocean.",
+          },
+        },
+        {
+          title: "Harbor neighborhoods",
+          description:
+            "The Rocks preserves historic character near the harbor, while neighborhoods like Surry Hills offer local cafes, shops, and residential charm.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/The_Rocks_Sydney.jpg",
+            alt: "The Rocks neighborhood in Sydney with historic buildings.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "September to November or March to May" },
+        { label: "Airport transfer", value: "Airport Link train or taxi to city center" },
+        { label: "Transit tips", value: "Get an Opal card for easy ferry, train, and bus access" },
+        { label: "Ticketing", value: "Book Opera House tours in advance" },
+        { label: "Neighborhood stay", value: "Circular Quay, The Rocks, or Bondi areas" },
+      ],
+      checklist: [
+        "Get an Opal card for transit",
+        "Book Opera House tour in advance",
+        "Pack beach essentials and sunscreen",
+        "Save offline maps for Sydney",
+        "Plan one harbor ferry ride",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Sydney?",
+          answer:
+            "Yes for the core highlights. This plan balances harbor icons, beaches, and neighborhoods with enough breathing room for coastal walks, food discoveries, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book Opera House tours?",
+          answer:
+            "Yes, book in advance for guided tours. You can also see the exterior and enjoy the harbor views without a tour. The building is impressive from outside.",
+        },
+        {
+          question: "Is Sydney walkable?",
+          answer:
+            "Harbor areas and neighborhoods are walkable, but Sydney is spread out. Use ferries, trains, and buses for longer distances, then explore on foot within each area.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Circular Quay offers harbor views and easy access to major sights. The Rocks provides historic character, while Bondi offers beach access and relaxed vibes.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for beaches to avoid crowds and get good light. Harbor areas are pleasant throughout the day. Afternoons can include neighborhood walks.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many places accept walk-ins for lunch. Food markets and casual spots don't require reservations.",
+        },
+        {
+          question: "What about the weather?",
+          answer:
+            "Sydney has a temperate climate. Summers (Dec-Feb) are warm, winters (Jun-Aug) are mild. Bring layers and sunscreen year-round. The weather is generally pleasant.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "melbourne",
+          city: "Melbourne",
+          days: 3,
+          description: "Laneway culture, coffee scenes, and easygoing neighborhoods.",
+        },
+        {
+          slug: "los-angeles",
+          city: "Los Angeles",
+          days: 3,
+          description: "Beaches, iconic neighborhoods, and relaxed coastal vibes.",
+        },
+        {
+          slug: "san-francisco",
+          city: "San Francisco",
+          days: 3,
+          description: "Hillside neighborhoods, waterfront walks, and diverse cuisine.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    melbourne: {
+      slug: "melbourne",
+      city: "Melbourne",
+      country: "Australia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Coffee lovers", "Culture seekers"],
+      style: ["Laneway culture", "Coffee scenes", "Easygoing neighborhoods"],
+      pacing: [
+        "Melbourne rewards a calm pace across its laneways and neighborhoods. Focus each day on one major area, then leave time for cafe stops, spontaneous food discoveries, and relaxed neighborhood walks.",
+        "Group your time by district. Pair the CBD with laneways for coffee and culture, dedicate another day to St. Kilda or Fitzroy for local character, then explore markets and neighborhoods for contrast.",
+        "Save unhurried time for long cafe sessions, laneway exploration, and the relaxed meals that showcase Melbourne's exceptional food and coffee culture.",
+      ],
+      hero: {
+        title: "Melbourne in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, focused on laneway culture, coffee scenes, and easygoing neighborhoods.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1757807776083-221d653b161b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Melbourne city skyline with Yarra River and modern architecture.",
+        },
+      },
+      cityStats: [
+        { value: "5M", label: "Residents in the metro area" },
+        { value: "40+", label: "Laneways with street art" },
+        { value: "2,000+", label: "Cafes across the city" },
+        { value: "4,000+", label: "Restaurants across the city" },
+      ],
+      fit: {
+        forYou: ["Laneway exploration", "Coffee culture", "Diverse food scenes", "Easygoing neighborhoods", "Art and culture"],
+        notForYou: ["A packed schedule of only beaches", "Iconic landmarks focus", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "CBD and laneways",
+          summary: "Federation Square, laneways, and coffee culture.",
+          morning: "Federation Square and Flinders Street Station",
+          afternoon: "Laneway exploration and street art",
+          evening: "CBD dinner or neighborhood exploration",
+        },
+        {
+          day: 2,
+          title: "Markets and neighborhoods",
+          summary: "Queen Victoria Market, neighborhoods, and local life.",
+          morning: "Queen Victoria Market",
+          afternoon: "Fitzroy or St. Kilda neighborhood walk",
+          evening: "Neighborhood dinner and local scene",
+        },
+        {
+          day: 3,
+          title: "Culture and relaxation",
+          summary: "Royal Botanic Gardens, museums, or relaxed time.",
+          morning: "Royal Botanic Gardens or National Gallery",
+          afternoon: "Neighborhood exploration or shopping",
+          evening: "Relaxed dinner or cafe time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Laneway culture",
+          description:
+            "Melbourne's laneways are hidden gems with street art, cafes, and local character. Slow walks reveal murals, coffee shops, and a creative energy that defines the city.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Hosier_Lane_Melbourne.jpg",
+            alt: "Hosier Lane in Melbourne with colorful street art and murals.",
+          },
+        },
+        {
+          title: "Coffee culture",
+          description:
+            "Melbourne is known for its exceptional coffee scene. Long cafe sessions, flat whites, and relaxed mornings are central to the local rhythm.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Melbourne_Cafe.jpg",
+            alt: "Coffee shop in Melbourne laneway with outdoor seating.",
+          },
+        },
+        {
+          title: "Easygoing neighborhoods",
+          description:
+            "Fitzroy and St. Kilda showcase Melbourne's neighborhood character with local shops, cafes, and residential charm that feels both creative and relaxed.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Fitzroy_Melbourne.jpg",
+            alt: "Fitzroy neighborhood in Melbourne with colorful buildings.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "September to November or March to May" },
+        { label: "Airport transfer", value: "SkyBus or taxi to city center" },
+        { label: "Transit tips", value: "Get a myki card for easy tram, train, and bus access" },
+        { label: "Ticketing", value: "Book major attractions in advance if needed" },
+        { label: "Neighborhood stay", value: "CBD, Fitzroy, or St. Kilda areas" },
+      ],
+      checklist: [
+        "Get a myki card for transit",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Melbourne",
+        "Plan one long cafe session",
+        "Explore laneways with street art",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Melbourne?",
+          answer:
+            "Yes for the core highlights. This plan balances laneways, neighborhoods, and markets with enough breathing room for cafe time, food discoveries, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions in advance?",
+          answer:
+            "Most laneways and neighborhoods don't require booking. For major museums or special events, check in advance. Markets are open and accessible.",
+        },
+        {
+          question: "Is Melbourne walkable?",
+          answer:
+            "The CBD and neighborhoods are very walkable. Trams provide easy access between areas. Melbourne is known for being pedestrian-friendly.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "CBD offers central location and easy access to laneways. Fitzroy provides local character, while St. Kilda offers beach access and relaxed vibes.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for markets to avoid crowds. Laneways are pleasant throughout the day. Afternoons can include neighborhood walks or cafe time.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many cafes and casual spots accept walk-ins. Food markets don't require reservations.",
+        },
+        {
+          question: "What about the coffee?",
+          answer:
+            "Melbourne's coffee is exceptional. Don't miss trying a flat white, and take time to explore different cafes. The coffee culture is a central part of the experience.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "sydney",
+          city: "Sydney",
+          days: 3,
+          description: "Harbor views, coastal walks, and relaxed beach time.",
+        },
+        {
+          slug: "amsterdam",
+          city: "Amsterdam",
+          days: 3,
+          description: "Canal walks, world-class museums, and relaxed neighborhoods.",
+        },
+        {
+          slug: "barcelona",
+          city: "Barcelona",
+          days: 4,
+          description: "Gaudi architecture, walkable neighborhoods, and beaches.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    dubai: {
+      slug: "dubai",
+      city: "Dubai",
+      country: "UAE",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Modern architecture fans", "Luxury seekers"],
+      style: ["Modern architecture", "Traditional souks", "Desert experiences"],
+      pacing: [
+        "Dubai rewards a calm pace across its mix of modern and traditional. Focus each day on one major area, then leave time for souk visits, spontaneous food discoveries, and relaxed waterfront time.",
+        "Group your time by district. Pair Burj Khalifa with Dubai Mall for modern icons, dedicate another day to traditional souks and old Dubai, then explore a desert experience or beach for contrast.",
+        "Save unhurried time for souk walks, long mall visits, and the relaxed meals that showcase Dubai's diverse food culture.",
+      ],
+      hero: {
+        title: "Dubai in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, pairing modern architecture, traditional souks, and desert experiences.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=80",
+          alt: "Burj Khalifa in Dubai with modern skyline.",
+        },
+      },
+      cityStats: [
+        { value: "3.4M", label: "Residents in the city" },
+        { value: "828m", label: "Burj Khalifa height (world's tallest)" },
+        { value: "200+", label: "Nationalities in the city" },
+        { value: "365", label: "Days of sunshine per year" },
+      ],
+      fit: {
+        forYou: ["Modern architecture", "Traditional souks", "Desert experiences", "Luxury shopping", "Diverse food scenes"],
+        notForYou: ["A packed schedule of only malls", "Beach-focused only", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Modern icons",
+          summary: "Burj Khalifa, Dubai Mall, and modern architecture.",
+          morning: "Burj Khalifa observation deck",
+          afternoon: "Dubai Mall and Dubai Fountain",
+          evening: "Fountain show and dinner",
+        },
+        {
+          day: 2,
+          title: "Traditional Dubai",
+          summary: "Gold Souk, Spice Souk, and old Dubai.",
+          morning: "Gold Souk and Spice Souk",
+          afternoon: "Dubai Museum and Al Fahidi Historic District",
+          evening: "Dubai Creek and traditional dinner",
+        },
+        {
+          day: 3,
+          title: "Desert or beach",
+          summary: "Desert safari, beach time, or relaxed exploration.",
+          morning: "Desert safari or Jumeirah Beach",
+          afternoon: "Beach time or Palm Jumeirah",
+          evening: "Relaxed dinner or return from desert",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Modern architecture",
+          description:
+            "Burj Khalifa and the Dubai skyline showcase ambitious modern design. The observation deck offers city views, while the surrounding area provides shopping and dining.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubai_Marina_Skyline.jpg",
+            alt: "Dubai Marina skyline with modern skyscrapers.",
+          },
+        },
+        {
+          title: "Traditional souks",
+          description:
+            "The Gold Souk and Spice Souk preserve traditional market culture. Slow walks reveal local goods, bargaining, and an authentic side of Dubai beyond the modern icons.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gold_Souk_Dubai.jpg",
+            alt: "Gold Souk in Dubai with shops and traditional architecture.",
+          },
+        },
+        {
+          title: "Desert experiences",
+          description:
+            "Desert safaris offer dune bashing, camel rides, and sunset views. The contrast between city and desert showcases Dubai's unique setting.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubai_Desert.jpg",
+            alt: "Desert dunes in Dubai with sunset colors.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to March for cooler weather" },
+        { label: "Airport transfer", value: "Metro or taxi to city center" },
+        { label: "Transit tips", value: "Get a Nol card for easy Metro and bus access" },
+        { label: "Ticketing", value: "Book Burj Khalifa and desert safaris in advance" },
+        { label: "Neighborhood stay", value: "Downtown Dubai, Dubai Marina, or near the beach" },
+      ],
+      checklist: [
+        "Book Burj Khalifa tickets in advance",
+        "Book desert safari if interested",
+        "Get a Nol card for transit",
+        "Pack light, breathable clothing",
+        "Save offline maps for Dubai",
+        "Carry cash for souks",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Dubai?",
+          answer:
+            "Yes for the core highlights. This plan balances modern icons, traditional souks, and desert time with enough breathing room for food discoveries, shopping, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions in advance?",
+          answer:
+            "For Burj Khalifa, yes—book in advance for timed entry. Desert safaris should also be booked ahead. Souks and neighborhoods don't require advance booking.",
+        },
+        {
+          question: "Is Dubai walkable?",
+          answer:
+            "Some areas are walkable, but Dubai is spread out and can be hot. Use the Metro for longer distances, then explore on foot within each area. Taxis are also convenient.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown Dubai offers proximity to Burj Khalifa and Dubai Mall. Dubai Marina provides modern convenience, while areas near the beach offer resort-style stays.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early to avoid heat, especially for outdoor activities. Malls provide air-conditioned breaks. Desert safaris typically run in the afternoon and evening.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For high-end restaurants, yes—especially on weekends. Many places accept walk-ins. Food courts in malls don't require reservations.",
+        },
+        {
+          question: "What about dress code?",
+          answer:
+            "Dubai is relatively liberal, but respectful dress is appreciated, especially in traditional areas. Beach areas are more relaxed. Cover shoulders and knees in souks and mosques.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "singapore",
+          city: "Singapore",
+          days: 3,
+          description: "Modern architecture, diverse neighborhoods, and exceptional food.",
+        },
+        {
+          slug: "tokyo",
+          city: "Tokyo",
+          days: 4,
+          description: "Traditional temples, modern districts, and exceptional food culture.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Skyline views, traditional markets, and easy island escapes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    marrakech: {
+      slug: "marrakech",
+      city: "Marrakech",
+      country: "Morocco",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture seekers", "Market lovers"],
+      style: ["Historic medinas", "Vibrant souks", "Tranquil gardens"],
+      pacing: [
+        "Marrakech rewards a calm pace despite its energy. Focus each day on one major area, then leave time for souk visits, garden breaks, and spontaneous food discoveries.",
+        "Group your time by area. Pair the medina with souks for traditional culture, dedicate another day to gardens and palaces, then explore neighborhoods like Gueliz for modern contrast.",
+        "Save unhurried time for souk walks, long garden visits, and the relaxed meals that showcase Marrakech's exceptional food culture.",
+      ],
+      hero: {
+        title: "Marrakech in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, featuring historic medinas, vibrant souks, and tranquil gardens.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?auto=format&fit=crop&w=1600&q=80",
+          alt: "Jemaa el-Fnaa square in Marrakech with evening lights and activity.",
+        },
+      },
+      cityStats: [
+        { value: "1M", label: "Residents in the city" },
+        { value: "700+", label: "Years of history" },
+        { value: "18", label: "Gates to the medina" },
+        { value: "1,000+", label: "Souk stalls in the medina" },
+      ],
+      fit: {
+        forYou: ["Historic medina exploration", "Vibrant souk shopping", "Tranquil garden visits", "Traditional food experiences", "Cultural immersion"],
+        notForYou: ["A packed schedule of only shopping", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Medina and souks",
+          summary: "Jemaa el-Fnaa, souks, and traditional culture.",
+          morning: "Jemaa el-Fnaa square",
+          afternoon: "Souk exploration and shopping",
+          evening: "Square at sunset and dinner",
+        },
+        {
+          day: 2,
+          title: "Palaces and gardens",
+          summary: "Bahia Palace, Majorelle Garden, and tranquility.",
+          morning: "Bahia Palace",
+          afternoon: "Majorelle Garden",
+          evening: "Gueliz neighborhood or medina return",
+        },
+        {
+          day: 3,
+          title: "Culture and relaxation",
+          summary: "Saadian Tombs, neighborhoods, or relaxed time.",
+          morning: "Saadian Tombs or medina walk",
+          afternoon: "Neighborhood exploration or hammam",
+          evening: "Traditional dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic medina",
+          description:
+            "Marrakech's medina is a UNESCO World Heritage site with narrow alleys, traditional architecture, and a maze-like quality that rewards slow exploration.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Marrakech_Medina.jpg",
+            alt: "Narrow alley in Marrakech medina with traditional architecture.",
+          },
+        },
+        {
+          title: "Vibrant souks",
+          description:
+            "The souks offer everything from spices to leather goods. Slow walks reveal local crafts, bargaining culture, and an authentic market experience.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Marrakech_Souk.jpg",
+            alt: "Colorful souk in Marrakech with spices and goods.",
+          },
+        },
+        {
+          title: "Tranquil gardens",
+          description:
+            "Majorelle Garden and other green spaces provide peaceful contrast to the medina's energy. These oases offer quiet moments and beautiful design.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Majorelle_Garden_Marrakech.jpg",
+            alt: "Majorelle Garden in Marrakech with blue buildings and plants.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for cooler weather" },
+        { label: "Airport transfer", value: "Taxi or airport bus to city center" },
+        { label: "Transit tips", value: "Walk the medina; taxis for longer distances" },
+        { label: "Ticketing", value: "Buy palace and garden tickets on-site" },
+        { label: "Neighborhood stay", value: "Medina (near Jemaa el-Fnaa) or Gueliz" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Bring cash for souks and markets",
+        "Save offline maps for Marrakech",
+        "Plan one garden visit",
+        "Respect local customs and dress",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Marrakech?",
+          answer:
+            "Yes for the core highlights. This plan balances medina exploration, souks, and gardens with enough breathing room for food discoveries, cultural experiences, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions in advance?",
+          answer:
+            "Most palaces and gardens don't require advance booking. Buy tickets on-site. For popular restaurants, reservations help, especially during peak season.",
+        },
+        {
+          question: "Is Marrakech walkable?",
+          answer:
+            "The medina is very walkable, though it's a maze. Use landmarks to navigate. Taxis are useful for reaching gardens and neighborhoods outside the medina.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The medina offers authentic riad experiences near the action. Gueliz provides modern convenience and is quieter, with easy access to gardens.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for souks to avoid heat and crowds. Gardens are pleasant throughout the day. Evenings are lively in Jemaa el-Fnaa.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially for dinner. Many places accept walk-ins. Street food in Jemaa el-Fnaa doesn't require reservations.",
+        },
+        {
+          question: "What about bargaining?",
+          answer:
+            "Bargaining is expected in souks. Start at about half the asking price and negotiate politely. It's part of the cultural experience, so enjoy the process.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "cairo",
+          city: "Cairo",
+          days: 3,
+          description: "Ancient pyramids, historic mosques, and bustling markets.",
+        },
+        {
+          slug: "istanbul",
+          city: "Istanbul",
+          days: 3,
+          description: "Historic core sights, ferry views, and layered neighborhoods.",
+        },
+        {
+          slug: "dubai",
+          city: "Dubai",
+          days: 3,
+          description: "Modern architecture, traditional souks, and desert experiences.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cairo: {
+      slug: "cairo",
+      city: "Cairo",
+      country: "Egypt",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Culture seekers"],
+      style: ["Ancient pyramids", "Historic mosques", "Bustling markets"],
+      pacing: [
+        "Cairo rewards a calm pace despite its energy. Focus each day on one major area, then leave time for market visits, mosque breaks, and spontaneous food discoveries.",
+        "Group your time by area. Pair the Pyramids of Giza with a morning visit, dedicate another day to Islamic Cairo and mosques, then explore the Egyptian Museum and Khan el-Khalili for culture and shopping.",
+        "Save unhurried time for market walks, long museum visits, and the relaxed meals that showcase Cairo's exceptional food culture.",
+      ],
+      hero: {
+        title: "Cairo in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, with ancient pyramids, historic mosques, and bustling markets.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1716639154447-98e6cd8de2e8?auto=format&fit=crop&w=1600&q=80",
+          alt: "Pyramids of Giza with Sphinx in foreground, Cairo.",
+        },
+      },
+      cityStats: [
+        { value: "10M", label: "Residents in the metro area" },
+        { value: "4,500+", label: "Years of history" },
+        { value: "3", label: "Main pyramids at Giza" },
+        { value: "1,000+", label: "Mosques across the city" },
+      ],
+      fit: {
+        forYou: ["Ancient pyramid visits", "Historic mosque exploration", "Bustling market shopping", "Museum visits", "Cultural immersion"],
+        notForYou: ["A packed schedule of only pyramids", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Pyramids of Giza",
+          summary: "Great Pyramid, Sphinx, and ancient wonders.",
+          morning: "Pyramids of Giza and Sphinx",
+          afternoon: "Pyramid complex exploration",
+          evening: "Return to city and dinner",
+        },
+        {
+          day: 2,
+          title: "Islamic Cairo",
+          summary: "Mosques, historic streets, and culture.",
+          morning: "Al-Azhar Mosque and area",
+          afternoon: "Khan el-Khalili market",
+          evening: "Historic Cairo walk and dinner",
+        },
+        {
+          day: 3,
+          title: "Museum and culture",
+          summary: "Egyptian Museum, neighborhoods, or relaxed time.",
+          morning: "Egyptian Museum",
+          afternoon: "Neighborhood exploration or Coptic Cairo",
+          evening: "Traditional dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Ancient pyramids",
+          description:
+            "The Pyramids of Giza are among the world's most iconic sights. Early morning visits offer better light and fewer crowds, with time to appreciate their scale and history.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Great_Pyramid_Giza.jpg",
+            alt: "Great Pyramid of Giza with desert and sky.",
+          },
+        },
+        {
+          title: "Historic mosques",
+          description:
+            "Islamic Cairo preserves centuries of architecture. Mosques like Al-Azhar showcase intricate design and offer peaceful moments away from the city's energy.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Al-Azhar_Mosque_Cairo.jpg",
+            alt: "Al-Azhar Mosque in Cairo with Islamic architecture.",
+          },
+        },
+        {
+          title: "Bustling markets",
+          description:
+            "Khan el-Khalili offers traditional market culture with spices, crafts, and local goods. Slow walks reveal bargaining, local life, and authentic experiences.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Khan_el-Khalili_Cairo.jpg",
+            alt: "Khan el-Khalili market in Cairo with shops and crowds.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for cooler weather" },
+        { label: "Airport transfer", value: "Taxi or airport bus to city center" },
+        { label: "Transit tips", value: "Use taxis or organized tours for pyramids; walk the city center" },
+        { label: "Ticketing", value: "Buy pyramid and museum tickets on-site" },
+        { label: "Neighborhood stay", value: "Downtown Cairo or near Khan el-Khalili" },
+      ],
+      checklist: [
+        "Book pyramid tour or arrange transport",
+        "Pack comfortable walking shoes",
+        "Bring cash for markets and tips",
+        "Save offline maps for Cairo",
+        "Plan one museum visit",
+        "Respect local customs and dress",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Cairo?",
+          answer:
+            "Yes for the core highlights. This plan balances pyramids, Islamic Cairo, and museums with enough breathing room for market visits, cultural experiences, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book pyramid visits?",
+          answer:
+            "You can buy tickets on-site, but organized tours help with transportation and context. Early morning visits are recommended to avoid heat and crowds.",
+        },
+        {
+          question: "Is Cairo walkable?",
+          answer:
+            "Islamic Cairo and downtown are walkable, but Cairo is vast and can be chaotic. Use taxis for longer distances. The pyramids require transportation from the city.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown Cairo offers central location and good access. Areas near Khan el-Khalili provide historic character and easy market access.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start very early for pyramids to avoid heat and crowds. Museums and mosques are pleasant throughout the day. Markets are lively in the afternoon and evening.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially for dinner. Many places accept walk-ins. Street food doesn't require reservations.",
+        },
+        {
+          question: "What about safety?",
+          answer:
+            "Cairo is generally safe for tourists, but use common sense. Avoid isolated areas at night, be cautious with valuables, and consider guided tours for pyramids.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "marrakech",
+          city: "Marrakech",
+          days: 3,
+          description: "Historic medinas, vibrant souks, and tranquil gardens.",
+        },
+        {
+          slug: "istanbul",
+          city: "Istanbul",
+          days: 3,
+          description: "Historic core sights, ferry views, and layered neighborhoods.",
+        },
+        {
+          slug: "athens",
+          city: "Athens",
+          days: 3,
+          description: "Ancient sites, neighborhood cafes, and sunset viewpoints.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "buenos-aires": {
+      slug: "buenos-aires",
+      city: "Buenos Aires",
+      country: "Argentina",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture lovers", "Food enthusiasts"],
+      style: ["European architecture", "Tango culture", "Vibrant neighborhoods"],
+      pacing: [
+        "Buenos Aires rewards a calm pace across its European-influenced neighborhoods. Focus each day on one major area, then leave time for cafe culture, spontaneous food discoveries, and relaxed evening walks.",
+        "Group your time by neighborhood. Pair La Boca with San Telmo for colorful culture, dedicate another day to Recoleta and Palermo for architecture and parks, then explore neighborhoods for local character.",
+        "Save unhurried time for long cafe sessions, neighborhood exploration, and the relaxed meals that showcase Buenos Aires' exceptional food and wine culture.",
+      ],
+      hero: {
+        title: "Buenos Aires in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, mixing European architecture, tango culture, and vibrant neighborhoods.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1601352682292-ab6ced05c50c?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful La Boca neighborhood in Buenos Aires with tango dancers.",
+        },
+      },
+      cityStats: [
+        { value: "3M", label: "Residents in the city" },
+        { value: "48", label: "Neighborhoods (barrios)" },
+        { value: "100+", label: "Tango venues" },
+        { value: "4,000+", label: "Restaurants across the city" },
+      ],
+      fit: {
+        forYou: ["European architecture", "Tango culture", "Vibrant neighborhoods", "Cafe culture", "Exceptional food and wine"],
+        notForYou: ["A packed schedule of only museums", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Colorful neighborhoods",
+          summary: "La Boca, San Telmo, and tango culture.",
+          morning: "La Boca and Caminito",
+          afternoon: "San Telmo market and area",
+          evening: "Tango show or neighborhood dinner",
+        },
+        {
+          day: 2,
+          title: "Recoleta and culture",
+          summary: "Recoleta Cemetery, Palermo, and architecture.",
+          morning: "Recoleta Cemetery",
+          afternoon: "Palermo neighborhoods and parks",
+          evening: "Palermo dinner and local scene",
+        },
+        {
+          day: 3,
+          title: "City center and culture",
+          summary: "Plaza de Mayo, neighborhoods, or relaxed time.",
+          morning: "Plaza de Mayo and Casa Rosada",
+          afternoon: "Neighborhood exploration or cafe time",
+          evening: "Traditional dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "European architecture",
+          description:
+            "Buenos Aires' architecture reflects European influence with grand boulevards, ornate buildings, and a sense of old-world elegance mixed with local character.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Recoleta_Cemetery_Buenos_Aires.jpg",
+            alt: "Recoleta Cemetery in Buenos Aires with ornate mausoleums.",
+          },
+        },
+        {
+          title: "Tango culture",
+          description:
+            "Tango is central to Buenos Aires' identity. From street performances to formal shows, the dance and music are part of the city's cultural fabric.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tango_Buenos_Aires.jpg",
+            alt: "Tango dancers in Buenos Aires with colorful backdrop.",
+          },
+        },
+        {
+          title: "Vibrant neighborhoods",
+          description:
+            "Each barrio has distinct character. From colorful La Boca to elegant Recoleta, slow walks reveal local cafes, shops, and residential charm.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Palermo_Buenos_Aires.jpg",
+            alt: "Palermo neighborhood in Buenos Aires with tree-lined streets.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Airport transfer", value: "Taxi or airport bus to city center" },
+        { label: "Transit tips", value: "Use subway and buses; taxis for convenience" },
+        { label: "Ticketing", value: "Book tango shows in advance" },
+        { label: "Neighborhood stay", value: "Palermo, Recoleta, or San Telmo" },
+      ],
+      checklist: [
+        "Book tango show in advance",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Buenos Aires",
+        "Plan one long cafe session",
+        "Try local steak and wine",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Buenos Aires?",
+          answer:
+            "Yes for the core highlights. This plan balances neighborhoods, culture, and food with enough breathing room for cafe time, tango experiences, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book tango shows?",
+          answer:
+            "Yes, book in advance, especially for popular venues. You can also see street tango in La Boca and San Telmo, which doesn't require booking.",
+        },
+        {
+          question: "Is Buenos Aires walkable?",
+          answer:
+            "Neighborhoods are walkable, but Buenos Aires is spread out. Use the subway for longer distances, then explore on foot within each area.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Palermo offers local character and good food scenes. Recoleta provides elegant architecture, while San Telmo offers historic charm.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for markets and to avoid crowds. Afternoons are perfect for cafe culture. Evenings are lively, especially for tango and dinner.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular steakhouses (parrillas), yes—especially on weekends. Many cafes accept walk-ins. Food markets don't require reservations.",
+        },
+        {
+          question: "What about the food?",
+          answer:
+            "Buenos Aires is known for exceptional steak, wine, and Italian-influenced cuisine. Don't miss trying a parrilla (steakhouse) and local Malbec wine.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "rio-de-janeiro",
+          city: "Rio de Janeiro",
+          days: 3,
+          description: "Iconic beaches, mountain viewpoints, and vibrant culture.",
+        },
+        {
+          slug: "mexico-city",
+          city: "Mexico City",
+          days: 3,
+          description: "Historic centers, world-class museums, and exceptional food markets.",
+        },
+        {
+          slug: "madrid",
+          city: "Madrid",
+          days: 3,
+          description: "Grand museums, historic plazas, and vibrant food markets.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "rio-de-janeiro": {
+      slug: "rio-de-janeiro",
+      city: "Rio de Janeiro",
+      country: "Brazil",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Beach lovers", "Culture seekers"],
+      style: ["Iconic beaches", "Mountain viewpoints", "Vibrant culture"],
+      pacing: [
+        "Rio rewards a calm pace across its beaches and mountains. Focus each day on one major area, then leave time for beach time, spontaneous food discoveries, and relaxed evening walks.",
+        "Group your time by region. Pair Copacabana with Ipanema for beach culture, dedicate another day to Christ the Redeemer and Sugarloaf for iconic views, then explore neighborhoods like Santa Teresa for local character.",
+        "Save unhurried time for long beach walks, mountain viewpoints, and the relaxed meals that showcase Rio's exceptional food and culture.",
+      ],
+      hero: {
+        title: "Rio de Janeiro in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, featuring iconic beaches, mountain viewpoints, and vibrant culture.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1600&q=80",
+          alt: "Christ the Redeemer statue in Rio de Janeiro with city and ocean views.",
+        },
+      },
+      cityStats: [
+        { value: "6.7M", label: "Residents in the metro area" },
+        { value: "23", label: "Beaches along the coast" },
+        { value: "709m", label: "Sugarloaf Mountain height" },
+        { value: "30m", label: "Christ the Redeemer height" },
+      ],
+      fit: {
+        forYou: ["Iconic beach time", "Mountain viewpoints", "Vibrant culture", "Relaxed pace", "Exceptional food"],
+        notForYou: ["A packed schedule of only museums", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only", "Mountain hiking focus"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Beaches and coast",
+          summary: "Copacabana, Ipanema, and beach culture.",
+          morning: "Copacabana Beach",
+          afternoon: "Ipanema Beach and promenade",
+          evening: "Beach area dinner and sunset",
+        },
+        {
+          day: 2,
+          title: "Iconic viewpoints",
+          summary: "Christ the Redeemer, Sugarloaf, and city views.",
+          morning: "Christ the Redeemer",
+          afternoon: "Sugarloaf Mountain",
+          evening: "Neighborhood dinner or relaxed time",
+        },
+        {
+          day: 3,
+          title: "Neighborhoods and culture",
+          summary: "Santa Teresa, Lapa, or relaxed time.",
+          morning: "Santa Teresa neighborhood",
+          afternoon: "Lapa or neighborhood exploration",
+          evening: "Traditional dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Iconic beaches",
+          description:
+            "Copacabana and Ipanema are world-famous for good reason. Long beach walks, people-watching, and relaxed time by the water are central to Rio's culture.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Copacabana_Beach_Rio.jpg",
+            alt: "Copacabana Beach in Rio de Janeiro with golden sand and ocean.",
+          },
+        },
+        {
+          title: "Mountain viewpoints",
+          description:
+            "Christ the Redeemer and Sugarloaf offer spectacular city and ocean views. Early morning visits provide clearer skies and fewer crowds.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sugarloaf_Mountain_Rio.jpg",
+            alt: "Sugarloaf Mountain in Rio de Janeiro with cable car and city views.",
+          },
+        },
+        {
+          title: "Vibrant culture",
+          description:
+            "From samba to street art, Rio's culture is vibrant and visible. Neighborhoods like Santa Teresa showcase local life, music, and creative energy.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Teresa_Rio.jpg",
+            alt: "Santa Teresa neighborhood in Rio with colorful street art.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for drier, cooler weather" },
+        { label: "Airport transfer", value: "Taxi or airport bus to city center" },
+        { label: "Transit tips", value: "Use metro and buses; taxis for convenience" },
+        { label: "Ticketing", value: "Book Christ the Redeemer and Sugarloaf in advance" },
+        { label: "Neighborhood stay", value: "Copacabana, Ipanema, or near the beach" },
+      ],
+      checklist: [
+        "Book Christ the Redeemer tickets in advance",
+        "Book Sugarloaf tickets in advance",
+        "Pack beach essentials and sunscreen",
+        "Save offline maps for Rio",
+        "Plan one long beach walk",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Rio?",
+          answer:
+            "Yes for the core highlights. This plan balances beaches, iconic viewpoints, and neighborhoods with enough breathing room for food discoveries, relaxed time, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions in advance?",
+          answer:
+            "For Christ the Redeemer and Sugarloaf, yes—book in advance for timed entry, especially in peak season. Beaches don't require booking.",
+        },
+        {
+          question: "Is Rio walkable?",
+          answer:
+            "Beach areas are walkable, but Rio is spread out and hilly. Use the metro for longer distances, then explore on foot within each area. Taxis are convenient.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Copacabana or Ipanema offer beach access and good transit. These areas are safe, walkable, and central to major sights.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Christ the Redeemer to avoid crowds and get clearer views. Beaches are pleasant throughout the day. Afternoons can include neighborhood walks.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many places accept walk-ins. Beach kiosks and casual spots don't require reservations.",
+        },
+        {
+          question: "What about safety?",
+          answer:
+            "Rio requires common sense. Stick to tourist areas, avoid isolated spots at night, don't flash valuables, and use official taxis. Beach areas are generally safe during the day.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "buenos-aires",
+          city: "Buenos Aires",
+          days: 3,
+          description: "European architecture, tango culture, and vibrant neighborhoods.",
+        },
+        {
+          slug: "mexico-city",
+          city: "Mexico City",
+          days: 3,
+          description: "Historic centers, world-class museums, and exceptional food markets.",
+        },
+        {
+          slug: "sydney",
+          city: "Sydney",
+          days: 3,
+          description: "Harbor views, coastal walks, and relaxed beach time.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "mexico-city": {
+      slug: "mexico-city",
+      city: "Mexico City",
+      country: "Mexico",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Food enthusiasts"],
+      style: ["Historic centers", "World-class museums", "Exceptional food markets"],
+      pacing: [
+        "Mexico City rewards a calm pace across its historic and modern areas. Focus each day on one major area, then leave time for market visits, museum breaks, and spontaneous food discoveries.",
+        "Group your time by district. Pair the Zocalo with historic center for culture, dedicate another day to museums and Chapultepec, then explore neighborhoods like Roma or Condesa for local character.",
+        "Save unhurried time for long market walks, museum visits, and the relaxed meals that showcase Mexico City's exceptional food culture.",
+      ],
+      hero: {
+        title: "Mexico City in 3 days",
+        subtitle:
+          "Explore the essentials with room to breathe, with historic centers, world-class museums, and exceptional food markets.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1533251568747-725d423801d3?auto=format&fit=crop&w=1600&q=80",
+          alt: "Palacio de Bellas Artes in Mexico City with historic architecture.",
+        },
+      },
+      cityStats: [
+        { value: "9.2M", label: "Residents in the city" },
+        { value: "150+", label: "Museums across the city" },
+        { value: "700+", label: "Years of history" },
+        { value: "40,000+", label: "Restaurants across the city" },
+      ],
+      fit: {
+        forYou: ["Historic center exploration", "World-class museums", "Exceptional food markets", "Vibrant neighborhoods", "Cultural immersion"],
+        notForYou: ["A packed schedule of only museums", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic center",
+          summary: "Zocalo, Templo Mayor, and historic culture.",
+          morning: "Zocalo and Metropolitan Cathedral",
+          afternoon: "Templo Mayor and historic streets",
+          evening: "Historic center dinner",
+        },
+        {
+          day: 2,
+          title: "Museums and culture",
+          summary: "Frida Kahlo Museum, Chapultepec, and art.",
+          morning: "Frida Kahlo Museum (book in advance)",
+          afternoon: "Chapultepec Park or Anthropology Museum",
+          evening: "Roma or Condesa neighborhood dinner",
+        },
+        {
+          day: 3,
+          title: "Markets and neighborhoods",
+          summary: "Xochimilco, markets, or relaxed time.",
+          morning: "Xochimilco or market visit",
+          afternoon: "Neighborhood exploration",
+          evening: "Traditional dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic center",
+          description:
+            "The Zocalo is one of the world's largest public squares, surrounded by historic buildings. The area showcases Mexico's colonial and pre-Columbian history.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Metropolitan_Cathedral_Mexico_City.jpg",
+            alt: "Metropolitan Cathedral in Mexico City with grand architecture.",
+          },
+        },
+        {
+          title: "World-class museums",
+          description:
+            "The Frida Kahlo Museum and National Anthropology Museum are world-class. Plan one focused visit, then balance it with neighborhood walks and food.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Frida_Kahlo_Museum_Mexico_City.jpg",
+            alt: "Frida Kahlo Museum (Casa Azul) in Mexico City with blue walls.",
+          },
+        },
+        {
+          title: "Exceptional food markets",
+          description:
+            "From Mercado de San Juan to street food, Mexico City's food scene is exceptional. Long market walks and local discoveries showcase the city's culinary culture.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Mercado_Mexico_City.jpg",
+            alt: "Food market in Mexico City with colorful produce and vendors.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for drier weather" },
+        { label: "Airport transfer", value: "Metro or taxi to city center" },
+        { label: "Transit tips", value: "Use Metro and buses; Uber is convenient" },
+        { label: "Ticketing", value: "Book Frida Kahlo Museum well in advance" },
+        { label: "Neighborhood stay", value: "Roma, Condesa, or historic center" },
+      ],
+      checklist: [
+        "Book Frida Kahlo Museum well in advance",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Mexico City",
+        "Plan one market visit",
+        "Try street food and local specialties",
+        "Carry cash for markets",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Mexico City?",
+          answer:
+            "Yes for the core highlights. This plan balances historic center, museums, and neighborhoods with enough breathing room for market visits, food discoveries, and unplanned stops.",
+        },
+        {
+          question: "Do I need to book Frida Kahlo Museum?",
+          answer:
+            "Yes, absolutely. Book well in advance as tickets sell out weeks ahead. The museum is small and popular, so advance planning is essential.",
+        },
+        {
+          question: "Is Mexico City walkable?",
+          answer:
+            "Neighborhoods are walkable, but Mexico City is vast. Use the Metro for longer distances, then explore on foot within each area. Uber is convenient and safe.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Roma or Condesa offer local character, good food scenes, and safety. The historic center provides proximity to major sights but can be noisier.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for museums to avoid crowds. Markets are best in the morning. Afternoons can include neighborhood walks or indoor stops.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many places accept walk-ins. Street food and markets don't require reservations.",
+        },
+        {
+          question: "What about the food?",
+          answer:
+            "Mexico City's food is exceptional. Don't miss street food (tacos, elotes), markets, and traditional restaurants. The city is a food destination.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "buenos-aires",
+          city: "Buenos Aires",
+          days: 3,
+          description: "European architecture, tango culture, and vibrant neighborhoods.",
+        },
+        {
+          slug: "rio-de-janeiro",
+          city: "Rio de Janeiro",
+          days: 3,
+          description: "Iconic beaches, mountain viewpoints, and vibrant culture.",
+        },
+        {
+          slug: "madrid",
+          city: "Madrid",
+          days: 3,
+          description: "Grand museums, historic plazas, and vibrant food markets.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bucharest: {
+      slug: "bucharest",
+      city: "Bucharest",
+      country: "Romania",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Architecture lovers", "History seekers"],
+      style: ["Grand architecture", "Historic neighborhoods", "Relaxed parks"],
+      pacing: [
+        "Bucharest rewards a calm pace across its mix of grand and historic architecture. Focus each day on one major area, then leave time for park visits, spontaneous food discoveries, and relaxed neighborhood walks.",
+        "Group your time by district. Pair the Palace of Parliament with the historic center for contrast, dedicate time to Herastrau Park and neighborhoods, then explore local character.",
+        "Save unhurried time for long park walks, neighborhood exploration, and the relaxed meals that showcase Bucharest's food culture.",
+      ],
+      hero: {
+        title: "Bucharest in 2 days",
+        subtitle:
+          "Explore the essentials with room to breathe, pairing grand architecture, historic neighborhoods, and relaxed parks.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1665200658303-ca61225bbaff?auto=format&fit=crop&w=1600&q=80",
+          alt: "Palace of Parliament in Bucharest with grand neoclassical architecture.",
+        },
+      },
+      cityStats: [
+        { value: "1.8M", label: "Residents in the city" },
+        { value: "365K", label: "Square meters of Palace of Parliament" },
+        { value: "40+", label: "Parks and gardens" },
+        { value: "600+", label: "Years of history" },
+      ],
+      fit: {
+        forYou: ["Grand architecture", "Historic neighborhoods", "Relaxed parks", "Affordable travel", "Cultural immersion"],
+        notForYou: ["A packed schedule of only museums", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Grand architecture",
+          summary: "Palace of Parliament, historic center, and contrast.",
+          morning: "Palace of Parliament tour",
+          afternoon: "Historic Old Town and Lipscani",
+          evening: "Old Town dinner and walk",
+        },
+        {
+          day: 2,
+          title: "Parks and neighborhoods",
+          summary: "Herastrau Park, neighborhoods, or relaxed time.",
+          morning: "Herastrau Park and Village Museum",
+          afternoon: "Neighborhood exploration or museums",
+          evening: "Traditional dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Grand architecture",
+          description:
+            "The Palace of Parliament is one of the world's largest buildings, showcasing communist-era scale. The historic Old Town offers contrast with charming streets and cafes.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Old_Town_Bucharest.jpg",
+            alt: "Historic Old Town in Bucharest with cobblestone streets.",
+          },
+        },
+        {
+          title: "Historic neighborhoods",
+          description:
+            "The Old Town (Lipscani) preserves historic character with cobblestone streets, cafes, and a relaxed atmosphere that feels both European and unique.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Lipscani_Bucharest.jpg",
+            alt: "Lipscani street in Bucharest Old Town with historic buildings.",
+          },
+        },
+        {
+          title: "Relaxed parks",
+          description:
+            "Herastrau Park offers green space and the Village Museum, showcasing traditional Romanian architecture in a peaceful setting.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Herastrau_Park_Bucharest.jpg",
+            alt: "Herastrau Park in Bucharest with lake and green space.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Bus or taxi to city center" },
+        { label: "Transit tips", value: "Use metro and buses; walk the center" },
+        { label: "Ticketing", value: "Book Palace of Parliament tour in advance" },
+        { label: "Neighborhood stay", value: "Old Town or city center" },
+      ],
+      checklist: [
+        "Book Palace of Parliament tour in advance",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Bucharest",
+        "Plan one park visit",
+        "Explore Old Town on foot",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Bucharest?",
+          answer:
+            "Yes for the core highlights. This plan balances grand architecture, historic neighborhoods, and parks with enough breathing room for food discoveries and unplanned stops.",
+        },
+        {
+          question: "Do I need to book Palace of Parliament?",
+          answer:
+            "Yes, book tours in advance as they're required to enter. The building is massive and the tour provides context for its history and scale.",
+        },
+        {
+          question: "Is Bucharest walkable?",
+          answer:
+            "The Old Town and city center are very walkable. Use the metro for longer distances, then explore on foot within each area.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The Old Town offers historic character and easy access to restaurants and cafes. The city center provides good transit connections.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Palace of Parliament to avoid crowds. The Old Town is pleasant throughout the day. Afternoons can include park walks.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many places accept walk-ins. The Old Town has many options for casual dining.",
+        },
+        {
+          question: "What about the food?",
+          answer:
+            "Bucharest offers Romanian cuisine with influences from neighboring countries. Try traditional dishes like sarmale (cabbage rolls) and local wines.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "sofia",
+          city: "Sofia",
+          days: 2,
+          description: "Historic churches, mountain views, and walkable city center.",
+        },
+        {
+          slug: "budapest",
+          city: "Budapest",
+          days: 3,
+          description: "Danube views, historic hills, and thermal baths.",
+        },
+        {
+          slug: "prague",
+          city: "Prague",
+          days: 3,
+          description: "Old Town, castle views, and easy river strolls.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sofia: {
+      slug: "sofia",
+      city: "Sofia",
+      country: "Bulgaria",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Mountain enthusiasts"],
+      style: ["Historic churches", "Mountain views", "Walkable city center"],
+      pacing: [
+        "Sofia rewards a calm pace across its compact center. Focus each day on one major area, then leave time for church visits, spontaneous food discoveries, and relaxed neighborhood walks.",
+        "Group your time by area. Pair the historic churches with the city center for culture, dedicate time to Vitosha Mountain access or parks, then explore local character.",
+        "Save unhurried time for long walks, church visits, and the relaxed meals that showcase Sofia's food culture.",
+      ],
+      hero: {
+        title: "Sofia in 2 days",
+        subtitle:
+          "Explore the essentials with room to breathe, featuring historic churches, mountain views, and walkable city center.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Alexander_Nevsky_Cathedral_Sofia.jpg",
+          alt: "Alexander Nevsky Cathedral in Sofia with golden domes.",
+        },
+      },
+      cityStats: [
+        { value: "1.2M", label: "Residents in the city" },
+        { value: "2,290m", label: "Vitosha Mountain height" },
+        { value: "50+", label: "Churches across the city" },
+        { value: "7,000+", label: "Years of history" },
+      ],
+      fit: {
+        forYou: ["Historic church visits", "Mountain access", "Walkable center", "Affordable travel", "Cultural immersion"],
+        notForYou: ["A packed schedule of only museums", "Beach-focused time", "Late-night party focus", "Budget backpacker style", "Off-the-beaten-path only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic center",
+          summary: "Alexander Nevsky Cathedral, churches, and culture.",
+          morning: "Alexander Nevsky Cathedral",
+          afternoon: "St. Sofia Church and city center walk",
+          evening: "City center dinner and walk",
+        },
+        {
+          day: 2,
+          title: "Culture and nature",
+          summary: "Serdika Complex, Vitosha, or relaxed time.",
+          morning: "Serdika Complex and Roman ruins",
+          afternoon: "Vitosha Mountain or park visit",
+          evening: "Traditional dinner or relaxed time",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic churches",
+          description:
+            "Alexander Nevsky Cathedral is Sofia's signature, with golden domes and grand scale. The city has many historic churches showcasing Orthodox architecture.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/St_Sofia_Church_Sofia.jpg",
+            alt: "St. Sofia Church in Sofia with historic architecture.",
+          },
+        },
+        {
+          title: "Mountain views",
+          description:
+            "Vitosha Mountain provides a natural backdrop and easy access from the city. Cable car rides or hikes offer city views and a contrast to urban energy.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Vitosha_Mountain_Sofia.jpg",
+            alt: "Vitosha Mountain near Sofia with city in background.",
+          },
+        },
+        {
+          title: "Walkable center",
+          description:
+            "Sofia's center is compact and pedestrian-friendly. Slow walks reveal Roman ruins, historic buildings, and a relaxed pace that feels both European and unique.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Serdika_Complex_Sofia.jpg",
+            alt: "Serdika Complex in Sofia with Roman ruins and modern buildings.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Metro or taxi to city center" },
+        { label: "Transit tips", value: "Use metro and trams; walk the center" },
+        { label: "Ticketing", value: "Most sights don't require advance booking" },
+        { label: "Neighborhood stay", value: "City center or near Vitosha" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Save offline maps for Sofia",
+        "Plan one church visit",
+        "Consider Vitosha Mountain if interested",
+        "Explore city center on foot",
+        "Carry cash for some establishments",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Sofia?",
+          answer:
+            "Yes for the core highlights. This plan balances historic churches, city center, and optional mountain time with enough breathing room for food discoveries and unplanned stops.",
+        },
+        {
+          question: "Do I need to book attractions?",
+          answer:
+            "Most churches and sights don't require advance booking. Buy tickets on-site. Vitosha Mountain access is straightforward without advance booking.",
+        },
+        {
+          question: "Is Sofia walkable?",
+          answer:
+            "The city center is very walkable and compact. Use the metro for longer distances, then explore on foot within each area.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The city center offers proximity to major sights, restaurants, and cafes. Areas near Vitosha provide mountain access and quieter streets.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for churches to avoid crowds. The city center is pleasant throughout the day. Afternoons can include park walks or mountain visits.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular restaurants, yes—especially on weekends. Many places accept walk-ins. The city center has many options for casual dining.",
+        },
+        {
+          question: "What about the food?",
+          answer:
+            "Sofia offers Bulgarian cuisine with influences from neighboring countries. Try traditional dishes like banitsa (cheese pastry) and local wines.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "bucharest",
+          city: "Bucharest",
+          days: 2,
+          description: "Grand architecture, historic neighborhoods, and relaxed parks.",
+        },
+        {
+          slug: "budapest",
+          city: "Budapest",
+          days: 3,
+          description: "Danube views, historic hills, and thermal baths.",
+        },
+        {
+          slug: "prague",
+          city: "Prague",
+          days: 3,
+          description: "Old Town, castle views, and easy river strolls.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
   }),
   es: withDefaults("es", {
     rome: {
@@ -11589,6 +16217,4634 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           city: "Berlín",
           days: 3,
           description: "Historia y barrios creativos.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bergen: {
+      slug: "bergen",
+      city: "Bergen",
+      country: "Noruega",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de fiordos", "Primer viaje", "Caminantes de montaña"],
+      style: ["Muelle histórico", "Vistas de montaña", "Paseos junto al agua"],
+      pacing: [
+        "Bergen recompensa un ritmo calmado. Ancla cada día con un área principal—el histórico Bryggen, un mirador de montaña o un paseo junto al agua—y luego deja tiempo para cafés, mercados y exploración lenta.",
+        "El centro compacto facilita agrupar lugares. El centro histórico y Bryggen funcionan como una caminata, mientras la montaña Fløyen ofrece un ritmo diferente con vistas y naturaleza.",
+        "Reserva tiempo para el mercado de pescado y momentos tranquilos junto al puerto. El tamaño compacto de la ciudad y el entorno del fiordo crean una atmósfera pacífica y manejable.",
+      ],
+      hero: {
+        title: "Bergen en 3 días",
+        subtitle:
+          "Explora muelle histórico, miradores de montaña y vistas del fiordo con un ritmo calmado y caminable.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bryggen_in_Bergen.jpg",
+          alt: "Muelle histórico Bryggen en Bergen con edificios de madera coloridos.",
+        },
+      },
+      cityStats: [
+        { value: "280K", label: "Habitantes en la ciudad" },
+        { value: "7", label: "Montañas que rodean la ciudad" },
+        { value: "900+", label: "Años de historia" },
+        { value: "1.2M", label: "Visitantes al año" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con vistas del fiordo",
+          "Muelle histórico y caminatas de montaña",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Tiempo junto al agua y mercado",
+        ],
+        notForYou: [
+          "Excursiones fuera de Bergen",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Expediciones largas de senderismo",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Bryggen histórico y centro",
+          summary: "Muelle colorido y paseos por el casco antiguo.",
+          morning: "Muelle Bryggen y edificios históricos",
+          afternoon: "Mercado de pescado y área del puerto",
+          evening: "Paseo junto al agua y cena",
+        },
+        {
+          day: 2,
+          title: "Montaña Fløyen",
+          summary: "Vistas de montaña y caminatas por la naturaleza.",
+          morning: "Funicular Fløyen y vistas desde la cumbre",
+          afternoon: "Senderos de montaña o regreso al centro",
+          evening: "Paseo por el casco antiguo y cafés",
+        },
+        {
+          day: 3,
+          title: "Museos y frente del agua",
+          summary: "Sitios culturales y vistas del puerto.",
+          morning: "Museo Hanseático o Fortaleza Bergenhus",
+          afternoon: "Paseo junto al agua y parques",
+          evening: "Último paseo por el puerto y vistas al atardecer",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Muelle histórico",
+          description:
+            "Los edificios de madera coloridos de Bryggen son Patrimonio de la Humanidad, ofreciendo un vistazo al pasado comercial de Bergen.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bryggen_bergen_2005_2.jpg",
+            alt: "Edificios de madera coloridos del muelle Bryggen en Bergen.",
+          },
+        },
+        {
+          title: "Miradores de montaña",
+          description:
+            "Fløyen y otras montañas circundantes ofrecen fácil acceso a vistas panorámicas del fiordo y la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bergen_from_Floyen.jpg",
+            alt: "Vista de la ciudad de Bergen y el fiordo desde la montaña Fløyen.",
+          },
+        },
+        {
+          title: "Vida junto al agua",
+          description:
+            "El puerto y el mercado de pescado crean una atmósfera animada y auténtica con mariscos frescos y cultura local.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bergen_fish_market.jpg",
+            alt: "Mercado de pescado de Bergen con vendedores y mariscos frescos.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o taxi al centro" },
+        { label: "Consejos de transporte", value: "Camina el centro; funicular para Fløyen" },
+        { label: "Entradas", value: "Reserva funicular Fløyen con antelación si es necesario" },
+        { label: "Zona para alojarse", value: "Centro de la ciudad cerca de Bryggen" },
+      ],
+      checklist: [
+        "Reserva entradas para funicular Fløyen",
+        "Empaca capas para clima de montaña",
+        "Guarda mapas offline para Bergen",
+        "Planifica una caminata de montaña",
+        "Visita el mercado de pescado",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Bergen?",
+          answer:
+            "Sí para lo esencial. Este plan cubre Bryggen, Fløyen y sitios culturales clave con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar el funicular Fløyen?",
+          answer:
+            "Reservar ayuda en temporada alta para evitar esperas. El funicular funciona con frecuencia, pero las entradas anticipadas pueden ahorrar tiempo.",
+        },
+        {
+          question: "¿Es Bergen caminable?",
+          answer:
+            "El centro histórico es muy caminable, y el frente del agua se conecta bien a pie. Usa el funicular para acceso a la montaña Fløyen.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro de la ciudad cerca de Bryggen te mantiene cerca de sitios históricos y el puerto, con fácil acceso a restaurantes y cafés.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Fløyen para evitar multitudes y obtener vistas claras. El mercado de pescado es agradable por la mañana, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Bergen se centra en mariscos frescos, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Bergen es bueno para vistas del fiordo?",
+          answer:
+            "Sí. La ciudad se encuentra en un fiordo, y la montaña Fløyen ofrece excelentes vistas panorámicas del puerto y fiordos circundantes.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "oslo",
+          city: "Oslo",
+          days: 3,
+          description: "Paseos junto al agua y museos compactos.",
+        },
+        {
+          slug: "stockholm",
+          city: "Estocolmo",
+          days: 3,
+          description: "Encanto del casco antiguo e islas.",
+        },
+        {
+          slug: "copenhagen",
+          city: "Copenhague",
+          days: 3,
+          description: "Paseos junto al agua y diseño.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bologna: {
+      slug: "bologna",
+      city: "Bolonia",
+      country: "Italia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de la comida", "Primer viaje", "Aficionados a ciudades universitarias"],
+      style: ["Torres medievales", "Mercados de comida", "Plazas históricas"],
+      pacing: [
+        "Bolonia recompensa un enfoque centrado en la comida. Ancla cada día con un área principal—el centro histórico con sus torres, o el barrio universitario—y luego deja tiempo para comidas largas, paradas en mercados y paseos lentos.",
+        "El centro compacto facilita agrupar lugares. Combina las Dos Torres con la Piazza Maggiore para lugares clásicos, luego explora los mercados de comida y el área universitaria para un ritmo diferente.",
+        "Reserva tiempo para los mercados de comida y momentos tranquilos en los pórticos. La arquitectura medieval de la ciudad y la cultura gastronómica crean una atmósfera relajada y auténtica.",
+      ],
+      hero: {
+        title: "Bolonia en 2 días",
+        subtitle:
+          "Explora torres medievales, mercados de comida y plazas históricas con un ritmo calmado y caminable.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bologna_-_Due_Torri.jpg",
+          alt: "Dos Torres de Bolonia elevándose sobre el centro histórico de la ciudad.",
+        },
+      },
+      cityStats: [
+        { value: "390K", label: "Habitantes en la ciudad" },
+        { value: "900+", label: "Años de historia" },
+        { value: "38KM", label: "Pórticos en toda la ciudad" },
+        { value: "1", label: "Universidad más antigua de Europa" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con arquitectura medieval",
+          "Mercados de comida y cocina auténtica",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Ambiente de ciudad universitaria",
+        ],
+        notForYou: [
+          "Excursiones fuera de Bolonia",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades de playa o costeras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Centro histórico y torres",
+          summary: "Dos Torres y Piazza Maggiore.",
+          morning: "Dos Torres y centro histórico",
+          afternoon: "Piazza Maggiore y Basílica de San Petronio",
+          evening: "Área del mercado de comida y cena",
+        },
+        {
+          day: 2,
+          title: "Barrio universitario y mercados",
+          summary: "Área universitaria y mercados de comida.",
+          morning: "Barrio universitario y pórticos",
+          afternoon: "Mercados de comida y tiendas locales",
+          evening: "Paseo por el centro histórico y aperitivo",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Torres medievales",
+          description:
+            "Las Dos Torres de Bolonia son símbolos icónicos de la ciudad, ofreciendo vistas y un vistazo a la arquitectura medieval.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Asinelli_e_Garisenda.jpg",
+            alt: "Las Dos Torres de Bolonia, Asinelli y Garisenda, en el centro histórico.",
+          },
+        },
+        {
+          title: "Mercados de comida",
+          description:
+            "Los mercados de comida de Bolonia muestran el patrimonio culinario de la ciudad con productos frescos, pasta y especialidades locales.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Mercato_di_Mezzo_Bologna.jpg",
+            alt: "Mercado de comida en Bolonia con productos frescos y especialidades locales.",
+          },
+        },
+        {
+          title: "Pórticos históricos",
+          description:
+            "El extenso sistema de pórticos de la ciudad proporciona paseos cubiertos en todo el centro histórico, único en Bolonia.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Portici_di_Bologna.jpg",
+            alt: "Pórticos históricos en Bolonia que proporcionan pasajes cubiertos.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o tren al centro" },
+        { label: "Consejos de transporte", value: "Camina el centro; todo está cerca" },
+        { label: "Entradas", value: "Reserva subida a las torres con antelación si visitas" },
+        { label: "Zona para alojarse", value: "Centro histórico cerca de Piazza Maggiore" },
+      ],
+      checklist: [
+        "Reserva subida a las Dos Torres si te interesa",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Bolonia",
+        "Planifica tiempo para mercados de comida",
+        "Prueba especialidades de pasta locales",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días para Bolonia?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el centro histórico, torres y mercados de comida con un ritmo calmado que deja margen para comidas y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar las Dos Torres?",
+          answer:
+            "Reservar ayuda en temporada alta para evitar esperas. La subida a las torres ofrece grandes vistas pero requiere planificación anticipada.",
+        },
+        {
+          question: "¿Es Bolonia caminable?",
+          answer:
+            "El centro histórico es muy caminable y compacto. Todo está a poca distancia caminando, y los pórticos proporcionan paseos cubiertos.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro histórico cerca de Piazza Maggiore te mantiene cerca de los lugares principales, mercados de comida y restaurantes.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para las torres para evitar multitudes y obtener vistas claras. Los mercados de comida son agradables por la mañana, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Bolonia es conocida por su comida, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Bolonia es buena para la comida?",
+          answer:
+            "Sí. Bolonia se considera la capital gastronómica de Italia, con excelentes mercados, pasta y cocina auténtica en toda la ciudad.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "florence",
+          city: "Florencia",
+          days: 3,
+          description: "Arte renacentista y paseos junto al río.",
+        },
+        {
+          slug: "venice",
+          city: "Venecia",
+          days: 3,
+          description: "Paseos por canales e iglesias clásicas.",
+        },
+        {
+          slug: "rome",
+          city: "Roma",
+          days: 3,
+          description: "Monumentos antiguos y plazas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bruges: {
+      slug: "bruges",
+      city: "Brujas",
+      country: "Bélgica",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Escapadas románticas", "Primer viaje", "Caminantes lentos"],
+      style: ["Plazas medievales", "Paseos por canales", "Iglesias históricas"],
+      pacing: [
+        "Brujas recompensa un ritmo lento y romántico. Ancla cada día con un área principal—la histórica plaza Markt, o los distritos de canales más tranquilos—y luego deja tiempo para cafés, tiendas de chocolate y paseos lentos.",
+        "El centro compacto facilita explorar a pie. Combina el Markt con el Campanario para lugares clásicos, luego explora los canales y barrios más tranquilos para un ritmo diferente.",
+        "Reserva tiempo para paseos en bote por los canales y momentos tranquilos en las plazas. La arquitectura medieval de la ciudad y los canales pacíficos crean una atmósfera relajada y atemporal.",
+      ],
+      hero: {
+        title: "Brujas en 2 días",
+        subtitle:
+          "Explora plazas medievales, paseos por canales e iglesias históricas con un ritmo calmado y romántico.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Brugge_grote_markt.jpg",
+          alt: "Plaza histórica Markt en Brujas con edificios medievales y la torre del Campanario.",
+        },
+      },
+      cityStats: [
+        { value: "118K", label: "Habitantes en la ciudad" },
+        { value: "800+", label: "Años de historia" },
+        { value: "50+", label: "Puentes sobre canales" },
+        { value: "UNESCO", label: "Patrimonio de la Humanidad" },
+      ],
+      fit: {
+        forYou: [
+          "Una visita romántica y de ritmo lento",
+          "Arquitectura medieval y canales",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Tiempo para cafés y tiendas de chocolate",
+        ],
+        notForYou: [
+          "Excursiones fuera de Brujas",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Ambiente de ciudad moderna",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Centro histórico y Markt",
+          summary: "Plaza Markt y torre del Campanario.",
+          morning: "Plaza Markt y torre del Campanario",
+          afternoon: "Plaza Burg y edificios históricos",
+          evening: "Paseo por canales y cena",
+        },
+        {
+          day: 2,
+          title: "Canales y distritos tranquilos",
+          summary: "Paseos en bote por canales y barrios más tranquilos.",
+          morning: "Paseo en bote por canales",
+          afternoon: "Distritos de canales más tranquilos e iglesias",
+          evening: "Último paseo por la plaza y cafés",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Plazas medievales",
+          description:
+            "Las plazas Markt y Burg de Brujas muestran arquitectura medieval con fachadas coloridas y edificios históricos.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bruges_Burg.jpg",
+            alt: "Plaza histórica Burg en Brujas con arquitectura medieval.",
+          },
+        },
+        {
+          title: "Red de canales",
+          description:
+            "Los canales de la ciudad crean una atmósfera pacífica y romántica con puentes, cisnes y paseos tranquilos junto al agua.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bruges_canals.jpg",
+            alt: "Canales pacíficos en Brujas con edificios históricos reflejados en el agua.",
+          },
+        },
+        {
+          title: "Iglesias históricas",
+          description:
+            "Las iglesias y campanarios de Brujas añaden al ambiente medieval, con interiores tranquilos y arte histórico.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Church_of_Our_Lady_Bruges.jpg",
+            alt: "Iglesia de Nuestra Señora en Brujas con arquitectura histórica.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "Tren desde Bruselas o Gante" },
+        { label: "Consejos de transporte", value: "Camina por todas partes; el centro es compacto" },
+        { label: "Entradas", value: "Reserva paseos por canales con antelación si es necesario" },
+        { label: "Zona para alojarse", value: "Centro histórico cerca del Markt" },
+      ],
+      checklist: [
+        "Reserva paseo en bote por canales",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Brujas",
+        "Planifica tiempo para cafés y chocolate",
+        "Visita el Campanario si te interesa",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días para Brujas?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el centro histórico, canales y lugares clave con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar paseos por canales?",
+          answer:
+            "Reservar ayuda en temporada alta para evitar esperas. Los paseos por canales son populares y ofrecen grandes vistas de la ciudad desde el agua.",
+        },
+        {
+          question: "¿Es Brujas caminable?",
+          answer:
+            "El centro histórico es muy caminable y compacto. Todo está a poca distancia caminando, y los canales crean rutas naturales para caminar.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro histórico cerca del Markt te mantiene cerca de los lugares principales, restaurantes y cafés, con fácil acceso a todo.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para evitar multitudes en el Markt y el Campanario. Los canales son agradables durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Brujas se centra en la cocina belga, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Brujas está muy concurrida?",
+          answer:
+            "Brujas puede estar ocupada, especialmente en temporada alta. Empezar temprano y explorar distritos de canales más tranquilos ayuda a evitar las multitudes más grandes.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "brussels",
+          city: "Bruselas",
+          days: 3,
+          description: "Grandes plazas y distritos de museos.",
+        },
+        {
+          slug: "amsterdam",
+          city: "Ámsterdam",
+          days: 3,
+          description: "Canales y barrios históricos.",
+        },
+        {
+          slug: "prague",
+          city: "Praga",
+          days: 3,
+          description: "Casco antiguo y vistas del castillo.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    dubrovnik: {
+      slug: "dubrovnik",
+      city: "Dubrovnik",
+      country: "Croacia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de historia", "Primer viaje", "Caminantes costeros"],
+      style: ["Murallas históricas", "Vistas del Adriático", "Paseos por el casco antiguo"],
+      pacing: [
+        "Dubrovnik recompensa un ritmo calmado y costero. Ancla cada día con un área principal—el histórico casco antiguo, las murallas de la ciudad, o una isla cercana—y luego deja tiempo para cafés, miradores y paseos lentos.",
+        "El casco antiguo compacto facilita explorar a pie. Combina las murallas de la ciudad con la calle principal para lugares clásicos, luego explora calles más tranquilas y miradores para un ritmo diferente.",
+        "Reserva tiempo para la isla Lokrum y momentos tranquilos a lo largo de las murallas. La arquitectura histórica de la ciudad y el entorno del Adriático crean una atmósfera relajada y escénica.",
+      ],
+      hero: {
+        title: "Dubrovnik en 3 días",
+        subtitle:
+          "Explora murallas históricas, vistas del Adriático y paseos por el casco antiguo con un ritmo calmado y costero.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubrovnik_Old_Town.jpg",
+          alt: "Casco antiguo histórico de Dubrovnik con edificios de piedra y techos rojos con vistas al mar Adriático.",
+        },
+      },
+      cityStats: [
+        { value: "42K", label: "Habitantes en la ciudad" },
+        { value: "1.940M", label: "Longitud de las murallas de la ciudad" },
+        { value: "UNESCO", label: "Patrimonio de la Humanidad" },
+        { value: "1.2M", label: "Visitantes al año" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con murallas históricas",
+          "Vistas del Adriático y paseos costeros",
+          "Casco antiguo compacto y caminable",
+          "Planificación clara y práctica",
+          "Excursiones de un día a islas",
+        ],
+        notForYou: [
+          "Excursiones lejos de Dubrovnik",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades solo de playa",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco antiguo y calle principal",
+          summary: "Centro histórico y Stradun.",
+          morning: "Entrada al casco antiguo y Stradun",
+          afternoon: "Edificios históricos e iglesias",
+          evening: "Paseo junto al agua y cena",
+        },
+        {
+          day: 2,
+          title: "Paseo por las murallas",
+          summary: "Circuito de murallas y miradores.",
+          morning: "Paseo por las murallas y miradores",
+          afternoon: "Fuerte Lovrijenac o más murallas",
+          evening: "Paseo por el casco antiguo y cafés",
+        },
+        {
+          day: 3,
+          title: "Isla Lokrum",
+          summary: "Visita a la isla y naturaleza.",
+          morning: "Barco a la isla Lokrum",
+          afternoon: "Exploración de la isla y playas",
+          evening: "Regreso al casco antiguo y vistas al atardecer",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Murallas históricas",
+          description:
+            "Las murallas de Dubrovnik ofrecen vistas panorámicas del casco antiguo y el mar Adriático, creando una experiencia única para caminar.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubrovnik_City_Walls.jpg",
+            alt: "Murallas históricas de Dubrovnik con vistas del casco antiguo y el mar.",
+          },
+        },
+        {
+          title: "Calles del casco antiguo",
+          description:
+            "Las calles de piedra caliza y edificios históricos crean una atmósfera atemporal, perfecta para exploración lenta.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Stradun_Dubrovnik.jpg",
+            alt: "Stradun, la calle principal del casco antiguo de Dubrovnik con edificios históricos.",
+          },
+        },
+        {
+          title: "Vistas del Adriático",
+          description:
+            "El entorno costero de la ciudad proporciona vistas impresionantes del mar desde las murallas, fortalezas y paseos junto al agua.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubrovnik_Adriatic_View.jpg",
+            alt: "Vista del mar Adriático desde Dubrovnik con el casco antiguo al fondo.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o taxi al casco antiguo" },
+        { label: "Consejos de transporte", value: "Camina el casco antiguo; barco para Lokrum" },
+        { label: "Entradas", value: "Reserva entradas para murallas con antelación" },
+        { label: "Zona para alojarse", value: "Casco antiguo o cerca" },
+      ],
+      checklist: [
+        "Reserva entradas para murallas",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Dubrovnik",
+        "Planifica visita a la isla Lokrum",
+        "Trae protección solar",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Dubrovnik?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el casco antiguo, murallas y la isla Lokrum con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar entradas para murallas?",
+          answer:
+            "Sí, se recomienda reservar con antelación, especialmente en temporada alta. El paseo por las murallas es popular y ofrece las mejores vistas de la ciudad.",
+        },
+        {
+          question: "¿Es Dubrovnik caminable?",
+          answer:
+            "El casco antiguo es muy caminable y compacto. Todo está a poca distancia caminando, aunque el paseo por las murallas requiere buena condición física.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El casco antiguo te mantiene cerca de los lugares principales, aunque áreas cercanas ofrecen buena relación calidad-precio y fácil acceso al centro histórico.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para las murallas para evitar multitudes y calor. El casco antiguo es agradable durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Dubrovnik se centra en mariscos, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Vale la pena visitar la isla Lokrum?",
+          answer:
+            "Sí. Lokrum ofrece un escape pacífico de las multitudes del casco antiguo, con senderos naturales, playas y ruinas históricas en un entorno escénico.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "split",
+          city: "Split",
+          days: 2,
+          description: "Palacio de Diocleciano y frente del agua.",
+        },
+        {
+          slug: "venice",
+          city: "Venecia",
+          days: 3,
+          description: "Paseos por canales e iglesias clásicas.",
+        },
+        {
+          slug: "athens",
+          city: "Atenas",
+          days: 3,
+          description: "Sitios antiguos y barrios con cafés.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    helsinki: {
+      slug: "helsinki",
+      city: "Helsinki",
+      country: "Finlandia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Aficionados al diseño", "Primer viaje", "Navegantes de islas"],
+      style: ["Diseño junto al agua", "Navegación entre islas", "Cultura de cafés"],
+      pacing: [
+        "Helsinki recompensa un ritmo calmado y centrado en el diseño. Ancla cada día con un área principal—el distrito del diseño, la isla Suomenlinna, o el frente del agua—y luego deja tiempo para cafés, saunas y paseos lentos.",
+        "El centro compacto facilita explorar a pie. Combina el distrito del diseño con el frente del agua para lugares modernos, luego explora Suomenlinna u otras islas para un ritmo diferente.",
+        "Reserva tiempo para la cultura de sauna y momentos tranquilos junto al puerto. El diseño moderno de la ciudad y el entorno de islas crean una atmósfera relajada y con visión de futuro.",
+      ],
+      hero: {
+        title: "Helsinki en 3 días",
+        subtitle:
+          "Explora diseño junto al agua, navegación entre islas y cultura relajada de cafés con un ritmo calmado y moderno.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Helsinki_Cathedral.jpg",
+          alt: "Catedral de Helsinki y Plaza del Senado con arquitectura neoclásica.",
+        },
+      },
+      cityStats: [
+        { value: "650K", label: "Habitantes en la ciudad" },
+        { value: "330", label: "Islas en el archipiélago" },
+        { value: "2M+", label: "Saunas en Finlandia" },
+        { value: "1", label: "Capital del diseño de Finlandia" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con diseño moderno",
+          "Navegación entre islas y paseos junto al agua",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Cultura de cafés y saunas",
+        ],
+        notForYou: [
+          "Excursiones lejos de Helsinki",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Ambiente de casco antiguo histórico",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Distrito del diseño y centro",
+          summary: "Tiendas de diseño y centro histórico.",
+          morning: "Distrito del diseño y tiendas",
+          afternoon: "Plaza del Senado y Catedral de Helsinki",
+          evening: "Paseo junto al agua y cena",
+        },
+        {
+          day: 2,
+          title: "Isla Suomenlinna",
+          summary: "Isla fortaleza y naturaleza.",
+          morning: "Barco a Suomenlinna",
+          afternoon: "Exploración de la fortaleza y paseos por la isla",
+          evening: "Regreso al centro y cafés",
+        },
+        {
+          day: 3,
+          title: "Frente del agua y mercados",
+          summary: "Área del puerto y plaza del mercado.",
+          morning: "Plaza del Mercado y puerto",
+          afternoon: "Catedral Uspenski y Katajanokka",
+          evening: "Último paseo junto al agua y atardecer",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Diseño moderno",
+          description:
+            "El distrito del diseño de Helsinki muestra el diseño finlandés con tiendas, galerías y arquitectura contemporánea en toda la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Helsinki_Design_District.jpg",
+            alt: "Distrito del diseño moderno en Helsinki con arquitectura contemporánea.",
+          },
+        },
+        {
+          title: "Fortaleza isleña",
+          description:
+            "Suomenlinna ofrece una experiencia única de isla con fortificaciones históricas, senderos naturales y vistas del puerto.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Suomenlinna_Helsinki.jpg",
+            alt: "Isla fortaleza Suomenlinna en Helsinki con edificios históricos y vistas del puerto.",
+          },
+        },
+        {
+          title: "Vida junto al agua",
+          description:
+            "El puerto y la Plaza del Mercado crean una atmósfera animada con ferries, mercados y cafés junto al agua.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Helsinki_Market_Square.jpg",
+            alt: "Plaza del Mercado en Helsinki con vendedores y vistas del puerto.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Tren al centro" },
+        { label: "Consejos de transporte", value: "Camina el centro; ferry para Suomenlinna" },
+        { label: "Entradas", value: "Reserva entradas para ferry Suomenlinna" },
+        { label: "Zona para alojarse", value: "Centro de la ciudad cerca de la Plaza del Senado" },
+      ],
+      checklist: [
+        "Reserva entradas para ferry Suomenlinna",
+        "Empaca capas para clima de isla",
+        "Guarda mapas offline para Helsinki",
+        "Planifica tiempo para sauna si te interesa",
+        "Visita tiendas de diseño",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días para Helsinki?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el distrito del diseño, Suomenlinna y sitios culturales clave con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar ferry Suomenlinna?",
+          answer:
+            "Las entradas para ferry están disponibles en el puerto, pero reservar con antelación puede ahorrar tiempo en temporada alta. El ferry funciona con frecuencia.",
+        },
+        {
+          question: "¿Es Helsinki caminable?",
+          answer:
+            "El centro de la ciudad es muy caminable y compacto. Todo está a poca distancia caminando, y el frente del agua se conecta bien a pie.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro de la ciudad cerca de la Plaza del Senado te mantiene cerca de los lugares principales, distrito del diseño y restaurantes, con fácil acceso al puerto.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Suomenlinna para maximizar el tiempo en la isla. El distrito del diseño es agradable durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Helsinki se centra en la cocina nórdica, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Helsinki es buena para el diseño?",
+          answer:
+            "Sí. Helsinki es conocida como una capital del diseño, con excelentes tiendas de diseño, galerías y arquitectura contemporánea en toda la ciudad.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "stockholm",
+          city: "Estocolmo",
+          days: 3,
+          description: "Encanto del casco antiguo e islas.",
+        },
+        {
+          slug: "copenhagen",
+          city: "Copenhague",
+          days: 3,
+          description: "Paseos junto al agua y diseño.",
+        },
+        {
+          slug: "oslo",
+          city: "Oslo",
+          days: 3,
+          description: "Paseos junto al agua y museos compactos.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    innsbruck: {
+      slug: "innsbruck",
+      city: "Innsbruck",
+      country: "Austria",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de montañas", "Primer viaje", "Caminantes alpinos"],
+      style: ["Vistas alpinas", "Casco antiguo histórico", "Acceso a montañas"],
+      pacing: [
+        "Innsbruck recompensa un ritmo calmado y alpino. Ancla cada día con un área principal—el histórico casco antiguo, o las montañas Nordkette—y luego deja tiempo para cafés, miradores y paseos lentos.",
+        "El centro compacto facilita explorar a pie. Combina el casco antiguo con el Tejado de Oro para lugares clásicos, luego explora las montañas o áreas cercanas para un ritmo diferente.",
+        "Reserva tiempo para miradores de montaña y momentos tranquilos en el casco antiguo. El entorno alpino de la ciudad y la arquitectura histórica crean una atmósfera relajada y escénica.",
+      ],
+      hero: {
+        title: "Innsbruck en 2 días",
+        subtitle:
+          "Explora vistas alpinas, casco antiguo histórico y fácil acceso a montañas con un ritmo calmado y escénico.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Innsbruck_Altstadt_10.jpg",
+          alt: "Casco antiguo histórico de Innsbruck con edificios coloridos y telón de fondo montañoso.",
+        },
+      },
+      cityStats: [
+        { value: "132K", label: "Habitantes en la ciudad" },
+        { value: "574M", label: "Elevación del teleférico Nordkette" },
+        { value: "800+", label: "Años de historia" },
+        { value: "2", label: "Juegos Olímpicos de Invierno organizados" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con vistas alpinas",
+          "Casco antiguo histórico y montañas",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Experiencia de teleférico de montaña",
+        ],
+        notForYou: [
+          "Excursiones lejos de Innsbruck",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades de playa o costeras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco antiguo histórico",
+          summary: "Tejado de Oro y paseos por el casco antiguo.",
+          morning: "Tejado de Oro y centro histórico",
+          afternoon: "Calles del casco antiguo e iglesias",
+          evening: "Paseo junto al río y cena",
+        },
+        {
+          day: 2,
+          title: "Montañas Nordkette",
+          summary: "Teleférico de montaña y vistas.",
+          morning: "Teleférico Nordkette y cumbre",
+          afternoon: "Caminatas de montaña o regreso al centro",
+          evening: "Paseo por el casco antiguo y cafés",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Entorno alpino",
+          description:
+            "El telón de fondo montañoso de Innsbruck crea vistas impresionantes desde el casco antiguo, con fácil acceso a la cordillera Nordkette vía teleférico.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Innsbruck_Nordkette.jpg",
+            alt: "Montañas Nordkette sobre Innsbruck con teleférico y vistas alpinas.",
+          },
+        },
+        {
+          title: "Casco antiguo histórico",
+          description:
+            "El casco antiguo colorido con el Tejado de Oro muestra arquitectura tirolesa e historia en un centro compacto y caminable.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Golden_Roof_Innsbruck.jpg",
+            alt: "Tejado de Oro en el casco antiguo histórico de Innsbruck con edificios coloridos.",
+          },
+        },
+        {
+          title: "Acceso a montañas",
+          description:
+            "El teleférico Nordkette proporciona fácil acceso a miradores alpinos y naturaleza, a solo minutos del centro de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Innsbruck_Cable_Car.jpg",
+            alt: "Teleférico ascendiendo a las montañas Nordkette desde Innsbruck.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o taxi al centro" },
+        { label: "Consejos de transporte", value: "Camina el casco antiguo; teleférico para montañas" },
+        { label: "Entradas", value: "Reserva teleférico Nordkette con antelación" },
+        { label: "Zona para alojarse", value: "Centro del casco antiguo" },
+      ],
+      checklist: [
+        "Reserva entradas para teleférico Nordkette",
+        "Empaca capas para clima de montaña",
+        "Guarda mapas offline para Innsbruck",
+        "Planifica tiempo para vistas de montaña",
+        "Usa zapatos cómodos para caminar",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días para Innsbruck?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el casco antiguo y las montañas Nordkette con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar el teleférico Nordkette?",
+          answer:
+            "Se recomienda reservar con antelación, especialmente en temporada alta. El teleférico ofrece vistas alpinas impresionantes y es una atracción popular.",
+        },
+        {
+          question: "¿Es Innsbruck caminable?",
+          answer:
+            "El casco antiguo es muy caminable y compacto. Todo está a poca distancia caminando, y la estación del teleférico está cerca del centro.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro del casco antiguo te mantiene cerca de los lugares principales, restaurantes y cafés, con fácil acceso al teleférico.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Nordkette para obtener vistas claras de montaña. El casco antiguo es agradable durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Innsbruck se centra en la cocina tirolesa, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Innsbruck es bueno para vistas de montaña?",
+          answer:
+            "Sí. La ciudad se encuentra en un valle rodeado de montañas, y el teleférico Nordkette proporciona fácil acceso a miradores alpinos impresionantes.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "vienna",
+          city: "Viena",
+          days: 3,
+          description: "Museos clásicos y jardines de palacios.",
+        },
+        {
+          slug: "salzburg",
+          city: "Salzburgo",
+          days: 3,
+          description: "Arquitectura barroca y vistas de montaña.",
+        },
+        {
+          slug: "munich",
+          city: "Múnich",
+          days: 3,
+          description: "Plazas históricas y pausas en jardines.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    riga: {
+      slug: "riga",
+      city: "Riga",
+      country: "Letonia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Aficionados a arquitectura", "Primer viaje", "Caminantes del casco antiguo"],
+      style: ["Art nouveau", "Plazas históricas", "Paseos junto al río"],
+      pacing: [
+        "Riga recompensa un ritmo calmado y arquitectónico. Ancla cada día con un área principal—el distrito art nouveau, o el histórico casco antiguo—y luego deja tiempo para cafés, mercados y paseos lentos.",
+        "El centro compacto facilita explorar a pie. Combina el casco antiguo con el distrito art nouveau para lugares diversos, luego explora el frente del río o mercados para un ritmo diferente.",
+        "Reserva tiempo para edificios art nouveau y momentos tranquilos a lo largo del río Daugava. La arquitectura diversa de la ciudad y el entorno del río crean una atmósfera relajada y cultural.",
+      ],
+      hero: {
+        title: "Riga en 2 días",
+        subtitle:
+          "Explora arquitectura art nouveau, plazas del casco antiguo y paseos junto al río con un ritmo calmado y cultural.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Historic_Centre_of_Riga-112610.jpg",
+          alt: "Casco antiguo histórico de Riga con edificios medievales y agujas de iglesias.",
+        },
+      },
+      cityStats: [
+        { value: "632K", label: "Habitantes en la ciudad" },
+        { value: "800+", label: "Edificios art nouveau" },
+        { value: "800+", label: "Años de historia" },
+        { value: "UNESCO", label: "Patrimonio de la Humanidad" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con art nouveau",
+          "Casco antiguo histórico y arquitectura",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Tiempo cultural y de mercado",
+        ],
+        notForYou: [
+          "Excursiones lejos de Riga",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades de playa o costeras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco antiguo y plazas",
+          summary: "Centro histórico y plazas principales.",
+          morning: "Casco antiguo y Plaza del Ayuntamiento",
+          afternoon: "Catedral del Domo y edificios históricos",
+          evening: "Paseo junto al río y cena",
+        },
+        {
+          day: 2,
+          title: "Distrito art nouveau",
+          summary: "Arquitectura art nouveau y calles.",
+          morning: "Distrito art nouveau y edificios",
+          afternoon: "Mercado Central o más arquitectura",
+          evening: "Paseo por el casco antiguo y cafés",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arquitectura art nouveau",
+          description:
+            "Riga tiene una de las colecciones más grandes del mundo de edificios art nouveau, con fachadas ornamentadas y detalles decorativos en toda la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riga_Art_Nouveau.jpg",
+            alt: "Edificio art nouveau en Riga con fachada ornamentada y detalles decorativos.",
+          },
+        },
+        {
+          title: "Casco antiguo histórico",
+          description:
+            "El casco antiguo medieval con calles empedradas y edificios históricos crea un centro encantador y caminable.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riga_Dome_Cathedral.jpg",
+            alt: "Catedral del Domo en el casco antiguo de Riga con arquitectura histórica.",
+          },
+        },
+        {
+          title: "Entorno junto al río",
+          description:
+            "El río Daugava proporciona un telón de fondo pacífico a la ciudad, con paseos junto al agua y vistas escénicas.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riga_Daugava_River.jpg",
+            alt: "Río Daugava en Riga con horizonte de la ciudad y vistas junto al agua.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o taxi al centro" },
+        { label: "Consejos de transporte", value: "Camina el centro; todo está cerca" },
+        { label: "Entradas", value: "Reserva atracciones principales con antelación si es necesario" },
+        { label: "Zona para alojarse", value: "Casco antiguo o distrito art nouveau" },
+      ],
+      checklist: [
+        "Reserva entradas para atracciones principales si visitas",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Riga",
+        "Planifica tiempo para edificios art nouveau",
+        "Visita el Mercado Central",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días para Riga?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el casco antiguo y el distrito art nouveau con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones?",
+          answer:
+            "Para atracciones principales, reservar con antelación puede ayudar en temporada alta. El casco antiguo y el distrito art nouveau se exploran mejor a pie.",
+        },
+        {
+          question: "¿Es Riga caminable?",
+          answer:
+            "El centro de la ciudad es muy caminable y compacto. Todo está a poca distancia caminando, y el casco antiguo se conecta bien con el distrito art nouveau.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El casco antiguo te mantiene cerca de los lugares principales, aunque el distrito art nouveau ofrece buena relación calidad-precio y fácil acceso al centro.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para evitar multitudes en las plazas del casco antiguo. El distrito art nouveau es agradable durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Riga se centra en la cocina báltica, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Riga es buena para art nouveau?",
+          answer:
+            "Sí. Riga tiene una de las colecciones más grandes del mundo de edificios art nouveau, con más de 800 ejemplos en toda la ciudad.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tallinn",
+          city: "Tallin",
+          days: 2,
+          description: "Casco antiguo medieval y murallas.",
+        },
+        {
+          slug: "vilnius",
+          city: "Vilna",
+          days: 2,
+          description: "Arquitectura barroca y calles históricas.",
+        },
+        {
+          slug: "stockholm",
+          city: "Estocolmo",
+          days: 3,
+          description: "Encanto del casco antiguo e islas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    split: {
+      slug: "split",
+      city: "Split",
+      country: "Croacia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de historia", "Primer viaje", "Caminantes junto al agua"],
+      style: ["Palacio romano", "Paseos junto al agua", "Calles históricas"],
+      pacing: [
+        "Split recompensa un ritmo calmado e histórico. Ancla cada día con un área principal—el Palacio de Diocleciano, o el frente del agua—y luego deja tiempo para cafés, miradores y paseos lentos.",
+        "El centro compacto facilita explorar a pie. Combina el palacio con el casco antiguo para lugares clásicos, luego explora el frente del agua o la colina Marjan para un ritmo diferente.",
+        "Reserva tiempo para la colina Marjan y momentos tranquilos a lo largo de la Riva. La historia romana de la ciudad y el entorno del Adriático crean una atmósfera relajada y escénica.",
+      ],
+      hero: {
+        title: "Split en 2 días",
+        subtitle:
+          "Explora el Palacio de Diocleciano, paseos junto al agua e islas cercanas con un ritmo calmado y costero.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Historical_Complex_of_Split_with_the_Palace_of_Diocletian-108827.jpg",
+          alt: "Palacio de Diocleciano en Split con arquitectura romana y edificios históricos.",
+        },
+      },
+      cityStats: [
+        { value: "178K", label: "Habitantes en la ciudad" },
+        { value: "1.700+", label: "Años de historia" },
+        { value: "UNESCO", label: "Patrimonio de la Humanidad" },
+        { value: "30K", label: "Metros cuadrados de palacio" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con historia romana",
+          "Paseos junto al agua y exploración del palacio",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Excursiones de un día a islas",
+        ],
+        notForYou: [
+          "Excursiones lejos de Split",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades solo de playa",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Palacio de Diocleciano",
+          summary: "Palacio romano y casco antiguo.",
+          morning: "Entrada al Palacio de Diocleciano y Peristilo",
+          afternoon: "Calles del palacio y Catedral de San Duje",
+          evening: "Paseo Riva y cena",
+        },
+        {
+          day: 2,
+          title: "Colina Marjan y frente del agua",
+          summary: "Miradores de la colina y área del puerto.",
+          morning: "Caminata por la colina Marjan y miradores",
+          afternoon: "Área del frente del agua y playas",
+          evening: "Paseo por el casco antiguo y cafés",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Palacio romano",
+          description:
+            "El Palacio de Diocleciano es un monumento romano viviente, con murallas, calles y edificios antiguos integrados en la ciudad moderna.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Peristyle_Split.jpg",
+            alt: "Plaza del Peristilo en el Palacio de Diocleciano, Split, con columnas y arquitectura romana.",
+          },
+        },
+        {
+          title: "Paseo junto al agua",
+          description:
+            "El paseo Riva a lo largo del puerto proporciona una atmósfera animada con cafés, vistas y fácil acceso al casco antiguo.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riva_Split.jpg",
+            alt: "Paseo junto al agua Riva en Split con cafés y vistas del puerto.",
+          },
+        },
+        {
+          title: "Colina Marjan",
+          description:
+            "La colina Marjan ofrece paseos tranquilos por la naturaleza y vistas panorámicas de Split, el puerto e islas circundantes.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Marjan_Hill_Split.jpg",
+            alt: "Vista desde la colina Marjan en Split mostrando la ciudad y el mar Adriático.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o taxi al centro" },
+        { label: "Consejos de transporte", value: "Camina el centro; todo está cerca" },
+        { label: "Entradas", value: "Reserva atracciones del palacio con antelación si es necesario" },
+        { label: "Zona para alojarse", value: "Casco antiguo o cerca de la Riva" },
+      ],
+      checklist: [
+        "Reserva entradas para atracciones del palacio si visitas",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Split",
+        "Planifica tiempo para la colina Marjan",
+        "Trae protección solar",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días para Split?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el Palacio de Diocleciano y la colina Marjan con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones del palacio?",
+          answer:
+            "Para atracciones principales dentro del palacio, reservar con antelación puede ayudar en temporada alta. El palacio en sí es gratis para explorar.",
+        },
+        {
+          question: "¿Es Split caminable?",
+          answer:
+            "El casco antiguo y el palacio son muy caminables y compactos. Todo está a poca distancia caminando, aunque la colina Marjan requiere algo de caminata cuesta arriba.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El casco antiguo te mantiene cerca del palacio y lugares principales, aunque áreas cerca de la Riva ofrecen buena relación calidad-precio y fácil acceso.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para el palacio para evitar multitudes. La colina Marjan es agradable durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Split se centra en mariscos, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Split es bueno para historia romana?",
+          answer:
+            "Sí. El Palacio de Diocleciano es uno de los monumentos romanos mejor conservados, con arquitectura antigua integrada en el centro moderno de la ciudad.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "dubrovnik",
+          city: "Dubrovnik",
+          days: 3,
+          description: "Murallas históricas y vistas del Adriático.",
+        },
+        {
+          slug: "rome",
+          city: "Roma",
+          days: 3,
+          description: "Monumentos antiguos y plazas.",
+        },
+        {
+          slug: "athens",
+          city: "Atenas",
+          days: 3,
+          description: "Sitios antiguos y barrios con cafés.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tallinn: {
+      slug: "tallinn",
+      city: "Tallin",
+      country: "Estonia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de historia", "Primer viaje", "Aficionados a ciudades medievales"],
+      style: ["Murallas medievales", "Plazas históricas", "Vistas del puerto"],
+      pacing: [
+        "Tallin recompensa un ritmo calmado y medieval. Ancla cada día con un área principal—el casco antiguo, o la colina Toompea—y luego deja tiempo para cafés, miradores y paseos lentos.",
+        "El casco antiguo compacto facilita explorar a pie. Combina la ciudad baja con Toompea para lugares clásicos, luego explora las murallas o el puerto para un ritmo diferente.",
+        "Reserva tiempo para las murallas de la ciudad y momentos tranquilos en las plazas. La arquitectura medieval de la ciudad y el entorno del puerto crean una atmósfera relajada e histórica.",
+      ],
+      hero: {
+        title: "Tallin en 2 días",
+        subtitle:
+          "Explora casco antiguo medieval, murallas de la ciudad y vistas del puerto con un ritmo calmado e histórico.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_Old_Town.jpg",
+          alt: "Casco antiguo medieval de Tallin con edificios históricos y agujas de iglesias.",
+        },
+      },
+      cityStats: [
+        { value: "437K", label: "Habitantes en la ciudad" },
+        { value: "800+", label: "Años de historia" },
+        { value: "1.9KM", label: "Longitud de las murallas" },
+        { value: "UNESCO", label: "Patrimonio de la Humanidad" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con arquitectura medieval",
+          "Casco antiguo histórico y murallas",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Tiempo de puerto y miradores",
+        ],
+        notForYou: [
+          "Excursiones lejos de Tallin",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades de playa o costeras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco antiguo y Toompea",
+          summary: "Centro medieval y vistas desde la colina.",
+          morning: "Entrada al casco antiguo y Plaza del Ayuntamiento",
+          afternoon: "Colina Toompea y Catedral de Alejandro Nevski",
+          evening: "Paseo por el puerto y cena",
+        },
+        {
+          day: 2,
+          title: "Murallas y distritos",
+          summary: "Paseo por murallas y distritos históricos.",
+          morning: "Paseo por murallas y miradores",
+          afternoon: "Distritos históricos e iglesias",
+          evening: "Paseo por el casco antiguo y cafés",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Casco antiguo medieval",
+          description:
+            "El casco antiguo de Tallin es uno de los centros medievales mejor conservados de Europa, con calles empedradas y edificios históricos.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_Town_Hall_Square.jpg",
+            alt: "Plaza del Ayuntamiento en el casco antiguo de Tallin con arquitectura medieval.",
+          },
+        },
+        {
+          title: "Murallas de la ciudad",
+          description:
+            "Las murallas y torres bien conservadas ofrecen vistas del casco antiguo y crean una experiencia única para caminar.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_City_Walls.jpg",
+            alt: "Murallas históricas de Tallin con torres medievales y vistas del casco antiguo.",
+          },
+        },
+        {
+          title: "Entorno del puerto",
+          description:
+            "El puerto proporciona un telón de fondo escénico al casco antiguo, con paseos junto al agua y vistas del mar Báltico.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tallinn_Harbor.jpg",
+            alt: "Puerto en Tallin con casco antiguo y vistas del mar Báltico.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o taxi al centro" },
+        { label: "Consejos de transporte", value: "Camina el casco antiguo; todo está cerca" },
+        { label: "Entradas", value: "Reserva paseo por murallas con antelación si es necesario" },
+        { label: "Zona para alojarse", value: "Centro del casco antiguo" },
+      ],
+      checklist: [
+        "Reserva paseo por murallas si te interesa",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Tallin",
+        "Planifica tiempo para la colina Toompea",
+        "Visita las plazas del casco antiguo",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días para Tallin?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el casco antiguo y las murallas con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar paseo por murallas?",
+          answer:
+            "Para paseos guiados, reservar con antelación puede ayudar. Las murallas se pueden ver desde varios puntos en todo el casco antiguo.",
+        },
+        {
+          question: "¿Es Tallin caminable?",
+          answer:
+            "El casco antiguo es muy caminable y compacto. Todo está a poca distancia caminando, aunque la colina Toompea requiere algo de caminata cuesta arriba.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro del casco antiguo te mantiene cerca de los lugares principales, restaurantes y cafés, con fácil acceso a todo.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para evitar multitudes en las plazas del casco antiguo. La colina Toompea es agradable durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Tallin se centra en la cocina estonia, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Tallin es bueno para historia medieval?",
+          answer:
+            "Sí. Tallin tiene uno de los cascos antiguos medievales mejor conservados de Europa, con murallas intactas, edificios históricos y una atmósfera encantadora.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "riga",
+          city: "Riga",
+          days: 2,
+          description: "Art nouveau y plazas del casco antiguo.",
+        },
+        {
+          slug: "vilnius",
+          city: "Vilna",
+          days: 2,
+          description: "Arquitectura barroca y calles históricas.",
+        },
+        {
+          slug: "stockholm",
+          city: "Estocolmo",
+          days: 3,
+          description: "Encanto del casco antiguo e islas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    vilnius: {
+      slug: "vilnius",
+      city: "Vilna",
+      country: "Lituania",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Aficionados a arquitectura", "Primer viaje", "Caminantes de ciudades barrocas"],
+      style: ["Arquitectura barroca", "Calles históricas", "Miradores desde colinas"],
+      pacing: [
+        "Vilna recompensa un ritmo calmado y barroco. Ancla cada día con un área principal—el casco antiguo, o la Torre Gediminas—y luego deja tiempo para cafés, miradores y paseos lentos.",
+        "El centro compacto facilita explorar a pie. Combina el casco antiguo con la Colina Gediminas para lugares clásicos, luego explora Užupis o distritos más tranquilos para un ritmo diferente.",
+        "Reserva tiempo para la Torre Gediminas y momentos tranquilos en el casco antiguo. La arquitectura barroca de la ciudad y el entorno de colina crean una atmósfera relajada y cultural.",
+      ],
+      hero: {
+        title: "Vilna en 2 días",
+        subtitle:
+          "Explora arquitectura barroca, calles históricas y miradores desde colinas con un ritmo calmado y cultural.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Vilnius_Old_Town.jpg",
+          alt: "Casco antiguo histórico de Vilna con arquitectura barroca y agujas de iglesias.",
+        },
+      },
+      cityStats: [
+        { value: "588K", label: "Habitantes en la ciudad" },
+        { value: "700+", label: "Años de historia" },
+        { value: "40+", label: "Iglesias en el casco antiguo" },
+        { value: "UNESCO", label: "Patrimonio de la Humanidad" },
+      ],
+      fit: {
+        forYou: [
+          "Un primer viaje con arquitectura barroca",
+          "Casco antiguo histórico y vistas desde colinas",
+          "Centro compacto y caminable",
+          "Planificación clara y práctica",
+          "Distritos culturales y artísticos",
+        ],
+        notForYou: [
+          "Excursiones lejos de Vilna",
+          "Plan de vida nocturna",
+          "Solo museos todo el día",
+          "Tiempo extenso de compras",
+          "Actividades de playa o costeras",
+        ],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco antiguo y Gediminas",
+          summary: "Centro histórico y torre desde la colina.",
+          morning: "Casco antiguo y Plaza de la Catedral",
+          afternoon: "Torre Gediminas y vistas desde la colina",
+          evening: "Paseo por el casco antiguo y cena",
+        },
+        {
+          day: 2,
+          title: "Užupis y distritos",
+          summary: "Distrito artístico e iglesias históricas.",
+          morning: "Distrito Užupis y área artística",
+          afternoon: "Iglesias históricas y calles más tranquilas",
+          evening: "Último paseo por el casco antiguo y cafés",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arquitectura barroca",
+          description:
+            "El casco antiguo de Vilna muestra arquitectura barroca con iglesias ornamentadas, edificios históricos y calles encantadoras en todo.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Vilnius_Cathedral.jpg",
+            alt: "Catedral de Vilna con arquitectura barroca en el casco antiguo.",
+          },
+        },
+        {
+          title: "Torre Gediminas",
+          description:
+            "La Torre Gediminas desde la colina ofrece vistas panorámicas de Vilna y el área circundante, accesible a pie o en funicular.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gediminas_Tower_Vilnius.jpg",
+            alt: "Torre Gediminas en la colina con vistas del casco antiguo de Vilna.",
+          },
+        },
+        {
+          title: "Distrito Užupis",
+          description:
+            "El distrito artístico Užupis añade una atmósfera creativa y bohemia al casco antiguo, con galerías, cafés y carácter único.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Uzupis_Vilnius.jpg",
+            alt: "Distrito artístico Užupis en Vilna con edificios coloridos y atmósfera creativa.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima cálido" },
+        { label: "Traslado del aeropuerto", value: "Autobús del aeropuerto o taxi al centro" },
+        { label: "Consejos de transporte", value: "Camina el casco antiguo; todo está cerca" },
+        { label: "Entradas", value: "Reserva Torre Gediminas con antelación si es necesario" },
+        { label: "Zona para alojarse", value: "Centro del casco antiguo" },
+      ],
+      checklist: [
+        "Reserva Torre Gediminas si te interesa",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Vilna",
+        "Planifica tiempo para el distrito Užupis",
+        "Visita las iglesias del casco antiguo",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días para Vilna?",
+          answer:
+            "Sí para lo esencial. Este plan cubre el casco antiguo y la Torre Gediminas con un ritmo calmado que deja margen para cafés y paradas espontáneas.",
+        },
+        {
+          question: "¿Necesito reservar Torre Gediminas?",
+          answer:
+            "Para la subida a la torre, reservar con antelación puede ayudar en temporada alta. La colina ofrece grandes vistas incluso sin entrar a la torre.",
+        },
+        {
+          question: "¿Es Vilna caminable?",
+          answer:
+            "El casco antiguo es muy caminable y compacto. Todo está a poca distancia caminando, aunque la Colina Gediminas requiere algo de caminata cuesta arriba.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro del casco antiguo te mantiene cerca de los lugares principales, restaurantes y cafés, con fácil acceso a todo.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para evitar multitudes en las plazas del casco antiguo. La Colina Gediminas es agradable durante todo el día, y puedes relajarte con un almuerzo largo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. La escena gastronómica de Vilna se centra en la cocina lituana, así que reserva algunas comidas con antelación.",
+        },
+        {
+          question: "¿Vilna es buena para arquitectura barroca?",
+          answer:
+            "Sí. Vilna tiene uno de los cascos antiguos barrocos más grandes de Europa, con más de 40 iglesias y edificios históricos en todo el centro.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "riga",
+          city: "Riga",
+          days: 2,
+          description: "Art nouveau y plazas del casco antiguo.",
+        },
+        {
+          slug: "tallinn",
+          city: "Tallin",
+          days: 2,
+          description: "Casco antiguo medieval y murallas.",
+        },
+        {
+          slug: "krakow",
+          city: "Cracovia",
+          days: 3,
+          description: "Casco antiguo y colina del castillo.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tokyo: {
+      slug: "tokyo",
+      city: "Tokio",
+      country: "Japón",
+      days: 4,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de la comida", "Buscadores de cultura"],
+      style: ["Templos tradicionales", "Distritos modernos", "Comida excepcional"],
+      pacing: [
+        "Tokio recompensa un ritmo calmado a través de sus diversos barrios. Enfoca cada día en una zona principal y deja tiempo para visitas a templos, mercados locales y descubrimientos espontáneos de comida.",
+        "Agrupa el tiempo por grupos de distritos. Combina Shibuya con Harajuku para energía moderna, dedica otro día a Asakusa y Ueno para cultura tradicional, luego explora Shinjuku y Ginza para contraste.",
+        "Reserva tiempo sin prisas para paseos por barrios, cenas en izakaya locales y los momentos tranquilos que revelan el carácter de Tokio más allá de los lugares principales.",
+      ],
+      hero: {
+        title: "Tokio en 4 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, equilibrando templos tradicionales, distritos modernos y cultura gastronómica excepcional.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1600&q=80",
+          alt: "Cruce de Shibuya en Tokio con luces de neón y multitudes.",
+        },
+      },
+      cityStats: [
+        { value: "13,9M", label: "Habitantes en el área metropolitana" },
+        { value: "23", label: "Barrios especiales en la ciudad" },
+        { value: "160.000+", label: "Restaurantes y establecimientos gastronómicos" },
+        { value: "2.000+", label: "Templos y santuarios" },
+      ],
+      fit: {
+        forYou: ["Visitas a templos tradicionales", "Exploración de distritos modernos", "Escenas gastronómicas excepcionales", "Tránsito público eficiente", "Barrios seguros y caminables"],
+        notForYou: ["Una agenda muy cargada solo de templos", "Excursiones fuera de Tokio", "Vida nocturna como prioridad", "Tiempo de playa", "Estilo mochilero económico"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Tokio moderno",
+          summary: "Shibuya, Harajuku y energía moderna.",
+          morning: "Cruce de Shibuya y Plaza Hachiko",
+          afternoon: "Harajuku y Takeshita Street",
+          evening: "Shibuya Sky o cena en barrio",
+        },
+        {
+          day: 2,
+          title: "Cultura tradicional",
+          summary: "Asakusa, Senso-ji y Parque Ueno.",
+          morning: "Templo Senso-ji y Calle Nakamise",
+          afternoon: "Parque Ueno y museos",
+          evening: "Cena tradicional en Asakusa",
+        },
+        {
+          day: 3,
+          title: "Imperial y compras",
+          summary: "Palacio Imperial, Ginza y Tsukiji.",
+          morning: "Jardines Orientales del Palacio Imperial",
+          afternoon: "Distrito Ginza y compras",
+          evening: "Zona del Mercado Exterior de Tsukiji",
+        },
+        {
+          day: 4,
+          title: "Barrios y comida",
+          summary: "Shinjuku, mercados locales y tiempo relajado.",
+          morning: "Shinjuku Gyoen o Santuario Meiji",
+          afternoon: "Exploración del barrio Shinjuku",
+          evening: "Cena en izakaya y Golden Gai",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Templos tradicionales",
+          description:
+            "Senso-ji y el Santuario Meiji ofrecen contrastes pacíficos con la energía moderna de Tokio. Las visitas matutinas proporcionan momentos tranquilos antes de que lleguen las multitudes.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sensoji_Temple_Tokyo.jpg",
+            alt: "Templo Senso-ji en Asakusa con arquitectura tradicional y linternas.",
+          },
+        },
+        {
+          title: "Distritos modernos",
+          description:
+            "Shibuya y Shinjuku muestran el lado contemporáneo de Tokio con luces de neón, tránsito eficiente y vida callejera vibrante que se siente tanto organizada como enérgica.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Shinjuku_Tokyo_Skyline.jpg",
+            alt: "Skyline de Shinjuku con rascacielos modernos y letreros de neón.",
+          },
+        },
+        {
+          title: "Cultura gastronómica excepcional",
+          description:
+            "Desde el mercado de pescado de Tsukiji hasta izakaya de barrios, la escena gastronómica de Tokio es de clase mundial. Las comidas largas y los descubrimientos locales son parte de la experiencia.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tsukiji_Market_Tokyo.jpg",
+            alt: "Mercado Exterior de Tsukiji con mariscos frescos y puestos de comida.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Traslado aeropuerto", value: "Narita Express o Skyliner al centro de la ciudad" },
+        { label: "Transporte", value: "Obtén un JR Pass o tarjeta IC para tránsito fácil" },
+        { label: "Entradas", value: "Reserva atracciones principales como Tokyo Skytree con antelación" },
+        { label: "Zona para alojarte", value: "Áreas de Shibuya, Shinjuku o Ginza" },
+      ],
+      checklist: [
+        "Obtén un JR Pass o tarjeta IC para tránsito",
+        "Reserva Tokyo Skytree si visitas",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Tokio",
+        "Planifica una experiencia de comida tradicional",
+        "Lleva efectivo para establecimientos pequeños",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 4 días para Tokio?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra Tokio tradicional y moderno con suficiente margen para descubrimientos gastronómicos, paseos por barrios y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito un JR Pass?",
+          answer:
+            "Para viajes por la ciudad, una tarjeta IC es más práctica. Los JR Passes son mejores para viajes más largos por Japón. Ambos ofrecen fácil acceso al excelente sistema de tránsito de Tokio.",
+        },
+        {
+          question: "¿Es Tokio caminable?",
+          answer:
+            "Los barrios son caminables, pero Tokio es vasto. Usa el eficiente sistema de metro y tren para moverte entre distritos, luego explora a pie dentro de cada área.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Shibuya o Shinjuku ofrecen buenas conexiones de tránsito y ubicaciones centrales. Ginza proporciona una base más exclusiva con fácil acceso a compras y restaurantes.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para visitas a templos para evitar multitudes. Los mercados como Tsukiji son mejores por la mañana. Las tardes pueden ser más lentas con exploración de barrios.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes de alta gama, sí—especialmente para sushi o kaiseki. Para izakaya y lugares casuales, las llegadas sin reserva son comunes, aunque los lugares populares pueden tener esperas.",
+        },
+        {
+          question: "¿Se habla inglés ampliamente?",
+          answer:
+            "En áreas turísticas, sí. Muchos restaurantes tienen menús en inglés y las señales de tránsito son bilingües. Aprender frases básicas en japonés ayuda, especialmente fuera de áreas centrales.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "seoul",
+          city: "Seúl",
+          days: 3,
+          description: "Palacios antiguos, barrios modernos y escenas gastronómicas dinámicas.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Templos dorados, mercados flotantes y comida callejera vibrante.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Vistas del skyline, mercados tradicionales y escapes fáciles a islas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    seoul: {
+      slug: "seoul",
+      city: "Seúl",
+      country: "Corea del Sur",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de historia", "Entusiastas de la comida"],
+      style: ["Palacios antiguos", "Barrios modernos", "Escenas gastronómicas dinámicas"],
+      pacing: [
+        "Seúl recompensa un ritmo calmado a través de su mezcla de antiguo y moderno. Ancla cada día con una zona principal y deja tiempo para visitas a palacios, mercados de barrios y descubrimientos espontáneos de comida.",
+        "Agrupa el tiempo por distrito. Combina Gyeongbokgung con Bukchon para cultura tradicional, dedica otro día a Myeongdong e Insadong para compras y comida, luego explora Gangnam para contraste moderno.",
+        "Reserva tiempo sin prisas para paseos por aldeas hanok, visitas a mercados locales y las comidas relajadas que muestran la excepcional cultura gastronómica de Seúl.",
+      ],
+      hero: {
+        title: "Seúl en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, mezclando palacios antiguos, barrios modernos y escenas de comida callejera dinámicas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1758509444769-95567facc5b0?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Seúl con Torre Namsan y arquitectura moderna.",
+        },
+      },
+      cityStats: [
+        { value: "9,7M", label: "Habitantes en la ciudad" },
+        { value: "5", label: "Grandes palacios en Seúl" },
+        { value: "25", label: "Distritos (gu) en la ciudad" },
+        { value: "20.000+", label: "Restaurantes y establecimientos gastronómicos" },
+      ],
+      fit: {
+        forYou: ["Visitas a palacios antiguos", "Aldeas hanok tradicionales", "Mercados gastronómicos vibrantes", "Distritos de compras modernos", "Tránsito público eficiente"],
+        notForYou: ["Una agenda muy cargada solo de palacios", "Excursiones fuera de Seúl", "Vida nocturna como prioridad", "Tiempo de playa", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Palacios y tradición",
+          summary: "Gyeongbokgung, Bukchon y cultura tradicional.",
+          morning: "Palacio Gyeongbokgung y cambio de guardia",
+          afternoon: "Paseo por Aldea Hanok de Bukchon",
+          evening: "Zona Insadong y cena tradicional",
+        },
+        {
+          day: 2,
+          title: "Seúl moderno",
+          summary: "Myeongdong, N Seoul Tower y compras.",
+          morning: "Distrito de compras Myeongdong",
+          afternoon: "N Seoul Tower y Parque Namsan",
+          evening: "Área Gangnam o Hongdae para vida nocturna",
+        },
+        {
+          day: 3,
+          title: "Mercados y barrios",
+          summary: "Mercado Gwangjang, áreas locales y tiempo relajado.",
+          morning: "Mercado Gwangjang y comida callejera",
+          afternoon: "Dongdaemun o exploración de barrios",
+          evening: "Cena tradicional hanjeongsik",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Palacios antiguos",
+          description:
+            "Gyeongbokgung y Changdeokgung muestran la historia real de Corea. Las visitas matutinas ofrecen momentos más tranquilos y la oportunidad de ver ceremonias tradicionales.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Changdeokgung_Palace_Seoul.jpg",
+            alt: "Palacio Changdeokgung con arquitectura tradicional coreana y jardines.",
+          },
+        },
+        {
+          title: "Aldeas hanok",
+          description:
+            "Bukchon preserva la arquitectura tradicional coreana en un entorno residencial. Los paseos lentos revelan patios, casas de té y calles tranquilas que se sienten alejadas del Seúl moderno.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bukchon_Hanok_Village_Seoul.jpg",
+            alt: "Casas hanok tradicionales en Aldea Bukchon con techos de tejas.",
+          },
+        },
+        {
+          title: "Cultura gastronómica dinámica",
+          description:
+            "Desde el Mercado Gwangjang hasta la comida callejera de Myeongdong, la escena gastronómica de Seúl es vibrante y accesible. Las comidas largas y los descubrimientos locales son centrales para la experiencia.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gwangjang_Market_Seoul.jpg",
+            alt: "Mercado Gwangjang con puestos de comida y vendedores en Seúl.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a noviembre" },
+        { label: "Traslado aeropuerto", value: "Tren expreso AREX o autobús del aeropuerto al centro" },
+        { label: "Transporte", value: "Obtén una tarjeta T-money para fácil acceso a metro y autobuses" },
+        { label: "Entradas", value: "Reserva tours de palacios y N Seoul Tower con antelación" },
+        { label: "Zona para alojarte", value: "Áreas de Myeongdong, Insadong o Gangnam" },
+      ],
+      checklist: [
+        "Obtén una tarjeta T-money para tránsito",
+        "Reserva tour del Jardín Secreto de Changdeokgung si te interesa",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Seúl",
+        "Planifica una experiencia de comida tradicional",
+        "Lleva efectivo para mercados y comida callejera",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Seúl?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra Seúl tradicional y moderno con suficiente margen para visitas a palacios, mercados gastronómicos y exploración de barrios.",
+        },
+        {
+          question: "¿Necesito reservar visitas a palacios?",
+          answer:
+            "Para Gyeongbokgung, no se necesita reserva anticipada. Para el Jardín Secreto de Changdeokgung, sí—reserva con antelación ya que los tours son limitados. El cambio de guardia en Gyeongbokgung es gratuito y vale la pena programar tu visita.",
+        },
+        {
+          question: "¿Es Seúl caminable?",
+          answer:
+            "Los barrios son caminables, pero Seúl está extendido. Usa el eficiente sistema de metro para moverte entre distritos, luego explora a pie dentro de cada área.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Myeongdong ofrece ubicación central y fácil acceso a compras y comida. Insadong proporciona carácter tradicional, mientras que Gangnam ofrece conveniencia moderna.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para visitas a palacios para evitar multitudes y ver el cambio de guardia. Los mercados son mejores por la mañana, y las tardes pueden ser más lentas con paseos por barrios.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para BBQ coreano de alta gama o hanjeongsik, sí—especialmente en fines de semana. Para comida callejera y lugares casuales, las llegadas sin reserva son comunes y parte de la experiencia.",
+        },
+        {
+          question: "¿Se habla inglés ampliamente?",
+          answer:
+            "En áreas turísticas y con personas jóvenes, sí. Muchos restaurantes tienen menús en inglés y las señales de tránsito son bilingües. Aprender frases básicas en coreano ayuda.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokio",
+          days: 4,
+          description: "Templos tradicionales, distritos modernos y cultura gastronómica excepcional.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Templos dorados, mercados flotantes y comida callejera vibrante.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Vistas del skyline, mercados tradicionales y escapes fáciles a islas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bangkok: {
+      slug: "bangkok",
+      city: "Bangkok",
+      country: "Tailandia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de templos", "Entusiastas de la comida"],
+      style: ["Templos dorados", "Mercados flotantes", "Comida callejera vibrante"],
+      pacing: [
+        "Bangkok recompensa un ritmo calmado a pesar de su energía. Ancla cada día con un templo o zona principal y deja tiempo para visitas a mercados, descubrimientos de comida callejera y paseos en bote por el río.",
+        "Agrupa el tiempo por zona. Combina el Gran Palacio con Wat Pho para cultura de templos, dedica otro día a Chatuchak o mercados flotantes, luego explora barrios como Chinatown para comida y vida local.",
+        "Reserva tiempo sin prisas para visitas a templos, paseos largos por mercados y las comidas relajadas que muestran la excepcional cultura de comida callejera de Bangkok.",
+      ],
+      hero: {
+        title: "Bangkok en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con templos dorados, mercados flotantes y escenas de comida callejera vibrantes.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Wat Phra Kaew (Templo del Buda Esmeralda) en Bangkok con arquitectura dorada.",
+        },
+      },
+      cityStats: [
+        { value: "10,5M", label: "Habitantes en el área metropolitana" },
+        { value: "400+", label: "Templos (wats) en toda la ciudad" },
+        { value: "50", label: "Distritos (khet) en Bangkok" },
+        { value: "20.000+", label: "Vendedores de comida callejera" },
+      ],
+      fit: {
+        forYou: ["Visitas a templos y cultura", "Mercados flotantes y callejeros", "Comida callejera vibrante", "Experiencias en bote por el río", "Viaje asequible"],
+        notForYou: ["Una agenda muy cargada solo de templos", "Tiempo de playa", "Vida nocturna como prioridad", "Centros comerciales extensos", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Grandes templos",
+          summary: "Gran Palacio, Wat Pho y cultura de templos.",
+          morning: "Gran Palacio y Wat Phra Kaew",
+          afternoon: "Wat Pho (Templo del Buda Reclinado)",
+          evening: "Wat Arun al atardecer y vistas del río",
+        },
+        {
+          day: 2,
+          title: "Mercados y comida",
+          summary: "Chatuchak o mercado flotante, comida callejera.",
+          morning: "Mercado de Fin de Semana Chatuchak o Damnoen Saduak",
+          afternoon: "Exploración del mercado y comida callejera",
+          evening: "Paseo gastronómico por Chinatown",
+        },
+        {
+          day: 3,
+          title: "Barrios y cultura",
+          summary: "Casa Jim Thompson, áreas locales y tiempo relajado.",
+          morning: "Casa Jim Thompson o Wat Saket",
+          afternoon: "Área Siam o paseo por barrios",
+          evening: "Bar en azotea o cena tradicional",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Templos dorados",
+          description:
+            "El Gran Palacio y Wat Pho muestran el patrimonio real y religioso de Tailandia. Las visitas matutinas ofrecen temperaturas más frescas y menos multitudes antes de que lleguen los grupos turísticos.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Wat_Pho_Bangkok.jpg",
+            alt: "Wat Pho con el Buda Reclinado y arquitectura dorada.",
+          },
+        },
+        {
+          title: "Mercados flotantes",
+          description:
+            "Damnoen Saduak y otros mercados flotantes ofrecen un vistazo a la vida tradicional tailandesa. Las visitas temprano por la mañana proporcionan la mejor experiencia antes del calor y las multitudes.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Damnoen_Saduak_Floating_Market.jpg",
+            alt: "Mercado flotante con botes y vendedores en el agua.",
+          },
+        },
+        {
+          title: "Comida callejera vibrante",
+          description:
+            "Desde Chinatown hasta mercados locales, la escena de comida callejera de Bangkok es de clase mundial. Los paseos gastronómicos largos y los descubrimientos locales son centrales para la experiencia.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bangkok_Street_Food.jpg",
+            alt: "Vendedores de comida callejera y puestos en Bangkok con exhibiciones coloridas.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a marzo para clima más fresco y seco" },
+        { label: "Traslado aeropuerto", value: "Airport Rail Link o taxi al centro" },
+        { label: "Transporte", value: "Usa BTS Skytrain y MRT para distancias largas; tuk-tuks para trayectos cortos" },
+        { label: "Entradas", value: "Compra entradas del Gran Palacio en el lugar; reserva tours de mercados flotantes con antelación" },
+        { label: "Zona para alojarte", value: "Sukhumvit, Silom o cerca del río" },
+      ],
+      checklist: [
+        "Reserva tour de mercado flotante si visitas",
+        "Empaca ropa ligera y transpirable",
+        "Trae zapatos cómodos para caminar",
+        "Guarda mapas offline para Bangkok",
+        "Planifica un paseo de comida callejera",
+        "Lleva efectivo para mercados y comida callejera",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Bangkok?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra templos, mercados y comida con suficiente margen para paseos en bote por el río, paseos por barrios y descubrimientos no planificados.",
+        },
+        {
+          question: "¿Necesito reservar visitas a templos?",
+          answer:
+            "No se necesita reserva anticipada para la mayoría de templos. Compra entradas en el lugar. Para mercados flotantes, reserva tours con antelación ya que están fuera de la ciudad y requieren transporte.",
+        },
+        {
+          question: "¿Es Bangkok caminable?",
+          answer:
+            "Los barrios son caminables, pero Bangkok está extendido y puede hacer calor. Usa BTS Skytrain y MRT para distancias largas, luego explora a pie dentro de cada área. Los botes por el río ofrecen tránsito escénico.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Sukhumvit ofrece buen acceso BTS y conveniencia moderna. Silom proporciona ubicación central, mientras que las áreas cerca del río ofrecen vistas escénicas y fácil acceso a botes.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para visitas a templos para evitar calor y multitudes. Los mercados flotantes son mejores al amanecer. Las tardes pueden ser más lentas con paradas interiores o descansos con aire acondicionado.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes de alta gama, sí. Para comida callejera y lugares casuales, las llegadas sin reserva son la norma. Los mercados gastronómicos y vendedores callejeros no requieren reservas.",
+        },
+        {
+          question: "¿Es segura la comida callejera?",
+          answer:
+            "Sí, generalmente. Busca puestos ocupados con alta rotación. Evita alimentos crudos si eres sensible. Quédate con artículos cocidos y mantente hidratado. La mayoría de viajeros disfrutan la comida callejera sin problemas.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokio",
+          days: 4,
+          description: "Templos tradicionales, distritos modernos y cultura gastronómica excepcional.",
+        },
+        {
+          slug: "seoul",
+          city: "Seúl",
+          days: 3,
+          description: "Palacios antiguos, barrios modernos y escenas gastronómicas dinámicas.",
+        },
+        {
+          slug: "singapore",
+          city: "Singapur",
+          days: 3,
+          description: "Arquitectura moderna, barrios diversos y comida excepcional.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    singapore: {
+      slug: "singapore",
+      city: "Singapur",
+      country: "Singapur",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de la comida", "Fans de arquitectura moderna"],
+      style: ["Arquitectura moderna", "Barrios diversos", "Comida excepcional"],
+      pacing: [
+        "Singapur recompensa un ritmo calmado a pesar de su tamaño compacto. Enfoca cada día en una zona principal y deja tiempo para descubrimientos gastronómicos, paseos por barrios y tiempo relajado en jardines.",
+        "Agrupa el tiempo por distrito. Combina Marina Bay con Gardens by the Bay para íconos modernos, dedica otro día a Chinatown y Little India para cultura y comida, luego explora Sentosa o barrios para contraste.",
+        "Reserva tiempo sin prisas para visitas a centros gastronómicos, paseos largos por jardines y las comidas relajadas que muestran la excepcional cocina multicultural de Singapur.",
+      ],
+      hero: {
+        title: "Singapur en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, combinando arquitectura moderna, barrios diversos y escenas gastronómicas excepcionales.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Marina Bay en Singapur con arquitectura moderna y agua.",
+        },
+      },
+      cityStats: [
+        { value: "5,6M", label: "Habitantes en la ciudad-estado" },
+        { value: "4", label: "Idiomas oficiales" },
+        { value: "350+", label: "Parques y jardines" },
+        { value: "12.000+", label: "Establecimientos gastronómicos" },
+      ],
+      fit: {
+        forYou: ["Arquitectura moderna", "Escenas gastronómicas diversas", "Tránsito público eficiente", "Calles seguras y limpias", "Tiempo en jardines y parques"],
+        notForYou: ["Una agenda muy cargada solo de centros comerciales", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Marina Bay e íconos modernos",
+          summary: "Marina Bay, Gardens by the Bay y vistas del skyline.",
+          morning: "Área Marina Bay Sands y Merlion",
+          afternoon: "Gardens by the Bay y Cloud Forest",
+          evening: "Espectáculo de luces de Marina Bay y cena",
+        },
+        {
+          day: 2,
+          title: "Barrios culturales",
+          summary: "Chinatown, Little India y comida diversa.",
+          morning: "Chinatown y Templo de la Reliquia del Diente de Buda",
+          afternoon: "Little India y Templo Sri Veeramakaliamman",
+          evening: "Cena en centro gastronómico y paseo por barrios",
+        },
+        {
+          day: 3,
+          title: "Sentosa o barrios",
+          summary: "Isla Sentosa, Orchard Road o tiempo relajado.",
+          morning: "Isla Sentosa o Jardines Botánicos",
+          afternoon: "Orchard Road o exploración de barrios",
+          evening: "Bar en azotea o cena tradicional",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arquitectura moderna",
+          description:
+            "Marina Bay muestra el skyline futurista de Singapur. Los Gardens by the Bay ofrecen un contraste verde con diseño innovador que se siente tanto natural como diseñado.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gardens_by_the_Bay_Singapore.jpg",
+            alt: "Gardens by the Bay con Supertree Grove y arquitectura moderna.",
+          },
+        },
+        {
+          title: "Barrios diversos",
+          description:
+            "Chinatown y Little India preservan el patrimonio cultural mientras ofrecen comida excepcional. Los paseos lentos revelan templos, mercados y vida local que se siente auténtica y vibrante.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Chinatown_Singapore.jpg",
+            alt: "Chinatown en Singapur con arquitectura tradicional y edificios coloridos.",
+          },
+        },
+        {
+          title: "Cultura gastronómica excepcional",
+          description:
+            "Desde centros gastronómicos hasta restaurantes finos, la escena gastronómica de Singapur es de clase mundial. Las comidas largas y los descubrimientos locales muestran la cocina multicultural de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Hawker_Center_Singapore.jpg",
+            alt: "Centro gastronómico en Singapur con puestos de comida y cocina diversa.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Todo el año, aunque febrero a abril es más seco" },
+        { label: "Traslado aeropuerto", value: "MRT o taxi al centro" },
+        { label: "Transporte", value: "Obtén una tarjeta EZ-Link para fácil acceso a MRT y autobuses" },
+        { label: "Entradas", value: "Reserva Gardens by the Bay y atracciones principales con antelación" },
+        { label: "Zona para alojarte", value: "Áreas de Marina Bay, Orchard Road o Chinatown" },
+      ],
+      checklist: [
+        "Obtén una tarjeta EZ-Link para tránsito",
+        "Reserva Gardens by the Bay con antelación",
+        "Empaca ropa ligera y transpirable",
+        "Guarda mapas offline para Singapur",
+        "Planifica una comida en centro gastronómico",
+        "Lleva efectivo para centros gastronómicos y mercados",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Singapur?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra íconos modernos, barrios culturales y comida con suficiente margen para paseos por jardines, exploración de barrios y descubrimientos no planificados.",
+        },
+        {
+          question: "¿Necesito reservar atracciones con antelación?",
+          answer:
+            "Para Gardens by the Bay y Marina Bay Sands SkyPark, sí—reserva con antelación para entrada con horario. La mayoría de templos y barrios no requieren reserva anticipada.",
+        },
+        {
+          question: "¿Es Singapur caminable?",
+          answer:
+            "Los barrios son caminables, pero Singapur se explora mejor con una mezcla de caminar y tránsito MRT eficiente. La ciudad es compacta y bien conectada.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Marina Bay ofrece conveniencia moderna y vistas del skyline. Orchard Road proporciona compras y ubicación central, mientras que Chinatown ofrece carácter cultural.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Gardens by the Bay para evitar multitudes y calor. Los templos son agradables durante todo el día. Las tardes pueden incluir paradas interiores o descansos con aire acondicionado.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes de alta gama, sí—especialmente en fines de semana. Para centros gastronómicos y lugares casuales, las llegadas sin reserva son la norma. Los centros gastronómicos no requieren reservas.",
+        },
+        {
+          question: "¿Se habla inglés ampliamente?",
+          answer:
+            "Sí, el inglés es uno de los idiomas oficiales y se habla ampliamente. Las señales están en inglés y la mayoría de locales son fluidos. Esto hace que Singapur sea muy accesible para hablantes de inglés.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokio",
+          days: 4,
+          description: "Templos tradicionales, distritos modernos y cultura gastronómica excepcional.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Templos dorados, mercados flotantes y comida callejera vibrante.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Vistas del skyline, mercados tradicionales y escapes fáciles a islas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "hong-kong": {
+      slug: "hong-kong",
+      city: "Hong Kong",
+      country: "China",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes del skyline", "Entusiastas de la comida"],
+      style: ["Vistas del skyline", "Mercados tradicionales", "Escapes fáciles a islas"],
+      pacing: [
+        "Hong Kong recompensa un ritmo calmado a través de su mezcla de energía urbana y escapes naturales. Enfoca cada día en una zona principal y deja tiempo para visitas a mercados, viajes a islas y descubrimientos espontáneos de comida.",
+        "Agrupa el tiempo por distrito. Combina Victoria Peak con Central para vistas del skyline, dedica otro día a Kowloon para mercados y cultura, luego explora una isla periférica como Lantau para contraste.",
+        "Reserva tiempo sin prisas para paseos por mercados, visitas largas a islas y las comidas relajadas que muestran la excepcional cultura gastronómica de Hong Kong.",
+      ],
+      hero: {
+        title: "Hong Kong en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con vistas del skyline, mercados tradicionales y escapes fáciles a islas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Hong Kong con Victoria Harbour y rascacielos modernos.",
+        },
+      },
+      cityStats: [
+        { value: "7,5M", label: "Habitantes en la ciudad" },
+        { value: "263", label: "Islas en Hong Kong" },
+        { value: "40%", label: "Tierra designada como parques nacionales" },
+        { value: "11.000+", label: "Restaurantes y establecimientos gastronómicos" },
+      ],
+      fit: {
+        forYou: ["Vistas icónicas del skyline", "Mercados tradicionales", "Viajes de un día a islas", "Tránsito público eficiente", "Escenas gastronómicas diversas"],
+        notForYou: ["Una agenda muy cargada solo de compras", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Skyline y Peak",
+          summary: "Victoria Peak, Star Ferry y vistas del puerto.",
+          morning: "Victoria Peak y Sky Terrace",
+          afternoon: "Star Ferry a Kowloon y Tsim Sha Tsui",
+          evening: "Avenue of Stars y Symphony of Lights",
+        },
+        {
+          day: 2,
+          title: "Mercados y cultura",
+          summary: "Temple Street, mercados y barrios locales.",
+          morning: "Área del Mercado Nocturno Temple Street",
+          afternoon: "Templo Wong Tai Sin o mercados locales",
+          evening: "Paseo gastronómico por Kowloon y exploración de barrios",
+        },
+        {
+          day: 3,
+          title: "Escape a isla",
+          summary: "Isla Lantau, Gran Buda o tiempo relajado.",
+          morning: "Isla Lantau y Ngong Ping",
+          afternoon: "Gran Buda y Monasterio Po Lin",
+          evening: "Regreso a la ciudad o cena en isla",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Skyline icónico",
+          description:
+            "Victoria Peak ofrece la vista clásica de Hong Kong. El Star Ferry proporciona una forma escénica de cruzar el puerto mientras disfrutas del skyline desde el nivel del agua.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Victoria_Peak_Hong_Kong.jpg",
+            alt: "Vista desde Victoria Peak mostrando el skyline de Hong Kong y el puerto.",
+          },
+        },
+        {
+          title: "Mercados tradicionales",
+          description:
+            "Temple Street y otros mercados muestran la vida local con comida, productos y energía nocturna que se siente auténtica y vibrante.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Temple_Street_Market_Hong_Kong.jpg",
+            alt: "Mercado Nocturno Temple Street con puestos y luces nocturnas.",
+          },
+        },
+        {
+          title: "Escapes a islas",
+          description:
+            "Lantau y otras islas periféricas ofrecen contraste natural con la energía urbana de Hong Kong. Los viajes de un día proporcionan senderismo, playas y momentos tranquilos.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Big_Buddha_Lantau.jpg",
+            alt: "Estatua del Gran Buda en Isla Lantau con montañas al fondo.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril para clima más fresco y seco" },
+        { label: "Traslado aeropuerto", value: "Tren Airport Express o autobús al centro" },
+        { label: "Transporte", value: "Obtén una tarjeta Octopus para fácil acceso a MTR, autobuses y ferries" },
+        { label: "Entradas", value: "Reserva Peak Tram y atracciones principales con antelación" },
+        { label: "Zona para alojarte", value: "Central, Tsim Sha Tsui o Causeway Bay" },
+      ],
+      checklist: [
+        "Obtén una tarjeta Octopus para tránsito",
+        "Reserva entradas para Peak Tram con antelación",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Hong Kong",
+        "Planifica un viaje de un día a una isla",
+        "Lleva efectivo para mercados y comida callejera",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Hong Kong?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra vistas del skyline, mercados y tiempo en islas con suficiente margen para descubrimientos gastronómicos, paseos por barrios y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones con antelación?",
+          answer:
+            "Para Victoria Peak Tram y atracciones principales, sí—reserva con antelación para entrada con horario. Los mercados y barrios no requieren reserva anticipada.",
+        },
+        {
+          question: "¿Es Hong Kong caminable?",
+          answer:
+            "Los barrios son caminables, pero Hong Kong es montañoso y extendido. Usa el eficiente sistema MTR para distancias largas, luego explora a pie dentro de cada área. El Star Ferry ofrece tránsito escénico.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Central ofrece buen acceso MTR y ubicación central. Tsim Sha Tsui proporciona vistas del puerto y fácil acceso a Kowloon, mientras que Causeway Bay ofrece compras y carácter local.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Victoria Peak para evitar multitudes y obtener vistas más claras. Los mercados son mejores por la noche. Los viajes a islas funcionan bien como excursiones de día completo.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes de alta gama, sí—especialmente en fines de semana. Para dim sum y lugares casuales, las llegadas sin reserva son comunes. Los mercados gastronómicos no requieren reservas.",
+        },
+        {
+          question: "¿Se habla inglés ampliamente?",
+          answer:
+            "Sí, el inglés se habla ampliamente junto con el cantonés. Las señales son bilingües y la mayoría de locales en áreas turísticas hablan inglés. Esto hace que Hong Kong sea muy accesible.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "tokyo",
+          city: "Tokio",
+          days: 4,
+          description: "Templos tradicionales, distritos modernos y cultura gastronómica excepcional.",
+        },
+        {
+          slug: "singapore",
+          city: "Singapur",
+          days: 3,
+          description: "Arquitectura moderna, barrios diversos y comida excepcional.",
+        },
+        {
+          slug: "bangkok",
+          city: "Bangkok",
+          days: 3,
+          description: "Templos dorados, mercados flotantes y comida callejera vibrante.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "new-york": {
+      slug: "new-york",
+      city: "Nueva York",
+      country: "EE.UU.",
+      days: 4,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de museos", "Exploradores de barrios"],
+      style: ["Barrios icónicos", "Museos de clase mundial", "Escenas gastronómicas diversas"],
+      pacing: [
+        "Nueva York recompensa un ritmo calmado a pesar de su energía. Enfoca cada día en una zona principal y deja tiempo para paseos por barrios, descubrimientos espontáneos de comida y tiempo relajado en parques.",
+        "Agrupa el tiempo por distrito y grupos de barrios. Combina los museos de Manhattan con Central Park, dedica otro día a Brooklyn para puentes y vida local, luego explora diferentes barrios de Manhattan para contraste.",
+        "Reserva tiempo sin prisas para paseos largos por parques, exploración de barrios y las comidas relajadas que muestran la excepcional diversidad gastronómica de Nueva York.",
+      ],
+      hero: {
+        title: "Nueva York en 4 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, cubriendo barrios icónicos, museos de clase mundial y escenas gastronómicas diversas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/New_York_City_Skyline.jpg",
+          alt: "Skyline de Nueva York con edificios icónicos y Central Park.",
+        },
+      },
+      cityStats: [
+        { value: "8,3M", label: "Habitantes en la ciudad" },
+        { value: "5", label: "Distritos en la ciudad" },
+        { value: "100+", label: "Museos y galerías" },
+        { value: "24.000+", label: "Restaurantes en toda la ciudad" },
+      ],
+      fit: {
+        forYou: ["Monumentos icónicos", "Museos de clase mundial", "Barrios diversos", "Tránsito público eficiente", "Parques y espacios verdes"],
+        notForYou: ["Una agenda muy cargada solo de compras", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Núcleo de Manhattan",
+          summary: "Central Park, museos y Upper East Side.",
+          morning: "Central Park y paseo por el embalse",
+          afternoon: "Museo Metropolitano o Museo de Historia Natural",
+          evening: "Upper East Side o cena en barrio",
+        },
+        {
+          day: 2,
+          title: "Midtown e íconos",
+          summary: "Times Square, Empire State y lugares clásicos.",
+          morning: "Times Square y área de Broadway",
+          afternoon: "Empire State Building o High Line",
+          evening: "Distrito de teatros o exploración de barrios",
+        },
+        {
+          day: 3,
+          title: "Brooklyn y puentes",
+          summary: "Brooklyn Bridge, DUMBO y barrios locales.",
+          morning: "Paseo por Brooklyn Bridge desde Manhattan",
+          afternoon: "DUMBO y Brooklyn Heights",
+          evening: "Cena en barrio de Brooklyn",
+        },
+        {
+          day: 4,
+          title: "Barrios y cultura",
+          summary: "SoHo, Greenwich Village o tiempo relajado.",
+          morning: "Paseo por SoHo o Greenwich Village",
+          afternoon: "Exploración de barrios y compras",
+          evening: "Cena en West Village o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Skyline icónico",
+          description:
+            "El skyline de Nueva York es instantáneamente reconocible. Las vistas desde Brooklyn Bridge, Central Park o plataformas de observación muestran la escala y energía de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Brooklyn_Bridge_New_York.jpg",
+            alt: "Brooklyn Bridge con skyline de Manhattan al fondo.",
+          },
+        },
+        {
+          title: "Museos de clase mundial",
+          description:
+            "El Museo Metropolitano y el Museo de Historia Natural ofrecen colecciones de clase mundial. Planifica una visita enfocada, luego equilíbrala con tiempo en parques y paseos por barrios.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Metropolitan_Museum_New_York.jpg",
+            alt: "Edificio del Museo Metropolitano de Arte con gran arquitectura.",
+          },
+        },
+        {
+          title: "Barrios diversos",
+          description:
+            "Desde SoHo hasta Greenwich Village, los barrios de Nueva York tienen cada uno carácter distintivo. Los paseos lentos revelan tiendas locales, cafés y vida residencial.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Greenwich_Village_New_York.jpg",
+            alt: "Calle de Greenwich Village con edificios de brownstone y aceras con árboles.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a noviembre" },
+        { label: "Traslado aeropuerto", value: "AirTrain y metro o taxi al centro" },
+        { label: "Transporte", value: "Obtén una MetroCard para fácil acceso a metro y autobuses" },
+        { label: "Entradas", value: "Reserva museos principales y plataformas de observación con antelación" },
+        { label: "Zona para alojarte", value: "Manhattan (Midtown, Upper East/West) o Brooklyn" },
+      ],
+      checklist: [
+        "Obtén una MetroCard para tránsito",
+        "Reserva entradas de museos principales con antelación",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Nueva York",
+        "Planifica un paseo largo por parques",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 4 días para Nueva York?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra monumentos icónicos, museos y barrios con suficiente margen para tiempo en parques, descubrimientos gastronómicos y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones con antelación?",
+          answer:
+            "Para museos principales como el Met y plataformas de observación como Empire State Building, sí—reserva con antelación para entrada con horario y esperas más cortas, sobre todo en temporada alta.",
+        },
+        {
+          question: "¿Es Nueva York caminable?",
+          answer:
+            "Los barrios son caminables, pero Nueva York es vasta. Usa el eficiente sistema de metro para distancias largas, luego explora a pie dentro de cada área. Caminar entre barrios cercanos también es agradable.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Manhattan ofrece ubicación central y fácil acceso a lugares principales. Midtown proporciona buenas conexiones de tránsito, mientras que Upper East/West ofrece calles más tranquilas cerca de Central Park.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para museos para evitar multitudes. Central Park es agradable durante todo el día. Las tardes pueden incluir paseos por barrios o paradas interiores.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana y para cena. Muchos lugares aceptan llegadas sin reserva para almuerzo. Los mercados gastronómicos y lugares casuales no requieren reservas.",
+        },
+        {
+          question: "¿Es Nueva York segura?",
+          answer:
+            "Sí, generalmente muy segura, especialmente en áreas turísticas. Usa sentido común, mantente consciente de tu entorno y evita áreas aisladas tarde en la noche. El metro es seguro y eficiente.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "london",
+          city: "Londres",
+          days: 3,
+          description: "Íconos, museos y barrios a través del Támesis.",
+        },
+        {
+          slug: "paris",
+          city: "París",
+          days: 3,
+          description: "Monumentos clásicos, museos y barrios de cafés.",
+        },
+        {
+          slug: "san-francisco",
+          city: "San Francisco",
+          days: 3,
+          description: "Barrios en colinas, paseos junto al agua y cocina diversa.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "san-francisco": {
+      slug: "san-francisco",
+      city: "San Francisco",
+      country: "EE.UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de la comida", "Exploradores de barrios"],
+      style: ["Barrios en colinas", "Paseos junto al agua", "Cocina diversa"],
+      pacing: [
+        "San Francisco recompensa un ritmo calmado a través de sus barrios en colinas. Enfoca cada día en una zona principal y deja tiempo para paseos junto al agua, descubrimientos espontáneos de comida y tiempo relajado en parques.",
+        "Agrupa el tiempo por distrito. Combina Fisherman's Wharf con North Beach para lugares clásicos, dedica otro día a Golden Gate Bridge y Presidio, luego explora barrios como Mission o Haight-Ashbury para carácter local.",
+        "Reserva tiempo sin prisas para paseos largos junto al agua, exploración de barrios y las comidas relajadas que muestran la excepcional diversidad gastronómica de San Francisco.",
+      ],
+      hero: {
+        title: "San Francisco en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con barrios en colinas, paseos junto al agua y cocina diversa.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1600&q=80",
+          alt: "Puente Golden Gate en San Francisco con bahía y ciudad al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "875K", label: "Habitantes en la ciudad" },
+        { value: "43", label: "Colinas en la ciudad" },
+        { value: "200+", label: "Parques y espacios verdes" },
+        { value: "4.500+", label: "Restaurantes en toda la ciudad" },
+      ],
+      fit: {
+        forYou: ["Puente Golden Gate icónico", "Barrios en colinas", "Paseos junto al agua", "Escenas gastronómicas diversas", "Parques y espacios verdes"],
+        notForYou: ["Una agenda muy cargada solo de compras", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Golden Gate y Presidio",
+          summary: "Puente Golden Gate, Presidio y zona junto al agua.",
+          morning: "Paseo o bicicleta por Puente Golden Gate",
+          afternoon: "Presidio y Crissy Field",
+          evening: "Distrito Marina o cena en barrio",
+        },
+        {
+          day: 2,
+          title: "Fisherman's Wharf y Alcatraz",
+          summary: "Zona junto al agua, Alcatraz y lugares clásicos.",
+          morning: "Tour de Alcatraz (reserva con antelación)",
+          afternoon: "Fisherman's Wharf y Pier 39",
+          evening: "Cena en barrio North Beach",
+        },
+        {
+          day: 3,
+          title: "Barrios y cultura",
+          summary: "Mission, Haight-Ashbury o tiempo relajado.",
+          morning: "Distrito Mission y murales",
+          afternoon: "Haight-Ashbury o Golden Gate Park",
+          evening: "Cena en barrio o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Golden Gate icónico",
+          description:
+            "El Puente Golden Gate es la seña de identidad de San Francisco. Caminar o andar en bicicleta a través ofrece vistas de la bahía y una sensación de la escala y entorno natural de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Golden_Gate_Bridge_Walk.jpg",
+            alt: "Personas caminando por Puente Golden Gate con vistas de la bahía.",
+          },
+        },
+        {
+          title: "Barrios en colinas",
+          description:
+            "Las colinas de San Francisco crean barrios distintos con carácter. Desde North Beach hasta Mission, cada área ofrece tiendas locales, cafés y encanto residencial.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/San_Francisco_Hills.jpg",
+            alt: "Barrio en colina de San Francisco con casas coloridas y calles empinadas.",
+          },
+        },
+        {
+          title: "Paseos junto al agua",
+          description:
+            "El Embarcadero y Marina ofrecen caminos largos junto al agua. Los paseos lentos proporcionan vistas de la bahía, tiempo en parques y fácil acceso a barrios y comida.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Embarcadero_San_Francisco.jpg",
+            alt: "Zona junto al agua Embarcadero en San Francisco con bahía y skyline de la ciudad.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para clima más cálido y seco" },
+        { label: "Traslado aeropuerto", value: "Tren BART o taxi al centro" },
+        { label: "Transporte", value: "Obtén una tarjeta Clipper para fácil acceso a Muni y BART" },
+        { label: "Entradas", value: "Reserva tours de Alcatraz con mucha antelación" },
+        { label: "Zona para alojarte", value: "Union Square, Fisherman's Wharf o áreas Mission" },
+      ],
+      checklist: [
+        "Reserva tour de Alcatraz con mucha antelación",
+        "Obtén una tarjeta Clipper para tránsito",
+        "Empaca zapatos cómodos para caminar en colinas",
+        "Guarda mapas offline para San Francisco",
+        "Planifica un paseo largo junto al agua",
+        "Lleva capas para clima cambiante",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para San Francisco?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra lugares icónicos, barrios y tiempo junto al agua con suficiente margen para descubrimientos gastronómicos, paseos por parques y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar Alcatraz con antelación?",
+          answer:
+            "Sí, absolutamente. Los tours de Alcatraz se agotan semanas antes, especialmente en temporada alta. Reserva lo antes posible a través del sitio web oficial del Servicio de Parques Nacionales.",
+        },
+        {
+          question: "¿Es San Francisco caminable?",
+          answer:
+            "Los barrios son caminables, pero San Francisco tiene colinas. Usa Muni y BART para distancias largas, luego explora a pie dentro de cada área. Las colinas son parte de la experiencia.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Union Square ofrece ubicación central y buen tránsito. Fisherman's Wharf proporciona acceso junto al agua, mientras que Mission ofrece carácter local y escenas gastronómicas.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Puente Golden Gate para evitar multitudes y niebla. Los tours de Alcatraz tienen horarios establecidos. Las tardes pueden incluir paseos por barrios o paradas interiores.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva para almuerzo. Los mercados gastronómicos y lugares casuales no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con el clima?",
+          answer:
+            "San Francisco tiene microclimas y puede ser fresco incluso en verano. Trae capas—la niebla es común, especialmente cerca del agua. La ciudad es conocida por su clima cambiante.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "new-york",
+          city: "Nueva York",
+          days: 4,
+          description: "Barrios icónicos, museos de clase mundial y escenas gastronómicas diversas.",
+        },
+        {
+          slug: "los-angeles",
+          city: "Los Ángeles",
+          days: 3,
+          description: "Playas, barrios icónicos y vibraciones costeras relajadas.",
+        },
+        {
+          slug: "london",
+          city: "Londres",
+          days: 3,
+          description: "Íconos, museos y barrios a través del Támesis.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "los-angeles": {
+      slug: "los-angeles",
+      city: "Los Ángeles",
+      country: "EE.UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de playas", "Buscadores de entretenimiento"],
+      style: ["Playas", "Barrios icónicos", "Vibraciones costeras relajadas"],
+      pacing: [
+        "Los Ángeles recompensa un ritmo calmado a través de sus barrios extendidos. Enfoca cada día en una zona principal y deja tiempo para tiempo en playas, descubrimientos espontáneos de comida y paseos relajados por barrios.",
+        "Agrupa el tiempo por región. Combina Santa Monica con Venice para cultura de playa, dedica otro día a Hollywood y Griffith Observatory, luego explora barrios como Beverly Hills o Downtown para contraste.",
+        "Reserva tiempo sin prisas para paseos largos por playas, exploración de barrios y las comidas relajadas que muestran la diversa cultura gastronómica de LA.",
+      ],
+      hero: {
+        title: "Los Ángeles en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, equilibrando playas, barrios icónicos y vibraciones costeras relajadas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1756072226051-f6835aec4f9a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline del centro de Los Ángeles al atardecer con luces de la ciudad.",
+        },
+      },
+      cityStats: [
+        { value: "4M", label: "Habitantes en la ciudad" },
+        { value: "75", label: "Millas de costa" },
+        { value: "88", label: "Ciudades incorporadas en el Condado de LA" },
+        { value: "10.000+", label: "Restaurantes en toda el área metropolitana" },
+      ],
+      fit: {
+        forYou: ["Tiempo en playas y paseos costeros", "Barrios icónicos", "Cultura de entretenimiento", "Escenas gastronómicas diversas", "Ritmo relajado"],
+        notForYou: ["Una agenda muy cargada solo de parques temáticos", "Solo enfocado en museos", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Playas y costa",
+          summary: "Santa Monica, Venice Beach y cultura de playa.",
+          morning: "Muelle de Santa Monica y playa",
+          afternoon: "Venice Beach boardwalk y canales",
+          evening: "Atardecer en playa y cena",
+        },
+        {
+          day: 2,
+          title: "Hollywood y vistas",
+          summary: "Griffith Observatory, Hollywood y lugares icónicos.",
+          morning: "Griffith Observatory y parque",
+          afternoon: "Hollywood Walk of Fame y área",
+          evening: "Sunset Boulevard o cena en barrio",
+        },
+        {
+          day: 3,
+          title: "Barrios y cultura",
+          summary: "Beverly Hills, Downtown o tiempo relajado.",
+          morning: "Beverly Hills o Downtown LA",
+          afternoon: "Exploración de barrios y compras",
+          evening: "Cena en barrio o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Playas icónicas",
+          description:
+            "Santa Monica y Venice Beach muestran la cultura costera de LA por una buena razón. Los paseos largos por playas, visitas a muelles y tiempo relajado junto al agua son centrales para la cultura de LA.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Venice_Beach_Los_Angeles.jpg",
+            alt: "Boardwalk de Venice Beach con palmeras y océano.",
+          },
+        },
+        {
+          title: "Griffith Observatory",
+          description:
+            "Griffith Observatory ofrece vistas de la ciudad y una sensación de la escala de LA. El parque que lo rodea proporciona espacio verde y senderos para caminar con panoramas de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Griffith_Observatory_Los_Angeles.jpg",
+            alt: "Griffith Observatory con skyline de la ciudad al fondo.",
+          },
+        },
+        {
+          title: "Barrios diversos",
+          description:
+            "Desde Beverly Hills hasta Downtown, los barrios de LA tienen cada uno carácter distintivo. Los paseos o caminatas lentas revelan tiendas locales, cafés y encanto residencial.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Beverly_Hills_Los_Angeles.jpg",
+            alt: "Calle de Beverly Hills con palmeras y tiendas exclusivas.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Todo el año, aunque primavera y otoño son más agradables" },
+        { label: "Traslado aeropuerto", value: "Autobús FlyAway o taxi al centro" },
+        { label: "Transporte", value: "Se recomienda auto de alquiler; Metro para algunas áreas" },
+        { label: "Entradas", value: "Reserva atracciones principales como Universal Studios con antelación" },
+        { label: "Zona para alojarte", value: "Áreas de Santa Monica, Hollywood o Downtown" },
+      ],
+      checklist: [
+        "Considera auto de alquiler para flexibilidad",
+        "Reserva atracciones principales con antelación",
+        "Empaca artículos esenciales para playa y protector solar",
+        "Guarda mapas offline para Los Ángeles",
+        "Planifica un paseo largo por playa",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Los Ángeles?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra playas, barrios icónicos y cultura de entretenimiento con suficiente margen para descubrimientos gastronómicos, tiempo relajado y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito un auto en LA?",
+          answer:
+            "Un auto de alquiler proporciona la mayor flexibilidad, ya que LA está extendido. Existe tránsito público pero es limitado. Los servicios de transporte compartido también están ampliamente disponibles y son convenientes.",
+        },
+        {
+          question: "¿Es Los Ángeles caminable?",
+          answer:
+            "Los barrios pueden ser caminables, pero LA está muy extendido. Las áreas de playa como Santa Monica y Venice son más caminables. La mayoría de áreas requieren transporte entre ellas.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Santa Monica ofrece acceso a playas y áreas caminables. Hollywood proporciona ubicación central, mientras que Downtown ofrece carácter urbano y buenas conexiones de tránsito.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para playas para evitar multitudes y conseguir estacionamiento. Griffith Observatory es agradable durante todo el día. Las tardes pueden incluir exploración de barrios.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva para almuerzo. Los quioscos de playa y lugares casuales no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con el tráfico?",
+          answer:
+            "El tráfico de LA es real. Planifica tiempo extra para conducir, especialmente durante horas pico. Considera quedarte en un área por día para minimizar tiempo de conducción.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "san-francisco",
+          city: "San Francisco",
+          days: 3,
+          description: "Barrios en colinas, paseos junto al agua y cocina diversa.",
+        },
+        {
+          slug: "sydney",
+          city: "Sídney",
+          days: 3,
+          description: "Vistas del puerto, paseos costeros y tiempo relajado en playas.",
+        },
+        {
+          slug: "new-york",
+          city: "Nueva York",
+          days: 4,
+          description: "Barrios icónicos, museos de clase mundial y escenas gastronómicas diversas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sydney: {
+      slug: "sydney",
+      city: "Sídney",
+      country: "Australia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de playas", "Entusiastas del puerto"],
+      style: ["Vistas del puerto", "Paseos costeros", "Tiempo relajado en playas"],
+      pacing: [
+        "Sídney recompensa un ritmo calmado a través de su puerto y áreas costeras. Enfoca cada día en una zona principal y deja tiempo para paseos por el puerto, tiempo en playas y descubrimientos espontáneos de comida.",
+        "Agrupa el tiempo por región. Combina la Ópera con Circular Quay para lugares icónicos, dedica otro día a Bondi Beach y paseos costeros, luego explora barrios como The Rocks o Surry Hills para carácter local.",
+        "Reserva tiempo sin prisas para paseos largos por el puerto, relajación en playas y las comidas relajadas que muestran la diversa cultura gastronómica de Sídney.",
+      ],
+      hero: {
+        title: "Sídney en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con vistas del puerto, paseos costeros y tiempo relajado en playas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1600&q=80",
+          alt: "Ópera de Sídney y Puente del Puerto con puerto en primer plano.",
+        },
+      },
+      cityStats: [
+        { value: "5,3M", label: "Habitantes en el área metropolitana" },
+        { value: "100+", label: "Playas a lo largo de la costa" },
+        { value: "70", label: "Islas del puerto" },
+        { value: "3.000+", label: "Restaurantes en toda la ciudad" },
+      ],
+      fit: {
+        forYou: ["Ópera y Puente del Puerto icónicos", "Paseos por el puerto y viajes en ferry", "Tiempo en playas y paseos costeros", "Escenas gastronómicas diversas", "Ritmo relajado"],
+        notForYou: ["Una agenda muy cargada solo de playas", "Solo enfocado en museos", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Íconos del puerto",
+          summary: "Ópera de Sídney, Puente del Puerto y Circular Quay.",
+          morning: "Tour de Ópera de Sídney o exterior",
+          afternoon: "Circular Quay y paseo por Puente del Puerto",
+          evening: "Área The Rocks y cena",
+        },
+        {
+          day: 2,
+          title: "Playas y costa",
+          summary: "Bondi Beach, paseo costero y tiempo en playa.",
+          morning: "Bondi Beach y paseo marítimo",
+          afternoon: "Paseo costero a Coogee o Bronte",
+          evening: "Cena en área de playa o regreso a la ciudad",
+        },
+        {
+          day: 3,
+          title: "Barrios y cultura",
+          summary: "Royal Botanic Gardens, barrios o tiempo relajado.",
+          morning: "Royal Botanic Gardens y Mrs. Macquarie's Chair",
+          afternoon: "Surry Hills o exploración de barrios",
+          evening: "Cena en barrio o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Puerto icónico",
+          description:
+            "La Ópera y el Puente del Puerto definen el skyline de Sídney. Los paseos por el puerto y viajes en ferry proporcionan las mejores vistas y una sensación de la relación de la ciudad con el agua.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sydney_Harbour_Ferry.jpg",
+            alt: "Ferry en el Puerto de Sídney con Ópera y puente al fondo.",
+          },
+        },
+        {
+          title: "Paseos costeros",
+          description:
+            "El paseo costero de Bondi a Coogee muestra la cultura de playa de Sídney. El sendero ofrece vistas del océano, acceso a playas y un ritmo relajado que se siente tanto activo como pacífico.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Bondi_Beach_Sydney.jpg",
+            alt: "Bondi Beach en Sídney con arena dorada y océano.",
+          },
+        },
+        {
+          title: "Barrios del puerto",
+          description:
+            "The Rocks preserva carácter histórico cerca del puerto, mientras que barrios como Surry Hills ofrecen cafés locales, tiendas y encanto residencial.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/The_Rocks_Sydney.jpg",
+            alt: "Barrio The Rocks en Sídney con edificios históricos.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Septiembre a noviembre o marzo a mayo" },
+        { label: "Traslado aeropuerto", value: "Tren Airport Link o taxi al centro" },
+        { label: "Transporte", value: "Obtén una tarjeta Opal para fácil acceso a ferries, trenes y autobuses" },
+        { label: "Entradas", value: "Reserva tours de la Ópera con antelación" },
+        { label: "Zona para alojarte", value: "Circular Quay, The Rocks o áreas Bondi" },
+      ],
+      checklist: [
+        "Obtén una tarjeta Opal para tránsito",
+        "Reserva tour de la Ópera con antelación",
+        "Empaca artículos esenciales para playa y protector solar",
+        "Guarda mapas offline para Sídney",
+        "Planifica un viaje en ferry por el puerto",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Sídney?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra íconos del puerto, playas y barrios con suficiente margen para paseos costeros, descubrimientos gastronómicos y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar tours de la Ópera?",
+          answer:
+            "Sí, reserva con antelación para tours guiados. También puedes ver el exterior y disfrutar las vistas del puerto sin un tour. El edificio es impresionante desde fuera.",
+        },
+        {
+          question: "¿Es Sídney caminable?",
+          answer:
+            "Las áreas del puerto y barrios son caminables, pero Sídney está extendido. Usa ferries, trenes y autobuses para distancias largas, luego explora a pie dentro de cada área.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Circular Quay ofrece vistas del puerto y fácil acceso a lugares principales. The Rocks proporciona carácter histórico, mientras que Bondi ofrece acceso a playas y vibraciones relajadas.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para playas para evitar multitudes y conseguir buena luz. Las áreas del puerto son agradables durante todo el día. Las tardes pueden incluir paseos por barrios.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva para almuerzo. Los mercados gastronómicos y lugares casuales no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con el clima?",
+          answer:
+            "Sídney tiene un clima templado. Los veranos (dic-feb) son cálidos, los inviernos (jun-ago) son suaves. Trae capas y protector solar todo el año. El clima es generalmente agradable.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "melbourne",
+          city: "Melbourne",
+          days: 3,
+          description: "Cultura de callejones, escenas de café y barrios relajados.",
+        },
+        {
+          slug: "los-angeles",
+          city: "Los Ángeles",
+          days: 3,
+          description: "Playas, barrios icónicos y vibraciones costeras relajadas.",
+        },
+        {
+          slug: "san-francisco",
+          city: "San Francisco",
+          days: 3,
+          description: "Barrios en colinas, paseos junto al agua y cocina diversa.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    melbourne: {
+      slug: "melbourne",
+      city: "Melbourne",
+      country: "Australia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes del café", "Buscadores de cultura"],
+      style: ["Cultura de callejones", "Escenas de café", "Barrios relajados"],
+      pacing: [
+        "Melbourne recompensa un ritmo calmado a través de sus callejones y barrios. Enfoca cada día en una zona principal y deja tiempo para paradas en cafés, descubrimientos espontáneos de comida y paseos relajados por barrios.",
+        "Agrupa el tiempo por distrito. Combina el CBD con callejones para café y cultura, dedica otro día a St. Kilda o Fitzroy para carácter local, luego explora mercados y barrios para contraste.",
+        "Reserva tiempo sin prisas para sesiones largas en cafés, exploración de callejones y las comidas relajadas que muestran la excepcional cultura gastronómica y de café de Melbourne.",
+      ],
+      hero: {
+        title: "Melbourne en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, enfocado en cultura de callejones, escenas de café y barrios relajados.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1757807776083-221d653b161b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Melbourne con río Yarra y arquitectura moderna.",
+        },
+      },
+      cityStats: [
+        { value: "5M", label: "Habitantes en el área metropolitana" },
+        { value: "40+", label: "Callejones con arte callejero" },
+        { value: "2.000+", label: "Cafés en toda la ciudad" },
+        { value: "4.000+", label: "Restaurantes en toda la ciudad" },
+      ],
+      fit: {
+        forYou: ["Exploración de callejones", "Cultura de café", "Escenas gastronómicas diversas", "Barrios relajados", "Arte y cultura"],
+        notForYou: ["Una agenda muy cargada solo de playas", "Enfoque en monumentos icónicos", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "CBD y callejones",
+          summary: "Federation Square, callejones y cultura de café.",
+          morning: "Federation Square y Flinders Street Station",
+          afternoon: "Exploración de callejones y arte callejero",
+          evening: "Cena en CBD o exploración de barrios",
+        },
+        {
+          day: 2,
+          title: "Mercados y barrios",
+          summary: "Queen Victoria Market, barrios y vida local.",
+          morning: "Queen Victoria Market",
+          afternoon: "Paseo por barrio Fitzroy o St. Kilda",
+          evening: "Cena en barrio y escena local",
+        },
+        {
+          day: 3,
+          title: "Cultura y relajación",
+          summary: "Royal Botanic Gardens, museos o tiempo relajado.",
+          morning: "Royal Botanic Gardens o Galería Nacional",
+          afternoon: "Exploración de barrios o compras",
+          evening: "Cena relajada o tiempo en café",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Cultura de callejones",
+          description:
+            "Los callejones de Melbourne son joyas ocultas con arte callejero, cafés y carácter local. Los paseos lentos revelan murales, cafeterías y una energía creativa que define la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Hosier_Lane_Melbourne.jpg",
+            alt: "Hosier Lane en Melbourne con arte callejero colorido y murales.",
+          },
+        },
+        {
+          title: "Cultura de café",
+          description:
+            "Melbourne es conocida por su excepcional escena de café. Las sesiones largas en cafés, flat whites y mañanas relajadas son centrales para el ritmo local.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Melbourne_Cafe.jpg",
+            alt: "Cafetería en callejón de Melbourne con asientos al aire libre.",
+          },
+        },
+        {
+          title: "Barrios relajados",
+          description:
+            "Fitzroy y St. Kilda muestran el carácter de barrio de Melbourne con tiendas locales, cafés y encanto residencial que se siente tanto creativo como relajado.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Fitzroy_Melbourne.jpg",
+            alt: "Barrio Fitzroy en Melbourne con edificios coloridos.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Septiembre a noviembre o marzo a mayo" },
+        { label: "Traslado aeropuerto", value: "SkyBus o taxi al centro" },
+        { label: "Transporte", value: "Obtén una tarjeta myki para fácil acceso a tranvías, trenes y autobuses" },
+        { label: "Entradas", value: "Reserva atracciones principales con antelación si es necesario" },
+        { label: "Zona para alojarte", value: "CBD, Fitzroy o áreas St. Kilda" },
+      ],
+      checklist: [
+        "Obtén una tarjeta myki para tránsito",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Melbourne",
+        "Planifica una sesión larga en café",
+        "Explora callejones con arte callejero",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Melbourne?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra callejones, barrios y mercados con suficiente margen para tiempo en cafés, descubrimientos gastronómicos y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones con antelación?",
+          answer:
+            "La mayoría de callejones y barrios no requieren reserva. Para museos principales o eventos especiales, verifica con antelación. Los mercados están abiertos y accesibles.",
+        },
+        {
+          question: "¿Es Melbourne caminable?",
+          answer:
+            "El CBD y barrios son muy caminables. Los tranvías proporcionan fácil acceso entre áreas. Melbourne es conocida por ser amigable para peatones.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "CBD ofrece ubicación central y fácil acceso a callejones. Fitzroy proporciona carácter local, mientras que St. Kilda ofrece acceso a playas y vibraciones relajadas.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para mercados para evitar multitudes. Los callejones son agradables durante todo el día. Las tardes pueden incluir paseos por barrios o tiempo en cafés.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos cafés y lugares casuales aceptan llegadas sin reserva. Los mercados gastronómicos no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con el café?",
+          answer:
+            "El café de Melbourne es excepcional. No te pierdas probar un flat white y tómate tiempo para explorar diferentes cafés. La cultura del café es una parte central de la experiencia.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "sydney",
+          city: "Sídney",
+          days: 3,
+          description: "Vistas del puerto, paseos costeros y tiempo relajado en playas.",
+        },
+        {
+          slug: "amsterdam",
+          city: "Ámsterdam",
+          days: 3,
+          description: "Paseos por canales, museos de clase mundial y barrios relajados.",
+        },
+        {
+          slug: "barcelona",
+          city: "Barcelona",
+          days: 4,
+          description: "Arquitectura de Gaudí, barrios caminables y playas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    dubai: {
+      slug: "dubai",
+      city: "Dubái",
+      country: "EAU",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Fans de arquitectura moderna", "Buscadores de lujo"],
+      style: ["Arquitectura moderna", "Souks tradicionales", "Experiencias en el desierto"],
+      pacing: [
+        "Dubái recompensa un ritmo calmado a través de su mezcla de moderno y tradicional. Enfoca cada día en una zona principal y deja tiempo para visitas a souks, descubrimientos espontáneos de comida y tiempo relajado junto al agua.",
+        "Agrupa el tiempo por distrito. Combina Burj Khalifa con Dubai Mall para íconos modernos, dedica otro día a souks tradicionales y Dubái antiguo, luego explora una experiencia en el desierto o playa para contraste.",
+        "Reserva tiempo sin prisas para paseos por souks, visitas largas a centros comerciales y las comidas relajadas que muestran la diversa cultura gastronómica de Dubái.",
+      ],
+      hero: {
+        title: "Dubái en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, combinando arquitectura moderna, souks tradicionales y experiencias en el desierto.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=80",
+          alt: "Burj Khalifa en Dubái con skyline moderno.",
+        },
+      },
+      cityStats: [
+        { value: "3,4M", label: "Habitantes en la ciudad" },
+        { value: "828m", label: "Altura del Burj Khalifa (más alto del mundo)" },
+        { value: "200+", label: "Nacionalidades en la ciudad" },
+        { value: "365", label: "Días de sol al año" },
+      ],
+      fit: {
+        forYou: ["Arquitectura moderna", "Souks tradicionales", "Experiencias en el desierto", "Compras de lujo", "Escenas gastronómicas diversas"],
+        notForYou: ["Una agenda muy cargada solo de centros comerciales", "Solo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Íconos modernos",
+          summary: "Burj Khalifa, Dubai Mall y arquitectura moderna.",
+          morning: "Plataforma de observación Burj Khalifa",
+          afternoon: "Dubai Mall y Dubai Fountain",
+          evening: "Espectáculo de fuentes y cena",
+        },
+        {
+          day: 2,
+          title: "Dubái tradicional",
+          summary: "Gold Souk, Spice Souk y Dubái antiguo.",
+          morning: "Gold Souk y Spice Souk",
+          afternoon: "Museo de Dubái y Distrito Histórico Al Fahidi",
+          evening: "Dubai Creek y cena tradicional",
+        },
+        {
+          day: 3,
+          title: "Desierto o playa",
+          summary: "Safari en el desierto, tiempo en playa o exploración relajada.",
+          morning: "Safari en el desierto o Jumeirah Beach",
+          afternoon: "Tiempo en playa o Palm Jumeirah",
+          evening: "Cena relajada o regreso del desierto",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arquitectura moderna",
+          description:
+            "Burj Khalifa y el skyline de Dubái muestran diseño moderno ambicioso. La plataforma de observación ofrece vistas de la ciudad, mientras que el área circundante proporciona compras y restaurantes.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubai_Marina_Skyline.jpg",
+            alt: "Skyline de Dubai Marina con rascacielos modernos.",
+          },
+        },
+        {
+          title: "Souks tradicionales",
+          description:
+            "El Gold Souk y Spice Souk preservan la cultura de mercado tradicional. Los paseos lentos revelan productos locales, regateo y un lado auténtico de Dubái más allá de los íconos modernos.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Gold_Souk_Dubai.jpg",
+            alt: "Gold Souk en Dubái con tiendas y arquitectura tradicional.",
+          },
+        },
+        {
+          title: "Experiencias en el desierto",
+          description:
+            "Los safaris en el desierto ofrecen dune bashing, paseos en camello y vistas al atardecer. El contraste entre ciudad y desierto muestra el entorno único de Dubái.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Dubai_Desert.jpg",
+            alt: "Dunas del desierto en Dubái con colores del atardecer.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a marzo para clima más fresco" },
+        { label: "Traslado aeropuerto", value: "Metro o taxi al centro" },
+        { label: "Transporte", value: "Obtén una tarjeta Nol para fácil acceso a Metro y autobuses" },
+        { label: "Entradas", value: "Reserva Burj Khalifa y safaris en el desierto con antelación" },
+        { label: "Zona para alojarte", value: "Downtown Dubái, Dubai Marina o cerca de la playa" },
+      ],
+      checklist: [
+        "Reserva entradas para Burj Khalifa con antelación",
+        "Reserva safari en el desierto si te interesa",
+        "Obtén una tarjeta Nol para tránsito",
+        "Empaca ropa ligera y transpirable",
+        "Guarda mapas offline para Dubái",
+        "Lleva efectivo para souks",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Dubái?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra íconos modernos, souks tradicionales y tiempo en el desierto con suficiente margen para descubrimientos gastronómicos, compras y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones con antelación?",
+          answer:
+            "Para Burj Khalifa, sí—reserva con antelación para entrada con horario. Los safaris en el desierto también deben reservarse con anticipación. Los souks y barrios no requieren reserva anticipada.",
+        },
+        {
+          question: "¿Es Dubái caminable?",
+          answer:
+            "Algunas áreas son caminables, pero Dubái está extendido y puede hacer calor. Usa el Metro para distancias largas, luego explora a pie dentro de cada área. Los taxis también son convenientes.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Downtown Dubái ofrece proximidad a Burj Khalifa y Dubai Mall. Dubai Marina proporciona conveniencia moderna, mientras que las áreas cerca de la playa ofrecen estadías estilo resort.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para evitar calor, especialmente para actividades al aire libre. Los centros comerciales proporcionan descansos con aire acondicionado. Los safaris en el desierto típicamente corren por la tarde y noche.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes de alta gama, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva. Las zonas de comida en centros comerciales no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con el código de vestimenta?",
+          answer:
+            "Dubái es relativamente liberal, pero se aprecia vestimenta respetuosa, especialmente en áreas tradicionales. Las áreas de playa son más relajadas. Cubre hombros y rodillas en souks y mezquitas.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "singapore",
+          city: "Singapur",
+          days: 3,
+          description: "Arquitectura moderna, barrios diversos y comida excepcional.",
+        },
+        {
+          slug: "tokyo",
+          city: "Tokio",
+          days: 4,
+          description: "Templos tradicionales, distritos modernos y cultura gastronómica excepcional.",
+        },
+        {
+          slug: "hong-kong",
+          city: "Hong Kong",
+          days: 3,
+          description: "Vistas del skyline, mercados tradicionales y escapes fáciles a islas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    marrakech: {
+      slug: "marrakech",
+      city: "Marruecos",
+      country: "Marruecos",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Buscadores de cultura", "Amantes de mercados"],
+      style: ["Medinas históricas", "Souks vibrantes", "Jardines tranquilos"],
+      pacing: [
+        "Marruecos recompensa un ritmo calmado a pesar de su energía. Enfoca cada día en una zona principal y deja tiempo para visitas a souks, descansos en jardines y descubrimientos espontáneos de comida.",
+        "Agrupa el tiempo por zona. Combina la medina con souks para cultura tradicional, dedica otro día a jardines y palacios, luego explora barrios como Gueliz para contraste moderno.",
+        "Reserva tiempo sin prisas para paseos por souks, visitas largas a jardines y las comidas relajadas que muestran la excepcional cultura gastronómica de Marruecos.",
+      ],
+      hero: {
+        title: "Marruecos en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con medinas históricas, souks vibrantes y jardines tranquilos.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?auto=format&fit=crop&w=1600&q=80",
+          alt: "Plaza Jemaa el-Fnaa en Marruecos con luces nocturnas y actividad.",
+        },
+      },
+      cityStats: [
+        { value: "1M", label: "Habitantes en la ciudad" },
+        { value: "700+", label: "Años de historia" },
+        { value: "18", label: "Puertas a la medina" },
+        { value: "1.000+", label: "Puestos de souk en la medina" },
+      ],
+      fit: {
+        forYou: ["Exploración de medina histórica", "Compras en souks vibrantes", "Visitas a jardines tranquilos", "Experiencias gastronómicas tradicionales", "Inmersión cultural"],
+        notForYou: ["Una agenda muy cargada solo de compras", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Medina y souks",
+          summary: "Jemaa el-Fnaa, souks y cultura tradicional.",
+          morning: "Plaza Jemaa el-Fnaa",
+          afternoon: "Exploración de souks y compras",
+          evening: "Plaza al atardecer y cena",
+        },
+        {
+          day: 2,
+          title: "Palacios y jardines",
+          summary: "Palacio Bahía, Jardín Majorelle y tranquilidad.",
+          morning: "Palacio Bahía",
+          afternoon: "Jardín Majorelle",
+          evening: "Barrio Gueliz o regreso a medina",
+        },
+        {
+          day: 3,
+          title: "Cultura y relajación",
+          summary: "Tumbas Saadíes, barrios o tiempo relajado.",
+          morning: "Tumbas Saadíes o paseo por medina",
+          afternoon: "Exploración de barrios o hammam",
+          evening: "Cena tradicional o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Medina histórica",
+          description:
+            "La medina de Marruecos es un sitio del Patrimonio Mundial de la UNESCO con callejones estrechos, arquitectura tradicional y una cualidad laberíntica que recompensa la exploración lenta.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Marrakech_Medina.jpg",
+            alt: "Callejón estrecho en medina de Marruecos con arquitectura tradicional.",
+          },
+        },
+        {
+          title: "Souks vibrantes",
+          description:
+            "Los souks ofrecen todo desde especias hasta productos de cuero. Los paseos lentos revelan artesanías locales, cultura de regateo y una experiencia de mercado auténtica.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Marrakech_Souk.jpg",
+            alt: "Souk colorido en Marruecos con especias y productos.",
+          },
+        },
+        {
+          title: "Jardines tranquilos",
+          description:
+            "El Jardín Majorelle y otros espacios verdes proporcionan contraste pacífico con la energía de la medina. Estos oasis ofrecen momentos tranquilos y diseño hermoso.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Majorelle_Garden_Marrakech.jpg",
+            alt: "Jardín Majorelle en Marruecos con edificios azules y plantas.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril para clima más fresco" },
+        { label: "Traslado aeropuerto", value: "Taxi o autobús del aeropuerto al centro" },
+        { label: "Transporte", value: "Camina la medina; taxis para distancias largas" },
+        { label: "Entradas", value: "Compra entradas de palacios y jardines en el lugar" },
+        { label: "Zona para alojarte", value: "Medina (cerca de Jemaa el-Fnaa) o Gueliz" },
+      ],
+      checklist: [
+        "Empaca zapatos cómodos para caminar",
+        "Trae efectivo para souks y mercados",
+        "Guarda mapas offline para Marruecos",
+        "Planifica una visita a jardines",
+        "Respeta costumbres y vestimenta locales",
+        "Lleva una botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Marruecos?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra exploración de medina, souks y jardines con suficiente margen para descubrimientos gastronómicos, experiencias culturales y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones con antelación?",
+          answer:
+            "La mayoría de palacios y jardines no requieren reserva anticipada. Compra entradas en el lugar. Para restaurantes populares, las reservas ayudan, especialmente durante temporada alta.",
+        },
+        {
+          question: "¿Es Marruecos caminable?",
+          answer:
+            "La medina es muy caminable, aunque es un laberinto. Usa puntos de referencia para navegar. Los taxis son útiles para llegar a jardines y barrios fuera de la medina.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "La medina ofrece experiencias auténticas de riad cerca de la acción. Gueliz proporciona conveniencia moderna y es más tranquilo, con fácil acceso a jardines.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para souks para evitar calor y multitudes. Los jardines son agradables durante todo el día. Las noches son animadas en Jemaa el-Fnaa.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente para cena. Muchos lugares aceptan llegadas sin reserva. La comida callejera en Jemaa el-Fnaa no requiere reservas.",
+        },
+        {
+          question: "¿Qué pasa con el regateo?",
+          answer:
+            "El regateo se espera en souks. Comienza aproximadamente a la mitad del precio solicitado y negocia educadamente. Es parte de la experiencia cultural, así que disfruta el proceso.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "cairo",
+          city: "El Cairo",
+          days: 3,
+          description: "Pirámides antiguas, mezquitas históricas y mercados bulliciosos.",
+        },
+        {
+          slug: "istanbul",
+          city: "Estambul",
+          days: 3,
+          description: "Lugares principales del núcleo histórico, vistas en ferry y barrios en capas.",
+        },
+        {
+          slug: "dubai",
+          city: "Dubái",
+          days: 3,
+          description: "Arquitectura moderna, souks tradicionales y experiencias en el desierto.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cairo: {
+      slug: "cairo",
+      city: "El Cairo",
+      country: "Egipto",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de historia", "Buscadores de cultura"],
+      style: ["Pirámides antiguas", "Mezquitas históricas", "Mercados bulliciosos"],
+      pacing: [
+        "El Cairo recompensa un ritmo calmado a pesar de su energía. Enfoca cada día en una zona principal y deja tiempo para visitas a mercados, descansos en mezquitas y descubrimientos espontáneos de comida.",
+        "Agrupa el tiempo por zona. Combina las Pirámides de Giza con una visita matutina, dedica otro día a El Cairo Islámico y mezquitas, luego explora el Museo Egipcio y Khan el-Khalili para cultura y compras.",
+        "Reserva tiempo sin prisas para paseos por mercados, visitas largas a museos y las comidas relajadas que muestran la excepcional cultura gastronómica de El Cairo.",
+      ],
+      hero: {
+        title: "El Cairo en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con pirámides antiguas, mezquitas históricas y mercados bulliciosos.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1716639154447-98e6cd8de2e8?auto=format&fit=crop&w=1600&q=80",
+          alt: "Pirámides de Giza con Esfinge en primer plano, El Cairo.",
+        },
+      },
+      cityStats: [
+        { value: "10M", label: "Habitantes en el área metropolitana" },
+        { value: "4.500+", label: "Años de historia" },
+        { value: "3", label: "Pirámides principales en Giza" },
+        { value: "1.000+", label: "Mezquitas en toda la ciudad" },
+      ],
+      fit: {
+        forYou: ["Visitas a pirámides antiguas", "Exploración de mezquitas históricas", "Compras en mercados bulliciosos", "Visitas a museos", "Inmersión cultural"],
+        notForYou: ["Una agenda muy cargada solo de pirámides", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Pirámides de Giza",
+          summary: "Gran Pirámide, Esfinge y maravillas antiguas.",
+          morning: "Pirámides de Giza y Esfinge",
+          afternoon: "Exploración del complejo de pirámides",
+          evening: "Regreso a la ciudad y cena",
+        },
+        {
+          day: 2,
+          title: "El Cairo Islámico",
+          summary: "Mezquitas, calles históricas y cultura.",
+          morning: "Mezquita Al-Azhar y área",
+          afternoon: "Mercado Khan el-Khalili",
+          evening: "Paseo por El Cairo Histórico y cena",
+        },
+        {
+          day: 3,
+          title: "Museo y cultura",
+          summary: "Museo Egipcio, barrios o tiempo relajado.",
+          morning: "Museo Egipcio",
+          afternoon: "Exploración de barrios o El Cairo Copto",
+          evening: "Cena tradicional o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Pirámides antiguas",
+          description:
+            "Las Pirámides de Giza están entre los lugares más icónicos del mundo. Las visitas temprano por la mañana ofrecen mejor luz y menos multitudes, con tiempo para apreciar su escala e historia.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Great_Pyramid_Giza.jpg",
+            alt: "Gran Pirámide de Giza con desierto y cielo.",
+          },
+        },
+        {
+          title: "Mezquitas históricas",
+          description:
+            "El Cairo Islámico preserva siglos de arquitectura. Mezquitas como Al-Azhar muestran diseño intrincado y ofrecen momentos pacíficos alejados de la energía de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Al-Azhar_Mosque_Cairo.jpg",
+            alt: "Mezquita Al-Azhar en El Cairo con arquitectura islámica.",
+          },
+        },
+        {
+          title: "Mercados bulliciosos",
+          description:
+            "Khan el-Khalili ofrece cultura de mercado tradicional con especias, artesanías y productos locales. Los paseos lentos revelan regateo, vida local y experiencias auténticas.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Khan_el-Khalili_Cairo.jpg",
+            alt: "Mercado Khan el-Khalili en El Cairo con tiendas y multitudes.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril para clima más fresco" },
+        { label: "Traslado aeropuerto", value: "Taxi o autobús del aeropuerto al centro" },
+        { label: "Transporte", value: "Usa taxis o tours organizados para pirámides; camina el centro de la ciudad" },
+        { label: "Entradas", value: "Compra entradas de pirámides y museo en el lugar" },
+        { label: "Zona para alojarte", value: "Downtown El Cairo o cerca de Khan el-Khalili" },
+      ],
+      checklist: [
+        "Reserva tour de pirámides o organiza transporte",
+        "Empaca zapatos cómodos para caminar",
+        "Trae efectivo para mercados y propinas",
+        "Guarda mapas offline para El Cairo",
+        "Planifica una visita a museos",
+        "Respeta costumbres y vestimenta locales",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para El Cairo?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra pirámides, El Cairo Islámico y museos con suficiente margen para visitas a mercados, experiencias culturales y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar visitas a pirámides?",
+          answer:
+            "Puedes comprar entradas en el lugar, pero los tours organizados ayudan con transporte y contexto. Se recomiendan visitas temprano por la mañana para evitar calor y multitudes.",
+        },
+        {
+          question: "¿Es El Cairo caminable?",
+          answer:
+            "El Cairo Islámico y downtown son caminables, pero El Cairo es vasto y puede ser caótico. Usa taxis para distancias largas. Las pirámides requieren transporte desde la ciudad.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Downtown El Cairo ofrece ubicación central y buen acceso. Las áreas cerca de Khan el-Khalili proporcionan carácter histórico y fácil acceso a mercados.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza muy temprano para pirámides para evitar calor y multitudes. Los museos y mezquitas son agradables durante todo el día. Los mercados son animados por la tarde y noche.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente para cena. Muchos lugares aceptan llegadas sin reserva. La comida callejera no requiere reservas.",
+        },
+        {
+          question: "¿Qué pasa con la seguridad?",
+          answer:
+            "El Cairo es generalmente seguro para turistas, pero usa sentido común. Evita áreas aisladas de noche, ten cuidado con objetos de valor y considera tours guiados para pirámides.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "marrakech",
+          city: "Marruecos",
+          days: 3,
+          description: "Medinas históricas, souks vibrantes y jardines tranquilos.",
+        },
+        {
+          slug: "istanbul",
+          city: "Estambul",
+          days: 3,
+          description: "Lugares principales del núcleo histórico, vistas en ferry y barrios en capas.",
+        },
+        {
+          slug: "athens",
+          city: "Atenas",
+          days: 3,
+          description: "Sitios antiguos, cafés de barrios y miradores al atardecer.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "buenos-aires": {
+      slug: "buenos-aires",
+      city: "Buenos Aires",
+      country: "Argentina",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de cultura", "Entusiastas de la comida"],
+      style: ["Arquitectura europea", "Cultura de tango", "Barrios vibrantes"],
+      pacing: [
+        "Buenos Aires recompensa un ritmo calmado a través de sus barrios con influencia europea. Enfoca cada día en una zona principal y deja tiempo para cultura de café, descubrimientos espontáneos de comida y paseos nocturnos relajados.",
+        "Agrupa el tiempo por barrio. Combina La Boca con San Telmo para cultura colorida, dedica otro día a Recoleta y Palermo para arquitectura y parques, luego explora barrios para carácter local.",
+        "Reserva tiempo sin prisas para sesiones largas en cafés, exploración de barrios y las comidas relajadas que muestran la excepcional cultura gastronómica y de vino de Buenos Aires.",
+      ],
+      hero: {
+        title: "Buenos Aires en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, mezclando arquitectura europea, cultura de tango y barrios vibrantes.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1601352682292-ab6ced05c50c?auto=format&fit=crop&w=1600&q=80",
+          alt: "Barrio colorido La Boca en Buenos Aires con bailarines de tango.",
+        },
+      },
+      cityStats: [
+        { value: "3M", label: "Habitantes en la ciudad" },
+        { value: "48", label: "Barrios (barrios)" },
+        { value: "100+", label: "Lugares de tango" },
+        { value: "4.000+", label: "Restaurantes en toda la ciudad" },
+      ],
+      fit: {
+        forYou: ["Arquitectura europea", "Cultura de tango", "Barrios vibrantes", "Cultura de café", "Comida y vino excepcionales"],
+        notForYou: ["Una agenda muy cargada solo de museos", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Barrios coloridos",
+          summary: "La Boca, San Telmo y cultura de tango.",
+          morning: "La Boca y Caminito",
+          afternoon: "Mercado San Telmo y área",
+          evening: "Espectáculo de tango o cena en barrio",
+        },
+        {
+          day: 2,
+          title: "Recoleta y cultura",
+          summary: "Cementerio Recoleta, Palermo y arquitectura.",
+          morning: "Cementerio Recoleta",
+          afternoon: "Barrios Palermo y parques",
+          evening: "Cena en Palermo y escena local",
+        },
+        {
+          day: 3,
+          title: "Centro de ciudad y cultura",
+          summary: "Plaza de Mayo, barrios o tiempo relajado.",
+          morning: "Plaza de Mayo y Casa Rosada",
+          afternoon: "Exploración de barrios o tiempo en café",
+          evening: "Cena tradicional o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arquitectura europea",
+          description:
+            "La arquitectura de Buenos Aires refleja influencia europea con bulevares grandiosos, edificios ornamentados y una sensación de elegancia del viejo mundo mezclada con carácter local.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Recoleta_Cemetery_Buenos_Aires.jpg",
+            alt: "Cementerio Recoleta en Buenos Aires con mausoleos ornamentados.",
+          },
+        },
+        {
+          title: "Cultura de tango",
+          description:
+            "El tango es central para la identidad de Buenos Aires. Desde actuaciones callejeras hasta espectáculos formales, el baile y la música son parte del tejido cultural de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Tango_Buenos_Aires.jpg",
+            alt: "Bailarines de tango en Buenos Aires con fondo colorido.",
+          },
+        },
+        {
+          title: "Barrios vibrantes",
+          description:
+            "Cada barrio tiene carácter distintivo. Desde colorido La Boca hasta elegante Recoleta, los paseos lentos revelan cafés locales, tiendas y encanto residencial.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Palermo_Buenos_Aires.jpg",
+            alt: "Barrio Palermo en Buenos Aires con calles arboladas.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Traslado aeropuerto", value: "Taxi o autobús del aeropuerto al centro" },
+        { label: "Transporte", value: "Usa metro y autobuses; taxis para conveniencia" },
+        { label: "Entradas", value: "Reserva espectáculos de tango con antelación" },
+        { label: "Zona para alojarte", value: "Palermo, Recoleta o San Telmo" },
+      ],
+      checklist: [
+        "Reserva espectáculo de tango con antelación",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Buenos Aires",
+        "Planifica una sesión larga en café",
+        "Prueba carne local y vino",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Buenos Aires?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra barrios, cultura y comida con suficiente margen para tiempo en cafés, experiencias de tango y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar espectáculos de tango?",
+          answer:
+            "Sí, reserva con antelación, especialmente para lugares populares. También puedes ver tango callejero en La Boca y San Telmo, que no requiere reserva.",
+        },
+        {
+          question: "¿Es Buenos Aires caminable?",
+          answer:
+            "Los barrios son caminables, pero Buenos Aires está extendido. Usa el metro para distancias largas, luego explora a pie dentro de cada área.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Palermo ofrece carácter local y buenas escenas gastronómicas. Recoleta proporciona arquitectura elegante, mientras que San Telmo ofrece encanto histórico.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para mercados y para evitar multitudes. Las tardes son perfectas para cultura de café. Las noches son animadas, especialmente para tango y cena.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para parrillas (asadores) populares, sí—especialmente en fines de semana. Muchos cafés aceptan llegadas sin reserva. Los mercados gastronómicos no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con la comida?",
+          answer:
+            "Buenos Aires es conocida por carne excepcional, vino y cocina con influencia italiana. No te pierdas probar una parrilla (asador) y vino Malbec local.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "rio-de-janeiro",
+          city: "Río de Janeiro",
+          days: 3,
+          description: "Playas icónicas, miradores de montaña y cultura vibrante.",
+        },
+        {
+          slug: "mexico-city",
+          city: "Ciudad de México",
+          days: 3,
+          description: "Centros históricos, museos de clase mundial y mercados gastronómicos excepcionales.",
+        },
+        {
+          slug: "madrid",
+          city: "Madrid",
+          days: 3,
+          description: "Museos grandiosos, plazas históricas y mercados gastronómicos vibrantes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "rio-de-janeiro": {
+      slug: "rio-de-janeiro",
+      city: "Río de Janeiro",
+      country: "Brasil",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de playas", "Buscadores de cultura"],
+      style: ["Playas icónicas", "Miradores de montaña", "Cultura vibrante"],
+      pacing: [
+        "Río de Janeiro recompensa un ritmo calmado a través de sus playas y montañas. Enfoca cada día en una zona principal y deja tiempo para tiempo en playas, descubrimientos espontáneos de comida y paseos nocturnos relajados.",
+        "Agrupa el tiempo por región. Combina Copacabana con Ipanema para cultura de playa, dedica otro día a Cristo Redentor y Pan de Azúcar para vistas icónicas, luego explora barrios como Santa Teresa para carácter local.",
+        "Reserva tiempo sin prisas para paseos largos por playas, miradores de montaña y las comidas relajadas que muestran la excepcional comida y cultura de Río.",
+      ],
+      hero: {
+        title: "Río de Janeiro en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con playas icónicas, miradores de montaña y cultura vibrante.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1600&q=80",
+          alt: "Estatua de Cristo Redentor en Río de Janeiro con vistas de ciudad y océano.",
+        },
+      },
+      cityStats: [
+        { value: "6,7M", label: "Habitantes en el área metropolitana" },
+        { value: "23", label: "Playas a lo largo de la costa" },
+        { value: "709m", label: "Altura del Pan de Azúcar" },
+        { value: "30m", label: "Altura del Cristo Redentor" },
+      ],
+      fit: {
+        forYou: ["Tiempo en playas icónicas", "Miradores de montaña", "Cultura vibrante", "Ritmo relajado", "Comida excepcional"],
+        notForYou: ["Una agenda muy cargada solo de museos", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común", "Enfoque en senderismo de montaña"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Playas y costa",
+          summary: "Copacabana, Ipanema y cultura de playa.",
+          morning: "Playa Copacabana",
+          afternoon: "Playa Ipanema y paseo marítimo",
+          evening: "Cena en área de playa y atardecer",
+        },
+        {
+          day: 2,
+          title: "Miradores icónicos",
+          summary: "Cristo Redentor, Pan de Azúcar y vistas de la ciudad.",
+          morning: "Cristo Redentor",
+          afternoon: "Pan de Azúcar",
+          evening: "Cena en barrio o tiempo relajado",
+        },
+        {
+          day: 3,
+          title: "Barrios y cultura",
+          summary: "Santa Teresa, Lapa o tiempo relajado.",
+          morning: "Barrio Santa Teresa",
+          afternoon: "Lapa o exploración de barrios",
+          evening: "Cena tradicional o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Playas icónicas",
+          description:
+            "Copacabana e Ipanema son mundialmente famosas por una buena razón. Los paseos largos por playas, observación de personas y tiempo relajado junto al agua son centrales para la cultura de Río.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Copacabana_Beach_Rio.jpg",
+            alt: "Playa Copacabana en Río de Janeiro con arena dorada y océano.",
+          },
+        },
+        {
+          title: "Miradores de montaña",
+          description:
+            "Cristo Redentor y Pan de Azúcar ofrecen vistas espectaculares de la ciudad y océano. Las visitas temprano por la mañana proporcionan cielos más claros y menos multitudes.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sugarloaf_Mountain_Rio.jpg",
+            alt: "Pan de Azúcar en Río de Janeiro con teleférico y vistas de la ciudad.",
+          },
+        },
+        {
+          title: "Cultura vibrante",
+          description:
+            "Desde samba hasta arte callejero, la cultura de Río es vibrante y visible. Barrios como Santa Teresa muestran vida local, música y energía creativa.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Teresa_Rio.jpg",
+            alt: "Barrio Santa Teresa en Río con arte callejero colorido.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para clima más seco y fresco" },
+        { label: "Traslado aeropuerto", value: "Taxi o autobús del aeropuerto al centro" },
+        { label: "Transporte", value: "Usa metro y autobuses; taxis para conveniencia" },
+        { label: "Entradas", value: "Reserva Cristo Redentor y Pan de Azúcar con antelación" },
+        { label: "Zona para alojarte", value: "Copacabana, Ipanema o cerca de la playa" },
+      ],
+      checklist: [
+        "Reserva entradas para Cristo Redentor con antelación",
+        "Reserva entradas para Pan de Azúcar con antelación",
+        "Empaca artículos esenciales para playa y protector solar",
+        "Guarda mapas offline para Río",
+        "Planifica un paseo largo por playa",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Río?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra playas, miradores icónicos y barrios con suficiente margen para descubrimientos gastronómicos, tiempo relajado y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones con antelación?",
+          answer:
+            "Para Cristo Redentor y Pan de Azúcar, sí—reserva con antelación para entrada con horario, especialmente en temporada alta. Las playas no requieren reserva.",
+        },
+        {
+          question: "¿Es Río de Janeiro caminable?",
+          answer:
+            "Las áreas de playa son caminables, pero Río está extendido y tiene colinas. Usa el metro para distancias largas, luego explora a pie dentro de cada área. Los taxis son convenientes.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Copacabana o Ipanema ofrecen acceso a playas y buen tránsito. Estas áreas son seguras, caminables y centrales para lugares principales.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Cristo Redentor para evitar multitudes y obtener vistas más claras. Las playas son agradables durante todo el día. Las tardes pueden incluir paseos por barrios.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva. Los quioscos de playa y lugares casuales no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con la seguridad?",
+          answer:
+            "Río requiere sentido común. Quédate en áreas turísticas, evita lugares aislados de noche, no muestres objetos de valor y usa taxis oficiales. Las áreas de playa son generalmente seguras durante el día.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "buenos-aires",
+          city: "Buenos Aires",
+          days: 3,
+          description: "Arquitectura europea, cultura de tango y barrios vibrantes.",
+        },
+        {
+          slug: "mexico-city",
+          city: "Ciudad de México",
+          days: 3,
+          description: "Centros históricos, museos de clase mundial y mercados gastronómicos excepcionales.",
+        },
+        {
+          slug: "sydney",
+          city: "Sídney",
+          days: 3,
+          description: "Vistas del puerto, paseos costeros y tiempo relajado en playas.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "mexico-city": {
+      slug: "mexico-city",
+      city: "Ciudad de México",
+      country: "México",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de historia", "Entusiastas de la comida"],
+      style: ["Centros históricos", "Museos de clase mundial", "Mercados gastronómicos excepcionales"],
+      pacing: [
+        "Ciudad de México recompensa un ritmo calmado a través de sus áreas históricas y modernas. Enfoca cada día en una zona principal y deja tiempo para visitas a mercados, descansos en museos y descubrimientos espontáneos de comida.",
+        "Agrupa el tiempo por distrito. Combina el Zócalo con centro histórico para cultura, dedica otro día a museos y Chapultepec, luego explora barrios como Roma o Condesa para carácter local.",
+        "Reserva tiempo sin prisas para paseos largos por mercados, visitas a museos y las comidas relajadas que muestran la excepcional cultura gastronómica de Ciudad de México.",
+      ],
+      hero: {
+        title: "Ciudad de México en 3 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con centros históricos, museos de clase mundial y mercados gastronómicos excepcionales.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1533251568747-725d423801d3?auto=format&fit=crop&w=1600&q=80",
+          alt: "Palacio de Bellas Artes en Ciudad de México con arquitectura histórica.",
+        },
+      },
+      cityStats: [
+        { value: "9,2M", label: "Habitantes en la ciudad" },
+        { value: "150+", label: "Museos en toda la ciudad" },
+        { value: "700+", label: "Años de historia" },
+        { value: "40.000+", label: "Restaurantes en toda la ciudad" },
+      ],
+      fit: {
+        forYou: ["Exploración del centro histórico", "Museos de clase mundial", "Mercados gastronómicos excepcionales", "Barrios vibrantes", "Inmersión cultural"],
+        notForYou: ["Una agenda muy cargada solo de museos", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Centro histórico",
+          summary: "Zócalo, Templo Mayor y cultura histórica.",
+          morning: "Zócalo y Catedral Metropolitana",
+          afternoon: "Templo Mayor y calles históricas",
+          evening: "Cena en centro histórico",
+        },
+        {
+          day: 2,
+          title: "Museos y cultura",
+          summary: "Museo Frida Kahlo, Chapultepec y arte.",
+          morning: "Museo Frida Kahlo (reserva con antelación)",
+          afternoon: "Parque Chapultepec o Museo de Antropología",
+          evening: "Cena en barrio Roma o Condesa",
+        },
+        {
+          day: 3,
+          title: "Mercados y barrios",
+          summary: "Xochimilco, mercados o tiempo relajado.",
+          morning: "Xochimilco o visita a mercado",
+          afternoon: "Exploración de barrios",
+          evening: "Cena tradicional o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Centro histórico",
+          description:
+            "El Zócalo es una de las plazas públicas más grandes del mundo, rodeada de edificios históricos. El área muestra la historia colonial y precolombina de México.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Metropolitan_Cathedral_Mexico_City.jpg",
+            alt: "Catedral Metropolitana en Ciudad de México con gran arquitectura.",
+          },
+        },
+        {
+          title: "Museos de clase mundial",
+          description:
+            "El Museo Frida Kahlo y el Museo Nacional de Antropología son de clase mundial. Planifica una visita enfocada, luego equilíbrala con paseos por barrios y comida.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Frida_Kahlo_Museum_Mexico_City.jpg",
+            alt: "Museo Frida Kahlo (Casa Azul) en Ciudad de México con paredes azules.",
+          },
+        },
+        {
+          title: "Mercados gastronómicos excepcionales",
+          description:
+            "Desde Mercado de San Juan hasta comida callejera, la escena gastronómica de Ciudad de México es excepcional. Los paseos largos por mercados y descubrimientos locales muestran la cultura culinaria de la ciudad.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Mercado_Mexico_City.jpg",
+            alt: "Mercado gastronómico en Ciudad de México con productos coloridos y vendedores.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril para clima más seco" },
+        { label: "Traslado aeropuerto", value: "Metro o taxi al centro" },
+        { label: "Transporte", value: "Usa Metro y autobuses; Uber es conveniente" },
+        { label: "Entradas", value: "Reserva Museo Frida Kahlo con mucha antelación" },
+        { label: "Zona para alojarte", value: "Roma, Condesa o centro histórico" },
+      ],
+      checklist: [
+        "Reserva Museo Frida Kahlo con mucha antelación",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Ciudad de México",
+        "Planifica una visita a mercados",
+        "Prueba comida callejera y especialidades locales",
+        "Lleva efectivo para mercados",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 3 días para Ciudad de México?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra centro histórico, museos y barrios con suficiente margen para visitas a mercados, descubrimientos gastronómicos y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar Museo Frida Kahlo?",
+          answer:
+            "Sí, absolutamente. Reserva con mucha antelación ya que las entradas se agotan semanas antes. El museo es pequeño y popular, así que la planificación anticipada es esencial.",
+        },
+        {
+          question: "¿Es Ciudad de México caminable?",
+          answer:
+            "Los barrios son caminables, pero Ciudad de México es vasta. Usa el Metro para distancias largas, luego explora a pie dentro de cada área. Uber es conveniente y seguro.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Roma o Condesa ofrecen carácter local, buenas escenas gastronómicas y seguridad. El centro histórico proporciona proximidad a lugares principales pero puede ser más ruidoso.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para museos para evitar multitudes. Los mercados son mejores por la mañana. Las tardes pueden incluir paseos por barrios o paradas interiores.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva. La comida callejera y mercados no requieren reservas.",
+        },
+        {
+          question: "¿Qué pasa con la comida?",
+          answer:
+            "La comida de Ciudad de México es excepcional. No te pierdas comida callejera (tacos, elotes), mercados y restaurantes tradicionales. La ciudad es un destino gastronómico.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "buenos-aires",
+          city: "Buenos Aires",
+          days: 3,
+          description: "Arquitectura europea, cultura de tango y barrios vibrantes.",
+        },
+        {
+          slug: "rio-de-janeiro",
+          city: "Río de Janeiro",
+          days: 3,
+          description: "Playas icónicas, miradores de montaña y cultura vibrante.",
+        },
+        {
+          slug: "madrid",
+          city: "Madrid",
+          days: 3,
+          description: "Museos grandiosos, plazas históricas y mercados gastronómicos vibrantes.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bucharest: {
+      slug: "bucharest",
+      city: "Bucarest",
+      country: "Rumania",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de arquitectura", "Buscadores de historia"],
+      style: ["Arquitectura grandiosa", "Barrios históricos", "Parques relajados"],
+      pacing: [
+        "Bucarest recompensa un ritmo calmado a través de su mezcla de arquitectura grandiosa e histórica. Enfoca cada día en una zona principal y deja tiempo para visitas a parques, descubrimientos espontáneos de comida y paseos relajados por barrios.",
+        "Agrupa el tiempo por distrito. Combina el Palacio del Parlamento con el centro histórico para contraste, dedica tiempo a Parque Herastrau y barrios, luego explora carácter local.",
+        "Reserva tiempo sin prisas para paseos largos por parques, exploración de barrios y las comidas relajadas que muestran la cultura gastronómica de Bucarest.",
+      ],
+      hero: {
+        title: "Bucarest en 2 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, combinando arquitectura grandiosa, barrios históricos y parques relajados.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1665200658303-ca61225bbaff?auto=format&fit=crop&w=1600&q=80",
+          alt: "Palacio del Parlamento en Bucarest con gran arquitectura neoclásica.",
+        },
+      },
+      cityStats: [
+        { value: "1,8M", label: "Habitantes en la ciudad" },
+        { value: "365K", label: "Metros cuadrados del Palacio del Parlamento" },
+        { value: "40+", label: "Parques y jardines" },
+        { value: "600+", label: "Años de historia" },
+      ],
+      fit: {
+        forYou: ["Arquitectura grandiosa", "Barrios históricos", "Parques relajados", "Viaje asequible", "Inmersión cultural"],
+        notForYou: ["Una agenda muy cargada solo de museos", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Arquitectura grandiosa",
+          summary: "Palacio del Parlamento, centro histórico y contraste.",
+          morning: "Tour del Palacio del Parlamento",
+          afternoon: "Casco Viejo Histórico y Lipscani",
+          evening: "Cena en casco viejo y paseo",
+        },
+        {
+          day: 2,
+          title: "Parques y barrios",
+          summary: "Parque Herastrau, barrios o tiempo relajado.",
+          morning: "Parque Herastrau y Museo del Pueblo",
+          afternoon: "Exploración de barrios o museos",
+          evening: "Cena tradicional o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arquitectura grandiosa",
+          description:
+            "El Palacio del Parlamento es uno de los edificios más grandes del mundo, mostrando escala de la era comunista. El Casco Viejo Histórico ofrece contraste con calles encantadoras y cafés.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Old_Town_Bucharest.jpg",
+            alt: "Casco Viejo Histórico en Bucarest con calles adoquinadas.",
+          },
+        },
+        {
+          title: "Barrios históricos",
+          description:
+            "El Casco Viejo (Lipscani) preserva carácter histórico con calles adoquinadas, cafés y una atmósfera relajada que se siente tanto europea como única.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Lipscani_Bucharest.jpg",
+            alt: "Calle Lipscani en Casco Viejo de Bucarest con edificios históricos.",
+          },
+        },
+        {
+          title: "Parques relajados",
+          description:
+            "Parque Herastrau ofrece espacio verde y el Museo del Pueblo, mostrando arquitectura tradicional rumana en un entorno pacífico.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Herastrau_Park_Bucharest.jpg",
+            alt: "Parque Herastrau en Bucarest con lago y espacio verde.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Autobús o taxi al centro" },
+        { label: "Transporte", value: "Usa metro y autobuses; camina el centro" },
+        { label: "Entradas", value: "Reserva tour del Palacio del Parlamento con antelación" },
+        { label: "Zona para alojarte", value: "Casco Viejo o centro de la ciudad" },
+      ],
+      checklist: [
+        "Reserva tour del Palacio del Parlamento con antelación",
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Bucarest",
+        "Planifica una visita a parques",
+        "Explora Casco Viejo a pie",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 2 días para Bucarest?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra arquitectura grandiosa, barrios históricos y parques con suficiente margen para descubrimientos gastronómicos y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar Palacio del Parlamento?",
+          answer:
+            "Sí, reserva tours con antelación ya que son requeridos para entrar. El edificio es masivo y el tour proporciona contexto para su historia y escala.",
+        },
+        {
+          question: "¿Es Bucarest caminable?",
+          answer:
+            "El Casco Viejo y centro de la ciudad son muy caminables. Usa el metro para distancias largas, luego explora a pie dentro de cada área.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El Casco Viejo ofrece carácter histórico y fácil acceso a restaurantes y cafés. El centro de la ciudad proporciona buenas conexiones de tránsito.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para Palacio del Parlamento para evitar multitudes. El Casco Viejo es agradable durante todo el día. Las tardes pueden incluir paseos por parques.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva. El Casco Viejo tiene muchas opciones para comida casual.",
+        },
+        {
+          question: "¿Qué pasa con la comida?",
+          answer:
+            "Bucarest ofrece cocina rumana con influencias de países vecinos. Prueba platos tradicionales como sarmale (rollos de repollo) y vinos locales.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "sofia",
+          city: "Sofía",
+          days: 2,
+          description: "Iglesias históricas, vistas de montaña y centro de ciudad caminable.",
+        },
+        {
+          slug: "budapest",
+          city: "Budapest",
+          days: 3,
+          description: "Vistas del Danubio, colinas históricas y baños termales.",
+        },
+        {
+          slug: "prague",
+          city: "Praga",
+          days: 3,
+          description: "Casco viejo, vistas del castillo y paseos fáciles junto al río.",
+        },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sofia: {
+      slug: "sofia",
+      city: "Sofía",
+      country: "Bulgaria",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primer viaje", "Amantes de historia", "Entusiastas de montañas"],
+      style: ["Iglesias históricas", "Vistas de montaña", "Centro de ciudad caminable"],
+      pacing: [
+        "Sofía recompensa un ritmo calmado a través de su centro compacto. Enfoca cada día en una zona principal y deja tiempo para visitas a iglesias, descubrimientos espontáneos de comida y paseos relajados por barrios.",
+        "Agrupa el tiempo por zona. Combina las iglesias históricas con el centro de la ciudad para cultura, dedica tiempo a acceso a Montaña Vitosha o parques, luego explora carácter local.",
+        "Reserva tiempo sin prisas para paseos largos, visitas a iglesias y las comidas relajadas que muestran la cultura gastronómica de Sofía.",
+      ],
+      hero: {
+        title: "Sofía en 2 días",
+        subtitle:
+          "Explora lo esencial con tiempo para respirar, con iglesias históricas, vistas de montaña y centro de ciudad caminable.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Alexander_Nevsky_Cathedral_Sofia.jpg",
+          alt: "Catedral Alexander Nevsky en Sofía con cúpulas doradas.",
+        },
+      },
+      cityStats: [
+        { value: "1,2M", label: "Habitantes en la ciudad" },
+        { value: "2.290m", label: "Altura de Montaña Vitosha" },
+        { value: "50+", label: "Iglesias en toda la ciudad" },
+        { value: "7.000+", label: "Años de historia" },
+      ],
+      fit: {
+        forYou: ["Visitas a iglesias históricas", "Acceso a montañas", "Centro caminable", "Viaje asequible", "Inmersión cultural"],
+        notForYou: ["Una agenda muy cargada solo de museos", "Tiempo enfocado en playas", "Vida nocturna como prioridad", "Estilo mochilero económico", "Solo fuera de lo común"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Centro histórico",
+          summary: "Catedral Alexander Nevsky, iglesias y cultura.",
+          morning: "Catedral Alexander Nevsky",
+          afternoon: "Iglesia St. Sofia y paseo por centro",
+          evening: "Cena en centro y paseo",
+        },
+        {
+          day: 2,
+          title: "Cultura y naturaleza",
+          summary: "Complejo Serdika, Vitosha o tiempo relajado.",
+          morning: "Complejo Serdika y ruinas romanas",
+          afternoon: "Montaña Vitosha o visita a parques",
+          evening: "Cena tradicional o tiempo relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Iglesias históricas",
+          description:
+            "La Catedral Alexander Nevsky es la seña de identidad de Sofía, con cúpulas doradas y gran escala. La ciudad tiene muchas iglesias históricas mostrando arquitectura ortodoxa.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/St_Sofia_Church_Sofia.jpg",
+            alt: "Iglesia St. Sofia en Sofía con arquitectura histórica.",
+          },
+        },
+        {
+          title: "Vistas de montaña",
+          description:
+            "Montaña Vitosha proporciona un telón de fondo natural y fácil acceso desde la ciudad. Los viajes en teleférico o caminatas ofrecen vistas de la ciudad y un contraste con la energía urbana.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Vitosha_Mountain_Sofia.jpg",
+            alt: "Montaña Vitosha cerca de Sofía con ciudad al fondo.",
+          },
+        },
+        {
+          title: "Centro caminable",
+          description:
+            "El centro de Sofía es compacto y amigable para peatones. Los paseos lentos revelan ruinas romanas, edificios históricos y un ritmo relajado que se siente tanto europeo como único.",
+          image: {
+            src: "https://commons.wikimedia.org/wiki/Special:FilePath/Serdika_Complex_Sofia.jpg",
+            alt: "Complejo Serdika en Sofía con ruinas romanas y edificios modernos.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Metro o taxi al centro" },
+        { label: "Transporte", value: "Usa metro y tranvías; camina el centro" },
+        { label: "Entradas", value: "La mayoría de lugares no requieren reserva anticipada" },
+        { label: "Zona para alojarte", value: "Centro de la ciudad o cerca de Vitosha" },
+      ],
+      checklist: [
+        "Empaca zapatos cómodos para caminar",
+        "Guarda mapas offline para Sofía",
+        "Planifica una visita a iglesias",
+        "Considera Montaña Vitosha si te interesa",
+        "Explora centro de la ciudad a pie",
+        "Lleva efectivo para algunos establecimientos",
+      ],
+      faqs: [
+        {
+          question: "¿Alcanzan 2 días para Sofía?",
+          answer:
+            "Sí para lo esencial. Este plan equilibra iglesias históricas, centro de la ciudad y tiempo opcional en montaña con suficiente margen para descubrimientos gastronómicos y paradas no planificadas.",
+        },
+        {
+          question: "¿Necesito reservar atracciones?",
+          answer:
+            "La mayoría de iglesias y lugares no requieren reserva anticipada. Compra entradas en el lugar. El acceso a Montaña Vitosha es directo sin reserva anticipada.",
+        },
+        {
+          question: "¿Es Sofía caminable?",
+          answer:
+            "El centro de la ciudad es muy caminable y compacto. Usa el metro para distancias largas, luego explora a pie dentro de cada área.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro de la ciudad ofrece proximidad a lugares principales, restaurantes y cafés. Las áreas cerca de Vitosha proporcionan acceso a montaña y calles más tranquilas.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "Empieza temprano para iglesias para evitar multitudes. El centro de la ciudad es agradable durante todo el día. Las tardes pueden incluir paseos por parques o visitas a montaña.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para restaurantes populares, sí—especialmente en fines de semana. Muchos lugares aceptan llegadas sin reserva. El centro de la ciudad tiene muchas opciones para comida casual.",
+        },
+        {
+          question: "¿Qué pasa con la comida?",
+          answer:
+            "Sofía ofrece cocina búlgara con influencias de países vecinos. Prueba platos tradicionales como banitsa (pastel de queso) y vinos locales.",
+        },
+      ],
+      relatedItineraries: [
+        {
+          slug: "bucharest",
+          city: "Bucarest",
+          days: 2,
+          description: "Arquitectura grandiosa, barrios históricos y parques relajados.",
+        },
+        {
+          slug: "budapest",
+          city: "Budapest",
+          days: 3,
+          description: "Vistas del Danubio, colinas históricas y baños termales.",
+        },
+        {
+          slug: "prague",
+          city: "Praga",
+          days: 3,
+          description: "Casco viejo, vistas del castillo y paseos fáciles junto al río.",
         },
       ],
       primaryCtaHref: "/",

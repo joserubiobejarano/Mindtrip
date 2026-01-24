@@ -114,6 +114,51 @@ export async function POST(req: NextRequest) {
   const profilesById = new Map((profiles || []).map(profile => [profile.id, profile]));
   const appUrl = process.env.APP_URL || 'https://kruno.app';
 
+  // Get or create public share links for all trips
+  const { createSupabaseAdmin } = await import('@/lib/supabase/admin');
+  const adminSupabase = createSupabaseAdmin();
+  
+  // Fetch existing shares for all trips
+  const tripIds = tripsToNotify.map(t => t.id);
+  const { data: existingShares } = await adminSupabase
+    .from('trip_shares')
+    .select('trip_id, public_slug')
+    .in('trip_id', tripIds);
+
+  const sharesByTripId = new Map(
+    (existingShares || []).map(share => [share.trip_id, share.public_slug])
+  );
+
+  // Generate slug helper
+  const generateSlug = () => {
+    return Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
+  };
+
+  // Create shares for trips that don't have one
+  const sharesToCreate = tripsToNotify
+    .filter(trip => !sharesByTripId.has(trip.id))
+    .map(trip => ({
+      trip_id: trip.id,
+      public_slug: generateSlug(),
+    }));
+
+  if (sharesToCreate.length > 0) {
+    const { data: newShares, error: createError } = await adminSupabase
+      .from('trip_shares')
+      .insert(sharesToCreate)
+      .select('trip_id, public_slug');
+
+    if (createError) {
+      console.error('[trip-reminders] Failed to create share links:', createError);
+    } else {
+      // Add new shares to the map
+      (newShares || []).forEach(share => {
+        sharesByTripId.set(share.trip_id, share.public_slug);
+      });
+    }
+  }
+
   let sentCount = 0;
 
   for (const trip of tripsToNotify) {
@@ -130,7 +175,12 @@ export async function POST(req: NextRequest) {
     }
 
     const tripCity = trip.destination_city || trip.destination_name || trip.title;
-    const tripUrl = `${appUrl}/trips/${trip.id}`;
+    
+    // Use public share link if available, fallback to authenticated URL
+    const publicSlug = sharesByTripId.get(trip.id);
+    const tripUrl = publicSlug 
+      ? `${appUrl}/p/${publicSlug}`
+      : `${appUrl}/trips/${trip.id}`;
 
     try {
       await sendTripReminderEmail({

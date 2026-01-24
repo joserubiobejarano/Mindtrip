@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdmin } from '@/lib/supabase/admin';
-import { SmartItinerary } from '@/types/itinerary';
 
 /**
- * Public endpoint to get smart itinerary by share slug
+ * Public endpoint to get days data by share slug
  * No authentication required - only works if trip has a valid share slug
  */
 export async function GET(
@@ -17,7 +16,7 @@ export async function GET(
       return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
     }
 
-    // Use service role for anonymous public access to shared itineraries
+    // Use service role for anonymous public access to shared trips
     const supabase = createSupabaseAdmin();
 
     // Get trip_id from share slug
@@ -49,36 +48,22 @@ export async function GET(
 
     const tripId = tripShareTyped.trip_id;
 
-    // Load itinerary from database (no auth check needed - trip is shareable)
-    const { data, error } = await supabase
-      .from('smart_itineraries')
-      .select('content')
+    // Load days data (only safe, public fields)
+    const { data: daysData, error: daysError } = await supabase
+      .from('days')
+      .select('id, trip_id, date, day_number')
       .eq('trip_id', tripId)
-      .single();
+      .order('day_number', { ascending: true });
 
-    if (error) {
-      console.error('[public-smart-itinerary GET] supabase error', error);
-      // If no row yet → 404
-      if (error.code === 'PGRST116' || error.details?.includes('Results contain 0 rows')) {
-        return NextResponse.json({ error: 'not-found' }, { status: 404 });
-      }
+    if (daysError) {
+      console.error('[public-days GET] supabase error', daysError);
       return NextResponse.json({ error: 'db-error' }, { status: 500 });
     }
 
-    type ItineraryQueryResult = {
-      content: any;
-    };
-
-    const dataTyped = data as ItineraryQueryResult | null;
-
-    if (!dataTyped?.content) {
-      return NextResponse.json({ error: 'not-found' }, { status: 404 });
-    }
-
-    // Return bare SmartItinerary directly
-    return NextResponse.json(dataTyped.content, { status: 200 });
+    // Return days data
+    return NextResponse.json(daysData || [], { status: 200 });
   } catch (err) {
-    console.error('[public-smart-itinerary GET] unexpected error', err);
+    console.error('[public-days GET] unexpected error', err);
     return NextResponse.json({ error: 'server-error' }, { status: 500 });
   }
 }

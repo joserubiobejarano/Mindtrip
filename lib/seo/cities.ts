@@ -1,3 +1,8 @@
+import { checkPrimaryKeywordUniqueness } from "./guide-seo-validation";
+
+export type GuideIntent = "informational" | "mixed" | "transactional";
+export type GuideContentLevel = "full" | "lite";
+
 export type CitySeo = {
   slug: string;
   name: string;
@@ -5,6 +10,9 @@ export type CitySeo = {
   days: number;
   description: string;
   highlights: string[];
+  intent: GuideIntent;
+  contentLevel: GuideContentLevel;
+  primaryKeyword: string;
 };
 
 export const cityPages: CitySeo[] = [
@@ -16,6 +24,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Paris travel guide focused on classic landmarks, cafe culture, and walkable neighborhoods.",
     highlights: ["Eiffel Tower", "Louvre Museum", "Montmartre"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Paris",
   },
   {
     slug: "barcelona",
@@ -25,6 +36,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 4-day Barcelona travel guide packed with Gaudi architecture, beaches, and food markets.",
     highlights: ["Sagrada Familia", "Gothic Quarter", "La Boqueria"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "4 days in Barcelona",
   },
   {
     slug: "london",
@@ -34,6 +48,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day London travel guide with iconic sights, museums, and neighborhoods across the Thames.",
     highlights: ["Westminster", "British Museum", "Tower Bridge"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in London",
   },
   {
     slug: "rome",
@@ -43,6 +60,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Rome travel guide highlighting ancient history, piazzas, and Italian cuisine.",
     highlights: ["Colosseum", "Vatican Museums", "Trevi Fountain"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Rome",
   },
   {
     slug: "lisbon",
@@ -52,6 +72,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Lisbon travel guide focused on historic hills, river walks, and relaxed neighborhoods.",
     highlights: ["Alfama", "Belem", "Praca do Comercio"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Lisbon",
   },
   {
     slug: "prague",
@@ -61,6 +84,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Prague travel guide covering the Old Town, castle views, and easy river strolls.",
     highlights: ["Old Town Square", "Charles Bridge", "Prague Castle"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Prague",
   },
   {
     slug: "vienna",
@@ -70,6 +96,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Vienna travel guide pairing classic museums, palace gardens, and grand avenues.",
     highlights: ["St. Stephen's Cathedral", "Schonbrunn Palace", "MuseumsQuartier"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Vienna",
   },
   {
     slug: "budapest",
@@ -79,6 +108,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Budapest travel guide with Danube views, historic hills, and thermal baths.",
     highlights: ["Parliament", "Buda Castle", "Chain Bridge"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Budapest",
   },
   {
     slug: "seville",
@@ -88,6 +120,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Seville travel guide centered on plazas, historic quarters, and riverside walks.",
     highlights: ["Seville Cathedral", "Plaza de Espana", "Barrio Santa Cruz"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Seville",
   },
   {
     slug: "berlin",
@@ -97,6 +132,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Berlin travel guide balancing history, creative neighborhoods, and relaxed parks.",
     highlights: ["Brandenburg Gate", "Museum Island", "East Side Gallery"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Berlin",
   },
   {
     slug: "florence",
@@ -106,6 +144,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Florence travel guide focused on art, river walks, and Renaissance squares.",
     highlights: ["Duomo", "Uffizi Gallery", "Ponte Vecchio"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Florence",
   },
   {
     slug: "venice",
@@ -115,6 +156,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Venice travel guide with canal strolls, classic churches, and slow island time.",
     highlights: ["St. Mark's Basilica", "Grand Canal", "Rialto Bridge"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Venice",
   },
   {
     slug: "milan",
@@ -124,6 +168,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Milan travel guide mixing cathedral sights, design districts, and aperitivo stops.",
     highlights: ["Duomo di Milano", "Galleria Vittorio Emanuele II", "Navigli"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Milan",
   },
   {
     slug: "munich",
@@ -133,6 +180,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Munich travel guide combining historic squares, garden breaks, and easy transit.",
     highlights: ["Marienplatz", "English Garden", "Nymphenburg Palace"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Munich",
   },
   {
     slug: "dublin",
@@ -142,6 +192,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Dublin travel guide with literary landmarks, cozy pubs, and riverside walks.",
     highlights: ["Trinity College", "Temple Bar", "St. Patrick's Cathedral"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Dublin",
   },
   {
     slug: "edinburgh",
@@ -151,6 +204,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Edinburgh travel guide featuring castle views, historic lanes, and scenic hikes.",
     highlights: ["Edinburgh Castle", "Royal Mile", "Arthur's Seat"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Edinburgh",
   },
   {
     slug: "copenhagen",
@@ -160,6 +216,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Copenhagen travel guide focused on waterfront strolls, design, and bike-friendly routes.",
     highlights: ["Nyhavn", "Tivoli Gardens", "Rosenborg Castle"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Copenhagen",
   },
   {
     slug: "stockholm",
@@ -169,6 +228,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Stockholm travel guide with old town charm, museums, and island-hopping pauses.",
     highlights: ["Gamla Stan", "Vasa Museum", "Djurgarden"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Stockholm",
   },
   {
     slug: "athens",
@@ -178,6 +240,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Athens travel guide blending ancient sites, neighborhood cafes, and sunset viewpoints.",
     highlights: ["Acropolis", "Plaka", "Ancient Agora"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Athens",
   },
   {
     slug: "porto",
@@ -187,6 +252,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Porto travel guide centered on riverside walks, historic lanes, and easy hilltop viewpoints.",
     highlights: ["Ribeira", "Dom Luis I Bridge", "Livraria Lello"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Porto",
   },
   {
     slug: "krakow",
@@ -196,6 +264,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Krakow travel guide focused on the old town, castle hill, and calm neighborhood strolls.",
     highlights: ["Main Market Square", "Wawel Castle", "Kazimierz"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Krakow",
   },
   {
     slug: "zurich",
@@ -205,6 +276,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Zurich travel guide mixing lakeside walks, compact museums, and relaxed old town time.",
     highlights: ["Lake Zurich", "Old Town", "Kunsthaus Zurich"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Zurich",
   },
   {
     slug: "brussels",
@@ -214,6 +288,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Brussels travel guide balancing grand squares, museum districts, and easy cafe breaks.",
     highlights: ["Grand Place", "Mont des Arts", "Royal Palace"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Brussels",
   },
   {
     slug: "valencia",
@@ -223,6 +300,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Valencia travel guide pairing old town sights, park strolls, and a relaxed beach afternoon.",
     highlights: ["City of Arts and Sciences", "Turia Gardens", "Central Market"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Valencia",
   },
   {
     slug: "oslo",
@@ -232,6 +312,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Oslo travel guide focused on waterfront walks, compact museums, and quiet park time.",
     highlights: ["Aker Brygge", "Vigeland Park", "Oslo Opera House"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Oslo",
   },
   {
     slug: "reykjavik",
@@ -241,6 +324,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Reykjavik travel guide with walkable downtown stops, cozy cafes, and easy coastal views.",
     highlights: ["Hallgrimskirkja", "Harpa Concert Hall", "Old Harbor"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Reykjavik",
   },
   {
     slug: "istanbul",
@@ -250,6 +336,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Istanbul travel guide blending historic core sights, ferry views, and layered neighborhoods.",
     highlights: ["Hagia Sophia", "Blue Mosque", "Grand Bazaar"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Istanbul",
   },
   {
     slug: "naples",
@@ -259,6 +348,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Naples travel guide featuring historic streets, waterfront walks, and slow cafe time.",
     highlights: ["Spaccanapoli", "Castel dell'Ovo", "Naples National Archaeological Museum"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Naples",
   },
   {
     slug: "nice",
@@ -268,6 +360,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Nice travel guide centered on old town lanes, seaside promenades, and scenic viewpoints.",
     highlights: ["Promenade des Anglais", "Old Town", "Castle Hill"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Nice",
   },
   {
     slug: "warsaw",
@@ -277,6 +372,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Warsaw travel guide blending historic old town, modern districts, and river walks.",
     highlights: ["Old Town Square", "Royal Castle", "Lazienki Park"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Warsaw",
   },
   {
     slug: "granada",
@@ -286,6 +384,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Granada travel guide focused on the Alhambra, historic quarters, and mountain views.",
     highlights: ["Alhambra", "Albaicin", "Generalife"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Granada",
   },
   {
     slug: "lyon",
@@ -295,6 +396,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Lyon travel guide pairing Roman history, gastronomy, and riverside neighborhoods.",
     highlights: ["Vieux Lyon", "Fourviere Basilica", "Presqu'ile"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Lyon",
   },
   {
     slug: "salzburg",
@@ -304,6 +408,9 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Salzburg travel guide with baroque architecture, mountain views, and music heritage.",
     highlights: ["Hohensalzburg Fortress", "Mirabell Palace", "Old Town"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Salzburg",
   },
   {
     slug: "rotterdam",
@@ -313,9 +420,352 @@ export const cityPages: CitySeo[] = [
     description:
       "A 3-day Rotterdam travel guide featuring modern architecture, waterfront walks, and cultural districts.",
     highlights: ["Erasmus Bridge", "Markthal", "Cube Houses"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Rotterdam",
+  },
+  {
+    slug: "bergen",
+    name: "Bergen",
+    country: "Norway",
+    days: 3,
+    description:
+      "A 3-day Bergen travel guide with fjord views, historic wharves, and mountain viewpoints.",
+    highlights: ["Bryggen", "Fløyen", "Fish Market"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Bergen",
+  },
+  {
+    slug: "bologna",
+    name: "Bologna",
+    country: "Italy",
+    days: 2,
+    description:
+      "A 2-day Bologna travel guide focused on medieval towers, food markets, and university quarter walks.",
+    highlights: ["Two Towers", "Piazza Maggiore", "Food Markets"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "2 days in Bologna",
+  },
+  {
+    slug: "bruges",
+    name: "Bruges",
+    country: "Belgium",
+    days: 2,
+    description:
+      "A 2-day Bruges travel guide with canal strolls, medieval squares, and quiet cobblestone lanes.",
+    highlights: ["Markt Square", "Belfry Tower", "Canal Tours"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "2 days in Bruges",
+  },
+  {
+    slug: "dubrovnik",
+    name: "Dubrovnik",
+    country: "Croatia",
+    days: 3,
+    description:
+      "A 3-day Dubrovnik travel guide featuring historic walls, Adriatic views, and old town walks.",
+    highlights: ["City Walls", "Old Town", "Lokrum Island"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Dubrovnik",
+  },
+  {
+    slug: "helsinki",
+    name: "Helsinki",
+    country: "Finland",
+    days: 3,
+    description:
+      "A 3-day Helsinki travel guide with waterfront design, island hopping, and relaxed cafe culture.",
+    highlights: ["Helsinki Cathedral", "Suomenlinna", "Design District"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Helsinki",
+  },
+  {
+    slug: "innsbruck",
+    name: "Innsbruck",
+    country: "Austria",
+    days: 2,
+    description:
+      "A 2-day Innsbruck travel guide pairing alpine views, historic old town, and easy mountain access.",
+    highlights: ["Golden Roof", "Nordkette", "Old Town"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "2 days in Innsbruck",
+  },
+  {
+    slug: "riga",
+    name: "Riga",
+    country: "Latvia",
+    days: 2,
+    description:
+      "A 2-day Riga travel guide with art nouveau architecture, old town squares, and riverfront walks.",
+    highlights: ["Old Town", "Art Nouveau District", "Daugava River"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "2 days in Riga",
+  },
+  {
+    slug: "split",
+    name: "Split",
+    country: "Croatia",
+    days: 2,
+    description:
+      "A 2-day Split travel guide centered on Diocletian's Palace, waterfront promenades, and nearby islands.",
+    highlights: ["Diocletian's Palace", "Riva Promenade", "Marjan Hill"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "2 days in Split",
+  },
+  {
+    slug: "tallinn",
+    name: "Tallinn",
+    country: "Estonia",
+    days: 2,
+    description:
+      "A 2-day Tallinn travel guide featuring medieval old town, city walls, and harbor views.",
+    highlights: ["Old Town", "Toompea Hill", "City Walls"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "2 days in Tallinn",
+  },
+  {
+    slug: "vilnius",
+    name: "Vilnius",
+    country: "Lithuania",
+    days: 2,
+    description:
+      "A 2-day Vilnius travel guide with baroque architecture, historic lanes, and hilltop viewpoints.",
+    highlights: ["Old Town", "Gediminas Tower", "Užupis"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "2 days in Vilnius",
+  },
+  {
+    slug: "tokyo",
+    name: "Tokyo",
+    country: "Japan",
+    days: 4,
+    description:
+      "A 4-day Tokyo travel guide balancing traditional temples, modern districts, and exceptional food culture.",
+    highlights: ["Senso-ji Temple", "Shibuya Crossing", "Tsukiji Market"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "4 days in Tokyo",
+  },
+  {
+    slug: "seoul",
+    name: "Seoul",
+    country: "South Korea",
+    days: 3,
+    description:
+      "A 3-day Seoul travel guide mixing ancient palaces, modern neighborhoods, and dynamic street food scenes.",
+    highlights: ["Gyeongbokgung Palace", "Myeongdong", "Bukchon Hanok Village"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Seoul",
+  },
+  {
+    slug: "bangkok",
+    name: "Bangkok",
+    country: "Thailand",
+    days: 3,
+    description:
+      "A 3-day Bangkok travel guide featuring golden temples, floating markets, and vibrant street food.",
+    highlights: ["Grand Palace", "Wat Pho", "Chatuchak Market"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Bangkok",
+  },
+  {
+    slug: "singapore",
+    name: "Singapore",
+    country: "Singapore",
+    days: 3,
+    description:
+      "A 3-day Singapore travel guide combining modern architecture, diverse neighborhoods, and exceptional food.",
+    highlights: ["Marina Bay", "Gardens by the Bay", "Chinatown"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Singapore",
+  },
+  {
+    slug: "hong-kong",
+    name: "Hong Kong",
+    country: "China",
+    days: 3,
+    description:
+      "A 3-day Hong Kong travel guide with skyline views, traditional markets, and easy island escapes.",
+    highlights: ["Victoria Peak", "Star Ferry", "Temple Street Night Market"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Hong Kong",
+  },
+  {
+    slug: "new-york",
+    name: "New York",
+    country: "USA",
+    days: 4,
+    description:
+      "A 4-day New York travel guide covering iconic neighborhoods, world-class museums, and diverse food scenes.",
+    highlights: ["Central Park", "Brooklyn Bridge", "Metropolitan Museum"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "4 days in New York",
+  },
+  {
+    slug: "san-francisco",
+    name: "San Francisco",
+    country: "USA",
+    days: 3,
+    description:
+      "A 3-day San Francisco travel guide featuring hillside neighborhoods, waterfront walks, and diverse cuisine.",
+    highlights: ["Golden Gate Bridge", "Alcatraz", "Fisherman's Wharf"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in San Francisco",
+  },
+  {
+    slug: "los-angeles",
+    name: "Los Angeles",
+    country: "USA",
+    days: 3,
+    description:
+      "A 3-day Los Angeles travel guide balancing beaches, iconic neighborhoods, and relaxed coastal vibes.",
+    highlights: ["Santa Monica Pier", "Griffith Observatory", "Venice Beach"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Los Angeles",
+  },
+  {
+    slug: "sydney",
+    name: "Sydney",
+    country: "Australia",
+    days: 3,
+    description:
+      "A 3-day Sydney travel guide with harbor views, coastal walks, and relaxed beach time.",
+    highlights: ["Sydney Opera House", "Harbour Bridge", "Bondi Beach"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Sydney",
+  },
+  {
+    slug: "melbourne",
+    name: "Melbourne",
+    country: "Australia",
+    days: 3,
+    description:
+      "A 3-day Melbourne travel guide focused on laneway culture, coffee scenes, and easygoing neighborhoods.",
+    highlights: ["Federation Square", "Queen Victoria Market", "St. Kilda"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Melbourne",
+  },
+  {
+    slug: "dubai",
+    name: "Dubai",
+    country: "UAE",
+    days: 3,
+    description:
+      "A 3-day Dubai travel guide pairing modern architecture, traditional souks, and desert experiences.",
+    highlights: ["Burj Khalifa", "Dubai Mall", "Gold Souk"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Dubai",
+  },
+  {
+    slug: "marrakech",
+    name: "Marrakech",
+    country: "Morocco",
+    days: 3,
+    description:
+      "A 3-day Marrakech travel guide featuring historic medinas, vibrant souks, and tranquil gardens.",
+    highlights: ["Jemaa el-Fnaa", "Bahia Palace", "Majorelle Garden"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Marrakech",
+  },
+  {
+    slug: "cairo",
+    name: "Cairo",
+    country: "Egypt",
+    days: 3,
+    description:
+      "A 3-day Cairo travel guide with ancient pyramids, historic mosques, and bustling markets.",
+    highlights: ["Pyramids of Giza", "Egyptian Museum", "Khan el-Khalili"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Cairo",
+  },
+  {
+    slug: "buenos-aires",
+    name: "Buenos Aires",
+    country: "Argentina",
+    days: 3,
+    description:
+      "A 3-day Buenos Aires travel guide mixing European architecture, tango culture, and vibrant neighborhoods.",
+    highlights: ["La Boca", "Recoleta Cemetery", "San Telmo"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Buenos Aires",
+  },
+  {
+    slug: "rio-de-janeiro",
+    name: "Rio de Janeiro",
+    country: "Brazil",
+    days: 3,
+    description:
+      "A 3-day Rio de Janeiro travel guide featuring iconic beaches, mountain viewpoints, and vibrant culture.",
+    highlights: ["Copacabana Beach", "Christ the Redeemer", "Sugarloaf Mountain"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Rio de Janeiro",
+  },
+  {
+    slug: "mexico-city",
+    name: "Mexico City",
+    country: "Mexico",
+    days: 3,
+    description:
+      "A 3-day Mexico City travel guide with historic centers, world-class museums, and exceptional food markets.",
+    highlights: ["Zocalo", "Frida Kahlo Museum", "Xochimilco"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Mexico City",
+  },
+  {
+    slug: "bucharest",
+    name: "Bucharest",
+    country: "Romania",
+    days: 2,
+    description:
+      "A 2-day Bucharest travel guide pairing grand architecture, historic neighborhoods, and relaxed parks.",
+    highlights: ["Palace of Parliament", "Old Town", "Herastrau Park"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "2 days in Bucharest",
+  },
+  {
+    slug: "sofia",
+    name: "Sofia",
+    country: "Bulgaria",
+    days: 2,
+    description:
+      "A 2-day Sofia travel guide featuring historic churches, mountain views, and walkable city center.",
+    highlights: ["Alexander Nevsky Cathedral", "Vitosha Mountain", "Serdika Complex"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "2 days in Sofia",
   },
 ];
 
 export function getCityBySlug(slug: string): CitySeo | undefined {
   return cityPages.find((city) => city.slug === slug);
+}
+
+if (process.env.NODE_ENV !== "production") {
+  checkPrimaryKeywordUniqueness(cityPages);
 }

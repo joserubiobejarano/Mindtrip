@@ -30,6 +30,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUsageLimits } from "@/lib/supabase/usage-limits";
 import { resolvePlacePhotoSrc, isPhotoSrcUsable, isGooglePhotoReference } from "@/lib/placePhotos";
 import { DayAccordionHeader } from "@/components/day-accordion-header";
+import { CityOverviewCards } from "@/components/city-overview-cards";
 
 type ItineraryStatus = 'idle' | 'loading' | 'generating' | 'loaded' | 'error';
 
@@ -414,6 +415,7 @@ export function ItineraryTab({
           summary: '',
           days: [],
           tripTips: [],
+          cityOverview: undefined,
         };
         
         let buffer = '';
@@ -534,6 +536,12 @@ export function ItineraryTab({
                   case 'tripTips':
                     partialItinerary.tripTips = data.data;
                     setSmartItinerary(prev => prev ? { ...prev, tripTips: data.data } : { ...partialItinerary } as SmartItinerary);
+                    break;
+                    
+                  case 'cityOverview':
+                    console.log('[itinerary-tab] Received cityOverview:', data.data);
+                    partialItinerary.cityOverview = data.data;
+                    setSmartItinerary(prev => prev ? { ...prev, cityOverview: data.data } : { ...partialItinerary } as SmartItinerary);
                     break;
                     
                   case 'complete':
@@ -769,6 +777,17 @@ export function ItineraryTab({
       // CASE 3: we have data
       const json = await res.json();
       console.log('[itinerary-tab] loadOrGenerate: loaded itinerary from DB', json);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[itinerary-tab] cityOverview check:', {
+          hasCityOverview: !!json.cityOverview,
+          cityOverviewKeys: json.cityOverview ? Object.keys(json.cityOverview) : [],
+          needsRegeneration: !json.cityOverview
+        });
+        if (!json.cityOverview) {
+          console.warn('[itinerary-tab] cityOverview missing - itinerary needs to be regenerated to see City Overview cards');
+        }
+      }
       
       // Validate structure before setting state
       try {
@@ -1274,6 +1293,19 @@ export function ItineraryTab({
                     </div>
                   )}
 
+                  {/* City Overview Cards */}
+                  {(() => {
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('[itinerary-tab] Rendering check:', {
+                        hasCityOverview: !!smartItinerary.cityOverview,
+                        cityOverview: smartItinerary.cityOverview ? 'present' : 'missing'
+                      });
+                    }
+                    return smartItinerary.cityOverview ? (
+                      <CityOverviewCards cityOverview={smartItinerary.cityOverview} />
+                    ) : null;
+                  })()}
+
                   {/* Days - Grouped by segments if multi-city */}
                   <div className="space-y-12">
                     {smartItinerary.days && smartItinerary.days.length > 0 ? (() => {
@@ -1379,7 +1411,7 @@ export function ItineraryTab({
 
                   return (
                     <Card 
-                      key={day.id} 
+                      key={`day-${day.index}-${day.id}`} 
                       id={`day-${day.id}`}
                       className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
                     >
@@ -1483,7 +1515,7 @@ export function ItineraryTab({
                                 <div className="pt-4 border-t border-gray-200">
                                   {/* Moment of day label */}
                                   <div className="flex justify-center md:justify-center">
-                                    <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                    <span className="text-base uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                                       {translateSlotLabel(slot.label)}
                                     </span>
                                   </div>
@@ -1643,7 +1675,7 @@ export function ItineraryTab({
 
                   return (
                     <Card 
-                      key={day.id} 
+                      key={`day-${day.index}-${day.id}`} 
                       id={`day-${day.id}`}
                       className={`overflow-hidden border shadow-sm transition-all ${selectedDayId === day.id ? 'ring-2 ring-primary' : ''}`}
                     >
@@ -1747,7 +1779,7 @@ export function ItineraryTab({
                                 <div className="pt-4 border-t border-gray-200">
                                   {/* Moment of day label */}
                                   <div className="flex justify-center md:justify-center">
-                                    <span className="text-sm uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+                                    <span className="text-base uppercase tracking-wide text-slate-600 font-bold" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                                       {translateSlotLabel(slot.label)}
                                     </span>
                                   </div>

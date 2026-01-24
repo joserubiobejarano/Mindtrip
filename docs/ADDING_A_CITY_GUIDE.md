@@ -3,7 +3,7 @@
 This guide covers the marketing-only city pages (no in-app itinerary UI).
 
 ## Where to add data
-- `lib/seo/cities.ts`: add the city to `cityPages` for hub/metadata.
+- `lib/seo/cities.ts`: add the city to `cityPages` for hub/metadata. Each entry must include `intent`, `contentLevel`, and `primaryKeyword` (see **When to use full vs lite** and **SEO data model** below).
 - `lib/itinerary/city-itineraries.ts`: add full guide data under each locale (`en`, `es`).
 
 ## Required fields (P0)
@@ -32,6 +32,36 @@ This guide covers the marketing-only city pages (no in-app itinerary UI).
   - Section headings that appear in metadata or schema
   - No English strings allowed in Spanish metadata
 
+## When to use full vs lite
+
+Set `contentLevel` on each city in `cityPages`:
+
+- **Full**: The guide meets P0 **and** minimum recommended depth (7 FAQs, 4+ logistics, 6+ checklist, custom hero/pacing, varied related itineraries). Use for flagship cities (e.g. Rome, Paris).
+- **Lite**: Lighter content, more defaults, or hub-only (no full itinerary). Use for expanding coverage without full Rome-level investment.
+
+## How intent affects indexing and CTAs
+
+Set `intent` on each city in `cityPages`. Intent influences how we think about indexing and CTAs (implementation may follow later):
+
+- **Informational**: Focus on traffic and topical authority; soft CTAs (e.g. “Explore more”).
+- **Mixed**: Balance info and conversion; clear primary/secondary CTAs (e.g. “Plan your trip”).
+- **Transactional**: Conversion-focused; stronger CTAs and signup/trip-creation prompts.
+
+## Minimum recommended content depth for full guides
+
+Full guides should align with `docs/GUIDE_QUALITY_CHECKLIST.md` P0 and P1:
+
+- Hero, 3–5 city stats, 3 image cards, day plans matching `days`, 7 FAQs, 3 related itineraries, 4+ logistics, 6+ checklist, primary/secondary CTAs.
+- Avoid heavy repetition across sections; include Spanish localization.
+
+## SEO data model (`cityPages`)
+
+Each city in `lib/seo/cities.ts` must define:
+
+- `intent`: `"informational"` | `"mixed"` | `"transactional"`.
+- `contentLevel`: `"full"` | `"lite"`.
+- `primaryKeyword`: Canonical target phrase (e.g. `"3 days in Paris"`). **Must not duplicate** any other indexed city guide; dev warns via `[Guide SEO]` if duplicates are detected.
+
 ## Images
 
 ### Hero images
@@ -48,8 +78,9 @@ This guide covers the marketing-only city pages (no in-app itinerary UI).
 - Ensure all image URLs are valid and city-relevant
 
 ## Guardrails to expect in dev
-- Missing sections or invalid image URLs will trigger `console.warn` in dev.
+- Missing sections or invalid image URLs will trigger `[Guide QA]` `console.warn` in dev.
 - Related links are checked for missing/unknown slugs.
+- Duplicate `primaryKeyword` across city guides triggers `[Guide SEO]` warnings.
 
 ## How to test locally
 1. Run `npm run dev`.

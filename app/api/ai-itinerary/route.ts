@@ -85,8 +85,56 @@ async function trySendTripReadyEmail(params: {
     return;
   }
 
+  // Get or create public share link for the trip
+  const { createSupabaseAdmin } = await import('@/lib/supabase/admin');
+  const adminSupabase = createSupabaseAdmin();
+  
+  // Check if share already exists
+  const { data: existingShare } = await adminSupabase
+    .from('trip_shares')
+    .select('public_slug')
+    .eq('trip_id', params.tripId)
+    .maybeSingle();
+
+  let publicSlug: string;
+  
+  if (existingShare?.public_slug) {
+    publicSlug = existingShare.public_slug;
+  } else {
+    // Generate a new slug and create share
+    const generateSlug = () => {
+      return Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+    };
+    
+    publicSlug = generateSlug();
+    const { error: shareError } = await adminSupabase
+      .from('trip_shares')
+      .insert({
+        trip_id: params.tripId,
+        public_slug: publicSlug,
+      });
+
+    if (shareError) {
+      console.error('[ai-itinerary] Failed to create share link:', shareError);
+      // Fallback to authenticated URL if share creation fails
+      const appUrl = process.env.APP_URL || 'https://kruno.app';
+      const tripUrl = `${appUrl}/trips/${params.tripId}`;
+      
+      await sendTripReadyEmail({
+        userEmail: recipient.email,
+        firstName: recipient.firstName,
+        tripName: params.tripTitle,
+        tripCity: params.tripCity,
+        tripUrl,
+        language: recipient.language,
+      });
+      return;
+    }
+  }
+
   const appUrl = process.env.APP_URL || 'https://kruno.app';
-  const tripUrl = `${appUrl}/trips/${params.tripId}`;
+  const tripUrl = `${appUrl}/p/${publicSlug}`;
 
   await sendTripReadyEmail({
     userEmail: recipient.email,

@@ -32,11 +32,44 @@ export interface ItineraryDay {
   slots: ItinerarySlot[]; // usually 3
 }
 
+export interface CityOverview {
+  gettingThere?: {
+    airports?: string[];
+    distanceToCity?: string;
+    transferOptions?: string[];
+  };
+  gettingAround?: {
+    publicTransport?: string;
+    walkability?: string;
+    taxiRideshare?: string;
+  };
+  budgetGuide?: {
+    budgetDaily?: string;
+    midRangeDaily?: string;
+    luxuryDaily?: string;
+    transportPass?: string;
+  };
+  bestTimeToVisit?: {
+    bestMonths?: string;
+    shoulderSeason?: string;
+    peakLowSeason?: string;
+  };
+  whereToStay?: Array<{
+    neighborhood: string;
+    description: string;
+  }>;
+  advancePlanning?: {
+    bookEarly?: string[];
+    spontaneous?: string[];
+  };
+}
+
 export interface SmartItinerary {
   title: string;
   summary: string;
   days: ItineraryDay[];
   tripTips: string[]; // trip-wide tips (season, holidays, packing)
+  cityOverview?: CityOverview; // Optional structured city overview
 }
 
 // Keeping AffiliateSuggestion for compatibility if needed elsewhere, 
