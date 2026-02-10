@@ -1,16 +1,16 @@
 "use client";
 
-import { NewNavbar } from "@/components/new-navbar";
+import { MarketingNavbar } from "@/components/marketing-navbar";
 import { NewFooter } from "@/components/new-footer";
 import Link from "next/link";
 import { useLanguage } from "@/components/providers/language-provider";
 
-export function PrivacyContent() {
+export function PrivacyContent({ isSignedIn = false }: { isSignedIn?: boolean }) {
   const { t, language } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background">
-      <NewNavbar />
+      <MarketingNavbar isSignedIn={isSignedIn} />
       <main className="max-w-4xl mx-auto px-6 py-12">
         <h1 
           className="text-4xl font-bold mb-6"

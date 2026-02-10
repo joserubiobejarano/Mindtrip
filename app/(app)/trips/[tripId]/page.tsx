@@ -142,4 +142,3 @@ export default async function TripDetailPage({
     </Suspense>
   );
 }
-

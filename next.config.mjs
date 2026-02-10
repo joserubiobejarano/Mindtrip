@@ -1,6 +1,21 @@
 import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "kruno.app",
+          },
+        ],
+        destination: "https://www.kruno.app/:path*",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       // Supabase storage (your project)
@@ -34,6 +49,7 @@ const nextConfig = {
       { pathname: "/api/wikimedia" },
       { pathname: "/brand/**" },
     ],
+    qualities: [50, 65, 75, 100],
   },
 
   webpack: (config) => {

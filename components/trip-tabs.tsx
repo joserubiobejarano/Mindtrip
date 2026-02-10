@@ -86,7 +86,11 @@ export function TripTabs({
             />
           </ErrorBoundary>
         </TabsContent>
-        <TabsContent value="itinerary" className="h-full mt-0">
+        <TabsContent
+          value="itinerary"
+          forceMount
+          className="h-full mt-0 data-[state=inactive]:hidden data-[state=inactive]:pointer-events-none"
+        >
           <ErrorBoundary
             fallbackTitle="Itinerary tab error"
             fallbackMessage="Something went wrong with the Itinerary tab. Try reloading the page."

@@ -98,6 +98,14 @@ All high-priority SEO issues have been resolved. The codebase now includes:
 - `app/(marketing)/influencers/[slug]/page.tsx` - Influencer detail
 - `app/(marketing)/[lang]/` - All localized variants
 
+## Lighthouse Recheck Checklist
+
+- Open Chrome DevTools → Lighthouse, select Mobile, Performance only, and run on `https://www.kruno.app/`.
+- Verify first navigation has 0-1 redirects and the final URL stays on `www`.
+- Confirm no Clerk scripts load on marketing pages (homepage + influencer landing) unless visiting auth/app routes.
+- Check LCP images are served via `next/image` with correct sizing and lower quality for cards.
+- Confirm fonts load from `next/font` (no render-blocking font CSS in the network waterfall).
+
 ## Bilingual SEO Strategy
 
 ### URL Structure

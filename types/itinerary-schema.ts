@@ -13,9 +13,19 @@ export const itineraryPlaceSchema = z.object({
   image_url: z.string().nullable().optional().describe("Stable Supabase Storage URL (prioritized over photos array)"),
 });
 
+export const slotSummarySchema = z.object({
+  block_title: z.string().describe("Specific anchor like 'Buda Castle + Fisherman's Bastion'"),
+  what_to_do: z.array(z.string()).min(2).max(4).describe("2-4 bullets, each mentioning specific POIs"),
+  local_insights: z.string().min(800).max(1600).describe("200-320 words, 1-2 paragraphs of practical city-specific insights unique to this slot/time-of-day"),
+  move_between: z.string().describe("1 short sentence with specific transport or walk distance"),
+  getting_around: z.string().optional().describe("Optional: 1-2 sentences with realistic transit mode for that area"),
+  cost_note: z.string().nullable().describe("Optional cost information; only if truly relevant (ticketed attraction, transit pass, specific expense); NO generic ranges"),
+  heads_up: z.string().describe("1 unique caution for this block, must not repeat across days"),
+});
+
 export const itinerarySlotSchema = z.object({
   label: z.enum(['morning', 'afternoon', 'evening']),
-  summary: z.string().describe("Brief summary of what happens in this slot"),
+  summary: z.union([slotSummarySchema, z.string()]).describe("Structured summary object (new format) or string (legacy format)"),
   places: z.array(itineraryPlaceSchema).describe("2-4 places that are geographically close"),
 });
 

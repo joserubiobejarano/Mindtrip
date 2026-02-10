@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { NewNavbar } from "@/components/new-navbar";
+import { MarketingNavbar } from "@/components/marketing-navbar";
 import { NewFooter } from "@/components/new-footer";
 
-export default function NotFoundPage() {
+export default async function NotFoundPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <NewNavbar />
+      <MarketingNavbar isSignedIn={false} />
       <main className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="max-w-2xl text-center space-y-6">
           <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">

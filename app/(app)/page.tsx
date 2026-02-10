@@ -4,6 +4,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { siteConfig, getSiteUrl } from "@/lib/seo/site";
 import type { Metadata } from "next";
 import { buildCanonicalUrl, buildLanguageAlternates, getLocalizedPath } from "@/lib/seo/urls";
+import { auth } from "@clerk/nextjs/server";
 
 export async function generateMetadata({
   searchParams,
@@ -24,7 +25,9 @@ export async function generateMetadata({
   });
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { userId } = await auth();
+  const isSignedIn = Boolean(userId);
   const siteUrl = getSiteUrl();
   const structuredData = [
     {
@@ -50,7 +53,7 @@ export default function HomePage() {
   return (
     <>
       <StructuredData data={structuredData} id="kruno-home-ld" />
-      <HomePageClient />
+      <HomePageClient isSignedIn={isSignedIn} />
     </>
   );
 }

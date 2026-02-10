@@ -90,7 +90,7 @@ export function TripChatBar({ tripId }: TripChatBarProps) {
 
       {/* disclaimer */}
       <p className="mx-auto mt-2 max-w-4xl text-center text-xs text-slate-400">
-        Kruno uses AI and may make mistakes. Always double-check important details.
+        Kruno uses automated suggestions and may make mistakes. Always double-check important details.
       </p>
     </div>
   );

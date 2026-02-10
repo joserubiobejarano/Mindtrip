@@ -15,4 +15,3 @@ export const metadata: Metadata = buildMetadata({
 export default function FlightsPage() {
   return <FlightsPageClient />;
 }
-

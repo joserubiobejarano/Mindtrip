@@ -1,19 +1,37 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Script from "next/script";
-import { Inter, Patrick_Hand } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+import { Inter, JetBrains_Mono, League_Spartan, Patrick_Hand, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { UmamiSubscriptionTracker } from "@/components/umami-subscription-tracker";
 import { siteConfig, getSiteUrl } from "@/lib/seo/site";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const patrickHand = Patrick_Hand({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-patrick-hand",
+  display: "swap",
+});
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-playfair-display",
+  display: "swap",
+});
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+});
+const leagueSpartan = League_Spartan({
+  subsets: ["latin"],
+  weight: ["900"],
+  variable: "--font-league-spartan",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -63,7 +81,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
   const shouldLoadUmami =
     process.env.NODE_ENV === "production" && Boolean(umamiWebsiteId);
@@ -75,37 +92,25 @@ export default function RootLayout({
     />
   ) : null;
 
-  // If no publishable key, render without Clerk (for build time)
-  if (!publishableKey) {
-    return (
-      <html lang="en" className={patrickHand.variable}>
-        <body className={inter.className}>
-          <Providers>{children}</Providers>
-          <Suspense fallback={null}>
-            <UmamiSubscriptionTracker />
-          </Suspense>
-          <CookieConsentBanner />
-          {/* TODO: Load analytics scripts only if consent === 'all' */}
-          {/* Example: {hasFullConsent() && <Script src="..." />} */}
-          {umamiScript}
-        </body>
-      </html>
-    );
-  }
-
   return (
-    <html lang="en" className={patrickHand.variable}>
+    <html
+      lang="en"
+      className={[
+        patrickHand.variable,
+        playfairDisplay.variable,
+        jetBrainsMono.variable,
+        leagueSpartan.variable,
+      ].join(" ")}
+    >
       <body className={inter.className}>
-        <ClerkProvider publishableKey={publishableKey}>
-          <Providers>{children}</Providers>
-          <Suspense fallback={null}>
-            <UmamiSubscriptionTracker />
-          </Suspense>
-          <CookieConsentBanner />
-          {/* TODO: Load analytics scripts only if consent === 'all' */}
-          {/* Example: {hasFullConsent() && <Script src="..." />} */}
-          {umamiScript}
-        </ClerkProvider>
+        <Providers>{children}</Providers>
+        <Suspense fallback={null}>
+          <UmamiSubscriptionTracker />
+        </Suspense>
+        <CookieConsentBanner />
+        {/* TODO: Load analytics scripts only if consent === 'all' */}
+        {/* Example: {hasFullConsent() && <Script src="..." />} */}
+        {umamiScript}
       </body>
     </html>
   );

@@ -71,7 +71,7 @@ export default async function LocalizedHomePage({
   return (
     <>
       <StructuredData data={structuredData} id={`kruno-home-ld-${lang}`} />
-      <HomePageClient showChrome={false} />
+      <HomePageClient showChrome={false} isSignedIn={false} />
     </>
   );
 }

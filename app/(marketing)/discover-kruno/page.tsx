@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { buildCanonicalUrl, buildLanguageAlternates, getLocalizedPath } from "@/lib/seo/urls";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Discover Kruno – AI Travel Planner",
-  description: "Create a clear trip plan in minutes with Kruno's AI travel planner.",
+  title: "Discover Kruno – Smart travel planner",
+  description: "Create a clear trip plan in minutes with Kruno's smart travel planner.",
   path: "/discover-kruno",
   robots: {
     index: false,
@@ -18,10 +18,10 @@ export const metadata: Metadata = buildMetadata({
   },
 });
 
-export default function DiscoverKrunoRoute() {
+export default async function DiscoverKrunoRoute() {
   return (
     <Suspense fallback={null}>
-      <DiscoverKrunoPage />
+      <DiscoverKrunoPage isSignedIn={false} />
     </Suspense>
   );
 }

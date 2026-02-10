@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProfileId } from '@/lib/auth/getProfileId';
-import { SmartItinerary, ItinerarySlot, ItineraryPlace } from '@/types/itinerary';
+import { SmartItinerary, ItinerarySlot, ItineraryPlace, SlotSummary } from '@/types/itinerary';
 import { smartItinerarySchema } from '@/types/itinerary-schema';
 import { getPlaceDetails, getPlacePhotoReference, findGooglePlaceId, validatePlaceId } from '@/lib/google/places-server';
 import { clearLikedPlacesAfterRegeneration } from '@/lib/supabase/explore-integration';
+import { upsertSmartItinerary } from '@/lib/supabase/smart-itineraries-server';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google/places-server';
-import { streamText } from 'ai';
+import { streamText, generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
+import { z } from 'zod';
 import { getUserSubscriptionStatus } from '@/lib/supabase/user-subscription';
 import type { Language } from '@/lib/i18n';
 import { findPhotoRefForActivity } from '@/lib/google/places-backfill';
@@ -361,6 +363,16 @@ function buildPhotoUrl(photoRef: string): string {
  * Deduplicate photos by photo_reference and build URLs
  * Returns array of unique photo URLs (up to maxCount)
  */
+/** Normalize URL for deduplication (origin + pathname, ignore query/fragment). */
+function normalizePhotoUrl(url: string): string {
+  try {
+    const u = url.startsWith('/') ? new URL(url, 'https://example.com') : new URL(url);
+    return u.origin + u.pathname;
+  } catch {
+    return url;
+  }
+}
+
 function deduplicateAndBuildPhotoUrls(
   places: ItineraryPlace[],
   maxCount: number = 4
@@ -370,8 +382,9 @@ function deduplicateAndBuildPhotoUrls(
 
   const tryAdd = (url: string | undefined | null) => {
     if (!url) return;
-    if (seen.has(url)) return;
-    seen.add(url);
+    const norm = normalizePhotoUrl(url);
+    if (seen.has(norm)) return;
+    seen.add(norm);
     photoUrls.push(url);
   };
 
@@ -407,9 +420,12 @@ function deduplicateAndBuildPhotoUrls(
 /**
  * Safety guard: Prevent duplicate photo_reference for different place_ids
  * If multiple places share the same photo_reference but have different place_ids,
- * set photo_reference to null for duplicates (keep first occurrence)
+ * try to find an alternative image for duplicates instead of leaving them empty.
  */
-function applyPhotoReferenceSafetyGuard(places: ItineraryPlace[]): void {
+async function applyPhotoReferenceSafetyGuard(
+  places: ItineraryPlace[],
+  context: PlaceMediaContext
+): Promise<void> {
   const refToPlaceIds = new Map<string, Set<string>>();
 
   // Build map: photo_reference -> set of place_ids
@@ -425,21 +441,34 @@ function applyPhotoReferenceSafetyGuard(places: ItineraryPlace[]): void {
   // Check for conflicts
   for (const [photoRef, placeIds] of refToPlaceIds.entries()) {
     if (placeIds.size > 1) {
-      // Multiple different place_ids share the same photo_reference - this is a problem
       console.warn(
-        `[smart-itinerary] Safety guard: photo_reference "${photoRef}" is shared by ${placeIds.size} different places. Clearing duplicates.`,
+        `[smart-itinerary] Safety guard: photo_reference shared by ${placeIds.size} different places. Finding alternatives for duplicates.`,
         { placeIds: Array.from(placeIds) }
       );
 
-      // Keep photo_reference for the first occurrence, clear for others
+      // Keep photo_reference for the first occurrence; find alternatives for others
       let firstOccurrence = true;
       for (const place of places) {
         if (place.photo_reference === photoRef && place.place_id) {
           if (firstOccurrence) {
             firstOccurrence = false;
           } else {
+            // Clear the duplicate and try to find an alternative image
             place.photo_reference = undefined;
             place.photos = [];
+            place.image_url = undefined;
+
+            // Try alternative search (area-first or "venue" suffix to get different result)
+            const altSearch =
+              place.area && place.area !== context.cityOrArea
+                ? `${place.area} ${place.name}`
+                : `${place.name} ${context.cityOrArea}`;
+            const result = await enrichPlaceMedia(place, context, {
+              searchTitleOverride: altSearch,
+            });
+            if (result.photoRef || result.imageUrl) {
+              // enrichPlaceMedia mutates place, so it's already updated
+            }
           }
         }
       }
@@ -462,10 +491,12 @@ type PlaceMediaContext = {
  * 2) Fetch photo_reference via place_id.
  * 3) Fallback to text search photo reference (Find Place + Details).
  * 4) Final fallback: cache stable image via cachePlaceImageWithDetails (Google/Unsplash/Mapbox).
+ * @param options.searchTitleOverride - If provided, use this instead of place.name for text search (e.g. for finding alternative images)
  */
 async function enrichPlaceMedia(
   place: ItineraryPlace,
-  context: PlaceMediaContext
+  context: PlaceMediaContext,
+  options?: { searchTitleOverride?: string }
 ): Promise<{ photoRef: string | null; imageUrl: string | null }> {
   // If we already have a cached image, prefer it
   if (place.image_url) {
@@ -494,8 +525,9 @@ async function enrichPlaceMedia(
   }
 
   // Try to find a photo_reference via text search (aligns with backfill helper)
+  const searchTitle = options?.searchTitleOverride ?? place.name;
   const backfillPhotoRef = await findPhotoRefForActivity({
-    title: place.name,
+    title: searchTitle,
     city: context.cityOrArea,
     country: context.destinationCountry || undefined,
     lat: context.centerLat || undefined,
@@ -530,53 +562,240 @@ async function enrichPlaceMedia(
 }
 
 /**
- * Ensure every slot summary is multi-paragraph and tip-heavy.
- * If a slot comes back as a single/empty paragraph, expand it with practical guidance.
+ * Validate that slot summaries have the correct structure
+ * Only validates structure, doesn't generate content
  */
-function ensureRichSlotSummaries(itinerary: SmartItinerary, destination?: string): void {
+function validateSlotSummaries(itinerary: SmartItinerary): void {
   if (!itinerary?.days?.length) return;
-
-  const toParagraphs = (text?: string | null): string[] => {
-    if (!text) return [];
-    return text
-      .split(/\n\s*\n/)
-      .map(p => p.trim())
-      .filter(Boolean);
-  };
-
+  
   for (const day of itinerary.days) {
     for (const slot of day.slots) {
-      const paragraphs = toParagraphs(slot.summary);
-      if (paragraphs.length >= 2) continue; // already rich enough
+      // Accept both string (legacy) and structured (new) formats
+      if (typeof slot.summary === 'string') {
+        // Legacy format - valid
+        continue;
+      }
+      
+      if (typeof slot.summary === 'object' && slot.summary !== null) {
+        // New structured format - validate required fields
+        const summary = slot.summary as SlotSummary;
+        if (
+          typeof summary.block_title !== 'string' ||
+          !Array.isArray(summary.what_to_do) ||
+          typeof summary.local_insights !== 'string' ||
+          typeof summary.move_between !== 'string' ||
+          (summary.getting_around !== undefined && typeof summary.getting_around !== 'string') ||
+          (summary.cost_note !== null && typeof summary.cost_note !== 'string') ||
+          typeof summary.heads_up !== 'string'
+        ) {
+          console.warn(`[smart-itinerary] Slot ${slot.label} has invalid structured summary`);
+        }
+      } else {
+        console.warn(`[smart-itinerary] Slot ${slot.label} missing summary`);
+      }
+    }
+  }
+}
 
-      const primary = slot.places?.[0];
-      const area =
-        primary?.area ||
-        primary?.neighborhood ||
-        day.areaCluster ||
-        destination ||
-        "the area";
-      const placeName = primary?.name || `this ${slot.label.toLowerCase()}`;
+/**
+ * Count words in a string (simple heuristic)
+ */
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
 
-      const paragraph1 = [
-        `Start your ${slot.label.toLowerCase()} around ${placeName} and give yourself time to soak in the vibe of ${area}.`,
-        `Expect most sights to run roughly 09:00 to 19:00 with last entry about an hour before close; double-check exact hours and timed-entry rules online.`,
-        `If tickets are needed, book ahead and budget common ranges of €10 to €30 for headline stops; carry a digital copy and ID for scans.`,
-      ].join(" ");
+/**
+ * Extract n-grams (phrases) from text for repetition detection
+ */
+function extractNgrams(text: string, n: number = 3): Set<string> {
+  const words = text.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const ngrams = new Set<string>();
+  for (let i = 0; i <= words.length - n; i++) {
+    const ngram = words.slice(i, i + n).join(' ');
+    if (ngram.length > 10) { // Only consider meaningful phrases
+      ngrams.add(ngram);
+    }
+  }
+  return ngrams;
+}
 
-      const paragraph2 = [
-        `Move between stops with clear routes: lean on nearby metro/bus/tram lines and note both origin and destination stations; single rides are often about €2 to €3 and walks of 10 to 20 minutes are common in ${area}.`,
-        `Watch for peak crowds at mid-morning and late afternoon; earlier entry windows or late slots can shorten queues.`,
-        `Keep a small buffer for bag checks and security at major landmarks.`,
-      ].join(" ");
+/**
+ * Check if text contains repeated sentence structures
+ */
+function hasRepeatedStructures(text: string, otherTexts: string[]): boolean {
+  const commonStarts = [
+    'start your',
+    'begin your',
+    'move between',
+    'refuel close',
+    'after exploring',
+    'next, head',
+    'then, make',
+    'don\'t forget',
+    'be sure to',
+    'make sure to',
+  ];
+  
+  const textLower = text.toLowerCase();
+  for (const start of commonStarts) {
+    if (textLower.startsWith(start)) {
+      // Check if other texts also start with this pattern
+      const otherMatches = otherTexts.filter(t => t.toLowerCase().startsWith(start));
+      if (otherMatches.length > 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
-      const paragraph3 = [
-        `Refuel close by: look for a bakery or café for a coffee and pastry before noon, or a menu del día around €12 to €20 if you're near local streets.`,
-        `Ask for house specials and check if reservations are needed for terraces during weekends.`,
-        `Add one wow moment, whether it's a viewpoint, a local market detour, or a quick stop for gelato while you walk.`,
-      ].join(" ");
+/**
+ * Post-process slot summaries to remove generic ranges and ensure uniqueness
+ */
+function sanitizeSlotSummaries(itinerary: SmartItinerary): void {
+  if (!itinerary?.days?.length) return;
 
-      slot.summary = [paragraph1, paragraph2, paragraph3].join("\n\n");
+  // Track used facts per day to prevent repetition
+  const usedFactsPerDay = new Map<number, Set<string>>();
+  // Track all slot summaries across the trip for cross-day repetition detection
+  const allSlotSummaries: Array<{ dayIndex: number; slotIndex: number; summary: SlotSummary }> = [];
+
+  // First pass: collect all summaries
+  for (const day of itinerary.days) {
+    for (let slotIdx = 0; slotIdx < day.slots.length; slotIdx++) {
+      const slot = day.slots[slotIdx];
+      if (typeof slot.summary === 'object' && slot.summary !== null) {
+        allSlotSummaries.push({
+          dayIndex: day.index,
+          slotIndex: slotIdx,
+          summary: slot.summary as SlotSummary,
+        });
+      }
+    }
+  }
+
+  for (const day of itinerary.days) {
+    const usedFacts = new Set<string>();
+    usedFactsPerDay.set(day.index, usedFacts);
+
+    for (const slot of day.slots) {
+      // Skip legacy string format
+      if (typeof slot.summary === 'string') {
+        continue;
+      }
+      
+      if (!slot.summary || typeof slot.summary !== 'object') {
+        continue;
+      }
+
+      const summary = slot.summary as SlotSummary;
+
+      // Enforce local_insights minimum length (200 words ≈ 800 characters)
+      if (summary.local_insights) {
+        const wordCount = countWords(summary.local_insights);
+        if (wordCount < 200) {
+          console.warn(`[smart-itinerary] Slot ${slot.label} local_insights too short (${wordCount} words, minimum 200). Keeping as-is but may need regeneration.`);
+        }
+      }
+
+      // Remove generic cost ranges from cost_note
+      if (summary.cost_note) {
+        const genericPatterns = [
+          /€?\d+\s*to\s*€?\d+/i,  // "€10 to €30"
+          /\d+\s*-\s*€?\d+/i,      // "10-30"
+          /€?\d+\s*-\s*€?\d+/i,    // "€10-€30"
+          /€?\d+\s*–\s*€?\d+/i,    // "€10–€30" (en dash)
+        ];
+        
+        const hasGenericRange = genericPatterns.some(pattern => 
+          pattern.test(summary.cost_note!)
+        );
+        
+        if (hasGenericRange) {
+          // Check if this is a known ticketed attraction
+          const hasKnownTicket = slot.places.some(p => 
+            p.tags?.includes('museum') || 
+            p.tags?.includes('attraction') ||
+            p.name.toLowerCase().includes('museum') ||
+            p.name.toLowerCase().includes('palace') ||
+            p.name.toLowerCase().includes('cathedral') ||
+            p.name.toLowerCase().includes('gallery') ||
+            p.name.toLowerCase().includes('sagrada') ||
+            p.name.toLowerCase().includes('colosseum') ||
+            p.name.toLowerCase().includes('tower')
+          );
+          
+          if (!hasKnownTicket) {
+            summary.cost_note = null; // Remove generic range
+          }
+        }
+      }
+
+      // Check for duplicate heads_up within the day
+      const headsUpKey = summary.heads_up.toLowerCase().trim();
+      if (usedFacts.has(headsUpKey)) {
+        // Generate a unique heads_up based on the first place
+        summary.heads_up = `Tip: Check opening hours for ${slot.places[0]?.name || 'attractions'} in this area`;
+      }
+      usedFacts.add(headsUpKey);
+
+      // Detect repeated phrases in local_insights across slots
+      if (summary.local_insights) {
+        const currentNgrams = extractNgrams(summary.local_insights, 4);
+        const otherSummaries = allSlotSummaries.filter(
+          s => !(s.dayIndex === day.index && s.slotIndex === day.slots.indexOf(slot))
+        );
+        
+        let repeatedPhrases = 0;
+        for (const other of otherSummaries) {
+          if (other.summary.local_insights) {
+            const otherNgrams = extractNgrams(other.summary.local_insights, 4);
+            // Count overlapping n-grams
+            for (const ngram of currentNgrams) {
+              if (otherNgrams.has(ngram)) {
+                repeatedPhrases++;
+              }
+            }
+          }
+        }
+        
+        // If too many repeated phrases, remove cost_note as a simple fix
+        // (Prefer removal over rewriting to avoid hallucination)
+        if (repeatedPhrases > 3 && summary.cost_note) {
+          console.warn(`[smart-itinerary] Detected repetitive local_insights in slot ${slot.label}, removing cost_note`);
+          summary.cost_note = null;
+        }
+      }
+
+      // Detect repeated sentence structures
+      const otherLocalInsights = allSlotSummaries
+        .filter(s => !(s.dayIndex === day.index && s.slotIndex === day.slots.indexOf(slot)))
+        .map(s => s.summary.local_insights)
+        .filter(Boolean) as string[];
+      
+      if (summary.local_insights && hasRepeatedStructures(summary.local_insights, otherLocalInsights)) {
+        // Remove cost_note if structure is too repetitive
+        if (summary.cost_note) {
+          console.warn(`[smart-itinerary] Detected repeated sentence structure in slot ${slot.label}, removing cost_note`);
+          summary.cost_note = null;
+        }
+      }
+
+      // Ensure what_to_do bullets reference actual POIs
+      summary.what_to_do = summary.what_to_do.filter((bullet: string) => {
+        // Check if bullet mentions at least one place from the slot
+        return slot.places.some(place => 
+          bullet.toLowerCase().includes(place.name.toLowerCase()) ||
+          bullet.toLowerCase().includes(place.area.toLowerCase())
+        );
+      });
+
+      // If no valid bullets remain, create minimal ones from place names
+      if (summary.what_to_do.length === 0 && slot.places.length > 0) {
+        summary.what_to_do = slot.places.slice(0, 2).map((p: ItineraryPlace) => 
+          `Visit ${p.name}${p.area ? ` in ${p.area}` : ''}`
+        );
+      }
     }
   }
 }
@@ -1261,14 +1480,30 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
            * Personal recommendations and insider tips
            * What makes this day special and what travelers will see, feel, and experience
            Format: Each sentence should be a separate bullet point. The overview should be a string with sentences separated by periods, which will be displayed as bullet points.
-        - In each slot's "summary": ALWAYS write 2 to 3 paragraphs (separated by blank lines), each 3 to 5 sentences, for EVERY destination and EVERY slot; never collapse to a single paragraph. Be specific about:
-           * The atmosphere and what makes this time special
-           * Exact movement guidance between places in the slot: call out metro/bus/tram line numbers, station names, walking cues, typical durations, frequencies, and approximate one-way costs; say when walking is best
-           * Opening/closing hours windows and reservation/ticket tips for the key stop in the slot (e.g., "opens 10:00, last entry 18:00, book skip-the-line online")
-           * Nearby food/coffee picks (by area or street) with what to try and expected price range
-           * What travelers will experience and why it's worth doing
-          * A vivid wow/fact or insider micro-tip tied to the area
-           * Keep everything concise but packed with specifics that feel like insider tips, not generic filler
+        - In each slot's "summary": Return a structured object (NOT paragraphs) with:
+          {
+            "block_title": string,        // Specific anchor like "Buda Castle + Fisherman's Bastion" (mention actual POIs from this slot)
+            "what_to_do": string[],      // 2-4 bullets, each MUST mention a specific POI/area from the slot's places array
+            "local_insights": string,     // REQUIRED: 200-320 words (1-2 paragraphs) of practical, city-specific insights unique to this slot/time-of-day. Must be different from other slots - no generic filler or repeated advice.
+            "move_between": string,       // 1 short sentence with specific transport (metro line/station names) or walk distance
+            "getting_around": string,     // Optional: 1-2 sentences describing realistic transit mode for that specific area (e.g., "The area is best explored on foot, but Metro Line 3 connects nearby")
+            "cost_note": string | null,   // Optional; ONLY include if truly relevant: well-known ticketed attractions (e.g., Sagrada Familia), transit passes, or very specific expenses tied to that slot. NEVER use generic ranges like "€10-€30"
+            "heads_up": string            // 1 unique caution for this block; must NOT repeat any heads_up from other blocks in the same day OR across days
+          }
+          
+          CRITICAL ANTI-REPETITION RULES (enforce strictly):
+          - Within the same trip, do NOT repeat the same sentence structures across slots ("Start your morning…", "Move between stops…", "Refuel close by…")
+          - Do NOT repeat the same generic advice ("book ahead", "avoid crowds", "carry cash") unless it's genuinely tied to that POI/area AND phrased completely differently
+          - Avoid repeating the same price ranges every slot. Only include cost_note when:
+              a) it's a well-known ticketed attraction (e.g., Sagrada Familia),
+              b) or a transit pass, or
+              c) a very specific expense tied to that slot.
+            Otherwise omit cost_note entirely.
+          - heads_up must be unique per slot AND not reused across days
+          - local_insights must be 200-320 words and contain practical, city-specific information that differs meaningfully from other slots. No generic filler.
+          - Each "what_to_do" bullet MUST reference at least one specific place from the slot's places array
+          - If you cannot be specific, output fewer bullets rather than generic advice
+          - Reference actual POI names, neighborhoods, and specific details from the places in this slot
          - Day trip prioritization: CRITICAL - Prioritize attractions and places within the main destination city before suggesting day trips. Only suggest day trips if:
            * The trip is 4+ days long, OR
            * The main destination is very small and doesn't have enough attractions for the full trip duration
@@ -1306,7 +1541,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             "slots": [
               {
                 "label": "morning" | "afternoon" | "evening",
-                "summary": string,
+                "summary": {
+                  "block_title": string,
+                  "what_to_do": string[],
+                  "local_insights": string (200-320 words, 1-2 paragraphs),
+                  "move_between": string,
+                  "getting_around": string (optional),
+                  "cost_note": string | null,
+                  "heads_up": string
+                },
                 "places": [
                   {
                     "id": string (UUID),
@@ -1409,64 +1652,218 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
     // Create a streaming response using Server-Sent Events
     const stream = new ReadableStream({
       async start(controller) {
+        let controllerClosed = false;
+        
+        // Helper to safely close the controller
+        const safeClose = () => {
+          if (!controllerClosed) {
+            try {
+              controller.close();
+              controllerClosed = true;
+            } catch (err: any) {
+              // Controller might already be closed (e.g., client disconnected)
+              if (err?.code !== 'ERR_INVALID_STATE' && !(err instanceof TypeError)) {
+                throw err;
+              }
+              controllerClosed = true;
+            }
+          }
+        };
+        
+        let accumulatedText = '';
+        let cleanTitle = '';
+        let cleanSummary = '';
+        let cleanCityOverview: any = undefined;
+        
         try {
-          let accumulatedText = '';
           let lastSentDayIndex = -1;
           let sentDayIndices = new Set<number>(); // Track sent day indices to prevent duplicates
+          let sentDayUpdatedIndices = new Set<number>(); // One day-updated per day index to avoid duplicate emissions
           let validatedItinerary: SmartItinerary | null = null;
           let titleSent = false;
           let summarySent = false;
           let cityOverviewSent = false;
+          let cityOverviewExtracted = false; // Track if cityOverview was extracted from stream (even if missing)
 
-          // Stream the text from OpenAI
-          // Note: response_format: 'json_object' doesn't work with streaming in the same way
-          // We'll stream the text and parse JSON incrementally
+          // PHASE 1A: Generate title and summary first, emit immediately so UI can show intro
+          console.log('[smart-itinerary] Phase 1A: Generating title/summary');
+          const phase1aSchema = z.object({
+            title: z.string(),
+            summary: z.string(),
+          });
+          const phase1aSystem = `
+            ${languageInstructions}
+
+            You are an expert travel planner. Generate ONLY the title and summary for a trip.
+
+            RULES:
+            1. Trip Title:
+               - CRITICAL PRIORITY #1 - ABSOLUTE REQUIREMENT: The trip title MUST ALWAYS be city-based ONLY (e.g., "Valencia Trip", "Barcelona Trip", "Madrid Trip", "Paris Trip")
+               - NEVER EVER use a landmark, place, POI, stadium, arena, market, museum, or any specific location name in the title - THIS IS FORBIDDEN
+               - The destination provided might be a landmark - you MUST determine which city it's located in and use ONLY that city name
+               - The format MUST ALWAYS be: "[CityName] Trip"
+            
+            2. Summary:
+               - CRITICAL: The "summary" field is the most important briefing text. It must include ALL of the following information in a comprehensive, detailed paragraph:
+                 * Airport-to-city transportation: Provide EXACT details including the specific train/bus line name or number, departure station name and location, destination station name, duration, frequency, and approximate cost.
+                 * Weather conditions and clothing recommendations: Describe the typical weather during the trip dates and what clothing/accessories travelers should pack.
+                 * Seasonal activities and events: List specific events, festivals, markets, or seasonal activities happening during the trip dates.
+                 * Local holidays and festivals: Mention any public holidays, cultural celebrations, or special events during the trip dates.
+                 * Practical city-specific tips: Include information about local customs, tipping culture, best times to visit attractions, common scams to avoid, useful apps, currency, and any other practical information.
+               - Never use the tilde character "~" for approximations; write "about" or "around" instead.
+
+            OUTPUT ONLY JSON: { "title": string, "summary": string }
+          `;
+          const phase1aUserPrompt = `Trip details:\n${JSON.stringify(tripMeta)}\n\nGenerate ONLY the title and summary for this trip.`;
+          const phase1aResult = await generateObject({
+            model: openai('gpt-4o-mini'),
+            system: phase1aSystem,
+            prompt: phase1aUserPrompt,
+            schema: phase1aSchema,
+            temperature: 0.7,
+          });
+          const phase1aData = phase1aResult.object;
+          const sanitizedTitle = sanitizeItineraryTitle(phase1aData.title, destination);
+          cleanTitle = sanitizeNoTilde(sanitizedTitle);
+          sendSSE(controller, 'title', cleanTitle);
+          titleSent = true;
+          cleanSummary = sanitizeNoTilde(phase1aData.summary);
+          console.log('[smart-itinerary] Phase 1A: Emitting summary event');
+          sendSSE(controller, 'summary', cleanSummary);
+          summarySent = true;
+
+          // PHASE 1B: Generate cityOverview in a second call, then emit
+          console.log('[smart-itinerary] Phase 1B: Generating cityOverview');
+          const phase1bSchema = z.object({
+            cityOverview: z.object({
+              gettingThere: z.object({
+                airports: z.array(z.string()),
+                distanceToCity: z.string(),
+                transferOptions: z.array(z.string()),
+              }),
+              gettingAround: z.object({
+                publicTransport: z.string(),
+                walkability: z.string(),
+                taxiRideshare: z.string(),
+              }),
+              budgetGuide: z.object({
+                budgetDaily: z.string(),
+                midRangeDaily: z.string(),
+                luxuryDaily: z.string(),
+                transportPass: z.string(),
+              }),
+              bestTimeToVisit: z.object({
+                bestMonths: z.string(),
+                shoulderSeason: z.string(),
+                peakLowSeason: z.string(),
+              }),
+              whereToStay: z.array(z.object({
+                neighborhood: z.string(),
+                description: z.string(),
+              })),
+              advancePlanning: z.object({
+                bookEarly: z.array(z.string()),
+                spontaneous: z.array(z.string()),
+              }),
+            }),
+          });
+          const phase1bSystem = `
+            ${languageInstructions}
+
+            You are an expert travel planner. The trip title and summary have already been generated. Generate ONLY the cityOverview with structured practical information.
+
+            RULES:
+            - CRITICAL: You MUST include the "cityOverview" field with structured practical information. This is a REQUIRED field.
+            - Extract information about airports, transportation, budget, best time to visit, neighborhoods, and advance planning from your knowledge of the destination.
+            - Fill in all relevant sections based on the destination.
+
+            OUTPUT ONLY JSON matching this schema:
+            {
+              "cityOverview": {
+                "gettingThere": { "airports": string[], "distanceToCity": string, "transferOptions": string[] },
+                "gettingAround": { "publicTransport": string, "walkability": string, "taxiRideshare": string },
+                "budgetGuide": { "budgetDaily": string, "midRangeDaily": string, "luxuryDaily": string, "transportPass": string },
+                "bestTimeToVisit": { "bestMonths": string, "shoulderSeason": string, "peakLowSeason": string },
+                "whereToStay": [{ "neighborhood": string, "description": string }],
+                "advancePlanning": { "bookEarly": string[], "spontaneous": string[] }
+              }
+            }
+          `;
+          const phase1bUserPrompt = `Trip details:\n${JSON.stringify(tripMeta)}\n\nGenerate ONLY the cityOverview (structured practical info) for this trip.`;
+          const phase1bResult = await generateObject({
+            model: openai('gpt-4o-mini'),
+            system: phase1bSystem,
+            prompt: phase1bUserPrompt,
+            schema: phase1bSchema,
+            temperature: 0.7,
+          });
+          cleanCityOverview = sanitizeNoTilde(phase1bResult.object.cityOverview);
+          console.log('[smart-itinerary] Phase 1B: Emitting cityOverview event');
+          sendSSE(controller, 'cityOverview', cleanCityOverview);
+          cityOverviewSent = true;
+          cityOverviewExtracted = true;
+
+          console.log('[smart-itinerary] Phase 1 complete, starting Phase 2 (days generation)');
+
+          // PHASE 2: Generate days progressively (streaming)
+          // Update system prompt for Phase 2 to focus on days only
+          const phase2System = `
+            ${languageInstructions}
+
+            You are an expert travel planner. Generate ONLY the days array for a travel itinerary.
+
+            RULES:
+            ${structureInstructions}
+            
+            IMPORTANT: The title, summary, and cityOverview have already been generated. You ONLY need to generate the days array.
+
+            For each day:
+            - Include id (UUID), index (1-based), date (ISO), title, theme, areaCluster, photos (empty array), overview, slots
+            - Each slot should have label ("morning" | "afternoon" | "evening"), summary (structured object), and places array
+            - Slot summary structure: { block_title, what_to_do (string[]), local_insights (200-320 words), move_between, getting_around (optional), cost_note (optional), heads_up }
+            - Each place should have id (UUID), name, description, area, neighborhood (optional), photos (empty array), visited (false), tags, place_id (optional)
+
+            OUTPUT ONLY JSON with this structure:
+            {
+              "days": [
+                {
+                  "id": string (UUID),
+                  "index": number,
+                  "date": string (ISO),
+                  "title": string,
+                  "theme": string,
+                  "areaCluster": string,
+                  "photos": [],
+                  "overview": string,
+                  "slots": [
+                    {
+                      "label": "morning" | "afternoon" | "evening",
+                      "summary": { ... },
+                      "places": [ ... ]
+                    }
+                  ]
+                }
+              ],
+              "tripTips": string[]
+            }
+          `;
+
           const result = await streamText({
             model: openai('gpt-4o-mini'),
-            system: system,
-            prompt: userPrompt,
+            system: phase2System,
+            prompt: userPrompt + `\n\nIMPORTANT: The title, summary, and cityOverview have already been generated. Generate ONLY the days array and tripTips.`,
             temperature: 0.7,
-            // Don't use response_format with streaming - we'll parse JSON manually
           });
 
-          // Process the stream
+          // Process Phase 2 stream (days only)
           for await (const chunk of result.textStream) {
             accumulatedText += chunk;
             
-            // Try to parse what we have so far (already deduplicated by index)
+            // Try to parse what we have so far (Phase 2 only generates days)
             const partial = extractCompleteObjects(accumulatedText);
             
-            // Send title if we have it and haven't sent it
-            // CRITICAL: Validate and sanitize title BEFORE sending to ensure it's city-based
-            if (partial.title && !titleSent) {
-              const sanitizedTitle = sanitizeItineraryTitle(partial.title, destination);
-              if (sanitizedTitle !== partial.title) {
-                console.warn(`[smart-itinerary] Sanitized title from "${partial.title}" to "${sanitizedTitle}"`);
-              }
-              const cleanTitle = sanitizeNoTilde(sanitizedTitle);
-              sendSSE(controller, 'title', cleanTitle);
-              // Update partial.title so final validation also uses sanitized version
-              partial.title = cleanTitle;
-              titleSent = true;
-            }
-            
-            // Send summary if we have it and haven't sent it
-            if (partial.summary && !summarySent) {
-              const cleanSummary = sanitizeNoTilde(partial.summary);
-              sendSSE(controller, 'summary', cleanSummary);
-              partial.summary = cleanSummary;
-              summarySent = true;
-            }
-            
-            // Send cityOverview if we have it and haven't sent it
-            if (partial.cityOverview && !cityOverviewSent) {
-              console.log('[smart-itinerary] Sending cityOverview via SSE');
-              const cleanCityOverview = sanitizeNoTilde(partial.cityOverview);
-              sendSSE(controller, 'cityOverview', cleanCityOverview);
-              cityOverviewSent = true;
-            }
-            
             // Send days as they become complete - deduplicate by index to prevent duplicate Day 1
+            // Note: cityOverview is already sent in Phase 1, so we can emit days immediately
             for (let i = lastSentDayIndex + 1; i < partial.days.length; i++) {
               const day = partial.days[i];
               // Check if day looks complete (has all required fields)
@@ -1481,14 +1878,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 
                 // Validate the day structure
                 try {
-                  // Send the day immediately (without photos for now)
+                  // Send the day immediately (without photos for now) - progressive emission
                   const sanitizedDay = sanitizeNoTilde(day);
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log(`[smart-itinerary] Emitting day ${day.index} event (progressive, cityOverview sent: ${cityOverviewSent}, extracted: ${cityOverviewExtracted})`);
+                  }
                   sendSSE(controller, 'day', sanitizedDay);
                   sentDayIndices.add(day.index); // Track that we've sent this index
                   lastSentDayIndex = i;
-                  
+                  // Only one day-updated per day index (avoid duplicate emissions from stream re-emits)
+                  if (sentDayUpdatedIndices.has(day.index)) continue;
+                  sentDayUpdatedIndices.add(day.index);
                   // Start fetching photos asynchronously in background
-                  // Don't await - let it happen in parallel
                   (async () => {
                     try {
                       const enrichedDay = { ...sanitizeNoTilde(day) };
@@ -1513,7 +1914,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                       }
                       
                       // Step 3: Apply safety guard to prevent duplicate photos for different places
-                      applyPhotoReferenceSafetyGuard(allPlaces);
+                      await applyPhotoReferenceSafetyGuard(allPlaces, {
+                        cityOrArea,
+                        tripId: tripId as string,
+                        destinationCountry,
+                        centerLat,
+                        centerLng,
+                      });
                       
                       // Step 4: Build day photos from unique photo_references
                       enrichedDay.photos = deduplicateAndBuildPhotoUrls(allPlaces, 4);
@@ -1543,21 +1950,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               try {
                 const parsed = JSON.parse(accumulatedText);
                 
-                // POST-PROCESS: Ensure title is city-based, not landmark-based
-                // POST-PROCESS: Ensure title is city-based, not landmark-based
-                // Use the sanitizeItineraryTitle function for consistency
-                if (parsed.title) {
-                  const originalTitle = parsed.title;
-                  parsed.title = sanitizeItineraryTitle(parsed.title, destination);
-                  if (parsed.title !== originalTitle) {
-                    console.warn(`[smart-itinerary] Post-processed title from "${originalTitle}" to "${parsed.title}"`);
-                  }
-                } else {
-                  // If no title, set default city-based title
-                  parsed.title = `${destination} Trip`;
-                }
+                // Merge Phase 1 data (title, summary, cityOverview) with Phase 2 data (days, tripTips)
+                const mergedData = {
+                  title: cleanTitle, // Use Phase 1 title
+                  summary: cleanSummary, // Use Phase 1 summary
+                  cityOverview: cleanCityOverview, // Use Phase 1 cityOverview
+                  days: parsed.days || [],
+                  tripTips: parsed.tripTips || [],
+                };
                 
-                validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
+                validatedItinerary = smartItinerarySchema.parse(mergedData) as SmartItinerary;
                 
                 // Deduplicate days by index before sending (safety check)
                 const deduplicatedDays = new Map<number, any>();
@@ -1583,21 +1985,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                   sendSSE(controller, 'tripTips', sanitizeNoTilde(validatedItinerary.tripTips));
                 }
                 
-                // Send cityOverview if we have it
-                if (validatedItinerary.cityOverview) {
-                  console.log('[smart-itinerary] Sending cityOverview in complete message');
-                  sendSSE(controller, 'cityOverview', sanitizeNoTilde(validatedItinerary.cityOverview));
-                } else {
-                  console.warn('[smart-itinerary] cityOverview missing in validated itinerary');
-                }
+                // cityOverview was already sent in Phase 1, no need to send again
                 
                 // Final enrichment pass for any remaining photos
                 const allPlaces = validatedItinerary.days.flatMap(day => 
                   day.slots.flatMap(slot => slot.places)
                 );
                 
-                // Enforce rich multi-paragraph slot summaries
-                ensureRichSlotSummaries(validatedItinerary, destination);
+                // Sanitize slot summaries to remove generic ranges and ensure uniqueness
+                sanitizeSlotSummaries(validatedItinerary);
 
                 // Step 1: Resolve/refresh place_ids (includes invalid ones)
                 const idStats = await resolveMissingPlaceIds(allPlaces, cityOrArea);
@@ -1618,7 +2014,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 }
                 
                 // Step 3: Apply safety guard to prevent duplicate photos for different places
-                applyPhotoReferenceSafetyGuard(allPlaces);
+                await applyPhotoReferenceSafetyGuard(allPlaces, {
+                  cityOrArea,
+                  tripId: tripId as string,
+                  destinationCountry,
+                  centerLat,
+                  centerLng,
+                });
                 
                 // DIAGNOSTIC LOGGING: Count items with place_id and photo_reference/image_url
                 const placeIdCount = allPlaces.filter(p => p.place_id).length;
@@ -1643,12 +2045,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 }
                 validatedItinerary = sanitizeNoTilde(validatedItinerary) as SmartItinerary;
                 
-                // Save to Supabase
+                // Save to Supabase (trip-level row so GET/backfill find it)
                 const { error: saveError } = await (supabase
                   .from('smart_itineraries') as any)
                   .upsert(
                     {
                       trip_id: tripId,
+                      trip_segment_id: null,
                       content: validatedItinerary,
                       updated_at: new Date().toISOString()
                     },
@@ -1707,6 +2110,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 };
                 console.error('[smart-itinerary] Error parsing/validating final JSON:', errorDetails);
                 
+                // Try to save partial itinerary so backfill can run
+                try {
+                  let days: any[] = [];
+                  try {
+                    const parsed = JSON.parse(accumulatedText);
+                    if (parsed?.days && Array.isArray(parsed.days)) days = parsed.days;
+                  } catch {
+                    const partial = extractCompleteObjects(accumulatedText);
+                    if (partial?.days?.length) days = partial.days;
+                  }
+                  const validDays = days.filter((d: any) => d?.id != null && d?.index != null && Array.isArray(d?.slots));
+                  if (validDays.length > 0) {
+                    const partialItinerary: SmartItinerary = {
+                      title: cleanTitle || 'Trip',
+                      summary: cleanSummary || '',
+                      days: validDays,
+                      tripTips: [],
+                    };
+                    const { error: saveErr } = await upsertSmartItinerary(tripId as string, partialItinerary);
+                    if (!saveErr) console.log('[smart-itinerary] Saved partial itinerary on parse error');
+                  }
+                } catch (partialSaveErr: any) {
+                  console.warn('[smart-itinerary] Could not save partial itinerary:', partialSaveErr?.message);
+                }
+                
                 sendSSE(controller, 'error', { 
                   message: 'Failed to parse itinerary',
                   details: parseError.message 
@@ -1721,29 +2149,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             try {
               parsed = JSON.parse(accumulatedText);
               
-              // POST-PROCESS: Ensure title is city-based (use sanitizeItineraryTitle for consistency)
-              if (parsed.title) {
-                const originalTitle = parsed.title;
-                parsed.title = sanitizeItineraryTitle(parsed.title, destination);
-                if (parsed.title !== originalTitle) {
-                  console.warn(`[smart-itinerary] Fallback post-processed title from "${originalTitle}" to "${parsed.title}"`);
-                }
-              } else {
-                parsed.title = `${destination} Trip`;
-              }
+              // Merge Phase 1 data (title, summary, cityOverview) with Phase 2 data (days, tripTips)
+              const mergedData = {
+                title: cleanTitle, // Use Phase 1 title
+                summary: cleanSummary, // Use Phase 1 summary
+                cityOverview: cleanCityOverview, // Use Phase 1 cityOverview
+                days: parsed.days || [],
+                tripTips: parsed.tripTips || [],
+              };
               
               // Deduplicate days by index before validation
-              if (parsed.days && Array.isArray(parsed.days)) {
+              if (mergedData.days && Array.isArray(mergedData.days)) {
                 const indexMap = new Map<number, any>();
-                for (const day of parsed.days) {
+                for (const day of mergedData.days) {
                   if (day.index !== undefined) {
                     indexMap.set(day.index, day);
                   }
                 }
-                parsed.days = Array.from(indexMap.values()).sort((a, b) => a.index - b.index);
+                mergedData.days = Array.from(indexMap.values()).sort((a, b) => a.index - b.index);
               }
               
-              validatedItinerary = smartItinerarySchema.parse(parsed) as SmartItinerary;
+              validatedItinerary = smartItinerarySchema.parse(mergedData) as SmartItinerary;
               validatedItinerary = sanitizeNoTilde(validatedItinerary);
               
               // Enrich photos
@@ -1751,8 +2177,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 day.slots.flatMap(slot => slot.places)
               );
               
-              // Enforce rich multi-paragraph slot summaries
-              ensureRichSlotSummaries(validatedItinerary, destination);
+              // Sanitize slot summaries to remove generic ranges and ensure uniqueness
+              sanitizeSlotSummaries(validatedItinerary);
 
               // Step 1: Resolve/refresh place_ids
               const idStats = await resolveMissingPlaceIds(allPlaces, cityOrArea);
@@ -1773,7 +2199,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               }
               
               // Step 3: Apply safety guard to prevent duplicate photos for different places
-              applyPhotoReferenceSafetyGuard(allPlaces);
+              await applyPhotoReferenceSafetyGuard(allPlaces, {
+                cityOrArea,
+                tripId: tripId as string,
+                destinationCountry,
+                centerLat,
+                centerLng,
+              });
               
               // DIAGNOSTIC LOGGING: Count items with place_id and photo_reference
               const placeIdCount = allPlaces.filter(p => p.place_id).length;
@@ -1797,12 +2229,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
                 day.photos = deduplicateAndBuildPhotoUrls(dayPlaces, 4);
               }
               
-              // Save
+              // Save (trip-level row so GET/backfill find it)
               const { error: saveError } = await (supabase
                 .from('smart_itineraries') as any)
                 .upsert(
                   {
                     trip_id: tripId,
+                    trip_segment_id: null,
                     content: validatedItinerary,
                     updated_at: new Date().toISOString()
                   },
@@ -1848,6 +2281,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
               };
               console.error('[smart-itinerary] Final parse error:', errorDetails);
               
+              // Try to save partial itinerary so backfill can run
+              try {
+                let days: any[] = [];
+                try {
+                  const parsedErr = JSON.parse(accumulatedText);
+                  if (parsedErr?.days && Array.isArray(parsedErr.days)) days = parsedErr.days;
+                } catch {
+                  const partial = extractCompleteObjects(accumulatedText);
+                  if (partial?.days?.length) days = partial.days;
+                }
+                const validDays = days.filter((d: any) => d?.id != null && d?.index != null && Array.isArray(d?.slots));
+                if (validDays.length > 0) {
+                  const partialItinerary: SmartItinerary = {
+                    title: cleanTitle || 'Trip',
+                    summary: cleanSummary || '',
+                    days: validDays,
+                    tripTips: [],
+                  };
+                  const { error: saveErr } = await upsertSmartItinerary(tripId as string, partialItinerary);
+                  if (!saveErr) console.log('[smart-itinerary] Saved partial itinerary on final parse error');
+                }
+              } catch (partialSaveErr: any) {
+                console.warn('[smart-itinerary] Could not save partial itinerary:', partialSaveErr?.message);
+              }
+              
               sendSSE(controller, 'error', { 
                 message: 'Failed to parse itinerary',
                 details: err.message 
@@ -1855,14 +2313,43 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tri
             }
           }
           
-          controller.close();
+          // cityOverview was already sent in Phase 1, so we don't need the missing sentinel
+          // But keep it for backwards compatibility if Phase 1 somehow failed
+          if (!cityOverviewSent && !cityOverviewExtracted) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('[smart-itinerary] Phase 1 cityOverview was not sent - this should not happen');
+            }
+            sendSSE(controller, 'cityOverview_missing', null);
+            cityOverviewExtracted = true;
+          }
+          
+          safeClose();
         } catch (err: any) {
           console.error('[smart-itinerary] Stream error:', err);
+          // Try to save partial itinerary so backfill can run
+          try {
+            if (accumulatedText) {
+              const partial = extractCompleteObjects(accumulatedText);
+              const validDays = (partial?.days || []).filter((d: any) => d?.id != null && d?.index != null && Array.isArray(d?.slots));
+              if (validDays.length > 0) {
+                const partialItinerary: SmartItinerary = {
+                  title: cleanTitle || 'Trip',
+                  summary: cleanSummary || '',
+                  days: validDays,
+                  tripTips: [],
+                };
+                const { error: saveErr } = await upsertSmartItinerary(tripId as string, partialItinerary);
+                if (!saveErr) console.log('[smart-itinerary] Saved partial itinerary on stream error');
+              }
+            }
+          } catch (partialSaveErr: any) {
+            console.warn('[smart-itinerary] Could not save partial itinerary:', partialSaveErr?.message);
+          }
           sendSSE(controller, 'error', { 
             message: 'Streaming error',
             details: err.message 
           });
-          controller.close();
+          safeClose();
         }
       },
     });
@@ -1892,9 +2379,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
   try {
     tripId = (await params).tripId;
     const url = new URL(req.url);
-    const mode = url.searchParams.get('mode') ?? 'load';
-    
-    // Only handle mode=load
+    const rawMode = url.searchParams.get('mode') ?? 'load';
+    const mode = (rawMode === 'load' || String(rawMode).toLowerCase().startsWith('load')) ? 'load' : rawMode;
     if (mode !== 'load') {
       return NextResponse.json({ error: 'unsupported-mode' }, { status: 400 });
     }
@@ -1968,19 +2454,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Load itinerary from database
+    // Load itinerary from database (trip-level only; same contract as getSmartItinerary)
     const { data, error } = await supabase
       .from('smart_itineraries')
       .select('content')
       .eq('trip_id', tripId)
-      .single();
+      .is('trip_segment_id', null)
+      .maybeSingle();
 
     if (error) {
       console.error('[smart-itinerary GET] supabase error', error);
-      // If no row yet → 404, frontend will decide to generate
-      if (error.code === 'PGRST116' || error.details?.includes('Results contain 0 rows')) {
-        return NextResponse.json({ error: 'not-found' }, { status: 404 });
-      }
       return NextResponse.json({ error: 'db-error' }, { status: 500 });
     }
 

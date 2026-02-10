@@ -13,6 +13,6 @@ export const metadata: Metadata = buildMetadata({
   },
 });
 
-export default function ContactPage() {
-  return <ContactContent />;
+export default async function ContactPage() {
+  return <ContactContent isSignedIn={false} />;
 }

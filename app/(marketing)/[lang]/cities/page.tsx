@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { cityPages } from "@/lib/seo/cities";
 import { getCityItinerary } from "@/lib/itinerary/city-itineraries";
+import type { ItineraryLocale } from "@/lib/i18n/itinerary";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { getSiteUrl } from "@/lib/seo/site";
 import {
@@ -51,7 +52,7 @@ export default async function LocalizedCitiesPage({
   const siteUrl = getSiteUrl();
   const basePath = getLocalizedPath("", lang);
   const cityCards = cityPages.map((city) => {
-    const itinerary = lang === "es" ? getCityItinerary(lang, city.slug) : undefined;
+    const itinerary = lang === "es" ? getCityItinerary(lang as ItineraryLocale, city.slug) : undefined;
     return {
       ...city,
       name: itinerary?.city ?? city.name,

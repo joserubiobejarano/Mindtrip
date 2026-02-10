@@ -13,6 +13,6 @@ export const metadata: Metadata = buildMetadata({
   },
 });
 
-export default function TermsPage() {
-  return <TermsContent />;
+export default async function TermsPage() {
+  return <TermsContent isSignedIn={false} />;
 }

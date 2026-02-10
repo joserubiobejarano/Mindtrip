@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import type { TripPersonalizationPayload } from "@/types/trip-personalization";
 import { getTripUrl } from "@/lib/routes";
@@ -45,7 +44,6 @@ export function useCreateTrip() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { user } = useUser();
   const { addToast } = useToast();
 
   const createTrip = async ({ destination, startDate, endDate, travelersCount, personalization }: CreateTripParams) => {
@@ -59,10 +57,6 @@ export function useCreateTrip() {
       // Validate dates
       if (end < start) {
         throw new Error("End date must be after start date");
-      }
-
-      if (!user?.id) {
-        throw new Error("User not authenticated");
       }
 
       // Use API route instead of direct Supabase call

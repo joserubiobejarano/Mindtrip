@@ -13,6 +13,6 @@ export const metadata: Metadata = buildMetadata({
   },
 });
 
-export default function CookiesPage() {
-  return <CookiesContent />;
+export default async function CookiesPage() {
+  return <CookiesContent isSignedIn={false} />;
 }

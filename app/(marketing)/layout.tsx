@@ -1,5 +1,5 @@
 import { NewFooter } from "@/components/new-footer";
-import { NewNavbar } from "@/components/new-navbar";
+import { MarketingHeaderSwitcher } from "@/components/marketing-header-switcher";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import { isSupportedLocale } from "@/lib/seo/urls";
 import { notFound } from "next/navigation";
@@ -19,7 +19,7 @@ export default async function MarketingLayout({
 
   const content = (
     <div className="min-h-screen bg-background">
-      <NewNavbar />
+      <MarketingHeaderSwitcher isSignedIn={false} />
       <main>{children}</main>
       <NewFooter />
     </div>

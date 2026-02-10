@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useTrip } from "@/hooks/use-trip";
 import { format } from "date-fns";
 import { Download } from "lucide-react";
-import { SmartItinerary } from "@/types/itinerary";
+import { SmartItinerary, SlotSummary } from "@/types/itinerary";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { resolvePlacePhotoSrc } from "@/lib/placePhotos";
@@ -62,20 +62,64 @@ function formatMdashText(text: string): string {
 }
 
 // Render slot summaries with paragraph spacing preserved
-const renderSlotSummary = (summary?: string) => {
+const renderSlotSummary = (summary?: string | SlotSummary) => {
   if (!summary) return null;
-  const formattedSummary = formatMdashText(summary);
-  const paragraphs = formattedSummary
-    .split(/\n\s*\n/)
-    .map(p => p.trim())
-    .filter(Boolean);
-  const content = paragraphs.length > 0 ? paragraphs : [formattedSummary.trim()];
+  
+  // Handle legacy string format (backward compatibility)
+  if (typeof summary === 'string') {
+    const formattedSummary = formatMdashText(summary);
+    const paragraphs = formattedSummary
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(Boolean);
+    const content = paragraphs.length > 0 ? paragraphs : [formattedSummary.trim()];
 
+    return (
+      <div className="mt-6 mb-9 space-y-6 text-base md:text-lg text-slate-800 leading-8 text-center md:text-left">
+        {content.map((p, idx) => (
+          <p key={idx}>{p}</p>
+        ))}
+      </div>
+    );
+  }
+  
+  // New structured format
   return (
-    <div className="mt-6 mb-9 space-y-6 text-base md:text-lg text-slate-800 leading-8 text-center md:text-left">
-      {content.map((p, idx) => (
-        <p key={idx}>{p}</p>
-      ))}
+    <div className="mt-6 mb-9 space-y-4 text-base md:text-lg text-slate-800 text-center md:text-left">
+      {/* Block Title */}
+      <h3 className="text-lg font-semibold text-slate-900 mb-3">
+        {summary.block_title}
+      </h3>
+      
+      {/* What to Do - Bullets */}
+      <ul className="space-y-2 mb-4 list-none">
+        {summary.what_to_do.map((item, idx) => (
+          <li key={idx} className="flex items-start gap-2">
+            <span className="text-slate-600 mt-1">•</span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+      
+      {/* Getting Around */}
+      <div className="text-slate-700 mb-3">
+        <span className="font-medium">Getting around: </span>
+        {summary.move_between}
+      </div>
+      
+      {/* Cost Note (if present) */}
+      {summary.cost_note && (
+        <div className="text-slate-700 mb-3">
+          <span className="font-medium">Cost: </span>
+          {summary.cost_note}
+        </div>
+      )}
+      
+      {/* Heads Up */}
+      <div className="text-slate-700 italic border-l-2 border-slate-300 pl-3">
+        <span className="font-medium">Heads up: </span>
+        {summary.heads_up}
+      </div>
     </div>
   );
 };

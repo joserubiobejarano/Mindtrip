@@ -14,9 +14,19 @@ export interface ItineraryPlace {
 
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening';
 
+export interface SlotSummary {
+  block_title: string;        // e.g., "Buda Castle + Fisherman's Bastion"
+  what_to_do: string[];       // 2-4 bullets, each mentioning specific POIs
+  local_insights: string;     // 200-320 words, 1-2 paragraphs, practical city-specific insights
+  move_between: string;        // 1 short sentence, specific transport/walk
+  getting_around?: string;     // Optional: 1-2 sentences, realistic transit mode for that area
+  cost_note: string | null;   // Optional; only if truly relevant (ticketed attraction, transit pass, specific expense)
+  heads_up: string;           // 1 unique caution per slot, not reused across days
+}
+
 export interface ItinerarySlot {
   label: TimeOfDay;
-  summary: string;
+  summary: SlotSummary | string;  // New structured format or legacy string format
   places: ItineraryPlace[];
 }
 
@@ -130,10 +140,30 @@ export function isSmartItinerary(obj: any): obj is SmartItinerary {
     for (const slot of day.slots) {
       if (
         typeof slot.label !== 'string' ||
-        typeof slot.summary !== 'string' ||
         !Array.isArray(slot.places)
       ) {
         return false;
+      }
+      
+      // Summary can be string (legacy) or SlotSummary object (new format)
+      if (typeof slot.summary === 'string') {
+        // Legacy format - valid
+      } else if (typeof slot.summary === 'object' && slot.summary !== null) {
+        // New structured format - validate structure
+        const summary = slot.summary as SlotSummary;
+        if (
+          typeof summary.block_title !== 'string' ||
+          !Array.isArray(summary.what_to_do) ||
+          typeof summary.local_insights !== 'string' ||
+          typeof summary.move_between !== 'string' ||
+          (summary.getting_around !== undefined && typeof summary.getting_around !== 'string') ||
+          (summary.cost_note !== null && typeof summary.cost_note !== 'string') ||
+          typeof summary.heads_up !== 'string'
+        ) {
+          return false;
+        }
+      } else {
+        return false; // Invalid format
       }
 
       // Validate each place

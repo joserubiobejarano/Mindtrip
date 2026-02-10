@@ -50,7 +50,7 @@ export default async function LocalizedDiscoverKrunoRoute({
   }
   return (
     <Suspense fallback={null}>
-      <DiscoverKrunoPage />
+      <DiscoverKrunoPage isSignedIn={false} />
     </Suspense>
   );
 }

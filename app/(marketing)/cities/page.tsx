@@ -8,7 +8,7 @@ import { buildCanonicalUrl, buildLanguageAlternates, getLocalizedPath } from "@/
 
 export const metadata: Metadata = buildMetadata({
   title: "City Travel Guides – Kruno",
-  description: "Browse AI-generated city travel guides from Kruno.",
+  description: "Browse smart city travel guides from Kruno.",
   path: "/cities",
   alternates: {
     canonical: buildCanonicalUrl(getLocalizedPath("/cities", "en")),

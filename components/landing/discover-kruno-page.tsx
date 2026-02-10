@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import { CalendarRange, MapPin, Share2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/date-range-picker";
@@ -40,10 +39,9 @@ const trackLandingEvent = (name: string, payload: Record<string, unknown>) => {
   }
 };
 
-export function DiscoverKrunoPage() {
+export function DiscoverKrunoPage({ isSignedIn = false }: { isSignedIn?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isSignedIn } = useAuth();
   const { createTrip, loading: creatingTrip } = useCreateTrip();
   const { t } = useLanguage();
 
@@ -204,6 +202,7 @@ export function DiscoverKrunoPage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 45vw"
+                quality={75}
                 priority
               />
             </div>

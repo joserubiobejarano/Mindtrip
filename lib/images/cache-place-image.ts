@@ -633,6 +633,50 @@ function generatePlaceholder(): { buffer: Buffer; contentType: string } {
 }
 
 /**
+ * Fetch a generic placeholder image from Picsum (deterministic by seed).
+ * Used as final fallback when all image providers fail.
+ */
+async function fetchPlaceholderImage(seed: string): Promise<{
+  buffer: Buffer;
+  contentType: string;
+  attempt: ProviderAttempt;
+} | null> {
+  try {
+    const safeSeed = encodeURIComponent(seed || 'place');
+    const url = `https://picsum.photos/seed/${safeSeed}/400/300`;
+    const sanitizedUrl = sanitizeUrl(url);
+
+    if (isDev) {
+      console.log('[cache-place-image] [Placeholder] Fetching generic image:', sanitizedUrl);
+    }
+
+    const response = await fetch(url, { redirect: 'follow' });
+    if (!response.ok) {
+      return null;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+
+    if (buffer.length < 100) {
+      return null;
+    }
+
+    return {
+      buffer,
+      contentType,
+      attempt: { provider: 'placeholder', ok: true, status: response.status, debugUrl: sanitizedUrl },
+    };
+  } catch (error: any) {
+    if (isDev) {
+      console.warn('[cache-place-image] [Placeholder] Error:', error?.message);
+    }
+    return null;
+  }
+}
+
+/**
  * Main function to cache a place image
  * Returns stable Supabase Storage URL or null if all fallbacks fail
  */
@@ -707,7 +751,7 @@ export async function cachePlaceImageWithDetails(params: CachePlaceImageParams):
       }
     }
 
-    // Priority 2: Try Unsplash search
+    // Priority 2: Try Unsplash search (place name + city for better matches)
     if (!imageData) {
       const searchQuery = city ? `${title} ${city}${country ? ` ${country}` : ''}` : title;
       if (isDev) {
@@ -725,6 +769,25 @@ export async function cachePlaceImageWithDetails(params: CachePlaceImageParams):
         } else {
           if (isDev) {
             console.warn('[cache-place-image] [Priority 2] ❌ Unsplash search failed:', result.attempt.reason);
+          }
+        }
+      }
+    }
+
+    // Priority 2b: Try Unsplash with generic city/destination query (broader fallback)
+    if (!imageData && city) {
+      const genericQuery = `${city} travel destination`;
+      if (isDev) {
+        console.log('[cache-place-image] [Priority 2b] Attempting Unsplash generic search:', genericQuery);
+      }
+      const result = await fetchUnsplashImage(genericQuery);
+      if (result) {
+        attempts.push(result.attempt);
+        if (result.attempt.ok && result.buffer.length > 100) {
+          imageData = result;
+          provider = 'unsplash';
+          if (isDev) {
+            console.log('[cache-place-image] [Priority 2b] ✅ Unsplash generic image fetched');
           }
         }
       }
@@ -760,7 +823,26 @@ export async function cachePlaceImageWithDetails(params: CachePlaceImageParams):
       }
     }
 
-    // If still no image, return null (don't use placeholder - let UI handle it)
+    // Priority 4: Final fallback - generic placeholder image (city/title based)
+    if (!imageData) {
+      const placeholderSeed = [city, title, placeId].filter(Boolean).join('-') || 'place';
+      if (isDev) {
+        console.log('[cache-place-image] [Priority 4] Attempting placeholder image');
+      }
+      const result = await fetchPlaceholderImage(placeholderSeed);
+      if (result && result.attempt.ok && result.buffer.length > 100) {
+        attempts.push(result.attempt);
+        imageData = result;
+        provider = 'placeholder';
+        if (isDev) {
+          console.log('[cache-place-image] [Priority 4] ✅ Placeholder image fetched');
+        }
+      } else if (result?.attempt) {
+        attempts.push(result.attempt);
+      }
+    }
+
+    // If still no image, return null
     if (!imageData) {
       const error = 'All image sources failed';
       if (isDev) {

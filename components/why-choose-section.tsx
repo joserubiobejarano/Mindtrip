@@ -6,7 +6,7 @@ const reasons = [
   {
     icon: Zap,
     title: "Smart Itinerary",
-    description: "AI-powered trip planning that creates the perfect itinerary.",
+    description: "Smart trip planning that creates the perfect itinerary.",
     bgColor: "#DBEAFE", // blue-100
     iconColor: "#1E40AF", // blue-700
   },

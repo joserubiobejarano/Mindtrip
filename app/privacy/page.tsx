@@ -13,6 +13,6 @@ export const metadata: Metadata = buildMetadata({
   },
 });
 
-export default function PrivacyPage() {
-  return <PrivacyContent />;
+export default async function PrivacyPage() {
+  return <PrivacyContent isSignedIn={false} />;
 }

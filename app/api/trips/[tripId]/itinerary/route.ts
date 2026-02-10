@@ -15,11 +15,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
   try {
     tripId = (await params).tripId;
     const url = new URL(req.url);
-    mode = url.searchParams.get('mode') ?? 'load';
-    
-    console.log('[legacy-itinerary]', { tripId, mode });
-    
-    // Only handle mode=load
+    const rawMode = url.searchParams.get('mode') ?? 'load';
+    mode = (rawMode === 'load' || String(rawMode).toLowerCase().startsWith('load')) ? 'load' : rawMode;
+    console.log('[legacy-itinerary]', { tripId, mode, rawMode });
     if (mode !== 'load') {
       console.error('[legacy-itinerary] unsupported mode', { tripId, mode });
       return NextResponse.json({ error: 'unsupported-mode' }, { status: 400 });
@@ -117,11 +115,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ trip
       return NextResponse.json({ error: 'not-found' }, { status: 404 });
     }
 
+    const itinerary = dataTyped.content;
+
     console.log('[legacy-itinerary] loaded from DB', { tripId, mode });
 
-    // Return obvious JSON structure to verify endpoint is working
+    // Return the actual itinerary content (same format as smart-itinerary route)
     return NextResponse.json(
-      { ok: true, route: "legacy-itinerary", tripId, mode },
+      itinerary,
       { status: 200 }
     );
   } catch (err) {

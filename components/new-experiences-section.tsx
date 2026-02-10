@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import { MapPin } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
@@ -102,6 +101,7 @@ function CityCard({ city, onCityClick }: { city: typeof cities[0]; onCityClick: 
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          quality={65}
         />
       </div>
       <div className="p-5 flex flex-col">
@@ -142,11 +142,11 @@ function CityCard({ city, onCityClick }: { city: typeof cities[0]; onCityClick: 
 
 interface NewExperiencesSectionProps {
   onCityClick: (cityName: string) => void;
+  isSignedIn?: boolean;
 }
 
-export function NewExperiencesSection({ onCityClick }: NewExperiencesSectionProps) {
+export function NewExperiencesSection({ onCityClick, isSignedIn = false }: NewExperiencesSectionProps) {
   const router = useRouter();
-  const { isSignedIn } = useAuth();
   const { t } = useLanguage();
 
   const handleViewAll = () => {

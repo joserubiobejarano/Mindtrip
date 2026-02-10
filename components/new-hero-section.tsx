@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { type DestinationOption } from "@/hooks/use-create-trip";
 import { useCreateTrip } from "@/hooks/use-create-trip";
-import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { usePaywall } from "@/hooks/usePaywall";
 import { DestinationAutocomplete, type DestinationOption as AutocompleteDestinationOption } from "@/components/destination-autocomplete";
@@ -34,10 +33,10 @@ const suggestionPromptKeys: Record<string, string> = {
 interface NewHeroSectionProps {
   destination: DestinationOption | null;
   setDestination: (destination: DestinationOption | null) => void;
+  isSignedIn?: boolean;
 }
 
-export function NewHeroSection({ destination, setDestination }: NewHeroSectionProps) {
-  const { isSignedIn, userId } = useAuth();
+export function NewHeroSection({ destination, setDestination, isSignedIn = false }: NewHeroSectionProps) {
   const router = useRouter();
   const { createTrip, loading: creatingTrip } = useCreateTrip();
   const { openPaywall } = usePaywall();
@@ -62,13 +61,12 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
   // Fetch Pro status
   useEffect(() => {
-    if (isSignedIn && userId) {
-      fetch("/api/user/subscription-status")
-        .then((res) => res.json())
-        .then((data) => setIsPro(data.isPro || false))
-        .catch(() => setIsPro(false));
-    }
-  }, [isSignedIn, userId]);
+    if (!isSignedIn) return;
+    fetch("/api/user/subscription-status")
+      .then((res) => res.json())
+      .then((data) => setIsPro(data.isPro || false))
+      .catch(() => setIsPro(false));
+  }, [isSignedIn]);
 
   // Sync destination from prop (e.g. from Experiences section)
   useEffect(() => {
@@ -246,11 +244,6 @@ export function NewHeroSection({ destination, setDestination }: NewHeroSectionPr
 
     if (!isSignedIn) {
       router.push("/sign-in");
-      return;
-    }
-
-    if (!userId) {
-      setSearchError(t('home_hero_error_sign_in'));
       return;
     }
 

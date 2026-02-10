@@ -24,6 +24,11 @@ Use this checklist before shipping any new city guide. The bar is "Rome quality.
 - One or two local tips add personality without adding length.
 - Image choices show different times of day or neighborhoods.
 
+## Default duration
+- Default guides must be **2 or 3 days**. Use 3 days unless the city is small/compact (then 2 is OK).
+- **Do not ship 4+ day default guides.** Longer durations belong in separate duration-variant pages (unique slug, `primaryKeyword`, and content).
+- If a 4-day guide is produced by mistake, correct it to 2–3 days before shipping.
+
 ## SEO
 - Follow the "SEO Copy Rules" in `docs/ADDING_A_CITY_GUIDE.md`, including fully localized Spanish metadata.
 - Set `intent`, `contentLevel`, and `primaryKeyword` on each city in `cityPages` per `docs/ADDING_A_CITY_GUIDE.md`. `primaryKeyword` must not duplicate any other indexed city guide.

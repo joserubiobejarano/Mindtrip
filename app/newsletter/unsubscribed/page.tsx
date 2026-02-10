@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { NewNavbar } from "@/components/new-navbar";
+import { MarketingNavbar } from "@/components/marketing-navbar";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -39,7 +39,7 @@ export default async function NewsletterUnsubscribedPage({
 
   return (
     <div className="min-h-screen bg-background">
-      <NewNavbar />
+      <MarketingNavbar isSignedIn={false} />
       <main className="px-6 pt-24 pb-16">
         <div className="max-w-xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-semibold mb-4">

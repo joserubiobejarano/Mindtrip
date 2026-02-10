@@ -249,13 +249,28 @@ export default async function LocalizedCityItineraryPage({
     ...item,
     image: getCityItinerary(lang, item.slug)?.hero.image,
   }));
-  const dayImageCards = await getDayImageCards({
+  // Use English city name and day plan titles for image lookup to ensure consistency across languages.
+  // Always use English itinerary for image lookup when available, regardless of current language.
+  // This ensures Spanish pages show the same images as English pages.
+  const englishItinerary = getCityItinerary("en", slug);
+  // Always prefer English city name and day plans for image lookup when English itinerary exists
+  const imageLookupCity = englishItinerary?.city ?? itinerary.city ?? city.name;
+  const imageLookupCountry = englishItinerary?.country ?? itinerary.country ?? city.country;
+  const imageLookupDayPlans = englishItinerary?.dayPlans ?? itinerary.dayPlans;
+  const dayImageCardsResult = await getDayImageCards({
     slug: itinerary.slug,
-    city: itinerary.city,
-    country: itinerary.country,
-    dayPlans: itinerary.dayPlans,
+    city: imageLookupCity,
+    country: imageLookupCountry,
+    dayPlans: imageLookupDayPlans,
     fallbackImage: itinerary.hero.image,
   });
+  // Map image cards to use current language titles for display (Spanish titles on ES pages, English on EN pages)
+  const dayImageCards = dayImageCardsResult
+    ? dayImageCardsResult.map((card, index) => ({
+        ...card,
+        title: itinerary.dayPlans[index]?.title ?? card.title,
+      }))
+    : null;
   if (process.env.NODE_ENV !== "production") {
     const missingP0 = validateGuide(itinerary);
     const invalidImageUrls = collectInvalidImageUrls(itinerary, relatedItemsWithImages);

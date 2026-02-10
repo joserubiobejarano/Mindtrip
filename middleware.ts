@@ -55,7 +55,11 @@ const isPublicRoute = createRouteMatcher([
 const isProtectedRoute = createRouteMatcher([
   '/trips(.*)',
   '/settings(.*)',
-  '/api(.*)',
+  '/my-trips(.*)',
+  '/mytrips(.*)',
+  '/api/trips(.*)',
+  '/api/user(.*)',
+  '/api/billing(.*)',
 ])
 
 export default clerkMiddleware(async (auth, request) => {
@@ -73,15 +77,25 @@ export default clerkMiddleware(async (auth, request) => {
 
   // Only protect routes that are explicitly protected
   if (isProtectedRoute(request)) {
-    try {
-      await auth.protect()
-    } catch (error) {
-      // Fail securely: return 401 instead of allowing unauthorized access
-      console.error('Clerk middleware auth error:', error)
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    const isApiRoute = pathname.startsWith('/api/')
+    
+    if (isApiRoute) {
+      // For API routes, the middleware just needs to run so Clerk can detect clerkMiddleware()
+      // API routes handle their own authentication logic via auth() calls in route handlers
+      // We don't call auth.protect() here to allow API routes to handle errors themselves
+      // The middleware running is sufficient for Clerk to set up the auth context
+    } else {
+      // For page routes, use protect() to enforce authentication
+      try {
+        await auth.protect()
+      } catch (error) {
+        // Fail securely: return 401 instead of allowing unauthorized access
+        console.error('Clerk middleware auth error:', error)
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        )
+      }
     }
   }
   
@@ -89,6 +103,17 @@ export default clerkMiddleware(async (auth, request) => {
 })
 
 export const config = {
-  matcher: ['/((?!_next|.*\\..*).*)'],
+  matcher: [
+    '/',
+    '/sign-in(.*)',
+    '/sign-up(.*)',
+    '/trips(.*)',
+    '/settings(.*)',
+    '/my-trips(.*)',
+    '/mytrips(.*)',
+    '/api/trips(.*)',
+    '/api/user(.*)',
+    '/api/billing(.*)',
+  ],
 }
 

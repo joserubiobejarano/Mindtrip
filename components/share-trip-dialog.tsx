@@ -32,6 +32,9 @@ export function ShareTripDialog({
   const [copied, setCopied] = useState(false);
   const { t } = useLanguage();
   const supabase = createClient();
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "https://www.kruno.app");
 
   const generateSlug = () => {
     return Math.random().toString(36).substring(2, 15) +
@@ -81,8 +84,6 @@ export function ShareTripDialog({
   const copyToClipboard = async () => {
     if (!publicSlug) return;
 
-    // Use environment variable if available, otherwise fallback to window.location.origin
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "");
     const url = `${baseUrl}/p/${publicSlug}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
@@ -116,7 +117,7 @@ export function ShareTripDialog({
               <Label>{t("share_dialog_public_url")}</Label>
               <div className="flex gap-2">
                 <Input
-                  value={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/p/${publicSlug}`}
+                  value={`${baseUrl}/p/${publicSlug}`}
                   readOnly
                   className="flex-1"
                 />

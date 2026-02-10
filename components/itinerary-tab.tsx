@@ -17,7 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/components/ui/toast";
 import { useLanguage } from "@/components/providers/language-provider";
-import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot } from "@/types/itinerary";
+import { SmartItinerary, ItineraryDay, ItineraryPlace, ItinerarySlot, SlotSummary } from "@/types/itinerary";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ExploreDeck } from "@/components/explore/ExploreDeck";
@@ -64,6 +64,33 @@ const isPlacesProxy = (src?: string | null): boolean => {
   return typeof src === "string" && src.startsWith("/api/places/photo");
 }
 
+/** Normalize URL for deduplication (pathname + host, or path only for relative). */
+function normalizeImageUrlForDedup(url: string): string {
+  try {
+    const u = url.startsWith('/') ? new URL(url, typeof window !== 'undefined' ? window.location.origin : 'https://example.com') : new URL(url);
+    return u.origin + u.pathname;
+  } catch {
+    return url;
+  }
+}
+
+/** Get up to 4 unique banner image URLs for a day, with normalized deduplication. */
+function getDayBannerImages(day: ItineraryDay): string[] {
+  const raw = (day.photos && day.photos.length > 0)
+    ? day.photos.map(photo => resolvePlacePhotoSrc(photo)).filter((src): src is string => src !== null)
+    : day.slots.flatMap(s => s.places.map(p => resolvePlacePhotoSrc(p))).filter((src): src is string => src !== null);
+  const valid = raw.filter((img): img is string => isPhotoSrcUsable(img));
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const img of valid) {
+    const norm = normalizeImageUrlForDedup(img);
+    if (seen.has(norm)) continue;
+    seen.add(norm);
+    unique.push(img);
+    if (unique.length >= 4) break;
+  }
+  return unique;
+}
 
 // Simple affiliate button component
 function AffiliateButton({ kind, day, t }: { kind: string, day: ItineraryDay, t: (key: string) => string }) {
@@ -104,6 +131,20 @@ export function ItineraryTab({
   const [status, setStatus] = useState<ItineraryStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   
+  // Draft state for progressive rendering - updates immediately on SSE events
+  const [draft, setDraft] = useState<Partial<SmartItinerary>>({});
+  
+  // Track City Overview readiness to control rendering order
+  const [overviewState, setOverviewState] = useState<'pending' | 'ready' | 'missing'>('pending');
+  const [bufferedDays, setBufferedDays] = useState<ItineraryDay[]>([]);
+  // Use ref to track overviewState in SSE handlers to avoid closure issues
+  const overviewStateRef = useRef<'pending' | 'ready' | 'missing'>('pending');
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    overviewStateRef.current = overviewState;
+  }, [overviewState]);
+  
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
@@ -123,6 +164,8 @@ export function ItineraryTab({
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const didAutoBackfillRef = useRef<boolean>(false);
   const triggerAutoBackfillRef = useRef<(() => Promise<void>) | null>(null);
+  const lastLoadedTripIdRef = useRef<string | null>(null);
+  const lastLoadedItineraryRef = useRef<SmartItinerary | null>(null);
   const { data: trip, isLoading: tripLoading } = useTrip(tripId);
   const { data: segments = [], isLoading: segmentsLoading } = useTripSegments(tripId);
   const [daysWithSegments, setDaysWithSegments] = useState<Map<string, string>>(new Map()); // day date -> segment_id
@@ -140,19 +183,82 @@ export function ItineraryTab({
   };
 
   // Render slot summaries with paragraph spacing preserved
-  const renderSlotSummary = (summary?: string) => {
+  const renderSlotSummary = (summary?: string | SlotSummary) => {
     if (!summary) return null;
-    const paragraphs = summary
-      .split(/\n\s*\n/)
-      .map(p => p.trim())
-      .filter(Boolean);
-    const content = paragraphs.length > 0 ? paragraphs : [summary.trim()];
-
+    
+    // Handle legacy string format (backward compatibility)
+    if (typeof summary === 'string') {
+      const paragraphs = summary
+        .split(/\n\s*\n/)
+        .map(p => p.trim())
+        .filter(Boolean);
+      const content = paragraphs.length > 0 ? paragraphs : [summary.trim()];
+      
+      return (
+        <div className="mt-5 mb-8 space-y-5 text-base md:text-lg text-slate-800 leading-7 text-center md:text-left">
+          {content.map((p, idx) => (
+            <p key={idx}>{p}</p>
+          ))}
+        </div>
+      );
+    }
+    
+    // New structured format
     return (
-      <div className="mt-5 mb-8 space-y-5 text-base md:text-lg text-slate-800 leading-7 text-center md:text-left">
-        {content.map((p, idx) => (
-          <p key={idx}>{p}</p>
-        ))}
+      <div className="mt-5 mb-8 space-y-4 text-base md:text-lg text-slate-800 text-center md:text-left">
+        {/* Block Title */}
+        <h3 className="text-lg font-semibold text-slate-900 mb-3">
+          {summary.block_title}
+        </h3>
+        
+        {/* What to Do - Bullets */}
+        <ul className="space-y-2 mb-4 list-none">
+          {summary.what_to_do.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2">
+              <span className="text-slate-600 mt-1">•</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+        
+        {/* Local Insights - as paragraphs */}
+        {summary.local_insights && (
+          <div className="text-slate-700 mb-4 leading-relaxed">
+            {summary.local_insights.split(/\n\s*\n/).map((paragraph, idx) => (
+              <p key={idx} className="mb-3 last:mb-0">
+                {paragraph.trim()}
+              </p>
+            ))}
+          </div>
+        )}
+        
+        {/* Getting Around (optional field for transit mode in area) */}
+        {summary.getting_around && (
+          <div className="text-slate-700 mb-3">
+            <span className="font-medium">Getting around: </span>
+            {summary.getting_around}
+          </div>
+        )}
+        
+        {/* Move Between (transport between stops) */}
+        <div className="text-slate-700 mb-3">
+          <span className="font-medium">Move between stops: </span>
+          {summary.move_between}
+        </div>
+        
+        {/* Cost Note (if present) */}
+        {summary.cost_note && (
+          <div className="text-slate-700 mb-3">
+            <span className="font-medium">Cost: </span>
+            {summary.cost_note}
+          </div>
+        )}
+        
+        {/* Heads Up */}
+        <div className="text-slate-700 italic border-l-2 border-slate-300 pl-3">
+          <span className="font-medium">Heads up: </span>
+          {summary.heads_up}
+        </div>
       </div>
     );
   };
@@ -365,6 +471,11 @@ export function ItineraryTab({
     console.log('[itinerary-tab] generateSmartItinerary: POST /smart-itinerary for trip', tripId);
     setError(null);
     setStatus('generating');
+    // Reset overview state for new generation
+    setOverviewState('pending');
+    setBufferedDays([]);
+    // Reset draft state for new generation
+    setDraft({});
 
     try {
       const res = await fetch(`/api/trips/${tripId}/smart-itinerary`, {
@@ -418,39 +529,85 @@ export function ItineraryTab({
           cityOverview: undefined,
         };
         
+        // Track first day received for dev logging
+        let firstDayReceived = false;
+        
         let buffer = '';
+        let streamErrorOccurred = false;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          
-          if (done) break;
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            
+            if (done) break;
 
-          buffer += decoder.decode(value, { stream: true });
-          
-          // Process complete SSE messages (lines ending with \n\n)
-          const lines = buffer.split('\n\n');
-          buffer = lines.pop() || ''; // Keep incomplete line in buffer
-          
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.substring(6));
-                console.log('[itinerary-tab] received SSE message:', data.type);
+            buffer += decoder.decode(value, { stream: true });
+            
+            // Process complete SSE messages (lines ending with \n\n)
+            const lines = buffer.split('\n\n');
+            buffer = lines.pop() || ''; // Keep incomplete line in buffer
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.substring(6));
+                  console.log('[itinerary-tab] received SSE message:', data.type);
                 
                 switch (data.type) {
                   case 'title':
                     partialItinerary.title = data.data;
+                    setDraft(prev => ({ ...prev, title: data.data }));
                     setSmartItinerary(prev => prev ? { ...prev, title: data.data } : { ...partialItinerary } as SmartItinerary);
                     break;
                     
                   case 'summary':
                     partialItinerary.summary = data.data;
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('[itinerary-tab] SSE summary received:', new Date().toISOString());
+                    }
+                    setDraft(prev => ({ ...prev, summary: data.data }));
                     setSmartItinerary(prev => prev ? { ...prev, summary: data.data } : { ...partialItinerary } as SmartItinerary);
                     break;
                     
                   case 'day':
-                    // Add or update day - deduplicate by both ID and index to prevent duplicate Day 1
+                    // Buffer days if overviewState is pending, otherwise add immediately
                     const dayData = data.data;
+                    
+                    // Dev log for first day
+                    if (!firstDayReceived && process.env.NODE_ENV === 'development') {
+                      console.log('[itinerary-tab] SSE first day received:', new Date().toISOString(), { dayIndex: dayData.index });
+                      firstDayReceived = true;
+                    }
+                    
+                    // Update draft immediately
+                    setDraft(prev => {
+                      const existingDays = prev.days || [];
+                      const dayIndex = existingDays.findIndex(d => d.id === dayData.id);
+                      if (dayIndex >= 0) {
+                        const newDays = [...existingDays];
+                        newDays[dayIndex] = dayData;
+                        return { ...prev, days: newDays };
+                      }
+                      return { ...prev, days: [...existingDays, dayData] };
+                    });
+                    
+                    if (overviewStateRef.current === 'pending') {
+                      // Buffer the day - don't render yet
+                      setBufferedDays(prev => {
+                        // Check if day already exists in buffer
+                        const existingIndex = prev.findIndex(d => d.id === dayData.id || d.index === dayData.index);
+                        if (existingIndex >= 0) {
+                          const newBuffer = [...prev];
+                          newBuffer[existingIndex] = dayData;
+                          return newBuffer;
+                        }
+                        return [...prev, dayData];
+                      });
+                      break;
+                    }
+                    
+                    // Overview is ready or missing - add day immediately
+                    // Add or update day - deduplicate by both ID and index to prevent duplicate Day 1
                     const dayIndex = partialItinerary.days?.findIndex(d => d.id === dayData.id) ?? -1;
                     
                     // Also check if a day with the same index already exists (different ID)
@@ -497,9 +654,9 @@ export function ItineraryTab({
                       }
                       
                       // Check for duplicate index (different ID) - deduplicate
-                      const existingDayByIndex = base.days.find(d => d.index === dayData.index && d.id !== dayData.id);
-                      if (existingDayByIndex && dayData.index !== undefined) {
-                        console.warn(`[itinerary-tab] Replacing duplicate day with index ${dayData.index} (old ID: ${existingDayByIndex.id}, new ID: ${dayData.id})`);
+                      const existingDayByIndex2 = base.days.find(d => d.index === dayData.index && d.id !== dayData.id);
+                      if (existingDayByIndex2 && dayData.index !== undefined) {
+                        console.warn(`[itinerary-tab] Replacing duplicate day with index ${dayData.index} (old ID: ${existingDayByIndex2.id}, new ID: ${dayData.id})`);
                         const newDays = base.days.filter(d => d.index !== dayData.index || d.id === dayData.id);
                         newDays.push(dayData);
                         // Sort by index
@@ -520,16 +677,24 @@ export function ItineraryTab({
                     break;
                     
                   case 'day-updated':
-                    // Update day with photos
+                    // Update day with photos; match by id first, then by day index to avoid missing last-day updates
                     setSmartItinerary(prev => {
                       if (!prev) return null;
-                      const dayIndex = prev.days.findIndex(d => d.id === data.data.id);
-                      if (dayIndex >= 0) {
-                        const newDays = [...prev.days];
-                        newDays[dayIndex] = data.data;
-                        return { ...prev, days: newDays };
+                      const incoming = data.data as ItineraryDay;
+                      if (!incoming?.id || !Array.isArray(incoming.slots)) return prev;
+                      let idx = prev.days.findIndex(d => d.id === incoming.id);
+                      if (idx < 0 && incoming.index !== undefined) {
+                        idx = prev.days.findIndex(d => d.index === incoming.index);
                       }
-                      return prev;
+                      const newDays = [...prev.days];
+                      if (idx >= 0) {
+                        newDays[idx] = incoming;
+                      } else {
+                        // Day not yet in state (e.g. day-updated arrived before day event); add it
+                        newDays.push(incoming);
+                        newDays.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+                      }
+                      return { ...prev, days: newDays };
                     });
                     break;
                     
@@ -539,9 +704,78 @@ export function ItineraryTab({
                     break;
                     
                   case 'cityOverview':
-                    console.log('[itinerary-tab] Received cityOverview:', data.data);
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('[itinerary-tab] SSE cityOverview received:', new Date().toISOString());
+                    }
                     partialItinerary.cityOverview = data.data;
-                    setSmartItinerary(prev => prev ? { ...prev, cityOverview: data.data } : { ...partialItinerary } as SmartItinerary);
+                    setDraft(prev => ({ ...prev, cityOverview: data.data }));
+                    setOverviewState('ready');
+                    
+                    // Flush buffered days into main state
+                    setBufferedDays(currentBuffer => {
+                      setSmartItinerary(prev => {
+                        const base = prev || {
+                          title: partialItinerary.title || '',
+                          summary: partialItinerary.summary || '',
+                          days: [],
+                          tripTips: partialItinerary.tripTips || [],
+                          cityOverview: data.data,
+                        };
+                        
+                        // Merge buffered days with existing days
+                        const allDays = [...(base.days || []), ...currentBuffer];
+                        
+                        // Deduplicate by index and sort
+                        const indexMap = new Map<number, ItineraryDay>();
+                        for (const day of allDays) {
+                          if (day.index !== undefined) {
+                            // Keep the most recent occurrence of each index
+                            indexMap.set(day.index, day);
+                          }
+                        }
+                        
+                        return {
+                          ...base,
+                          cityOverview: data.data,
+                          days: Array.from(indexMap.values()).sort((a, b) => a.index - b.index),
+                        };
+                      });
+                      
+                      // Return empty array to clear buffer
+                      return [];
+                    });
+                    break;
+                    
+                  case 'cityOverview_missing':
+                    console.log('[itinerary-tab] Received cityOverview_missing sentinel (backwards compatibility)');
+                    setOverviewState('missing');
+                    
+                    // Flush buffered days into main state
+                    setBufferedDays(currentBuffer => {
+                      setSmartItinerary(prev => {
+                        if (!prev) return null;
+                        
+                        // Merge buffered days with existing days
+                        const allDays = [...(prev.days || []), ...currentBuffer];
+                        
+                        // Deduplicate by index and sort
+                        const indexMap = new Map<number, ItineraryDay>();
+                        for (const day of allDays) {
+                          if (day.index !== undefined) {
+                            // Keep the most recent occurrence of each index
+                            indexMap.set(day.index, day);
+                          }
+                        }
+                        
+                        return {
+                          ...prev,
+                          days: Array.from(indexMap.values()).sort((a, b) => a.index - b.index),
+                        };
+                      });
+                      
+                      // Return empty array to clear buffer
+                      return [];
+                    });
                     break;
                     
                   case 'complete':
@@ -590,10 +824,53 @@ export function ItineraryTab({
                         tripTips: Array.isArray(completeData.tripTips) ? completeData.tripTips : [],
                       };
                       
-                      setSmartItinerary(validatedData);
-                      setStatus('loaded');
-                      // Trigger auto-backfill after itinerary is loaded
-                      setTimeout(() => triggerAutoBackfillRef.current?.(), 500);
+                      // Merge buffered days with validated days
+                      setBufferedDays(currentBuffer => {
+                        const allDays = [...(validatedData.days || []), ...currentBuffer];
+                        
+                        // Deduplicate by index and sort
+                        const indexMap = new Map<number, ItineraryDay>();
+                        for (const day of allDays) {
+                          if (day.index !== undefined) {
+                            // Keep the most recent occurrence of each index
+                            indexMap.set(day.index, day);
+                          }
+                        }
+                        
+                        const finalData = {
+                          ...validatedData,
+                          days: Array.from(indexMap.values()).sort((a, b) => a.index - b.index),
+                        };
+                        
+                        // Merge draft into final data (don't overwrite with empty object)
+                        setDraft(prev => {
+                          // Merge draft fields that might not be in finalData
+                          return {
+                            ...prev,
+                            ...finalData,
+                            // Preserve draft days if they exist and finalData doesn't have them
+                            days: finalData.days.length > 0 ? finalData.days : (prev.days || []),
+                          };
+                        });
+                        
+                        setSmartItinerary(finalData);
+                        setStatus('loaded');
+                        lastLoadedTripIdRef.current = tripId;
+                        lastLoadedItineraryRef.current = finalData;
+
+                        // Mark overview state
+                        if (validatedData.cityOverview) {
+                          setOverviewState('ready');
+                        } else {
+                          setOverviewState('missing');
+                        }
+                        
+                        // Return empty array to clear buffer
+                        return [];
+                      });
+                      
+                      // Trigger auto-backfill after itinerary is saved (delay so DB write is visible)
+                      setTimeout(() => triggerAutoBackfillRef.current?.(), 3000);
                     } catch (parseErr: any) {
                       console.error('[itinerary-tab] complete: error validating/parsing complete data', {
                         error: parseErr,
@@ -609,6 +886,16 @@ export function ItineraryTab({
                   case 'error':
                     const errorData = data.data;
                     
+                    // Helper to check if object is empty
+                    const isEmptyObject = (obj: any): boolean => {
+                      if (!obj || typeof obj !== 'object') return false;
+                      try {
+                        return Object.keys(obj).length === 0;
+                      } catch {
+                        return false;
+                      }
+                    };
+                    
                     // Safely extract error message - ensure it's always a string
                     let errorMessage: string;
                     if (typeof errorData === 'string') {
@@ -616,15 +903,50 @@ export function ItineraryTab({
                     } else if (errorData?.message && typeof errorData.message === 'string') {
                       errorMessage = errorData.message;
                     } else if (errorData && typeof errorData === 'object') {
-                      // Try to stringify if it's an object, but provide fallback
-                      try {
-                        const stringified = JSON.stringify(errorData);
-                        // If it's an empty object, use default message
-                        errorMessage = stringified === '{}' 
-                          ? 'Failed to generate itinerary' 
-                          : `Error: ${stringified}`;
-                      } catch {
+                      // Check if it's an empty object first
+                      if (isEmptyObject(errorData)) {
                         errorMessage = 'Failed to generate itinerary';
+                      } else {
+                        // Try to extract meaningful error message from validation errors
+                        const details = errorData.details || errorData.zodIssues;
+                        if (details && typeof details === 'string') {
+                          // Parse validation error details if it's a JSON string
+                          try {
+                            const parsedDetails = JSON.parse(details);
+                            if (Array.isArray(parsedDetails) && parsedDetails.length > 0) {
+                              const firstError = parsedDetails[0];
+                              if (firstError.code === 'too_small' && firstError.minimum) {
+                                errorMessage = `Validation error: ${firstError.type || 'field'} must be at least ${firstError.minimum} characters`;
+                              } else if (firstError.message) {
+                                errorMessage = firstError.message;
+                              } else {
+                                errorMessage = errorData.message || 'Failed to parse itinerary';
+                              }
+                            } else {
+                              errorMessage = errorData.message || 'Failed to parse itinerary';
+                            }
+                          } catch {
+                            // If parsing fails, use the details string or message
+                            errorMessage = errorData.message || details || 'Failed to parse itinerary';
+                          }
+                        } else if (details && Array.isArray(details) && details.length > 0) {
+                          const firstError = details[0];
+                          if (firstError.code === 'too_small' && firstError.minimum) {
+                            errorMessage = `Validation error: ${firstError.type || 'field'} must be at least ${firstError.minimum} characters`;
+                          } else if (firstError.message) {
+                            errorMessage = firstError.message;
+                          } else {
+                            errorMessage = errorData.message || 'Failed to parse itinerary';
+                          }
+                        } else {
+                          // Try to stringify if it's an object, but provide fallback
+                          try {
+                            const stringified = JSON.stringify(errorData);
+                            errorMessage = errorData.message || `Error: ${stringified}`;
+                          } catch {
+                            errorMessage = errorData.message || 'Failed to generate itinerary';
+                          }
+                        }
                       }
                     } else {
                       errorMessage = 'Failed to generate itinerary';
@@ -632,20 +954,48 @@ export function ItineraryTab({
                     
                     const errorDetails = errorData?.details || errorData?.zodIssues;
                     
-                    // Log with better structure for debugging
-                    console.error('[itinerary-tab] SSE error:', {
+                    // Log with better structure for debugging - only log if there's meaningful data
+                    const logData: Record<string, any> = {
                       message: errorMessage,
-                      details: errorDetails,
-                      rawErrorData: errorData,
-                      errorDataType: typeof errorData,
-                      errorDataStringified: typeof errorData === 'object' ? JSON.stringify(errorData) : String(errorData)
-                    });
+                    };
+                    
+                    // Only add properties if they have meaningful values
+                    if (errorDetails !== undefined && errorDetails !== null && !isEmptyObject(errorDetails)) {
+                      logData.details = errorDetails;
+                    }
+                    if (errorData !== undefined && errorData !== null && !isEmptyObject(errorData)) {
+                      // Only include rawErrorData if it's not empty
+                      if (typeof errorData === 'object' && Object.keys(errorData).length > 0) {
+                        logData.rawErrorData = errorData;
+                        try {
+                          const stringified = typeof errorData === 'object' 
+                            ? JSON.stringify(errorData) 
+                            : String(errorData);
+                          if (stringified !== '{}') {
+                            logData.errorDataStringified = stringified;
+                          }
+                        } catch (e) {
+                          // Skip if stringification fails
+                        }
+                      }
+                    }
+                    
+                    // Only log if we have meaningful data to show
+                    if (Object.keys(logData).length > 1 || logData.message !== 'Failed to generate itinerary') {
+                      console.error('[itinerary-tab] SSE error:', logData);
+                    } else {
+                      // For empty objects, log a simpler message
+                      console.error('[itinerary-tab] SSE error: Failed to generate itinerary');
+                    }
                     
                     // If we have partial data, show it but also show the error
                     setSmartItinerary(prev => {
                       if (prev && prev.days && prev.days.length > 0) {
                         setError(errorMessage);
                         setStatus('loaded'); // Show partial data
+                        lastLoadedTripIdRef.current = tripId;
+                        lastLoadedItineraryRef.current = prev;
+                        setTimeout(() => triggerAutoBackfillRef.current?.(), 3000);
                         return prev;
                       } else {
                         setError(errorMessage);
@@ -657,24 +1007,58 @@ export function ItineraryTab({
                 }
               } catch (err) {
                 console.error('[itinerary-tab] Error parsing SSE message:', err, line);
+                streamErrorOccurred = true;
               }
             }
+          } // end for loop
+        } // end while loop
+        } catch (readerError: any) {
+          console.error('[itinerary-tab] SSE stream reading error:', {
+            error: readerError,
+            message: readerError?.message,
+            stack: readerError?.stack,
+            hasPartialData: partialItinerary.days && partialItinerary.days.length > 0
+          });
+          streamErrorOccurred = true;
+          
+          // If we have partial data, show it but also show the error
+          if (partialItinerary.days && partialItinerary.days.length > 0) {
+            setSmartItinerary(partialItinerary as SmartItinerary);
+            setError(readerError?.message || 'Stream interrupted while generating itinerary');
+            setStatus('loaded');
+            lastLoadedTripIdRef.current = tripId;
+            lastLoadedItineraryRef.current = partialItinerary as SmartItinerary;
+            setTimeout(() => triggerAutoBackfillRef.current?.(), 3000);
+          } else {
+            setError(readerError?.message || 'Failed to read itinerary stream');
+            setStatus('error');
+          }
+        } finally {
+          // Ensure reader is released
+          try {
+            reader.releaseLock();
+          } catch (e) {
+            // Reader may already be released
           }
         }
         
-        // If we completed without error, mark as loaded
-        // Check if we have partial data
-        setSmartItinerary(prev => {
-          if (prev && prev.days && prev.days.length > 0) {
-            setStatus('loaded');
-            return prev;
-          } else {
-            // No data received, treat as error
-            setError(t('itinerary_error_no_data'));
-            setStatus('error');
-            return null;
-          }
-        });
+        // If we completed without error and no stream error occurred, mark as loaded
+        if (!streamErrorOccurred) {
+          // Check if we have partial data
+          setSmartItinerary(prev => {
+            if (prev && prev.days && prev.days.length > 0) {
+              setStatus('loaded');
+              lastLoadedTripIdRef.current = tripId;
+              lastLoadedItineraryRef.current = prev;
+              return prev;
+            } else {
+              // No data received, treat as error
+              setError(t('itinerary_error_no_data'));
+              setStatus('error');
+              return null;
+            }
+          });
+        }
       } else {
         // Fallback: non-streaming response (for backwards compatibility)
         const json = await res.json();
@@ -720,8 +1104,17 @@ export function ItineraryTab({
           
           setSmartItinerary(validatedData);
           setStatus('loaded');
+          lastLoadedTripIdRef.current = tripId;
+          lastLoadedItineraryRef.current = validatedData;
+          // Mark overview as ready if present, or confirmed missing if not
+                      if (validatedData.cityOverview) {
+                        setOverviewState('ready');
+                      } else {
+                        setOverviewState('missing');
+                      }
+                      setBufferedDays([]);
           // Trigger auto-backfill after itinerary is loaded
-          setTimeout(() => triggerAutoBackfillRef.current?.(), 500);
+          setTimeout(() => triggerAutoBackfillRef.current?.(), 3000);
         } catch (parseErr: any) {
           console.error('[itinerary-tab] generateSmartItinerary: error validating non-streaming data', {
             error: parseErr,
@@ -749,29 +1142,60 @@ export function ItineraryTab({
     console.log('[itinerary-tab] loadOrGenerate: start for trip', tripId);
     setStatus('loading');
     setError(null);
+    // Reset overview state when loading
+    setOverviewState('pending');
+    setBufferedDays([]);
 
     try {
       const res = await fetch(`/api/trips/${tripId}/smart-itinerary?mode=load`);
-      console.log('[itinerary-tab] loadOrGenerate: GET /smart-itinerary?mode=load status', res.status);
 
-      // CASE 1: no itinerary yet → trigger generation
+      // CASE 1: no itinerary yet → use in-memory data if we have it, else trigger generation
       if (res.status === 404) {
-        console.log('[itinerary-tab] no itinerary found, starting generation…');
+        const existing = lastLoadedItineraryRef.current;
+        if (
+          lastLoadedTripIdRef.current === tripId &&
+          existing?.days &&
+          Array.isArray(existing.days) &&
+          existing.days.length > 0
+        ) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[itinerary-tab] 404 but have in-memory itinerary for this trip, keeping it');
+          }
+          setSmartItinerary(existing);
+          setStatus('loaded');
+          setOverviewState(existing.cityOverview ? 'ready' : 'missing');
+          return;
+        }
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[itinerary-tab] No itinerary found (404), starting generation…');
+        }
         setStatus('generating');
         await generateSmartItinerary();
         return;
       }
 
-      // CASE 2: other errors
+      // CASE 2: other errors - log once and fall back to generation
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('[itinerary-tab] loadOrGenerate: error loading itinerary', { status: res.status, error: errorData.error });
-        addToast({
-          variant: 'destructive',
-          title: t('itinerary_toast_failed_load'),
-          description: errorData.error || t('itinerary_toast_please_try_again'),
+        // Only log error details once, don't spam console
+        console.error('[itinerary-tab] loadOrGenerate: error loading itinerary', { 
+          status: res.status, 
+          error: errorData.error,
+          tripId 
         });
-        throw new Error(`Failed to load itinerary: ${res.status}`);
+        // Don't show toast for 404 - it's expected. Only show for other errors.
+        if (res.status !== 404) {
+          addToast({
+            variant: 'destructive',
+            title: t('itinerary_toast_failed_load'),
+            description: errorData.error || t('itinerary_toast_please_try_again'),
+          });
+        }
+        // Fall back to generation instead of throwing - ensures SSE can still work
+        console.log('[itinerary-tab] Falling back to generation due to load error');
+        setStatus('generating');
+        await generateSmartItinerary();
+        return;
       }
 
       // CASE 3: we have data
@@ -830,6 +1254,18 @@ export function ItineraryTab({
         // GET handler now returns bare SmartItinerary directly
         setSmartItinerary(validatedData);
         setStatus('loaded');
+        lastLoadedTripIdRef.current = tripId;
+        lastLoadedItineraryRef.current = validatedData;
+
+        // Handle cityOverview: if present, mark as ready; if missing, mark as confirmed missing
+        if (validatedData.cityOverview) {
+          setOverviewState('ready');
+        } else {
+          setOverviewState('missing');
+        }
+        setBufferedDays([]);
+        // Trigger backfill when loading from DB (delay so DB is ready; didAutoBackfillRef prevents double-run)
+        setTimeout(() => triggerAutoBackfillRef.current?.(), 3000);
         
         // Dev-only log: verify image_url values exist in fetched data
         if (process.env.NODE_ENV === 'development') {
@@ -880,44 +1316,72 @@ export function ItineraryTab({
     didAutoBackfillRef.current = true;
     setIsBackfillingImages(true);
 
+    const MAX_BACKFILL_RUNS = 5;
+    const DELAY_BETWEEN_RUNS_MS = 1500;
+    const MAX_404_RETRIES = 2;
+    const DELAY_404_MS = 2000;
+
     try {
-      const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dryRun: false,
-          limit: 50,
-        }),
-      });
+      let runCount = 0;
+      let hasMore = true;
+      let retry404Count = 0;
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(errorData.error || `Backfill failed with status ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[itinerary-tab] triggerAutoBackfill: success', {
-          scanned: result.scanned,
-          updated: result.updated,
-          notFound: result.notFound,
-          errors: result.errors,
+      while (hasMore && runCount < MAX_BACKFILL_RUNS) {
+        runCount++;
+        const response = await fetch(`/api/trips/${tripId}/itinerary/backfill-images`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dryRun: false,
+            limit: 50,
+          }),
         });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          if (response.status === 404 && retry404Count < MAX_404_RETRIES) {
+            retry404Count++;
+            runCount--;
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[itinerary-tab] triggerAutoBackfill: 404 (itinerary may not be saved yet), retrying in', DELAY_404_MS, 'ms', { retry: retry404Count });
+            }
+            await new Promise((r) => setTimeout(r, DELAY_404_MS));
+            continue;
+          }
+          // Reset so backfill can retry on next load when user returns/refreshes
+          if (response.status === 404) {
+            didAutoBackfillRef.current = false;
+          }
+          throw new Error(errorData.error || `Backfill failed with status ${response.status}`);
+        }
+
+        const result = await response.json();
+        hasMore = result.hasMore === true;
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[itinerary-tab] triggerAutoBackfill: run', runCount, {
+            scanned: result.scanned,
+            updated: result.updated,
+            notFound: result.notFound,
+            errors: result.errors,
+            hasMore,
+          });
+        }
+
+        if (hasMore && runCount < MAX_BACKFILL_RUNS) {
+          await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_RUNS_MS));
+        }
       }
 
       // Refresh itinerary data to show new images
       // Add small delay to ensure DB write has propagated
       await new Promise(resolve => setTimeout(resolve, 500));
       await loadOrGenerate();
-      
+
       if (process.env.NODE_ENV === 'development') {
-        console.log('[itinerary-tab] triggerAutoBackfill: refreshed itinerary after backfill', {
-          scanned: result.scanned,
-          updated: result.updated,
-        });
+        console.log('[itinerary-tab] triggerAutoBackfill: completed', runCount, 'runs, refreshed itinerary');
       }
     } catch (error: any) {
       if (process.env.NODE_ENV === 'development') {
@@ -966,10 +1430,10 @@ export function ItineraryTab({
     }
   }, [tripId, segments, isActive]);
 
-  // 1. Load existing or start generation
+  // 1. Load existing or start generation (skip when returning to tab if already loaded for this trip)
   useEffect(() => {
     if (!isActive) return;
-    // Reset backfill ref when tripId changes
+    if (lastLoadedTripIdRef.current === tripId) return;
     didAutoBackfillRef.current = false;
     loadOrGenerate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1162,6 +1626,30 @@ export function ItineraryTab({
     </Card>
   );
 
+  // City Overview Skeleton Component
+  const CityOverviewSkeleton = () => (
+    <div className="mt-8 mb-10 max-w-4xl mx-auto">
+      <div className="h-7 w-48 bg-slate-200 rounded mb-4 animate-pulse" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <Card key={i} className="p-4 shadow-sm border-2 border-slate-200">
+            <CardContent className="p-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
+                <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+              </div>
+              <div className="space-y-3">
+                <div className="h-4 w-full bg-slate-200 rounded animate-pulse" />
+                <div className="h-4 w-3/4 bg-slate-200 rounded animate-pulse" />
+                <div className="h-4 w-5/6 bg-slate-200 rounded animate-pulse" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
   const ErrorCard = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
     <Card className="bg-red-50 border-red-200 text-slate-800 max-w-4xl mx-auto mt-6 mb-8">
       <CardHeader>
@@ -1236,8 +1724,8 @@ export function ItineraryTab({
             />
           )}
 
-          {/* Generating State - only show if we have no partial data */}
-          {status === 'generating' && (!smartItinerary || !smartItinerary.days || smartItinerary.days.length === 0) && (
+          {/* Generating State - show only before any partial data (intro not yet received) */}
+          {status === 'generating' && !draft.summary && !draft.title && !draft.cityOverview && (!draft.days || draft.days.length === 0) && (
             <LoadingCard
               title={t('itinerary_generating_title')}
               subtitle={t('itinerary_generating_subtitle_designing')}
@@ -1252,70 +1740,119 @@ export function ItineraryTab({
             />
           )}
 
-          {/* Itinerary (loaded or generating with partial data) - Only show if days exist */}
-          {(status === 'loaded' || (status === 'generating' && smartItinerary)) && smartItinerary && (
+          {/* Itinerary (loaded or generating with partial data) - Show if we have any data */}
+          {(status === 'loaded' || (status === 'generating' && (smartItinerary || draft.title || draft.summary))) && (smartItinerary || draft.title || draft.summary || status === 'generating') && (
             <>
-              {/* Safety guard: check if days is a valid array */}
-              {!Array.isArray(smartItinerary.days) ? (
-                <ErrorCard
-                  message={t('itinerary_error_problem_regenerate')}
-                  onRetry={loadOrGenerate}
-                />
-              ) : smartItinerary.days && smartItinerary.days.length > 0 ? (
-                <div className="space-y-8 pb-10">
-                  {/* Trip Summary - Only show if days are loaded */}
-                  {smartItinerary.days && smartItinerary.days.length > 0 && (smartItinerary.title || smartItinerary.summary || (smartItinerary.tripTips && smartItinerary.tripTips.length > 0)) && (
-                    <div className="space-y-4 mb-10 max-w-4xl mx-auto">
-                      {smartItinerary.title && (
-                        <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{smartItinerary.title}</h2>
-                      )}
-                      {smartItinerary.summary && (
-                        <div className="prose prose-neutral max-w-none text-slate-900 text-left">
-                          <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
-                            {textToBulletPoints(smartItinerary.summary).map((point, idx) => (
-                              <li key={idx} className="font-normal">
-                                {point}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {smartItinerary.tripTips && smartItinerary.tripTips.length > 0 && (
-                        <div className="mt-6 text-left max-w-3xl mx-auto">
-                          <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>{t('itinerary_trip_tips')}</h3>
-                          <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
-                            {smartItinerary.tripTips.map((tip, i) => (
-                              <li key={i}>{tip}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  )}
+              {/* Get effective data: prefer smartItinerary, fallback to draft */}
+              {(() => {
+                const effectiveData = smartItinerary || {
+                  title: draft.title || '',
+                  summary: draft.summary || '',
+                  days: draft.days || [],
+                  tripTips: draft.tripTips || [],
+                  cityOverview: draft.cityOverview,
+                };
+                
+                // Safety guard: check if days is a valid array
+                if (effectiveData.days && !Array.isArray(effectiveData.days)) {
+                  return (
+                    <ErrorCard
+                      message={t('itinerary_error_problem_regenerate')}
+                      onRetry={loadOrGenerate}
+                    />
+                  );
+                }
+                
+                return (
+                  <div className="space-y-8 pb-10">
+                    {/* Trip Summary - Show as soon as we have title/summary/tripTips */}
+                    {(effectiveData.title || effectiveData.summary || (effectiveData.tripTips && effectiveData.tripTips.length > 0)) && (
+                      <div className="space-y-4 mb-10 max-w-4xl mx-auto">
+                        {effectiveData.title && (
+                          <h2 className="text-3xl font-bold text-slate-900 text-center" style={{ fontFamily: "'Patrick Hand', cursive" }}>{effectiveData.title}</h2>
+                        )}
+                        {effectiveData.summary && (
+                          <div className="prose prose-neutral max-w-none text-slate-900 text-left">
+                            {(() => {
+                              if (process.env.NODE_ENV === 'development' && effectiveData.summary) {
+                                console.log('[itinerary-tab] UI rendering summary:', new Date().toISOString());
+                              }
+                              return null;
+                            })()}
+                            <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
+                              {textToBulletPoints(effectiveData.summary).map((point, idx) => (
+                                <li key={idx} className="font-normal">
+                                  {point}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {effectiveData.tripTips && effectiveData.tripTips.length > 0 && (
+                          <div className="mt-6 text-left max-w-3xl mx-auto">
+                            <h3 className="text-lg font-bold text-slate-900 mb-3" style={{ fontFamily: "'Patrick Hand', cursive" }}>{t('itinerary_trip_tips')}</h3>
+                            <ul className="list-disc pl-5 space-y-2 text-base text-slate-700 leading-relaxed">
+                              {effectiveData.tripTips.map((tip, i) => (
+                                <li key={i}>{tip}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                  {/* City Overview Cards */}
-                  {(() => {
-                    if (process.env.NODE_ENV === 'development') {
-                      console.log('[itinerary-tab] Rendering check:', {
-                        hasCityOverview: !!smartItinerary.cityOverview,
-                        cityOverview: smartItinerary.cityOverview ? 'present' : 'missing'
-                      });
-                    }
-                    return smartItinerary.cityOverview ? (
-                      <CityOverviewCards cityOverview={smartItinerary.cityOverview} />
-                    ) : null;
-                  })()}
+                    {/* City Overview Cards - Show before days, with skeleton while loading */}
+                    {(() => {
+                      const effectiveCityOverview = effectiveData.cityOverview || draft.cityOverview;
+                      
+                      if (process.env.NODE_ENV === 'development') {
+                        console.log('[itinerary-tab] Rendering check:', {
+                          hasCityOverview: !!effectiveCityOverview,
+                          cityOverview: effectiveCityOverview ? 'present' : 'missing',
+                          overviewState,
+                          status,
+                          fromDraft: !!draft.cityOverview,
+                          fromSmartItinerary: !!effectiveData.cityOverview,
+                        });
+                      }
+                      
+                      // Show actual cards immediately when cityOverview data exists
+                      if (effectiveCityOverview) {
+                        return <CityOverviewCards cityOverview={effectiveCityOverview} />;
+                      }
+                      
+                      // Show "generating city overview" indicator and skeleton when overview hasn't arrived yet
+                      if (status === 'generating' && overviewState === 'pending') {
+                        if (process.env.NODE_ENV === 'development') {
+                          console.log('[itinerary-tab] UI showing skeleton:', new Date().toISOString());
+                        }
+                        return (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
+                              <span>{t('itinerary_generating_overview')}</span>
+                            </div>
+                            <CityOverviewSkeleton />
+                          </div>
+                        );
+                      }
+                      
+                      // Don't show anything if overview is confirmed missing (backwards compatibility)
+                      return null;
+                    })()}
 
-                  {/* Days - Grouped by segments if multi-city */}
-                  <div className="space-y-12">
-                    {smartItinerary.days && smartItinerary.days.length > 0 ? (() => {
+                    {/* Days - Grouped by segments if multi-city - Render progressively as they arrive */}
+                    {/* Only render days if overviewState is not pending */}
+                    {overviewState !== 'pending' && (
+                      <div className="space-y-12">
+                        {effectiveData.days && effectiveData.days.length > 0 ? (() => {
                       // Group days by segment if multi-city
                       if (segments.length > 1) {
                         const groupedDays: Array<{ segment: typeof segments[0] | null; days: ItineraryDay[] }> = [];
                         let currentSegment: typeof segments[0] | null = null;
                         let currentDays: ItineraryDay[] = [];
 
-                        smartItinerary.days.forEach((day, index) => {
+                          effectiveData.days.forEach((day, index) => {
                           const daySegmentId = daysWithSegments.get(day.date);
                           const segment = daySegmentId ? segments.find(s => s.id === daySegmentId) : null;
 
@@ -1365,19 +1902,10 @@ export function ItineraryTab({
                         return groupedDays.map((group, groupIdx) => (
                           <div key={group.segment?.id || `no-segment-${groupIdx}`} className="space-y-8">
                             {group.days.map((day) => {
-                  // Gather all photos from day.photos (already deduplicated by backend)
-                  // Fallback to collecting from places if day.photos is empty
-                  const dayImages = (day.photos && day.photos.length > 0) 
+                  const bannerImages = getDayBannerImages(day);
+                  const dayImages = (day.photos && day.photos.length > 0)
                     ? day.photos.map(photo => resolvePlacePhotoSrc(photo)).filter((src): src is string => src !== null)
                     : day.slots.flatMap(s => s.places.map(p => resolvePlacePhotoSrc(p))).filter((src): src is string => src !== null);
-                  
-                  // Deduplicate by URL to ensure unique images
-                  // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
-                  const validDayImages = dayImages.filter((img): img is string => 
-                    isPhotoSrcUsable(img)
-                  );
-                  const uniqueDayImages = Array.from(new Set(validDayImages));
-                  const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.includes(day.id);
 
                   // Debug logging (development only) - first 5 activities per day
@@ -1432,54 +1960,52 @@ export function ItineraryTab({
                       
                       {isExpanded && (
                         <>
-                          {/* Image Gallery */}
+                          {/* Image Gallery - always 4 slots (placeholder for missing) */}
                           {(() => {
-                            // Filter out failed images and only show valid ones
-                            // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
                               return !failedImages.has(imageKey) && isPhotoSrcUsable(img);
                             });
-
-                            if (validImages.length === 0) {
-                              return null; // Don't render empty gallery
-                            }
-
+                            if (validImages.length === 0) return null;
                             return (
                               <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
-                                {validImages.map((img, idx) => {
+                                {[0, 1, 2, 3].map((idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
-                                  // Double-check validation before rendering Image
-                                  if (!isPhotoSrcUsable(img)) {
-                                    return null;
-                                  }
-                                  const shouldUnoptimize = isPlacesProxy(img);
-                                  if (process.env.NODE_ENV === 'development' && idx === 0) {
-                                    console.debug('[ItineraryTab] Banner image:', { src: img, unoptimized: shouldUnoptimize });
+                                  const img = validImages[idx];
+                                  if (img && isPhotoSrcUsable(img)) {
+                                    const shouldUnoptimize = isPlacesProxy(img);
+                                    if (process.env.NODE_ENV === 'development' && idx === 0) {
+                                      console.debug('[ItineraryTab] Banner image:', { src: img, unoptimized: shouldUnoptimize });
+                                    }
+                                    return (
+                                      <div
+                                        key={imageKey}
+                                        className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openLightbox(img, dayImages.filter((i): i is string => isPhotoSrcUsable(i)));
+                                        }}
+                                      >
+                                        <Image
+                                          src={img}
+                                          alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`}
+                                          fill
+                                          sizes="(max-width: 768px) 25vw, 25vw"
+                                          unoptimized={shouldUnoptimize}
+                                          className="object-cover"
+                                          onError={() => {
+                                            setFailedImages(prev => new Set(prev).add(imageKey));
+                                          }}
+                                        />
+                                      </div>
+                                    );
                                   }
                                   return (
-                                    <div 
-                                      key={imageKey} 
-                                      className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => isPhotoSrcUsable(img)));
-                                        }
-                                      }}
-                                    >
-                                      <Image 
-                                        src={img} 
-                                        alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                        fill
-                                        sizes="(max-width: 768px) 25vw, 25vw"
-                                        unoptimized={shouldUnoptimize}
-                                        className="object-cover"
-                                        onError={() => {
-                                          setFailedImages(prev => new Set(prev).add(imageKey));
-                                        }}
-                                      />
-                                    </div>
+                                    <div
+                                      key={imageKey}
+                                      className="relative flex-1 min-w-0 aspect-[4/3] bg-gray-200 overflow-hidden"
+                                      aria-hidden
+                                    />
                                   );
                                 })}
                               </div>
@@ -1628,20 +2154,11 @@ export function ItineraryTab({
                         // Single-city trip: render days normally
                         return (
                           <>
-                            {smartItinerary.days.map((day) => {
-                  // Gather all photos from day.photos (already deduplicated by backend)
-                  // Fallback to collecting from places if day.photos is empty
-                  const dayImages = (day.photos && day.photos.length > 0) 
+                            {effectiveData.days.map((day) => {
+                  const bannerImages = getDayBannerImages(day);
+                  const dayImages = (day.photos && day.photos.length > 0)
                     ? day.photos.map(photo => resolvePlacePhotoSrc(photo)).filter((src): src is string => src !== null)
                     : day.slots.flatMap(s => s.places.map(p => resolvePlacePhotoSrc(p))).filter((src): src is string => src !== null);
-                  
-                  // Deduplicate by URL to ensure unique images
-                  // CRITICAL: Filter out invalid URLs (null, undefined, empty strings)
-                  const validDayImages = dayImages.filter((img): img is string => 
-                    isPhotoSrcUsable(img)
-                  );
-                  const uniqueDayImages = Array.from(new Set(validDayImages));
-                  const bannerImages = uniqueDayImages.slice(0, 4);
                   const isExpanded = expandedDays.includes(day.id);
 
                   // Debug logging (development only) - first 5 activities per day
@@ -1696,54 +2213,52 @@ export function ItineraryTab({
                       
                       {isExpanded && (
                         <>
-                          {/* Image Gallery */}
+                          {/* Image Gallery - always 4 slots (placeholder for missing) */}
                           {(() => {
-                            // Filter out failed images and only show valid ones
-                            // CRITICAL: Validate that img is truthy, non-empty string before rendering
                             const validImages = bannerImages.filter((img, idx): img is string => {
                               const imageKey = `${day.id}-banner-${idx}`;
                               return !failedImages.has(imageKey) && isPhotoSrcUsable(img);
                             });
-
-                            if (validImages.length === 0) {
-                              return null; // Don't render empty gallery
-                            }
-
+                            if (validImages.length === 0) return null;
                             return (
                               <div className="w-full flex gap-0.5 bg-gray-100 overflow-hidden rounded-t-xl">
-                                {validImages.map((img, idx) => {
+                                {[0, 1, 2, 3].map((idx) => {
                                   const imageKey = `${day.id}-banner-${idx}`;
-                                  // Double-check validation before rendering Image
-                                  if (!isPhotoSrcUsable(img)) {
-                                    return null;
-                                  }
-                                  const shouldUnoptimize = isPlacesProxy(img);
-                                  if (process.env.NODE_ENV === 'development' && idx === 0) {
-                                    console.debug('[ItineraryTab] Banner image (collapsed):', { src: img, unoptimized: shouldUnoptimize });
+                                  const img = validImages[idx];
+                                  if (img && isPhotoSrcUsable(img)) {
+                                    const shouldUnoptimize = isPlacesProxy(img);
+                                    if (process.env.NODE_ENV === 'development' && idx === 0) {
+                                      console.debug('[ItineraryTab] Banner image (single-city):', { src: img, unoptimized: shouldUnoptimize });
+                                    }
+                                    return (
+                                      <div
+                                        key={imageKey}
+                                        className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openLightbox(img, dayImages.filter((i): i is string => isPhotoSrcUsable(i)));
+                                        }}
+                                      >
+                                        <Image
+                                          src={img}
+                                          alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`}
+                                          fill
+                                          sizes="(max-width: 768px) 25vw, 25vw"
+                                          unoptimized={shouldUnoptimize}
+                                          className="object-cover"
+                                          onError={() => {
+                                            setFailedImages(prev => new Set(prev).add(imageKey));
+                                          }}
+                                        />
+                                      </div>
+                                    );
                                   }
                                   return (
-                                    <div 
-                                      key={imageKey} 
-                                      className="relative flex-1 min-w-0 aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity bg-gray-200 overflow-hidden"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (img) {
-                                          openLightbox(img, dayImages.filter((img): img is string => isPhotoSrcUsable(img)));
-                                        }
-                                      }}
-                                    >
-                                      <Image 
-                                        src={img} 
-                                        alt={day.title ? `${day.title} photo ${idx + 1}` : `Trip photo ${idx + 1}`} 
-                                        fill
-                                        sizes="(max-width: 768px) 25vw, 25vw"
-                                        unoptimized={shouldUnoptimize}
-                                        className="object-cover"
-                                        onError={() => {
-                                          setFailedImages(prev => new Set(prev).add(imageKey));
-                                        }}
-                                      />
-                                    </div>
+                                    <div
+                                      key={imageKey}
+                                      className="relative flex-1 min-w-0 aspect-[4/3] bg-gray-200 overflow-hidden"
+                                      aria-hidden
+                                    />
                                   );
                                 })}
                               </div>
@@ -1882,49 +2397,51 @@ export function ItineraryTab({
                         </>
                       )}
                     </Card>
-                      );
-                    })}
-                          </>
-                        );
-                      }
-                    })() : null}
-                    
-                    {/* Loading placeholder for days still being generated */}
-                    {status === 'generating' && (
-                      <Card className="bg-gray-50 border-gray-200">
-                        <CardHeader className="bg-gray-50 border-b pb-4">
-                          <div className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                            <CardTitle className="text-lg font-medium text-gray-500">
-                              {t('itinerary_generating_more_days')}
-                            </CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                          <p className="text-sm text-gray-500">{t('itinerary_generating_rest')}</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                </div>
-              ) : null}
-            </>
-          )}
+                  );
+                })}
+              </>
+            );
+          }
+        })() : null}
 
-          {/* Fallback: if status is loaded but no itinerary (shouldn't happen, but safety check) */}
-          {status === 'loaded' && !smartItinerary && (
-            <ErrorCard
-              message={t('itinerary_error_no_itinerary')}
-              onRetry={loadOrGenerate}
-            />
-          )}
+                {/* Loading placeholder after city overview while days are generated (shown even when 0 days) */}
+                {status === 'generating' && (overviewState === 'ready' || overviewState === 'missing') && (
+                  <Card className="bg-gray-50 border-gray-200">
+                    <CardHeader className="bg-gray-50 border-b pb-4">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                        <CardTitle className="text-lg font-medium text-gray-500">
+                          {t('itinerary_generating_more_days')}
+                        </CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-500">{t('itinerary_generating_rest')}</p>
+                    </CardContent>
+                  </Card>
+                )}
 
-          {/* Fallback: if status is idle (shouldn't happen after mount, but safety check) */}
-          {status === 'idle' && (
-            <LoadingCard
-              title={t('itinerary_generating_title')}
-              subtitle={t('itinerary_preparing')}
-            />
+                {/* Fallback: if status is loaded but no itinerary (shouldn't happen, but safety check) */}
+                {status === 'loaded' && !smartItinerary && (
+                  <ErrorCard
+                    message={t('itinerary_error_no_itinerary')}
+                    onRetry={loadOrGenerate}
+                  />
+                )}
+
+                {/* Fallback: if status is idle (shouldn't happen after mount, but safety check) */}
+                {(status as ItineraryStatus) === 'idle' && (
+                  <LoadingCard
+                    title={t('itinerary_generating_title')}
+                    subtitle={t('itinerary_preparing')}
+                  />
+                )}
+        </div>
+      )}
+      </div>
+              );
+            })()}
+          </>
           )}
         </div>
       </div>

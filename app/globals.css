@@ -2,15 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800;900&display=swap');
-@import '@fontsource/playfair-display/400.css';
-@import '@fontsource/playfair-display/500.css';
-@import '@fontsource/playfair-display/600.css';
-@import '@fontsource/playfair-display/700.css';
-@import '@fontsource/jetbrains-mono/400.css';
-
 @layer base {
   :root {
     --background: 30 50% 96%;
@@ -50,8 +41,8 @@
     --cream: 40 40% 97%;
     --sage: 150 20% 45%;
 
-    --font-display: "Playfair Display", Georgia, serif;
-    --font-mono: "JetBrains Mono", monospace;
+    --font-display: var(--font-playfair-display), "Playfair Display", Georgia, serif;
+    --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
     --font-body: system-ui, -apple-system, sans-serif;
     --font-hand: var(--font-patrick-hand), "Patrick Hand", cursive;
 

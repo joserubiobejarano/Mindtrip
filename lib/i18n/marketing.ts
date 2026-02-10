@@ -37,16 +37,16 @@ type MarketingCopy = {
 
 const marketingCopy: Record<MarketingLocale, MarketingCopy> = {
   en: {
-    homeMetaTitle: "Kruno - AI Travel Planner",
+    homeMetaTitle: "Kruno - Smart travel planner",
     homeMetaDescription:
-      "Plan smart, personalized trips with Kruno's AI travel planner. Build itineraries, discover places, and travel with confidence.",
+      "Plan smart, personalized trips with Kruno's smart travel planner. Build itineraries, discover places, and travel with confidence.",
     citiesMetaTitle: "City Travel Guides – Kruno",
-    citiesMetaDescription: "Browse AI-generated city travel guides from Kruno.",
+    citiesMetaDescription: "Browse smart city travel guides from Kruno.",
     influencersMetaTitle: "Influencer Guides – Kruno",
     influencersMetaDescription: "Discover travel guides curated by influencers and creators on Kruno.",
-    discoverMetaTitle: "Discover Kruno – AI Travel Planner",
+    discoverMetaTitle: "Discover Kruno – Smart travel planner",
     discoverMetaDescription:
-      "Create a clear trip plan in minutes with Kruno's AI travel planner.",
+      "Create a clear trip plan in minutes with Kruno's smart travel planner.",
     citiesHubTitle: "City travel guides",
     citiesHubSubtitle:
       "Pick a city to explore a ready-to-use travel guide and plan faster with Kruno.",
@@ -58,13 +58,13 @@ const marketingCopy: Record<MarketingLocale, MarketingCopy> = {
     cityDetailHighlightsTitle: "Top highlights",
     cityDetailPlanTitle: "Plan this trip in Kruno",
     cityDetailPlanBody:
-      "Turn this guide into a personalized plan with dates, preferences, and AI recommendations.",
+      "Turn this guide into a personalized plan with dates, preferences, and smart recommendations.",
     cityDetailPlanCta: "Start planning",
     cityDetailBrowseAll: "Browse all cities",
     cityDetailExploreMore: "Explore more cities",
     influencerDetailPlanTitle: "Plan a trip with this style",
     influencerDetailPlanBody:
-      "Use this creator-inspired style to build a custom travel guide with Kruno's AI planner.",
+      "Use this creator-inspired style to build a custom travel guide with Kruno's smart planner.",
     influencerDetailPlanCta: "Start planning",
     influencerDetailBrowseAll: "Browse all creators",
     influencerDetailMore: "More creators",
@@ -78,16 +78,16 @@ const marketingCopy: Record<MarketingLocale, MarketingCopy> = {
     exploreInfluencersCta: "View all creators →",
   },
   es: {
-    homeMetaTitle: "Kruno - Planificador de viajes con IA",
+    homeMetaTitle: "Kruno - Planificador de viajes inteligente",
     homeMetaDescription:
       "Planifica viajes personalizados con Kruno. Crea itinerarios, descubre lugares y viaja con confianza.",
     citiesMetaTitle: "Guías de viaje por ciudad – Kruno",
     citiesMetaDescription:
-      "Explora guías de viaje por ciudad creadas con IA por Kruno.",
+      "Explora guías de viaje inteligentes por ciudad de Kruno.",
     influencersMetaTitle: "Guías de influencers – Kruno",
     influencersMetaDescription:
       "Descubre guías de viaje creadas por influencers y creadores en Kruno.",
-    discoverMetaTitle: "Descubre Kruno – Planificador de viajes con IA",
+    discoverMetaTitle: "Descubre Kruno – Planificador de viajes inteligente",
     discoverMetaDescription:
       "Crea un plan de viaje claro en minutos con el planificador de Kruno.",
     citiesHubTitle: "Guías de viaje por ciudad",
@@ -101,7 +101,7 @@ const marketingCopy: Record<MarketingLocale, MarketingCopy> = {
     cityDetailHighlightsTitle: "Principales destacados",
     cityDetailPlanTitle: "Planifica este viaje en Kruno",
     cityDetailPlanBody:
-      "Convierte esta guía en un plan personalizado con fechas, preferencias y recomendaciones de IA.",
+      "Convierte esta guía en un plan personalizado con fechas, preferencias y recomendaciones inteligentes.",
     cityDetailPlanCta: "Empezar a planificar",
     cityDetailBrowseAll: "Ver todas las ciudades",
     cityDetailExploreMore: "Explora más ciudades",

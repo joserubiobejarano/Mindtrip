@@ -111,7 +111,7 @@ export default async function InfluencerPage({
       <div className="rounded-2xl border border-border/40 p-6 bg-background">
         <h2 className="text-xl font-semibold">Plan a trip with this style</h2>
         <p className="mt-2 text-muted-foreground">
-          Use this creator-inspired style to build a custom travel guide with Kruno&apos;s AI planner.
+          Use this creator-inspired style to build a custom travel guide with Kruno&apos;s smart planner.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
