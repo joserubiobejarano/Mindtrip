@@ -31011,6 +31011,3558 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    "abu-dhabi": {
+      slug: "abu-dhabi",
+      city: "Abu Dhabi",
+      country: "UAE",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture and architecture", "Relaxed pace travelers"],
+      style: ["Grand mosques", "Waterfront promenades", "Museums"],
+      pacing: [
+        "Abu Dhabi rewards a calm pace. Anchor each day with one headline sight—the Grand Mosque, Louvre, or Corniche—then leave room for waterfront strolls and quiet stops.",
+        "Group time by area to keep transit light. Pair the mosque with a morning visit; dedicate another day to Saadiyat Island for museums and beach time.",
+        "Save an open afternoon for the Corniche or a market so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Abu Dhabi in 3 days",
+        subtitle:
+          "Grand mosques, waterfront walks, and world-class museums with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Abu%20dhabi,%20Moschea%20dello%20Sceicco%20Zayed,%20cortile,%20pavimento.jpg",
+          alt: "Sheikh Zayed Grand Mosque in Abu Dhabi at golden hour.",
+        },
+      },
+      cityStats: [
+        { value: "200+", label: "Nationalities in the city" },
+        { value: "8 km", label: "Corniche waterfront" },
+        { value: "82", label: "Domes at Sheikh Zayed Grand Mosque" },
+        { value: "1.5M+", label: "Metro area residents" },
+      ],
+      fit: {
+        forYou: ["First trip with iconic sights", "Culture and calm pacing", "Waterfront walks", "Museum time", "Mix of modern and traditional"],
+        notForYou: ["Beach-only focus", "Late-night nightlife", "Packed back-to-back tours", "Budget backpacker style", "Ski or snow activities"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Sheikh Zayed Grand Mosque",
+          summary: "Grand mosque visit and Corniche stroll.",
+          morning: "Sheikh Zayed Grand Mosque",
+          afternoon: "Heritage Village or Qasr al Hosn area",
+          evening: "Corniche walk and dinner",
+        },
+        {
+          day: 2,
+          title: "Saadiyat Island and Louvre",
+          summary: "Louvre Abu Dhabi and beach or park time.",
+          morning: "Louvre Abu Dhabi",
+          afternoon: "Saadiyat Beach or Mangrove walk",
+          evening: "Return to mainland and relaxed dinner",
+        },
+        {
+          day: 3,
+          title: "Corniche and markets",
+          summary: "Waterfront, souks, and final stops.",
+          morning: "Corniche walk or Emirates Palace exterior",
+          afternoon: "Central Market or Marina Mall area",
+          evening: "Final waterfront stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Sheikh Zayed Grand Mosque",
+          description:
+            "The mosque is the city's icon. Visit in the morning for light and calm. Dress modestly; abayas are available.",
+          image: {
+            src: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Sheikh Zayed Grand Mosque white domes and pools in Abu Dhabi.",
+          },
+        },
+        {
+          title: "The Corniche",
+          description:
+            "The waterfront promenade runs for miles. Morning and evening walks offer sea views and a relaxed pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1586724237569-f3d0c2dee8c7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Abu Dhabi Corniche waterfront and skyline.",
+          },
+        },
+        {
+          title: "Louvre Abu Dhabi",
+          description:
+            "The museum blends art and architecture. Plan a half day; the building and lagoon are as striking as the collection.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1200&q=80",
+            alt: "Louvre Abu Dhabi dome and water in Abu Dhabi.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for mild weather" },
+        { label: "Airport transfer", value: "Taxi or bus from AUH" },
+        { label: "Transit tips", value: "Taxis and buses; mosque and Louvre are reachable by bus" },
+        { label: "Ticketing", value: "Book Louvre in advance; mosque is free" },
+        { label: "Dress code", value: "Modest dress for the mosque; abayas provided" },
+      ],
+      checklist: [
+        "Book Louvre Abu Dhabi ticket",
+        "Pack modest clothing for mosque visit",
+        "Save offline maps",
+        "Carry a refillable water bottle",
+        "Plan morning visit for the mosque",
+        "Check mosque opening hours",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Abu Dhabi?",
+          answer:
+            "Yes for the Grand Mosque, Louvre, and Corniche. The pace stays relaxed with room for waterfront time.",
+        },
+        {
+          question: "Do I need to book the mosque?",
+          answer:
+            "Entry is free; no booking required. Modest dress is required; abayas are available at the mosque.",
+        },
+        {
+          question: "Is Abu Dhabi walkable?",
+          answer:
+            "The Corniche is very walkable. For the mosque and Louvre, use taxi or bus; distances are spread out.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Corniche area keeps you near the waterfront; downtown or Yas Island suit different budgets and styles.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Morning is ideal for the mosque to avoid heat and crowds. Louvre can be a half-day block.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots, booking helps. Many hotels and malls have walk-in options.",
+        },
+        {
+          question: "Is Abu Dhabi safe for tourists?",
+          answer:
+            "Yes. The city is very safe; normal precautions apply. Dress respectfully in religious and public areas.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "dubai", city: "Dubai", days: 3, description: "Modern skyline, souks, and desert experiences." },
+        { slug: "doha", city: "Doha", days: 3, description: "Museums, souks, and corniche strolls." },
+        { slug: "muscat", city: "Muscat", days: 3, description: "Forts, souks, and coastal views." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "sao-paulo": {
+      slug: "sao-paulo",
+      city: "São Paulo",
+      country: "Brazil",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Food and culture", "Urban explorers"],
+      style: ["Museums", "Neighborhoods", "Markets"],
+      pacing: [
+        "São Paulo works best at a calm pace. Anchor each day with one main area—Paulista, Ibirapuera, or the historic center—then leave room for coffee and market stops.",
+        "Group sights by district to keep transit manageable. Pair Paulista with a museum; dedicate another day to Ibirapuera and nearby neighborhoods.",
+        "Save an open afternoon for Mercado Municipal or a neighborhood stroll.",
+      ],
+      hero: {
+        title: "São Paulo in 3 days",
+        subtitle:
+          "Museums, parks, and diverse food at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1680573346254-7768c3c2f6df?auto=format&fit=crop&w=1600&q=80",
+          alt: "São Paulo skyline and Paulista Avenue from above.",
+        },
+      },
+      cityStats: [
+        { value: "12M+", label: "Metro area residents" },
+        { value: "1.6 km", label: "Paulista Avenue length" },
+        { value: "158", label: "Museums in the city" },
+        { value: "90+", label: "Years of Mercado Municipal" },
+      ],
+      fit: {
+        forYou: ["Museums and parks", "Food and markets", "First-time visitors", "Urban walks", "Calm pacing"],
+        notForYou: ["Beach focus", "Late-night only", "Packed tour schedule", "Remote nature day trips", "Shopping-only trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Paulista Avenue and museums",
+          summary: "Paulista, MASP, and nearby culture.",
+          morning: "Paulista Avenue and MASP",
+          afternoon: "Japan House or Itaú Cultural",
+          evening: "Paulista area dinner and stroll",
+        },
+        {
+          day: 2,
+          title: "Ibirapuera Park",
+          summary: "Park, museums, and green space.",
+          morning: "Ibirapuera Park and trails",
+          afternoon: "MAM or Afro Brazil Museum",
+          evening: "Vila Madalena or Jardins area",
+        },
+        {
+          day: 3,
+          title: "Mercado Municipal and center",
+          summary: "Market, historic center, and food.",
+          morning: "Mercado Municipal and pastel",
+          afternoon: "Sé or Luz area",
+          evening: "Final neighborhood dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Paulista Avenue",
+          description:
+            "The avenue is the city's spine. Sunday it closes to cars; any day it offers museums, cafes, and people-watching.",
+          image: {
+            src: "https://images.unsplash.com/photo-1558979152-2e1ec2f4358d?auto=format&fit=crop&w=1200&q=80",
+            alt: "Paulista Avenue and buildings in São Paulo.",
+          },
+        },
+        {
+          title: "Ibirapuera Park",
+          description:
+            "The park offers green space, lakes, and museums. A morning or afternoon here balances urban days.",
+          image: {
+            src: "https://images.unsplash.com/photo-1587334207828-3246900e24b4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Ibirapuera Park and skyline in São Paulo.",
+          },
+        },
+        {
+          title: "Mercado Municipal",
+          description:
+            "The market is famous for fruit, sandwiches, and pastel. Plan for a long lunch or snack stop.",
+          image: {
+            src: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mercado Municipal interior in São Paulo.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to September for drier, cooler weather" },
+        { label: "Airport transfer", value: "Taxi or Uber from GRU or CGH" },
+        { label: "Transit tips", value: "Metro and Uber; Paulista and center are well connected" },
+        { label: "Ticketing", value: "Book MASP or key museums in advance in peak times" },
+        { label: "Neighborhood stay", value: "Paulista, Jardins, or Vila Madalena" },
+      ],
+      checklist: [
+        "Save offline maps and Uber app",
+        "Pack layers for air-conditioned spaces",
+        "Plan a market lunch at Mercado Municipal",
+        "Carry a refillable water bottle",
+        "Wear comfortable walking shoes",
+        "Check museum opening days",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for São Paulo?",
+          answer:
+            "Yes for Paulista, Ibirapuera, and the market. The city is large; this plan keeps the pace realistic.",
+        },
+        {
+          question: "Do I need a transit pass?",
+          answer:
+            "Metro is useful for Paulista and center. Uber is widely used for longer hops and evenings.",
+        },
+        {
+          question: "Is São Paulo walkable?",
+          answer:
+            "Paulista and Ibirapuera are walkable. Use metro or Uber between areas; traffic can be heavy.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Paulista or Jardins keep you central. Vila Madalena suits a more bohemian, nightlife-friendly base.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "A normal start is fine. MASP and the market are best before midday crowds.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots, yes. Many places take walk-ins; weekend dinners fill up.",
+        },
+        {
+          question: "Is São Paulo safe for tourists?",
+          answer:
+            "Stick to main areas and normal precautions. Avoid flashing valuables; use Uber at night.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "rio-de-janeiro", city: "Rio de Janeiro", days: 3, description: "Beaches, Christ the Redeemer, and rhythm." },
+        { slug: "buenos-aires", city: "Buenos Aires", days: 3, description: "Tango, neighborhoods, and cafe culture." },
+        { slug: "lima", city: "Lima", days: 3, description: "Historic plazas, clifftop walks, and food." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    honolulu: {
+      slug: "honolulu",
+      city: "Honolulu",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and beach", "Relaxed pace travelers"],
+      style: ["Pearl Harbor", "Waikiki", "Diamond Head"],
+      pacing: [
+        "Honolulu works at a calm pace. Anchor each day with one main focus—Pearl Harbor, Waikiki and Diamond Head, or the coast—then leave room for beach time and casual meals.",
+        "Group time by area. Pair Pearl Harbor with a half day; dedicate another day to Waikiki and a Diamond Head walk or drive.",
+        "Save an open afternoon for the beach or a scenic drive.",
+      ],
+      hero: {
+        title: "Honolulu in 3 days",
+        subtitle:
+          "Pearl Harbor, Waikiki, and Diamond Head with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Diamond%20Head%20Volcanic%20Cone,%20Honolulu%20(503701)%20(20808316082).jpg",
+          alt: "Waikiki Beach and Diamond Head in Honolulu.",
+        },
+      },
+      cityStats: [
+        { value: "350K+", label: "Honolulu city residents" },
+        { value: "762", label: "Ft Diamond Head summit" },
+        { value: "1941", label: "Pearl Harbor memorial year" },
+        { value: "2 mi", label: "Waikiki Beach stretch" },
+      ],
+      fit: {
+        forYou: ["History and memorials", "Beach and sun", "First-time visitors", "Scenic views", "Relaxed pacing"],
+        notForYou: ["Non-stop nightlife", "Packed tour schedule", "Winter sports", "Remote hiking only", "Shopping-only focus"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Pearl Harbor",
+          summary: "Memorial sites and museum time.",
+          morning: "Pearl Harbor Visitor Center and USS Arizona",
+          afternoon: "USS Missouri or Pacific Aviation Museum",
+          evening: "Return to Waikiki and relaxed dinner",
+        },
+        {
+          day: 2,
+          title: "Waikiki and Diamond Head",
+          summary: "Beach, views, and waterfront.",
+          morning: "Waikiki Beach and walk",
+          afternoon: "Diamond Head lookout or hike",
+          evening: "Waikiki sunset and dinner",
+        },
+        {
+          day: 3,
+          title: "Coast and wrap-up",
+          summary: "Scenic drive or beach time.",
+          morning: "Hanauma Bay or coast drive",
+          afternoon: "Beach or last-minute sights",
+          evening: "Final dinner and stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Pearl Harbor",
+          description:
+            "The memorial is a sobering, essential visit. Book tickets in advance; plan at least a half day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pearl Harbor memorial and harbor in Honolulu.",
+          },
+        },
+        {
+          title: "Waikiki Beach",
+          description:
+            "The beach is the city's hub. Morning and evening walks are pleasant; leave time for swimming and sun.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Waikiki Beach and palm trees in Honolulu.",
+          },
+        },
+        {
+          title: "Diamond Head",
+          description:
+            "The crater and summit offer ocean and city views. Go early to avoid heat; the walk is moderate.",
+          image: {
+            src: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&w=1200&q=80",
+            alt: "Diamond Head crater and coast from above in Honolulu.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for drier weather" },
+        { label: "Airport transfer", value: "Taxi or shuttle from HNL" },
+        { label: "Transit tips", value: "Car or Uber for Pearl Harbor and Diamond Head; Waikiki is walkable" },
+        { label: "Ticketing", value: "Book Pearl Harbor tickets well in advance" },
+        { label: "Neighborhood stay", value: "Waikiki for beach and convenience" },
+      ],
+      checklist: [
+        "Book Pearl Harbor tickets in advance",
+        "Pack sunscreen and reef-safe lotion",
+        "Wear comfortable shoes for Diamond Head",
+        "Save offline maps",
+        "Carry a refillable water bottle",
+        "Check Diamond Head opening hours",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Honolulu?",
+          answer:
+            "Yes for Pearl Harbor, Waikiki, and Diamond Head. You can add a relaxed beach day or coast drive.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Waikiki is walkable. For Pearl Harbor and Diamond Head, shuttle or Uber works; a car helps for the coast.",
+        },
+        {
+          question: "Is Honolulu walkable?",
+          answer:
+            "Waikiki is very walkable. Other sights need a short drive or shuttle.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Waikiki keeps you near the beach, restaurants, and easy transport to Pearl Harbor and Diamond Head.",
+        },
+        {
+          question: "What time should I start for Pearl Harbor?",
+          answer:
+            "Morning is best. Book the first available slot to avoid crowds and heat.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots, yes. Many Waikiki places take walk-ins; weekend dinners fill up.",
+        },
+        {
+          question: "Is Honolulu safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; Waikiki and main sights are well frequented.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "san-diego", city: "San Diego", days: 3, description: "Waterfront, parks, and coastal pacing." },
+        { slug: "sydney", city: "Sydney", days: 3, description: "Harbor, beaches, and relaxed pace." },
+        { slug: "bali", city: "Bali", days: 3, description: "Temples, rice terraces, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sapporo: {
+      slug: "sapporo",
+      city: "Sapporo",
+      country: "Japan",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Food and parks", "Relaxed winter-city fans"],
+      style: ["Odori Park", "Nijo Market", "Beer and ramen"],
+      pacing: [
+        "Sapporo rewards a calm pace. Anchor each day with one main area—Odori and center, the market and beer museum, or a park or day trip—then leave room for food stops.",
+        "Group time by district. The center is walkable; use subway for Beer Museum or farther parks.",
+        "Save an open afternoon for a market lunch or a relaxed park stroll.",
+      ],
+      hero: {
+        title: "Sapporo in 3 days",
+        subtitle:
+          "Odori Park, Nijo Market, and beer culture with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sapporo_TV_Tower_and_Odori_park.JPG",
+          alt: "Sapporo cityscape and Odori Park in winter.",
+        },
+      },
+      cityStats: [
+        { value: "1.9M+", label: "City residents" },
+        { value: "1.5 km", label: "Odori Park length" },
+        { value: "1876", label: "Sapporo Beer founding year" },
+        { value: "200+", label: "Ramen shops in the city" },
+      ],
+      fit: {
+        forYou: ["Food and markets", "Parks and easy walks", "First-time visitors", "Beer and ramen", "Calm pacing"],
+        notForYou: ["Beach-only focus", "Late-night only", "Packed tour schedule", "Ski-only trip", "Shopping-only focus"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Odori Park and center",
+          summary: "Park, TV tower, and downtown.",
+          morning: "Odori Park and Sapporo TV Tower",
+          afternoon: "Tanukikoji shopping arcade",
+          evening: "Ramen or dinner in Susukino",
+        },
+        {
+          day: 2,
+          title: "Nijo Market and beer",
+          summary: "Market and Sapporo Beer Museum.",
+          morning: "Nijo Market and seafood breakfast",
+          afternoon: "Sapporo Beer Museum and garden",
+          evening: "Odori or Susukino dinner",
+        },
+        {
+          day: 3,
+          title: "Parks and wrap-up",
+          summary: "Maruyama Park or Moerenuma.",
+          morning: "Maruyama Park or Moerenuma Park",
+          afternoon: "Last-minute shopping or cafe",
+          evening: "Final dinner and stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Odori Park",
+          description:
+            "The park runs through the center. Seasonal events and the TV tower make it a natural hub for a relaxed walk.",
+          image: {
+            src: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80",
+            alt: "Odori Park and Sapporo skyline.",
+          },
+        },
+        {
+          title: "Nijo Market",
+          description:
+            "The market is famous for crab, salmon, and seafood bowls. Plan a morning visit and breakfast.",
+          image: {
+            src: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+            alt: "Nijo Market seafood in Sapporo.",
+          },
+        },
+        {
+          title: "Sapporo Beer Museum",
+          description:
+            "The red-brick museum and garden offer beer history and tastings. A relaxed half day fits the pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1532634922-8fe0b757fb13?auto=format&fit=crop&w=1200&q=80",
+            alt: "Sapporo Beer Museum building and garden.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "February for Snow Festival; September for mild weather" },
+        { label: "Airport transfer", value: "Train or bus from New Chitose Airport" },
+        { label: "Transit tips", value: "Subway for center and Beer Museum; walk Odori and Tanukikoji" },
+        { label: "Ticketing", value: "Beer Museum is walk-in; Snow Festival is free" },
+        { label: "Neighborhood stay", value: "Odori or Susukino for center access" },
+      ],
+      checklist: [
+        "Pack layers for winter or cool evenings",
+        "Save offline maps and subway map",
+        "Plan a market breakfast at Nijo",
+        "Carry a refillable water bottle",
+        "Wear comfortable walking shoes",
+        "Check market opening hours",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Sapporo?",
+          answer:
+            "Yes for Odori, Nijo Market, and the Beer Museum. You can add a park or day trip if you have energy.",
+        },
+        {
+          question: "Do I need a transit pass?",
+          answer:
+            "A subway day pass helps. The center is walkable; subway is useful for Beer Museum and parks.",
+        },
+        {
+          question: "Is Sapporo walkable?",
+          answer:
+            "Odori, Tanukikoji, and Susukino are very walkable. Subway covers the rest.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near Odori or Susukino keeps you central for park, market, and dinner options.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Nijo Market is best in the morning. Odori and the center are flexible.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular ramen spots, expect queues. Many places are walk-in; peak dinner may wait.",
+        },
+        {
+          question: "Is Sapporo safe for tourists?",
+          answer:
+            "Yes. The city is very safe; normal precautions apply.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "tokyo", city: "Tokyo", days: 3, description: "Temples, neighborhoods, and food." },
+        { slug: "osaka", city: "Osaka", days: 3, description: "Street food, canals, and landmarks." },
+        { slug: "kyoto", city: "Kyoto", days: 3, description: "Temples, gardens, and traditional streets." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    perth: {
+      slug: "perth",
+      city: "Perth",
+      country: "Australia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Parks and waterfront", "Relaxed pace travelers"],
+      style: ["Kings Park", "Fremantle", "Swan River"],
+      pacing: [
+        "Perth rewards a calm pace. Anchor each day with one main area—Kings Park, the river and CBD, or Fremantle—then leave room for waterfront strolls and cafe stops.",
+        "Group time by area. Kings Park and the CBD are close; Fremantle is a short train ride for a full day or half day.",
+        "Save an open afternoon for the Swan River or a beach so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Perth in 3 days",
+        subtitle:
+          "Kings Park, Fremantle, and the Swan River with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Perth%20(AU),%20View%20from%20Kings%20Park%20--%202019%20--%200525-30.jpg",
+          alt: "Perth skyline and Swan River at sunset.",
+        },
+      },
+      cityStats: [
+        { value: "2M+", label: "Metro area residents" },
+        { value: "400 ha", label: "Kings Park size" },
+        { value: "19 km", label: "Train to Fremantle" },
+        { value: "60 km", label: "Swan River length through metro" },
+      ],
+      fit: {
+        forYou: ["Parks and river", "First-time visitors", "Relaxed pacing", "Waterfront walks", "Cafe and food"],
+        notForYou: ["Non-stop nightlife", "Packed tour schedule", "Snow or ski", "Remote outback only", "Shopping-only focus"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Kings Park and CBD",
+          summary: "Park, views, and city center.",
+          morning: "Kings Park and Botanic Garden",
+          afternoon: "CBD and Elizabeth Quay",
+          evening: "Swan River stroll and dinner",
+        },
+        {
+          day: 2,
+          title: "Fremantle",
+          summary: "Port town, markets, and waterfront.",
+          morning: "Fremantle Markets and high street",
+          afternoon: "Fremantle Prison or Fishing Boat Harbour",
+          evening: "Fremantle dinner and return",
+        },
+        {
+          day: 3,
+          title: "Swan River and wrap-up",
+          summary: "River, beaches, or last stops.",
+          morning: "Swan River walk or ferry",
+          afternoon: "Cottesloe or Scarborough Beach",
+          evening: "Final dinner and stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Kings Park",
+          description:
+            "The park offers city and river views. Morning or late afternoon walks are ideal; the botanic garden is free.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80",
+            alt: "Kings Park and Perth skyline from above.",
+          },
+        },
+        {
+          title: "Fremantle",
+          description:
+            "The port town has markets, cafes, and a relaxed vibe. A full day or half day fits the pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Fremantle harbour and historic buildings.",
+          },
+        },
+        {
+          title: "Swan River",
+          description:
+            "The river runs through the city. Walks, ferries, and waterfront cafes offer a calm pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1476514525537-07c4c29489fb?auto=format&fit=crop&w=1200&q=80",
+            alt: "Swan River and Perth waterfront.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "September to November or March to May for mild weather" },
+        { label: "Airport transfer", value: "Train or taxi from Perth Airport" },
+        { label: "Transit tips", value: "Train to Fremantle; walk Kings Park and CBD" },
+        { label: "Ticketing", value: "Kings Park is free; book Fremantle Prison if desired" },
+        { label: "Neighborhood stay", value: "CBD, Northbridge, or near the river" },
+      ],
+      checklist: [
+        "Pack sunscreen and a hat",
+        "Save offline maps and train timetable",
+        "Plan a Fremantle market morning",
+        "Carry a refillable water bottle",
+        "Wear comfortable walking shoes",
+        "Check Fremantle Markets days",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Perth?",
+          answer:
+            "Yes for Kings Park, Fremantle, and the Swan River. The pace stays relaxed with room for beach or river time.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Train to Fremantle is easy. Kings Park and the CBD are walkable; car helps for beaches.",
+        },
+        {
+          question: "Is Perth walkable?",
+          answer:
+            "Kings Park, CBD, and Elizabeth Quay are walkable. Fremantle is compact; train gets you there.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "CBD or Northbridge keep you central. Near the river suits a quieter base.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Kings Park is pleasant in the morning. Fremantle Markets are best on weekend mornings.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots, yes. Many places take walk-ins; weekend dinners fill up.",
+        },
+        {
+          question: "Is Perth safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; main areas are well frequented.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "sydney", city: "Sydney", days: 3, description: "Harbor, beaches, and relaxed pace." },
+        { slug: "melbourne", city: "Melbourne", days: 3, description: "Laneways, coffee, and culture." },
+        { slug: "brisbane", city: "Brisbane", days: 3, description: "River, South Bank, and subtropical pace." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    funchal: {
+      slug: "funchal",
+      city: "Funchal",
+      country: "Portugal",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Garden and views", "Relaxed pace"],
+      style: ["Gardens", "Old town", "Cable car and levadas"],
+      pacing: [
+        "Funchal works best at a calm pace. Anchor each day with one main focus—gardens and Monte, the old town, or a levada walk—then leave room for cafe stops and harbor strolls.",
+        "Group sights by area. Monte and the botanical gardens pair well; the old town and market are walkable from the center. Save a half day for a short levada or coastal view.",
+        "Keep one afternoon open for the seafront or a relaxed meal so the trip never feels rushed.",
+      ],
+      hero: {
+        title: "Funchal in 3 days",
+        subtitle:
+          "Gardens, old town, and cable car with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1725380054256-48ae4ae7c20e?auto=format&fit=crop&w=1600&q=80",
+          alt: "Funchal harbor and old town with mountain backdrop.",
+        },
+      },
+      cityStats: [
+        { value: "110K+", label: "Residents in Funchal" },
+        { value: "7 km", label: "Cable car to Monte" },
+        { value: "500+", label: "Years of recorded history" },
+        { value: "1,400 km", label: "Levada network on Madeira" },
+      ],
+      fit: {
+        forYou: ["Gardens and viewpoints", "First-time visitors to Madeira", "Walkable old town and harbor", "Calm pacing with cafe breaks", "Cable car and short walks"],
+        notForYou: ["Non-stop nightlife", "Packed tour schedule", "Long mountain hikes only", "Beach-only focus", "Shopping-heavy trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and harbor",
+          summary: "Market, streets, and seafront.",
+          morning: "Mercado dos Lavradores and old town streets",
+          afternoon: "Harbor area and Forte de São Tiago",
+          evening: "Seafront stroll and dinner",
+        },
+        {
+          day: 2,
+          title: "Monte and gardens",
+          summary: "Cable car, Monte Palace, and views.",
+          morning: "Cable car to Monte and Monte Palace Gardens",
+          afternoon: "Botanical Garden or wicker sled descent",
+          evening: "Return to Funchal and relaxed dinner",
+        },
+        {
+          day: 3,
+          title: "Levada or coast",
+          summary: "Short walk or coastal views.",
+          morning: "Short levada walk or Camara de Lobos",
+          afternoon: "Last stops in old town or viewpoints",
+          evening: "Final dinner and harbor walk",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Old town and market",
+          description:
+            "The market and cobbled streets set the tone. Morning is best for the market; the old town stays pleasant into the evening.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Funchal old town and harbor from above.",
+          },
+        },
+        {
+          title: "Monte and gardens",
+          description:
+            "The cable car links Funchal to Monte. Allow a full morning or day for the gardens and views.",
+          image: {
+            src: "https://images.unsplash.com/photo-1583495729010-84c2b2e07b6e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Monte Palace Gardens in Funchal.",
+          },
+        },
+        {
+          title: "Harbor and coast",
+          description:
+            "The seafront and nearby villages offer a calm pace. Leave time for a relaxed lunch or short coastal drive.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Funchal harbor and bay view.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for warm, dry weather" },
+        { label: "Airport transfer", value: "Taxi or bus from Madeira Airport to Funchal" },
+        { label: "Transit tips", value: "Walk the center; cable car to Monte; bus or taxi for levadas" },
+        { label: "Ticketing", value: "Book cable car and Monte Palace in advance in peak season" },
+        { label: "Neighborhood stay", value: "Center or old town for walkable access" },
+      ],
+      checklist: [
+        "Book cable car and Monte Palace if visiting in peak season",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Funchal",
+        "Plan one slow cafe or meal break daily",
+        "Carry a refillable water bottle",
+        "Check market opening days",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Funchal?",
+          answer:
+            "Yes for the gardens, old town, and a taste of Monte or a short levada. The pace stays relaxed with room for harbor time.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for the center and Monte. A car or tour helps for levada walks or Camara de Lobos.",
+        },
+        {
+          question: "Is Funchal walkable?",
+          answer:
+            "The old town and harbor are very walkable. The cable car takes you to Monte; taxis or buses fill the gaps.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Center or old town keeps you close to the market, streets, and seafront. Near the cable car is convenient for Monte.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "The market is best in the morning. Monte and gardens are fine from mid-morning; avoid the hottest midday in summer.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots, yes—especially at weekends. Many places accept walk-ins for lunch.",
+        },
+        {
+          question: "Is Funchal safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; the center and old town are well frequented.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "lisbon", city: "Lisbon", days: 3, description: "Hills, river, and historic neighborhoods." },
+        { slug: "porto", city: "Porto", days: 3, description: "River, cellars, and old town." },
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Old town, walls, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    kotor: {
+      slug: "kotor",
+      city: "Kotor",
+      country: "Montenegro",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Old town and views", "Calm pace"],
+      style: ["Old town", "Fortress climb", "Bay views"],
+      pacing: [
+        "Kotor rewards a calm pace. Anchor each day with one main area—the old town, the fortress climb, or the bay—then leave room for cafe stops and evening strolls.",
+        "The old town is compact; you can cover the main streets and squares in a day. Dedicate another to the fortress and views, and save time for a short bay trip or rest.",
+        "Keep one afternoon open for a relaxed meal or a quiet corner so the trip never feels rushed.",
+      ],
+      hero: {
+        title: "Kotor in 3 days",
+        subtitle:
+          "Old town, fortress, and bay with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1681154008165-0b6fa82093ab?auto=format&fit=crop&w=1600&q=80",
+          alt: "Kotor old town and bay with mountain backdrop.",
+        },
+      },
+      cityStats: [
+        { value: "1,200+", label: "Years of history" },
+        { value: "1,350", label: "Steps to fortress summit" },
+        { value: "4.5 km", label: "Old town walls" },
+        { value: "28 km", label: "Bay length" },
+      ],
+      fit: {
+        forYou: ["Old town and history", "First-time visitors", "Fortress and viewpoints", "Calm pacing with breaks", "Bay and coastal vibe"],
+        notForYou: ["Non-stop nightlife", "Packed tour schedule", "Beach-only focus", "Long mountain hikes only", "Shopping-heavy trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town core",
+          summary: "Squares, churches, and streets.",
+          morning: "Old town gates and main square",
+          afternoon: "Churches and narrow streets",
+          evening: "Harbor stroll and dinner",
+        },
+        {
+          day: 2,
+          title: "Fortress and views",
+          summary: "Climb and bay views.",
+          morning: "Fortress climb and viewpoints",
+          afternoon: "Descent and old town rest",
+          evening: "Evening walk and dinner",
+        },
+        {
+          day: 3,
+          title: "Bay and wrap-up",
+          summary: "Bay trip or last stops.",
+          morning: "Short bay cruise or Perast",
+          afternoon: "Last old town stops or rest",
+          evening: "Final dinner and stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Old town",
+          description:
+            "The walled town is a maze of stone streets and squares. Mornings are quieter; evenings are good for dinner and a stroll.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Kotor old town and bay from above.",
+          },
+        },
+        {
+          title: "Fortress climb",
+          description:
+            "The climb to the fortress offers bay and town views. Start early in summer to avoid heat and crowds.",
+          image: {
+            src: "https://images.unsplash.com/photo-1586502160157-2a1b0d686e59?auto=format&fit=crop&w=1200&q=80",
+            alt: "Kotor fortress walls and bay view.",
+          },
+        },
+        {
+          title: "The bay",
+          description:
+            "The Bay of Kotor is a fjord-like inlet. A short boat trip or drive to Perast adds variety without rushing.",
+          image: {
+            src: "https://images.unsplash.com/photo-1549140602-7c6583f74a75?auto=format&fit=crop&w=1200&q=80",
+            alt: "Bay of Kotor and mountains.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Taxi or bus from Tivat or Podgorica" },
+        { label: "Transit tips", value: "Old town on foot; boat or bus for bay" },
+        { label: "Ticketing", value: "Small fee for fortress climb" },
+        { label: "Neighborhood stay", value: "Inside old town or just outside gates" },
+      ],
+      checklist: [
+        "Wear comfortable shoes for fortress climb",
+        "Start fortress early in summer",
+        "Save offline map of old town",
+        "Carry water for the climb",
+        "Plan one relaxed meal daily",
+        "Check boat trip options for the bay",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Kotor?",
+          answer:
+            "Yes for the old town, fortress, and a taste of the bay. The pace stays relaxed with room for rest.",
+        },
+        {
+          question: "Is the fortress climb hard?",
+          answer:
+            "It is steep and stepped. Take your time, bring water, and start early in hot weather.",
+        },
+        {
+          question: "Is Kotor walkable?",
+          answer:
+            "The old town is very walkable. The fortress is a climb; the bay requires a boat or bus.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Inside the old town for atmosphere, or just outside the gates for easier access and parking.",
+        },
+        {
+          question: "What time should I start the fortress?",
+          answer:
+            "Early morning in summer to avoid heat and crowds. Late afternoon light is good for photos.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "Popular spots can fill at dinner; booking is wise in peak season. Lunch is often walk-in.",
+        },
+        {
+          question: "Is Kotor safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; the old town is well frequented.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Old town, walls, and coast." },
+        { slug: "split", city: "Split", days: 3, description: "Palace, harbor, and islands." },
+        { slug: "mostar", city: "Mostar", days: 2, description: "Bridge and old town." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    rovinj: {
+      slug: "rovinj",
+      city: "Rovinj",
+      country: "Croatia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Old town and harbor", "Relaxed pace"],
+      style: ["Old town", "Church and harbor", "Coastal walks"],
+      pacing: [
+        "Rovinj works best at a calm pace. Anchor each day with one focus—the old town and church, the harbor, or the coast—then leave room for cafe stops and sunset views.",
+        "The old town is compact; a day covers the main streets and the church. Add a harbor morning and a coastal or island half day for variety.",
+        "Keep one afternoon open for a relaxed meal or a quiet beach so the trip never feels rushed.",
+      ],
+      hero: {
+        title: "Rovinj in 3 days",
+        subtitle:
+          "Old town, harbor, and coast with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1635144915529-9a10c5758293?auto=format&fit=crop&w=1600&q=80",
+          alt: "Rovinj old town and harbor from the water.",
+        },
+      },
+      cityStats: [
+        { value: "14K+", label: "Residents" },
+        { value: "63 m", label: "Church tower height" },
+        { value: "20+", label: "Islands in the archipelago" },
+        { value: "1,700+", label: "Years of history" },
+      ],
+      fit: {
+        forYou: ["Old town and harbor", "First-time visitors", "Sunset and coastal views", "Calm pacing with breaks", "Art and cafes"],
+        notForYou: ["Non-stop nightlife", "Packed tour schedule", "Big-city museums", "Long hikes only", "Shopping-heavy trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and church",
+          summary: "Streets, church, and views.",
+          morning: "Old town streets and St. Euphemia Church",
+          afternoon: "Harbor and main square",
+          evening: "Sunset from the harbor and dinner",
+        },
+        {
+          day: 2,
+          title: "Harbor and market",
+          summary: "Harbor life and local flavor.",
+          morning: "Morning market and harbor stroll",
+          afternoon: "Boat trip or coastal walk",
+          evening: "Harbor dinner and evening walk",
+        },
+        {
+          day: 3,
+          title: "Coast and wrap-up",
+          summary: "Beach or last stops.",
+          morning: "Coastal walk or beach",
+          afternoon: "Last old town stops or rest",
+          evening: "Final dinner and sunset",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Old town and church",
+          description:
+            "The church crowns the old town. The climb to the tower gives harbor and island views; the streets below are ideal for a slow stroll.",
+          image: {
+            src: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?auto=format&fit=crop&w=1200&q=80",
+            alt: "Rovinj old town and church from the harbor.",
+          },
+        },
+        {
+          title: "Harbor",
+          description:
+            "The harbor is the heart of Rovinj. Morning market and evening dinners keep the pace relaxed.",
+          image: {
+            src: "https://images.unsplash.com/photo-1549140602-7c6583f74a75?auto=format&fit=crop&w=1200&q=80",
+            alt: "Rovinj harbor and boats.",
+          },
+        },
+        {
+          title: "Coast and islands",
+          description:
+            "Short boat trips or coastal walks add variety. Leave time for a quiet beach or a sunset view.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Croatian coast and clear water.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for warm weather and sea" },
+        { label: "Airport transfer", value: "Taxi or bus from Pula or Trieste" },
+        { label: "Transit tips", value: "Old town on foot; boat for islands" },
+        { label: "Ticketing", value: "Church tower has a small fee" },
+        { label: "Neighborhood stay", value: "Old town or near harbor" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Save offline map of old town",
+        "Plan a harbor or sunset evening",
+        "Carry a refillable water bottle",
+        "Check boat trip options",
+        "Book popular restaurants in peak season",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Rovinj?",
+          answer:
+            "Yes for the old town, harbor, and a taste of the coast or islands. The pace stays relaxed.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for the old town and harbor. A car or boat helps for beaches and nearby towns.",
+        },
+        {
+          question: "Is Rovinj walkable?",
+          answer:
+            "The old town and harbor are very walkable. Boats go to the islands.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old town or near the harbor for atmosphere and easy walks. Book ahead in summer.",
+        },
+        {
+          question: "What time is best for the church tower?",
+          answer:
+            "Morning or late afternoon for softer light. Sunset from the harbor is popular.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "In peak season, yes for dinner at popular spots. Lunch is often walk-in.",
+        },
+        {
+          question: "Is Rovinj safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; the town is well frequented.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Old town, walls, and coast." },
+        { slug: "split", city: "Split", days: 3, description: "Palace, harbor, and islands." },
+        { slug: "venice", city: "Venice", days: 3, description: "Canals, squares, and lagoon." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    brasov: {
+      slug: "brasov",
+      city: "Brasov",
+      country: "Romania",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Old town and castles", "Calm pace"],
+      style: ["Old town", "Black Church", "Nearby castles and views"],
+      pacing: [
+        "Brasov works best at a calm pace. Anchor each day with one focus—the old town and church, a nearby castle, or the mountain view—then leave room for cafe stops and evening strolls.",
+        "The old town is compact and walkable. Dedicate one day to Bran or Peles if you like castles; keep another for the center and Mount Tampa.",
+        "Keep one afternoon open for a relaxed meal or a quiet corner so the trip never feels rushed.",
+      ],
+      hero: {
+        title: "Brasov in 3 days",
+        subtitle:
+          "Old town, Black Church, and nearby castles with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1680003935289-0c8d65e1ae30?auto=format&fit=crop&w=1600&q=80",
+          alt: "Brasov old town with Mount Tampa and Black Church.",
+        },
+      },
+      cityStats: [
+        { value: "250K+", label: "Metro area residents" },
+        { value: "900+", label: "Years of history" },
+        { value: "960 m", label: "Mount Tampa summit" },
+        { value: "30 km", label: "Distance to Bran Castle" },
+      ],
+      fit: {
+        forYou: ["Old town and history", "First-time visitors to Transylvania", "Castles and views", "Calm pacing with breaks", "Cafe and mountain vibe"],
+        notForYou: ["Non-stop nightlife", "Packed tour schedule", "Beach focus", "Long mountain hikes only", "Shopping-heavy trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and Black Church",
+          summary: "Council Square, church, and streets.",
+          morning: "Council Square and Black Church",
+          afternoon: "Rope Street and old town lanes",
+          evening: "Evening stroll and dinner",
+        },
+        {
+          day: 2,
+          title: "Mount Tampa or Schei",
+          summary: "Views and quieter streets.",
+          morning: "Cable car or walk to Tampa viewpoint",
+          afternoon: "Schei district or rest",
+          evening: "Dinner in the old town",
+        },
+        {
+          day: 3,
+          title: "Castle or wrap-up",
+          summary: "Bran or Peles, or last stops.",
+          morning: "Bran Castle or Peles Castle trip",
+          afternoon: "Return and last stops in Brasov",
+          evening: "Final dinner and stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Old town",
+          description:
+            "Council Square and the Black Church anchor the center. Mornings are quieter; the streets stay pleasant into the evening.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Brasov old town and Council Square.",
+          },
+        },
+        {
+          title: "Black Church",
+          description:
+            "The Gothic church dominates the skyline. Allow time for the interior and the square outside.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80",
+            alt: "Brasov Black Church and old town.",
+          },
+        },
+        {
+          title: "Castles and mountains",
+          description:
+            "Bran and Peles are day-trip options. Mount Tampa gives a quick view over the town without a long drive.",
+          image: {
+            src: "https://images.unsplash.com/photo-1586502160157-2a1b0d686e59?auto=format&fit=crop&w=1200&q=80",
+            alt: "Transylvania mountain and castle view.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Train or bus from Bucharest" },
+        { label: "Transit tips", value: "Walk the old town; bus or tour for Bran and Peles" },
+        { label: "Ticketing", value: "Book Bran and Peles in advance in peak season" },
+        { label: "Neighborhood stay", value: "Old town for walkable access" },
+      ],
+      checklist: [
+        "Book Bran or Peles if visiting in peak season",
+        "Pack comfortable walking shoes",
+        "Save offline map of old town",
+        "Plan one relaxed meal daily",
+        "Carry a refillable water bottle",
+        "Check cable car hours for Mount Tampa",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Brasov?",
+          answer:
+            "Yes for the old town, Black Church, and one castle or Mount Tampa. The pace stays relaxed.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for the old town. A car or tour is useful for Bran and Peles.",
+        },
+        {
+          question: "Is Brasov walkable?",
+          answer:
+            "The old town is very walkable. Mount Tampa has a cable car; castles require a drive or tour.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old town keeps you close to the square, church, and restaurants. Book ahead in peak season.",
+        },
+        {
+          question: "What time should I start for castles?",
+          answer:
+            "Morning is best to avoid crowds at Bran and Peles. The old town is flexible.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots, yes in peak season. Many places accept walk-ins at lunch.",
+        },
+        {
+          question: "Is Brasov safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; the old town is well frequented.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "bucharest", city: "Bucharest", days: 3, description: "Capital, old town, and parks." },
+        { slug: "prague", city: "Prague", days: 3, description: "Old town, castle, and river." },
+        { slug: "krakow", city: "Krakow", days: 3, description: "Old town, square, and nearby sites." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    mostar: {
+      slug: "mostar",
+      city: "Mostar",
+      country: "Bosnia and Herzegovina",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["Short breaks", "First-timers", "Old town and bridge"],
+      style: ["Stari Most", "Old Bazaar", "Old town streets"],
+      pacing: [
+        "Mostar works well in two days at a calm pace. Day one focuses on the bridge and old town; day two allows for a relaxed revisit or a short trip to Blagaj or nearby.",
+        "The old town is compact. You can see the bridge, bazaar, and main streets without rushing. Leave time for cafe stops and evening views of the bridge.",
+        "Keep one afternoon open so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Mostar in 2 days",
+        subtitle:
+          "The bridge, old town, and bazaar with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1623536167776-922ccb1ff749?auto=format&fit=crop&w=1600&q=80",
+          alt: "Stari Most bridge and old town in Mostar.",
+        },
+      },
+      cityStats: [
+        { value: "450+", label: "Years of Stari Most" },
+        { value: "24 m", label: "Bridge height above the river" },
+        { value: "100K+", label: "Metro area residents" },
+        { value: "UNESCO", label: "World Heritage site" },
+      ],
+      fit: {
+        forYou: ["Bridge and old town", "Short break or add-on", "Calm pacing with breaks", "First-time visitors", "History and atmosphere"],
+        notForYou: ["Non-stop nightlife", "Packed tour schedule", "Beach focus", "Long multi-day exploration", "Shopping-heavy trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Bridge and old town",
+          summary: "Stari Most, bazaar, and streets.",
+          morning: "Stari Most and bridge views",
+          afternoon: "Old Bazaar and cobbled streets",
+          evening: "Evening at the bridge and dinner",
+        },
+        {
+          day: 2,
+          title: "Revisit and wrap-up",
+          summary: "Morning in old town or Blagaj.",
+          morning: "Old town revisit or Blagaj trip",
+          afternoon: "Last stops and relaxed lunch",
+          evening: "Final dinner and bridge view",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Stari Most",
+          description:
+            "The bridge is the heart of Mostar. Mornings and evenings offer different light; allow time to see it from both sides of the river.",
+          image: {
+            src: "https://images.unsplash.com/photo-1586502160157-2a1b0d686e59?auto=format&fit=crop&w=1200&q=80",
+            alt: "Stari Most bridge over the Neretva.",
+          },
+        },
+        {
+          title: "Old Bazaar",
+          description:
+            "The bazaar and old town streets run along the river. A slow stroll and a coffee keep the pace relaxed.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mostar old town and bazaar streets.",
+          },
+        },
+        {
+          title: "River and views",
+          description:
+            "The Neretva runs under the bridge. Views from the banks and the bridge change with the light.",
+          image: {
+            src: "https://images.unsplash.com/photo-1549140602-7c6583f74a75?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mostar river and old town.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Taxi or bus from Sarajevo or Dubrovnik" },
+        { label: "Transit tips", value: "Old town on foot; bus or taxi for Blagaj" },
+        { label: "Ticketing", value: "No tickets for bridge or old town" },
+        { label: "Neighborhood stay", value: "Near old town for walkable access" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Save offline map of old town",
+        "Plan an evening at the bridge",
+        "Carry a refillable water bottle",
+        "Book accommodation in advance in peak season",
+        "Check Blagaj opening if visiting",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Mostar?",
+          answer:
+            "Yes for the bridge, old town, and bazaar. The pace stays relaxed; you can add Blagaj or a slow second day.",
+        },
+        {
+          question: "Is Mostar walkable?",
+          answer:
+            "The old town is very walkable. Everything centers on the bridge and the river.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near the old town for easy access to the bridge and restaurants. Book ahead in summer.",
+        },
+        {
+          question: "What time is best for the bridge?",
+          answer:
+            "Morning and evening light are both good. Evenings are busy but atmospheric.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "Popular spots can fill at dinner; booking is wise in peak season. Lunch is often walk-in.",
+        },
+        {
+          question: "Is a day trip to Blagaj worth it?",
+          answer:
+            "Yes if you have a relaxed second day. The tekke and spring are a short trip from Mostar.",
+        },
+        {
+          question: "Is Mostar safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; the old town is well frequented.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "sarajevo", city: "Sarajevo", days: 3, description: "Old town, history, and mountains." },
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Old town, walls, and coast." },
+        { slug: "kotor", city: "Kotor", days: 3, description: "Old town, fortress, and bay." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cincinnati: {
+      slug: "cincinnati",
+      city: "Cincinnati",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Riverfront and neighborhoods", "Food and markets"],
+      style: ["Riverfront walks", "Historic districts", "Relaxed Midwest pace"],
+      pacing: [
+        "Cincinnati rewards a calm pace. Anchor each day with one area—the riverfront, Over-the-Rhine, or Findlay Market—then leave room for coffee stops and neighborhood strolls.",
+        "Group sights by district. Pair Smale Park with the Banks for an easy first day; dedicate another to OTR and Findlay Market for food and architecture.",
+        "Save an open afternoon for a museum or a slow walk so the trip stays relaxed.",
+      ],
+      hero: {
+        title: "Cincinnati in 3 days",
+        subtitle:
+          "Riverfront walks, historic Over-the-Rhine, and Findlay Market with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1633949966177-3a0435071694?auto=format&fit=crop&w=1600&q=80",
+          alt: "Cincinnati skyline and Ohio River at dusk.",
+        },
+      },
+      cityStats: [
+        { value: "2.2M", label: "Metro area residents" },
+        { value: "150+", label: "Years of Findlay Market" },
+        { value: "45", label: "Minutes to downtown from airport" },
+        { value: "3 mi", label: "Riverfront park stretch" },
+      ],
+      fit: {
+        forYou: ["Riverfront and parks", "Historic neighborhoods", "First-time visitors", "Food and markets", "Calm pacing with breaks"],
+        notForYou: ["Beach or mountain focus", "Late-night nightlife", "Packed back-to-back tours", "Remote nature day trips", "Shopping-only trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Riverfront and the Banks",
+          summary: "Smale Park, Roebling Bridge, and downtown core.",
+          morning: "Smale Riverfront Park and Serpentine Wall",
+          afternoon: "The Banks and Roebling Bridge views",
+          evening: "Downtown dinner and evening stroll",
+        },
+        {
+          day: 2,
+          title: "Over-the-Rhine and Findlay Market",
+          summary: "Historic OTR, market, and brewery district.",
+          morning: "Findlay Market and surrounding stalls",
+          afternoon: "Over-the-Rhine streets and Washington Park",
+          evening: "Vine Street or Main Street dinner",
+        },
+        {
+          day: 3,
+          title: "Museums and wrap-up",
+          summary: "Union Terminal, Mount Adams, or a relaxed revisit.",
+          morning: "Cincinnati Museum Center or Eden Park",
+          afternoon: "Mount Adams views or OTR revisit",
+          evening: "Final dinner and relaxed wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Riverfront and bridges",
+          description:
+            "The Ohio River and Roebling Bridge define the skyline. Mornings and evenings along the river stay calm and scenic.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569025695580-5d3c5d42c937?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cincinnati riverfront and Roebling Bridge.",
+          },
+        },
+        {
+          title: "Over-the-Rhine",
+          description:
+            "Historic brick buildings and revived streets. Findlay Market and Washington Park anchor the neighborhood.",
+          image: {
+            src: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic brick buildings in Over-the-Rhine, Cincinnati.",
+          },
+        },
+        {
+          title: "Markets and food",
+          description:
+            "Findlay Market and nearby spots set the tone for casual meals and local flavor.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Indoor market hall with vendors and produce.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Taxi or rideshare from CVG; about 20 miles" },
+        { label: "Transit tips", value: "Walk downtown and OTR; streetcar connects key areas" },
+        { label: "Ticketing", value: "Book Museum Center or attractions ahead in peak season" },
+        { label: "Neighborhood stay", value: "Downtown or Over-the-Rhine for walkable access" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Save offline map of downtown and OTR",
+        "Plan one market or cafe stop daily",
+        "Carry a refillable water bottle",
+        "Check Museum Center hours if visiting",
+        "Book popular restaurants for weekend dinners",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Cincinnati?",
+          answer:
+            "Yes for the core highlights. You can cover the riverfront, OTR, and Findlay Market with room for breaks.",
+        },
+        {
+          question: "Is Cincinnati walkable?",
+          answer:
+            "Downtown and Over-the-Rhine are walkable. The streetcar helps connect the Banks, downtown, and OTR.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown or Over-the-Rhine keep you close to the river, market, and main sights.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots on weekends, yes. Weekdays are often walk-in friendly.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Findlay Market is busiest late morning; riverfront is pleasant early or at dusk.",
+        },
+        {
+          question: "Is the streetcar useful?",
+          answer:
+            "Yes for moving between the Banks, downtown, and OTR without driving.",
+        },
+        {
+          question: "When is the best weather?",
+          answer:
+            "Spring and fall are mild. Summer can be hot; plan shade or indoor stops in the afternoon.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lakefront, museums, and neighborhoods." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music, food, and relaxed Southern pace." },
+        { slug: "detroit", city: "Detroit", days: 3, description: "Museums, riverfront, and revived districts." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    pittsburgh: {
+      slug: "pittsburgh",
+      city: "Pittsburgh",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Bridges and views", "Museums and food"],
+      style: ["River confluence", "Strip District", "Neighborhood dining"],
+      pacing: [
+        "Pittsburgh works well at a calm pace. Focus each day on one area—Point State Park and downtown, the Strip and museums, or South Side and Mount Washington—then leave room for meals and strolls.",
+        "The three rivers and bridges keep the layout clear. Pair the Point with downtown for day one; dedicate another to Carnegie museums or the Strip District.",
+        "Save an open afternoon for a viewpoint or a relaxed neighborhood walk.",
+      ],
+      hero: {
+        title: "Pittsburgh in 3 days",
+        subtitle:
+          "Bridges, Point State Park, and the Strip District with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1661293871205-2077a22db175?auto=format&fit=crop&w=1600&q=80",
+          alt: "Pittsburgh skyline and bridges at golden hour.",
+        },
+      },
+      cityStats: [
+        { value: "446", label: "Bridges in the metro area" },
+        { value: "3", label: "Rivers meeting at the Point" },
+        { value: "2.4M", label: "Metro residents" },
+        { value: "90+", label: "Neighborhoods" },
+      ],
+      fit: {
+        forYou: ["Bridges and city views", "Museums and culture", "First-time visitors", "Food and markets", "Calm pacing"],
+        notForYou: ["Beach or wilderness focus", "Late-night nightlife", "Back-to-back tours", "Shopping-only trips", "Long day trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Point State Park and downtown",
+          summary: "The Point, fountain, and downtown core.",
+          morning: "Point State Park and the fountain",
+          afternoon: "Downtown Cultural District and Market Square",
+          evening: "Downtown or Strip dinner",
+        },
+        {
+          day: 2,
+          title: "Strip District and Carnegie Museums",
+          summary: "Markets, museums, and neighborhood flavor.",
+          morning: "Strip District markets and food stops",
+          afternoon: "Carnegie Museum of Art or Natural History",
+          evening: "Strip or Lawrenceville dinner",
+        },
+        {
+          day: 3,
+          title: "South Side and Mount Washington",
+          summary: "Incline, viewpoints, and relaxed wrap-up.",
+          morning: "Duquesne or Monongahela Incline",
+          afternoon: "Mount Washington views and South Side stroll",
+          evening: "Final dinner and relaxed wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Three rivers and bridges",
+          description:
+            "The confluence at Point State Park ties the city together. Views from the Point or Mount Washington are memorable.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pittsburgh bridges and rivers from above.",
+          },
+        },
+        {
+          title: "Strip District",
+          description:
+            "Markets, warehouses, and food stalls. Mornings are lively; a slow walk and a meal keep the pace relaxed.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pittsburgh Strip District market scene.",
+          },
+        },
+        {
+          title: "Inclines and viewpoints",
+          description:
+            "The inclines lift you to Mount Washington for skyline views. Sunset is popular but any clear time works.",
+          image: {
+            src: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pittsburgh skyline from Mount Washington.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Bus 28X or taxi from Pittsburgh International" },
+        { label: "Transit tips", value: "Walk downtown and Strip; bus or car for museums and inclines" },
+        { label: "Ticketing", value: "Book Carnegie Museums or inclines ahead in peak season" },
+        { label: "Neighborhood stay", value: "Downtown or Strip area for walkable access" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Save offline map of downtown and Strip",
+        "Plan an incline ride for views",
+        "Carry a refillable water bottle",
+        "Check museum hours before visiting",
+        "Book popular restaurants for weekend dinners",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Pittsburgh?",
+          answer:
+            "Yes for the Point, Strip District, museums, and a viewpoint. The pace stays relaxed.",
+        },
+        {
+          question: "Is Pittsburgh walkable?",
+          answer:
+            "Downtown and the Strip are walkable. Use bus or car for Carnegie museums and Mount Washington.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown or near the Strip keeps you close to the Point, markets, and dining.",
+        },
+        {
+          question: "Which incline should I take?",
+          answer:
+            "Both Duquesne and Monongahela offer great views. Duquesne is often less crowded.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots on weekends, yes. Weekday lunches often accept walk-ins.",
+        },
+        {
+          question: "When is the best time for the Point?",
+          answer:
+            "Morning or late afternoon avoid the midday sun; the fountain is photogenic any clear day.",
+        },
+        {
+          question: "Is the Strip District open every day?",
+          answer:
+            "Weekend mornings are busiest. Some vendors close Monday or Tuesday; check ahead.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "philadelphia", city: "Philadelphia", days: 3, description: "History, markets, and walkable core." },
+        { slug: "boston", city: "Boston", days: 3, description: "Historic core, waterfront, and walkable streets." },
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lakefront, museums, and diverse districts." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    chennai: {
+      slug: "chennai",
+      city: "Chennai",
+      country: "India",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Temples and beaches", "South Indian food"],
+      style: ["Temples", "Marina Beach", "Mylapore and markets"],
+      pacing: [
+        "Chennai rewards a calm pace. Anchor each day with one focus—Kapaleeshwarar and Mylapore, Marina Beach and Fort St. George, or temples and markets—then leave room for meals and rest.",
+        "The heat can be strong. Plan temple and indoor visits for midday; save beach and walks for early morning or late afternoon.",
+        "Save an open afternoon for a museum or a slow revisit so the trip stays relaxed.",
+      ],
+      hero: {
+        title: "Chennai in 3 days",
+        subtitle:
+          "Temples, Marina Beach, and Mylapore with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1748961099955-e2b5655cba15?auto=format&fit=crop&w=1600&q=80",
+          alt: "Kapaleeshwarar Temple gopuram and tank in Chennai.",
+        },
+      },
+      cityStats: [
+        { value: "10M+", label: "Metro area residents" },
+        { value: "2nd", label: "Longest urban beach in India (Marina)" },
+        { value: "400+", label: "Years of history" },
+        { value: "12+", label: "Major temples in the city" },
+      ],
+      fit: {
+        forYou: ["Temples and culture", "Beach and coastal walks", "First-time visitors", "South Indian food", "Calm pacing"],
+        notForYou: ["Cold-weather escape", "Non-stop nightlife", "Back-to-back tours", "Shopping-only trips", "Adventure sports"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Mylapore and Kapaleeshwarar",
+          summary: "Temple, tank, and neighborhood streets.",
+          morning: "Kapaleeshwarar Temple and tank",
+          afternoon: "Mylapore streets and San Thome area",
+          evening: "Local dinner and relaxed stroll",
+        },
+        {
+          day: 2,
+          title: "Marina Beach and Fort St. George",
+          summary: "Beach walk and colonial fort.",
+          morning: "Marina Beach walk and lighthouse",
+          afternoon: "Fort St. George and museum",
+          evening: "Beach or Egmore dinner",
+        },
+        {
+          day: 3,
+          title: "Temples and wrap-up",
+          summary: "Parthasarathy, Kalikambal, or a relaxed revisit.",
+          morning: "Parthasarathy Temple or another temple",
+          afternoon: "George Town markets or museum",
+          evening: "Final dinner and relaxed wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Temple and tank",
+          description:
+            "Kapaleeshwarar and its tank anchor Mylapore. Mornings are cooler and less crowded.",
+          image: {
+            src: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1200&q=80",
+            alt: "Kapaleeshwarar Temple gopuram in Chennai.",
+          },
+        },
+        {
+          title: "Marina Beach",
+          description:
+            "The long beach is ideal for an early or late walk. Avoid midday sun.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Marina Beach shoreline in Chennai.",
+          },
+        },
+        {
+          title: "Mylapore streets",
+          description:
+            "Narrow lanes, street food, and small shops. A slow walk keeps the pace relaxed.",
+          image: {
+            src: "https://images.unsplash.com/photo-1548013146-72479768b430?auto=format&fit=crop&w=1200&q=80",
+            alt: "Street scene in Mylapore, Chennai.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to February for cooler weather" },
+        { label: "Airport transfer", value: "Taxi or prepaid cab from Chennai International" },
+        { label: "Transit tips", value: "Auto-rickshaw or cab for temples and beach; traffic can be heavy" },
+        { label: "Ticketing", value: "Temples are free; Fort St. George has a small fee" },
+        { label: "Neighborhood stay", value: "Mylapore or Egmore for central access" },
+      ],
+      checklist: [
+        "Pack light, breathable clothes and sunscreen",
+        "Remove shoes before temple entry",
+        "Carry a refillable water bottle",
+        "Plan beach for early or late; avoid midday sun",
+        "Check temple opening times",
+        "Book popular restaurants for dinner if needed",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Chennai?",
+          answer:
+            "Yes for the main temples, Marina Beach, and Mylapore. The pace can stay relaxed with breaks.",
+        },
+        {
+          question: "Is Chennai safe for tourists?",
+          answer:
+            "Yes. Normal precautions apply; stick to well-frequented areas and use registered transport.",
+        },
+        {
+          question: "What should I wear at temples?",
+          answer:
+            "Modest dress; shoulders and knees covered. Remove shoes before entry; some temples lend wraps.",
+        },
+        {
+          question: "When is the best time for Marina Beach?",
+          answer:
+            "Early morning or late afternoon to avoid heat and strong sun.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For upscale or popular spots, booking helps. Many local places are walk-in.",
+        },
+        {
+          question: "Is the city walkable?",
+          answer:
+            "Mylapore and some areas are walkable in the morning or evening. Use cabs or auto-rickshaws for longer hops.",
+        },
+        {
+          question: "What is the best way to get around?",
+          answer:
+            "Prepaid taxis or app-based cabs are reliable. Auto-rickshaws need agreed fare before setting off.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "mumbai", city: "Mumbai", days: 3, description: "Gateway, Marine Drive, and markets." },
+        { slug: "delhi", city: "Delhi", days: 3, description: "Monuments, bazaars, and diverse neighborhoods." },
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Temples, markets, and street food." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "san-juan": {
+      slug: "san-juan",
+      city: "San Juan",
+      country: "Puerto Rico",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Colonial old town", "Beach and fort views"],
+      style: ["Old San Juan", "El Morro", "Condado and coast"],
+      pacing: [
+        "San Juan works at a calm pace. Focus day one on Old San Juan and El Morro; day two on more of the old town or Condado; day three on a relaxed revisit or beach.",
+        "The old town is compact and walkable. Leave time for cobbled streets, cafes, and fort views without rushing.",
+        "Save an open afternoon for the coast or a second fort visit.",
+      ],
+      hero: {
+        title: "San Juan in 3 days",
+        subtitle:
+          "Old San Juan, El Morro, and Condado with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1651517280844-82848eb8f206?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful colonial buildings and fort in Old San Juan.",
+        },
+      },
+      cityStats: [
+        { value: "500+", label: "Years of history" },
+        { value: "2", label: "Major forts in old town" },
+        { value: "7", label: "Blocks of cobbled old town" },
+        { value: "350K+", label: "Metro residents" },
+      ],
+      fit: {
+        forYou: ["Colonial streets and forts", "Beach and coast", "First-time visitors", "Walkable old town", "Calm pacing"],
+        notForYou: ["Remote rainforest only", "Non-stop nightlife", "Back-to-back tours", "Shopping-only trips", "Long day trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old San Juan and El Morro",
+          summary: "Fort, walls, and colonial streets.",
+          morning: "El Morro fort and grounds",
+          afternoon: "Old San Juan streets and plazas",
+          evening: "Dinner in old town",
+        },
+        {
+          day: 2,
+          title: "San Cristobal and old town",
+          summary: "Second fort and more streets.",
+          morning: "Castillo San Cristobal",
+          afternoon: "Calle del Cristo and cathedral area",
+          evening: "Sunset from the walls and dinner",
+        },
+        {
+          day: 3,
+          title: "Condado and coast",
+          summary: "Beach, oceanfront, and relaxed wrap-up.",
+          morning: "Condado beach or oceanfront walk",
+          afternoon: "Relaxed lunch and last stops",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "El Morro",
+          description:
+            "The fort and lawn overlook the ocean. Mornings are cooler; the views are memorable.",
+          image: {
+            src: "https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=1200&q=80",
+            alt: "El Morro fort in Old San Juan.",
+          },
+        },
+        {
+          title: "Colonial streets",
+          description:
+            "Colorful facades and cobbled lanes. A slow walk and a cafe stop keep the pace relaxed.",
+          image: {
+            src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colorful street in Old San Juan.",
+          },
+        },
+        {
+          title: "Condado and coast",
+          description:
+            "Beach and oceanfront walks offer a contrast to the old town.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Condado beach and ocean in San Juan.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "December to April for dry, warm weather" },
+        { label: "Airport transfer", value: "Taxi or Uber from Luis Munoz Marin; about 15–20 minutes" },
+        { label: "Transit tips", value: "Old San Juan on foot; taxi or Uber for Condado and airport" },
+        { label: "Ticketing", value: "El Morro and San Cristobal have a combined ticket" },
+        { label: "Neighborhood stay", value: "Old San Juan or Condado for walkable access" },
+      ],
+      checklist: [
+        "Pack sunscreen and light layers",
+        "Wear comfortable walking shoes for cobblestones",
+        "Book fort ticket online in peak season",
+        "Carry a refillable water bottle",
+        "Plan beach for morning or late afternoon",
+        "Check hurricane season if traveling June–November",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for San Juan?",
+          answer:
+            "Yes for Old San Juan, both forts, and Condado. The pace stays relaxed with time for meals and beach.",
+        },
+        {
+          question: "Is San Juan walkable?",
+          answer:
+            "Old San Juan is very walkable. Use taxi or Uber for Condado and the airport.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old San Juan for history and atmosphere; Condado for beach and more hotels.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for the old town and Condado. Rent a car only if you plan day trips.",
+        },
+        {
+          question: "When is hurricane season?",
+          answer:
+            "June to November. Check forecasts; travel insurance is wise in peak season.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots in old town, yes on weekends. Many places accept walk-ins at lunch.",
+        },
+        {
+          question: "Is the fort ticket valid for both forts?",
+          answer:
+            "Yes. One ticket covers El Morro and San Cristobal for the same day or next.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "miami", city: "Miami", days: 3, description: "Beaches, art deco, and neighborhoods." },
+        { slug: "havana", city: "Havana", days: 3, description: "Colonial plazas, vintage cars, and waterfront." },
+        { slug: "cartagena", city: "Cartagena", days: 3, description: "Walled city, plazas, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tampa: {
+      slug: "tampa",
+      city: "Tampa",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Riverwalk and Ybor", "Beach and history"],
+      style: ["Riverwalk", "Ybor City", "St. Pete Beach"],
+      pacing: [
+        "Tampa works at a calm pace. Anchor day one on the Riverwalk and downtown; day two on Ybor City; day three on St. Pete Beach or a relaxed revisit.",
+        "The Riverwalk ties downtown together. Ybor has a different vibe—historic, walkable, and good for food and evening strolls.",
+        "Save an open afternoon for the beach or a museum so the trip stays relaxed.",
+      ],
+      hero: {
+        title: "Tampa in 3 days",
+        subtitle:
+          "Riverwalk, Ybor City, and St. Pete Beach with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1668321935604-756835c8f8e9?auto=format&fit=crop&w=1600&q=80",
+          alt: "Tampa Riverwalk and downtown skyline at dusk.",
+        },
+      },
+      cityStats: [
+        { value: "2.5 mi", label: "Riverwalk along the Hillsborough" },
+        { value: "100+", label: "Years of Ybor City history" },
+        { value: "4M", label: "Metro area residents" },
+        { value: "30 min", label: "Drive to St. Pete Beach" },
+      ],
+      fit: {
+        forYou: ["Riverfront and downtown", "Historic Ybor", "First-time visitors", "Beach and coast", "Calm pacing"],
+        notForYou: ["Theme parks only", "Non-stop nightlife", "Back-to-back tours", "Shopping-only trips", "Remote nature only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Riverwalk and downtown",
+          summary: "Riverwalk, parks, and downtown core.",
+          morning: "Tampa Riverwalk and Curtis Hixon Park",
+          afternoon: "Downtown museums or Tampa Bay History Center",
+          evening: "Downtown or Channel District dinner",
+        },
+        {
+          day: 2,
+          title: "Ybor City",
+          summary: "Historic district, cigars, and food.",
+          morning: "Ybor City Museum and Seventh Avenue",
+          afternoon: "Columbia Restaurant or local lunch",
+          evening: "Ybor evening stroll and dinner",
+        },
+        {
+          day: 3,
+          title: "St. Pete Beach and wrap-up",
+          summary: "Beach time and relaxed finish.",
+          morning: "St. Pete Beach or Fort De Soto",
+          afternoon: "Beach and lunch by the water",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Riverwalk",
+          description:
+            "The Riverwalk links parks, museums, and dining. Mornings and evenings are pleasant for a stroll.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Tampa Riverwalk along the river.",
+          },
+        },
+        {
+          title: "Ybor City",
+          description:
+            "Historic brick streets and cigar heritage. Day and evening both work; dinner here is a good close.",
+          image: {
+            src: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
+            alt: "Ybor City historic district, Tampa.",
+          },
+        },
+        {
+          title: "Beach and coast",
+          description:
+            "St. Pete Beach and nearby shores offer a relaxed contrast to downtown and Ybor.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "St. Pete Beach shoreline near Tampa.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for mild weather" },
+        { label: "Airport transfer", value: "Taxi or rideshare from TPA; about 15 minutes to downtown" },
+        { label: "Transit tips", value: "Walk Riverwalk and Ybor; car or Uber for St. Pete Beach" },
+        { label: "Ticketing", value: "Book museums or attractions ahead in peak season" },
+        { label: "Neighborhood stay", value: "Downtown or Channel District for Riverwalk and Ybor access" },
+      ],
+      checklist: [
+        "Pack sunscreen and light layers",
+        "Wear comfortable walking shoes",
+        "Plan beach for morning or late afternoon",
+        "Carry a refillable water bottle",
+        "Check museum hours before visiting",
+        "Book popular restaurants for weekend dinners",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Tampa?",
+          answer:
+            "Yes for the Riverwalk, Ybor City, and a beach half-day. The pace stays relaxed.",
+        },
+        {
+          question: "Is Tampa walkable?",
+          answer:
+            "Downtown and the Riverwalk are walkable; Ybor is compact. Use car or Uber for St. Pete Beach.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown or Channel District for Riverwalk and Ybor; stay near the beach if beach is the priority.",
+        },
+        {
+          question: "How do I get to St. Pete Beach?",
+          answer:
+            "Uber or car is easiest; about 30–40 minutes from downtown. No direct train.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For Columbia and popular spots, yes on weekends. Weekday lunches often accept walk-ins.",
+        },
+        {
+          question: "When is the best time for Ybor?",
+          answer:
+            "Daytime for history and museums; evening for dinner and atmosphere. Weekends are busier.",
+        },
+        {
+          question: "Is Tampa good for families?",
+          answer:
+            "Yes. Riverwalk, museums, and beach offer variety; pace can be adjusted for kids.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "miami", city: "Miami", days: 3, description: "Beaches, art deco, and neighborhoods." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music, food, and relaxed Southern pace." },
+        { slug: "san-diego", city: "San Diego", days: 3, description: "Waterfront, parks, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    stuttgart: {
+      slug: "stuttgart",
+      city: "Stuttgart",
+      country: "Germany",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Car and design fans", "Park and city walks"],
+      style: ["Museums", "Parks", "Compact center"],
+      pacing: [
+        "Stuttgart rewards a calm rhythm. Anchor each day with one main area—the museum quarter, Schlossplatz and shopping streets, or Wilhelma and parks—then leave room for coffee and short walks.",
+        "Group sights by district. Pair Mercedes-Benz Museum with the nearby river walk; do the palace square and Königstrasse on another day; save Wilhelma or a hill viewpoint for the third.",
+        "Save an unhurried afternoon for a park or a neighborhood like Bohnenviertel so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Stuttgart in 3 days",
+        subtitle:
+          "Automotive heritage, palace square, and parks with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1627880376042-fa3041b3da70?auto=format&fit=crop&w=1600&q=80",
+          alt: "Stuttgart city center with Schlossplatz and historic buildings.",
+        },
+      },
+      cityStats: [
+        { value: "600k+", label: "Residents in the city" },
+        { value: "2", label: "Major automotive museums" },
+        { value: "200+", label: "Parks and green spaces" },
+        { value: "50+", label: "Museums and galleries" },
+      ],
+      fit: {
+        forYou: ["Museums and design", "Parks and walks", "First-time visitors", "Compact center", "Calm pacing"],
+        notForYou: ["Beach or mountain focus", "Late-night nightlife", "Back-to-back tours", "Remote nature only", "Shopping-only trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Museum quarter and river",
+          summary: "Mercedes-Benz Museum and Neckar park.",
+          morning: "Mercedes-Benz Museum",
+          afternoon: "Neckar park and Schlossplatz area",
+          evening: "Dinner near Schlossplatz or Calwer Strasse",
+        },
+        {
+          day: 2,
+          title: "Palace and main street",
+          summary: "Old palace, Königstrasse, and city center.",
+          morning: "Altes Schloss and Schillerplatz",
+          afternoon: "Königstrasse and shopping streets",
+          evening: "Bohnenviertel or Market Hall area",
+        },
+        {
+          day: 3,
+          title: "Wilhelma and viewpoints",
+          summary: "Zoo and gardens or a hill viewpoint.",
+          morning: "Wilhelma zoo and botanical garden",
+          afternoon: "Tea or walk in the grounds",
+          evening: "Final dinner and relaxed wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Palace square",
+          description:
+            "Schlossplatz is the heart of the city. Expect fountains, tram lines, and a clear view of the old palace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569931721099-9d4a2d2e1a5a?auto=format&fit=crop&w=1200&q=80",
+            alt: "Schlossplatz in Stuttgart with palace and square.",
+          },
+        },
+        {
+          title: "Automotive heritage",
+          description:
+            "Mercedes-Benz and Porsche museums define Stuttgart. One museum day is enough for a focused visit.",
+          image: {
+            src: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1200&q=80",
+            alt: "Modern architecture at Mercedes-Benz Museum Stuttgart.",
+          },
+        },
+        {
+          title: "Parks and green",
+          description:
+            "Wilhelma and parks offer a calm contrast to the center. Good for a slow half-day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
+            alt: "Green park and trees in Stuttgart.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for walks and parks" },
+        { label: "Airport transfer", value: "S-Bahn to Hauptbahnhof; about 30 minutes" },
+        { label: "Transit tips", value: "Walk the center; S-Bahn and U-Bahn for museums and Wilhelma" },
+        { label: "Ticketing", value: "Book Mercedes-Benz or Porsche Museum ahead in peak season" },
+        { label: "Neighborhood stay", value: "Center near Schlossplatz or Marienplatz" },
+      ],
+      checklist: [
+        "Book museum tickets if visiting Mercedes-Benz or Porsche",
+        "Pack comfortable walking shoes",
+        "Save offline transit maps",
+        "Plan one park or garden half-day",
+        "Carry a refillable water bottle",
+        "Check market hours for Markthalle",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Stuttgart?", answer: "Yes for the main museums, palace area, and one park day. The center is compact and easy to walk." },
+        { question: "Do I need to book museums?", answer: "For Mercedes-Benz and Porsche, advance booking helps in peak season and keeps your day on track." },
+        { question: "Is Stuttgart walkable?", answer: "The center is very walkable. Use S-Bahn or U-Bahn for the museums and Wilhelma." },
+        { question: "Where should I stay?", answer: "Near Schlossplatz or Marienplatz for the center; good tram links to museums and Wilhelma." },
+        { question: "What is Wilhelma?", answer: "Wilhelma is a combined zoo and botanical garden. Plan at least a half-day; mornings are quieter." },
+        { question: "When is the best time to visit?", answer: "Spring and fall are ideal for parks and walking. Summer can be warm; winter is quieter with shorter days." },
+        { question: "Do I need a car?", answer: "No. Public transport and walking cover this plan. Rent a car only for day trips to the Black Forest or vineyards." },
+      ],
+      relatedItineraries: [
+        { slug: "munich", city: "Munich", days: 3, description: "Beer gardens, museums, and grand squares." },
+        { slug: "frankfurt", city: "Frankfurt", days: 3, description: "Riverfront, museums, and compact center." },
+        { slug: "zurich", city: "Zurich", days: 3, description: "Lake, old town, and calm pacing." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    nuremberg: {
+      slug: "nuremberg",
+      city: "Nuremberg",
+      country: "Germany",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History fans", "Walkable old town"],
+      style: ["Castle", "Medieval streets", "Markets"],
+      pacing: [
+        "Nuremberg works at a calm pace. Anchor day one on the castle and old town; day two on Hauptmarkt and churches; day three on a museum or relaxed revisit.",
+        "The old town is compact. Group the castle with the Albrecht Dürer House and half-timbered lanes; save Hauptmarkt for a morning or market day.",
+        "Leave one afternoon open for a museum, a park, or a slow café so the trip stays relaxed.",
+      ],
+      hero: {
+        title: "Nuremberg in 3 days",
+        subtitle:
+          "Imperial Castle, medieval old town, and historic squares with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1632210130467-7279eccec0a7?auto=format&fit=crop&w=1600&q=80",
+          alt: "Nuremberg Imperial Castle and old town rooftops.",
+        },
+      },
+      cityStats: [
+        { value: "1,000+", label: "Years of history" },
+        { value: "2", label: "Castles in the city" },
+        { value: "50+", label: "Museums and galleries" },
+        { value: "500k+", label: "Metro residents" },
+      ],
+      fit: {
+        forYou: ["Medieval old town", "Castle and history", "First-time visitors", "Walkable center", "Markets and squares"],
+        notForYou: ["Beach or coast", "Late-night nightlife", "Packed museum-only days", "Remote nature only", "Shopping-only trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Castle and old town",
+          summary: "Imperial Castle and medieval streets.",
+          morning: "Imperial Castle and courtyard",
+          afternoon: "Albrecht Dürer House and timbered lanes",
+          evening: "Dinner in the old town",
+        },
+        {
+          day: 2,
+          title: "Hauptmarkt and churches",
+          summary: "Main square, fountain, and churches.",
+          morning: "Hauptmarkt and Schöner Brunnen",
+          afternoon: "St. Lorenz and St. Sebald churches",
+          evening: "Weißgerbergasse and evening stroll",
+        },
+        {
+          day: 3,
+          title: "Museums and wrap-up",
+          summary: "Documentation Center or Toy Museum and relaxed finish.",
+          morning: "Documentation Center or Spielzeugmuseum",
+          afternoon: "City park or relaxed revisit",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Imperial Castle",
+          description:
+            "The castle dominates the skyline. Allow a few hours for the courtyard, tower, and views over the old town.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Nuremberg Imperial Castle from below.",
+          },
+        },
+        {
+          title: "Hauptmarkt",
+          description:
+            "The main square hosts the Christmas market in winter and daily market life. The fountain and facades are iconic.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80",
+            alt: "Nuremberg Hauptmarkt with historic buildings.",
+          },
+        },
+        {
+          title: "Medieval lanes",
+          description:
+            "Half-timbered streets like Weissgerbergasse give the old town its character. A slow walk fits the pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Medieval street in Nuremberg old town.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October; December for Christmas market" },
+        { label: "Airport transfer", value: "U-Bahn to center; about 12 minutes from airport" },
+        { label: "Transit tips", value: "Old town is walkable; tram for Documentation Center" },
+        { label: "Ticketing", value: "Book castle and Documentation Center ahead in peak season" },
+        { label: "Neighborhood stay", value: "Old town or near Hauptbahnhof" },
+      ],
+      checklist: [
+        "Book castle visit if in peak season",
+        "Pack comfortable walking shoes",
+        "Save offline old town map",
+        "Plan Hauptmarkt for a morning",
+        "Carry a refillable water bottle",
+        "Check Christmas market dates if visiting in winter",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Nuremberg?", answer: "Yes for the castle, old town, Hauptmarkt, and one museum. The center is compact and walkable." },
+        { question: "Do I need to book the castle?", answer: "In peak season, booking helps. The courtyard is open; timed entry may apply for inner areas." },
+        { question: "Is Nuremberg walkable?", answer: "Yes. The old town is small enough to cover on foot. Tram helps for the Documentation Center." },
+        { question: "Where should I stay?", answer: "Old town for atmosphere; near Hauptbahnhof for train access. Both are within walking distance of sights." },
+        { question: "When is the Christmas market?", answer: "Usually late November until Christmas Eve. Book accommodation early; the old town is very busy." },
+        { question: "What is the Documentation Center?", answer: "A museum on Nazi history and the Nuremberg trials. Allow 2–3 hours; book ahead in peak season." },
+        { question: "Do I need a car?", answer: "No. The old town and main sights are walkable; public transport covers the rest." },
+      ],
+      relatedItineraries: [
+        { slug: "munich", city: "Munich", days: 3, description: "Beer gardens, museums, and grand squares." },
+        { slug: "prague", city: "Prague", days: 3, description: "Old town, castle, and river walks." },
+        { slug: "dresden", city: "Dresden", days: 3, description: "Baroque center, river, and museums." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    galway: {
+      slug: "galway",
+      city: "Galway",
+      country: "Ireland",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Music and pubs", "Coastal walks"],
+      style: ["Latin Quarter", "Harbor", "Salthill"],
+      pacing: [
+        "Galway rewards a relaxed rhythm. Anchor day one on the Latin Quarter and Spanish Arch; day two on Salthill and the promenade; day three on a market or a short day trip.",
+        "The center is small. Walking covers the Latin Quarter, Eyre Square, and the harbor. Save one morning for the market if it fits your dates.",
+        "Leave one afternoon open for a pub, a café, or a slow walk so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Galway in 3 days",
+        subtitle:
+          "Colorful streets, live music, and coastal promenade with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1641158641932-c74516b6502b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful streets and pubs in Galway Latin Quarter.",
+        },
+      },
+      cityStats: [
+        { value: "80k+", label: "Residents in the city" },
+        { value: "1", label: "Medieval wall remnant (Spanish Arch)" },
+        { value: "2 km", label: "Salthill promenade" },
+        { value: "500+", label: "Years of market tradition" },
+      ],
+      fit: {
+        forYou: ["Compact city", "Music and pubs", "Coastal walks", "First-time visitors", "Relaxed pacing"],
+        notForYou: ["Big museums only", "Late-night clubbing focus", "Packed tours every day", "Remote wilderness", "Shopping-only trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Latin Quarter and harbor",
+          summary: "Colorful streets, Spanish Arch, and harbor.",
+          morning: "Eyre Square and Shop Street",
+          afternoon: "Spanish Arch and Claddagh",
+          evening: "Latin Quarter pubs and dinner",
+        },
+        {
+          day: 2,
+          title: "Salthill and promenade",
+          summary: "Promenade walk and seaside.",
+          morning: "Walk to Salthill and promenade",
+          afternoon: "Beach or aquarium and lunch",
+          evening: "Return to center and dinner",
+        },
+        {
+          day: 3,
+          title: "Market and wrap-up",
+          summary: "Market morning and relaxed finish.",
+          morning: "Galway Market if open, or revisit",
+          afternoon: "Café or short walk",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Latin Quarter",
+          description:
+            "Narrow streets, buskers, and pubs define the center. Mornings are quieter; evenings bring music and crowds.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569931721099-9d4a2d2e1a5a?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colorful street in Galway Latin Quarter.",
+          },
+        },
+        {
+          title: "Spanish Arch",
+          description:
+            "The arch and harbor area link the city to the sea. A short walk from the Latin Quarter.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Spanish Arch and harbor in Galway.",
+          },
+        },
+        {
+          title: "Salthill promenade",
+          description:
+            "The promenade runs along the bay. Good for a morning or afternoon walk with sea views.",
+          image: {
+            src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
+            alt: "Salthill promenade and bay in Galway.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for weather; year-round for atmosphere" },
+        { label: "Airport transfer", value: "Bus from Shannon or Dublin; train from Dublin" },
+        { label: "Transit tips", value: "Center is walkable; bus to Salthill" },
+        { label: "Ticketing", value: "No major advance booking needed for this plan" },
+        { label: "Neighborhood stay", value: "Latin Quarter or Eyre Square area" },
+      ],
+      checklist: [
+        "Pack layers and rain gear",
+        "Wear comfortable walking shoes",
+        "Check market days for Galway Market",
+        "Save offline map for center",
+        "Carry a refillable water bottle",
+        "Plan one pub evening for music",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Galway?", answer: "Yes for the Latin Quarter, Salthill, and a relaxed third day. The city is small and walkable." },
+        { question: "Is Galway walkable?", answer: "Yes. The center and harbor are walkable. Bus to Salthill is quick." },
+        { question: "Where should I stay?", answer: "Latin Quarter or near Eyre Square for atmosphere and walking distance to everything." },
+        { question: "When is Galway Market?", answer: "Weekends at Church Lane. Check current times; it's a highlight for local food and crafts." },
+        { question: "Do I need a car?", answer: "Not for this plan. Rent a car only if you want to add Connemara or the Cliffs of Moher." },
+        { question: "What about rain?", answer: "Pack a rain jacket and layers. Pubs and cafés offer shelter; the city is used to wet weather." },
+        { question: "Is Galway good for families?", answer: "Yes. The center is safe and compact; Salthill has a beach and aquarium. Pubs are family-friendly during the day." },
+      ],
+      relatedItineraries: [
+        { slug: "dublin", city: "Dublin", days: 3, description: "History, pubs, and compact center." },
+        { slug: "cork", city: "Cork", days: 2, description: "English Market, river, and compact center." },
+        { slug: "belfast", city: "Belfast", days: 3, description: "Titanic heritage, city hall, and waterfront." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cannes: {
+      slug: "cannes",
+      city: "Cannes",
+      country: "France",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Riviera coast", "Relaxed pacing"],
+      style: ["Croisette", "Le Suquet", "Beach and views"],
+      pacing: [
+        "Cannes works at a calm pace. Anchor day one on the Croisette and beach; day two on Le Suquet and the old town; day three on the islands or a relaxed revisit.",
+        "The seafront is the spine. Morning walks along the Croisette are pleasant; Le Suquet offers contrast with narrow lanes and views.",
+        "Save one afternoon for the islands or a long lunch so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Cannes in 3 days",
+        subtitle:
+          "La Croisette, old town, and Riviera atmosphere with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1690293794495-481065b52199?auto=format&fit=crop&w=1600&q=80",
+          alt: "Cannes Croisette and Mediterranean coast.",
+        },
+      },
+      cityStats: [
+        { value: "7 km", label: "Coastline along the bay" },
+        { value: "2", label: "Lérins Islands (Île Sainte-Marguerite, Île de Saint-Honorat)" },
+        { value: "70k+", label: "Residents" },
+        { value: "300+", label: "Days of sun per year" },
+      ],
+      fit: {
+        forYou: ["Beach and promenade", "Old town and views", "First-time visitors", "Relaxed Riviera pace", "Short island trip"],
+        notForYou: ["Packed sightseeing only", "Late-night party focus", "Museum-heavy days", "Remote nature only", "Budget backpacker only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Croisette and beach",
+          summary: "Promenade, beach, and bay views.",
+          morning: "La Croisette walk and beach",
+          afternoon: "Beach or Palais des Festivals area",
+          evening: "Seafront dinner and evening stroll",
+        },
+        {
+          day: 2,
+          title: "Le Suquet and old town",
+          summary: "Hill quarter, castle, and views.",
+          morning: "Le Suquet climb and castle area",
+          afternoon: "Old town lanes and Marché Forville",
+          evening: "Dinner in Le Suquet or port",
+        },
+        {
+          day: 3,
+          title: "Islands or relaxed wrap-up",
+          summary: "Lérins Islands or calm revisit.",
+          morning: "Ferry to Île Sainte-Marguerite or Saint-Honorat",
+          afternoon: "Island walk and return",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "La Croisette",
+          description:
+            "The famous promenade lines the bay. Morning and evening walks offer sea views and a relaxed pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cannes Croisette promenade and palm trees.",
+          },
+        },
+        {
+          title: "Le Suquet",
+          description:
+            "The old town on the hill has narrow streets, a castle tower, and views over the bay.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Le Suquet old town and castle in Cannes.",
+          },
+        },
+        {
+          title: "Lérins Islands",
+          description:
+            "Sainte-Marguerite and Saint-Honorat offer nature and quiet. A half-day ferry trip fits the pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
+            alt: "Lérins Islands view from Cannes.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for beach and boats" },
+        { label: "Airport transfer", value: "Bus or taxi from Nice airport; about 30 minutes" },
+        { label: "Transit tips", value: "Center is walkable; ferry from port for islands" },
+        { label: "Ticketing", value: "Book ferry for islands in peak season" },
+        { label: "Neighborhood stay", value: "Near Croisette or Le Suquet" },
+      ],
+      checklist: [
+        "Pack sunscreen and beach gear",
+        "Book island ferry if visiting in summer",
+        "Wear comfortable walking shoes",
+        "Save offline map for center",
+        "Carry a refillable water bottle",
+        "Plan one long lunch by the sea",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Cannes?", answer: "Yes for the Croisette, Le Suquet, and one island or relaxed day. The center is compact." },
+        { question: "Do I need to book the island ferry?", answer: "In summer, booking ahead helps. Ferries run regularly from the port." },
+        { question: "Is Cannes walkable?", answer: "Yes. The Croisette and Le Suquet are walkable. The port is central for ferries." },
+        { question: "Where should I stay?", answer: "Near the Croisette for beach and promenade; Le Suquet area for old town atmosphere." },
+        { question: "When is the best time to visit?", answer: "April to October for warm weather and sea. May is busy with the film festival; book early." },
+        { question: "What are the Lérins Islands?", answer: "Sainte-Marguerite has nature and the Man in the Iron Mask prison; Saint-Honorat has a monastery. Both are a short ferry ride." },
+        { question: "Do I need a car?", answer: "No for this plan. Walking and ferry cover the itinerary. Rent a car only for drives along the coast." },
+      ],
+      relatedItineraries: [
+        { slug: "nice", city: "Nice", days: 3, description: "Promenade, old town, and coast." },
+        { slug: "marseille", city: "Marseille", days: 3, description: "Old port, Calanques, and city." },
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudi, beaches, and neighborhoods." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    catania: {
+      slug: "catania",
+      city: "Catania",
+      country: "Italy",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Baroque and Etna", "Food and markets"],
+      style: ["Baroque streets", "Markets", "Volcano views"],
+      pacing: [
+        "Catania rewards a calm rhythm. Anchor day one on Piazza del Duomo and Via Etnea; day two on the fish market and churches; day three on a museum or Etna view.",
+        "The center is compact. Group the baroque core with the elephant fountain and cathedral; save the market for a morning; leave one afternoon open.",
+        "Save time for long lunches and an evening passeggiata so the trip feels Sicilian and relaxed.",
+      ],
+      hero: {
+        title: "Catania in 3 days",
+        subtitle:
+          "Baroque center, fish market, and Mount Etna views with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1761770535261-c239a2e27fb3?auto=format&fit=crop&w=1600&q=80",
+          alt: "Piazza del Duomo and baroque buildings in Catania.",
+        },
+      },
+      cityStats: [
+        { value: "300k+", label: "Residents in the city" },
+        { value: "3,350 m", label: "Mount Etna (visible from city)" },
+        { value: "2,700+", label: "Years of history" },
+        { value: "UNESCO", label: "Baroque cities list (with Val di Noto)" },
+      ],
+      fit: {
+        forYou: ["Baroque architecture", "Markets and food", "First-time visitors", "Volcano views", "Relaxed pacing"],
+        notForYou: ["Beach-only focus", "Late-night clubbing", "Packed museum days", "Remote wilderness", "Shopping-only trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Piazza del Duomo and Via Etnea",
+          summary: "Cathedral square and main street.",
+          morning: "Piazza del Duomo and elephant fountain",
+          afternoon: "Via Etnea and Benedictine monastery area",
+          evening: "Dinner and passeggiata on Via Etnea",
+        },
+        {
+          day: 2,
+          title: "Fish market and churches",
+          summary: "La Pescheria and baroque churches.",
+          morning: "La Pescheria fish market",
+          afternoon: "Churches and Via dei Crociferi",
+          evening: "Dinner in old town",
+        },
+        {
+          day: 3,
+          title: "Museums or Etna view",
+          summary: "Castello Ursino or viewpoint and wrap-up.",
+          morning: "Castello Ursino or Bellini Gardens",
+          afternoon: "Relaxed revisit or Etna viewpoint",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Piazza del Duomo",
+          description:
+            "The cathedral square and elephant fountain are the heart of the city. Baroque facades and street life define the scene.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Piazza del Duomo and baroque cathedral in Catania.",
+          },
+        },
+        {
+          title: "La Pescheria",
+          description:
+            "The fish market is a morning highlight. Go early for the buzz; then explore the surrounding streets.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Fish market La Pescheria in Catania.",
+          },
+        },
+        {
+          title: "Via Etnea and Etna",
+          description:
+            "The main street runs toward Mount Etna. On clear days the volcano frames the city skyline.",
+          image: {
+            src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
+            alt: "Via Etnea with Mount Etna in the distance.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Bus or taxi from Catania airport; about 15 minutes" },
+        { label: "Transit tips", value: "Center is walkable; bus or train for Etna trips" },
+        { label: "Ticketing", value: "Book Etna tours ahead if going up the volcano" },
+        { label: "Neighborhood stay", value: "Center near Piazza del Duomo or Via Etnea" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Plan fish market for a morning",
+        "Save offline map for center",
+        "Carry a refillable water bottle",
+        "Book Etna tour if planning a summit trip",
+        "Plan one long lunch for Sicilian food",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Catania?", answer: "Yes for the baroque center, fish market, and one museum or relaxed day. The city is compact and walkable." },
+        { question: "When is the fish market open?", answer: "La Pescheria is a morning market. Go before midday for the best atmosphere." },
+        { question: "Is Catania walkable?", answer: "Yes. The center, Piazza del Duomo, and Via Etnea are all walkable." },
+        { question: "Where should I stay?", answer: "Near Piazza del Duomo or Via Etnea for the center and easy access to the market and restaurants." },
+        { question: "Do I need to book Etna tours?", answer: "Yes if you want to go up the volcano. Half-day and full-day tours leave from the city." },
+        { question: "What about the heat?", answer: "Summer can be hot. Plan indoor or shaded stops for midday; mornings and evenings are pleasant." },
+        { question: "Is Catania safe?", answer: "The center is generally safe. Use normal precautions; watch bags in crowded areas like the market." },
+      ],
+      relatedItineraries: [
+        { slug: "palermo", city: "Palermo", days: 3, description: "Markets, palaces, and Sicilian capital." },
+        { slug: "naples", city: "Naples", days: 3, description: "Historic center, pizza, and coast." },
+        { slug: "rome", city: "Rome", days: 3, description: "Ancient icons, piazzas, and cafes." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    dakar: {
+      slug: "dakar",
+      city: "Dakar",
+      country: "Senegal",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture and history", "Coastal walks"],
+      style: ["Goree Island", "Markets", "Monuments"],
+      pacing: [
+        "Dakar works well at a calm pace. Anchor day one on the Plateau and Corniche; day two on Goree Island; day three on markets and the African Renaissance Monument or Ngor.",
+        "Group sights by area to keep transit simple. The ferry to Goree is a half-day; leave time for the museum and waterfront.",
+        "Save an open afternoon for Marché Kermel or a beach pause so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Dakar in 3 days",
+        subtitle:
+          "Coastal views, Goree Island, and markets at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80",
+          alt: "Dakar coastline and Atlantic Ocean from the Corniche.",
+        },
+      },
+      cityStats: [
+        { value: "3M+", label: "Metro area residents" },
+        { value: "20 min", label: "Ferry to Goree Island" },
+        { value: "49 m", label: "African Renaissance Monument height" },
+        { value: "UNESCO", label: "Goree Island memory site" },
+      ],
+      fit: {
+        forYou: ["First visit to West Africa", "History and memory", "Markets and local life", "Coastal and island time", "Relaxed pacing"],
+        notForYou: ["Beach-only focus", "Heavy nightlife", "Packed back-to-back tours", "Remote desert only", "Rushed checklist"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Plateau and Corniche",
+          summary: "Downtown, waterfront, and first views.",
+          morning: "Plateau district and Place de l'Independance",
+          afternoon: "Corniche walk and ocean views",
+          evening: "Dinner in Plateau or Almadies",
+        },
+        {
+          day: 2,
+          title: "Goree Island",
+          summary: "Ferry, House of Slaves, and island lanes.",
+          morning: "Ferry to Goree and House of Slaves",
+          afternoon: "Island walk and small beaches",
+          evening: "Return to Dakar and waterfront dinner",
+        },
+        {
+          day: 3,
+          title: "Markets and monument",
+          summary: "Marché Kermel, African Renaissance Monument or Ngor.",
+          morning: "Marché Kermel or Sandaga",
+          afternoon: "African Renaissance Monument or Ngor beach",
+          evening: "Final dinner and stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Goree Island",
+          description:
+            "The island is a short ferry ride away. The House of Slaves and quiet lanes set a reflective, calm tone.",
+          image: {
+            src: "https://images.unsplash.com/photo-1523805009345-7443845c4f89?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colorful buildings and waterfront on Goree Island, Dakar.",
+          },
+        },
+        {
+          title: "Markets",
+          description:
+            "Marché Kermel and Sandaga offer local color. Go in the morning for the best atmosphere.",
+          image: {
+            src: "https://images.unsplash.com/photo-1488459716781-31db59582aae?auto=format&fit=crop&w=1200&q=80",
+            alt: "Market stalls and local produce in Dakar.",
+          },
+        },
+        {
+          title: "Corniche and coast",
+          description:
+            "The waterfront drive and beaches give the city a calm, open feel. Good for a slow afternoon.",
+          image: {
+            src: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Atlantic coast and Corniche in Dakar.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to April (cooler, dry)" },
+        { label: "Airport transfer", value: "Taxi or shuttle from Blaise Diagne" },
+        { label: "Transit tips", value: "Ferry to Goree from port; taxis for cross-town" },
+        { label: "Ticketing", value: "Buy Goree ferry ticket at port; go early" },
+        { label: "Neighborhood stay", value: "Plateau or Almadies" },
+      ],
+      checklist: [
+        "Book or confirm ferry time to Goree",
+        "Pack sun protection and light layers",
+        "Wear comfortable walking shoes",
+        "Save offline map for Plateau and port",
+        "Plan one slow market morning",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Dakar?",
+          answer:
+            "Yes for the Plateau, Goree Island, and a market or monument day. The pace stays relaxed.",
+        },
+        {
+          question: "Do I need to book the Goree ferry?",
+          answer:
+            "You can buy tickets at the port. Going early helps avoid crowds and midday heat.",
+        },
+        {
+          question: "Is Dakar walkable?",
+          answer:
+            "The Plateau is walkable; taxis or ride-hail are useful for the Corniche, monument, or beaches.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Plateau keeps you central for downtown and the port; Almadies is calmer and near the coast.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for Goree and markets to beat heat and crowds. Afternoons can be lighter.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For most places, no. A few upscale spots may take reservations; walk-in is common elsewhere.",
+        },
+        {
+          question: "Is it safe?",
+          answer:
+            "Use normal precautions. Watch bags in markets and crowded areas; avoid walking alone late at night in empty areas.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "marrakech", city: "Marrakech", days: 3, description: "Medina, souks, and gardens." },
+        { slug: "accra", city: "Accra", days: 3, description: "Independence landmarks and coastal walks." },
+        { slug: "cairo", city: "Cairo", days: 3, description: "Pyramids, museums, and Nile views." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    johannesburg: {
+      slug: "johannesburg",
+      city: "Johannesburg",
+      country: "South Africa",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and culture", "Urban explorers"],
+      style: ["Museums", "Neighborhoods", "Nearby sights"],
+      pacing: [
+        "Johannesburg rewards a calm rhythm. Anchor day one on Constitution Hill and the CBD or Maboneng; day two on the Apartheid Museum and Soweto; day three on a museum or neighborhood of choice.",
+        "Group time by area to keep drives manageable. Pair related sights so you are not crossing the city repeatedly.",
+        "Leave one afternoon open for markets, cafes, or a relaxed wrap-up.",
+      ],
+      hero: {
+        title: "Johannesburg in 3 days",
+        subtitle:
+          "Museums, Soweto, and city neighborhoods at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=1600&q=80",
+          alt: "Johannesburg skyline at golden hour.",
+        },
+      },
+      cityStats: [
+        { value: "5.6M+", label: "Metro area residents" },
+        { value: "1,753 m", label: "Elevation (highveld)" },
+        { value: "40+", label: "Languages spoken" },
+        { value: "100+", label: "Years of gold-mining history" },
+      ],
+      fit: {
+        forYou: ["First visit to South Africa", "History and memory", "Museums and neighborhoods", "Guided Soweto visit", "Relaxed pacing"],
+        notForYou: ["Safari-only focus", "Heavy nightlife", "Packed back-to-back tours", "Beach or coast", "Rushed checklist"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Constitution Hill and city",
+          summary: "Constitution Hill, CBD or Maboneng.",
+          morning: "Constitution Hill and Old Fort",
+          afternoon: "Maboneng Precinct or CBD walk",
+          evening: "Dinner in Maboneng or Rosebank",
+        },
+        {
+          day: 2,
+          title: "Apartheid Museum and Soweto",
+          summary: "Museum and Soweto tour.",
+          morning: "Apartheid Museum",
+          afternoon: "Soweto tour (Vilakazi Street, Hector Pieterson)",
+          evening: "Dinner in Soweto or return to city",
+        },
+        {
+          day: 3,
+          title: "Museums or neighborhoods",
+          summary: "Cradle of Humankind, market, or relaxed revisit.",
+          morning: "Cradle of Humankind or Market on Main",
+          afternoon: "Neighborhood stroll or museum of choice",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Constitution Hill",
+          description:
+            "The site bridges prison history and the Constitutional Court. A focused visit sets the tone for understanding the city.",
+          image: {
+            src: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=1200&q=80",
+            alt: "Constitution Hill and Johannesburg city view.",
+          },
+        },
+        {
+          title: "Soweto",
+          description:
+            "Vilakazi Street and the Hector Pieterson Museum offer a structured way to see Soweto. Guided tours are widely available.",
+          image: {
+            src: "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?auto=format&fit=crop&w=1200&q=80",
+            alt: "Vilakazi Street and Soweto township.",
+          },
+        },
+        {
+          title: "Maboneng and neighborhoods",
+          description:
+            "Maboneng and nearby areas show the city's creative side. Cafes, galleries, and street life add variety.",
+          image: {
+            src: "https://images.unsplash.com/photo-1484318571209-661cf29a69c3?auto=format&fit=crop&w=1200&q=80",
+            alt: "Street art and cafes in Maboneng, Johannesburg.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to May or September to October" },
+        { label: "Airport transfer", value: "Gautrain or taxi from OR Tambo" },
+        { label: "Transit tips", value: "Uber or guided tours for Soweto and Cradle; some areas walkable" },
+        { label: "Ticketing", value: "Book Apartheid Museum and Cradle ahead" },
+        { label: "Neighborhood stay", value: "Sandton, Rosebank, or Maboneng area" },
+      ],
+      checklist: [
+        "Book Apartheid Museum ticket",
+        "Arrange Soweto tour if desired",
+        "Pack a light layer for cool mornings",
+        "Save offline maps for chosen areas",
+        "Plan one slow cafe or market stop",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Johannesburg?",
+          answer:
+            "Yes for the Apartheid Museum, Soweto, Constitution Hill, and one or two neighborhoods. Pace stays manageable.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Uber and guided tours work well. A car is optional; many use tours for Soweto and Cradle.",
+        },
+        {
+          question: "Is Soweto safe to visit?",
+          answer:
+            "With a reputable guide or tour, yes. Solo wandering is not recommended; stick to organized visits.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Sandton and Rosebank are convenient and safe; Maboneng suits those who want a more urban, creative base.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start by mid-morning for museums and tours. Early starts help at the Apartheid Museum.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For upscale or popular spots, booking helps. Many cafes and casual places accept walk-ins.",
+        },
+        {
+          question: "Is Johannesburg walkable?",
+          answer:
+            "Some areas (Maboneng, Rosebank) are walkable. For Soweto and Cradle, use tours or drive.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "cape-town", city: "Cape Town", days: 3, description: "Table Mountain, waterfront, and neighborhoods." },
+        { slug: "nairobi", city: "Nairobi", days: 3, description: "Museums, parks, and wildlife experiences." },
+        { slug: "cairo", city: "Cairo", days: 3, description: "Pyramids, museums, and Nile." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    minneapolis: {
+      slug: "minneapolis",
+      city: "Minneapolis",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Arts and parks", "Walkers"],
+      style: ["Lakes", "Bridges", "Neighborhoods"],
+      pacing: [
+        "Minneapolis works well at a calm pace. Anchor day one on the river and Stone Arch Bridge; day two on the Walker and Sculpture Garden; day three on a lake or neighborhood.",
+        "Group sights by area. The riverfront and downtown pair easily; the arts district and Uptown are good second and third anchors.",
+        "Leave one afternoon open for a lake walk or cafe so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Minneapolis in 3 days",
+        subtitle:
+          "Lakes, arts, and walkable neighborhoods at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1600296344597-1aadaf1308bd?auto=format&fit=crop&w=1600&q=80",
+          alt: "Stone Arch Bridge and Minneapolis skyline over the Mississippi.",
+        },
+      },
+      cityStats: [
+        { value: "22", label: "Lakes within the city" },
+        { value: "3.8M", label: "Metro area residents" },
+        { value: "13", label: "Miles of Grand Rounds trail" },
+        { value: "200+", label: "Parks and green spaces" },
+      ],
+      fit: {
+        forYou: ["First visit to the Twin Cities", "Arts and outdoors", "River and lake walks", "Neighborhood cafes", "Relaxed pacing"],
+        notForYou: ["Beach-only focus", "Heavy nightlife", "Packed museum-only days", "Remote wilderness only", "Rushed checklist"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "River and Stone Arch Bridge",
+          summary: "Mississippi riverfront and downtown.",
+          morning: "Stone Arch Bridge and Mill District",
+          afternoon: "Downtown loop and Nicollet Mall",
+          evening: "Dinner in North Loop or downtown",
+        },
+        {
+          day: 2,
+          title: "Walker and Sculpture Garden",
+          summary: "Contemporary art and outdoor sculpture.",
+          morning: "Walker Art Center",
+          afternoon: "Minneapolis Sculpture Garden and Loring Park",
+          evening: "Uptown or Lyn-Lake dinner",
+        },
+        {
+          day: 3,
+          title: "Lakes or neighborhoods",
+          summary: "Lake Calhoun/Bde Maka Ska or Grand Rounds stretch.",
+          morning: "Lake walk or Grand Rounds segment",
+          afternoon: "Neighborhood cafe or museum of choice",
+          evening: "Final dinner and stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Stone Arch Bridge",
+          description:
+            "The bridge and riverfront define the city's industrial past and current park life. A morning or evening walk is ideal.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578645510357-2746c0efb3cc?auto=format&fit=crop&w=1200&q=80",
+            alt: "Stone Arch Bridge over the Mississippi in Minneapolis.",
+          },
+        },
+        {
+          title: "Sculpture Garden",
+          description:
+            "The Walker's outdoor sculpture garden is free and open. Combine with a short museum visit or skip inside for a calm outdoor hour.",
+          image: {
+            src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
+            alt: "Minneapolis Sculpture Garden with Spoonbridge and Cherry.",
+          },
+        },
+        {
+          title: "Lakes and trails",
+          description:
+            "The chain of lakes and Grand Rounds offer easy walks and bike paths. Good for a slow half-day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80",
+            alt: "Lake and skyline in Minneapolis.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to June or September to October" },
+        { label: "Airport transfer", value: "Light rail or taxi from MSP" },
+        { label: "Transit tips", value: "Light rail for airport and downtown; walk or bike for lakes" },
+        { label: "Ticketing", value: "Book Walker Art Center ahead in peak times" },
+        { label: "Neighborhood stay", value: "North Loop, downtown, or Uptown" },
+      ],
+      checklist: [
+        "Check Walker Art Center hours",
+        "Pack a light layer for cool mornings",
+        "Wear comfortable walking shoes",
+        "Save offline map for river and lakes",
+        "Plan one slow cafe or lake stop",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Minneapolis?",
+          answer:
+            "Yes for the riverfront, Walker and Sculpture Garden, and a lake or neighborhood day. The pace stays relaxed.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No for this plan. Light rail, walking, and ride-hail cover downtown, Walker, and nearby lakes.",
+        },
+        {
+          question: "Is Minneapolis walkable?",
+          answer:
+            "Downtown and the riverfront are walkable; the lakes and Grand Rounds are best on foot or bike.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "North Loop or downtown for river and downtown; Uptown for lakes and cafes.",
+        },
+        {
+          question: "What about winter?",
+          answer:
+            "Winter is cold but the skyways and indoor spaces help. For lakes and long walks, May–October is easier.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots on weekends, a reservation helps. Many breweries and cafes are walk-in.",
+        },
+        {
+          question: "Is the Sculpture Garden free?",
+          answer:
+            "Yes. The outdoor garden is free; the Walker Art Center has an admission fee.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lakefront, architecture, and neighborhoods." },
+        { slug: "denver", city: "Denver", days: 3, description: "Arts, parks, and mountain views." },
+        { slug: "portland", city: "Portland", days: 3, description: "Parks, food, and relaxed pace." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "santo-domingo": {
+      slug: "santo-domingo",
+      city: "Santo Domingo",
+      country: "Dominican Republic",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and culture", "Walkers"],
+      style: ["Colonial zone", "Waterfront", "Local life"],
+      pacing: [
+        "Santo Domingo rewards a calm rhythm. Anchor day one on the Zona Colonial; day two on museums and the Malecón; day three on a relaxed revisit or nearby stop.",
+        "The colonial core is compact. Group the Alcázar, cathedral, and lanes on one day; leave another for the waterfront and cafes.",
+        "Save an open afternoon for people-watching on the Malecón or a long lunch.",
+      ],
+      hero: {
+        title: "Santo Domingo in 3 days",
+        subtitle:
+          "Colonial zone, waterfront, and local culture at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1750691434503-e916deb91a4b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colonial architecture and street in Santo Domingo Zona Colonial.",
+        },
+      },
+      cityStats: [
+        { value: "500+", label: "Years of history" },
+        { value: "UNESCO", label: "Colonial City World Heritage" },
+        { value: "3km", label: "Malecón waterfront length" },
+        { value: "2.5M+", label: "Metro area residents" },
+      ],
+      fit: {
+        forYou: ["First visit to the Caribbean", "Colonial history", "Walkable old town", "Waterfront strolls", "Relaxed pacing"],
+        notForYou: ["Beach-only focus", "Heavy nightlife", "Packed back-to-back tours", "Remote countryside only", "Rushed checklist"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Zona Colonial core",
+          summary: "Alcázar, cathedral, and colonial lanes.",
+          morning: "Alcázar de Colón and Plaza España",
+          afternoon: "Cathedral and Calle Las Damas",
+          evening: "Dinner in the colonial zone",
+        },
+        {
+          day: 2,
+          title: "Museums and Malecón",
+          summary: "Museums and waterfront walk.",
+          morning: "Museum of the Royal Houses or Amber Museum",
+          afternoon: "Malecón walk and ocean views",
+          evening: "Dinner on the Malecón or in the zone",
+        },
+        {
+          day: 3,
+          title: "Markets and relaxed revisit",
+          summary: "Market, cafes, or final colonial stroll.",
+          morning: "Mercado Modelo or cafe stop",
+          afternoon: "Revisit a favorite spot or park",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Zona Colonial",
+          description:
+            "The colonial quarter is compact and walkable. Cobbled streets and restored buildings set the tone.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518105521514-9ec36310bb2f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colonial street and architecture in Santo Domingo.",
+          },
+        },
+        {
+          title: "Alcázar de Colón",
+          description:
+            "The former viceregal palace anchors the colonial zone. Allow an hour or two for the building and plaza.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Alcázar de Colón in Santo Domingo.",
+          },
+        },
+        {
+          title: "Malecón",
+          description:
+            "The waterfront promenade is ideal for a slow walk. Ocean views and breeze add a calm end to the day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Malecón waterfront in Santo Domingo.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "December to April (dry, warm)" },
+        { label: "Airport transfer", value: "Taxi or shuttle from Las Américas" },
+        { label: "Transit tips", value: "Walk the colonial zone; taxi for Malecón or elsewhere" },
+        { label: "Ticketing", value: "Buy Alcázar and museum tickets at site" },
+        { label: "Neighborhood stay", value: "Zona Colonial" },
+      ],
+      checklist: [
+        "Pack sun protection and light layers",
+        "Wear comfortable walking shoes",
+        "Save offline map for Zona Colonial",
+        "Plan one slow lunch in the zone",
+        "Carry a refillable water bottle",
+        "Check museum opening days",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Santo Domingo?",
+          answer:
+            "Yes for the colonial zone, main museums, and the Malecón. The pace stays relaxed.",
+        },
+        {
+          question: "Is the Zona Colonial walkable?",
+          answer:
+            "Yes. The core is compact; you can cover the main sights on foot in a day.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No for this plan. Taxis or ride-hail work for the Malecón or other areas outside the zone.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "In or near the Zona Colonial for easy access to sights, restaurants, and the Malecón.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Mornings are good for museums and the Alcázar before heat and crowds. Afternoons can be lighter.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For most places, no. A few upscale spots may take reservations; walk-in is common.",
+        },
+        {
+          question: "Is it safe?",
+          answer:
+            "The colonial zone is generally safe. Use normal precautions; watch bags in crowded areas.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "havana", city: "Havana", days: 3, description: "Colonial streets, music, and culture." },
+        { slug: "cartagena", city: "Cartagena", days: 3, description: "Walled city and Caribbean coast." },
+        { slug: "mexico-city", city: "Mexico City", days: 3, description: "Historic center and neighborhoods." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tunis: {
+      slug: "tunis",
+      city: "Tunis",
+      country: "Tunisia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and medina", "Culture"],
+      style: ["Medina", "Bardo Museum", "Carthage"],
+      pacing: [
+        "Tunis works well at a calm pace. Anchor day one on the medina; day two on the Bardo Museum and Avenue Habib Bourguiba; day three on Carthage or Sidi Bou Said.",
+        "Group sights by area. The medina is a full morning or day; the Bardo and avenue pair easily; Carthage is a half-day trip.",
+        "Leave one afternoon open for cafes or a relaxed revisit so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Tunis in 3 days",
+        subtitle:
+          "Medina lanes, Bardo Museum, and Carthage at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Medina of Tunis with traditional architecture and narrow lanes.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Medina of Tunis" },
+        { value: "2.7M+", label: "Metro area residents" },
+        { value: "3,000+", label: "Years of Carthage history" },
+        { value: "1", label: "Bardo Museum (major mosaic collection)" },
+      ],
+      fit: {
+        forYou: ["First visit to Tunisia", "Medina and markets", "Roman and Punic history", "Museums and cafes", "Relaxed pacing"],
+        notForYou: ["Beach-only focus", "Heavy nightlife", "Packed back-to-back tours", "Desert-only focus", "Rushed checklist"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Medina of Tunis",
+          summary: "Souks, gates, and medina lanes.",
+          morning: "Bab el Bhar and main souks",
+          afternoon: "Zitouna area and medina lanes",
+          evening: "Dinner in the medina or Ville Nouvelle",
+        },
+        {
+          day: 2,
+          title: "Bardo and Avenue Bourguiba",
+          summary: "Bardo Museum and city avenue.",
+          morning: "Bardo Museum",
+          afternoon: "Avenue Habib Bourguiba and cafes",
+          evening: "Dinner in Ville Nouvelle",
+        },
+        {
+          day: 3,
+          title: "Carthage or Sidi Bou Said",
+          summary: "Roman ruins or blue-and-white village.",
+          morning: "Carthage archaeological site",
+          afternoon: "Sidi Bou Said or return to Tunis",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Medina",
+          description:
+            "The medina is UNESCO-listed. Narrow lanes, souks, and the Zitouna area set a calm, historic tone.",
+          image: {
+            src: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=1200&q=80",
+            alt: "Traditional lane in the medina of Tunis.",
+          },
+        },
+        {
+          title: "Bardo Museum",
+          description:
+            "The Bardo holds one of the world's leading Roman mosaic collections. Allow a few hours for a focused visit.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555992336-fb0d29498b13?auto=format&fit=crop&w=1200&q=80",
+            alt: "Bardo Museum and mosaics in Tunis.",
+          },
+        },
+        {
+          title: "Carthage",
+          description:
+            "The archaeological site and sea views make a rewarding half-day. Combine with Sidi Bou Said for a full day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Ruins and sea view at Carthage near Tunis.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Airport transfer", value: "Taxi or shuttle from Tunis-Carthage" },
+        { label: "Transit tips", value: "TGM train for Carthage and Sidi Bou Said; walk the medina" },
+        { label: "Ticketing", value: "Buy Bardo and Carthage tickets at site" },
+        { label: "Neighborhood stay", value: "Ville Nouvelle or near medina" },
+      ],
+      checklist: [
+        "Check Bardo Museum opening days",
+        "Pack a light layer for indoor sites",
+        "Wear comfortable walking shoes",
+        "Save offline map for medina",
+        "Plan one slow cafe or souk stop",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Tunis?",
+          answer:
+            "Yes for the medina, Bardo, and Carthage or Sidi Bou Said. The pace stays relaxed.",
+        },
+        {
+          question: "Is the medina walkable?",
+          answer:
+            "Yes. The medina is compact but labyrinthine; allow time and a rough map or guide for first visit.",
+        },
+        {
+          question: "Do I need a car for Carthage?",
+          answer:
+            "No. The TGM train runs to Carthage and Sidi Bou Said; taxis are also an option.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Ville Nouvelle is convenient for the Bardo and avenue; near the medina for early medina mornings.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start early for the medina and Bardo to avoid heat and crowds. Carthage can be a morning or afternoon focus.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For most places, no. Upscale or popular spots may take reservations; walk-in is common.",
+        },
+        {
+          question: "Is Tunis safe?",
+          answer:
+            "Use normal precautions. The medina and main sights are generally safe; watch bags in crowded souks.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "marrakech", city: "Marrakech", days: 3, description: "Medina, souks, and gardens." },
+        { slug: "fez", city: "Fez", days: 3, description: "Medina and crafts." },
+        { slug: "cairo", city: "Cairo", days: 3, description: "Pyramids, museums, and Nile." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
   }),
   es: withDefaults("es", {
     paris: {
@@ -58566,6 +62118,1880 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { slug: "buenos-aires", city: "Buenos Aires", days: 3, description: "Tango, barrios y cultura de café." },
         { slug: "santiago", city: "Santiago", days: 3, description: "Vino, montañas y vistas de la ciudad." },
         { slug: "rio-de-janeiro", city: "Río de Janeiro", days: 3, description: "Playas, Cristo Redentor y ritmo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "abu-dhabi": {
+      slug: "abu-dhabi",
+      city: "Abu Dabi",
+      country: "EAU",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura y arquitectura", "Viajeros con ritmo tranquilo"],
+      style: ["Grandes mezquitas", "Paseos marítimos", "Museos"],
+      pacing: [
+        "Abu Dabi recompensa un ritmo tranquilo. Ancla cada día con un gran punto de interés—la Gran Mezquita, el Louvre o la Corniche—y deja tiempo para paseos junto al agua y paradas tranquilas.",
+        "Agrupa el tiempo por zona para moverte poco. Combina la mezquita con una visita por la mañana; dedica otro día a la isla de Saadiyat para museos y playa.",
+        "Reserva una tarde libre para la Corniche o un mercado para que el viaje sea relajado.",
+      ],
+      hero: {
+        title: "Abu Dabi en 3 días",
+        subtitle:
+          "Grandes mezquitas, paseos marítimos y museos de primer nivel con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Abu%20dhabi,%20Moschea%20dello%20Sceicco%20Zayed,%20cortile,%20pavimento.jpg",
+          alt: "Gran Mezquita Sheikh Zayed en Abu Dabi a la hora dorada.",
+        },
+      },
+      cityStats: [
+        { value: "200+", label: "Nacionalidades en la ciudad" },
+        { value: "8 km", label: "Corniche marítima" },
+        { value: "82", label: "Cúpulas en la Gran Mezquita Sheikh Zayed" },
+        { value: "1,5M+", label: "Residentes en el área metropolitana" },
+      ],
+      fit: {
+        forYou: ["Primer viaje con lugares icónicos", "Cultura y ritmo tranquilo", "Paseos marítimos", "Tiempo en museos", "Mezcla de moderno y tradicional"],
+        notForYou: ["Solo playa", "Solo vida nocturna", "Tours uno tras otro", "Estilo mochilero", "Esquí o nieve"],
+      },
+      dayPlans: [
+        { day: 1, title: "Gran Mezquita Sheikh Zayed", summary: "Visita a la gran mezquita y paseo por la Corniche.", morning: "Gran Mezquita Sheikh Zayed", afternoon: "Heritage Village o zona Qasr al Hosn", evening: "Paseo por la Corniche y cena" },
+        { day: 2, title: "Isla Saadiyat y Louvre", summary: "Louvre Abu Dabi y playa o parque.", morning: "Louvre Abu Dabi", afternoon: "Playa Saadiyat o paseo por manglares", evening: "Vuelta a tierra y cena tranquila" },
+        { day: 3, title: "Corniche y mercados", summary: "Frente marítimo, zocos y últimas paradas.", morning: "Paseo por la Corniche o exterior del Emirates Palace", afternoon: "Mercado Central o zona Marina Mall", evening: "Último paseo marítimo" },
+      ],
+      imageInfoCards: [
+        { title: "Gran Mezquita Sheikh Zayed", description: "La mezquita es el icono de la ciudad. Visítala por la mañana por la luz y la calma. Viste con modestia; hay abayas disponibles.", image: { src: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80", alt: "Gran Mezquita Sheikh Zayed, cúpulas blancas y estanques en Abu Dabi." } },
+        { title: "La Corniche", description: "El paseo marítimo recorre kilómetros. Los paseos de mañana y tarde ofrecen vistas al mar y un ritmo relajado.", image: { src: "https://images.unsplash.com/photo-1586724237569-f3d0c2dee8c7?auto=format&fit=crop&w=1200&q=80", alt: "Corniche y skyline de Abu Dabi." } },
+        { title: "Louvre Abu Dabi", description: "El museo combina arte y arquitectura. Planifica medio día; el edificio y la laguna son tan impactantes como la colección.", image: { src: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1200&q=80", alt: "Cúpula del Louvre Abu Dabi y agua en Abu Dabi." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril por clima suave" },
+        { label: "Traslado aeropuerto", value: "Taxi o autobús desde AUH" },
+        { label: "Transporte", value: "Taxis y autobuses; mezquita y Louvre en autobús" },
+        { label: "Entradas", value: "Reserva el Louvre con antelación; mezquita gratis" },
+        { label: "Vestimenta", value: "Ropa modesta para la mezquita; abayas disponibles" },
+      ],
+      checklist: [
+        "Reserva entrada al Louvre Abu Dabi",
+        "Lleva ropa modesta para la mezquita",
+        "Guarda mapas sin conexión",
+        "Lleva botella de agua reutilizable",
+        "Planifica la visita a la mezquita por la mañana",
+        "Consulta horarios de la mezquita",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Abu Dabi?", answer: "Sí para la Gran Mezquita, el Louvre y la Corniche. El ritmo se mantiene relajado con tiempo junto al agua." },
+        { question: "¿Hay que reservar la mezquita?", answer: "La entrada es gratis; no hace falta reserva. Se requiere vestimenta modesta; hay abayas en la mezquita." },
+        { question: "¿Abu Dabi es caminable?", answer: "La Corniche es muy caminable. Para la mezquita y el Louvre usa taxi o autobús; las distancias están repartidas." },
+        { question: "¿Dónde alojarme?", answer: "La zona de la Corniche te deja cerca del frente marítimo; centro o isla Yas según presupuesto y estilo." },
+        { question: "¿A qué hora empezar cada día?", answer: "La mañana es ideal para la mezquita para evitar calor y multitudes. El Louvre puede ser un bloque de medio día." },
+        { question: "¿Reservar restaurantes con antelación?", answer: "Para sitios populares ayuda reservar. Muchos hoteles y centros comerciales tienen opciones sin reserva." },
+        { question: "¿Abu Dabi es seguro para turistas?", answer: "Sí. La ciudad es muy segura; precauciones normales. Viste con respeto en zonas religiosas y públicas." },
+      ],
+      relatedItineraries: [
+        { slug: "dubai", city: "Dubái", days: 3, description: "Skyline moderno, zocos y experiencias en el desierto." },
+        { slug: "doha", city: "Doha", days: 3, description: "Museos, zocos y paseos por la cornisa." },
+        { slug: "muscat", city: "Mascate", days: 3, description: "Fuertes, zocos y vistas costeras." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "sao-paulo": {
+      slug: "sao-paulo",
+      city: "São Paulo",
+      country: "Brasil",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Comida y cultura", "Exploradores urbanos"],
+      style: ["Museos", "Barrios", "Mercados"],
+      pacing: [
+        "São Paulo funciona mejor con ritmo tranquilo. Ancla cada día en una zona—Paulista, Ibirapuera o el centro histórico—y deja tiempo para café y mercados.",
+        "Agrupa las visitas por distrito para no moverte mucho. Combina Paulista con un museo; dedica otro día a Ibirapuera y barrios cercanos.",
+        "Reserva una tarde libre para el Mercado Municipal o un paseo por un barrio.",
+      ],
+      hero: {
+        title: "São Paulo en 3 días",
+        subtitle:
+          "Museos, parques y comida diversa con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1680573346254-7768c3c2f6df?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline y avenida Paulista de São Paulo desde arriba.",
+        },
+      },
+      cityStats: [
+        { value: "12M+", label: "Residentes en el área metropolitana" },
+        { value: "1,6 km", label: "Longitud de la avenida Paulista" },
+        { value: "158", label: "Museos en la ciudad" },
+        { value: "90+", label: "Años del Mercado Municipal" },
+      ],
+      fit: {
+        forYou: ["Museos y parques", "Comida y mercados", "Primera visita", "Paseos urbanos", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Solo vida nocturna", "Horario repleto de tours", "Excursiones remotas", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Avenida Paulista y museos", summary: "Paulista, MASP y cultura cercana.", morning: "Avenida Paulista y MASP", afternoon: "Japan House o Itaú Cultural", evening: "Cena por Paulista y paseo" },
+        { day: 2, title: "Parque Ibirapuera", summary: "Parque, museos y espacio verde.", morning: "Parque Ibirapuera y senderos", afternoon: "MAM o Museo Afro Brasil", evening: "Vila Madalena o zona Jardins" },
+        { day: 3, title: "Mercado Municipal y centro", summary: "Mercado, centro histórico y comida.", morning: "Mercado Municipal y pastel", afternoon: "Sé o zona Luz", evening: "Última cena de barrio" },
+      ],
+      imageInfoCards: [
+        { title: "Avenida Paulista", description: "La avenida es la columna vertebral de la ciudad. Los domingos se cierra al tráfico; cualquier día ofrece museos, cafés y ambiente.", image: { src: "https://images.unsplash.com/photo-1558979152-2e1ec2f4358d?auto=format&fit=crop&w=1200&q=80", alt: "Avenida Paulista y edificios en São Paulo." } },
+        { title: "Parque Ibirapuera", description: "El parque ofrece verde, lagos y museos. Una mañana o tarde aquí equilibra los días urbanos.", image: { src: "https://images.unsplash.com/photo-1587334207828-3246900e24b4?auto=format&fit=crop&w=1200&q=80", alt: "Parque Ibirapuera y skyline de São Paulo." } },
+        { title: "Mercado Municipal", description: "El mercado es famoso por fruta, bocadillos y pastel. Planifica un almuerzo largo o parada para picar.", image: { src: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80", alt: "Interior del Mercado Municipal en São Paulo." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a septiembre, más seco y fresco" },
+        { label: "Traslado aeropuerto", value: "Taxi o Uber desde GRU o CGH" },
+        { label: "Transporte", value: "Metro y Uber; Paulista y centro bien conectados" },
+        { label: "Entradas", value: "Reserva MASP o museos clave en temporada alta" },
+        { label: "Alojamiento", value: "Paulista, Jardins o Vila Madalena" },
+      ],
+      checklist: [
+        "Guarda mapas sin conexión y app de Uber",
+        "Lleva capas para espacios con aire acondicionado",
+        "Planifica un almuerzo en el Mercado Municipal",
+        "Lleva botella de agua reutilizable",
+        "Zapatos cómodos para caminar",
+        "Consulta días de apertura de museos",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en São Paulo?", answer: "Sí para Paulista, Ibirapuera y el mercado. La ciudad es grande; este plan mantiene un ritmo realista." },
+        { question: "¿Necesito pase de transporte?", answer: "El metro es útil para Paulista y centro. Uber se usa mucho para trayectos largos y noches." },
+        { question: "¿São Paulo es caminable?", answer: "Paulista e Ibirapuera son caminables. Usa metro o Uber entre zonas; el tráfico puede ser denso." },
+        { question: "¿Dónde alojarme?", answer: "Paulista o Jardins te dejan en el centro. Vila Madalena encaja si buscas ambiente más bohemio y vida nocturna." },
+        { question: "¿A qué hora empezar cada día?", answer: "Un inicio normal está bien. MASP y el mercado son mejores antes del mediodía." },
+        { question: "¿Reservar restaurantes con antelación?", answer: "Para sitios populares, sí. Muchos aceptan sin reserva; las cenas de fin de semana se llenan." },
+        { question: "¿São Paulo es seguro para turistas?", answer: "Quédate en zonas principales y precauciones normales. Evita mostrar objetos de valor; usa Uber de noche." },
+      ],
+      relatedItineraries: [
+        { slug: "rio-de-janeiro", city: "Río de Janeiro", days: 3, description: "Playas, Cristo Redentor y ritmo." },
+        { slug: "buenos-aires", city: "Buenos Aires", days: 3, description: "Tango, barrios y cultura de café." },
+        { slug: "lima", city: "Lima", days: 3, description: "Plazas históricas, paseos por acantilados y comida." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    honolulu: {
+      slug: "honolulu",
+      city: "Honolulu",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y playa", "Viajeros con ritmo tranquilo"],
+      style: ["Pearl Harbor", "Waikiki", "Diamond Head"],
+      pacing: [
+        "Honolulu funciona con ritmo tranquilo. Ancla cada día en un foco—Pearl Harbor, Waikiki y Diamond Head, o la costa—y deja tiempo para playa y comidas tranquilas.",
+        "Agrupa el tiempo por zona. Combina Pearl Harbor con medio día; dedica otro a Waikiki y un paseo o vuelta por Diamond Head.",
+        "Reserva una tarde libre para la playa o un paseo escénico.",
+      ],
+      hero: {
+        title: "Honolulu en 3 días",
+        subtitle:
+          "Pearl Harbor, Waikiki y Diamond Head con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Diamond%20Head%20Volcanic%20Cone,%20Honolulu%20(503701)%20(20808316082).jpg",
+          alt: "Playa Waikiki y Diamond Head en Honolulu.",
+        },
+      },
+      cityStats: [
+        { value: "350K+", label: "Residentes de la ciudad" },
+        { value: "232", label: "Metros cumbre Diamond Head" },
+        { value: "1941", label: "Año del memorial Pearl Harbor" },
+        { value: "3 km", label: "Extensión de playa Waikiki" },
+      ],
+      fit: {
+        forYou: ["Historia y memoriales", "Playa y sol", "Primera visita", "Vistas escénicas", "Ritmo relajado"],
+        notForYou: ["Solo vida nocturna", "Horario repleto de tours", "Deportes de invierno", "Solo senderismo remoto", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Pearl Harbor", summary: "Memoriales y tiempo en el museo.", morning: "Centro de visitantes Pearl Harbor y USS Arizona", afternoon: "USS Missouri o Museo de Aviación del Pacífico", evening: "Vuelta a Waikiki y cena tranquila" },
+        { day: 2, title: "Waikiki y Diamond Head", summary: "Playa, vistas y frente marítimo.", morning: "Playa Waikiki y paseo", afternoon: "Mirador o ruta Diamond Head", evening: "Atardecer en Waikiki y cena" },
+        { day: 3, title: "Costa y despedida", summary: "Paseo escénico o tiempo de playa.", morning: "Hanauma Bay o paseo por la costa", afternoon: "Playa o últimas visitas", evening: "Última cena y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Pearl Harbor", description: "El memorial es una visita esencial y emotiva. Reserva entradas con antelación; planifica al menos medio día.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Memorial Pearl Harbor y puerto en Honolulu." } },
+        { title: "Playa Waikiki", description: "La playa es el centro de la ciudad. Los paseos de mañana y tarde son agradables; deja tiempo para nadar y sol.", image: { src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80", alt: "Playa Waikiki y palmeras en Honolulu." } },
+        { title: "Diamond Head", description: "El cráter y la cumbre ofrecen vistas al océano y la ciudad. Ve temprano para evitar calor; la caminata es moderada.", image: { src: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&w=1200&q=80", alt: "Cráter Diamond Head y costa desde arriba en Honolulu." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre, tiempo más seco" },
+        { label: "Traslado aeropuerto", value: "Taxi o shuttle desde HNL" },
+        { label: "Transporte", value: "Coche o Uber para Pearl Harbor y Diamond Head; Waikiki caminable" },
+        { label: "Entradas", value: "Reserva entradas a Pearl Harbor con antelación" },
+        { label: "Alojamiento", value: "Waikiki para playa y comodidad" },
+      ],
+      checklist: [
+        "Reserva entradas a Pearl Harbor con antelación",
+        "Lleva protector solar y loción respetuosa con arrecifes",
+        "Zapatos cómodos para Diamond Head",
+        "Guarda mapas sin conexión",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios de Diamond Head",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Honolulu?", answer: "Sí para Pearl Harbor, Waikiki y Diamond Head. Puedes añadir un día de playa o paseo por la costa." },
+        { question: "¿Necesito coche?", answer: "Waikiki es caminable. Para Pearl Harbor y Diamond Head, shuttle o Uber; el coche ayuda para la costa." },
+        { question: "¿Honolulu es caminable?", answer: "Waikiki es muy caminable. Otras visitas requieren un trayecto corto en coche o shuttle." },
+        { question: "¿Dónde alojarme?", answer: "Waikiki te deja cerca de la playa, restaurantes y transporte a Pearl Harbor y Diamond Head." },
+        { question: "¿A qué hora empezar para Pearl Harbor?", answer: "La mañana es mejor. Reserva la primera franja disponible para evitar multitudes y calor." },
+        { question: "¿Reservar restaurantes con antelación?", answer: "Para sitios populares, sí. Muchos en Waikiki aceptan sin reserva; las cenas de fin de semana se llenan." },
+        { question: "¿Honolulu es seguro para turistas?", answer: "Sí. Precaución normal; Waikiki y los principales puntos están muy transitados." },
+      ],
+      relatedItineraries: [
+        { slug: "san-diego", city: "San Diego", days: 3, description: "Frente marítimo, parques y ritmo costero." },
+        { slug: "sydney", city: "Sídney", days: 3, description: "Puerto, playas y ritmo relajado." },
+        { slug: "bali", city: "Bali", days: 3, description: "Templos, arrozales y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sapporo: {
+      slug: "sapporo",
+      city: "Sapporo",
+      country: "Japón",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Comida y parques", "Fans de ciudad invernal tranquila"],
+      style: ["Parque Odori", "Mercado Nijo", "Cerveza y ramen"],
+      pacing: [
+        "Sapporo recompensa un ritmo tranquilo. Ancla cada día en una zona—Odori y centro, mercado y museo de la cerveza, o un parque o excursión—y deja tiempo para paradas de comida.",
+        "Agrupa el tiempo por distrito. El centro es caminable; usa el metro para el Museo de la Cerveza o parques más lejos.",
+        "Reserva una tarde libre para un almuerzo en el mercado o un paseo tranquilo por el parque.",
+      ],
+      hero: {
+        title: "Sapporo en 3 días",
+        subtitle:
+          "Parque Odori, mercado Nijo y cultura cervecera con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Sapporo_TV_Tower_and_Odori_park.JPG",
+          alt: "Ciudad de Sapporo y parque Odori en invierno.",
+        },
+      },
+      cityStats: [
+        { value: "1,9M+", label: "Residentes en la ciudad" },
+        { value: "1,5 km", label: "Longitud del parque Odori" },
+        { value: "1876", label: "Año de fundación de Sapporo Beer" },
+        { value: "200+", label: "Locales de ramen en la ciudad" },
+      ],
+      fit: {
+        forYou: ["Comida y mercados", "Parques y paseos fáciles", "Primera visita", "Cerveza y ramen", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Solo vida nocturna", "Horario repleto de tours", "Solo esquí", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Parque Odori y centro", summary: "Parque, torre TV y centro.", morning: "Parque Odori y torre TV de Sapporo", afternoon: "Galería comercial Tanukikoji", evening: "Ramen o cena en Susukino" },
+        { day: 2, title: "Mercado Nijo y cerveza", summary: "Mercado y Museo de la Cerveza Sapporo.", morning: "Mercado Nijo y desayuno de marisco", afternoon: "Museo de la Cerveza Sapporo y jardín", evening: "Cena en Odori o Susukino" },
+        { day: 3, title: "Parques y despedida", summary: "Parque Maruyama o Moerenuma.", morning: "Parque Maruyama o parque Moerenuma", afternoon: "Últimas compras o café", evening: "Última cena y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Parque Odori", description: "El parque cruza el centro. Eventos estacionales y la torre TV lo convierten en un eje natural para un paseo tranquilo.", image: { src: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80", alt: "Parque Odori y skyline de Sapporo." } },
+        { title: "Mercado Nijo", description: "El mercado es famoso por cangrejo, salmón y bowls de marisco. Planifica una visita por la mañana y desayuno.", image: { src: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80", alt: "Marisco del mercado Nijo en Sapporo." } },
+        { title: "Museo de la Cerveza Sapporo", description: "El museo de ladrillo rojo y el jardín ofrecen historia y degustación. Un medio día tranquilo encaja en el ritmo.", image: { src: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&w=1200&q=80", alt: "Edificio y jardín del Museo de la Cerveza Sapporo." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Febrero por Festival de la Nieve; septiembre por clima suave" },
+        { label: "Traslado aeropuerto", value: "Tren o autobús desde aeropuerto New Chitose" },
+        { label: "Transporte", value: "Metro para centro y Museo de la Cerveza; Odori y Tanukikoji a pie" },
+        { label: "Entradas", value: "Museo de la Cerveza sin reserva; Festival de la Nieve gratis" },
+        { label: "Alojamiento", value: "Odori o Susukino para acceso al centro" },
+      ],
+      checklist: [
+        "Lleva capas para invierno o tardes frescas",
+        "Guarda mapas sin conexión y mapa del metro",
+        "Planifica un desayuno en el mercado Nijo",
+        "Lleva botella de agua reutilizable",
+        "Zapatos cómodos para caminar",
+        "Consulta horarios del mercado",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Sapporo?", answer: "Sí para Odori, mercado Nijo y el Museo de la Cerveza. Puedes añadir un parque o excursión si tienes energía." },
+        { question: "¿Necesito pase de transporte?", answer: "Un pase de metro diario ayuda. El centro es caminable; el metro es útil para el Museo de la Cerveza y parques." },
+        { question: "¿Sapporo es caminable?", answer: "Odori, Tanukikoji y Susukino son muy caminables. El metro cubre el resto." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de Odori o Susukino te deja en el centro para parque, mercado y cenas." },
+        { question: "¿A qué hora empezar cada día?", answer: "El mercado Nijo es mejor por la mañana. Odori y el centro son flexibles." },
+        { question: "¿Reservar restaurantes con antelación?", answer: "Para locales de ramen populares, espera colas. Muchos son sin reserva; puede haber espera en cena punta." },
+        { question: "¿Sapporo es seguro para turistas?", answer: "Sí. La ciudad es muy segura; precauciones normales." },
+      ],
+      relatedItineraries: [
+        { slug: "tokyo", city: "Tokio", days: 3, description: "Templos, barrios y comida." },
+        { slug: "osaka", city: "Osaka", days: 3, description: "Comida callejera, canales y monumentos." },
+        { slug: "kyoto", city: "Kioto", days: 3, description: "Templos, jardines y calles tradicionales." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    perth: {
+      slug: "perth",
+      city: "Perth",
+      country: "Australia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Parques y frente marítimo", "Viajeros con ritmo tranquilo"],
+      style: ["Kings Park", "Fremantle", "Río Swan"],
+      pacing: [
+        "Perth recompensa un ritmo tranquilo. Ancla cada día en una zona—Kings Park, el río y el CBD, o Fremantle—y deja tiempo para paseos marítimos y cafés.",
+        "Agrupa el tiempo por zona. Kings Park y el CBD están cerca; Fremantle es un trayecto corto en tren para un día completo o medio día.",
+        "Reserva una tarde libre para el río Swan o una playa para que el viaje sea relajado.",
+      ],
+      hero: {
+        title: "Perth en 3 días",
+        subtitle:
+          "Kings Park, Fremantle y el río Swan con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://commons.wikimedia.org/wiki/Special:FilePath/Perth%20(AU),%20View%20from%20Kings%20Park%20--%202019%20--%200525-30.jpg",
+          alt: "Skyline de Perth y río Swan al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "2M+", label: "Residentes en el área metropolitana" },
+        { value: "400 ha", label: "Tamaño de Kings Park" },
+        { value: "19 km", label: "Tren a Fremantle" },
+        { value: "60 km", label: "Longitud del río Swan por el metro" },
+      ],
+      fit: {
+        forYou: ["Parques y río", "Primera visita", "Ritmo relajado", "Paseos marítimos", "Café y comida"],
+        notForYou: ["Solo vida nocturna", "Horario repleto de tours", "Nieve o esquí", "Solo outback remoto", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Kings Park y CBD", summary: "Parque, vistas y centro.", morning: "Kings Park y jardín botánico", afternoon: "CBD y Elizabeth Quay", evening: "Paseo por el río Swan y cena" },
+        { day: 2, title: "Fremantle", summary: "Puerto, mercados y frente marítimo.", morning: "Mercados de Fremantle y calle principal", afternoon: "Fremantle Prison o Fishing Boat Harbour", evening: "Cena en Fremantle y vuelta" },
+        { day: 3, title: "Río Swan y despedida", summary: "Río, playas o últimas paradas.", morning: "Paseo o ferry por el río Swan", afternoon: "Playa Cottesloe o Scarborough", evening: "Última cena y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Kings Park", description: "El parque ofrece vistas a la ciudad y al río. Los paseos de mañana o tarde son ideales; el jardín botánico es gratis.", image: { src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80", alt: "Kings Park y skyline de Perth desde arriba." } },
+        { title: "Fremantle", description: "El puerto tiene mercados, cafés y ambiente relajado. Un día completo o medio día encaja en el ritmo.", image: { src: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80", alt: "Puerto de Fremantle y edificios históricos." } },
+        { title: "Río Swan", description: "El río cruza la ciudad. Paseos, ferris y cafés junto al agua ofrecen un ritmo tranquilo.", image: { src: "https://images.unsplash.com/photo-1476514525537-07c4c29489fb?auto=format&fit=crop&w=1200&q=80", alt: "Río Swan y frente marítimo de Perth." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Septiembre a noviembre o marzo a mayo, clima suave" },
+        { label: "Traslado aeropuerto", value: "Tren o taxi desde aeropuerto de Perth" },
+        { label: "Transporte", value: "Tren a Fremantle; Kings Park y CBD a pie" },
+        { label: "Entradas", value: "Kings Park gratis; reserva Fremantle Prison si quieres" },
+        { label: "Alojamiento", value: "CBD, Northbridge o cerca del río" },
+      ],
+      checklist: [
+        "Lleva protector solar y gorra",
+        "Guarda mapas sin conexión y horario de trenes",
+        "Planifica una mañana en los mercados de Fremantle",
+        "Lleva botella de agua reutilizable",
+        "Zapatos cómodos para caminar",
+        "Consulta días de los mercados de Fremantle",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Perth?", answer: "Sí para Kings Park, Fremantle y el río Swan. El ritmo se mantiene relajado con tiempo para playa o río." },
+        { question: "¿Necesito coche?", answer: "El tren a Fremantle es fácil. Kings Park y el CBD son caminables; el coche ayuda para playas." },
+        { question: "¿Perth es caminable?", answer: "Kings Park, CBD y Elizabeth Quay son caminables. Fremantle es compacto; el tren te acerca." },
+        { question: "¿Dónde alojarme?", answer: "CBD o Northbridge te dejan en el centro. Cerca del río para una base más tranquila." },
+        { question: "¿A qué hora empezar cada día?", answer: "Kings Park es agradable por la mañana. Los mercados de Fremantle son mejores los fines de semana por la mañana." },
+        { question: "¿Reservar restaurantes con antelación?", answer: "Para sitios populares, sí. Muchos aceptan sin reserva; las cenas de fin de semana se llenan." },
+        { question: "¿Perth es seguro para turistas?", answer: "Sí. Precaución normal; las zonas principales están muy transitadas." },
+      ],
+      relatedItineraries: [
+        { slug: "sydney", city: "Sídney", days: 3, description: "Puerto, playas y ritmo relajado." },
+        { slug: "melbourne", city: "Melbourne", days: 3, description: "Callejones, café y cultura." },
+        { slug: "brisbane", city: "Brisbane", days: 3, description: "Río, South Bank y ritmo subtropical." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    funchal: {
+      slug: "funchal",
+      city: "Funchal",
+      country: "Portugal",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Jardines y vistas", "Ritmo tranquilo"],
+      style: ["Jardines", "Casco antiguo", "Teleférico y levadas"],
+      pacing: [
+        "Funchal se disfruta mejor con calma. Ancla cada día en un eje—jardines y Monte, casco antiguo o una levada—y deja tiempo para cafés y paseos por el puerto.",
+        "Agrupa las visitas por zona. Monte y jardines van bien juntos; el casco antiguo y el mercado se recorren a pie. Reserva media jornada para una levada corta o vistas al mar.",
+        "Deja una tarde libre para el paseo marítimo o una comida tranquila.",
+      ],
+      hero: {
+        title: "Funchal en 3 días",
+        subtitle:
+          "Jardines, casco antiguo y teleférico con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1725380054256-48ae4ae7c20e?auto=format&fit=crop&w=1600&q=80",
+          alt: "Puerto y casco antiguo de Funchal con la montaña al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "110K+", label: "Habitantes en Funchal" },
+        { value: "7 km", label: "Teleférico a Monte" },
+        { value: "500+", label: "Años de historia" },
+        { value: "1.400 km", label: "Red de levadas en Madeira" },
+      ],
+      fit: {
+        forYou: ["Jardines y miradores", "Primera vez en Madeira", "Casco antiguo y puerto caminables", "Ritmo tranquilo con cafés", "Teleférico y paseos cortos"],
+        notForYou: ["Solo vida nocturna", "Horario repleto de tours", "Solo senderos largos de montaña", "Solo playa", "Viaje centrado en compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Casco antiguo y puerto", summary: "Mercado, calles y paseo marítimo.", morning: "Mercado dos Lavradores y calles del casco antiguo", afternoon: "Zona del puerto y Forte de São Tiago", evening: "Paseo por el paseo marítimo y cena" },
+        { day: 2, title: "Monte y jardines", summary: "Teleférico, Monte Palace y vistas.", morning: "Teleférico a Monte y Jardines de Monte Palace", afternoon: "Jardín Botánico o bajada en trineo de mimbre", evening: "Vuelta a Funchal y cena tranquila" },
+        { day: 3, title: "Levada o costa", summary: "Paseo corto o vistas costeras.", morning: "Levada corta o Câmara de Lobos", afternoon: "Últimas paradas en el casco antiguo o miradores", evening: "Cena final y paseo por el puerto" },
+      ],
+      imageInfoCards: [
+        { title: "Casco antiguo y mercado", description: "El mercado y las calles empedradas marcan el tono. La mañana es mejor para el mercado; el casco antiguo es agradable hasta el atardecer.", image: { src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo y puerto de Funchal desde arriba." } },
+        { title: "Monte y jardines", description: "El teleférico une Funchal con Monte. Reserva una mañana o día para los jardines y las vistas.", image: { src: "https://images.unsplash.com/photo-1583495729010-84c2b2e07b6e?auto=format&fit=crop&w=1200&q=80", alt: "Jardines de Monte Palace en Funchal." } },
+        { title: "Puerto y costa", description: "El paseo marítimo y los pueblos cercanos ofrecen un ritmo tranquilo. Deja tiempo para un almuerzo relajado o un corto trayecto por la costa.", image: { src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80", alt: "Puerto y bahía de Funchal." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para tiempo cálido y seco" },
+        { label: "Traslado aeropuerto", value: "Taxi o bus desde el aeropuerto de Madeira" },
+        { label: "Transporte", value: "Centro a pie; teleférico a Monte; bus o taxi para levadas" },
+        { label: "Entradas", value: "Reserva teleférico y Monte Palace con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Centro o casco antiguo para acceso a pie" },
+      ],
+      checklist: [
+        "Reserva teleférico y Monte Palace en temporada alta",
+        "Zapatos cómodos para caminar",
+        "Guarda mapas sin conexión de Funchal",
+        "Planifica un café o comida tranquila al día",
+        "Lleva botella de agua reutilizable",
+        "Consulta días de apertura del mercado",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Funchal?", answer: "Sí para jardines, casco antiguo y una levada corta o Monte. El ritmo se mantiene relajado con tiempo para el puerto." },
+        { question: "¿Necesito coche?", answer: "No para el centro y Monte. Coche o excursión ayudan para levadas o Câmara de Lobos." },
+        { question: "¿Funchal es caminable?", answer: "El casco antiguo y el puerto son muy caminables. El teleférico te lleva a Monte; taxis o buses cubren el resto." },
+        { question: "¿Dónde alojarme?", answer: "Centro o casco antiguo para estar cerca del mercado, calles y paseo marítimo. Cerca del teleférico conviene para Monte." },
+        { question: "¿A qué hora empezar cada día?", answer: "El mercado es mejor por la mañana. Monte y jardines están bien desde media mañana; evita el mediodía en verano." },
+        { question: "¿Reservar restaurantes con antelación?", answer: "En sitios populares sí, sobre todo en fin de semana. Muchos aceptan sin reserva a mediodía." },
+        { question: "¿Funchal es seguro para turistas?", answer: "Sí. Precaución normal; el centro y casco antiguo están muy transitados." },
+      ],
+      relatedItineraries: [
+        { slug: "lisbon", city: "Lisboa", days: 3, description: "Colinas, río y barrios históricos." },
+        { slug: "porto", city: "Oporto", days: 3, description: "Río, bodegas y casco antiguo." },
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Casco antiguo, murallas y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    kotor: {
+      slug: "kotor",
+      city: "Kotor",
+      country: "Montenegro",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Casco antiguo y vistas", "Ritmo tranquilo"],
+      style: ["Casco antiguo", "Subida a la fortaleza", "Vistas de la bahía"],
+      pacing: [
+        "Kotor se disfruta con calma. Ancla cada día en una zona—casco antiguo, subida a la fortaleza o la bahía—y deja tiempo para cafés y paseos nocturnos.",
+        "El casco antiguo es compacto; en un día ves las calles y plazas principales. Dedica otro a la fortaleza y las vistas, y reserva tiempo para un corto paseo por la bahía o descanso.",
+        "Deja una tarde libre para una comida tranquila o un rincón tranquilo.",
+      ],
+      hero: {
+        title: "Kotor en 3 días",
+        subtitle:
+          "Casco antiguo, fortaleza y bahía con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1681154008165-0b6fa82093ab?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casco antiguo y bahía de Kotor con montañas al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "1.200+", label: "Años de historia" },
+        { value: "1.350", label: "Escalones hasta la fortaleza" },
+        { value: "4,5 km", label: "Murallas del casco antiguo" },
+        { value: "28 km", label: "Longitud de la bahía" },
+      ],
+      fit: {
+        forYou: ["Casco antiguo e historia", "Primera vez", "Fortaleza y miradores", "Ritmo tranquilo con pausas", "Bahía y ambiente costero"],
+        notForYou: ["Solo vida nocturna", "Horario repleto de tours", "Solo playa", "Solo senderos largos", "Viaje centrado en compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Núcleo del casco antiguo", summary: "Plazas, iglesias y calles.", morning: "Puertas del casco antiguo y plaza principal", afternoon: "Iglesias y calles estrechas", evening: "Paseo por el puerto y cena" },
+        { day: 2, title: "Fortaleza y vistas", summary: "Subida y vistas de la bahía.", morning: "Subida a la fortaleza y miradores", afternoon: "Bajada y descanso en el casco antiguo", evening: "Paseo nocturno y cena" },
+        { day: 3, title: "Bahía y despedida", summary: "Paseo en barco o últimas paradas.", morning: "Crucero corto por la bahía o Perast", afternoon: "Últimas paradas en el casco antiguo o descanso", evening: "Cena final y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Casco antiguo", description: "La ciudad amurallada es un laberinto de calles de piedra y plazas. Las mañanas son más tranquilas; las tardes son buenas para cenar y pasear.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo y bahía de Kotor desde arriba." } },
+        { title: "Subida a la fortaleza", description: "La subida ofrece vistas de la bahía y la ciudad. Empieza temprano en verano para evitar calor y aglomeraciones.", image: { src: "https://images.unsplash.com/photo-1586502160157-2a1b0d686e59?auto=format&fit=crop&w=1200&q=80", alt: "Murallas de la fortaleza de Kotor y bahía." } },
+        { title: "La bahía", description: "La bahía de Kotor es un entrante tipo fiordo. Un corto paseo en barco o coche a Perast añade variedad sin prisas.", image: { src: "https://images.unsplash.com/photo-1549140602-7c6583f74a75?auto=format&fit=crop&w=1200&q=80", alt: "Bahía de Kotor y montañas." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Taxi o bus desde Tivat o Podgorica" },
+        { label: "Transporte", value: "Casco antiguo a pie; barco o bus para la bahía" },
+        { label: "Entradas", value: "Pequeña tarifa para la subida a la fortaleza" },
+        { label: "Alojamiento", value: "Dentro del casco antiguo o junto a las puertas" },
+      ],
+      checklist: [
+        "Zapatos cómodos para la subida a la fortaleza",
+        "Empieza la fortaleza temprano en verano",
+        "Guarda mapa sin conexión del casco antiguo",
+        "Lleva agua para la subida",
+        "Planifica una comida tranquila al día",
+        "Consulta opciones de paseos en barco por la bahía",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Kotor?", answer: "Sí para el casco antiguo, la fortaleza y un poco de la bahía. El ritmo se mantiene relajado con tiempo para descansar." },
+        { question: "¿La subida a la fortaleza es dura?", answer: "Es empinada y con escalones. Ve con calma, lleva agua y empieza temprano con calor." },
+        { question: "¿Kotor es caminable?", answer: "El casco antiguo es muy caminable. La fortaleza es una subida; la bahía requiere barco o bus." },
+        { question: "¿Dónde alojarme?", answer: "Dentro del casco antiguo por el ambiente, o junto a las puertas para acceso y aparcamiento." },
+        { question: "¿A qué hora empezar la fortaleza?", answer: "A primera hora en verano para evitar calor y aglomeraciones. La luz de media tarde es buena para fotos." },
+        { question: "¿Reservar restaurantes?", answer: "Los sitios populares se llenan a la cena; conviene reservar en temporada alta. A mediodía suele haber sitio sin reserva." },
+        { question: "¿Kotor es seguro para turistas?", answer: "Sí. Precaución normal; el casco antiguo está muy transitado." },
+      ],
+      relatedItineraries: [
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Casco antiguo, murallas y costa." },
+        { slug: "split", city: "Split", days: 3, description: "Palacio, puerto e islas." },
+        { slug: "mostar", city: "Mostar", days: 2, description: "Puente y casco antiguo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    rovinj: {
+      slug: "rovinj",
+      city: "Rovinj",
+      country: "Croacia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Casco antiguo y puerto", "Ritmo tranquilo"],
+      style: ["Casco antiguo", "Iglesia y puerto", "Paseos costeros"],
+      pacing: [
+        "Rovinj se disfruta con calma. Ancla cada día en un eje—casco antiguo e iglesia, puerto o costa—y deja tiempo para cafés y vistas al atardecer.",
+        "El casco antiguo es compacto; en un día recorres las calles principales y la iglesia. Añade una mañana de puerto y media jornada de costa o isla.",
+        "Deja una tarde libre para una comida tranquila o una playa tranquila.",
+      ],
+      hero: {
+        title: "Rovinj en 3 días",
+        subtitle:
+          "Casco antiguo, puerto y costa con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1635144915529-9a10c5758293?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casco antiguo y puerto de Rovinj desde el agua.",
+        },
+      },
+      cityStats: [
+        { value: "14K+", label: "Habitantes" },
+        { value: "63 m", label: "Altura de la torre de la iglesia" },
+        { value: "20+", label: "Islas en el archipiélago" },
+        { value: "1.700+", label: "Años de historia" },
+      ],
+      fit: {
+        forYou: ["Casco antiguo y puerto", "Primera vez", "Atardeceres y vistas costeras", "Ritmo tranquilo con pausas", "Arte y cafés"],
+        notForYou: ["Solo vida nocturna", "Horario repleto de tours", "Museos de gran ciudad", "Solo senderos largos", "Viaje centrado en compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Casco antiguo e iglesia", summary: "Calles, iglesia y vistas.", morning: "Calles del casco antiguo e iglesia de Santa Eufemia", afternoon: "Puerto y plaza principal", evening: "Atardecer desde el puerto y cena" },
+        { day: 2, title: "Puerto y mercado", summary: "Vida del puerto y ambiente local.", morning: "Mercado matinal y paseo por el puerto", afternoon: "Paseo en barco o paseo costero", evening: "Cena en el puerto y paseo nocturno" },
+        { day: 3, title: "Costa y despedida", summary: "Playa o últimas paradas.", morning: "Paseo costero o playa", afternoon: "Últimas paradas en el casco antiguo o descanso", evening: "Cena final y atardecer" },
+      ],
+      imageInfoCards: [
+        { title: "Casco antiguo e iglesia", description: "La iglesia corona el casco antiguo. La subida a la torre da vistas del puerto y las islas; las calles de abajo son ideales para un paseo tranquilo.", image: { src: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo e iglesia de Rovinj desde el puerto." } },
+        { title: "Puerto", description: "El puerto es el corazón de Rovinj. Mercado por la mañana y cenas por la noche mantienen el ritmo relajado.", image: { src: "https://images.unsplash.com/photo-1549140602-7c6583f74a75?auto=format&fit=crop&w=1200&q=80", alt: "Puerto y barcos de Rovinj." } },
+        { title: "Costa e islas", description: "Cortos paseos en barco o paseos costeros añaden variedad. Deja tiempo para una playa tranquila o una vista al atardecer.", image: { src: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80", alt: "Costa croata y aguas transparentes." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para buen tiempo y mar" },
+        { label: "Traslado aeropuerto", value: "Taxi o bus desde Pula o Trieste" },
+        { label: "Transporte", value: "Casco antiguo a pie; barco para islas" },
+        { label: "Entradas", value: "La torre de la iglesia tiene tarifa reducida" },
+        { label: "Alojamiento", value: "Casco antiguo o cerca del puerto" },
+      ],
+      checklist: [
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del casco antiguo",
+        "Planifica una tarde o noche en el puerto o al atardecer",
+        "Lleva botella de agua reutilizable",
+        "Consulta opciones de paseos en barco",
+        "Reserva restaurantes populares en temporada alta",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Rovinj?", answer: "Sí para el casco antiguo, el puerto y un poco de costa o islas. El ritmo se mantiene relajado." },
+        { question: "¿Necesito coche?", answer: "No para el casco antiguo y el puerto. Coche o barco ayudan para playas y pueblos cercanos." },
+        { question: "¿Rovinj es caminable?", answer: "El casco antiguo y el puerto son muy caminables. Los barcos van a las islas." },
+        { question: "¿Dónde alojarme?", answer: "Casco antiguo o cerca del puerto por ambiente y paseos. Reserva con antelación en verano." },
+        { question: "¿Cuándo es mejor la torre de la iglesia?", answer: "Por la mañana o media tarde para luz suave. El atardecer desde el puerto es muy popular." },
+        { question: "¿Reservar restaurantes?", answer: "En temporada alta sí para cenar en sitios populares. A mediodía suele haber sitio sin reserva." },
+        { question: "¿Rovinj es seguro para turistas?", answer: "Sí. Precaución normal; la ciudad está muy transitada." },
+      ],
+      relatedItineraries: [
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Casco antiguo, murallas y costa." },
+        { slug: "split", city: "Split", days: 3, description: "Palacio, puerto e islas." },
+        { slug: "venice", city: "Venecia", days: 3, description: "Canales, plazas y laguna." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    brasov: {
+      slug: "brasov",
+      city: "Brașov",
+      country: "Rumanía",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Casco antiguo y castillos", "Ritmo tranquilo"],
+      style: ["Casco antiguo", "Iglesia Negra", "Castillos y vistas cercanos"],
+      pacing: [
+        "Brașov se disfruta con calma. Ancla cada día en un eje—casco antiguo e iglesia, un castillo cercano o la vista desde la montaña—y deja tiempo para cafés y paseos nocturnos.",
+        "El casco antiguo es compacto y caminable. Dedica un día a Bran o Peles si te gustan los castillos; reserva otro para el centro y el monte Tampa.",
+        "Deja una tarde libre para una comida tranquila o un rincón tranquilo.",
+      ],
+      hero: {
+        title: "Brașov en 3 días",
+        subtitle:
+          "Casco antiguo, Iglesia Negra y castillos cercanos con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1680003935289-0c8d65e1ae30?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casco antiguo de Brașov con monte Tampa e Iglesia Negra.",
+        },
+      },
+      cityStats: [
+        { value: "250K+", label: "Habitantes en el área metropolitana" },
+        { value: "900+", label: "Años de historia" },
+        { value: "960 m", label: "Cima del monte Tampa" },
+        { value: "30 km", label: "Distancia al castillo de Bran" },
+      ],
+      fit: {
+        forYou: ["Casco antiguo e historia", "Primera vez en Transilvania", "Castillos y vistas", "Ritmo tranquilo con pausas", "Café y ambiente de montaña"],
+        notForYou: ["Solo vida nocturna", "Horario repleto de tours", "Solo playa", "Solo senderos largos", "Viaje centrado en compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Casco antiguo e Iglesia Negra", summary: "Plaza del Consejo, iglesia y calles.", morning: "Plaza del Consejo e Iglesia Negra", afternoon: "Callea de la Cuerda y callejuelas del casco antiguo", evening: "Paseo nocturno y cena" },
+        { day: 2, title: "Monte Tampa o Schei", summary: "Vistas y calles tranquilas.", morning: "Teleférico o paseo al mirador de Tampa", afternoon: "Barrio Schei o descanso", evening: "Cena en el casco antiguo" },
+        { day: 3, title: "Castillo o despedida", summary: "Bran o Peles, o últimas paradas.", morning: "Excursión al castillo de Bran o de Peles", afternoon: "Vuelta y últimas paradas en Brașov", evening: "Cena final y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Casco antiguo", description: "La Plaza del Consejo y la Iglesia Negra marcan el centro. Las mañanas son más tranquilas; las calles son agradables hasta el atardecer.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo y Plaza del Consejo de Brașov." } },
+        { title: "Iglesia Negra", description: "La iglesia gótica domina el skyline. Reserva tiempo para el interior y la plaza exterior.", image: { src: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80", alt: "Iglesia Negra y casco antiguo de Brașov." } },
+        { title: "Castillos y montañas", description: "Bran y Peles son opciones de excursión. El monte Tampa da una vista rápida de la ciudad sin largo trayecto.", image: { src: "https://images.unsplash.com/photo-1586502160157-2a1b0d686e59?auto=format&fit=crop&w=1200&q=80", alt: "Montaña y castillo en Transilvania." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Tren o bus desde Bucarest" },
+        { label: "Transporte", value: "Casco antiguo a pie; bus o excursión para Bran y Peles" },
+        { label: "Entradas", value: "Reserva Bran y Peles con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Casco antiguo para acceso a pie" },
+      ],
+      checklist: [
+        "Reserva Bran o Peles en temporada alta",
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del casco antiguo",
+        "Planifica una comida tranquila al día",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios del teleférico del monte Tampa",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Brașov?", answer: "Sí para el casco antiguo, la Iglesia Negra y un castillo o el monte Tampa. El ritmo se mantiene relajado." },
+        { question: "¿Necesito coche?", answer: "No para el casco antiguo. Coche o excursión son útiles para Bran y Peles." },
+        { question: "¿Brașov es caminable?", answer: "El casco antiguo es muy caminable. El monte Tampa tiene teleférico; los castillos requieren coche o excursión." },
+        { question: "¿Dónde alojarme?", answer: "Casco antiguo para estar cerca de la plaza, iglesia y restaurantes. Reserva con antelación en temporada alta." },
+        { question: "¿A qué hora ir a los castillos?", answer: "Por la mañana es mejor para evitar aglomeraciones en Bran y Peles. El casco antiguo es flexible." },
+        { question: "¿Reservar restaurantes?", answer: "En sitios populares sí en temporada alta. Muchos aceptan sin reserva a mediodía." },
+        { question: "¿Brașov es seguro para turistas?", answer: "Sí. Precaución normal; el casco antiguo está muy transitado." },
+      ],
+      relatedItineraries: [
+        { slug: "bucharest", city: "Bucarest", days: 3, description: "Capital, casco antiguo y parques." },
+        { slug: "prague", city: "Praga", days: 3, description: "Casco antiguo, castillo y río." },
+        { slug: "krakow", city: "Cracovia", days: 3, description: "Casco antiguo, plaza y sitios cercanos." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    mostar: {
+      slug: "mostar",
+      city: "Mostar",
+      country: "Bosnia y Herzegovina",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Escapadas cortas", "Primera vez", "Puente y casco antiguo"],
+      style: ["Stari Most", "Bazar antiguo", "Calles del casco antiguo"],
+      pacing: [
+        "Mostar se disfruta en dos días con calma. El primer día se centra en el puente y el casco antiguo; el segundo permite una segunda visita tranquila o un corto viaje a Blagaj o alrededores.",
+        "El casco antiguo es compacto. Puedes ver el puente, el bazar y las calles principales sin prisas. Deja tiempo para cafés y vistas nocturnas del puente.",
+        "Deja una tarde libre para que el viaje sea relajado.",
+      ],
+      hero: {
+        title: "Mostar en 2 días",
+        subtitle:
+          "El puente, casco antiguo y bazar con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1623536167776-922ccb1ff749?auto=format&fit=crop&w=1600&q=80",
+          alt: "Puente Stari Most y casco antiguo de Mostar.",
+        },
+      },
+      cityStats: [
+        { value: "450+", label: "Años del Stari Most" },
+        { value: "24 m", label: "Altura del puente sobre el río" },
+        { value: "100K+", label: "Habitantes en el área metropolitana" },
+        { value: "UNESCO", label: "Patrimonio de la Humanidad" },
+      ],
+      fit: {
+        forYou: ["Puente y casco antiguo", "Escapada corta o complemento", "Ritmo tranquilo con pausas", "Primera vez", "Historia y ambiente"],
+        notForYou: ["Solo vida nocturna", "Horario repleto de tours", "Solo playa", "Exploración de muchos días", "Viaje centrado en compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Puente y casco antiguo", summary: "Stari Most, bazar y calles.", morning: "Stari Most y vistas del puente", afternoon: "Bazar antiguo y calles empedradas", evening: "Atardecer en el puente y cena" },
+        { day: 2, title: "Segunda visita y despedida", summary: "Mañana en el casco antiguo o Blagaj.", morning: "Segunda visita al casco antiguo o excursión a Blagaj", afternoon: "Últimas paradas y almuerzo tranquilo", evening: "Cena final y vista del puente" },
+      ],
+      imageInfoCards: [
+        { title: "Stari Most", description: "El puente es el corazón de Mostar. La mañana y la tarde ofrecen luz distinta; dedica tiempo a verlo desde ambas orillas.", image: { src: "https://images.unsplash.com/photo-1586502160157-2a1b0d686e59?auto=format&fit=crop&w=1200&q=80", alt: "Puente Stari Most sobre el Neretva." } },
+        { title: "Bazar antiguo", description: "El bazar y las calles del casco antiguo bordean el río. Un paseo tranquilo y un café mantienen el ritmo relajado.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Calles del casco antiguo y bazar de Mostar." } },
+        { title: "Río y vistas", description: "El Neretva pasa bajo el puente. Las vistas desde las orillas y el puente cambian con la luz.", image: { src: "https://images.unsplash.com/photo-1549140602-7c6583f74a75?auto=format&fit=crop&w=1200&q=80", alt: "Río y casco antiguo de Mostar." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Taxi o bus desde Sarajevo o Dubrovnik" },
+        { label: "Transporte", value: "Casco antiguo a pie; bus o taxi para Blagaj" },
+        { label: "Entradas", value: "No hay entradas para el puente ni el casco antiguo" },
+        { label: "Alojamiento", value: "Cerca del casco antiguo para acceso a pie" },
+      ],
+      checklist: [
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del casco antiguo",
+        "Planifica una tarde o noche en el puente",
+        "Lleva botella de agua reutilizable",
+        "Reserva alojamiento con antelación en temporada alta",
+        "Consulta horarios de Blagaj si visitas",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Mostar?", answer: "Sí para el puente, casco antiguo y bazar. El ritmo se mantiene relajado; puedes añadir Blagaj o un segundo día tranquilo." },
+        { question: "¿Mostar es caminable?", answer: "El casco antiguo es muy caminable. Todo gira en torno al puente y el río." },
+        { question: "¿Dónde alojarme?", answer: "Cerca del casco antiguo para acceso fácil al puente y restaurantes. Reserva con antelación en verano." },
+        { question: "¿Cuándo es mejor el puente?", answer: "La luz de mañana y tarde es buena. Por la noche hay más ambiente pero más gente." },
+        { question: "¿Reservar restaurantes?", answer: "Los sitios populares se llenan a la cena; conviene reservar en temporada alta. A mediodía suele haber sitio sin reserva." },
+        { question: "¿Merece la pena una excursión a Blagaj?", answer: "Sí si tienes un segundo día tranquilo. La tekke y el manantial están cerca de Mostar." },
+        { question: "¿Mostar es seguro para turistas?", answer: "Sí. Precaución normal; el casco antiguo está muy transitado." },
+      ],
+      relatedItineraries: [
+        { slug: "sarajevo", city: "Sarajevo", days: 3, description: "Casco antiguo, historia y montañas." },
+        { slug: "dubrovnik", city: "Dubrovnik", days: 3, description: "Casco antiguo, murallas y costa." },
+        { slug: "kotor", city: "Kotor", days: 3, description: "Casco antiguo, fortaleza y bahía." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cincinnati: {
+      slug: "cincinnati",
+      city: "Cincinnati",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Río y barrios", "Comida y mercados"],
+      style: ["Paseos por el río", "Barrios históricos", "Ritmo relajado del Medio Oeste"],
+      pacing: [
+        "Cincinnati se disfruta con calma. Ancla cada día en una zona—el paseo fluvial, Over-the-Rhine o Findlay Market—y deja tiempo para cafés y paseos por barrios.",
+        "Agrupa las visitas por distrito. Combina Smale Park con the Banks el primer día; dedica otro a OTR y Findlay Market para comida y arquitectura.",
+        "Reserva una tarde libre para un museo o un paseo tranquilo.",
+      ],
+      hero: {
+        title: "Cincinnati en 3 días",
+        subtitle:
+          "Paseos por el río, Over-the-Rhine histórico y Findlay Market con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1633949966177-3a0435071694?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Cincinnati y río Ohio al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "2,2 M", label: "Habitantes en el área metropolitana" },
+        { value: "150+", label: "Años del Findlay Market" },
+        { value: "45", label: "Minutos al centro desde el aeropuerto" },
+        { value: "3 mi", label: "Tramo de parque fluvial" },
+      ],
+      fit: {
+        forYou: ["Río y parques", "Barrios históricos", "Primera vez", "Comida y mercados", "Ritmo tranquilo con pausas"],
+        notForYou: ["Solo playa o montaña", "Vida nocturna hasta tarde", "Tours uno tras otro", "Excursiones lejanas", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Paseo fluvial y the Banks", summary: "Smale Park, puente Roebling y centro.", morning: "Smale Riverfront Park y Serpentine Wall", afternoon: "The Banks y vistas del puente Roebling", evening: "Cena en el centro y paseo" },
+        { day: 2, title: "Over-the-Rhine y Findlay Market", summary: "OTR histórico, mercado y zona de cervecerías.", morning: "Findlay Market y puestos", afternoon: "Calles de Over-the-Rhine y Washington Park", evening: "Cena en Vine Street o Main Street" },
+        { day: 3, title: "Museos y despedida", summary: "Union Terminal, Mount Adams o segunda visita tranquila.", morning: "Cincinnati Museum Center o Eden Park", afternoon: "Vistas desde Mount Adams o nueva visita a OTR", evening: "Cena final y cierre tranquilo" },
+      ],
+      imageInfoCards: [
+        { title: "Río y puentes", description: "El Ohio y el puente Roebling definen el skyline. Las mañanas y tardes junto al río son tranquilas y con buenas vistas.", image: { src: "https://images.unsplash.com/photo-1569025695580-5d3c5d42c937?auto=format&fit=crop&w=1200&q=80", alt: "Paseo fluvial y puente Roebling en Cincinnati." } },
+        { title: "Over-the-Rhine", description: "Edificios de ladrillo históricos y calles revitalizadas. Findlay Market y Washington Park centran el barrio.", image: { src: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80", alt: "Edificios de ladrillo históricos en Over-the-Rhine, Cincinnati." } },
+        { title: "Mercados y comida", description: "Findlay Market y alrededores marcan el tono para comidas informales y sabor local.", image: { src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80", alt: "Mercado cubierto con puestos y productos." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Taxi o rideshare desde CVG; unos 20 mi" },
+        { label: "Transporte", value: "Centro y OTR a pie; streetcar conecta zonas clave" },
+        { label: "Entradas", value: "Reserva Museum Center o atracciones en temporada alta" },
+        { label: "Alojamiento", value: "Centro o Over-the-Rhine para acceso a pie" },
+      ],
+      checklist: [
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del centro y OTR",
+        "Planifica una parada diaria en mercado o café",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios del Museum Center si visitas",
+        "Reserva restaurantes populares para cenas de fin de semana",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Cincinnati?", answer: "Sí para lo esencial. Puedes cubrir el paseo fluvial, OTR y Findlay Market con tiempo para pausas." },
+        { question: "¿Cincinnati es caminable?", answer: "El centro y Over-the-Rhine son caminables. El streetcar ayuda a conectar the Banks, centro y OTR." },
+        { question: "¿Dónde alojarme?", answer: "Centro o Over-the-Rhine para estar cerca del río, el mercado y los principales puntos." },
+        { question: "¿Reservar restaurantes?", answer: "Para sitios populares en fin de semana, sí. Entre semana suele haber sitio sin reserva." },
+        { question: "¿A qué hora empezar cada día?", answer: "Findlay Market tiene más ambiente a media mañana; el paseo fluvial es agradable temprano o al atardecer." },
+        { question: "¿El streetcar es útil?", answer: "Sí para ir de the Banks al centro y OTR sin coche." },
+        { question: "¿Cuándo hace mejor tiempo?", answer: "Primavera y otoño son suaves. En verano puede hacer mucho calor; planifica sombra o interiores por la tarde." },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lago, museos y barrios." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Música, comida y ritmo sureño." },
+        { slug: "detroit", city: "Detroit", days: 3, description: "Museos, río y barrios revitalizados." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    pittsburgh: {
+      slug: "pittsburgh",
+      city: "Pittsburgh",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Puentes y vistas", "Museos y comida"],
+      style: ["Confluencia de ríos", "Strip District", "Comida de barrio"],
+      pacing: [
+        "Pittsburgh se disfruta con calma. Centra cada día en una zona—Point State Park y centro, Strip y museos, o South Side y Mount Washington—y deja tiempo para comidas y paseos.",
+        "Los tres ríos y los puentes dan claridad al plano. Combina el Point con el centro el primer día; dedica otro a los museos Carnegie o el Strip District.",
+        "Reserva una tarde libre para un mirador o un paseo tranquilo por un barrio.",
+      ],
+      hero: {
+        title: "Pittsburgh en 3 días",
+        subtitle:
+          "Puentes, Point State Park y Strip District con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1661293871205-2077a22db175?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Pittsburgh y puentes en la hora dorada.",
+        },
+      },
+      cityStats: [
+        { value: "446", label: "Puentes en el área metropolitana" },
+        { value: "3", label: "Ríos que se unen en el Point" },
+        { value: "2,4 M", label: "Habitantes en el área metropolitana" },
+        { value: "90+", label: "Barrios" },
+      ],
+      fit: {
+        forYou: ["Puentes y vistas urbanas", "Museos y cultura", "Primera vez", "Comida y mercados", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o naturaleza", "Vida nocturna hasta tarde", "Tours uno tras otro", "Solo compras", "Excursiones largas"],
+      },
+      dayPlans: [
+        { day: 1, title: "Point State Park y centro", summary: "El Point, fuente y centro.", morning: "Point State Park y la fuente", afternoon: "Cultural District y Market Square", evening: "Cena en el centro o en el Strip" },
+        { day: 2, title: "Strip District y museos Carnegie", summary: "Mercados, museos y ambiente de barrio.", morning: "Mercados y paradas del Strip District", afternoon: "Carnegie Museum of Art o Natural History", evening: "Cena en el Strip o Lawrenceville" },
+        { day: 3, title: "South Side y Mount Washington", summary: "Funicular, miradores y cierre tranquilo.", morning: "Duquesne o Monongahela Incline", afternoon: "Vistas desde Mount Washington y paseo por South Side", evening: "Cena final y cierre tranquilo" },
+      ],
+      imageInfoCards: [
+        { title: "Tres ríos y puentes", description: "La confluencia en Point State Park une la ciudad. Las vistas desde el Point o Mount Washington son memorables.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Puentes y ríos de Pittsburgh desde arriba." } },
+        { title: "Strip District", description: "Mercados, almacenes y puestos. Por la mañana hay ambiente; un paseo tranquilo y una comida mantienen el ritmo.", image: { src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80", alt: "Mercado del Strip District en Pittsburgh." } },
+        { title: "Funiculares y miradores", description: "Los funiculares suben a Mount Washington para vistas del skyline. El atardecer es popular pero cualquier momento despejado vale.", image: { src: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80", alt: "Skyline de Pittsburgh desde Mount Washington." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Bus 28X o taxi desde Pittsburgh International" },
+        { label: "Transporte", value: "Centro y Strip a pie; bus o coche para museos y funiculares" },
+        { label: "Entradas", value: "Reserva Carnegie Museums o funiculares en temporada alta" },
+        { label: "Alojamiento", value: "Centro o zona Strip para acceso a pie" },
+      ],
+      checklist: [
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del centro y Strip",
+        "Planifica un viaje en funicular para las vistas",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios de museos antes de ir",
+        "Reserva restaurantes populares para cenas de fin de semana",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Pittsburgh?", answer: "Sí para el Point, Strip District, museos y un mirador. El ritmo se mantiene relajado." },
+        { question: "¿Pittsburgh es caminable?", answer: "El centro y el Strip son caminables. Usa bus o coche para los museos Carnegie y Mount Washington." },
+        { question: "¿Dónde alojarme?", answer: "Centro o cerca del Strip para estar cerca del Point, mercados y restaurantes." },
+        { question: "¿Qué funicular tomar?", answer: "Duquesne y Monongahela ofrecen buenas vistas. Duquesne suele tener menos gente." },
+        { question: "¿Reservar restaurantes?", answer: "Para sitios populares en fin de semana, sí. A mediodía entre semana suele haber sitio sin reserva." },
+        { question: "¿Cuándo es mejor el Point?", answer: "Mañana o media tarde evitan el sol del mediodía; la fuente queda bien cualquier día despejado." },
+        { question: "¿El Strip District abre todos los días?", answer: "Los sábados y domingos por la mañana hay más ambiente. Algunos puestos cierran lunes o martes; conviene comprobar." },
+      ],
+      relatedItineraries: [
+        { slug: "philadelphia", city: "Filadelfia", days: 3, description: "Historia, mercados y centro caminable." },
+        { slug: "boston", city: "Boston", days: 3, description: "Núcleo histórico, frente fluvial y calles caminables." },
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lago, museos y barrios diversos." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    chennai: {
+      slug: "chennai",
+      city: "Chennai",
+      country: "India",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Templos y playas", "Comida del sur de India"],
+      style: ["Templos", "Playa Marina", "Mylapore y mercados"],
+      pacing: [
+        "Chennai se disfruta con calma. Ancla cada día en un eje—Kapaleeshwarar y Mylapore, playa Marina y Fuerte St. George, o templos y mercados—y deja tiempo para comidas y descanso.",
+        "El calor puede ser fuerte. Planifica templos e interiores a mediodía; reserva playa y paseos para primera hora o media tarde.",
+        "Reserva una tarde libre para un museo o una segunda visita tranquila.",
+      ],
+      hero: {
+        title: "Chennai en 3 días",
+        subtitle:
+          "Templos, playa Marina y Mylapore con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1748961099955-e2b5655cba15?auto=format&fit=crop&w=1600&q=80",
+          alt: "Gopuram del templo Kapaleeshwarar y tanque en Chennai.",
+        },
+      },
+      cityStats: [
+        { value: "10 M+", label: "Habitantes en el área metropolitana" },
+        { value: "2.ª", label: "Playa urbana más larga de India (Marina)" },
+        { value: "400+", label: "Años de historia" },
+        { value: "12+", label: "Templos principales en la ciudad" },
+      ],
+      fit: {
+        forYou: ["Templos y cultura", "Playa y paseos costeros", "Primera vez", "Comida del sur de India", "Ritmo tranquilo"],
+        notForYou: ["Escape al frío", "Solo vida nocturna", "Tours uno tras otro", "Solo compras", "Deportes de aventura"],
+      },
+      dayPlans: [
+        { day: 1, title: "Mylapore y Kapaleeshwarar", summary: "Templo, tanque y calles del barrio.", morning: "Templo Kapaleeshwarar y tanque", afternoon: "Calles de Mylapore y zona San Thome", evening: "Cena local y paseo tranquilo" },
+        { day: 2, title: "Playa Marina y Fuerte St. George", summary: "Paseo por la playa y fuerte colonial.", morning: "Paseo por la playa Marina y faro", afternoon: "Fuerte St. George y museo", evening: "Cena en la playa o Egmore" },
+        { day: 3, title: "Templos y despedida", summary: "Parthasarathy, Kalikambal o segunda visita tranquila.", morning: "Templo Parthasarathy u otro templo", afternoon: "Mercados de George Town o museo", evening: "Cena final y cierre tranquilo" },
+      ],
+      imageInfoCards: [
+        { title: "Templo y tanque", description: "Kapaleeshwarar y su tanque centran Mylapore. Por la mañana hace menos calor y hay menos gente.", image: { src: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1200&q=80", alt: "Gopuram del templo Kapaleeshwarar en Chennai." } },
+        { title: "Playa Marina", description: "La playa larga es ideal para un paseo temprano o tarde. Evita el mediodía.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Línea de costa de la playa Marina en Chennai." } },
+        { title: "Calles de Mylapore", description: "Calles estrechas, comida callejera y tiendas pequeñas. Un paseo tranquilo mantiene el ritmo.", image: { src: "https://images.unsplash.com/photo-1548013146-72479768b430?auto=format&fit=crop&w=1200&q=80", alt: "Escena callejera en Mylapore, Chennai." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a febrero para tiempo más fresco" },
+        { label: "Traslado aeropuerto", value: "Taxi o cab prepago desde Chennai International" },
+        { label: "Transporte", value: "Auto-rickshaw o cab para templos y playa; el tráfico puede ser denso" },
+        { label: "Entradas", value: "Templos gratis; Fuerte St. George tiene tarifa reducida" },
+        { label: "Alojamiento", value: "Mylapore o Egmore para acceso céntrico" },
+      ],
+      checklist: [
+        "Ropa ligera y transpirable, y protector solar",
+        "Quítate los zapatos antes de entrar en los templos",
+        "Lleva botella de agua reutilizable",
+        "Planifica la playa a primera o última hora; evita el mediodía",
+        "Consulta horarios de los templos",
+        "Reserva restaurantes populares para cena si hace falta",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Chennai?", answer: "Sí para los templos principales, playa Marina y Mylapore. El ritmo puede ser relajado con pausas." },
+        { question: "¿Chennai es seguro para turistas?", answer: "Sí. Precaución normal; quédate en zonas frecuentadas y usa transporte registrado." },
+        { question: "¿Qué llevar en los templos?", answer: "Vestir modesto; hombros y rodillas cubiertos. Quitarse zapatos antes de entrar; algunos templos prestan faldas." },
+        { question: "¿Cuándo es mejor la playa Marina?", answer: "Primera hora de la mañana o media tarde para evitar calor y sol fuerte." },
+        { question: "¿Reservar restaurantes?", answer: "Para sitios de nivel alto o muy populares, reservar ayuda. Muchos locales aceptan sin reserva." },
+        { question: "¿La ciudad es caminable?", answer: "Mylapore y algunas zonas se pueden recorrer a pie por la mañana o tarde. Usa cab o auto-rickshaw para trayectos largos." },
+        { question: "¿Cuál es la mejor forma de moverse?", answer: "Taxis prepago o cab por app son fiables. En auto-rickshaw conviene acordar precio antes de salir." },
+      ],
+      relatedItineraries: [
+        { slug: "mumbai", city: "Mumbai", days: 3, description: "Gateway, Marine Drive y mercados." },
+        { slug: "delhi", city: "Delhi", days: 3, description: "Monumentos, bazares y barrios diversos." },
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Templos, mercados y comida callejera." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "san-juan": {
+      slug: "san-juan",
+      city: "San Juan",
+      country: "Puerto Rico",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Casco antiguo colonial", "Playa y vistas del fuerte"],
+      style: ["Viejo San Juan", "El Morro", "Condado y costa"],
+      pacing: [
+        "San Juan se disfruta con calma. El primer día centra en Viejo San Juan y El Morro; el segundo en más casco antiguo o Condado; el tercero en una segunda visita tranquila o playa.",
+        "El casco antiguo es compacto y caminable. Deja tiempo para calles empedradas, cafés y vistas del fuerte sin prisas.",
+        "Reserva una tarde libre para la costa o una segunda visita al fuerte.",
+      ],
+      hero: {
+        title: "San Juan en 3 días",
+        subtitle:
+          "Viejo San Juan, El Morro y Condado con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1651517280844-82848eb8f206?auto=format&fit=crop&w=1600&q=80",
+          alt: "Edificios coloniales de colores y fuerte en Viejo San Juan.",
+        },
+      },
+      cityStats: [
+        { value: "500+", label: "Años de historia" },
+        { value: "2", label: "Fuertes principales en el casco antiguo" },
+        { value: "7", label: "Manzanas del casco antiguo empedrado" },
+        { value: "350K+", label: "Habitantes en el área metropolitana" },
+      ],
+      fit: {
+        forYou: ["Calles coloniales y fuertes", "Playa y costa", "Primera vez", "Casco antiguo caminable", "Ritmo tranquilo"],
+        notForYou: ["Solo selva lejana", "Vida nocturna hasta tarde", "Tours uno tras otro", "Solo compras", "Excursiones largas"],
+      },
+      dayPlans: [
+        { day: 1, title: "Viejo San Juan y El Morro", summary: "Fuerte, murallas y calles coloniales.", morning: "Fuerte El Morro y jardines", afternoon: "Calles del Viejo San Juan y plazas", evening: "Cena en el casco antiguo" },
+        { day: 2, title: "San Cristobal y casco antiguo", summary: "Segundo fuerte y más calles.", morning: "Castillo San Cristobal", afternoon: "Calle del Cristo y zona de la catedral", evening: "Atardecer desde las murallas y cena" },
+        { day: 3, title: "Condado y costa", summary: "Playa, paseo marítimo y cierre tranquilo.", morning: "Playa de Condado o paseo por la costa", afternoon: "Almuerzo tranquilo y últimas paradas", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "El Morro", description: "El fuerte y el césped miran al océano. Por la mañana hace menos calor; las vistas son memorables.", image: { src: "https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=1200&q=80", alt: "Fuerte El Morro en Viejo San Juan." } },
+        { title: "Calles coloniales", description: "Fachadas de colores y calles empedradas. Un paseo tranquilo y un café mantienen el ritmo.", image: { src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1200&q=80", alt: "Calle de colores en Viejo San Juan." } },
+        { title: "Condado y costa", description: "Playa y paseos por la costa ofrecen contraste con el casco antiguo.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Playa de Condado y mar en San Juan." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Diciembre a abril, tiempo seco y cálido" },
+        { label: "Traslado aeropuerto", value: "Taxi o Uber desde Luis Muñoz Marín; 15–20 minutos" },
+        { label: "Transporte", value: "Viejo San Juan a pie; taxi o Uber para Condado y aeropuerto" },
+        { label: "Entradas", value: "El Morro y San Cristobal tienen entrada conjunta" },
+        { label: "Alojamiento", value: "Viejo San Juan o Condado para acceso a pie" },
+      ],
+      checklist: [
+        "Protector solar y capas ligeras",
+        "Zapatos cómodos para adoquines",
+        "Reserva entrada al fuerte online en temporada alta",
+        "Lleva botella de agua reutilizable",
+        "Planifica la playa por la mañana o media tarde",
+        "Consulta temporada de huracanes si viajas junio–noviembre",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en San Juan?", answer: "Sí para Viejo San Juan, los dos fuertes y Condado. El ritmo se mantiene relajado con tiempo para comidas y playa." },
+        { question: "¿San Juan es caminable?", answer: "Viejo San Juan es muy caminable. Usa taxi o Uber para Condado y aeropuerto." },
+        { question: "¿Dónde alojarme?", answer: "Viejo San Juan para historia y ambiente; Condado para playa y más hoteles." },
+        { question: "¿Necesito coche?", answer: "No para el casco antiguo y Condado. Alquila coche solo si planeas excursiones." },
+        { question: "¿Cuándo es la temporada de huracanes?", answer: "Junio a noviembre. Consulta previsiones; un seguro de viaje es recomendable en temporada alta." },
+        { question: "¿Reservar restaurantes?", answer: "Para sitios populares en el casco antiguo, sí en fin de semana. Muchos aceptan sin reserva a mediodía." },
+        { question: "¿La entrada al fuerte vale para los dos?", answer: "Sí. Una entrada cubre El Morro y San Cristobal para el mismo día o el siguiente." },
+      ],
+      relatedItineraries: [
+        { slug: "miami", city: "Miami", days: 3, description: "Playas, art deco y barrios." },
+        { slug: "havana", city: "La Habana", days: 3, description: "Plazas coloniales, coches clásicos y paseo marítimo." },
+        { slug: "cartagena", city: "Cartagena", days: 3, description: "Ciudad amurallada, plazas y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    stuttgart: {
+      slug: "stuttgart",
+      city: "Stuttgart",
+      country: "Alemania",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Coches y diseño", "Parques y paseos"],
+      style: ["Museos", "Parques", "Centro compacto"],
+      pacing: [
+        "Stuttgart recompensa un ritmo tranquilo. Ancla cada día en una zona: el barrio de museos, Schlossplatz y calles comerciales, o Wilhelma y parques; luego deja espacio para café y paseos cortos.",
+        "Agrupa los lugares por distrito. Combina el Museo Mercedes-Benz con el paseo junto al río; dedica otro día a la plaza del palacio y Königstrasse; reserva Wilhelma o un mirador para el tercero.",
+        "Guarda una tarde sin prisa para un parque o un barrio como Bohnenviertel.",
+      ],
+      hero: {
+        title: "Stuttgart en 3 días",
+        subtitle:
+          "Patrimonio automovilístico, plaza del palacio y parques con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1627880376042-fa3041b3da70?auto=format&fit=crop&w=1600&q=80",
+          alt: "Centro de Stuttgart con Schlossplatz y edificios históricos.",
+        },
+      },
+      cityStats: [
+        { value: "600k+", label: "Habitantes en la ciudad" },
+        { value: "2", label: "Grandes museos del automóvil" },
+        { value: "200+", label: "Parques y zonas verdes" },
+        { value: "50+", label: "Museos y galerías" },
+      ],
+      fit: {
+        forYou: ["Museos y diseño", "Parques y paseos", "Primera vez", "Centro compacto", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o montaña", "Vida nocturna hasta tarde", "Tours uno tras otro", "Solo naturaleza lejana", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Barrio de museos y río", summary: "Museo Mercedes-Benz y parque del Neckar.", morning: "Museo Mercedes-Benz", afternoon: "Parque del Neckar y zona Schlossplatz", evening: "Cena cerca de Schlossplatz o Calwer Strasse" },
+        { day: 2, title: "Palacio y calle principal", summary: "Palacio antiguo, Königstrasse y centro.", morning: "Altes Schloss y Schillerplatz", afternoon: "Königstrasse y calles comerciales", evening: "Bohnenviertel o zona Markthalle" },
+        { day: 3, title: "Wilhelma y miradores", summary: "Zoo y jardines o mirador.", morning: "Zoo y jardín botánico Wilhelma", afternoon: "Té o paseo por los jardines", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Plaza del palacio", description: "Schlossplatz es el corazón de la ciudad. Fuentes, tranvías y vistas al palacio antiguo.", image: { src: "https://images.unsplash.com/photo-1569931721099-9d4a2d2e1a5a?auto=format&fit=crop&w=1200&q=80", alt: "Schlossplatz en Stuttgart con palacio y plaza." } },
+        { title: "Patrimonio automovilístico", description: "Los museos Mercedes-Benz y Porsche definen Stuttgart. Un día de museo basta para una visita tranquila.", image: { src: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1200&q=80", alt: "Arquitectura moderna del Museo Mercedes-Benz en Stuttgart." } },
+        { title: "Parques y verde", description: "Wilhelma y los parques ofrecen contraste con el centro. Ideal para media jornada tranquila.", image: { src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80", alt: "Parque y árboles en Stuttgart." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para paseos y parques" },
+        { label: "Traslado aeropuerto", value: "S-Bahn a Hauptbahnhof; unos 30 minutos" },
+        { label: "Transporte", value: "Centro a pie; S-Bahn y U-Bahn para museos y Wilhelma" },
+        { label: "Entradas", value: "Reserva Museo Mercedes-Benz o Porsche en temporada alta" },
+        { label: "Alojamiento", value: "Centro cerca de Schlossplatz o Marienplatz" },
+      ],
+      checklist: [
+        "Reserva entradas a museos si visitas Mercedes-Benz o Porsche",
+        "Zapatos cómodos para caminar",
+        "Guarda mapas de transporte sin conexión",
+        "Planifica media jornada de parque o jardín",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios de Markthalle",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Stuttgart?", answer: "Sí para los museos principales, la plaza del palacio y un día de parque. El centro es compacto y fácil de recorrer a pie." },
+        { question: "¿Hay que reservar los museos?", answer: "Para Mercedes-Benz y Porsche, reservar con antelación ayuda en temporada alta y mantiene el día organizado." },
+        { question: "¿Stuttgart es caminable?", answer: "El centro es muy caminable. Usa S-Bahn o U-Bahn para los museos y Wilhelma." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de Schlossplatz o Marienplatz para el centro; buen enlace en tranvía con museos y Wilhelma." },
+        { question: "¿Qué es Wilhelma?", answer: "Wilhelma es zoo y jardín botánico. Planifica al menos media jornada; por la mañana hay menos gente." },
+        { question: "¿Cuándo es la mejor época?", answer: "Primavera y otoño son ideales para parques y paseos. Verano puede ser cálido; invierno es más tranquilo." },
+        { question: "¿Necesito coche?", answer: "No. El transporte público y caminar cubren este plan. Alquila coche solo para excursiones a la Selva Negra o viñedos." },
+      ],
+      relatedItineraries: [
+        { slug: "munich", city: "Múnich", days: 3, description: "Jardines de cerveza, museos y grandes plazas." },
+        { slug: "frankfurt", city: "Fráncfort", days: 3, description: "Río, museos y centro compacto." },
+        { slug: "zurich", city: "Zúrich", days: 3, description: "Lago, casco antiguo y ritmo tranquilo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    nuremberg: {
+      slug: "nuremberg",
+      city: "Núremberg",
+      country: "Alemania",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de la historia", "Casco antiguo caminable"],
+      style: ["Castillo", "Calles medievales", "Mercados"],
+      pacing: [
+        "Núremberg se disfruta con calma. Ancla el primer día en el castillo y casco antiguo; el segundo en Hauptmarkt e iglesias; el tercero en un museo o revisita tranquila.",
+        "El casco antiguo es compacto. Agrupa el castillo con la casa de Albrecht Dürer y las callejuelas; reserva Hauptmarkt para una mañana o día de mercado.",
+        "Deja una tarde libre para museo, parque o café.",
+      ],
+      hero: {
+        title: "Núremberg en 3 días",
+        subtitle:
+          "Castillo Imperial, casco antiguo medieval y plazas históricas con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1632210130467-7279eccec0a7?auto=format&fit=crop&w=1600&q=80",
+          alt: "Castillo Imperial de Núremberg y tejados del casco antiguo.",
+        },
+      },
+      cityStats: [
+        { value: "1.000+", label: "Años de historia" },
+        { value: "2", label: "Castillos en la ciudad" },
+        { value: "50+", label: "Museos y galerías" },
+        { value: "500k+", label: "Habitantes en el área metropolitana" },
+      ],
+      fit: {
+        forYou: ["Casco antiguo medieval", "Castillo e historia", "Primera vez", "Centro caminable", "Mercados y plazas"],
+        notForYou: ["Solo playa o costa", "Vida nocturna hasta tarde", "Días solo de museos", "Solo naturaleza lejana", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Castillo y casco antiguo", summary: "Castillo Imperial y calles medievales.", morning: "Castillo Imperial y patio", afternoon: "Casa de Albrecht Dürer y callejuelas", evening: "Cena en el casco antiguo" },
+        { day: 2, title: "Hauptmarkt e iglesias", summary: "Plaza principal, fuente e iglesias.", morning: "Hauptmarkt y Schöner Brunnen", afternoon: "Iglesias San Lorenzo y San Sebaldo", evening: "Weißgerbergasse y paseo nocturno" },
+        { day: 3, title: "Museos y cierre", summary: "Centro de Documentación o Museo del Juguete y cierre tranquilo.", morning: "Centro de Documentación o Spielzeugmuseum", afternoon: "Parque urbano o revisita", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Castillo Imperial", description: "El castillo domina el skyline. Reserva unas horas para el patio, la torre y las vistas al casco antiguo.", image: { src: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=1200&q=80", alt: "Castillo Imperial de Núremberg desde abajo." } },
+        { title: "Hauptmarkt", description: "La plaza principal acoge el mercado navideño en invierno y la vida diaria. La fuente y las fachadas son icónicas.", image: { src: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80", alt: "Hauptmarkt de Núremberg con edificios históricos." } },
+        { title: "Callejuelas medievales", description: "Calles de entramado como Weissgerbergasse dan carácter al casco antiguo. Un paseo lento encaja en el ritmo.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Calle medieval en el casco antiguo de Núremberg." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre; diciembre para el mercado navideño" },
+        { label: "Traslado aeropuerto", value: "U-Bahn al centro; unos 12 minutos desde el aeropuerto" },
+        { label: "Transporte", value: "Casco antiguo a pie; tranvía para el Centro de Documentación" },
+        { label: "Entradas", value: "Reserva castillo y Centro de Documentación en temporada alta" },
+        { label: "Alojamiento", value: "Casco antiguo o cerca de Hauptbahnhof" },
+      ],
+      checklist: [
+        "Reserva visita al castillo si es temporada alta",
+        "Zapatos cómodos para caminar",
+        "Guarda mapa del casco antiguo sin conexión",
+        "Planifica Hauptmarkt para una mañana",
+        "Lleva botella de agua reutilizable",
+        "Consulta fechas del mercado navideño si viajas en invierno",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Núremberg?", answer: "Sí para el castillo, casco antiguo, Hauptmarkt y un museo. El centro es compacto y caminable." },
+        { question: "¿Hay que reservar el castillo?", answer: "En temporada alta conviene reservar. El patio está abierto; puede haber entrada con horario para zonas interiores." },
+        { question: "¿Núremberg es caminable?", answer: "Sí. El casco antiguo es pequeño y se recorre a pie. El tranvía ayuda para el Centro de Documentación." },
+        { question: "¿Dónde alojarme?", answer: "Casco antiguo por ambiente; cerca de Hauptbahnhof para el tren. Ambos están a pie de los lugares clave." },
+        { question: "¿Cuándo es el mercado navideño?", answer: "Suele ser de finales de noviembre a Nochebuena. Reserva alojamiento con antelación; el casco antiguo se llena." },
+        { question: "¿Qué es el Centro de Documentación?", answer: "Museo sobre el nazismo y los juicios de Núremberg. Reserva 2–3 horas; conviene reservar en temporada alta." },
+        { question: "¿Necesito coche?", answer: "No. El casco antiguo y los principales lugares se recorren a pie; el transporte público cubre el resto." },
+      ],
+      relatedItineraries: [
+        { slug: "munich", city: "Múnich", days: 3, description: "Jardines de cerveza, museos y grandes plazas." },
+        { slug: "prague", city: "Praga", days: 3, description: "Casco antiguo, castillo y paseos por el río." },
+        { slug: "dresden", city: "Dresde", days: 3, description: "Centro barroco, río y museos." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    galway: {
+      slug: "galway",
+      city: "Galway",
+      country: "Irlanda",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Música y pubs", "Paseos costeros"],
+      style: ["Latin Quarter", "Puerto", "Salthill"],
+      pacing: [
+        "Galway recompensa un ritmo relajado. Ancla el primer día en el Latin Quarter y el Spanish Arch; el segundo en Salthill y el paseo marítimo; el tercero en mercado o excursión corta.",
+        "El centro es pequeño. Caminar cubre el Latin Quarter, Eyre Square y el puerto. Reserva una mañana para el mercado si coincide.",
+        "Deja una tarde libre para pub, café o paseo lento.",
+      ],
+      hero: {
+        title: "Galway en 3 días",
+        subtitle:
+          "Calles coloridas, música en vivo y paseo marítimo con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1641158641932-c74516b6502b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Calles coloridas y pubs en el Latin Quarter de Galway.",
+        },
+      },
+      cityStats: [
+        { value: "80k+", label: "Habitantes en la ciudad" },
+        { value: "1", label: "Resto de muralla medieval (Spanish Arch)" },
+        { value: "2 km", label: "Paseo marítimo de Salthill" },
+        { value: "500+", label: "Años de tradición de mercado" },
+      ],
+      fit: {
+        forYou: ["Ciudad compacta", "Música y pubs", "Paseos por la costa", "Primera vez", "Ritmo relajado"],
+        notForYou: ["Solo grandes museos", "Vida nocturna de discotecas", "Tours repletos cada día", "Naturaleza remota", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Latin Quarter y puerto", summary: "Calles coloridas, Spanish Arch y puerto.", morning: "Eyre Square y Shop Street", afternoon: "Spanish Arch y Claddagh", evening: "Pubs del Latin Quarter y cena" },
+        { day: 2, title: "Salthill y paseo marítimo", summary: "Paseo por el paseo marítimo y la costa.", morning: "Paseo a Salthill y paseo marítimo", afternoon: "Playa o acuario y almuerzo", evening: "Regreso al centro y cena" },
+        { day: 3, title: "Mercado y cierre", summary: "Mañana de mercado y cierre tranquilo.", morning: "Galway Market si está abierto, o revisita", afternoon: "Café o paseo corto", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Latin Quarter", description: "Calles estrechas, músicos callejeros y pubs definen el centro. Por la mañana hay menos gente; por la noche música y ambiente.", image: { src: "https://images.unsplash.com/photo-1569931721099-9d4a2d2e1a5a?auto=format&fit=crop&w=1200&q=80", alt: "Calle colorida en el Latin Quarter de Galway." } },
+        { title: "Spanish Arch", description: "El arco y la zona del puerto unen la ciudad con el mar. A poca distancia del Latin Quarter.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Spanish Arch y puerto en Galway." } },
+        { title: "Paseo marítimo de Salthill", description: "El paseo recorre la bahía. Bueno para un paseo matutino o vespertino con vistas al mar.", image: { src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80", alt: "Paseo marítimo de Salthill y bahía en Galway." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre por clima; todo el año por ambiente" },
+        { label: "Traslado aeropuerto", value: "Autobús desde Shannon o Dublín; tren desde Dublín" },
+        { label: "Transporte", value: "Centro a pie; autobús a Salthill" },
+        { label: "Entradas", value: "No hace falta reservar con antelación para este plan" },
+        { label: "Alojamiento", value: "Latin Quarter o zona Eyre Square" },
+      ],
+      checklist: [
+        "Ropa por capas y chubasquero",
+        "Zapatos cómodos para caminar",
+        "Consulta días del Galway Market",
+        "Guarda mapa del centro sin conexión",
+        "Lleva botella de agua reutilizable",
+        "Planifica una noche de pub con música",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Galway?", answer: "Sí para el Latin Quarter, Salthill y un tercer día relajado. La ciudad es pequeña y caminable." },
+        { question: "¿Galway es caminable?", answer: "Sí. El centro y el puerto se recorren a pie. El autobús a Salthill es rápido." },
+        { question: "¿Dónde alojarme?", answer: "Latin Quarter o cerca de Eyre Square por ambiente y distancia a todo." },
+        { question: "¿Cuándo es el Galway Market?", answer: "Fines de semana en Church Lane. Consulta horarios; es un buen plan para comida y artesanía local." },
+        { question: "¿Necesito coche?", answer: "No para este plan. Alquila coche solo si quieres añadir Connemara o los Acantilados de Moher." },
+        { question: "¿Y si llueve?", answer: "Lleva chubasquero y capas. Pubs y cafés dan refugio; la ciudad está acostumbrada a la lluvia." },
+        { question: "¿Galway es buena para familias?", answer: "Sí. El centro es seguro y compacto; Salthill tiene playa y acuario. Los pubs son familiares durante el día." },
+      ],
+      relatedItineraries: [
+        { slug: "dublin", city: "Dublín", days: 3, description: "Historia, pubs y centro compacto." },
+        { slug: "cork", city: "Cork", days: 2, description: "English Market, río y centro compacto." },
+        { slug: "belfast", city: "Belfast", days: 3, description: "Patrimonio del Titanic, ayuntamiento y puerto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cannes: {
+      slug: "cannes",
+      city: "Cannes",
+      country: "Francia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Costa Riviera", "Ritmo relajado"],
+      style: ["Croisette", "Le Suquet", "Playa y vistas"],
+      pacing: [
+        "Cannes se disfruta con calma. Ancla el primer día en la Croisette y la playa; el segundo en Le Suquet y el casco antiguo; el tercero en las islas o una revisita tranquila.",
+        "El paseo marítimo es la columna vertebral. Los paseos matutinos por la Croisette son agradables; Le Suquet ofrece contraste con callejuelas y vistas.",
+        "Reserva una tarde para las islas o un almuerzo largo.",
+      ],
+      hero: {
+        title: "Cannes en 3 días",
+        subtitle:
+          "La Croisette, casco antiguo y ambiente de la Riviera con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1690293794495-481065b52199?auto=format&fit=crop&w=1600&q=80",
+          alt: "Croisette de Cannes y costa mediterránea.",
+        },
+      },
+      cityStats: [
+        { value: "7 km", label: "Línea de costa de la bahía" },
+        { value: "2", label: "Islas Lérins (Sainte-Marguerite, Saint-Honorat)" },
+        { value: "70k+", label: "Habitantes" },
+        { value: "300+", label: "Días de sol al año" },
+      ],
+      fit: {
+        forYou: ["Playa y paseo marítimo", "Casco antiguo y vistas", "Primera vez", "Ritmo Riviera relajado", "Excursión corta a las islas"],
+        notForYou: ["Solo turismo intenso", "Fiesta hasta tarde", "Días solo de museos", "Solo naturaleza remota", "Solo presupuesto mochilero"],
+      },
+      dayPlans: [
+        { day: 1, title: "Croisette y playa", summary: "Paseo marítimo, playa y vistas a la bahía.", morning: "Paseo por La Croisette y playa", afternoon: "Playa o zona Palais des Festivals", evening: "Cena frente al mar y paseo" },
+        { day: 2, title: "Le Suquet y casco antiguo", summary: "Barrio alto, castillo y vistas.", morning: "Subida a Le Suquet y zona del castillo", afternoon: "Callejuelas del casco antiguo y Marché Forville", evening: "Cena en Le Suquet o puerto" },
+        { day: 3, title: "Islas o cierre tranquilo", summary: "Islas Lérins o revisita tranquila.", morning: "Ferry a Île Sainte-Marguerite o Saint-Honorat", afternoon: "Paseo por la isla y regreso", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "La Croisette", description: "El famoso paseo marítimo bordea la bahía. Los paseos matutinos y vespertinos ofrecen vistas al mar y ritmo tranquilo.", image: { src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200&q=80", alt: "Paseo de la Croisette en Cannes y palmeras." } },
+        { title: "Le Suquet", description: "El casco antiguo en la colina tiene callejuelas, torre del castillo y vistas a la bahía.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo y castillo de Le Suquet en Cannes." } },
+        { title: "Islas Lérins", description: "Sainte-Marguerite y Saint-Honorat ofrecen naturaleza y tranquilidad. Un ferry de media jornada encaja en el ritmo.", image: { src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80", alt: "Vista de las islas Lérins desde Cannes." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para playa y barcos" },
+        { label: "Traslado aeropuerto", value: "Autobús o taxi desde aeropuerto de Niza; unos 30 minutos" },
+        { label: "Transporte", value: "Centro a pie; ferry desde el puerto para las islas" },
+        { label: "Entradas", value: "Reserva ferry a las islas en temporada alta" },
+        { label: "Alojamiento", value: "Cerca de la Croisette o Le Suquet" },
+      ],
+      checklist: [
+        "Protector solar y equipo de playa",
+        "Reserva ferry a las islas si viajas en verano",
+        "Zapatos cómodos para caminar",
+        "Guarda mapa del centro sin conexión",
+        "Lleva botella de agua reutilizable",
+        "Planifica un almuerzo largo junto al mar",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Cannes?", answer: "Sí para la Croisette, Le Suquet y un día de isla o relajado. El centro es compacto." },
+        { question: "¿Hay que reservar el ferry a las islas?", answer: "En verano conviene reservar con antelación. Los ferries salen con frecuencia desde el puerto." },
+        { question: "¿Cannes es caminable?", answer: "Sí. La Croisette y Le Suquet se recorren a pie. El puerto está en el centro para los ferries." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de la Croisette para playa y paseo; zona Le Suquet por ambiente de casco antiguo." },
+        { question: "¿Cuándo es la mejor época?", answer: "Abril a octubre por clima y mar. Mayo es muy concurrido por el festival de cine; reserva con antelación." },
+        { question: "¿Qué son las islas Lérins?", answer: "Sainte-Marguerite tiene naturaleza y la prisión del Hombre de la Máscara de Hierro; Saint-Honorat tiene un monasterio. Ambas están a un ferry corto." },
+        { question: "¿Necesito coche?", answer: "No para este plan. Caminar y ferry cubren el itinerario. Alquila coche solo para recorrer la costa." },
+      ],
+      relatedItineraries: [
+        { slug: "nice", city: "Niza", days: 3, description: "Paseo marítimo, casco antiguo y costa." },
+        { slug: "marseille", city: "Marsella", days: 3, description: "Puerto antiguo, Calanques y ciudad." },
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudí, playas y barrios." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    catania: {
+      slug: "catania",
+      city: "Catania",
+      country: "Italia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Barroco y Etna", "Comida y mercados"],
+      style: ["Calles barrocas", "Mercados", "Vistas al volcán"],
+      pacing: [
+        "Catania recompensa un ritmo tranquilo. Ancla el primer día en Piazza del Duomo y Via Etnea; el segundo en el mercado del pescado y las iglesias; el tercero en un museo o vista al Etna.",
+        "El centro es compacto. Agrupa el núcleo barroco con la fuente del elefante y la catedral; reserva el mercado para una mañana; deja una tarde libre.",
+        "Guarda tiempo para almuerzos largos y un paseo vespertino para sentir el ambiente siciliano.",
+      ],
+      hero: {
+        title: "Catania en 3 días",
+        subtitle:
+          "Centro barroco, mercado del pescado y vistas al Etna con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1761770535261-c239a2e27fb3?auto=format&fit=crop&w=1600&q=80",
+          alt: "Piazza del Duomo y edificios barrocos en Catania.",
+        },
+      },
+      cityStats: [
+        { value: "300k+", label: "Habitantes en la ciudad" },
+        { value: "3.350 m", label: "Monte Etna (visible desde la ciudad)" },
+        { value: "2.700+", label: "Años de historia" },
+        { value: "UNESCO", label: "Ciudades barrocas (con Val di Noto)" },
+      ],
+      fit: {
+        forYou: ["Arquitectura barroca", "Mercados y comida", "Primera vez", "Vistas al volcán", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Discotecas hasta tarde", "Días solo de museos", "Naturaleza remota", "Solo compras"],
+      },
+      dayPlans: [
+        { day: 1, title: "Piazza del Duomo y Via Etnea", summary: "Plaza de la catedral y calle principal.", morning: "Piazza del Duomo y fuente del elefante", afternoon: "Via Etnea y zona del monasterio benedictino", evening: "Cena y passeggiata por Via Etnea" },
+        { day: 2, title: "Mercado del pescado e iglesias", summary: "La Pescheria e iglesias barrocas.", morning: "Mercado del pescado La Pescheria", afternoon: "Iglesias y Via dei Crociferi", evening: "Cena en el casco antiguo" },
+        { day: 3, title: "Museos o vista al Etna", summary: "Castello Ursino o mirador y cierre.", morning: "Castello Ursino o Jardines Bellini", afternoon: "Revisita tranquila o mirador al Etna", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Piazza del Duomo", description: "La plaza de la catedral y la fuente del elefante son el corazón de la ciudad. Fachadas barrocas y vida callejera.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Piazza del Duomo y catedral barroca en Catania." } },
+        { title: "La Pescheria", description: "El mercado del pescado es un imprescindible matutino. Madruga para el ambiente; luego recorre las calles cercanas.", image: { src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80", alt: "Mercado del pescado La Pescheria en Catania." } },
+        { title: "Via Etnea y Etna", description: "La calle principal se dirige hacia el Etna. Los días despejados el volcán enmarca el skyline de la ciudad.", image: { src: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80", alt: "Via Etnea con el Monte Etna al fondo." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Autobús o taxi desde aeropuerto de Catania; unos 15 minutos" },
+        { label: "Transporte", value: "Centro a pie; autobús o tren para excursiones al Etna" },
+        { label: "Entradas", value: "Reserva tours al Etna si subes al volcán" },
+        { label: "Alojamiento", value: "Centro cerca de Piazza del Duomo o Via Etnea" },
+      ],
+      checklist: [
+        "Zapatos cómodos para caminar",
+        "Planifica el mercado del pescado para una mañana",
+        "Guarda mapa del centro sin conexión",
+        "Lleva botella de agua reutilizable",
+        "Reserva tour al Etna si quieres subir al volcán",
+        "Planifica un almuerzo largo de comida siciliana",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Catania?", answer: "Sí para el centro barroco, el mercado del pescado y un día de museo o relajado. La ciudad es compacta y caminable." },
+        { question: "¿Cuándo está abierto el mercado del pescado?", answer: "La Pescheria es un mercado matutino. Ve antes del mediodía para el mejor ambiente." },
+        { question: "¿Catania es caminable?", answer: "Sí. El centro, Piazza del Duomo y Via Etnea se recorren a pie." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de Piazza del Duomo o Via Etnea para el centro y fácil acceso al mercado y restaurantes." },
+        { question: "¿Hay que reservar tours al Etna?", answer: "Sí si quieres subir al volcán. Hay tours de media y jornada completa desde la ciudad." },
+        { question: "¿Qué pasa con el calor?", answer: "El verano puede ser muy caluroso. Planifica paradas a la sombra o en interiores al mediodía; mañanas y tardes son agradables." },
+        { question: "¿Catania es segura?", answer: "El centro suele ser seguro. Toma precauciones normales; cuidado con bolsos en zonas concurridas como el mercado." },
+      ],
+      relatedItineraries: [
+        { slug: "palermo", city: "Palermo", days: 3, description: "Mercados, palacios y capital siciliana." },
+        { slug: "naples", city: "Nápoles", days: 3, description: "Centro histórico, pizza y costa." },
+        { slug: "rome", city: "Roma", days: 3, description: "Iconos antiguos, plazas y cafés." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tampa: {
+      slug: "tampa",
+      city: "Tampa",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Riverwalk y Ybor", "Playa e historia"],
+      style: ["Riverwalk", "Ybor City", "St. Pete Beach"],
+      pacing: [
+        "Tampa se disfruta con calma. Ancla el primer día en el Riverwalk y el centro; el segundo en Ybor City; el tercero en St. Pete Beach o una segunda visita tranquila.",
+        "El Riverwalk une el centro. Ybor tiene otro ambiente—histórico, caminable y bueno para comida y paseos nocturnos.",
+        "Reserva una tarde libre para la playa o un museo.",
+      ],
+      hero: {
+        title: "Tampa en 3 días",
+        subtitle:
+          "Riverwalk, Ybor City y St. Pete Beach con espacio para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1668321935604-756835c8f8e9?auto=format&fit=crop&w=1600&q=80",
+          alt: "Riverwalk de Tampa y skyline del centro al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "2,5 mi", label: "Riverwalk junto al Hillsborough" },
+        { value: "100+", label: "Años de historia de Ybor City" },
+        { value: "4 M", label: "Habitantes en el área metropolitana" },
+        { value: "30 min", label: "En coche a St. Pete Beach" },
+      ],
+      fit: {
+        forYou: ["Río y centro", "Ybor histórico", "Primera vez", "Playa y costa", "Ritmo tranquilo"],
+        notForYou: ["Solo parques temáticos", "Vida nocturna hasta tarde", "Tours uno tras otro", "Solo compras", "Solo naturaleza lejana"],
+      },
+      dayPlans: [
+        { day: 1, title: "Riverwalk y centro", summary: "Riverwalk, parques y centro.", morning: "Tampa Riverwalk y Curtis Hixon Park", afternoon: "Museos del centro o Tampa Bay History Center", evening: "Cena en el centro o Channel District" },
+        { day: 2, title: "Ybor City", summary: "Distrito histórico, cigarros y comida.", morning: "Ybor City Museum y Seventh Avenue", afternoon: "Columbia Restaurant o almuerzo local", evening: "Paseo nocturno por Ybor y cena" },
+        { day: 3, title: "St. Pete Beach y despedida", summary: "Playa y cierre tranquilo.", morning: "St. Pete Beach o Fort De Soto", afternoon: "Playa y almuerzo junto al agua", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Riverwalk", description: "El Riverwalk conecta parques, museos y restaurantes. Mañanas y tardes son agradables para pasear.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Riverwalk de Tampa junto al río." } },
+        { title: "Ybor City", description: "Calles de ladrillo históricas y herencia del cigarro. De día y de noche; cenar aquí cierra bien.", image: { src: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80", alt: "Distrito histórico de Ybor City, Tampa." } },
+        { title: "Playa y costa", description: "St. Pete Beach y playas cercanas ofrecen un contraste relajado con el centro y Ybor.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Costa de St. Pete Beach cerca de Tampa." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril para tiempo suave" },
+        { label: "Traslado aeropuerto", value: "Taxi o rideshare desde TPA; unos 15 min al centro" },
+        { label: "Transporte", value: "Riverwalk y Ybor a pie; coche o Uber para St. Pete Beach" },
+        { label: "Entradas", value: "Reserva museos o atracciones en temporada alta" },
+        { label: "Alojamiento", value: "Centro o Channel District para Riverwalk y Ybor" },
+      ],
+      checklist: [
+        "Protector solar y capas ligeras",
+        "Zapatos cómodos para caminar",
+        "Planifica la playa por la mañana o media tarde",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios de museos antes de ir",
+        "Reserva restaurantes populares para cenas de fin de semana",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Tampa?", answer: "Sí para el Riverwalk, Ybor City y media jornada de playa. El ritmo se mantiene relajado." },
+        { question: "¿Tampa es caminable?", answer: "El centro y el Riverwalk son caminables; Ybor es compacto. Usa coche o Uber para St. Pete Beach." },
+        { question: "¿Dónde alojarme?", answer: "Centro o Channel District para Riverwalk y Ybor; cerca de la playa si la playa es la prioridad." },
+        { question: "¿Cómo llego a St. Pete Beach?", answer: "Uber o coche es lo más fácil; unos 30–40 min desde el centro. No hay tren directo." },
+        { question: "¿Reservar restaurantes?", answer: "Para Columbia y sitios populares, sí en fin de semana. A mediodía entre semana suele haber sitio sin reserva." },
+        { question: "¿Cuándo es mejor Ybor?", answer: "De día para historia y museos; por la noche para cena y ambiente. Los fines de semana hay más gente." },
+        { question: "¿Tampa es buena para familias?", answer: "Sí. Riverwalk, museos y playa ofrecen variedad; el ritmo se puede adaptar a niños." },
+      ],
+      relatedItineraries: [
+        { slug: "miami", city: "Miami", days: 3, description: "Playas, art deco y barrios." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Música, comida y ritmo sureño." },
+        { slug: "san-diego", city: "San Diego", days: 3, description: "Frente marítimo, parques y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    dakar: {
+      slug: "dakar",
+      city: "Dakar",
+      country: "Senegal",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura e historia", "Paseos costeros"],
+      style: ["Isla de Gorée", "Mercados", "Monumentos"],
+      pacing: [
+        "Dakar se disfruta con calma. Ancla el primer día en la Meseta y la Corniche; el segundo en la isla de Gorée; el tercero en mercados y el Monumento al Renacimiento Africano o Ngor.",
+        "Agrupa las visitas por zona. El ferry a Gorée ocupa media jornada; deja tiempo para el museo y el paseo junto al agua.",
+        "Reserva una tarde libre para el Marché Kermel o una pausa en la playa.",
+      ],
+      hero: {
+        title: "Dakar en 3 días",
+        subtitle:
+          "Vistas costeras, isla de Gorée y mercados con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80",
+          alt: "Costa de Dakar y océano Atlántico desde la Corniche.",
+        },
+      },
+      cityStats: [
+        { value: "3M+", label: "Habitantes en el área metropolitana" },
+        { value: "20 min", label: "Ferry a la isla de Gorée" },
+        { value: "49 m", label: "Altura del Monumento al Renacimiento Africano" },
+        { value: "UNESCO", label: "Sitio de memoria de Gorée" },
+      ],
+      fit: {
+        forYou: ["Primera vez en África Occidental", "Historia y memoria", "Mercados y vida local", "Costa e isla", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Vida nocturna intensa", "Tours uno tras otro", "Solo desierto", "Lista de tareas apretada"],
+      },
+      dayPlans: [
+        { day: 1, title: "Meseta y Corniche", summary: "Centro, paseo marítimo y primeras vistas.", morning: "Barrio Plateau y Place de l'Independance", afternoon: "Paseo por la Corniche y vistas al océano", evening: "Cena en Plateau o Almadies" },
+        { day: 2, title: "Isla de Gorée", summary: "Ferry, Casa de los Esclavos y callejuelas.", morning: "Ferry a Gorée y Casa de los Esclavos", afternoon: "Paseo por la isla y playas pequeñas", evening: "Regreso a Dakar y cena junto al agua" },
+        { day: 3, title: "Mercados y monumento", summary: "Marché Kermel, Monumento al Renacimiento Africano o Ngor.", morning: "Marché Kermel o Sandaga", afternoon: "Monumento al Renacimiento Africano o playa de Ngor", evening: "Cena final y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Isla de Gorée", description: "La isla está a un ferry corto. La Casa de los Esclavos y las callejuelas marcan un tono reflexivo y tranquilo.", image: { src: "https://images.unsplash.com/photo-1523805009345-7443845c4f89?auto=format&fit=crop&w=1200&q=80", alt: "Edificios coloridos y frente marítimo en la isla de Gorée, Dakar." } },
+        { title: "Mercados", description: "Marché Kermel y Sandaga ofrecen color local. Ve por la mañana para el mejor ambiente.", image: { src: "https://images.unsplash.com/photo-1488459716781-31db59582aae?auto=format&fit=crop&w=1200&q=80", alt: "Puestos y productos locales en Dakar." } },
+        { title: "Corniche y costa", description: "La carretera costera y las playas dan a la ciudad una sensación abierta y tranquila. Ideal para una tarde lenta.", image: { src: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1200&q=80", alt: "Costa atlántica y Corniche en Dakar." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a abril (menos calor, seco)" },
+        { label: "Traslado aeropuerto", value: "Taxi o shuttle desde Blaise Diagne" },
+        { label: "Transporte", value: "Ferry a Gorée desde el puerto; taxis para cruzar la ciudad" },
+        { label: "Entradas", value: "Compra el billete del ferry a Gorée en el puerto; ve temprano" },
+        { label: "Alojamiento", value: "Plateau o Almadies" },
+      ],
+      checklist: [
+        "Reserva o confirma horario del ferry a Gorée",
+        "Protector solar y capas ligeras",
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión de Plateau y puerto",
+        "Planifica una mañana tranquila de mercado",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Dakar?", answer: "Sí para la Meseta, la isla de Gorée y un día de mercado o monumento. El ritmo se mantiene relajado." },
+        { question: "¿Hay que reservar el ferry a Gorée?", answer: "Puedes comprar billetes en el puerto. Ir temprano ayuda a evitar aglomeraciones y el calor del mediodía." },
+        { question: "¿Dakar es caminable?", answer: "La Meseta se recorre a pie; taxis o ride-hail son útiles para la Corniche, el monumento o las playas." },
+        { question: "¿Dónde alojarme?", answer: "Plateau te deja en el centro y cerca del puerto; Almadies es más tranquilo y cerca de la costa." },
+        { question: "¿A qué hora empezar cada día?", answer: "Empieza temprano para Gorée y mercados para evitar calor y multitudes. Las tardes pueden ser más ligeras." },
+        { question: "¿Necesito reservar restaurantes?", answer: "En la mayoría no. Algunos locales de nivel alto admiten reserva; el resto suele aceptar sin reserva." },
+        { question: "¿Es seguro?", answer: "Precauciones normales. Cuidado con bolsos en mercados y zonas concurridas; evita caminar solo de noche en zonas vacías." },
+      ],
+      relatedItineraries: [
+        { slug: "marrakech", city: "Marrakech", days: 3, description: "Medina, zocos y jardines." },
+        { slug: "accra", city: "Accra", days: 3, description: "Independencia y paseos costeros." },
+        { slug: "cairo", city: "El Cairo", days: 3, description: "Pirámides, museos y Nilo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    johannesburg: {
+      slug: "johannesburg",
+      city: "Johannesburgo",
+      country: "Sudáfrica",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y cultura", "Exploradores urbanos"],
+      style: ["Museos", "Barrios", "Soweto"],
+      pacing: [
+        "Johannesburgo recompensa un ritmo tranquilo. Ancla el primer día en Constitution Hill y el CBD o Maboneng; el segundo en el Museo del Apartheid y Soweto; el tercero en un museo o barrio a elegir.",
+        "Agrupa las visitas por zona para no cruzar la ciudad a cada rato. Combina sitios relacionados.",
+        "Deja una tarde libre para mercados, cafés o un cierre relajado.",
+      ],
+      hero: {
+        title: "Johannesburgo en 3 días",
+        subtitle:
+          "Museos, Soweto y barrios con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Johannesburgo en la hora dorada.",
+        },
+      },
+      cityStats: [
+        { value: "5,6M+", label: "Habitantes en el área metropolitana" },
+        { value: "1.753 m", label: "Altitud (highveld)" },
+        { value: "40+", label: "Idiomas que se hablan" },
+        { value: "100+", label: "Años de historia minera del oro" },
+      ],
+      fit: {
+        forYou: ["Primera vez en Sudáfrica", "Historia y memoria", "Museos y barrios", "Visita guiada a Soweto", "Ritmo tranquilo"],
+        notForYou: ["Solo safari", "Vida nocturna intensa", "Tours uno tras otro", "Solo playa", "Lista de tareas apretada"],
+      },
+      dayPlans: [
+        { day: 1, title: "Constitution Hill y centro", summary: "Constitution Hill, CBD o Maboneng.", morning: "Constitution Hill y Old Fort", afternoon: "Maboneng Precinct o paseo por el CBD", evening: "Cena en Maboneng o Rosebank" },
+        { day: 2, title: "Museo del Apartheid y Soweto", summary: "Museo y tour por Soweto.", morning: "Museo del Apartheid", afternoon: "Tour por Soweto (Vilakazi Street, Hector Pieterson)", evening: "Cena en Soweto o vuelta al centro" },
+        { day: 3, title: "Museos o barrios", summary: "Cuna de la Humanidad, Market on Main o revisita.", morning: "Cuna de la Humanidad o Market on Main", afternoon: "Paseo por barrio o museo a elegir", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Constitution Hill", description: "El sitio une historia carcelaria y el Tribunal Constitucional. Una visita enfocada ayuda a entender la ciudad.", image: { src: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=1200&q=80", alt: "Constitution Hill y vista de Johannesburgo." } },
+        { title: "Soweto", description: "Vilakazi Street y el Museo Hector Pieterson ofrecen una forma ordenada de ver Soweto. Los tours guiados son habituales.", image: { src: "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?auto=format&fit=crop&w=1200&q=80", alt: "Vilakazi Street y township de Soweto." } },
+        { title: "Maboneng y barrios", description: "Maboneng y zonas cercanas muestran el lado creativo de la ciudad. Cafés, galerías y vida callejera añaden variedad.", image: { src: "https://images.unsplash.com/photo-1484318571209-661cf29a69c3?auto=format&fit=crop&w=1200&q=80", alt: "Arte callejero y cafés en Maboneng, Johannesburgo." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a mayo o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Gautrain o taxi desde OR Tambo" },
+        { label: "Transporte", value: "Uber o tours guiados para Soweto y Cradle; algunas zonas a pie" },
+        { label: "Entradas", value: "Reserva Museo del Apartheid y Cradle con antelación" },
+        { label: "Alojamiento", value: "Sandton, Rosebank o zona Maboneng" },
+      ],
+      checklist: [
+        "Reserva entrada al Museo del Apartheid",
+        "Organiza tour por Soweto si lo deseas",
+        "Lleva una capa ligera para mañanas frescas",
+        "Guarda mapas sin conexión de las zonas elegidas",
+        "Planifica una parada tranquila de café o mercado",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Johannesburgo?", answer: "Sí para el Museo del Apartheid, Soweto, Constitution Hill y uno o dos barrios. El ritmo es manejable." },
+        { question: "¿Necesito coche?", answer: "Uber y tours guiados funcionan bien. El coche es opcional; muchos usan tours para Soweto y Cradle." },
+        { question: "¿Soweto es seguro para visitar?", answer: "Con un guía o tour de confianza, sí. No se recomienda pasear solo; limítate a visitas organizadas." },
+        { question: "¿Dónde alojarme?", answer: "Sandton y Rosebank son cómodos y seguros; Maboneng para una base más urbana y creativa." },
+        { question: "¿A qué hora empezar cada día?", answer: "Empieza a media mañana para museos y tours. Empezar temprano ayuda en el Museo del Apartheid." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En locales de nivel alto o muy populares, reservar ayuda. Muchos cafés y sitios informales aceptan sin reserva." },
+        { question: "¿Johannesburgo es caminable?", answer: "Algunas zonas (Maboneng, Rosebank) sí. Para Soweto y Cradle, usa tours o coche." },
+      ],
+      relatedItineraries: [
+        { slug: "cape-town", city: "Ciudad del Cabo", days: 3, description: "Table Mountain, frente marítimo y barrios." },
+        { slug: "nairobi", city: "Nairobi", days: 3, description: "Museos, parques y vida salvaje." },
+        { slug: "cairo", city: "El Cairo", days: 3, description: "Pirámides, museos y Nilo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    minneapolis: {
+      slug: "minneapolis",
+      city: "Minneapolis",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Arte y parques", "Caminantes"],
+      style: ["Lagos", "Puentes", "Barrios"],
+      pacing: [
+        "Minneapolis se disfruta con calma. Ancla el primer día en el río y el Stone Arch Bridge; el segundo en el Walker y el Sculpture Garden; el tercero en un lago o barrio.",
+        "Agrupa las visitas por zona. El frente fluvial y el centro encajan bien; el distrito de arte y Uptown son buenos segundo y tercer eje.",
+        "Deja una tarde libre para un paseo por el lago o un café.",
+      ],
+      hero: {
+        title: "Minneapolis en 3 días",
+        subtitle:
+          "Lagos, arte y barrios caminables con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1600296344597-1aadaf1308bd?auto=format&fit=crop&w=1600&q=80",
+          alt: "Stone Arch Bridge y skyline de Minneapolis sobre el Mississippi.",
+        },
+      },
+      cityStats: [
+        { value: "22", label: "Lagos dentro de la ciudad" },
+        { value: "3,8 M", label: "Habitantes en el área metropolitana" },
+        { value: "21 km", label: "Sendero Grand Rounds" },
+        { value: "200+", label: "Parques y zonas verdes" },
+      ],
+      fit: {
+        forYou: ["Primera vez en las Twin Cities", "Arte y naturaleza", "Paseos por río y lagos", "Cafés de barrio", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Vida nocturna intensa", "Días solo de museos", "Solo naturaleza remota", "Lista de tareas apretada"],
+      },
+      dayPlans: [
+        { day: 1, title: "Río y Stone Arch Bridge", summary: "Frente fluvial del Mississippi y centro.", morning: "Stone Arch Bridge y Mill District", afternoon: "Recorrido por el centro y Nicollet Mall", evening: "Cena en North Loop o centro" },
+        { day: 2, title: "Walker y Sculpture Garden", summary: "Arte contemporáneo y escultura al aire libre.", morning: "Walker Art Center", afternoon: "Minneapolis Sculpture Garden y Loring Park", evening: "Cena en Uptown o Lyn-Lake" },
+        { day: 3, title: "Lagos o barrios", summary: "Lake Calhoun/Bde Maka Ska o tramo del Grand Rounds.", morning: "Paseo por el lago o tramo del Grand Rounds", afternoon: "Café de barrio o museo a elegir", evening: "Cena final y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Stone Arch Bridge", description: "El puente y el frente fluvial definen el pasado industrial y la vida de parques. Un paseo matutino o vespertino es ideal.", image: { src: "https://images.unsplash.com/photo-1578645510357-2746c0efb3cc?auto=format&fit=crop&w=1200&q=80", alt: "Stone Arch Bridge sobre el Mississippi en Minneapolis." } },
+        { title: "Sculpture Garden", description: "El jardín de esculturas del Walker es gratis y abierto. Combínalo con una visita corta al museo o solo disfruta al aire libre.", image: { src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80", alt: "Minneapolis Sculpture Garden con Spoonbridge and Cherry." } },
+        { title: "Lagos y senderos", description: "La cadena de lagos y el Grand Rounds ofrecen paseos y carriles bici. Bueno para media jornada tranquila.", image: { src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80", alt: "Lago y skyline en Minneapolis." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Tren ligero o taxi desde MSP" },
+        { label: "Transporte", value: "Tren ligero para aeropuerto y centro; a pie o bici para lagos" },
+        { label: "Entradas", value: "Reserva Walker Art Center en temporada alta" },
+        { label: "Alojamiento", value: "North Loop, centro o Uptown" },
+      ],
+      checklist: [
+        "Consulta horarios del Walker Art Center",
+        "Lleva capa ligera para mañanas frescas",
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del río y lagos",
+        "Planifica una parada tranquila de café o lago",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Minneapolis?", answer: "Sí para el frente fluvial, Walker y Sculpture Garden y un día de lago o barrio. El ritmo se mantiene relajado." },
+        { question: "¿Necesito coche?", answer: "No para este plan. Tren ligero, a pie y ride-hail cubren centro, Walker y lagos cercanos." },
+        { question: "¿Minneapolis es caminable?", answer: "El centro y el frente fluvial sí; los lagos y el Grand Rounds se disfrutan a pie o en bici." },
+        { question: "¿Dónde alojarme?", answer: "North Loop o centro para río y centro; Uptown para lagos y cafés." },
+        { question: "¿Y en invierno?", answer: "El invierno es frío pero los skyways y espacios interiores ayudan. Para lagos y paseos largos, mayo–octubre es más fácil." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares los fines de semana, una reserva ayuda. Muchas cervecerías y cafés aceptan sin reserva." },
+        { question: "¿El Sculpture Garden es gratis?", answer: "Sí. El jardín al aire libre es gratis; el Walker Art Center tiene entrada de pago." },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lago, arquitectura y barrios." },
+        { slug: "denver", city: "Denver", days: 3, description: "Arte, parques y vistas a las montañas." },
+        { slug: "portland", city: "Portland", days: 3, description: "Parques, comida y ritmo relajado." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "santo-domingo": {
+      slug: "santo-domingo",
+      city: "Santo Domingo",
+      country: "República Dominicana",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y cultura", "Caminantes"],
+      style: ["Zona colonial", "Frente marítimo", "Vida local"],
+      pacing: [
+        "Santo Domingo recompensa un ritmo tranquilo. Ancla el primer día en la Zona Colonial; el segundo en museos y el Malecón; el tercero en una revisita o parada cercana.",
+        "El núcleo colonial es compacto. Agrupa el Alcázar, la catedral y las callejuelas en un día; deja otro para el frente marítimo y los cafés.",
+        "Reserva una tarde libre para el Malecón o un almuerzo largo.",
+      ],
+      hero: {
+        title: "Santo Domingo en 3 días",
+        subtitle:
+          "Zona colonial, frente marítimo y cultura local con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1750691434503-e916deb91a4b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Arquitectura colonial y calle en la Zona Colonial de Santo Domingo.",
+        },
+      },
+      cityStats: [
+        { value: "500+", label: "Años de historia" },
+        { value: "UNESCO", label: "Ciudad Colonial Patrimonio Mundial" },
+        { value: "3 km", label: "Longitud del Malecón" },
+        { value: "2,5M+", label: "Habitantes en el área metropolitana" },
+      ],
+      fit: {
+        forYou: ["Primera vez en el Caribe", "Historia colonial", "Casco antiguo caminable", "Paseos por el frente marítimo", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Vida nocturna intensa", "Tours uno tras otro", "Solo campo remoto", "Lista de tareas apretada"],
+      },
+      dayPlans: [
+        { day: 1, title: "Núcleo de la Zona Colonial", summary: "Alcázar, catedral y callejuelas coloniales.", morning: "Alcázar de Colón y Plaza España", afternoon: "Catedral y Calle Las Damas", evening: "Cena en la zona colonial" },
+        { day: 2, title: "Museos y Malecón", summary: "Museos y paseo por el frente marítimo.", morning: "Museo de las Casas Reales o Museo del Ámbar", afternoon: "Paseo por el Malecón y vistas al mar", evening: "Cena en el Malecón o en la zona" },
+        { day: 3, title: "Mercados y revisita", summary: "Mercado Modelo, cafés o último paseo colonial.", morning: "Mercado Modelo o parada en café", afternoon: "Revisita de un favorito o parque", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Zona Colonial", description: "El barrio colonial es compacto y caminable. Calles empedradas y edificios restaurados marcan el tono.", image: { src: "https://images.unsplash.com/photo-1518105521514-9ec36310bb2f?auto=format&fit=crop&w=1200&q=80", alt: "Calle y arquitectura colonial en Santo Domingo." } },
+        { title: "Alcázar de Colón", description: "El antiguo palacio virreinal es el eje de la zona colonial. Reserva una o dos horas para el edificio y la plaza.", image: { src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1200&q=80", alt: "Alcázar de Colón en Santo Domingo." } },
+        { title: "Malecón", description: "El paseo marítimo es ideal para un paseo lento. Las vistas al mar y la brisa cierran bien el día.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Malecón frente marítimo en Santo Domingo." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Diciembre a abril (seco, cálido)" },
+        { label: "Traslado aeropuerto", value: "Taxi o shuttle desde Las Américas" },
+        { label: "Transporte", value: "Zona colonial a pie; taxi para Malecón o otros barrios" },
+        { label: "Entradas", value: "Compra entradas al Alcázar y museos en taquilla" },
+        { label: "Alojamiento", value: "Zona Colonial" },
+      ],
+      checklist: [
+        "Protector solar y capas ligeras",
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión de la Zona Colonial",
+        "Planifica un almuerzo tranquilo en la zona",
+        "Lleva botella de agua reutilizable",
+        "Consulta días de apertura de museos",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Santo Domingo?", answer: "Sí para la zona colonial, los museos principales y el Malecón. El ritmo se mantiene relajado." },
+        { question: "¿La Zona Colonial es caminable?", answer: "Sí. El núcleo es compacto; puedes ver los principales puntos a pie en un día." },
+        { question: "¿Necesito coche?", answer: "No para este plan. Taxis o ride-hail sirven para el Malecón u otras zonas fuera de la colonial." },
+        { question: "¿Dónde alojarme?", answer: "En o cerca de la Zona Colonial para estar cerca de sitios, restaurantes y el Malecón." },
+        { question: "¿A qué hora empezar cada día?", answer: "Las mañanas van bien para museos y Alcázar antes del calor y las multitudes. Las tardes pueden ser más ligeras." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En la mayoría no. Algunos de nivel alto admiten reserva; el resto suele aceptar sin reserva." },
+        { question: "¿Es seguro?", answer: "La zona colonial suele ser segura. Precauciones normales; cuidado con bolsos en zonas concurridas." },
+      ],
+      relatedItineraries: [
+        { slug: "havana", city: "La Habana", days: 3, description: "Calles coloniales, música y cultura." },
+        { slug: "cartagena", city: "Cartagena", days: 3, description: "Ciudad amurallada y costa caribeña." },
+        { slug: "mexico-city", city: "Ciudad de México", days: 3, description: "Centro histórico y barrios." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tunis: {
+      slug: "tunis",
+      city: "Túnez",
+      country: "Túnez",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y medina", "Cultura"],
+      style: ["Medina", "Museo del Bardo", "Cartago"],
+      pacing: [
+        "Túnez se disfruta con calma. Ancla el primer día en la medina; el segundo en el Museo del Bardo y la avenida Habib Bourguiba; el tercero en Cartago o Sidi Bou Said.",
+        "Agrupa las visitas por zona. La medina ocupa una mañana o un día; el Bardo y la avenida encajan bien; Cartago es una excursión de media jornada.",
+        "Deja una tarde libre para cafés o una revisita tranquila.",
+      ],
+      hero: {
+        title: "Túnez en 3 días",
+        subtitle:
+          "Medina, Museo del Bardo y Cartago con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Medina de Túnez con arquitectura tradicional y callejuelas.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Medina de Túnez" },
+        { value: "2,7M+", label: "Habitantes en el área metropolitana" },
+        { value: "3.000+", label: "Años de historia de Cartago" },
+        { value: "1", label: "Museo del Bardo (gran colección de mosaicos)" },
+      ],
+      fit: {
+        forYou: ["Primera vez en Túnez", "Medina y mercados", "Historia romana y púnica", "Museos y cafés", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Vida nocturna intensa", "Tours uno tras otro", "Solo desierto", "Lista de tareas apretada"],
+      },
+      dayPlans: [
+        { day: 1, title: "Medina de Túnez", summary: "Zocos, puertas y callejuelas.", morning: "Bab el Bhar y zocos principales", afternoon: "Zona Zitouna y callejuelas de la medina", evening: "Cena en la medina o Ville Nouvelle" },
+        { day: 2, title: "Bardo y avenida Bourguiba", summary: "Museo del Bardo y avenida de la ciudad.", morning: "Museo del Bardo", afternoon: "Avenida Habib Bourguiba y cafés", evening: "Cena en Ville Nouvelle" },
+        { day: 3, title: "Cartago o Sidi Bou Said", summary: "Ruinas romanas o pueblo blanco y azul.", morning: "Sitio arqueológico de Cartago", afternoon: "Sidi Bou Said o regreso a Túnez", evening: "Cena final y cierre" },
+      ],
+      imageInfoCards: [
+        { title: "Medina", description: "La medina es Patrimonio UNESCO. Callejuelas, zocos y la zona Zitouna marcan un tono histórico y tranquilo.", image: { src: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=1200&q=80", alt: "Callejuela tradicional en la medina de Túnez." } },
+        { title: "Museo del Bardo", description: "El Bardo alberga una de las mejores colecciones de mosaicos romanos del mundo. Reserva unas horas para una visita enfocada.", image: { src: "https://images.unsplash.com/photo-1555992336-fb0d29498b13?auto=format&fit=crop&w=1200&q=80", alt: "Museo del Bardo y mosaicos en Túnez." } },
+        { title: "Cartago", description: "El sitio arqueológico y las vistas al mar hacen una media jornada gratificante. Combina con Sidi Bou Said para un día completo.", image: { src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80", alt: "Ruinas y vista al mar en Cartago cerca de Túnez." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Traslado aeropuerto", value: "Taxi o shuttle desde Túnez-Cartago" },
+        { label: "Transporte", value: "Tren TGM para Cartago y Sidi Bou Said; medina a pie" },
+        { label: "Entradas", value: "Compra entradas al Bardo y Cartago en taquilla" },
+        { label: "Alojamiento", value: "Ville Nouvelle o cerca de la medina" },
+      ],
+      checklist: [
+        "Consulta días de apertura del Museo del Bardo",
+        "Lleva capa ligera para interiores",
+        "Zapatos cómodos para caminar",
+        "Guarda mapa sin conexión de la medina",
+        "Planifica una parada tranquila de café o zoco",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Túnez?", answer: "Sí para la medina, el Bardo y Cartago o Sidi Bou Said. El ritmo se mantiene relajado." },
+        { question: "¿La medina es caminable?", answer: "Sí. La medina es compacta pero laberíntica; reserva tiempo y un mapa o guía para la primera visita." },
+        { question: "¿Necesito coche para Cartago?", answer: "No. El tren TGM llega a Cartago y Sidi Bou Said; los taxis también son una opción." },
+        { question: "¿Dónde alojarme?", answer: "Ville Nouvelle es cómoda para el Bardo y la avenida; cerca de la medina para mañanas tempranas en la medina." },
+        { question: "¿A qué hora empezar cada día?", answer: "Empieza temprano para la medina y el Bardo para evitar calor y multitudes. Cartago puede ser por la mañana o la tarde." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En la mayoría no. Algunos de nivel alto admiten reserva; el resto suele aceptar sin reserva." },
+        { question: "¿Túnez es seguro?", answer: "Precauciones normales. La medina y los sitios principales suelen ser seguros; cuidado con bolsos en zocos concurridos." },
+      ],
+      relatedItineraries: [
+        { slug: "marrakech", city: "Marrakech", days: 3, description: "Medina, zocos y jardines." },
+        { slug: "fez", city: "Fez", days: 3, description: "Medina y artesanía." },
+        { slug: "cairo", city: "El Cairo", days: 3, description: "Pirámides, museos y Nilo." },
       ],
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
