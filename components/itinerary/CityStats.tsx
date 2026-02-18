@@ -21,12 +21,16 @@ export function CityStats({ title, cityName, items }: CityStatsProps) {
   // Replace "City" with the actual city name in the title
   const displayTitle = title.replace(/City/i, cityName);
 
+  const isThreeItems = items.length === 3;
+
   return (
     <section className="space-y-8">
       <div className="text-center">
         <p className="text-base font-bold uppercase tracking-[0.25em] text-[#7b2b04]">{displayTitle}</p>
       </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        className={`grid gap-6 sm:grid-cols-2 ${isThreeItems ? "lg:grid-cols-3 lg:max-w-4xl lg:mx-auto" : "lg:grid-cols-4"}`}
+      >
         {items.map((stat, index) => {
           const Icon = statIcons[index % statIcons.length];
           return (

@@ -25,6 +25,12 @@ if (!KEY) {
 }
 
 const QUERIES = [
+  { slug: 'toulon', city: 'Toulon', query: 'Toulon France harbor Mediterranean' },
+  { slug: 'birmingham', city: 'Birmingham', query: 'Birmingham England city' },
+  { slug: 'dusseldorf', city: 'Düsseldorf', query: 'Düsseldorf Germany Rhine Rheinturm' },
+  { slug: 'kuwait-city', city: 'Kuwait City', query: 'Kuwait Towers' },
+  { slug: 'almaty', city: 'Almaty', query: 'Almaty Kazakhstan mountains city' },
+  { slug: 'dar-es-salaam', city: 'Dar es Salaam', query: 'Dar es Salaam Tanzania waterfront' },
   { slug: 'stuttgart', city: 'Stuttgart', query: 'Stuttgart Germany city' },
   { slug: 'nuremberg', city: 'Nuremberg', query: 'Nuremberg Germany castle' },
   { slug: 'galway', city: 'Galway', query: 'Galway Ireland city' },
