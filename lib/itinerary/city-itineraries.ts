@@ -1723,6 +1723,746 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    baltimore: {
+      slug: "baltimore",
+      city: "Baltimore",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Waterfront walks", "History and culture"],
+      style: ["Inner Harbor", "Historic neighborhoods", "Easy pacing"],
+      pacing: [
+        "Baltimore works best at a calm pace. Anchor each day with one main area—the Inner Harbor, Fells Point, or a museum—then leave room for crab cakes, waterfront strolls, and unplanned stops.",
+        "Group time by neighborhood to keep transit light. Pair the Harbor with the Aquarium for a full day; add Fells Point and Mount Vernon on others for variety.",
+        "Save an open afternoon for a harbor walk or a relaxed meal so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Baltimore in 3 days",
+        subtitle:
+          "Inner Harbor, historic neighborhoods, and relaxed waterfront pacing without rushing.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1617603804604-5f8450e07583?auto=format&fit=crop&w=1600&q=80",
+          alt: "Baltimore Inner Harbor with boats and city skyline.",
+        },
+      },
+      cityStats: [
+        { value: "280+", label: "Years of city history" },
+        { value: "7", label: "Museums on the waterfront" },
+        { value: "3.5 mi", label: "Harbor promenade" },
+        { value: "2.8M", label: "Metro population" },
+      ],
+      fit: {
+        forYou: ["Waterfront and harbor focus", "First-time visitors", "Walkable core", "Relaxed pace with good food", "History and aquariums"],
+        notForYou: ["Beach-only trips", "Heavy nightlife focus", "Remote countryside", "Back-to-back museum days", "Budget backpacker only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Inner Harbor and Aquarium",
+          summary: "Waterfront loop and National Aquarium.",
+          morning: "Inner Harbor promenade and Harborplace",
+          afternoon: "National Aquarium",
+          evening: "Harbor East dinner and evening stroll",
+        },
+        {
+          day: 2,
+          title: "Fells Point and historic streets",
+          summary: "Cobblestone streets and local character.",
+          morning: "Fells Point streets and Broadway Market",
+          afternoon: "Waterfront walk to Canton",
+          evening: "Dinner in Fells Point",
+        },
+        {
+          day: 3,
+          title: "Mount Vernon and culture",
+          summary: "Museums and grand avenues.",
+          morning: "Washington Monument and Mount Vernon Place",
+          afternoon: "Walters Art Museum or Maryland Historical Society",
+          evening: "Final harbor walk or neighborhood dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The Inner Harbor",
+          description:
+            "The harbor is the city's living room. Expect boats, waterfront dining, and a steady flow of walkers and families.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Baltimore Inner Harbor waterfront with boats.",
+          },
+        },
+        {
+          title: "Historic neighborhoods",
+          description:
+            "Fells Point and Mount Vernon offer cobblestones, brick rowhouses, and local cafes within a short walk or ride.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic brick rowhouses in a Baltimore neighborhood.",
+          },
+        },
+        {
+          title: "Waterfront dining",
+          description:
+            "Crab houses and harbor-side spots set the tone for relaxed meals with a view.",
+          image: {
+            src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80",
+            alt: "Waterfront dining with harbor views in Baltimore.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Light Rail or taxi from BWI" },
+        { label: "Transit tips", value: "Walk the Harbor; Water Taxi or circulator for longer hops" },
+        { label: "Ticketing", value: "Book Aquarium ahead in peak season" },
+        { label: "Neighborhood stay", value: "Inner Harbor or Fells Point" },
+      ],
+      checklist: [
+        "Book National Aquarium slot if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline map for Harbor area",
+        "Plan one slow waterfront break daily",
+        "Carry a refillable water bottle",
+        "Check Water Taxi schedule for harbor hop",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Baltimore?",
+          answer:
+            "Yes for the core highlights. Expect one major area per day, short walks along the harbor, and room for crab cakes and unplanned stops.",
+        },
+        {
+          question: "Should I buy Aquarium tickets in advance?",
+          answer:
+            "Yes in peak season. Timed entry keeps the visit on track and avoids long waits.",
+        },
+        {
+          question: "Do I need a transit pass?",
+          answer:
+            "Not necessarily. The Inner Harbor and Fells Point are walkable; the circulator or Water Taxi help for longer hops.",
+        },
+        {
+          question: "Is Baltimore walkable?",
+          answer:
+            "Yes. The Harbor, Fells Point, and Mount Vernon are manageable on foot with optional transit for returns.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Inner Harbor keeps you central for the Aquarium and promenade; Fells Point feels more local with easy harbor access.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "A morning start works well for the Aquarium and harbor walks; afternoons can be slower with long lunches.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular crab houses and weekend dinners, yes. Keep one or two reservations and leave the rest flexible.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "washington-dc", city: "Washington DC", days: 3, description: "Monuments, museums, and mall strolls." },
+        { slug: "philadelphia", city: "Philadelphia", days: 3, description: "Historic landmarks and walkable neighborhoods." },
+        { slug: "boston", city: "Boston", days: 3, description: "Historic core, waterfront, and relaxed streets." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "st-louis": {
+      slug: "st-louis",
+      city: "St. Louis",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Parks and museums", "Family-friendly"],
+      style: ["Gateway Arch", "Forest Park", "Walkable neighborhoods"],
+      pacing: [
+        "St. Louis rewards a calm pace. Anchor each day with one main area—the Arch and riverfront, Forest Park, or a neighborhood—then leave room for food and relaxed strolls.",
+        "Group time by area to keep transit light. Pair the Arch with the Old Courthouse; dedicate a full day to Forest Park and another to Soulard or the Delmar Loop.",
+        "Save an open afternoon for a park walk or a brewery stop so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "St. Louis in 3 days",
+        subtitle:
+          "Gateway Arch, Forest Park, and neighborhood charm at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1610234759638-9796101136ef?auto=format&fit=crop&w=1600&q=80",
+          alt: "Gateway Arch and St. Louis skyline from the riverfront.",
+        },
+      },
+      cityStats: [
+        { value: "630 ft", label: "Gateway Arch height" },
+        { value: "1,300+", label: "Acres in Forest Park" },
+        { value: "2.8M", label: "Metro population" },
+        { value: "50+", label: "Breweries in the region" },
+      ],
+      fit: {
+        forYou: ["Iconic arch and riverfront", "Parks and free museums", "First-time visitors", "Relaxed pacing", "Family-friendly stops"],
+        notForYou: ["Beach or mountain focus", "Heavy nightlife only", "Remote day trips only", "Non-stop tours", "Budget backpacker only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Gateway Arch and riverfront",
+          summary: "Arch grounds and Mississippi views.",
+          morning: "Gateway Arch and museum",
+          afternoon: "Old Courthouse and riverfront walk",
+          evening: "Laclede's Landing or downtown dinner",
+        },
+        {
+          day: 2,
+          title: "Forest Park",
+          summary: "Museums, zoo, and green space.",
+          morning: "Saint Louis Art Museum or History Museum",
+          afternoon: "Forest Park trails and Grand Basin",
+          evening: "The Hill or Central West End dinner",
+        },
+        {
+          day: 3,
+          title: "Soulard and neighborhoods",
+          summary: "Market, breweries, and local character.",
+          morning: "Soulard Market and historic district",
+          afternoon: "Anheuser-Busch tour or neighborhood stroll",
+          evening: "Final dinner and relaxed wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The Gateway Arch",
+          description:
+            "The Arch defines the skyline. Morning light and river views set a calm tone for the day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Gateway Arch in St. Louis with riverfront.",
+          },
+        },
+        {
+          title: "Forest Park",
+          description:
+            "One of the largest urban parks in the US. Museums, the zoo, and trails fit a relaxed pace.",
+          image: {
+            src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Forest Park green space and paths in St. Louis.",
+          },
+        },
+        {
+          title: "Historic neighborhoods",
+          description:
+            "Soulard, the Hill, and the Loop offer brick streets, food, and local character.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic brick street in a St. Louis neighborhood.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "MetroLink or taxi from STL" },
+        { label: "Transit tips", value: "Walk downtown and Arch; MetroLink for Forest Park" },
+        { label: "Ticketing", value: "Book Arch tram in advance in peak season" },
+        { label: "Neighborhood stay", value: "Downtown, Central West End, or Soulard" },
+      ],
+      checklist: [
+        "Book Gateway Arch tram if visiting",
+        "Pack comfortable walking shoes",
+        "Save offline map for downtown and Forest Park",
+        "Plan one park or brewery break",
+        "Carry a refillable water bottle",
+        "Check Forest Park museum hours",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for St. Louis?",
+          answer:
+            "Yes for the Arch, Forest Park, and a neighborhood day. The pace stays relaxed with room for food and parks.",
+        },
+        {
+          question: "Should I book the Arch tram in advance?",
+          answer:
+            "Yes in peak season. Timed tickets keep the visit on track and avoid long waits.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for the core plan. MetroLink and walking cover the Arch, Forest Park, and central neighborhoods.",
+        },
+        {
+          question: "Is St. Louis walkable?",
+          answer:
+            "Yes. Downtown and the Arch are compact; Forest Park is large but walkable within the day.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown or Central West End put you near the Arch or Forest Park with good transit links.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Morning works well for the Arch and museums; afternoons can be slower with park or neighborhood time.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots on game days or weekends, yes. Otherwise one or two reservations and flexibility works.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lakefront, museums, and neighborhoods." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music heritage and Southern food." },
+        { slug: "kansas-city", city: "Kansas City", days: 3, description: "Fountains, barbecue, and jazz." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    charlotte: {
+      slug: "charlotte",
+      city: "Charlotte",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Museums and parks", "Southern food"],
+      style: ["Uptown skyline", "Green spaces", "Easy pacing"],
+      pacing: [
+        "Charlotte works at a calm pace. Anchor each day with one main area—Uptown museums, a park, or a neighborhood—then leave room for food and short strolls.",
+        "Group time by district. Pair the Mint and Discovery Place with a walk through Romare Bearden Park; add Freedom Park or NoDa on other days.",
+        "Save an open afternoon for a park or a relaxed meal so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Charlotte in 3 days",
+        subtitle:
+          "Museums, green spaces, and Southern hospitality at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1638289231271-65a10c95b9e6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Charlotte skyline at sunset.",
+        },
+      },
+      cityStats: [
+        { value: "800K+", label: "Metro population" },
+        { value: "200+", label: "Parks and green spaces" },
+        { value: "30+", label: "Museums and cultural sites" },
+        { value: "15 min", label: "Uptown to airport (by light rail)" },
+      ],
+      fit: {
+        forYou: ["Museums and parks", "First-time visitors", "Walkable Uptown", "Relaxed pace", "Southern food and drink"],
+        notForYou: ["Beach or mountain focus", "Heavy nightlife only", "Remote day trips only", "Non-stop tours", "Budget backpacker only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Uptown and museums",
+          summary: "Mint Museum, Discovery Place, and parks.",
+          morning: "Mint Museum Uptown or Bechtler",
+          afternoon: "Discovery Place and Romare Bearden Park",
+          evening: "Uptown dinner and evening stroll",
+        },
+        {
+          day: 2,
+          title: "Freedom Park and neighborhoods",
+          summary: "Green space and local character.",
+          morning: "Freedom Park and Little Sugar Creek Greenway",
+          afternoon: "Dilworth or Plaza Midwood stroll",
+          evening: "Neighborhood dinner",
+        },
+        {
+          day: 3,
+          title: "NoDa and culture",
+          summary: "Arts district and relaxed pacing.",
+          morning: "NoDa arts district and galleries",
+          afternoon: "Optimist Park or craft brewery stop",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Uptown skyline",
+          description:
+            "Charlotte's center is compact. Museums, parks, and dining sit within a short walk.",
+          image: {
+            src: "https://images.unsplash.com/photo-1514565131-fce88c9659e2?auto=format&fit=crop&w=1200&q=80",
+            alt: "Charlotte Uptown skyline and buildings.",
+          },
+        },
+        {
+          title: "Parks and greenways",
+          description:
+            "Freedom Park and the greenway system offer easy escapes without leaving the city.",
+          image: {
+            src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Green park and paths in Charlotte.",
+          },
+        },
+        {
+          title: "Neighborhood character",
+          description:
+            "NoDa, Dilworth, and Plaza Midwood add local flavor and relaxed dining.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+            alt: "Charlotte neighborhood street with local shops.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to November" },
+        { label: "Airport transfer", value: "LYNX Blue Line to Uptown" },
+        { label: "Transit tips", value: "Walk Uptown; light rail or bus for neighborhoods" },
+        { label: "Ticketing", value: "Book museum tickets ahead if visiting multiple" },
+        { label: "Neighborhood stay", value: "Uptown or South End" },
+      ],
+      checklist: [
+        "Book museum slots if visiting several",
+        "Pack comfortable walking shoes",
+        "Save offline map for Uptown and parks",
+        "Plan one park or cafe break daily",
+        "Carry a refillable water bottle",
+        "Check LYNX schedule for evening returns",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Charlotte?",
+          answer:
+            "Yes for Uptown, a park day, and a neighborhood. The pace stays relaxed with room for food and green space.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for this plan. The light rail and walking cover Uptown and key neighborhoods.",
+        },
+        {
+          question: "Is Charlotte walkable?",
+          answer:
+            "Yes. Uptown is compact; Freedom Park and NoDa are reachable by light rail or short rides.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Uptown keeps you central for museums and dining; South End offers light rail and a younger vibe.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Morning works for museums; afternoons can be slower with park or neighborhood time.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots on weekends, yes. Keep one or two reservations and leave the rest flexible.",
+        },
+        {
+          question: "What about the NASCAR Hall of Fame?",
+          answer:
+            "Worth a stop if you like racing; pair it with an Uptown morning and leave the afternoon open.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "raleigh", city: "Raleigh", days: 3, description: "Museums, greenways, and relaxed pace." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music heritage and Southern food." },
+        { slug: "atlanta", city: "Atlanta", days: 3, description: "History, parks, and Southern food." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    milwaukee: {
+      slug: "milwaukee",
+      city: "Milwaukee",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Lakefront and breweries", "Museums"],
+      style: ["Lake Michigan", "Historic Third Ward", "Easy pacing"],
+      pacing: [
+        "Milwaukee rewards a calm pace. Anchor each day with one main area—the lakefront, the Third Ward, or a museum—then leave room for beer gardens, waterfront strolls, and unplanned stops.",
+        "Group time by district. Pair the Art Museum with the lakefront; add the Third Ward and a brewery on other days.",
+        "Save an open afternoon for a lake walk or a relaxed meal so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Milwaukee in 3 days",
+        subtitle:
+          "Lakefront, breweries, and historic neighborhoods at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1584582812876-db5756d5a772?auto=format&fit=crop&w=1600&q=80",
+          alt: "Milwaukee lakefront and Art Museum with Calatrava wings.",
+        },
+      },
+      cityStats: [
+        { value: "1.5M", label: "Metro population" },
+        { value: "85+", label: "Breweries in the region" },
+        { value: "3 mi", label: "Lakefront path" },
+        { value: "150+", label: "Years of brewing history" },
+      ],
+      fit: {
+        forYou: ["Lakefront and museums", "Brewery and beer garden fans", "First-time visitors", "Walkable core", "Relaxed pacing"],
+        notForYou: ["Beach-only trips", "Heavy nightlife only", "Remote countryside", "Non-stop tours", "Budget backpacker only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Lakefront and Art Museum",
+          summary: "Calatrava building and lake views.",
+          morning: "Milwaukee Art Museum and lakefront",
+          afternoon: "Veterans Park and lake path",
+          evening: "Waterfront dinner",
+        },
+        {
+          day: 2,
+          title: "Historic Third Ward",
+          summary: "Brick streets, shops, and public market.",
+          morning: "Third Ward streets and Milwaukee Public Market",
+          afternoon: "Riverwalk and nearby galleries",
+          evening: "Third Ward dinner",
+        },
+        {
+          day: 3,
+          title: "Breweries and river",
+          summary: "Brewery tour or riverwalk.",
+          morning: "Lakefront Brewery or Harley-Davidson Museum",
+          afternoon: "Riverwalk and beer garden",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Lakefront and Art Museum",
+          description:
+            "The Calatrava-designed museum and lake path set a calm, scenic tone for the day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578645510447-e20b46571173?auto=format&fit=crop&w=1200&q=80",
+            alt: "Milwaukee Art Museum on the lakefront.",
+          },
+        },
+        {
+          title: "Historic Third Ward",
+          description:
+            "Brick warehouses, the Public Market, and riverwalk add local character.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic brick buildings in Milwaukee Third Ward.",
+          },
+        },
+        {
+          title: "River and breweries",
+          description:
+            "The riverwalk links breweries and beer gardens for a relaxed afternoon.",
+          image: {
+            src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80",
+            alt: "Milwaukee riverwalk and waterfront.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to October for lake and beer gardens" },
+        { label: "Airport transfer", value: "Uber or shuttle from MKE" },
+        { label: "Transit tips", value: "Walk downtown and lakefront; bus or streetcar for hops" },
+        { label: "Ticketing", value: "Book Art Museum or brewery tours ahead in peak season" },
+        { label: "Neighborhood stay", value: "Third Ward or downtown" },
+      ],
+      checklist: [
+        "Book Art Museum or brewery tour if desired",
+        "Pack comfortable walking shoes",
+        "Save offline map for lakefront and Third Ward",
+        "Plan one lake or beer garden break",
+        "Carry a refillable water bottle",
+        "Check streetcar schedule for evening returns",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Milwaukee?",
+          answer:
+            "Yes for the lakefront, Third Ward, and a brewery or museum day. The pace stays relaxed.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for this plan. Downtown, the lakefront, and Third Ward are walkable with bus or streetcar for longer hops.",
+        },
+        {
+          question: "Is Milwaukee walkable?",
+          answer:
+            "Yes. The lakefront path, Art Museum, and Third Ward are manageable on foot.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Third Ward or downtown put you near the lakefront, Public Market, and riverwalk.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Morning works for the Art Museum and lakefront; afternoons can be slower with a beer garden or market.",
+        },
+        {
+          question: "Do I need to book brewery tours in advance?",
+          answer:
+            "For popular breweries on weekends, yes. One booked tour and one flexible stop works well.",
+        },
+        {
+          question: "What about winter?",
+          answer:
+            "Museums and the Public Market work year-round; lake walks are best in warmer months.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Lakefront, museums, and neighborhoods." },
+        { slug: "minneapolis", city: "Minneapolis", days: 3, description: "Lakes, arts, and walkable core." },
+        { slug: "detroit", city: "Detroit", days: 3, description: "Revival, museums, and riverfront." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tucson: {
+      slug: "tucson",
+      city: "Tucson",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Desert and culture", "Relaxed pacing"],
+      style: ["Saguaro desert", "Historic districts", "Southwestern food"],
+      pacing: [
+        "Tucson works at a calm pace. Anchor each day with one main area—the desert, Mission San Xavier, or downtown—then leave room for Mexican food, desert light, and unplanned stops.",
+        "Group time by area. Pair Saguaro East with a desert drive; add Mission San Xavier and Fourth Avenue on other days.",
+        "Save an open afternoon for a sunset view or a relaxed meal so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Tucson in 3 days",
+        subtitle:
+          "Desert views, Mission San Xavier, and Southwestern flavor at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1662019578129-2072e4dce5e2?auto=format&fit=crop&w=1600&q=80",
+          alt: "Saguaro cacti and desert landscape near Tucson.",
+        },
+      },
+      cityStats: [
+        { value: "1M+", label: "Metro population" },
+        { value: "2", label: "Saguaro National Park districts" },
+        { value: "230+", label: "Days of sunshine per year" },
+        { value: "4,000+", label: "Years of history in the region" },
+      ],
+      fit: {
+        forYou: ["Desert and missions", "First-time visitors", "Southwestern food", "Relaxed pace", "Short drives and walks"],
+        notForYou: ["Beach or snow focus", "Heavy nightlife only", "Non-stop tours", "No car at all", "Budget backpacker only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Saguaro National Park East",
+          summary: "Desert drive and short walks.",
+          morning: "Saguaro East scenic drive and short trails",
+          afternoon: "Desert Museum or Tanque Verde area",
+          evening: "Sunset view and dinner",
+        },
+        {
+          day: 2,
+          title: "Mission San Xavier and Tucson Mountain Park",
+          summary: "Mission and desert views.",
+          morning: "Mission San Xavier del Bac",
+          afternoon: "Tucson Mountain Park or Gates Pass",
+          evening: "Fourth Avenue or downtown dinner",
+        },
+        {
+          day: 3,
+          title: "Downtown and Fourth Avenue",
+          summary: "Historic core and local character.",
+          morning: "Downtown Tucson and Presidio district",
+          afternoon: "Fourth Avenue shops and cafes",
+          evening: "Final dinner and wrap-up",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Saguaro desert",
+          description:
+            "The desert defines Tucson. Morning or late afternoon light makes short drives and walks memorable.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=1200&q=80",
+            alt: "Saguaro cacti and desert near Tucson.",
+          },
+        },
+        {
+          title: "Mission San Xavier",
+          description:
+            "The White Dove of the Desert is a working mission and a calm stop on the way to the west side.",
+          image: {
+            src: "https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mission San Xavier del Bac near Tucson.",
+          },
+        },
+        {
+          title: "Downtown and Fourth Avenue",
+          description:
+            "Historic downtown and Fourth Avenue add local flavor and relaxed dining.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+            alt: "Fourth Avenue or downtown Tucson street.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for mild desert weather" },
+        { label: "Airport transfer", value: "Sun Tran or taxi from TUS" },
+        { label: "Transit tips", value: "Car helpful for Saguaro and Mission; Sun Link for downtown" },
+        { label: "Ticketing", value: "Saguaro Park pass; Mission is free" },
+        { label: "Neighborhood stay", value: "Downtown, Fourth Avenue, or near the university" },
+      ],
+      checklist: [
+        "Get Saguaro National Park pass if visiting",
+        "Pack sun protection and water",
+        "Save offline map for desert drives",
+        "Plan morning or late afternoon for desert",
+        "Carry a refillable water bottle",
+        "Check Mission San Xavier hours",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Tucson?",
+          answer:
+            "Yes for Saguaro, Mission San Xavier, and downtown. The pace stays relaxed with room for desert light and food.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Helpful for Saguaro and the Mission. Downtown and Fourth Avenue are walkable; Sun Link covers the core.",
+        },
+        {
+          question: "Is Tucson walkable?",
+          answer:
+            "Downtown and Fourth Avenue are walkable. Desert sights require a short drive.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown or near Fourth Avenue put you in the core; east side is closer to Saguaro East.",
+        },
+        {
+          question: "What time should I start for the desert?",
+          answer:
+            "Morning or late afternoon avoids the hottest hours and gives the best light.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular Southwestern spots on weekends, yes. Otherwise one or two reservations and flexibility works.",
+        },
+        {
+          question: "What about summer?",
+          answer:
+            "Very hot. Plan early morning or late afternoon for outdoor time and plenty of water.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "phoenix", city: "Phoenix", days: 3, description: "Desert, museums, and outdoor pacing." },
+        { slug: "san-diego", city: "San Diego", days: 3, description: "Waterfront, parks, and coastal pace." },
+        { slug: "santa-fe", city: "Santa Fe", days: 2, description: "Southwestern art and adobe charm." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
     birmingham: {
       slug: "birmingham",
       city: "Birmingham",
@@ -28767,6 +29507,561 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    york: {
+      slug: "york",
+      city: "York",
+      country: "United Kingdom",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Short breaks"],
+      style: ["Medieval walls", "Minster and lanes", "Compact center"],
+      pacing: [
+        "York is compact enough for two calm days. Day one: Minster and The Shambles. Day two: city walls, museums, and a relaxed final stroll.",
+        "Start at the Minster in the morning to avoid the busiest slot. The center is walkable; no need to rush between sights.",
+        "Leave time for tea, a long lunch, or a quiet bench by the river so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "York in 2 days",
+        subtitle:
+          "Medieval walls, the Minster, and historic lanes with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1656695712976-317f643bbf61?auto=format&fit=crop&w=1600&q=80",
+          alt: "York Minster cathedral and historic city skyline.",
+        },
+      },
+      cityStats: [
+        { value: "2,000+", label: "Years of history" },
+        { value: "3.4km", label: "Medieval city walls" },
+        { value: "200K+", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: ["Medieval history and architecture", "Compact walkable city", "First-time visitors", "Short break", "Calm pacing"],
+        notForYou: ["Beach or countryside focus", "Long day trips", "Heavy nightlife", "Museum-only marathon", "Rushed multi-city tour"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Minster and The Shambles",
+          summary: "York Minster, The Shambles, and historic center.",
+          morning: "York Minster and Chapter House",
+          afternoon: "The Shambles and surrounding lanes",
+          evening: "Dinner in the center",
+        },
+        {
+          day: 2,
+          title: "Walls and museums",
+          summary: "City walls walk and optional museum.",
+          morning: "City walls walk (Bootham Bar to Monk Bar)",
+          afternoon: "Jorvik Viking Centre or Yorkshire Museum, or relaxed stroll",
+          evening: "Final tea or dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "York Minster",
+          description:
+            "The cathedral dominates the skyline. Mornings are quieter; allow at least 1.5 hours for the interior and tower.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1200&q=80",
+            alt: "York Minster cathedral exterior.",
+          },
+        },
+        {
+          title: "The Shambles",
+          description:
+            "The narrow medieval street is the postcard view. Early morning or late afternoon is quieter for a slow walk.",
+          image: {
+            src: "https://images.unsplash.com/photo-1515586838455-8f8f9409684e?auto=format&fit=crop&w=1200&q=80",
+            alt: "The Shambles historic street in York.",
+          },
+        },
+        {
+          title: "City walls",
+          description:
+            "The medieval walls form a 3.4km loop. A full circuit or a shorter stretch fits a relaxed morning.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596422846543-75b6d0c44e1e?auto=format&fit=crop&w=1200&q=80",
+            alt: "York city walls and gate.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for milder weather" },
+        { label: "Train", value: "York station; direct from London, Edinburgh, Leeds" },
+        { label: "Getting around", value: "Center is walkable; no car needed" },
+        { label: "Ticketing", value: "Book Minster and Jorvik in advance in peak season" },
+        { label: "Stay", value: "Central near Minster or within the walls" },
+      ],
+      checklist: [
+        "Book Minster ticket in advance",
+        "Comfortable shoes for cobbles and walls",
+        "Pack a light layer for rain",
+        "Save offline map of center",
+        "Plan one tea or long lunch",
+        "Check Minster and museum opening times",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for York?", answer: "Yes for the Minster, The Shambles, city walls, and a relaxed pace. Add a day for nearby countryside or coast if you like." },
+        { question: "Do I need to book the Minster?", answer: "Yes in peak season. Mornings are quieter for the tower and interior." },
+        { question: "Is York walkable?", answer: "Yes. The center is compact; all main sights are within 15–20 minutes on foot." },
+        { question: "Where should I stay?", answer: "Near the Minster or inside the walls for easy access to the main sights." },
+        { question: "How do I get to York?", answer: "Train from London King's Cross (about 2 hours), Edinburgh, or Leeds; York station is central." },
+        { question: "Do I need a car?", answer: "No for the city. Rent one only for North York Moors or coast day trips." },
+        { question: "Should I book restaurants?", answer: "For weekend dinner yes. Lunch and weekdays often have walk-in space." },
+      ],
+      relatedItineraries: [
+        { slug: "london", city: "London", days: 3, description: "Iconic sights, museums, and Thames walks." },
+        { slug: "edinburgh", city: "Edinburgh", days: 3, description: "Castle, Royal Mile, and historic lanes." },
+        { slug: "bath", city: "Bath", days: 2, description: "Roman Baths, Georgian streets, and compact center." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cambridge: {
+      slug: "cambridge",
+      city: "Cambridge",
+      country: "United Kingdom",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture and history", "Short breaks"],
+      style: ["College backs", "River Cam", "Compact center"],
+      pacing: [
+        "Cambridge fits two calm days. Day one: King's College and the Backs. Day two: more colleges, river punting, and market square.",
+        "Start at King's in the morning to enjoy the chapel and grounds before crowds. The center is walkable.",
+        "Leave time for a punt on the Cam, tea, or a long lunch so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Cambridge in 2 days",
+        subtitle:
+          "College backs, river punting, and a compact center with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1618391440321-7ea5fa610260?auto=format&fit=crop&w=1600&q=80",
+          alt: "King's College Chapel and the Backs in Cambridge.",
+        },
+      },
+      cityStats: [
+        { value: "31", label: "Colleges" },
+        { value: "800+", label: "Years of university history" },
+        { value: "125K+", label: "Residents" },
+      ],
+      fit: {
+        forYou: ["University and architecture", "Compact walkable city", "First-time visitors", "Short break", "Calm pacing"],
+        notForYou: ["Beach or countryside focus", "Long day trips", "Heavy nightlife", "Museum-only marathon", "Rushed multi-city tour"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "King's College and the Backs",
+          summary: "King's Chapel, the Backs, and river views.",
+          morning: "King's College Chapel and grounds",
+          afternoon: "The Backs and Trinity College exterior",
+          evening: "Dinner in the center",
+        },
+        {
+          day: 2,
+          title: "Punting and market",
+          summary: "River punting and market square.",
+          morning: "Punt on the Cam or Fitzwilliam Museum",
+          afternoon: "Market Square and more college courts",
+          evening: "Final tea or dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "King's College Chapel",
+          description:
+            "The chapel is the landmark. Mornings are quieter; allow time for the interior and the famous fan vaulting.",
+          image: {
+            src: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1200&q=80",
+            alt: "King's College Chapel in Cambridge.",
+          },
+        },
+        {
+          title: "The Backs",
+          description:
+            "The green lawns behind the colleges along the Cam are ideal for a slow stroll or a punt.",
+          image: {
+            src: "https://images.unsplash.com/photo-1515586838455-8f8f9409684e?auto=format&fit=crop&w=1200&q=80",
+            alt: "The Backs and River Cam in Cambridge.",
+          },
+        },
+        {
+          title: "River punting",
+          description:
+            "A punt along the Cam gives a different view of the colleges. Book in advance in peak season or join a shared trip.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Punting on the River Cam in Cambridge.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October; avoid exam season in May–June" },
+        { label: "Train", value: "Cambridge station; direct from London King's Cross" },
+        { label: "Getting around", value: "Center is walkable; no car needed" },
+        { label: "Ticketing", value: "Book King's Chapel in advance in peak season" },
+        { label: "Stay", value: "Central near the colleges or station" },
+      ],
+      checklist: [
+        "Book King's College Chapel ticket in advance",
+        "Comfortable shoes for cobbles",
+        "Pack a light layer for rain",
+        "Save offline map of center",
+        "Plan a punt or long lunch",
+        "Check college opening times",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Cambridge?", answer: "Yes for the main colleges, the Backs, and a relaxed pace. Add a day for more museums or nearby villages if you like." },
+        { question: "Do I need to book King's Chapel?", answer: "Yes in peak season. Mornings are quieter." },
+        { question: "Is Cambridge walkable?", answer: "Yes. The center is compact; colleges and market are within 15–20 minutes on foot." },
+        { question: "Where should I stay?", answer: "Near the colleges or the station for easy access to the center." },
+        { question: "How do I get to Cambridge?", answer: "Train from London King's Cross (about 1 hour); buses from Stansted Airport." },
+        { question: "Do I need a car?", answer: "No for the city. Rent one only for countryside or Ely day trips." },
+        { question: "Should I book restaurants?", answer: "For weekend dinner yes. Lunch and weekdays often have walk-in space." },
+      ],
+      relatedItineraries: [
+        { slug: "london", city: "London", days: 3, description: "Iconic sights, museums, and Thames walks." },
+        { slug: "oxford", city: "Oxford", days: 2, description: "Colleges, Bodleian, and compact center." },
+        { slug: "york", city: "York", days: 2, description: "Minster, The Shambles, and city walls." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bern: {
+      slug: "bern",
+      city: "Bern",
+      country: "Switzerland",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and architecture", "Short breaks"],
+      style: ["Old town arcades", "Bear Park", "River views"],
+      pacing: [
+        "Bern is compact enough for two calm days. Day one: old town, Zytglogge, and Bear Park. Day two: museums, river walk, and final stroll.",
+        "Start in the old town in the morning. The arcades and fountains are best on foot; no need to rush.",
+        "Leave time for a cafe under the arcades or a riverside pause so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Bern in 2 days",
+        subtitle:
+          "Old town arcades, Bear Park, and the Aare with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1600&q=80",
+          alt: "Bern old town with arcades and cathedral.",
+        },
+      },
+      cityStats: [
+        { value: "6", label: "km of arcades" },
+        { value: "UNESCO", label: "Old town World Heritage" },
+        { value: "500+", label: "Years as federal city" },
+      ],
+      fit: {
+        forYou: ["Medieval and federal history", "Compact walkable city", "First-time visitors", "Short break", "Calm pacing"],
+        notForYou: ["Beach or mountain focus", "Long day trips", "Heavy nightlife", "Museum-only marathon", "Rushed multi-city tour"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and Bear Park",
+          summary: "Arcades, Zytglogge, and Bear Park.",
+          morning: "Zytglogge and Kramgasse",
+          afternoon: "Bear Park and Nydegg area",
+          evening: "Dinner under the arcades",
+        },
+        {
+          day: 2,
+          title: "Museums and river",
+          summary: "Museum choice and Aare walk.",
+          morning: "Einstein House or Historical Museum",
+          afternoon: "Aare river walk or Rosengarten",
+          evening: "Final stroll and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Old town arcades",
+          description:
+            "The medieval arcades line the main streets. Mornings are quieter for a slow walk and window shopping.",
+          image: {
+            src: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1200&q=80",
+            alt: "Bern old town arcades and cobbled street.",
+          },
+        },
+        {
+          title: "Bear Park",
+          description:
+            "The bears are a Bern symbol. The park by the river is free and fits a relaxed half-hour stop.",
+          image: {
+            src: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Bern Bear Park by the Aare river.",
+          },
+        },
+        {
+          title: "Aare and cathedral",
+          description:
+            "The Aare loops around the old town. The cathedral tower gives a clear view over the city.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Bern Cathedral and old town from the river.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for milder weather" },
+        { label: "Train", value: "Bern main station; direct from Zurich, Geneva" },
+        { label: "Getting around", value: "Center is walkable; trams for longer hops" },
+        { label: "Ticketing", value: "Bear Park free; book museums online in peak season" },
+        { label: "Stay", value: "Central old town or near station" },
+      ],
+      checklist: [
+        "Comfortable shoes for cobbles",
+        "Pack a light layer for rain",
+        "Save offline map of center",
+        "Plan one cafe or long lunch under arcades",
+        "Check museum opening times",
+        "Carry Swiss francs or card",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Bern?", answer: "Yes for the old town, Bear Park, and a relaxed pace. Add a day for more museums or a trip to the Alps if you like." },
+        { question: "Do I need to book Bear Park?", answer: "No. Entry is free. Mornings are quieter." },
+        { question: "Is Bern walkable?", answer: "Yes. The old town is compact; main sights are within 15–20 minutes on foot." },
+        { question: "Where should I stay?", answer: "In or near the old town for easy access to arcades and Bear Park." },
+        { question: "How do I get to Bern?", answer: "Train from Zurich (about 1 hour), Geneva (about 2 hours), or Basel." },
+        { question: "Do I need a car?", answer: "No for the city. Trains cover day trips to Interlaken or Lucerne." },
+        { question: "Should I book restaurants?", answer: "For weekend dinner yes. Lunch and weekdays often have walk-in space." },
+      ],
+      relatedItineraries: [
+        { slug: "zurich", city: "Zurich", days: 3, description: "Lake, old town, and museums." },
+        { slug: "lucerne", city: "Lucerne", days: 3, description: "Chapel Bridge, lake, and mountains." },
+        { slug: "geneva", city: "Geneva", days: 2, description: "Lake, Jet d'Eau, and compact center." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    basel: {
+      slug: "basel",
+      city: "Basel",
+      country: "Switzerland",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Art and culture", "Short breaks"],
+      style: ["Museums", "Rhine promenade", "Compact old town"],
+      pacing: [
+        "Basel fits two calm days. Day one: Kunstmuseum or Fondation Beyeler and old town. Day two: Rhine walk, more museums, and a relaxed final stroll.",
+        "Start at one major museum in the morning. The center is walkable; the Rhine divides the city but bridges link both sides.",
+        "Leave time for a Rhine promenade or a cafe in the old town so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Basel in 2 days",
+        subtitle:
+          "Art museums, Rhine walks, and a compact old town with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1632510835438-2e30acba7d22?auto=format&fit=crop&w=1600&q=80",
+          alt: "Basel old town and Rhine river.",
+        },
+      },
+      cityStats: [
+        { value: "40+", label: "Museums" },
+        { value: "3", label: "Countries at the border" },
+        { value: "170K+", label: "Residents" },
+      ],
+      fit: {
+        forYou: ["Art and culture", "Compact walkable city", "First-time visitors", "Short break", "Calm pacing"],
+        notForYou: ["Beach or mountain focus", "Long day trips", "Heavy nightlife", "Non-museum focus", "Rushed multi-city tour"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Kunstmuseum and old town",
+          summary: "Art museum and historic center.",
+          morning: "Kunstmuseum Basel",
+          afternoon: "Old town and Marktplatz",
+          evening: "Dinner by the Rhine",
+        },
+        {
+          day: 2,
+          title: "Rhine and more culture",
+          summary: "Rhine promenade and optional museum.",
+          morning: "Rhine promenade and Mittlere Brücke",
+          afternoon: "Fondation Beyeler or Tinguely Museum, or relaxed stroll",
+          evening: "Final dinner or cafe",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Kunstmuseum",
+          description:
+            "One of the leading art museums in Switzerland. Allow at least 2 hours; mornings are quieter.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Basel Kunstmuseum and city view.",
+          },
+        },
+        {
+          title: "Rhine promenade",
+          description:
+            "The Rhine runs through the city. A walk along the bank or a ferry crossing sets a calm rhythm.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569931723598-95b1b0c2b2e2?auto=format&fit=crop&w=1200&q=80",
+            alt: "Rhine river and Basel waterfront.",
+          },
+        },
+        {
+          title: "Old town",
+          description:
+            "Marktplatz and the Rathaus define the center. Narrow lanes and fountains make for a slow afternoon.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80",
+            alt: "Basel old town and Rathaus.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for milder weather" },
+        { label: "Train", value: "Basel SBB; direct from Zurich, Geneva, Paris" },
+        { label: "Getting around", value: "Center walkable; trams for longer hops" },
+        { label: "Ticketing", value: "Book major museums online in peak season" },
+        { label: "Stay", value: "Central old town or near the Rhine" },
+      ],
+      checklist: [
+        "Book Kunstmuseum or Beyeler in advance",
+        "Comfortable shoes for cobbles",
+        "Pack a light layer for rain",
+        "Save offline map of center",
+        "Plan one Rhine walk or long lunch",
+        "Check museum opening times",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Basel?", answer: "Yes for one or two major museums, the old town, and a relaxed pace. Add a day for more art or a trip to the Black Forest if you like." },
+        { question: "Do I need to book museums?", answer: "For Kunstmuseum and Fondation Beyeler, booking helps in peak season." },
+        { question: "Is Basel walkable?", answer: "Yes. The center is compact; the Rhine is crossed by several bridges." },
+        { question: "Where should I stay?", answer: "In or near the old town for easy access to museums and the Rhine." },
+        { question: "How do I get to Basel?", answer: "Train from Zurich (about 1 hour), Geneva, or Paris; EuroAirport serves Basel." },
+        { question: "Do I need a car?", answer: "No for the city. Trains cover day trips to Lucerne or Colmar." },
+        { question: "Should I book restaurants?", answer: "For weekend dinner yes. Lunch and weekdays often have walk-in space." },
+      ],
+      relatedItineraries: [
+        { slug: "zurich", city: "Zurich", days: 3, description: "Lake, old town, and museums." },
+        { slug: "bern", city: "Bern", days: 2, description: "Old town, Bear Park, and arcades." },
+        { slug: "geneva", city: "Geneva", days: 2, description: "Lake, Jet d'Eau, and compact center." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    graz: {
+      slug: "graz",
+      city: "Graz",
+      country: "Austria",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture and architecture", "Short breaks"],
+      style: ["Schlossberg", "Old town", "Design and cafes"],
+      pacing: [
+        "Graz fits two calm days. Day one: Schlossberg and old town. Day two: Kunsthaus, museums, and a relaxed final stroll.",
+        "Start at the Schlossberg in the morning for views before crowds. The center is walkable; the hill is accessible by foot or funicular.",
+        "Leave time for a cafe in the old town or a slow walk along the Mur so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Graz in 2 days",
+        subtitle:
+          "Schlossberg, old town, and design with room to breathe.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1657053040367-9cdb45634b86?auto=format&fit=crop&w=1600&q=80",
+          alt: "Graz old town and Schlossberg from the Mur.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Old town World Heritage" },
+        { value: "270K+", label: "Residents" },
+        { value: "2nd", label: "Largest city in Austria" },
+      ],
+      fit: {
+        forYou: ["Culture and design", "Compact walkable city", "First-time visitors", "Short break", "Calm pacing"],
+        notForYou: ["Beach or mountain focus", "Long day trips", "Heavy nightlife", "Museum-only marathon", "Rushed multi-city tour"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Schlossberg and old town",
+          summary: "Hilltop views and historic center.",
+          morning: "Schlossberg (views and clock tower)",
+          afternoon: "Old town, Hauptplatz, and Herrengasse",
+          evening: "Dinner in the center",
+        },
+        {
+          day: 2,
+          title: "Kunsthaus and Mur",
+          summary: "Design museum and river walk.",
+          morning: "Kunsthaus Graz or Armoury",
+          afternoon: "Mur promenade and final stroll",
+          evening: "Final dinner or cafe",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Schlossberg",
+          description:
+            "The hill dominates the city. The clock tower and views are worth the climb or funicular ride; mornings are quieter.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Graz Schlossberg and clock tower.",
+          },
+        },
+        {
+          title: "Old town",
+          description:
+            "Hauptplatz and Herrengasse form the core. Baroque facades and courtyards suit a slow walk.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80",
+            alt: "Graz old town and Hauptplatz.",
+          },
+        },
+        {
+          title: "Kunsthaus Graz",
+          description:
+            "The blue biomorphic building contrasts with the historic center. Allow an hour or two for the exhibitions.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Kunsthaus Graz and Mur river.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for milder weather" },
+        { label: "Train", value: "Graz main station; direct from Vienna, Salzburg" },
+        { label: "Getting around", value: "Center is walkable; trams and buses for Schlossberg area" },
+        { label: "Ticketing", value: "Book Kunsthaus or Armoury in advance in peak season" },
+        { label: "Stay", value: "Central old town or near the Mur" },
+      ],
+      checklist: [
+        "Book Kunsthaus or Armoury in advance",
+        "Comfortable shoes for Schlossberg steps",
+        "Pack a light layer for rain",
+        "Save offline map of center",
+        "Plan one cafe or long lunch",
+        "Check museum opening times",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Graz?", answer: "Yes for the Schlossberg, old town, and one major museum. Add a day for more culture or wine region if you like." },
+        { question: "Do I need to book the Schlossberg?", answer: "No. The hill is free; funicular is ticketed. Mornings are quieter." },
+        { question: "Is Graz walkable?", answer: "Yes. The center is compact; Schlossberg is a short climb or funicular from the old town." },
+        { question: "Where should I stay?", answer: "In or near the old town for easy access to Schlossberg and museums." },
+        { question: "How do I get to Graz?", answer: "Train from Vienna (about 2.5 hours) or Salzburg; Graz has an airport with limited connections." },
+        { question: "Do I need a car?", answer: "No for the city. Rent one for Styrian wine region or nearby lakes." },
+        { question: "Should I book restaurants?", answer: "For weekend dinner yes. Lunch and weekdays often have walk-in space." },
+      ],
+      relatedItineraries: [
+        { slug: "vienna", city: "Vienna", days: 3, description: "Museums, palaces, and grand avenues." },
+        { slug: "salzburg", city: "Salzburg", days: 3, description: "Fortress, old town, and music." },
+        { slug: "innsbruck", city: "Innsbruck", days: 2, description: "Alps, Golden Roof, and compact center." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
     frankfurt: {
       slug: "frankfurt",
       city: "Frankfurt",
@@ -37690,6 +38985,1170 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    ghent: {
+      slug: "ghent",
+      city: "Ghent",
+      country: "Belgium",
+      days: 2,
+      pace: "Relaxed",
+      idealFor: ["First-timers", "History lovers", "Food-first travelers"],
+      style: ["Medieval sights", "Canal walks", "Cafe culture"],
+      pacing: [
+        "Ghent rewards a slow pace. The compact medieval center invites wandering without a strict schedule—anchor each day with one major sight, then leave room for canal views and long lunches.",
+        "Group your time by neighborhood. Pair the castle and cathedral in one morning, then drift toward Patershol or the waterfront for an afternoon of cafes and people-watching.",
+        "Save an unhurried evening for the Graslei quays, where golden light on the guildhouses and a cold Belgian beer set the tone for the city.",
+      ],
+      hero: {
+        title: "Ghent in 2 days",
+        subtitle:
+          "Medieval towers, quiet canals, and Belgian hospitality at a gentle pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1667335781544-26964774142b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Graslei waterfront with medieval guildhouses in Ghent at golden hour.",
+        },
+      },
+      cityStats: [
+        { value: "1,000+", label: "Years of history" },
+        { value: "3", label: "Medieval towers" },
+        { value: "260+", label: "Heritage buildings" },
+        { value: "1M+", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: ["A compact, walkable city", "Medieval architecture and canals", "Belgian food and beer", "A relaxed two-day pace", "Fewer crowds than Bruges"],
+        notForYou: ["A beach or resort trip", "High-energy nightlife", "Extensive museum tours", "Day trips to multiple cities", "Large theme parks"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Medieval core",
+          summary: "Castle, cathedral, and belfry views.",
+          morning: "Gravensteen Castle and surrounding streets",
+          afternoon: "St. Bavo's Cathedral and the Ghent Altarpiece",
+          evening: "Belfry views and dinner in Patershol",
+        },
+        {
+          day: 2,
+          title: "Canals and neighborhoods",
+          summary: "Waterfront strolls and local flavors.",
+          morning: "Graslei and Korenlei waterfront walk",
+          afternoon: "St. Michael's Bridge and Design Museum",
+          evening: "Belgian beer tasting and canal-side dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The medieval waterfront",
+          description:
+            "Graslei and Korenlei face each other across the Leie river, lined with guildhouses that glow at sunset. A bench here is the best seat in town.",
+          image: {
+            src: "https://images.unsplash.com/photo-1491557345352-5929e343eb89?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic guildhouses along Graslei waterfront in Ghent.",
+          },
+        },
+        {
+          title: "Towers and spires",
+          description:
+            "Three towers define the skyline—St. Bavo's, the Belfry, and St. Nicholas'. Climb the Belfry for rooftop views across red-tiled roofs.",
+          image: {
+            src: "https://images.unsplash.com/photo-1564352969906-8b7f46ba4b8b?auto=format&fit=crop&w=1200&q=80",
+            alt: "View of Ghent's three towers from above.",
+          },
+        },
+        {
+          title: "Patershol charm",
+          description:
+            "Narrow cobbled lanes hide cozy restaurants and quiet corners. This neighborhood is best explored without a plan.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555990538-1e74b3f4e78e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cobblestone streets and traditional buildings in Patershol, Ghent.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Getting there", value: "30-minute train from Brussels" },
+        { label: "Transit tips", value: "Walk the center; trams for outer neighborhoods" },
+        { label: "Ticketing", value: "Book Gravensteen and Belfry online in peak season" },
+        { label: "Neighborhood stay", value: "Historic center or near Korenlei" },
+      ],
+      checklist: [
+        "Book Gravensteen Castle tickets",
+        "Reserve Belfry climb slot",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Ghent",
+        "Plan one long Belgian lunch",
+        "Bring a light rain layer",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Ghent?", answer: "Yes for the highlights. You can cover the medieval core, canals, and key neighborhoods at a relaxed pace with time for meals and wandering." },
+        { question: "Should I visit Bruges instead?", answer: "Ghent offers similar medieval charm with fewer crowds and a more local feel. Both are worth visiting if you have time." },
+        { question: "Is Ghent walkable?", answer: "Very. The historic center is compact and flat, making it easy to explore on foot." },
+        { question: "Where should I stay?", answer: "The historic center keeps you close to everything. Near Korenlei or Patershol gives you evening atmosphere." },
+        { question: "Do I need to book restaurants?", answer: "For popular spots on weekends, yes. Weekday evenings are usually fine without reservations." },
+        { question: "What should I eat?", answer: "Try waterzooi, a creamy chicken or fish stew, and finish with cuberdons, Ghent's nose-shaped candies." },
+        { question: "Is the Ghent Altarpiece worth seeing?", answer: "Yes. The Van Eyck masterpiece in St. Bavo's Cathedral is one of Europe's most important paintings." },
+      ],
+      relatedItineraries: [
+        { slug: "bruges", city: "Bruges", days: 2, description: "Canal strolls and medieval squares." },
+        { slug: "brussels", city: "Brussels", days: 3, description: "Grand squares and museum districts." },
+        { slug: "amsterdam", city: "Amsterdam", days: 3, description: "Canals, museums, and neighborhoods." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sintra: {
+      slug: "sintra",
+      city: "Sintra",
+      country: "Portugal",
+      days: 2,
+      pace: "Relaxed",
+      idealFor: ["Palace lovers", "Garden wanderers", "Day-trip extenders"],
+      style: ["Fairytale palaces", "Forest walks", "Romantic architecture"],
+      pacing: [
+        "Sintra's hills reward patience. Tackle one major palace per morning when crowds are lighter, then spend afternoons in gardens or the historic village center.",
+        "The palaces are spread across forested hillsides—group nearby sights to minimize shuttle rides. Pena and Moorish Castle work well together; Quinta da Regaleira and the town center pair naturally.",
+        "Save time for the village itself. The winding streets, pastry shops, and queijada bakeries deserve unhurried attention.",
+      ],
+      hero: {
+        title: "Sintra in 2 days",
+        subtitle:
+          "Hilltop palaces, mystical gardens, and Portuguese pastries in a fairytale setting.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1536663815808-535e2280d2c2?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful towers of Pena Palace rising above the forest in Sintra.",
+        },
+      },
+      cityStats: [
+        { value: "1,000+", label: "Years of royal history" },
+        { value: "4", label: "UNESCO World Heritage palaces" },
+        { value: "500m", label: "Elevation at Pena Palace" },
+        { value: "30 min", label: "Train from Lisbon" },
+      ],
+      fit: {
+        forYou: ["Romantic architecture and gardens", "A hilltop escape from Lisbon", "Photography opportunities", "Forest walks between palaces", "Portuguese pastry stops"],
+        notForYou: ["Beach time", "Flat, easy walking", "Urban nightlife", "Modern art museums", "Budget backpacking"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Hilltop palaces",
+          summary: "Pena Palace and Moorish Castle views.",
+          morning: "Pena Palace and surrounding park",
+          afternoon: "Moorish Castle walls and viewpoints",
+          evening: "Village center dinner and sunset stroll",
+        },
+        {
+          day: 2,
+          title: "Gardens and town",
+          summary: "Quinta da Regaleira and village charm.",
+          morning: "Quinta da Regaleira wells and gardens",
+          afternoon: "National Palace and historic center",
+          evening: "Pastry tasting and evening train back",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Pena Palace colors",
+          description:
+            "The red and yellow towers of Pena Palace emerge from the forest like something from a storybook. Morning light makes the colors pop.",
+          image: {
+            src: "https://images.unsplash.com/photo-1548530537-a5765e3eab81?auto=format&fit=crop&w=1200&q=80",
+            alt: "Vibrant towers of Pena Palace in Sintra surrounded by forest.",
+          },
+        },
+        {
+          title: "Quinta da Regaleira",
+          description:
+            "Underground tunnels, initiatic wells, and hidden grottoes make this estate feel like an adventure. Allow at least two hours to explore.",
+          image: {
+            src: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?auto=format&fit=crop&w=1200&q=80",
+            alt: "The Initiation Well spiral staircase at Quinta da Regaleira.",
+          },
+        },
+        {
+          title: "Village pastry stops",
+          description:
+            "Queijadas and travesseiros are Sintra's signature sweets. Grab a box from a village bakery and enjoy them on a bench.",
+          image: {
+            src: "https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=1200&q=80",
+            alt: "Traditional Portuguese pastries from Sintra.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Getting there", value: "40-minute train from Lisbon Rossio" },
+        { label: "Transit tips", value: "434 bus loops to palaces; walk the village" },
+        { label: "Ticketing", value: "Book Pena and Quinta da Regaleira online" },
+        { label: "Where to stay", value: "Village center or near train station" },
+      ],
+      checklist: [
+        "Book Pena Palace timed entry",
+        "Reserve Quinta da Regaleira tickets",
+        "Wear sturdy shoes for hills",
+        "Bring layers—hilltops are cooler",
+        "Save offline maps for trail paths",
+        "Try queijadas and travesseiros",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Sintra?", answer: "Yes. Two days lets you see the main palaces at a comfortable pace with time for the village and gardens." },
+        { question: "Can I do Sintra as a day trip?", answer: "You can see one or two palaces in a day, but staying overnight lets you enjoy quieter mornings and evenings." },
+        { question: "How hilly is it?", answer: "Very. Palaces sit on forested hills with steep paths. The 434 bus helps, but expect some climbing." },
+        { question: "Which palace should I prioritize?", answer: "Pena Palace is the most iconic. If you love mysteries, Quinta da Regaleira's wells and tunnels are unmissable." },
+        { question: "Where should I stay?", answer: "The village center puts you close to restaurants and the train. Staying overnight means peaceful morning visits." },
+        { question: "Do I need to book ahead?", answer: "Yes for Pena Palace and Quinta da Regaleira in high season. Morning slots fill quickly." },
+        { question: "What about the Moorish Castle?", answer: "Worth it for the views. The walls offer panoramic vistas over Sintra and the coast." },
+      ],
+      relatedItineraries: [
+        { slug: "lisbon", city: "Lisbon", days: 3, description: "Hills, trams, and riverside neighborhoods." },
+        { slug: "porto", city: "Porto", days: 3, description: "River views and historic lanes." },
+        { slug: "seville", city: "Seville", days: 3, description: "Plazas, Alcazar, and Andalusian charm." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    oxford: {
+      slug: "oxford",
+      city: "Oxford",
+      country: "United Kingdom",
+      days: 2,
+      pace: "Relaxed",
+      idealFor: ["History buffs", "Book lovers", "Architecture fans"],
+      style: ["College courtyards", "Library visits", "Pub evenings"],
+      pacing: [
+        "Oxford is best absorbed slowly. The colleges reveal their beauty through quiet courtyards and hidden gardens—rushing between them misses the point.",
+        "Anchor mornings with one major college or library, then let the afternoon drift through covered markets, museum galleries, or riverside walks.",
+        "Save an evening for a traditional pub. The Eagle and Child or Turf Tavern connect you to the city's literary past over a pint.",
+      ],
+      hero: {
+        title: "Oxford in 2 days",
+        subtitle:
+          "Ancient colleges, world-class libraries, and centuries of scholarship in a walkable city.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1752600379883-07e74678bc2a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Radcliffe Camera and surrounding spires in Oxford at dusk.",
+        },
+      },
+      cityStats: [
+        { value: "900+", label: "Years of teaching" },
+        { value: "38", label: "Constituent colleges" },
+        { value: "12M+", label: "Books in Bodleian Libraries" },
+        { value: "1h", label: "Train from London" },
+      ],
+      fit: {
+        forYou: ["Historic architecture", "Literary connections", "Quiet courtyards and gardens", "Museums and libraries", "Traditional pub culture"],
+        notForYou: ["Beach holidays", "Modern nightclubs", "Shopping-focused trips", "Outdoor adventure sports", "Large theme parks"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Colleges and libraries",
+          summary: "Bodleian, Radcliffe Camera, and Christ Church.",
+          morning: "Bodleian Library tour and Radcliffe Camera views",
+          afternoon: "Christ Church College and meadow walk",
+          evening: "Dinner and drinks at a historic pub",
+        },
+        {
+          day: 2,
+          title: "Museums and markets",
+          summary: "Ashmolean, Pitt Rivers, and Covered Market.",
+          morning: "Ashmolean Museum highlights",
+          afternoon: "Pitt Rivers Museum and Natural History Museum",
+          evening: "Covered Market browsing and farewell dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The Radcliffe Camera",
+          description:
+            "This circular library dominates Radcliffe Square. You cannot enter without a Bodleian tour, but the exterior alone is worth the visit.",
+          image: {
+            src: "https://images.unsplash.com/photo-1570435456662-fc3a209fda28?auto=format&fit=crop&w=1200&q=80",
+            alt: "The domed Radcliffe Camera library building in Oxford.",
+          },
+        },
+        {
+          title: "Christ Church grandeur",
+          description:
+            "The largest Oxford college features a grand dining hall that inspired Harry Potter and a cathedral within its walls.",
+          image: {
+            src: "https://images.unsplash.com/photo-1567604136436-4b95b7f67d29?auto=format&fit=crop&w=1200&q=80",
+            alt: "Christ Church College courtyard and tower in Oxford.",
+          },
+        },
+        {
+          title: "Historic pubs",
+          description:
+            "The Eagle and Child hosted Tolkien and C.S. Lewis. The Turf Tavern hides down an alley. Both serve proper pints and history.",
+          image: {
+            src: "https://images.unsplash.com/photo-1546622891-02c72c1537b6?auto=format&fit=crop&w=1200&q=80",
+            alt: "Traditional English pub interior with wooden beams.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Getting there", value: "1-hour train from London Paddington" },
+        { label: "Transit tips", value: "Walk the center; buses for Park and Ride" },
+        { label: "Ticketing", value: "Book Bodleian tours and Christ Church online" },
+        { label: "Neighborhood stay", value: "City center or Jericho" },
+      ],
+      checklist: [
+        "Book Bodleian Library tour",
+        "Reserve Christ Church entry",
+        "Pack comfortable walking shoes",
+        "Bring umbrella or rain jacket",
+        "Save offline maps for Oxford",
+        "Plan one traditional pub dinner",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Oxford?", answer: "Yes for the main colleges, libraries, and museums. Two days gives you a relaxed pace with time for pubs and markets." },
+        { question: "Can I enter the colleges?", answer: "Most colleges open to visitors at set times for a small fee. Check hours as they vary by term." },
+        { question: "Is Oxford walkable?", answer: "Very. The historic center is compact and best explored on foot." },
+        { question: "Where should I stay?", answer: "The city center keeps you close to colleges. Jericho offers a quieter neighborhood with good restaurants." },
+        { question: "Do I need to book the Bodleian?", answer: "Yes. Guided tours require advance booking, especially the extended tour that includes the Divinity School." },
+        { question: "What about Harry Potter locations?", answer: "Christ Church's dining hall and Bodleian's Divinity School appeared in the films. Both are accessible to visitors." },
+        { question: "Are the museums free?", answer: "Yes. The Ashmolean, Pitt Rivers, and Natural History Museum are all free, though donations are welcome." },
+      ],
+      relatedItineraries: [
+        { slug: "london", city: "London", days: 3, description: "Iconic sights, museums, and riverside walks." },
+        { slug: "bath", city: "Bath", days: 2, description: "Roman baths and Georgian architecture." },
+        { slug: "edinburgh", city: "Edinburgh", days: 3, description: "Castle views and historic lanes." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    queenstown: {
+      slug: "queenstown",
+      city: "Queenstown",
+      country: "New Zealand",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Scenic seekers", "Outdoor enthusiasts", "Wine lovers"],
+      style: ["Lake views", "Mountain drives", "Adventure optional"],
+      pacing: [
+        "Queenstown's drama unfolds at any pace you choose. Whether you chase adrenaline or prefer a gondola ride and vineyard lunch, the mountains and lake set the scene.",
+        "Anchor each day with one headline experience—a scenic drive, a lake cruise, or a hilltop viewpoint—then fill the gaps with waterfront strolls and long meals.",
+        "Save at least one afternoon for the Gibbston Valley wineries. The Central Otago pinot noir pairs perfectly with mountain views.",
+      ],
+      hero: {
+        title: "Queenstown in 3 days",
+        subtitle:
+          "Mountain peaks, mirror lakes, and alpine vineyards at your own pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=1600&q=80",
+          alt: "Lake Wakatipu and the Remarkables mountain range in Queenstown.",
+        },
+      },
+      cityStats: [
+        { value: "310m", label: "Lake Wakatipu depth" },
+        { value: "1,748m", label: "Remarkables peak height" },
+        { value: "200+", label: "Central Otago wineries" },
+        { value: "2M+", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: ["Mountain and lake scenery", "Scenic drives without rushing", "Wine tasting afternoons", "Optional adventure activities", "Photography opportunities"],
+        notForYou: ["Beach holidays", "Big-city nightlife", "Museum-heavy trips", "Flat terrain", "Tropical warmth"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Lake and gondola",
+          summary: "Waterfront strolls and hilltop views.",
+          morning: "Queenstown waterfront and gardens",
+          afternoon: "Skyline Gondola and Luge runs",
+          evening: "Lakefront dinner with mountain views",
+        },
+        {
+          day: 2,
+          title: "Glenorchy road trip",
+          summary: "Scenic drive and Lord of the Rings landscapes.",
+          morning: "Drive to Glenorchy along Lake Wakatipu",
+          afternoon: "Glenorchy lagoon and Dart River views",
+          evening: "Return to Queenstown for dinner",
+        },
+        {
+          day: 3,
+          title: "Wine and Arrowtown",
+          summary: "Vineyard visits and historic gold town.",
+          morning: "Gibbston Valley winery tour and tasting",
+          afternoon: "Arrowtown historic village and gold-era streets",
+          evening: "Final lakefront evening in Queenstown",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Lake Wakatipu mirror",
+          description:
+            "On calm days the lake reflects the mountains perfectly. Early mornings and late afternoons offer the best light for photos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1469521669194-babb45599def?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mirror reflection of mountains in Lake Wakatipu.",
+          },
+        },
+        {
+          title: "Glenorchy road",
+          description:
+            "The 45-minute drive from Queenstown to Glenorchy hugs the lake with mountain views the entire way. Stop often for photos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508193638397-1c4234db14d9?auto=format&fit=crop&w=1200&q=80",
+            alt: "Scenic road along Lake Wakatipu toward Glenorchy.",
+          },
+        },
+        {
+          title: "Central Otago wines",
+          description:
+            "The world's southernmost wine region produces exceptional pinot noir. Gibbston Valley and Chard Farm are easy stops from town.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&q=80",
+            alt: "Vineyard rows with mountain backdrop in Central Otago.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Getting there", value: "Fly to Queenstown Airport; 10 min to town" },
+        { label: "Transit tips", value: "Rental car for scenic drives; town is walkable" },
+        { label: "Ticketing", value: "Book gondola and jet boat rides in peak season" },
+        { label: "Neighborhood stay", value: "Town center or lakefront" },
+      ],
+      checklist: [
+        "Book rental car for scenic drives",
+        "Reserve Skyline Gondola tickets",
+        "Pack layers for mountain weather",
+        "Bring camera for lake reflections",
+        "Plan one winery lunch",
+        "Save offline maps for rural roads",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Queenstown?", answer: "Yes for the main highlights. You can enjoy the lake, a scenic drive, wineries, and Arrowtown at a relaxed pace." },
+        { question: "Do I need a car?", answer: "Highly recommended. The best experiences—Glenorchy, wineries, Arrowtown—require driving scenic routes." },
+        { question: "What about adventure activities?", answer: "Bungee, skydiving, and jet boats are available but optional. The scenery is spectacular even without them." },
+        { question: "Where should I stay?", answer: "Town center puts you near restaurants and the waterfront. Lakefront hotels offer mountain views." },
+        { question: "When is the best time to visit?", answer: "Autumn (March–May) brings golden colors. Spring (Sept–Nov) has fewer crowds. Summer is busy but warm." },
+        { question: "Is the Glenorchy drive worth it?", answer: "Absolutely. The 45-minute route along Lake Wakatipu is one of New Zealand's most scenic drives." },
+        { question: "Should I visit Milford Sound?", answer: "It is a long day trip (4+ hours each way). With only 3 days, focus on Queenstown and nearby areas." },
+      ],
+      relatedItineraries: [
+        { slug: "auckland", city: "Auckland", days: 3, description: "Harbor views and volcanic cones." },
+        { slug: "wellington", city: "Wellington", days: 3, description: "Waterfront and compact neighborhoods." },
+        { slug: "sydney", city: "Sydney", days: 3, description: "Beaches, harbor, and coastal walks." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    interlaken: {
+      slug: "interlaken",
+      city: "Interlaken",
+      country: "Switzerland",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Mountain lovers", "Scenic train riders", "Lake enthusiasts"],
+      style: ["Alpine views", "Lake villages", "Relaxed excursions"],
+      pacing: [
+        "Interlaken sits between two lakes with the Jungfrau peaks as a backdrop. Use the town as a base and take one major excursion per day, leaving afternoons for lakeside relaxation.",
+        "The big mountain trips—Jungfraujoch or Schilthorn—deserve full mornings. Start early to catch clear skies, then descend for a slower afternoon.",
+        "Save one day for the quieter side: a boat to Brienz, a walk through Iseltwald, or simply watching the Eiger turn gold at sunset.",
+      ],
+      hero: {
+        title: "Interlaken in 3 days",
+        subtitle:
+          "Two lakes, towering peaks, and Swiss mountain villages at an easy pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1527668752968-14dc70a27c95?auto=format&fit=crop&w=1600&q=80",
+          alt: "Interlaken valley with lakes and the Jungfrau peaks in the background.",
+        },
+      },
+      cityStats: [
+        { value: "3,454m", label: "Jungfraujoch elevation" },
+        { value: "2", label: "Lakes flanking Interlaken" },
+        { value: "150+", label: "Years of tourism" },
+        { value: "570m", label: "Town elevation" },
+      ],
+      fit: {
+        forYou: ["Mountain scenery without extreme hiking", "Scenic train experiences", "Lake villages and boat rides", "Swiss alpine atmosphere", "Photography opportunities"],
+        notForYou: ["Beach vacations", "Big-city nightlife", "Budget backpacking", "Flat landscapes", "All-inclusive resorts"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Town and Harder Kulm",
+          summary: "Interlaken orientation and sunset viewpoint.",
+          morning: "Höhematte park and town center stroll",
+          afternoon: "Harder Kulm funicular for panoramic views",
+          evening: "Dinner with views of the illuminated peaks",
+        },
+        {
+          day: 2,
+          title: "Jungfrau excursion",
+          summary: "Top of Europe train journey.",
+          morning: "Train to Jungfraujoch via Kleine Scheidegg",
+          afternoon: "Ice Palace and Sphinx observation deck",
+          evening: "Return to Interlaken for a quiet dinner",
+        },
+        {
+          day: 3,
+          title: "Lakes and villages",
+          summary: "Boat rides and lakeside charm.",
+          morning: "Boat to Brienz and waterfront walk",
+          afternoon: "Iseltwald village or Giessbach Falls",
+          evening: "Final evening along Lake Thun",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Jungfraujoch heights",
+          description:
+            "The highest train station in Europe delivers glaciers, ice caves, and views that stretch to four countries on clear days.",
+          image: {
+            src: "https://images.unsplash.com/photo-1531210483974-4f8205670a71?auto=format&fit=crop&w=1200&q=80",
+            alt: "Snow-covered peaks and glacier at Jungfraujoch.",
+          },
+        },
+        {
+          title: "Harder Kulm terrace",
+          description:
+            "A short funicular ride delivers you to a viewing platform suspended between lakes, with the Eiger, Mönch, and Jungfrau directly ahead.",
+          image: {
+            src: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1200&q=80",
+            alt: "Harder Kulm viewing platform overlooking Interlaken and the Alps.",
+          },
+        },
+        {
+          title: "Lakeside villages",
+          description:
+            "Brienz and Iseltwald offer quiet waterfront charm, wooden chalets, and the chance to slow down after mountain excursions.",
+          image: {
+            src: "https://images.unsplash.com/photo-1594735942592-3e9e7c8d8b4c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Traditional Swiss village of Iseltwald on Lake Brienz.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "June to September for clear peaks; December to March for snow" },
+        { label: "Getting there", value: "2.5-hour train from Zurich or 2 hours from Bern" },
+        { label: "Transit tips", value: "Swiss Travel Pass covers trains and boats; buy Jungfrau ticket separately" },
+        { label: "Ticketing", value: "Book Jungfraujoch train in advance during peak season" },
+        { label: "Neighborhood stay", value: "Town center or near Interlaken Ost station" },
+      ],
+      checklist: [
+        "Book Jungfraujoch train tickets",
+        "Pack warm layers for high altitude",
+        "Bring sunglasses and sunscreen for snow glare",
+        "Save offline train schedules",
+        "Plan one lakeside lunch",
+        "Check weather forecast for mountain days",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Interlaken?", answer: "Yes for the highlights. You can do Jungfraujoch, Harder Kulm, and a lake day comfortably without rushing." },
+        { question: "Is the Jungfraujoch trip worth the cost?", answer: "It is expensive but unforgettable on a clear day. Check the webcams before booking to ensure good visibility." },
+        { question: "Do I need a car?", answer: "No. Trains, boats, and funiculars connect everything. A Swiss Travel Pass simplifies logistics." },
+        { question: "Where should I stay?", answer: "Town center is convenient. Near Interlaken Ost station puts you closer to Jungfrau trains." },
+        { question: "What if the weather is bad?", answer: "Harder Kulm and lake boats run in most conditions. Save Jungfraujoch for the clearest day in your trip." },
+        { question: "Should I visit Lauterbrunnen?", answer: "Yes if you have time. The valley of waterfalls is en route to Jungfraujoch and worth a stop." },
+        { question: "Is Interlaken walkable?", answer: "Very. The town center is compact and flat. Most excursions start from the train stations." },
+      ],
+      relatedItineraries: [
+        { slug: "zurich", city: "Zurich", days: 3, description: "Lakeside walks and compact museums." },
+        { slug: "lucerne", city: "Lucerne", days: 3, description: "Chapel Bridge and mountain access." },
+        { slug: "geneva", city: "Geneva", days: 2, description: "Lake views and compact old town." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "santa-fe": {
+      slug: "santa-fe",
+      city: "Santa Fe",
+      country: "USA",
+      days: 2,
+      pace: "Relaxed",
+      idealFor: ["Art lovers", "First-timers", "Slow walkers"],
+      style: ["Adobe architecture", "Galleries", "Desert light"],
+      pacing: [
+        "Santa Fe rewards a slow pace. Anchor each day with one main area—the Plaza and Canyon Road, or the Railyard and museums—then leave room for long lunches and gallery browsing.",
+        "Group time by neighborhood to keep walking light. The historic core is compact; pair the Plaza with Palace of the Governors in one morning, then dedicate an afternoon to Canyon Road or the Georgia O'Keeffe Museum.",
+        "Save an unhurried evening for a stroll around the Plaza and a relaxed dinner so the trip feels calm and open-ended.",
+      ],
+      hero: {
+        title: "Santa Fe in 2 days",
+        subtitle:
+          "Adobe streets, art galleries, and high-desert light at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1689272290237-cd5364acf395?auto=format&fit=crop&w=1600&q=80",
+          alt: "Adobe buildings and warm light in Santa Fe.",
+        },
+      },
+      cityStats: [
+        { value: "400+", label: "Years of history" },
+        { value: "250+", label: "Art galleries" },
+        { value: "7,000 ft", label: "Elevation" },
+        { value: "80k+", label: "Residents" },
+      ],
+      fit: {
+        forYou: ["Art and adobe architecture", "Compact, walkable core", "Relaxed two-day pace", "First-time visitors", "Desert light and quiet streets"],
+        notForYou: ["Beach or coastal activities", "High-energy nightlife", "Packed museum-only days", "Theme parks", "Budget backpacker style"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Plaza and historic core",
+          summary: "Palace of the Governors, Plaza, and adobe lanes.",
+          morning: "Palace of the Governors and Plaza area",
+          afternoon: "Canyon Road galleries and adobe walk",
+          evening: "Dinner near the Plaza and evening stroll",
+        },
+        {
+          day: 2,
+          title: "Museums and Railyard",
+          summary: "Georgia O'Keeffe Museum and Railyard district.",
+          morning: "Georgia O'Keeffe Museum",
+          afternoon: "Railyard Arts District or Museum Hill",
+          evening: "Final Plaza loop and relaxed dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Adobe and light",
+          description:
+            "Santa Fe's adobe buildings and high-desert light define the city. Mornings and late afternoons are best for walks and photos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=1200&q=80",
+            alt: "Adobe architecture and desert light in Santa Fe.",
+          },
+        },
+        {
+          title: "Canyon Road",
+          description:
+            "Galleries and studios line this historic street. A slow walk with stops in a few favorites beats rushing through.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=1200&q=80",
+            alt: "Canyon Road galleries and adobe walls in Santa Fe.",
+          },
+        },
+        {
+          title: "Plaza life",
+          description:
+            "The Plaza is the heart of town. Bench time here, with a coffee or ice cream, captures the pace of the city.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Santa Fe Plaza with historic buildings and trees.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Getting there", value: "Albuquerque Sunport, then shuttle or rental car" },
+        { label: "Transit tips", value: "Walk the historic core; car optional for Museum Hill" },
+        { label: "Ticketing", value: "Book O'Keeffe Museum in advance in peak season" },
+        { label: "Neighborhood stay", value: "Near the Plaza or Canyon Road" },
+      ],
+      checklist: [
+        "Book Georgia O'Keeffe Museum slot",
+        "Pack layers for cool mornings and warm afternoons",
+        "Bring sunscreen and a hat",
+        "Save offline maps for Santa Fe",
+        "Plan one long gallery or cafe break",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Santa Fe?", answer: "Yes for the core. You can cover the Plaza, Canyon Road, and one or two museums at a relaxed pace." },
+        { question: "Do I need a car?", answer: "Not for the historic center. A car helps for Museum Hill or day trips to nearby pueblos." },
+        { question: "Is Santa Fe walkable?", answer: "Yes. The Plaza, Canyon Road, and Railyard are within easy walking distance." },
+        { question: "Where should I stay?", answer: "Near the Plaza keeps you central. Canyon Road area is quieter and still walkable." },
+        { question: "What about altitude?", answer: "At 7,000 feet, take it easy the first day. Stay hydrated and avoid overdoing it." },
+        { question: "When is the best light?", answer: "Morning and late afternoon. Midday sun is strong; plan indoor or shaded stops then." },
+        { question: "Do I need to book restaurants?", answer: "For popular spots on weekends, yes. Weekday dinners are often fine without reservations." },
+      ],
+      relatedItineraries: [
+        { slug: "denver", city: "Denver", days: 3, description: "Mountain views, breweries, and city walks." },
+        { slug: "austin", city: "Austin", days: 3, description: "Live music, food, and relaxed neighborhoods." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music heritage, Southern food, and downtown." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    charleston: {
+      slug: "charleston",
+      city: "Charleston",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Food-first travelers"],
+      style: ["Historic streets", "Waterfront walks", "Southern food"],
+      pacing: [
+        "Charleston rewards a calm rhythm. Anchor each day with one main area—the Historic District, the waterfront, or a museum and market—then leave room for long meals and porch swings.",
+        "Group time by neighborhood to keep walking light. The peninsula is compact; pair Rainbow Row with the Battery in one morning, then dedicate another day to King Street and the market.",
+        "Save an unhurried afternoon for Waterfront Park or a harbor stroll so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Charleston in 3 days",
+        subtitle:
+          "Historic streets, waterfront views, and Southern food at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1653443109860-04c904bded58?auto=format&fit=crop&w=1600&q=80",
+          alt: "Historic Charleston street with pastel buildings and cobblestones.",
+        },
+      },
+      cityStats: [
+        { value: "350+", label: "Years of history" },
+        { value: "2,800+", label: "Historic buildings" },
+        { value: "4", label: "Miles of waterfront" },
+        { value: "7M+", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: ["Historic architecture and streets", "Waterfront and park strolls", "Southern food and hospitality", "A clear plan with breathing room", "First-time visitors"],
+        notForYou: ["Beach-only focus", "Packed museum-only schedule", "Late-night nightlife", "Theme parks", "Rushed sightseeing"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic District core",
+          summary: "Rainbow Row, Battery, and waterfront.",
+          morning: "Rainbow Row and East Battery walk",
+          afternoon: "Waterfront Park and Harbor View",
+          evening: "King Street stroll and dinner",
+        },
+        {
+          day: 2,
+          title: "Markets and museums",
+          summary: "City Market, historic houses, and calm pacing.",
+          morning: "City Market and French Quarter",
+          afternoon: "Historic house or museum visit",
+          evening: "Dinner in a historic district restaurant",
+        },
+        {
+          day: 3,
+          title: "King Street and neighborhoods",
+          summary: "Shopping, galleries, and final strolls.",
+          morning: "King Street and lower peninsula",
+          afternoon: "Museum or garden option",
+          evening: "Final waterfront walk and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic streets",
+          description:
+            "Charleston's pastel row houses and cobblestone lanes feel like a step back in time. Slow walks reveal details and porch life.",
+          image: {
+            src: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pastel historic houses and street in Charleston.",
+          },
+        },
+        {
+          title: "Waterfront Park",
+          description:
+            "The pier and waterfront promenade offer harbor views and shade. A bench here is a good pause between sights.",
+          image: {
+            src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80",
+            alt: "Charleston Waterfront Park pier and harbor.",
+          },
+        },
+        {
+          title: "Southern food",
+          description:
+            "Lowcountry cuisine and Southern hospitality shape the day. Plan for one long meal rather than rushing between stops.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+            alt: "Southern-style meal and dining in Charleston.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Getting there", value: "Charleston International Airport; downtown 20 minutes" },
+        { label: "Transit tips", value: "Walk the historic core; pedicab or car for longer hops" },
+        { label: "Ticketing", value: "Book historic house tours in advance in peak season" },
+        { label: "Neighborhood stay", value: "Historic District or French Quarter" },
+      ],
+      checklist: [
+        "Book one historic house or museum tour",
+        "Pack comfortable walking shoes",
+        "Bring a light layer for air conditioning",
+        "Save offline maps for Charleston",
+        "Plan one long Southern lunch",
+        "Carry a refillable water bottle",
+        "Check for seasonal events",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Charleston?", answer: "Yes for the core. You can cover the Historic District, waterfront, market, and a museum or two at a relaxed pace." },
+        { question: "Is Charleston walkable?", answer: "Yes. The peninsula is compact and flat. Most sights are within a 20-minute walk." },
+        { question: "Where should I stay?", answer: "The Historic District keeps you central. French Quarter is quieter and still walkable." },
+        { question: "Do I need to book restaurants?", answer: "For popular spots, yes—especially on weekends. Reserve one or two, then leave the rest flexible." },
+        { question: "What about heat and humidity?", answer: "Summer can be hot. Start early, take midday breaks, and plan shade or indoor stops." },
+        { question: "Should I take a carriage tour?", answer: "Optional. Walking is free and flexible; carriage tours add narrative if you want a guided overview." },
+        { question: "When is the best light for photos?", answer: "Morning and late afternoon. Rainbow Row and the Battery look best in soft light." },
+      ],
+      relatedItineraries: [
+        { slug: "savannah", city: "Savannah", days: 3, description: "Historic squares, riverfront, and Southern pace." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music heritage, food, and neighborhoods." },
+        { slug: "new-orleans", city: "New Orleans", days: 3, description: "French Quarter, jazz, and Creole food." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    asheville: {
+      slug: "asheville",
+      city: "Asheville",
+      country: "USA",
+      days: 2,
+      pace: "Relaxed",
+      idealFor: ["First-timers", "Outdoor and art fans", "Food and beer lovers"],
+      style: ["Mountain views", "Breweries", "Downtown walks"],
+      pacing: [
+        "Asheville rewards a slow pace. Anchor each day with one main focus—Biltmore or the Blue Ridge Parkway, or downtown and the River Arts District—then leave room for breweries and cafe stops.",
+        "Group time by area to keep driving minimal. Pair Biltmore with a relaxed afternoon, or do a short Parkway stretch and downtown in one day.",
+        "Save an open-ended evening for downtown dinner and a stroll so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Asheville in 2 days",
+        subtitle:
+          "Mountain views, craft breweries, and a compact downtown at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1670446728605-29b68e95e8be?auto=format&fit=crop&w=1600&q=80",
+          alt: "Blue Ridge Mountains and forest near Asheville.",
+        },
+      },
+      cityStats: [
+        { value: "2,200+", label: "Acres at Biltmore Estate" },
+        { value: "30+", label: "Craft breweries" },
+        { value: "2,134 ft", label: "Downtown elevation" },
+        { value: "90k+", label: "Residents" },
+      ],
+      fit: {
+        forYou: ["Mountain scenery and Biltmore", "Craft beer and local food", "Compact downtown", "Two-day relaxed pace", "Art and galleries"],
+        notForYou: ["Beach or coastal focus", "High-energy nightlife only", "Packed theme-park days", "Long backcountry hikes in this plan", "Rushed sightseeing"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Biltmore or Blue Ridge",
+          summary: "Estate grounds or Parkway views and downtown.",
+          morning: "Biltmore Estate grounds and house visit",
+          afternoon: "Biltmore village or return to downtown",
+          evening: "Downtown dinner and brewery stop",
+        },
+        {
+          day: 2,
+          title: "Downtown and River Arts",
+          summary: "Galleries, breweries, and local flavor.",
+          morning: "Downtown Asheville and Pack Square",
+          afternoon: "River Arts District or Grove Arcade",
+          evening: "Final dinner and evening stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Mountain backdrop",
+          description:
+            "The Blue Ridge Mountains frame Asheville. Even a short drive on the Parkway or a view from town captures the setting.",
+          image: {
+            src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+            alt: "Blue Ridge Mountains and rolling hills near Asheville.",
+          },
+        },
+        {
+          title: "Downtown and breweries",
+          description:
+            "Compact downtown has breweries, restaurants, and galleries. A slow walk with a stop or two beats rushing.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Downtown Asheville street with shops and restaurants.",
+          },
+        },
+        {
+          title: "Biltmore Estate",
+          description:
+            "The estate offers house tours, gardens, and winery. Plan at least a half day if you visit; morning light is best.",
+          image: {
+            src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
+            alt: "Biltmore Estate architecture and grounds.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Getting there", value: "Asheville Regional Airport or drive from Charlotte" },
+        { label: "Transit tips", value: "Car useful for Biltmore and Parkway; downtown is walkable" },
+        { label: "Ticketing", value: "Book Biltmore in advance; tickets are dated" },
+        { label: "Neighborhood stay", value: "Downtown or near Biltmore" },
+      ],
+      checklist: [
+        "Book Biltmore Estate tickets",
+        "Pack layers for mountain weather",
+        "Bring comfortable walking shoes",
+        "Save offline maps for Asheville and Parkway",
+        "Plan one long brewery or lunch break",
+        "Check Parkway road status in winter",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        { question: "Is 2 days enough for Asheville?", answer: "Yes for the core. You can do Biltmore or Parkway plus downtown at a relaxed pace." },
+        { question: "Do I need a car?", answer: "Helpful for Biltmore and the Blue Ridge Parkway. Downtown is walkable once you are there." },
+        { question: "Is Biltmore worth the cost?", answer: "Yes if you enjoy estates and gardens. Plan at least a half day; the grounds are large." },
+        { question: "Where should I stay?", answer: "Downtown keeps you close to restaurants and breweries. Near Biltmore is quieter." },
+        { question: "What about winter?", answer: "Cold and sometimes icy. Parkway sections may close. Biltmore and downtown are still doable." },
+        { question: "Should I drive the full Parkway?", answer: "Even a short stretch (e.g. to Craggy Gardens) gives great views. Full Parkway is a longer day." },
+        { question: "Do I need to book restaurants?", answer: "For popular spots on weekends, yes. Weeknights are often fine without reservations." },
+      ],
+      relatedItineraries: [
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music, food, and downtown." },
+        { slug: "charleston", city: "Charleston", days: 3, description: "Historic streets and Southern food." },
+        { slug: "savannah", city: "Savannah", days: 3, description: "Squares, riverfront, and relaxed pace." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    memphis: {
+      slug: "memphis",
+      city: "Memphis",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["Music fans", "First-timers", "Food-first travelers"],
+      style: ["Blues and soul", "Riverfront", "Southern food"],
+      pacing: [
+        "Memphis rewards a steady rhythm. Anchor each day with one main area—Beale Street and the museums, or Graceland, or the riverfront and Civil Rights—then leave room for barbecue and live music.",
+        "Group time by neighborhood to keep transit light. Downtown is walkable; Graceland is a short drive. Pair the National Civil Rights Museum with a South Main stroll in one day.",
+        "Save an unhurried evening for Beale Street or a riverfront walk so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Memphis in 3 days",
+        subtitle:
+          "Music heritage, riverfront strolls, and Southern barbecue at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1560651480-d2381777204f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Beale Street and neon signs in Memphis at dusk.",
+        },
+      },
+      cityStats: [
+        { value: "200+", label: "Years of history" },
+        { value: "20+", label: "Live music venues on Beale" },
+        { value: "5", label: "Miles of riverfront" },
+        { value: "10M+", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: ["Blues, soul, and rock 'n' roll history", "Barbecue and Southern food", "Riverfront and downtown walks", "A clear plan with breathing room", "First-time visitors"],
+        notForYou: ["Beach or coastal focus", "Packed museum-only schedule", "Quiet, low-key only", "Theme parks", "Rushed sightseeing"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Beale Street and downtown",
+          summary: "Music history, Beale Street, and downtown strolls.",
+          morning: "Beale Street and Sun Studio or Stax Museum",
+          afternoon: "National Civil Rights Museum",
+          evening: "Beale Street live music and dinner",
+        },
+        {
+          day: 2,
+          title: "Graceland and Elvis",
+          summary: "Graceland and museum exhibits.",
+          morning: "Graceland mansion and exhibits",
+          afternoon: "Graceland campus or return to downtown",
+          evening: "Downtown dinner and optional music",
+        },
+        {
+          day: 3,
+          title: "Riverfront and neighborhoods",
+          summary: "Mississippi views, South Main, and final stops.",
+          morning: "Mud Island or Tom Lee Park riverfront",
+          afternoon: "South Main arts district",
+          evening: "Final barbecue or music stop",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Beale Street",
+          description:
+            "The heart of Memphis music. Daytime is quieter; evening brings neon and live blues. A slow walk and one venue stop capture the vibe.",
+          image: {
+            src: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
+            alt: "Beale Street at night with neon signs in Memphis.",
+          },
+        },
+        {
+          title: "Mississippi riverfront",
+          description:
+            "The river defines Memphis. A walk along the waterfront or a short cruise offers a different perspective on the city.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mississippi River and Memphis skyline.",
+          },
+        },
+        {
+          title: "Barbecue and soul food",
+          description:
+            "Memphis barbecue and Southern soul food are part of the experience. Plan for at least one long, relaxed meal.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Southern barbecue and sides in Memphis.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to May or September to October" },
+        { label: "Getting there", value: "Memphis International Airport; downtown 15 minutes" },
+        { label: "Transit tips", value: "Walk downtown; car or ride for Graceland" },
+        { label: "Ticketing", value: "Book Graceland and Civil Rights Museum in advance" },
+        { label: "Neighborhood stay", value: "Downtown or South Main" },
+      ],
+      checklist: [
+        "Book Graceland tickets",
+        "Reserve National Civil Rights Museum slot",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Memphis",
+        "Plan one long barbecue or music evening",
+        "Carry a refillable water bottle",
+        "Check Beale Street event schedule",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Memphis?", answer: "Yes for the core. You can cover Beale Street, Graceland, Civil Rights Museum, and the riverfront at a relaxed pace." },
+        { question: "Is downtown walkable?", answer: "Yes. Beale Street, the riverfront, and South Main are within easy walking distance." },
+        { question: "How do I get to Graceland?", answer: "Drive or ride-share; about 15 minutes south of downtown. Allow half a day for the full experience." },
+        { question: "Where should I stay?", answer: "Downtown keeps you close to Beale Street and the riverfront. South Main is quieter and still walkable." },
+        { question: "Do I need to book barbecue spots?", answer: "Popular places can have waits at peak times. Weekday lunch is often easier than weekend dinner." },
+        { question: "When is the best time for live music?", answer: "Evening on Beale Street. Daytime is quieter; nights bring more bands and crowds." },
+        { question: "Is the Civil Rights Museum worth it?", answer: "Yes. Plan at least two hours. It is powerful and well done; book ahead in peak season." },
+      ],
+      relatedItineraries: [
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music heritage, food, and downtown." },
+        { slug: "new-orleans", city: "New Orleans", days: 3, description: "French Quarter, jazz, and Creole food." },
+        { slug: "austin", city: "Austin", days: 3, description: "Live music, food, and outdoor vibe." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    savannah: {
+      slug: "savannah",
+      city: "Savannah",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Slow walkers"],
+      style: ["Historic squares", "Riverfront", "Southern pace"],
+      pacing: [
+        "Savannah rewards a calm rhythm. Anchor each day with one main area—the historic squares, River Street, or a museum and garden—then leave room for long lunches and bench time in the shade.",
+        "Group time by neighborhood to keep walking light. The grid of squares is compact; pair Forsyth Park with the southern squares in one morning, then dedicate another day to River Street and the factors' walk.",
+        "Save an unhurried afternoon for a square-side bench or a slow riverfront stroll so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Savannah in 3 days",
+        subtitle:
+          "Historic squares, oak-shaded streets, and riverfront walks at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1599666782416-c5b8ed6e480d?auto=format&fit=crop&w=1600&q=80",
+          alt: "Savannah historic square with oak trees and fountain.",
+        },
+      },
+      cityStats: [
+        { value: "22", label: "Historic squares" },
+        { value: "270+", label: "Years of history" },
+        { value: "2", label: "Miles of riverfront" },
+        { value: "14M+", label: "Annual visitors" },
+      ],
+      fit: {
+        forYou: ["Historic squares and architecture", "Riverfront and park strolls", "Southern food and hospitality", "A clear plan with breathing room", "First-time visitors"],
+        notForYou: ["Beach-only focus", "Packed museum-only schedule", "Late-night nightlife focus", "Theme parks", "Rushed sightseeing"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic squares and Forsyth",
+          summary: "Forsyth Park, squares, and oak-shaded streets.",
+          morning: "Forsyth Park and fountain",
+          afternoon: "Bull Street squares and Monterey Square",
+          evening: "Dinner in the Historic District",
+        },
+        {
+          day: 2,
+          title: "River Street and factors' walk",
+          summary: "Riverfront, cobblestones, and harbor views.",
+          morning: "River Street and factors' walk",
+          afternoon: "City Market or waterfront museums",
+          evening: "River Street dinner and evening stroll",
+        },
+        {
+          day: 3,
+          title: "Museums and neighborhoods",
+          summary: "House museum, gardens, and final strolls.",
+          morning: "Historic house or garden visit",
+          afternoon: "Remaining squares and Broughton Street",
+          evening: "Final square walk and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The squares",
+          description:
+            "Savannah's 22 squares are outdoor living rooms. Oak shade, fountains, and benches invite slow pauses between sights.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Savannah historic square with oaks and fountain.",
+          },
+        },
+        {
+          title: "River Street",
+          description:
+            "The cobblestone riverfront lines the Savannah River. Restaurants, shops, and harbor views make for a relaxed walk.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Savannah River Street and waterfront.",
+          },
+        },
+        {
+          title: "Oak-shaded streets",
+          description:
+            "Spanish moss and live oaks define the streets. Morning and late afternoon light are best for walks and photos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=1200&q=80",
+            alt: "Oak-shaded street in Savannah Historic District.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Getting there", value: "Savannah/Hilton Head Airport; downtown 20 minutes" },
+        { label: "Transit tips", value: "Walk the historic grid; free ferry across the river" },
+        { label: "Ticketing", value: "Book historic house tours in advance in peak season" },
+        { label: "Neighborhood stay", value: "Historic District near a square" },
+      ],
+      checklist: [
+        "Book one historic house or garden tour",
+        "Pack comfortable walking shoes",
+        "Bring a light layer for air conditioning",
+        "Save offline maps for Savannah",
+        "Plan one long Southern lunch",
+        "Carry a refillable water bottle",
+        "Check for seasonal events and festivals",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Savannah?", answer: "Yes for the core. You can cover the main squares, River Street, and a museum or two at a relaxed pace." },
+        { question: "Is Savannah walkable?", answer: "Yes. The historic grid is compact and flat. Most sights are within a 15-minute walk." },
+        { question: "Where should I stay?", answer: "The Historic District near a square keeps you central. Avoid staying too far from the grid if you want to walk." },
+        { question: "Do I need to book restaurants?", answer: "For popular spots, yes—especially on weekends. Reserve one or two, then leave the rest flexible." },
+        { question: "What about heat and humidity?", answer: "Summer can be hot. Start early, use the shade of the squares, and plan indoor or waterfront stops at midday." },
+        { question: "Should I take a trolley tour?", answer: "Optional. Walking is free and flexible; trolleys add narrative if you want an overview first." },
+        { question: "When is the best light for photos?", answer: "Morning and late afternoon. The squares and oak streets look best in soft light." },
+      ],
+      relatedItineraries: [
+        { slug: "charleston", city: "Charleston", days: 3, description: "Historic streets, waterfront, and Southern food." },
+        { slug: "new-orleans", city: "New Orleans", days: 3, description: "French Quarter, jazz, and Creole food." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Music heritage, food, and downtown." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
   }),
   es: withDefaults("es", {
     paris: {
@@ -38745,6 +41204,746 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           days: 3,
           description: "Monumentos, museos y tiempo tranquilo en barrios.",
         },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    baltimore: {
+      slug: "baltimore",
+      city: "Baltimore",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Paseos por el agua", "Historia y cultura"],
+      style: ["Inner Harbor", "Barrios históricos", "Ritmo fácil"],
+      pacing: [
+        "Baltimore se disfruta mejor con un ritmo tranquilo. Ancla cada día en una zona—Inner Harbor, Fells Point o un museo—y deja tiempo para crab cakes, paseos por el agua y paradas espontáneas.",
+        "Agrupa el tiempo por barrio para moverte poco. Combina el Harbor con el Acuario un día; añade Fells Point y Mount Vernon en otros para variedad.",
+        "Reserva una tarde abierta para un paseo por el puerto o una comida relajada.",
+      ],
+      hero: {
+        title: "Baltimore en 3 días",
+        subtitle:
+          "Inner Harbor, barrios históricos y ritmo relajado junto al agua sin prisas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1617603804604-5f8450e07583?auto=format&fit=crop&w=1600&q=80",
+          alt: "Inner Harbor de Baltimore con barcos y skyline.",
+        },
+      },
+      cityStats: [
+        { value: "280+", label: "Años de historia de la ciudad" },
+        { value: "7", label: "Museos en el waterfront" },
+        { value: "5,6 km", label: "Paseo marítimo del puerto" },
+        { value: "2,8M", label: "Población metropolitana" },
+      ],
+      fit: {
+        forYou: ["Enfoque en puerto y agua", "Primera vez", "Núcleo caminable", "Ritmo relajado y buena comida", "Historia y acuarios"],
+        notForYou: ["Solo playa", "Solo vida nocturna", "Campo remoto", "Días de museos sin parar", "Solo mochilero con poco presupuesto"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Inner Harbor y Acuario",
+          summary: "Circuito por el agua y Acuario Nacional.",
+          morning: "Paseo por Inner Harbor y Harborplace",
+          afternoon: "Acuario Nacional",
+          evening: "Cena en Harbor East y paseo nocturno",
+        },
+        {
+          day: 2,
+          title: "Fells Point y calles históricas",
+          summary: "Calles adoquinadas y carácter local.",
+          morning: "Calles de Fells Point y Broadway Market",
+          afternoon: "Paseo por el agua hasta Canton",
+          evening: "Cena en Fells Point",
+        },
+        {
+          day: 3,
+          title: "Mount Vernon y cultura",
+          summary: "Museos y grandes avenidas.",
+          morning: "Monumento a Washington y Mount Vernon Place",
+          afternoon: "Walters Art Museum o Maryland Historical Society",
+          evening: "Último paseo por el puerto o cena en barrio",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "El Inner Harbor",
+          description:
+            "El puerto es el salón de la ciudad. Espera barcos, comida junto al agua y un flujo constante de paseantes y familias.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Waterfront del Inner Harbor de Baltimore con barcos.",
+          },
+        },
+        {
+          title: "Barrios históricos",
+          description:
+            "Fells Point y Mount Vernon ofrecen adoquines, casas de ladrillo y cafés locales a un paseo o un trayecto corto.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Casas de ladrillo históricas en un barrio de Baltimore.",
+          },
+        },
+        {
+          title: "Comida junto al agua",
+          description:
+            "Crab houses y locales con vista al puerto marcan el tono de comidas relajadas con vistas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80",
+            alt: "Comida junto al agua con vistas al puerto en Baltimore.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "Light Rail o taxi desde BWI" },
+        { label: "Transporte", value: "Camina por el Harbor; Water Taxi o circulator para trayectos largos" },
+        { label: "Entradas", value: "Reserva el Acuario con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Inner Harbor o Fells Point" },
+      ],
+      checklist: [
+        "Reserva horario para el Acuario Nacional si lo visitas",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapa sin conexión de la zona del Harbor",
+        "Planifica una pausa lenta junto al agua al día",
+        "Lleva botella de agua reutilizable",
+        "Revisa horarios del Water Taxi para saltos por el puerto",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Baltimore?",
+          answer:
+            "Sí para lo esencial. Cuenta con una zona principal por día, paseos cortos por el puerto y margen para crab cakes y paradas espontáneas.",
+        },
+        {
+          question: "¿Debo comprar entradas del Acuario con antelación?",
+          answer:
+            "Sí en temporada alta. La entrada con horario mantiene la visita en curso y evita esperas largas.",
+        },
+        {
+          question: "¿Necesito un pase de transporte?",
+          answer:
+            "No necesariamente. Inner Harbor y Fells Point son caminables; el circulator o Water Taxi ayudan en trayectos más largos.",
+        },
+        {
+          question: "¿Baltimore es caminable?",
+          answer:
+            "Sí. El Harbor, Fells Point y Mount Vernon se pueden hacer a pie con transporte opcional para volver.",
+        },
+        {
+          question: "¿Dónde debería alojarme?",
+          answer:
+            "Inner Harbor te deja céntrico para el Acuario y el paseo; Fells Point se siente más local con fácil acceso al puerto.",
+        },
+        {
+          question: "¿A qué hora empezar cada día?",
+          answer:
+            "Empezar por la mañana va bien para el Acuario y paseos por el puerto; las tardes pueden ser más lentas con almuerzos largos.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "Para crab houses populares y cenas de fin de semana, sí. Mantén una o dos reservas y deja el resto flexible.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "washington-dc", city: "Washington DC", days: 3, description: "Monumentos, museos y paseos por el mall." },
+        { slug: "philadelphia", city: "Filadelfia", days: 3, description: "Monumentos históricos y barrios caminables." },
+        { slug: "boston", city: "Boston", days: 3, description: "Núcleo histórico, waterfront y calles relajadas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "st-louis": {
+      slug: "st-louis",
+      city: "San Luis",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Parques y museos", "En familia"],
+      style: ["Gateway Arch", "Forest Park", "Barrios caminables"],
+      pacing: [
+        "San Luis se disfruta con un ritmo tranquilo. Ancla cada día en una zona—el Arch y el río, Forest Park o un barrio—y deja tiempo para comida y paseos relajados.",
+        "Agrupa el tiempo por zona para moverte poco. Combina el Arch con el Old Courthouse; dedica un día entero a Forest Park y otro a Soulard o el Delmar Loop.",
+        "Reserva una tarde abierta para un paseo por el parque o una parada en cervecería.",
+      ],
+      hero: {
+        title: "San Luis en 3 días",
+        subtitle:
+          "Gateway Arch, Forest Park y encanto de barrio con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1610234759638-9796101136ef?auto=format&fit=crop&w=1600&q=80",
+          alt: "Gateway Arch y skyline de San Luis desde el río.",
+        },
+      },
+      cityStats: [
+        { value: "192 m", label: "Altura del Gateway Arch" },
+        { value: "530+", label: "Hectáreas en Forest Park" },
+        { value: "2,8M", label: "Población metropolitana" },
+        { value: "50+", label: "Cervecerías en la región" },
+      ],
+      fit: {
+        forYou: ["Arch icónico y río", "Parques y museos gratis", "Primera vez", "Ritmo relajado", "Paradas en familia"],
+        notForYou: ["Solo playa o montaña", "Solo vida nocturna", "Solo excursiones lejanas", "Tours sin parar", "Solo mochilero con poco presupuesto"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Gateway Arch y río",
+          summary: "Terrenos del Arch y vistas del Mississippi.",
+          morning: "Gateway Arch y museo",
+          afternoon: "Old Courthouse y paseo por el río",
+          evening: "Laclede's Landing o cena en el centro",
+        },
+        {
+          day: 2,
+          title: "Forest Park",
+          summary: "Museos, zoo y zona verde.",
+          morning: "Saint Louis Art Museum o History Museum",
+          afternoon: "Senderos de Forest Park y Grand Basin",
+          evening: "Cena en The Hill o Central West End",
+        },
+        {
+          day: 3,
+          title: "Soulard y barrios",
+          summary: "Mercado, cervecerías y carácter local.",
+          morning: "Soulard Market y barrio histórico",
+          afternoon: "Tour Anheuser-Busch o paseo por barrio",
+          evening: "Última cena y cierre relajado",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "El Gateway Arch",
+          description:
+            "El Arch define el skyline. La luz de la mañana y las vistas del río marcan un tono tranquilo para el día.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Gateway Arch en San Luis con río.",
+          },
+        },
+        {
+          title: "Forest Park",
+          description:
+            "Uno de los parques urbanos más grandes de EE. UU. Museos, zoo y senderos encajan en un ritmo relajado.",
+          image: {
+            src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Zona verde y senderos de Forest Park en San Luis.",
+          },
+        },
+        {
+          title: "Barrios históricos",
+          description:
+            "Soulard, The Hill y el Loop ofrecen calles de ladrillo, comida y carácter local.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle de ladrillo histórico en un barrio de San Luis.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado del aeropuerto", value: "MetroLink o taxi desde STL" },
+        { label: "Transporte", value: "Camina por el centro y el Arch; MetroLink para Forest Park" },
+        { label: "Entradas", value: "Reserva el tranvía del Arch con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Centro, Central West End o Soulard" },
+      ],
+      checklist: [
+        "Reserva tranvía del Gateway Arch si lo usas",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del centro y Forest Park",
+        "Planifica una pausa en parque o cervecería",
+        "Lleva botella de agua reutilizable",
+        "Revisa horarios de museos de Forest Park",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en San Luis?",
+          answer:
+            "Sí para el Arch, Forest Park y un día de barrio. El ritmo se mantiene relajado con margen para comida y parques.",
+        },
+        {
+          question: "¿Debo reservar el tranvía del Arch con antelación?",
+          answer:
+            "Sí en temporada alta. Las entradas con horario mantienen la visita en curso y evitan esperas largas.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "No para este plan. MetroLink y caminar cubren el Arch, Forest Park y barrios céntricos.",
+        },
+        {
+          question: "¿San Luis es caminable?",
+          answer:
+            "Sí. El centro y el Arch son compactos; Forest Park es grande pero caminable en un día.",
+        },
+        {
+          question: "¿Dónde debería alojarme?",
+          answer:
+            "Centro o Central West End te dejan cerca del Arch o de Forest Park con buen transporte.",
+        },
+        {
+          question: "¿A qué hora empezar cada día?",
+          answer:
+            "Por la mañana va bien para el Arch y museos; las tardes pueden ser más lentas con parque o barrio.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "Para sitios populares en días de partido o fines de semana, sí. Si no, una o dos reservas y flexibilidad funcionan bien.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Waterfront, museos y barrios." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Herencia musical y comida sureña." },
+        { slug: "kansas-city", city: "Kansas City", days: 3, description: "Fuentes, barbacoa y jazz." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    charlotte: {
+      slug: "charlotte",
+      city: "Charlotte",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Museos y parques", "Comida sureña"],
+      style: ["Skyline Uptown", "Zonas verdes", "Ritmo fácil"],
+      pacing: [
+        "Charlotte se disfruta con un ritmo tranquilo. Ancla cada día en una zona—museos de Uptown, un parque o un barrio—y deja tiempo para comida y paseos cortos.",
+        "Agrupa el tiempo por zona. Combina el Mint y Discovery Place con un paseo por Romare Bearden Park; añade Freedom Park o NoDa en otros días.",
+        "Reserva una tarde abierta para un parque o una comida relajada.",
+      ],
+      hero: {
+        title: "Charlotte en 3 días",
+        subtitle:
+          "Museos, zonas verdes y hospitalidad sureña con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1638289231271-65a10c95b9e6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline de Charlotte al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "800K+", label: "Población metropolitana" },
+        { value: "200+", label: "Parques y zonas verdes" },
+        { value: "30+", label: "Museos y sitios culturales" },
+        { value: "15 min", label: "Uptown al aeropuerto (tren ligero)" },
+      ],
+      fit: {
+        forYou: ["Museos y parques", "Primera vez", "Uptown caminable", "Ritmo relajado", "Comida y bebida sureñas"],
+        notForYou: ["Solo playa o montaña", "Solo vida nocturna", "Solo excursiones lejanas", "Tours sin parar", "Solo mochilero con poco presupuesto"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Uptown y museos",
+          summary: "Mint Museum, Discovery Place y parques.",
+          morning: "Mint Museum Uptown o Bechtler",
+          afternoon: "Discovery Place y Romare Bearden Park",
+          evening: "Cena en Uptown y paseo nocturno",
+        },
+        {
+          day: 2,
+          title: "Freedom Park y barrios",
+          summary: "Zona verde y carácter local.",
+          morning: "Freedom Park y Little Sugar Creek Greenway",
+          afternoon: "Paseo por Dilworth o Plaza Midwood",
+          evening: "Cena en barrio",
+        },
+        {
+          day: 3,
+          title: "NoDa y cultura",
+          summary: "Distrito de arte y ritmo relajado.",
+          morning: "Distrito de arte NoDa y galerías",
+          afternoon: "Optimist Park o parada en cervecería artesanal",
+          evening: "Última cena y cierre",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Skyline de Uptown",
+          description:
+            "El centro de Charlotte es compacto. Museos, parques y restaurantes quedan a un paseo corto.",
+          image: {
+            src: "https://images.unsplash.com/photo-1514565131-fce88c9659e2?auto=format&fit=crop&w=1200&q=80",
+            alt: "Skyline y edificios de Uptown en Charlotte.",
+          },
+        },
+        {
+          title: "Parques y greenways",
+          description:
+            "Freedom Park y la red de greenways ofrecen escapes fáciles sin salir de la ciudad.",
+          image: {
+            src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Parque verde y senderos en Charlotte.",
+          },
+        },
+        {
+          title: "Carácter de barrio",
+          description:
+            "NoDa, Dilworth y Plaza Midwood añaden sabor local y comida relajada.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle de barrio en Charlotte con tiendas locales.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a noviembre" },
+        { label: "Traslado del aeropuerto", value: "LYNX Blue Line a Uptown" },
+        { label: "Transporte", value: "Camina Uptown; tren ligero o bus para barrios" },
+        { label: "Entradas", value: "Reserva entradas de museos si visitas varios" },
+        { label: "Alojamiento", value: "Uptown o South End" },
+      ],
+      checklist: [
+        "Reserva horarios de museos si visitas varios",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapa sin conexión de Uptown y parques",
+        "Planifica una pausa en parque o café al día",
+        "Lleva botella de agua reutilizable",
+        "Revisa horarios de LYNX para regresos nocturnos",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Charlotte?",
+          answer:
+            "Sí para Uptown, un día de parque y un barrio. El ritmo se mantiene relajado con margen para comida y zona verde.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "No para este plan. El tren ligero y caminar cubren Uptown y barrios clave.",
+        },
+        {
+          question: "¿Charlotte es caminable?",
+          answer:
+            "Sí. Uptown es compacto; Freedom Park y NoDa se alcanzan en tren ligero o trayectos cortos.",
+        },
+        {
+          question: "¿Dónde debería alojarme?",
+          answer:
+            "Uptown te deja céntrico para museos y comida; South End ofrece tren ligero y ambiente más joven.",
+        },
+        {
+          question: "¿A qué hora empezar cada día?",
+          answer:
+            "Por la mañana va bien para museos; las tardes pueden ser más lentas con parque o barrio.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "Para sitios populares los fines de semana, sí. Mantén una o dos reservas y deja el resto flexible.",
+        },
+        {
+          question: "¿Y el NASCAR Hall of Fame?",
+          answer:
+            "Vale la pena si te gusta el motor; combínalo con una mañana en Uptown y deja la tarde abierta.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "raleigh", city: "Raleigh", days: 3, description: "Museos, greenways y ritmo relajado." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Herencia musical y comida sureña." },
+        { slug: "atlanta", city: "Atlanta", days: 3, description: "Historia, parques y comida sureña." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    milwaukee: {
+      slug: "milwaukee",
+      city: "Milwaukee",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Waterfront y cervecerías", "Museos"],
+      style: ["Lago Míchigan", "Historic Third Ward", "Ritmo fácil"],
+      pacing: [
+        "Milwaukee se disfruta con un ritmo tranquilo. Ancla cada día en una zona—waterfront, Third Ward o un museo—y deja tiempo para beer gardens, paseos por el agua y paradas espontáneas.",
+        "Agrupa el tiempo por zona. Combina el Art Museum con el waterfront; añade el Third Ward y una cervecería en otros días.",
+        "Reserva una tarde abierta para un paseo por el lago o una comida relajada.",
+      ],
+      hero: {
+        title: "Milwaukee en 3 días",
+        subtitle:
+          "Waterfront, cervecerías y barrios históricos con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1584582812876-db5756d5a772?auto=format&fit=crop&w=1600&q=80",
+          alt: "Waterfront de Milwaukee y Art Museum con alas Calatrava.",
+        },
+      },
+      cityStats: [
+        { value: "1,5M", label: "Población metropolitana" },
+        { value: "85+", label: "Cervecerías en la región" },
+        { value: "4,8 km", label: "Sendero del lago" },
+        { value: "150+", label: "Años de historia cervecera" },
+      ],
+      fit: {
+        forYou: ["Waterfront y museos", "Cervecerías y beer gardens", "Primera vez", "Núcleo caminable", "Ritmo relajado"],
+        notForYou: ["Solo playa", "Solo vida nocturna", "Campo remoto", "Tours sin parar", "Solo mochilero con poco presupuesto"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Waterfront y Art Museum",
+          summary: "Edificio Calatrava y vistas del lago.",
+          morning: "Milwaukee Art Museum y waterfront",
+          afternoon: "Veterans Park y sendero del lago",
+          evening: "Cena junto al agua",
+        },
+        {
+          day: 2,
+          title: "Historic Third Ward",
+          summary: "Calles de ladrillo, tiendas y mercado público.",
+          morning: "Calles del Third Ward y Milwaukee Public Market",
+          afternoon: "Riverwalk y galerías cercanas",
+          evening: "Cena en Third Ward",
+        },
+        {
+          day: 3,
+          title: "Cervecerías y río",
+          summary: "Tour de cervecería o riverwalk.",
+          morning: "Lakefront Brewery o Harley-Davidson Museum",
+          afternoon: "Riverwalk y beer garden",
+          evening: "Última cena y cierre",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Waterfront y Art Museum",
+          description:
+            "El museo diseñado por Calatrava y el sendero del lago marcan un tono tranquilo y escénico para el día.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578645510447-e20b46571173?auto=format&fit=crop&w=1200&q=80",
+            alt: "Milwaukee Art Museum en el waterfront.",
+          },
+        },
+        {
+          title: "Historic Third Ward",
+          description:
+            "Almacenes de ladrillo, Public Market y riverwalk añaden carácter local.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Edificios de ladrillo históricos en Third Ward, Milwaukee.",
+          },
+        },
+        {
+          title: "Río y cervecerías",
+          description:
+            "El riverwalk conecta cervecerías y beer gardens para una tarde relajada.",
+          image: {
+            src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80",
+            alt: "Riverwalk y waterfront de Milwaukee.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a octubre para lago y beer gardens" },
+        { label: "Traslado del aeropuerto", value: "Uber o shuttle desde MKE" },
+        { label: "Transporte", value: "Camina por el centro y waterfront; bus o streetcar para saltos" },
+        { label: "Entradas", value: "Reserva Art Museum o tours de cervecería en temporada alta" },
+        { label: "Alojamiento", value: "Third Ward o centro" },
+      ],
+      checklist: [
+        "Reserva Art Museum o tour de cervecería si quieres",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapa sin conexión de waterfront y Third Ward",
+        "Planifica una pausa en lago o beer garden",
+        "Lleva botella de agua reutilizable",
+        "Revisa horarios del streetcar para regresos nocturnos",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Milwaukee?",
+          answer:
+            "Sí para el waterfront, Third Ward y un día de cervecería o museo. El ritmo se mantiene relajado.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "No para este plan. Centro, waterfront y Third Ward son caminables con bus o streetcar para saltos.",
+        },
+        {
+          question: "¿Milwaukee es caminable?",
+          answer:
+            "Sí. El sendero del lago, Art Museum y Third Ward se pueden hacer a pie.",
+        },
+        {
+          question: "¿Dónde debería alojarme?",
+          answer:
+            "Third Ward o centro te dejan cerca del waterfront, Public Market y riverwalk.",
+        },
+        {
+          question: "¿A qué hora empezar cada día?",
+          answer:
+            "Por la mañana va bien para el Art Museum y waterfront; las tardes pueden ser más lentas con beer garden o mercado.",
+        },
+        {
+          question: "¿Necesito reservar tours de cervecería con antelación?",
+          answer:
+            "Para cervecerías populares los fines de semana, sí. Un tour reservado y una parada flexible funcionan bien.",
+        },
+        {
+          question: "¿Y en invierno?",
+          answer:
+            "Museos y Public Market funcionan todo el año; los paseos por el lago son mejores en meses cálidos.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "chicago", city: "Chicago", days: 3, description: "Waterfront, museos y barrios." },
+        { slug: "minneapolis", city: "Minneapolis", days: 3, description: "Lagos, arte y núcleo caminable." },
+        { slug: "detroit", city: "Detroit", days: 3, description: "Revival, museos y waterfront." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    tucson: {
+      slug: "tucson",
+      city: "Tucson",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Desierto y cultura", "Ritmo relajado"],
+      style: ["Desierto de saguaro", "Distritos históricos", "Comida del suroeste"],
+      pacing: [
+        "Tucson se disfruta con un ritmo tranquilo. Ancla cada día en una zona—el desierto, Mission San Xavier o el centro—y deja tiempo para comida mexicana, luz del desierto y paradas espontáneas.",
+        "Agrupa el tiempo por zona. Combina Saguaro Este con un paseo en coche por el desierto; añade Mission San Xavier y Fourth Avenue en otros días.",
+        "Reserva una tarde abierta para un mirador al atardecer o una comida relajada.",
+      ],
+      hero: {
+        title: "Tucson en 3 días",
+        subtitle:
+          "Vistas del desierto, Mission San Xavier y sabor del suroeste con ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1662019578129-2072e4dce5e2?auto=format&fit=crop&w=1600&q=80",
+          alt: "Saguaros y paisaje desértico cerca de Tucson.",
+        },
+      },
+      cityStats: [
+        { value: "1M+", label: "Población metropolitana" },
+        { value: "2", label: "Distritos de Saguaro National Park" },
+        { value: "230+", label: "Días de sol al año" },
+        { value: "4.000+", label: "Años de historia en la región" },
+      ],
+      fit: {
+        forYou: ["Desierto y misiones", "Primera vez", "Comida del suroeste", "Ritmo relajado", "Trayectos cortos en coche y a pie"],
+        notForYou: ["Solo playa o nieve", "Solo vida nocturna", "Tours sin parar", "Sin coche en absoluto", "Solo mochilero con poco presupuesto"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Saguaro National Park Este",
+          summary: "Paseo en coche por el desierto y paseos cortos.",
+          morning: "Paseo escénico Saguaro Este y senderos cortos",
+          afternoon: "Desert Museum o zona Tanque Verde",
+          evening: "Mirador al atardecer y cena",
+        },
+        {
+          day: 2,
+          title: "Mission San Xavier y Tucson Mountain Park",
+          summary: "Misión y vistas del desierto.",
+          morning: "Mission San Xavier del Bac",
+          afternoon: "Tucson Mountain Park o Gates Pass",
+          evening: "Cena en Fourth Avenue o centro",
+        },
+        {
+          day: 3,
+          title: "Centro y Fourth Avenue",
+          summary: "Núcleo histórico y carácter local.",
+          morning: "Centro de Tucson y distrito Presidio",
+          afternoon: "Tiendas y cafés de Fourth Avenue",
+          evening: "Última cena y cierre",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Desierto de saguaro",
+          description:
+            "El desierto define Tucson. La luz de la mañana o del final de la tarde hace que los paseos en coche y a pie sean memorables.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=1200&q=80",
+            alt: "Saguaros y desierto cerca de Tucson.",
+          },
+        },
+        {
+          title: "Mission San Xavier",
+          description:
+            "La White Dove of the Desert es una misión en uso y una parada tranquila de camino al lado oeste.",
+          image: {
+            src: "https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mission San Xavier del Bac cerca de Tucson.",
+          },
+        },
+        {
+          title: "Centro y Fourth Avenue",
+          description:
+            "El centro histórico y Fourth Avenue añaden sabor local y comida relajada.",
+          image: {
+            src: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle de Fourth Avenue o centro de Tucson.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril para clima suave en el desierto" },
+        { label: "Traslado del aeropuerto", value: "Sun Tran o taxi desde TUS" },
+        { label: "Transporte", value: "Coche útil para Saguaro y Mission; Sun Link para el centro" },
+        { label: "Entradas", value: "Pase del parque Saguaro; la Mission es gratis" },
+        { label: "Alojamiento", value: "Centro, Fourth Avenue o cerca de la universidad" },
+      ],
+      checklist: [
+        "Consigue pase de Saguaro National Park si lo visitas",
+        "Lleva protección solar y agua",
+        "Guarda mapa sin conexión para paseos por el desierto",
+        "Planifica mañana o final de tarde para el desierto",
+        "Lleva botella de agua reutilizable",
+        "Revisa horarios de Mission San Xavier",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Tucson?",
+          answer:
+            "Sí para Saguaro, Mission San Xavier y el centro. El ritmo se mantiene relajado con margen para luz del desierto y comida.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "Útil para Saguaro y la Mission. El centro y Fourth Avenue son caminables; Sun Link cubre el núcleo.",
+        },
+        {
+          question: "¿Tucson es caminable?",
+          answer:
+            "El centro y Fourth Avenue son caminables. Los lugares del desierto requieren un trayecto corto en coche.",
+        },
+        {
+          question: "¿Dónde debería alojarme?",
+          answer:
+            "Centro o cerca de Fourth Avenue te dejan en el núcleo; el este queda más cerca de Saguaro Este.",
+        },
+        {
+          question: "¿A qué hora empezar para el desierto?",
+          answer:
+            "Mañana o final de tarde evita las horas más calurosas y da la mejor luz.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "Para sitios del suroeste populares los fines de semana, sí. Si no, una o dos reservas y flexibilidad funcionan bien.",
+        },
+        {
+          question: "¿Y en verano?",
+          answer:
+            "Muy caluroso. Planifica mañana temprano o final de tarde para estar fuera y mucha agua.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "phoenix", city: "Phoenix", days: 3, description: "Desierto, museos y ritmo al aire libre." },
+        { slug: "san-diego", city: "San Diego", days: 3, description: "Waterfront, parques y ritmo costero." },
+        { slug: "santa-fe", city: "Santa Fe", days: 2, description: "Arte del suroeste y encanto adobe." },
       ],
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
@@ -64469,6 +67668,371 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    york: {
+      slug: "york",
+      city: "York",
+      country: "Reino Unido",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de la historia", "Escapadas cortas"],
+      style: ["Murallas medievales", "Minster y calles", "Centro compacto"],
+      pacing: [
+        "York es lo bastante compacta para dos días tranquilos. Día uno: Minster y The Shambles. Día dos: murallas, museos y último paseo.",
+        "Empieza en el Minster por la mañana para evitar la hora punta. El centro es caminable; no hace falta correr.",
+        "Deja tiempo para té, almuerzo largo o banco junto al río para que el viaje se sienta relajado.",
+      ],
+      hero: {
+        title: "York en 2 días",
+        subtitle:
+          "Murallas medievales, el Minster y calles históricas con tiempo para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1656695712976-317f643bbf61?auto=format&fit=crop&w=1600&q=80",
+          alt: "Catedral de York Minster y skyline histórico.",
+        },
+      },
+      cityStats: [
+        { value: "2.000+", label: "Años de historia" },
+        { value: "3,4 km", label: "Murallas medievales" },
+        { value: "200K+", label: "Visitantes anuales" },
+      ],
+      fit: {
+        forYou: ["Historia y arquitectura medieval", "Ciudad compacta caminable", "Primera vez", "Escapada corta", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o campo", "Excursiones largas", "Vida nocturna fuerte", "Maratón solo de museos", "Tour express multi-ciudad"],
+      },
+      dayPlans: [
+        { day: 1, title: "Minster y The Shambles", summary: "York Minster, The Shambles y centro histórico.", morning: "York Minster y Chapter House", afternoon: "The Shambles y calles aledañas", evening: "Cena en el centro" },
+        { day: 2, title: "Murallas y museos", summary: "Paseo por las murallas y museo opcional.", morning: "Paseo por las murallas (Bootham Bar a Monk Bar)", afternoon: "Jorvik Viking Centre o Yorkshire Museum, o paseo relajado", evening: "Último té o cena" },
+      ],
+      imageInfoCards: [
+        { title: "York Minster", description: "La catedral domina el skyline. Por la mañana hay menos gente; calcula al menos 1,5 horas para el interior y la torre.", image: { src: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1200&q=80", alt: "Exterior de la catedral York Minster." } },
+        { title: "The Shambles", description: "La calle medieval estrecha es la imagen de postal. Mañana temprano o tarde es más tranquilo para un paseo lento.", image: { src: "https://images.unsplash.com/photo-1515586838455-8f8f9409684e?auto=format&fit=crop&w=1200&q=80", alt: "Calle histórica The Shambles en York." } },
+        { title: "Murallas de la ciudad", description: "Las murallas medievales forman un circuito de 3,4 km. El recorrido completo o un tramo encaja en una mañana tranquila.", image: { src: "https://images.unsplash.com/photo-1596422846543-75b6d0c44e1e?auto=format&fit=crop&w=1200&q=80", alt: "Murallas y puerta de York." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para tiempo más suave" },
+        { label: "Tren", value: "Estación de York; directo desde Londres, Edimburgo, Leeds" },
+        { label: "Moverse", value: "El centro es caminable; no hace falta coche" },
+        { label: "Entradas", value: "Reserva Minster y Jorvik con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Centro cerca del Minster o dentro de las murallas" },
+      ],
+      checklist: [
+        "Reserva entrada al Minster con antelación",
+        "Zapatos cómodos para adoquines y murallas",
+        "Lleva capa para lluvia",
+        "Guarda mapa del centro sin conexión",
+        "Planifica un té o almuerzo largo",
+        "Consulta horarios del Minster y museos",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en York?", answer: "Sí para el Minster, The Shambles, murallas y ritmo relajado. Añade un día para campo o costa cercana si quieres." },
+        { question: "¿Debo reservar el Minster?", answer: "Sí en temporada alta. Por la mañana suele haber menos gente para la torre y el interior." },
+        { question: "¿York es caminable?", answer: "Sí. El centro es compacto; los principales lugares están a 15–20 minutos a pie." },
+        { question: "¿Dónde alojarme?", answer: "Cerca del Minster o dentro de las murallas para tener los principales lugares a mano." },
+        { question: "¿Cómo llegar a York?", answer: "Tren desde Londres King's Cross (unas 2 horas), Edimburgo o Leeds; la estación está en el centro." },
+        { question: "¿Necesito coche?", answer: "No para la ciudad. Alquila solo para North York Moors o costa." },
+        { question: "¿Reservar restaurantes?", answer: "Para cena en fin de semana sí. Almuerzo y entre semana suele haber sitio sin reserva." },
+      ],
+      relatedItineraries: [
+        { slug: "london", city: "Londres", days: 3, description: "Monumentos icónicos, museos y paseos por el Támesis." },
+        { slug: "edinburgh", city: "Edimburgo", days: 3, description: "Castillo, Royal Mile y calles históricas." },
+        { slug: "bath", city: "Bath", days: 2, description: "Baños Romanos, calles georgianas y centro compacto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cambridge: {
+      slug: "cambridge",
+      city: "Cambridge",
+      country: "Reino Unido",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura e historia", "Escapadas cortas"],
+      style: ["College backs", "Río Cam", "Centro compacto"],
+      pacing: [
+        "Cambridge encaja en dos días tranquilos. Día uno: King's College y los Backs. Día dos: más colleges, punting y plaza del mercado.",
+        "Empieza en King's por la mañana para disfrutar la capilla y los jardines antes de las multitudes. El centro es caminable.",
+        "Deja tiempo para un paseo en punt por el Cam, té o almuerzo largo para que el viaje se sienta relajado.",
+      ],
+      hero: {
+        title: "Cambridge en 2 días",
+        subtitle:
+          "College backs, punting en el río y centro compacto con tiempo para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1618391440321-7ea5fa610260?auto=format&fit=crop&w=1600&q=80",
+          alt: "Capilla de King's College y los Backs en Cambridge.",
+        },
+      },
+      cityStats: [
+        { value: "31", label: "Colleges" },
+        { value: "800+", label: "Años de historia universitaria" },
+        { value: "125K+", label: "Habitantes" },
+      ],
+      fit: {
+        forYou: ["Universidad y arquitectura", "Ciudad compacta caminable", "Primera vez", "Escapada corta", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o campo", "Excursiones largas", "Vida nocturna fuerte", "Maratón solo de museos", "Tour express multi-ciudad"],
+      },
+      dayPlans: [
+        { day: 1, title: "King's College y los Backs", summary: "Capilla de King's, los Backs y vistas al río.", morning: "Capilla y jardines de King's College", afternoon: "Los Backs y exterior de Trinity College", evening: "Cena en el centro" },
+        { day: 2, title: "Punting y mercado", summary: "Punting en el Cam y plaza del mercado.", morning: "Punt por el Cam o Fitzwilliam Museum", afternoon: "Market Square y más patios de colleges", evening: "Último té o cena" },
+      ],
+      imageInfoCards: [
+        { title: "Capilla de King's College", description: "La capilla es el emblema. Por la mañana hay menos gente; dedica tiempo al interior y la bóveda de abanico.", image: { src: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1200&q=80", alt: "Capilla de King's College en Cambridge." } },
+        { title: "Los Backs", description: "Los jardines traseros de los colleges junto al Cam son ideales para un paseo lento o un punt.", image: { src: "https://images.unsplash.com/photo-1515586838455-8f8f9409684e?auto=format&fit=crop&w=1200&q=80", alt: "Los Backs y río Cam en Cambridge." } },
+        { title: "Punting en el río", description: "Un punt por el Cam ofrece otra perspectiva de los colleges. Reserva con antelación en temporada alta o únete a un grupo.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Punting en el río Cam en Cambridge." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre; evita época de exámenes en mayo–junio" },
+        { label: "Tren", value: "Estación de Cambridge; directo desde Londres King's Cross" },
+        { label: "Moverse", value: "El centro es caminable; no hace falta coche" },
+        { label: "Entradas", value: "Reserva Capilla de King's con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Centro cerca de los colleges o la estación" },
+      ],
+      checklist: [
+        "Reserva entrada a la Capilla de King's con antelación",
+        "Zapatos cómodos para adoquines",
+        "Lleva capa para lluvia",
+        "Guarda mapa del centro sin conexión",
+        "Planifica un punt o almuerzo largo",
+        "Consulta horarios de los colleges",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Cambridge?", answer: "Sí para los colleges principales, los Backs y ritmo relajado. Añade un día para más museos o pueblos cercanos si quieres." },
+        { question: "¿Debo reservar la Capilla de King's?", answer: "Sí en temporada alta. Por la mañana suele haber menos gente." },
+        { question: "¿Cambridge es caminable?", answer: "Sí. El centro es compacto; colleges y mercado están a 15–20 minutos a pie." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de los colleges o la estación para tener el centro a mano." },
+        { question: "¿Cómo llegar a Cambridge?", answer: "Tren desde Londres King's Cross (aproximadamente 1 hora); autobuses desde el aeropuerto de Stansted." },
+        { question: "¿Necesito coche?", answer: "No para la ciudad. Alquila solo para campo o Ely." },
+        { question: "¿Reservar restaurantes?", answer: "Para cena en fin de semana sí. Almuerzo y entre semana suele haber sitio sin reserva." },
+      ],
+      relatedItineraries: [
+        { slug: "london", city: "Londres", days: 3, description: "Monumentos icónicos, museos y paseos por el Támesis." },
+        { slug: "oxford", city: "Oxford", days: 2, description: "Colleges, Bodleian y centro compacto." },
+        { slug: "york", city: "York", days: 2, description: "Minster, The Shambles y murallas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bern: {
+      slug: "bern",
+      city: "Berna",
+      country: "Suiza",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y arquitectura", "Escapadas cortas"],
+      style: ["Arcadas del casco antiguo", "Bear Park", "Vistas al río"],
+      pacing: [
+        "Berna es lo bastante compacta para dos días tranquilos. Día uno: casco antiguo, Zytglogge y Bear Park. Día dos: museos, paseo junto al río y último paseo.",
+        "Empieza en el casco antiguo por la mañana. Las arcadas y las fuentes se ven mejor a pie; no hace falta correr.",
+        "Deja tiempo para un café bajo las arcadas o una pausa junto al río para que el viaje se sienta relajado.",
+      ],
+      hero: {
+        title: "Berna en 2 días",
+        subtitle:
+          "Arcadas del casco antiguo, Bear Park y el Aare con tiempo para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casco antiguo de Berna con arcadas y catedral.",
+        },
+      },
+      cityStats: [
+        { value: "6", label: "km de arcadas" },
+        { value: "UNESCO", label: "Casco antiguo Patrimonio Mundial" },
+        { value: "500+", label: "Años como ciudad federal" },
+      ],
+      fit: {
+        forYou: ["Historia medieval y federal", "Ciudad compacta caminable", "Primera vez", "Escapada corta", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o montaña", "Excursiones largas", "Vida nocturna fuerte", "Maratón solo de museos", "Tour express multi-ciudad"],
+      },
+      dayPlans: [
+        { day: 1, title: "Casco antiguo y Bear Park", summary: "Arcadas, Zytglogge y Bear Park.", morning: "Zytglogge y Kramgasse", afternoon: "Bear Park y zona Nydegg", evening: "Cena bajo las arcadas" },
+        { day: 2, title: "Museos y río", summary: "Elección de museo y paseo junto al Aare.", morning: "Casa Einstein o Museo Histórico", afternoon: "Paseo junto al Aare o Rosengarten", evening: "Último paseo y cena" },
+      ],
+      imageInfoCards: [
+        { title: "Arcadas del casco antiguo", description: "Las arcadas medievales bordean las calles principales. Por la mañana hay menos gente para un paseo lento y escaparates.", image: { src: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1200&q=80", alt: "Arcadas y calle adoquinada del casco antiguo de Berna." } },
+        { title: "Bear Park", description: "Los osos son un símbolo de Berna. El parque junto al río es gratis y encaja en una parada tranquila de media hora.", image: { src: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?auto=format&fit=crop&w=1200&q=80", alt: "Bear Park de Berna junto al río Aare." } },
+        { title: "Aare y catedral", description: "El Aare rodea el casco antiguo. La torre de la catedral ofrece una vista clara de la ciudad.", image: { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80", alt: "Catedral de Berna y casco antiguo desde el río." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para tiempo más suave" },
+        { label: "Tren", value: "Estación principal de Berna; directo desde Zúrich, Ginebra" },
+        { label: "Moverse", value: "El centro es caminable; tranvía para trayectos largos" },
+        { label: "Entradas", value: "Bear Park gratis; reserva museos online en temporada alta" },
+        { label: "Alojamiento", value: "Casco antiguo o cerca de la estación" },
+      ],
+      checklist: [
+        "Zapatos cómodos para adoquines",
+        "Lleva capa para lluvia",
+        "Guarda mapa del centro sin conexión",
+        "Planifica un café o almuerzo largo bajo las arcadas",
+        "Consulta horarios de museos",
+        "Lleva francos suizos o tarjeta",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Berna?", answer: "Sí para el casco antiguo, Bear Park y ritmo relajado. Añade un día para más museos o los Alpes si quieres." },
+        { question: "¿Hay que reservar Bear Park?", answer: "No. La entrada es gratis. Por la mañana suele haber menos gente." },
+        { question: "¿Berna es caminable?", answer: "Sí. El casco antiguo es compacto; los principales lugares están a 15–20 minutos a pie." },
+        { question: "¿Dónde alojarme?", answer: "En el casco antiguo o cerca para tener arcadas y Bear Park a mano." },
+        { question: "¿Cómo llegar a Berna?", answer: "Tren desde Zúrich (aproximadamente 1 hora), Ginebra (unas 2 horas) o Basilea." },
+        { question: "¿Necesito coche?", answer: "No para la ciudad. Los trenes cubren excursiones a Interlaken o Lucerna." },
+        { question: "¿Reservar restaurantes?", answer: "Para cena en fin de semana sí. Almuerzo y entre semana suele haber sitio sin reserva." },
+      ],
+      relatedItineraries: [
+        { slug: "zurich", city: "Zúrich", days: 3, description: "Lago, casco antiguo y museos." },
+        { slug: "lucerne", city: "Lucerna", days: 3, description: "Puente de la Capilla, lago y montañas." },
+        { slug: "geneva", city: "Ginebra", days: 2, description: "Lago, Jet d'Eau y centro compacto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    basel: {
+      slug: "basel",
+      city: "Basilea",
+      country: "Suiza",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Arte y cultura", "Escapadas cortas"],
+      style: ["Museos", "Paseo del Rin", "Casco antiguo compacto"],
+      pacing: [
+        "Basilea encaja en dos días tranquilos. Día uno: Kunstmuseum o Fondation Beyeler y casco antiguo. Día dos: paseo por el Rin, más museos y último paseo.",
+        "Empieza en un museo importante por la mañana. El centro es caminable; el Rin divide la ciudad pero los puentes unen ambas orillas.",
+        "Deja tiempo para un paseo por el Rin o un café en el casco antiguo para que el viaje se sienta relajado.",
+      ],
+      hero: {
+        title: "Basilea en 2 días",
+        subtitle:
+          "Museos de arte, paseos por el Rin y casco antiguo compacto con tiempo para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1632510835438-2e30acba7d22?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casco antiguo de Basilea y río Rin.",
+        },
+      },
+      cityStats: [
+        { value: "40+", label: "Museos" },
+        { value: "3", label: "Países en la frontera" },
+        { value: "170K+", label: "Habitantes" },
+      ],
+      fit: {
+        forYou: ["Arte y cultura", "Ciudad compacta caminable", "Primera vez", "Escapada corta", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o montaña", "Excursiones largas", "Vida nocturna fuerte", "Sin museos", "Tour express multi-ciudad"],
+      },
+      dayPlans: [
+        { day: 1, title: "Kunstmuseum y casco antiguo", summary: "Museo de arte y centro histórico.", morning: "Kunstmuseum Basel", afternoon: "Casco antiguo y Marktplatz", evening: "Cena junto al Rin" },
+        { day: 2, title: "Rin y más cultura", summary: "Paseo del Rin y museo opcional.", morning: "Paseo del Rin y Mittlere Brücke", afternoon: "Fondation Beyeler o Museo Tinguely, o paseo relajado", evening: "Última cena o café" },
+      ],
+      imageInfoCards: [
+        { title: "Kunstmuseum", description: "Uno de los principales museos de arte de Suiza. Calcula al menos 2 horas; por la mañana hay menos gente.", image: { src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80", alt: "Kunstmuseum y vista de Basilea." } },
+        { title: "Paseo del Rin", description: "El Rin cruza la ciudad. Un paseo por la orilla o un cruce en ferry marcan un ritmo tranquilo.", image: { src: "https://images.unsplash.com/photo-1569931723598-95b1b0c2b2e2?auto=format&fit=crop&w=1200&q=80", alt: "Río Rin y paseo marítimo de Basilea." } },
+        { title: "Casco antiguo", description: "Marktplatz y el Rathaus definen el centro. Calles estrechas y fuentes para una tarde tranquila.", image: { src: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo y Rathaus de Basilea." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para tiempo más suave" },
+        { label: "Tren", value: "Basel SBB; directo desde Zúrich, Ginebra, París" },
+        { label: "Moverse", value: "Centro caminable; tranvía para trayectos largos" },
+        { label: "Entradas", value: "Reserva museos principales online en temporada alta" },
+        { label: "Alojamiento", value: "Casco antiguo o cerca del Rin" },
+      ],
+      checklist: [
+        "Reserva Kunstmuseum o Beyeler con antelación",
+        "Zapatos cómodos para adoquines",
+        "Lleva capa para lluvia",
+        "Guarda mapa del centro sin conexión",
+        "Planifica un paseo por el Rin o almuerzo largo",
+        "Consulta horarios de museos",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Basilea?", answer: "Sí para uno o dos museos importantes, el casco antiguo y ritmo relajado. Añade un día para más arte o la Selva Negra si quieres." },
+        { question: "¿Hay que reservar museos?", answer: "Para Kunstmuseum y Fondation Beyeler, reservar ayuda en temporada alta." },
+        { question: "¿Basilea es caminable?", answer: "Sí. El centro es compacto; el Rin se cruza por varios puentes." },
+        { question: "¿Dónde alojarme?", answer: "En el casco antiguo o cerca para tener museos y el Rin a mano." },
+        { question: "¿Cómo llegar a Basilea?", answer: "Tren desde Zúrich (aproximadamente 1 hora), Ginebra o París; EuroAirport sirve a Basilea." },
+        { question: "¿Necesito coche?", answer: "No para la ciudad. Los trenes cubren excursiones a Lucerna o Colmar." },
+        { question: "¿Reservar restaurantes?", answer: "Para cena en fin de semana sí. Almuerzo y entre semana suele haber sitio sin reserva." },
+      ],
+      relatedItineraries: [
+        { slug: "zurich", city: "Zúrich", days: 3, description: "Lago, casco antiguo y museos." },
+        { slug: "bern", city: "Berna", days: 2, description: "Casco antiguo, Bear Park y arcadas." },
+        { slug: "geneva", city: "Ginebra", days: 2, description: "Lago, Jet d'Eau y centro compacto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    graz: {
+      slug: "graz",
+      city: "Graz",
+      country: "Austria",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura y arquitectura", "Escapadas cortas"],
+      style: ["Schlossberg", "Casco antiguo", "Diseño y cafés"],
+      pacing: [
+        "Graz encaja en dos días tranquilos. Día uno: Schlossberg y casco antiguo. Día dos: Kunsthaus, museos y último paseo.",
+        "Empieza en el Schlossberg por la mañana para las vistas antes de las multitudes. El centro es caminable; la colina se sube a pie o en funicular.",
+        "Deja tiempo para un café en el casco antiguo o un paseo lento junto al Mur para que el viaje se sienta relajado.",
+      ],
+      hero: {
+        title: "Graz en 2 días",
+        subtitle:
+          "Schlossberg, casco antiguo y diseño con tiempo para respirar.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1657053040367-9cdb45634b86?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casco antiguo de Graz y Schlossberg desde el Mur.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Casco antiguo Patrimonio Mundial" },
+        { value: "270K+", label: "Habitantes" },
+        { value: "2ª", label: "Ciudad más grande de Austria" },
+      ],
+      fit: {
+        forYou: ["Cultura y diseño", "Ciudad compacta caminable", "Primera vez", "Escapada corta", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o montaña", "Excursiones largas", "Vida nocturna fuerte", "Maratón solo de museos", "Tour express multi-ciudad"],
+      },
+      dayPlans: [
+        { day: 1, title: "Schlossberg y casco antiguo", summary: "Vistas desde la colina y centro histórico.", morning: "Schlossberg (vistas y torre del reloj)", afternoon: "Casco antiguo, Hauptplatz y Herrengasse", evening: "Cena en el centro" },
+        { day: 2, title: "Kunsthaus y Mur", summary: "Museo de diseño y paseo junto al río.", morning: "Kunsthaus Graz o Armería", afternoon: "Paseo del Mur y último paseo", evening: "Última cena o café" },
+      ],
+      imageInfoCards: [
+        { title: "Schlossberg", description: "La colina domina la ciudad. La torre del reloj y las vistas merecen la subida o el funicular; por la mañana hay menos gente.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Schlossberg y torre del reloj de Graz." } },
+        { title: "Casco antiguo", description: "Hauptplatz y Herrengasse forman el núcleo. Fachadas barrocas y patios invitan a un paseo lento.", image: { src: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo y Hauptplatz de Graz." } },
+        { title: "Kunsthaus Graz", description: "El edificio biomórfico azul contrasta con el centro histórico. Calcula una o dos horas para las exposiciones.", image: { src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80", alt: "Kunsthaus Graz y río Mur." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para tiempo más suave" },
+        { label: "Tren", value: "Estación principal de Graz; directo desde Viena, Salzburgo" },
+        { label: "Moverse", value: "El centro es caminable; tranvía y autobuses para la zona del Schlossberg" },
+        { label: "Entradas", value: "Reserva Kunsthaus o Armería con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Casco antiguo o cerca del Mur" },
+      ],
+      checklist: [
+        "Reserva Kunsthaus o Armería con antelación",
+        "Zapatos cómodos para las escaleras del Schlossberg",
+        "Lleva capa para lluvia",
+        "Guarda mapa del centro sin conexión",
+        "Planifica un café o almuerzo largo",
+        "Consulta horarios de museos",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Graz?", answer: "Sí para el Schlossberg, casco antiguo y un museo importante. Añade un día para más cultura o región vinícola si quieres." },
+        { question: "¿Hay que reservar el Schlossberg?", answer: "No. La colina es gratis; el funicular es de pago. Por la mañana suele haber menos gente." },
+        { question: "¿Graz es caminable?", answer: "Sí. El centro es compacto; el Schlossberg está a un corto paseo o funicular desde el casco antiguo." },
+        { question: "¿Dónde alojarme?", answer: "En el casco antiguo o cerca para tener Schlossberg y museos a mano." },
+        { question: "¿Cómo llegar a Graz?", answer: "Tren desde Viena (unas 2,5 horas) o Salzburgo; Graz tiene aeropuerto con conexiones limitadas." },
+        { question: "¿Necesito coche?", answer: "No para la ciudad. Alquila para la región vinícola de Estiria o lagos cercanos." },
+        { question: "¿Reservar restaurantes?", answer: "Para cena en fin de semana sí. Almuerzo y entre semana suele haber sitio sin reserva." },
+      ],
+      relatedItineraries: [
+        { slug: "vienna", city: "Viena", days: 3, description: "Museos, palacios y grandes avenidas." },
+        { slug: "salzburg", city: "Salzburgo", days: 3, description: "Fortaleza, casco antiguo y música." },
+        { slug: "innsbruck", city: "Innsbruck", days: 2, description: "Alpes, Tejado de Oro y centro compacto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
     frankfurt: {
       slug: "frankfurt",
       city: "Fráncfort",
@@ -69346,6 +72910,1170 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { slug: "seattle", city: "Seattle", days: 3, description: "Frente al agua, café y parques." },
         { slug: "denver", city: "Denver", days: 3, description: "Vistas a la montaña, cervecerías y ciudad." },
         { slug: "vancouver", city: "Vancouver", days: 3, description: "Parques, puerto y barrios." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    ghent: {
+      slug: "ghent",
+      city: "Gante",
+      country: "Bélgica",
+      days: 2,
+      pace: "Relajado",
+      idealFor: ["Primera vez", "Amantes de la historia", "Viajeros gastronómicos"],
+      style: ["Monumentos medievales", "Paseos junto al canal", "Cultura de café"],
+      pacing: [
+        "Gante recompensa un ritmo lento. El compacto centro medieval invita a pasear sin horario fijo: ancla cada día con un gran monumento y deja espacio para vistas al canal y almuerzos largos.",
+        "Agrupa el tiempo por barrio. Combina el castillo y la catedral en una mañana, luego deriva hacia Patershol o el paseo marítimo para una tarde de cafés y gente.",
+        "Reserva una tarde tranquila para los muelles de Graslei, donde la luz dorada sobre las casas gremiales y una cerveza belga fría marcan el tono de la ciudad.",
+      ],
+      hero: {
+        title: "Gante en 2 días",
+        subtitle:
+          "Torres medievales, canales tranquilos y hospitalidad belga a un ritmo apacible.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1667335781544-26964774142b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Paseo marítimo de Graslei con casas gremiales medievales en Gante al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "1.000+", label: "Años de historia" },
+        { value: "3", label: "Torres medievales" },
+        { value: "260+", label: "Edificios patrimoniales" },
+        { value: "1M+", label: "Visitantes anuales" },
+      ],
+      fit: {
+        forYou: ["Una ciudad compacta y caminable", "Arquitectura medieval y canales", "Comida y cerveza belga", "Un ritmo relajado de dos días", "Menos multitudes que Brujas"],
+        notForYou: ["Un viaje de playa o resort", "Vida nocturna intensa", "Tours extensos de museos", "Excursiones a múltiples ciudades", "Grandes parques temáticos"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Centro medieval",
+          summary: "Castillo, catedral y vistas desde el campanario.",
+          morning: "Castillo de Gravensteen y calles cercanas",
+          afternoon: "Catedral de San Bavón y el Altar de Gante",
+          evening: "Vistas del campanario y cena en Patershol",
+        },
+        {
+          day: 2,
+          title: "Canales y barrios",
+          summary: "Paseos junto al agua y sabores locales.",
+          morning: "Paseo por Graslei y Korenlei",
+          afternoon: "Puente de San Miguel y Museo del Diseño",
+          evening: "Cata de cervezas belgas y cena junto al canal",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "El paseo marítimo medieval",
+          description:
+            "Graslei y Korenlei se miran a través del río Leie, flanqueados por casas gremiales que brillan al atardecer. Un banco aquí es el mejor asiento de la ciudad.",
+          image: {
+            src: "https://images.unsplash.com/photo-1491557345352-5929e343eb89?auto=format&fit=crop&w=1200&q=80",
+            alt: "Casas gremiales históricas a lo largo del paseo de Graslei en Gante.",
+          },
+        },
+        {
+          title: "Torres y agujas",
+          description:
+            "Tres torres definen el horizonte: San Bavón, el Campanario y San Nicolás. Sube al Campanario para ver los tejados rojos desde arriba.",
+          image: {
+            src: "https://images.unsplash.com/photo-1564352969906-8b7f46ba4b8b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Vista de las tres torres de Gante desde arriba.",
+          },
+        },
+        {
+          title: "Encanto de Patershol",
+          description:
+            "Callejones estrechos de adoquines esconden restaurantes acogedores y rincones tranquilos. Este barrio se explora mejor sin plan.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555990538-1e74b3f4e78e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calles de adoquines y edificios tradicionales en Patershol, Gante.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Cómo llegar", value: "Tren de 30 minutos desde Bruselas" },
+        { label: "Transporte", value: "Camina por el centro; tranvía para barrios exteriores" },
+        { label: "Entradas", value: "Reserva Gravensteen y Campanario en temporada alta" },
+        { label: "Alojamiento", value: "Centro histórico o cerca de Korenlei" },
+      ],
+      checklist: [
+        "Reserva entradas al Castillo de Gravensteen",
+        "Reserva subida al Campanario",
+        "Lleva zapatos cómodos",
+        "Guarda mapas sin conexión de Gante",
+        "Planifica un largo almuerzo belga",
+        "Lleva una capa ligera para la lluvia",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Gante?", answer: "Sí para lo esencial. Puedes recorrer el centro medieval, los canales y los barrios clave a un ritmo relajado con tiempo para comidas y paseos." },
+        { question: "¿Debería visitar Brujas en su lugar?", answer: "Gante ofrece un encanto medieval similar con menos multitudes y un ambiente más local. Ambas merecen la pena si tienes tiempo." },
+        { question: "¿Gante es caminable?", answer: "Muy. El centro histórico es compacto y llano, lo que facilita explorarlo a pie." },
+        { question: "¿Dónde debería alojarme?", answer: "El centro histórico te mantiene cerca de todo. Cerca de Korenlei o Patershol te da ambiente nocturno." },
+        { question: "¿Necesito reservar restaurantes?", answer: "Para sitios populares los fines de semana, sí. Las noches entre semana suelen estar bien sin reserva." },
+        { question: "¿Qué debería comer?", answer: "Prueba el waterzooi, un guiso cremoso de pollo o pescado, y termina con cuberdons, los caramelos con forma de nariz de Gante." },
+        { question: "¿Vale la pena ver el Altar de Gante?", answer: "Sí. La obra maestra de Van Eyck en la Catedral de San Bavón es una de las pinturas más importantes de Europa." },
+      ],
+      relatedItineraries: [
+        { slug: "bruges", city: "Brujas", days: 2, description: "Paseos junto al canal y plazas medievales." },
+        { slug: "brussels", city: "Bruselas", days: 3, description: "Grandes plazas y distritos de museos." },
+        { slug: "amsterdam", city: "Ámsterdam", days: 3, description: "Canales, museos y barrios." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    sintra: {
+      slug: "sintra",
+      city: "Sintra",
+      country: "Portugal",
+      days: 2,
+      pace: "Relajado",
+      idealFor: ["Amantes de palacios", "Paseantes de jardines", "Extensión de excursión"],
+      style: ["Palacios de cuento", "Paseos por el bosque", "Arquitectura romántica"],
+      pacing: [
+        "Las colinas de Sintra recompensan la paciencia. Visita un palacio importante por mañana cuando hay menos gente, luego pasa las tardes en jardines o en el centro del pueblo.",
+        "Los palacios están repartidos por laderas boscosas: agrupa los cercanos para minimizar trayectos en autobús. Pena y el Castillo de los Moros van bien juntos; Quinta da Regaleira y el centro se combinan naturalmente.",
+        "Reserva tiempo para el pueblo. Las calles sinuosas, las pastelerías y las queijadas merecen atención tranquila.",
+      ],
+      hero: {
+        title: "Sintra en 2 días",
+        subtitle:
+          "Palacios en la colina, jardines místicos y pasteles portugueses en un escenario de cuento.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1536663815808-535e2280d2c2?auto=format&fit=crop&w=1600&q=80",
+          alt: "Torres coloridas del Palacio da Pena emergiendo del bosque en Sintra.",
+        },
+      },
+      cityStats: [
+        { value: "1.000+", label: "Años de historia real" },
+        { value: "4", label: "Palacios Patrimonio de la UNESCO" },
+        { value: "500m", label: "Altitud del Palacio da Pena" },
+        { value: "30 min", label: "Tren desde Lisboa" },
+      ],
+      fit: {
+        forYou: ["Arquitectura romántica y jardines", "Una escapada de Lisboa a las colinas", "Oportunidades de fotografía", "Paseos por el bosque entre palacios", "Paradas para pasteles portugueses"],
+        notForYou: ["Tiempo de playa", "Caminatas llanas y fáciles", "Vida nocturna urbana", "Museos de arte moderno", "Viaje de mochilero económico"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Palacios en la colina",
+          summary: "Palacio da Pena y vistas del Castillo de los Moros.",
+          morning: "Palacio da Pena y parque circundante",
+          afternoon: "Murallas y miradores del Castillo de los Moros",
+          evening: "Cena en el centro del pueblo y paseo al atardecer",
+        },
+        {
+          day: 2,
+          title: "Jardines y pueblo",
+          summary: "Quinta da Regaleira y encanto del pueblo.",
+          morning: "Pozos y jardines de la Quinta da Regaleira",
+          afternoon: "Palacio Nacional y centro histórico",
+          evening: "Cata de pasteles y tren de vuelta por la tarde",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Colores del Palacio da Pena",
+          description:
+            "Las torres rojas y amarillas del Palacio da Pena emergen del bosque como algo de un libro de cuentos. La luz de la mañana hace resaltar los colores.",
+          image: {
+            src: "https://images.unsplash.com/photo-1548530537-a5765e3eab81?auto=format&fit=crop&w=1200&q=80",
+            alt: "Torres vibrantes del Palacio da Pena en Sintra rodeadas de bosque.",
+          },
+        },
+        {
+          title: "Quinta da Regaleira",
+          description:
+            "Túneles subterráneos, pozos iniciáticos y grutas ocultas hacen que esta finca parezca una aventura. Reserva al menos dos horas para explorar.",
+          image: {
+            src: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?auto=format&fit=crop&w=1200&q=80",
+            alt: "Escalera en espiral del Pozo Iniciático en la Quinta da Regaleira.",
+          },
+        },
+        {
+          title: "Paradas de pasteles del pueblo",
+          description:
+            "Las queijadas y los travesseiros son los dulces típicos de Sintra. Compra una caja en una pastelería del pueblo y disfrútalos en un banco.",
+          image: {
+            src: "https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pasteles portugueses tradicionales de Sintra.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Cómo llegar", value: "Tren de 40 minutos desde Lisboa Rossio" },
+        { label: "Transporte", value: "Autobús 434 en bucle a los palacios; camina por el pueblo" },
+        { label: "Entradas", value: "Reserva Pena y Quinta da Regaleira en línea" },
+        { label: "Alojamiento", value: "Centro del pueblo o cerca de la estación de tren" },
+      ],
+      checklist: [
+        "Reserva entrada con hora al Palacio da Pena",
+        "Reserva entradas a la Quinta da Regaleira",
+        "Lleva zapatos resistentes para las colinas",
+        "Lleva capas: las cumbres son más frescas",
+        "Guarda mapas sin conexión para los senderos",
+        "Prueba las queijadas y los travesseiros",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Sintra?", answer: "Sí. Dos días te permiten ver los palacios principales a un ritmo cómodo con tiempo para el pueblo y los jardines." },
+        { question: "¿Puedo hacer Sintra como excursión de un día?", answer: "Puedes ver uno o dos palacios en un día, pero quedarte una noche te permite disfrutar de mañanas y tardes más tranquilas." },
+        { question: "¿Cuántas cuestas hay?", answer: "Muchas. Los palacios están en colinas boscosas con caminos empinados. El autobús 434 ayuda, pero espera algo de subida." },
+        { question: "¿Qué palacio debería priorizar?", answer: "El Palacio da Pena es el más icónico. Si te gustan los misterios, los pozos y túneles de la Quinta da Regaleira son imprescindibles." },
+        { question: "¿Dónde debería alojarme?", answer: "El centro del pueblo te pone cerca de restaurantes y el tren. Quedarte una noche significa visitas matutinas tranquilas." },
+        { question: "¿Necesito reservar con antelación?", answer: "Sí para el Palacio da Pena y la Quinta da Regaleira en temporada alta. Las franjas de mañana se llenan rápido." },
+        { question: "¿Y el Castillo de los Moros?", answer: "Vale la pena por las vistas. Las murallas ofrecen panorámicas de Sintra y la costa." },
+      ],
+      relatedItineraries: [
+        { slug: "lisbon", city: "Lisboa", days: 3, description: "Colinas, tranvías y barrios junto al río." },
+        { slug: "porto", city: "Oporto", days: 3, description: "Vistas al río y calles históricas." },
+        { slug: "seville", city: "Sevilla", days: 3, description: "Plazas, Alcázar y encanto andaluz." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    oxford: {
+      slug: "oxford",
+      city: "Oxford",
+      country: "Reino Unido",
+      days: 2,
+      pace: "Relajado",
+      idealFor: ["Aficionados a la historia", "Amantes de los libros", "Fans de la arquitectura"],
+      style: ["Patios universitarios", "Visitas a bibliotecas", "Noches de pub"],
+      pacing: [
+        "Oxford se absorbe mejor lentamente. Los colleges revelan su belleza a través de patios tranquilos y jardines ocultos: correr entre ellos se pierde el punto.",
+        "Ancla las mañanas con un college o biblioteca importante, luego deja que la tarde fluya por mercados cubiertos, galerías de museos o paseos junto al río.",
+        "Reserva una noche para un pub tradicional. The Eagle and Child o Turf Tavern te conectan con el pasado literario de la ciudad tomando una pinta.",
+      ],
+      hero: {
+        title: "Oxford en 2 días",
+        subtitle:
+          "Colleges antiguos, bibliotecas de clase mundial y siglos de erudición en una ciudad caminable.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1752600379883-07e74678bc2a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Radcliffe Camera y agujas circundantes en Oxford al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "900+", label: "Años de enseñanza" },
+        { value: "38", label: "Colleges constituyentes" },
+        { value: "12M+", label: "Libros en las Bibliotecas Bodleianas" },
+        { value: "1h", label: "Tren desde Londres" },
+      ],
+      fit: {
+        forYou: ["Arquitectura histórica", "Conexiones literarias", "Patios y jardines tranquilos", "Museos y bibliotecas", "Cultura tradicional de pub"],
+        notForYou: ["Vacaciones de playa", "Discotecas modernas", "Viajes centrados en compras", "Deportes de aventura al aire libre", "Grandes parques temáticos"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Colleges y bibliotecas",
+          summary: "Bodleian, Radcliffe Camera y Christ Church.",
+          morning: "Tour de la Biblioteca Bodleiana y vistas de Radcliffe Camera",
+          afternoon: "Christ Church College y paseo por el prado",
+          evening: "Cena y copas en un pub histórico",
+        },
+        {
+          day: 2,
+          title: "Museos y mercados",
+          summary: "Ashmolean, Pitt Rivers y Covered Market.",
+          morning: "Puntos destacados del Museo Ashmolean",
+          afternoon: "Museo Pitt Rivers y Museo de Historia Natural",
+          evening: "Paseo por el Covered Market y cena de despedida",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "La Radcliffe Camera",
+          description:
+            "Esta biblioteca circular domina Radcliffe Square. No puedes entrar sin un tour de la Bodleian, pero solo el exterior vale la visita.",
+          image: {
+            src: "https://images.unsplash.com/photo-1570435456662-fc3a209fda28?auto=format&fit=crop&w=1200&q=80",
+            alt: "El edificio abovedado de la biblioteca Radcliffe Camera en Oxford.",
+          },
+        },
+        {
+          title: "Grandeza de Christ Church",
+          description:
+            "El college más grande de Oxford presenta un gran comedor que inspiró Harry Potter y una catedral dentro de sus muros.",
+          image: {
+            src: "https://images.unsplash.com/photo-1567604136436-4b95b7f67d29?auto=format&fit=crop&w=1200&q=80",
+            alt: "Patio y torre del Christ Church College en Oxford.",
+          },
+        },
+        {
+          title: "Pubs históricos",
+          description:
+            "The Eagle and Child acogió a Tolkien y C.S. Lewis. The Turf Tavern se esconde en un callejón. Ambos sirven pintas auténticas e historia.",
+          image: {
+            src: "https://images.unsplash.com/photo-1546622891-02c72c1537b6?auto=format&fit=crop&w=1200&q=80",
+            alt: "Interior de pub inglés tradicional con vigas de madera.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Cómo llegar", value: "Tren de 1 hora desde Londres Paddington" },
+        { label: "Transporte", value: "Camina por el centro; autobuses para Park and Ride" },
+        { label: "Entradas", value: "Reserva tours de Bodleian y Christ Church en línea" },
+        { label: "Alojamiento", value: "Centro de la ciudad o Jericho" },
+      ],
+      checklist: [
+        "Reserva tour de la Biblioteca Bodleiana",
+        "Reserva entrada a Christ Church",
+        "Lleva zapatos cómodos",
+        "Lleva paraguas o chubasquero",
+        "Guarda mapas sin conexión de Oxford",
+        "Planifica una cena tradicional de pub",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Oxford?", answer: "Sí para los colleges, bibliotecas y museos principales. Dos días te dan un ritmo relajado con tiempo para pubs y mercados." },
+        { question: "¿Puedo entrar a los colleges?", answer: "La mayoría de colleges abren a visitantes en horarios establecidos por una pequeña tarifa. Consulta los horarios ya que varían según el trimestre." },
+        { question: "¿Oxford es caminable?", answer: "Muy. El centro histórico es compacto y se explora mejor a pie." },
+        { question: "¿Dónde debería alojarme?", answer: "El centro de la ciudad te mantiene cerca de los colleges. Jericho ofrece un barrio más tranquilo con buenos restaurantes." },
+        { question: "¿Necesito reservar la Bodleian?", answer: "Sí. Los tours guiados requieren reserva anticipada, especialmente el tour extendido que incluye la Divinity School." },
+        { question: "¿Y las ubicaciones de Harry Potter?", answer: "El comedor de Christ Church y la Divinity School de la Bodleian aparecieron en las películas. Ambos son accesibles para visitantes." },
+        { question: "¿Los museos son gratis?", answer: "Sí. El Ashmolean, Pitt Rivers y el Museo de Historia Natural son todos gratuitos, aunque se agradecen las donaciones." },
+      ],
+      relatedItineraries: [
+        { slug: "london", city: "Londres", days: 3, description: "Monumentos icónicos, museos y paseos junto al río." },
+        { slug: "bath", city: "Bath", days: 2, description: "Baños romanos y arquitectura georgiana." },
+        { slug: "edinburgh", city: "Edimburgo", days: 3, description: "Vistas del castillo y calles históricas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    queenstown: {
+      slug: "queenstown",
+      city: "Queenstown",
+      country: "Nueva Zelanda",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Buscadores de paisajes", "Entusiastas del aire libre", "Amantes del vino"],
+      style: ["Vistas al lago", "Rutas de montaña", "Aventura opcional"],
+      pacing: [
+        "El drama de Queenstown se despliega a cualquier ritmo que elijas. Ya sea que busques adrenalina o prefieras un paseo en teleférico y almuerzo en viñedo, las montañas y el lago ponen el escenario.",
+        "Ancla cada día con una experiencia destacada—una ruta escénica, un crucero por el lago o un mirador en la colina—luego llena los huecos con paseos por la orilla y comidas largas.",
+        "Reserva al menos una tarde para las bodegas del Valle de Gibbston. El pinot noir de Otago Central combina perfectamente con las vistas a la montaña.",
+      ],
+      hero: {
+        title: "Queenstown en 3 días",
+        subtitle:
+          "Picos de montaña, lagos espejo y viñedos alpinos a tu propio ritmo.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=1600&q=80",
+          alt: "Lago Wakatipu y cordillera Remarkables en Queenstown.",
+        },
+      },
+      cityStats: [
+        { value: "310m", label: "Profundidad del lago Wakatipu" },
+        { value: "1.748m", label: "Altura del pico Remarkables" },
+        { value: "200+", label: "Bodegas de Otago Central" },
+        { value: "2M+", label: "Visitantes anuales" },
+      ],
+      fit: {
+        forYou: ["Paisajes de montaña y lago", "Rutas escénicas sin prisas", "Tardes de cata de vinos", "Actividades de aventura opcionales", "Oportunidades de fotografía"],
+        notForYou: ["Vacaciones de playa", "Vida nocturna de gran ciudad", "Viajes centrados en museos", "Terreno llano", "Calor tropical"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Lago y teleférico",
+          summary: "Paseos por la orilla y vistas desde la colina.",
+          morning: "Paseo marítimo y jardines de Queenstown",
+          afternoon: "Teleférico Skyline y circuitos de Luge",
+          evening: "Cena junto al lago con vistas a la montaña",
+        },
+        {
+          day: 2,
+          title: "Excursión a Glenorchy",
+          summary: "Ruta escénica y paisajes de El Señor de los Anillos.",
+          morning: "Conducir a Glenorchy a lo largo del lago Wakatipu",
+          afternoon: "Laguna de Glenorchy y vistas del río Dart",
+          evening: "Regreso a Queenstown para cenar",
+        },
+        {
+          day: 3,
+          title: "Vino y Arrowtown",
+          summary: "Visitas a bodegas y pueblo histórico de oro.",
+          morning: "Tour y cata en bodega del Valle de Gibbston",
+          afternoon: "Pueblo histórico de Arrowtown y calles de la época del oro",
+          evening: "Última noche junto al lago en Queenstown",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Espejo del lago Wakatipu",
+          description:
+            "En días de calma el lago refleja las montañas perfectamente. Las primeras horas de la mañana y las últimas de la tarde ofrecen la mejor luz para fotos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1469521669194-babb45599def?auto=format&fit=crop&w=1200&q=80",
+            alt: "Reflejo espejo de montañas en el lago Wakatipu.",
+          },
+        },
+        {
+          title: "Carretera de Glenorchy",
+          description:
+            "El trayecto de 45 minutos desde Queenstown a Glenorchy bordea el lago con vistas a las montañas todo el camino. Para a menudo para fotos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1508193638397-1c4234db14d9?auto=format&fit=crop&w=1200&q=80",
+            alt: "Carretera escénica a lo largo del lago Wakatipu hacia Glenorchy.",
+          },
+        },
+        {
+          title: "Vinos de Otago Central",
+          description:
+            "La región vinícola más austral del mundo produce un pinot noir excepcional. El Valle de Gibbston y Chard Farm son paradas fáciles desde el pueblo.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&q=80",
+            alt: "Hileras de viñedos con fondo de montañas en Otago Central.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Cómo llegar", value: "Vuelo al aeropuerto de Queenstown; 10 min al pueblo" },
+        { label: "Transporte", value: "Coche de alquiler para rutas escénicas; el pueblo es caminable" },
+        { label: "Entradas", value: "Reserva teleférico y paseos en jet en temporada alta" },
+        { label: "Alojamiento", value: "Centro del pueblo o junto al lago" },
+      ],
+      checklist: [
+        "Reserva coche de alquiler para rutas escénicas",
+        "Reserva entradas del Teleférico Skyline",
+        "Lleva capas para el tiempo de montaña",
+        "Lleva cámara para reflejos del lago",
+        "Planifica un almuerzo en bodega",
+        "Guarda mapas sin conexión para carreteras rurales",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Queenstown?", answer: "Sí para lo principal. Puedes disfrutar del lago, una ruta escénica, bodegas y Arrowtown a un ritmo relajado." },
+        { question: "¿Necesito coche?", answer: "Muy recomendado. Las mejores experiencias—Glenorchy, bodegas, Arrowtown—requieren conducir por rutas escénicas." },
+        { question: "¿Y las actividades de aventura?", answer: "Puenting, paracaidismo y jet boats están disponibles pero son opcionales. El paisaje es espectacular incluso sin ellos." },
+        { question: "¿Dónde debería alojarme?", answer: "El centro del pueblo te pone cerca de restaurantes y la orilla. Los hoteles junto al lago ofrecen vistas a las montañas." },
+        { question: "¿Cuándo es la mejor época para visitar?", answer: "El otoño (marzo-mayo) trae colores dorados. La primavera (sept-nov) tiene menos multitudes. El verano está lleno pero es cálido." },
+        { question: "¿Vale la pena la ruta de Glenorchy?", answer: "Absolutamente. La ruta de 45 minutos a lo largo del lago Wakatipu es una de las más escénicas de Nueva Zelanda." },
+        { question: "¿Debería visitar Milford Sound?", answer: "Es una excursión de un día largo (4+ horas cada trayecto). Con solo 3 días, céntrate en Queenstown y alrededores." },
+      ],
+      relatedItineraries: [
+        { slug: "auckland", city: "Auckland", days: 3, description: "Vistas al puerto y conos volcánicos." },
+        { slug: "wellington", city: "Wellington", days: 3, description: "Paseo marítimo y barrios compactos." },
+        { slug: "sydney", city: "Sídney", days: 3, description: "Playas, puerto y paseos costeros." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    interlaken: {
+      slug: "interlaken",
+      city: "Interlaken",
+      country: "Suiza",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de la montaña", "Viajeros en tren escénico", "Entusiastas de lagos"],
+      style: ["Vistas alpinas", "Pueblos lacustres", "Excursiones relajadas"],
+      pacing: [
+        "Interlaken se sitúa entre dos lagos con los picos del Jungfrau de fondo. Usa el pueblo como base y haz una excursión importante por día, dejando las tardes para relax junto al lago.",
+        "Las grandes excursiones de montaña—Jungfraujoch o Schilthorn—merecen mañanas completas. Empieza temprano para cielos despejados, luego desciende para una tarde más tranquila.",
+        "Reserva un día para el lado más tranquilo: un barco a Brienz, un paseo por Iseltwald, o simplemente ver el Eiger dorado al atardecer.",
+      ],
+      hero: {
+        title: "Interlaken en 3 días",
+        subtitle:
+          "Dos lagos, picos imponentes y pueblos de montaña suizos a un ritmo fácil.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1527668752968-14dc70a27c95?auto=format&fit=crop&w=1600&q=80",
+          alt: "Valle de Interlaken con lagos y los picos del Jungfrau de fondo.",
+        },
+      },
+      cityStats: [
+        { value: "3.454m", label: "Altitud del Jungfraujoch" },
+        { value: "2", label: "Lagos flanqueando Interlaken" },
+        { value: "150+", label: "Años de turismo" },
+        { value: "570m", label: "Altitud del pueblo" },
+      ],
+      fit: {
+        forYou: ["Paisajes de montaña sin senderismo extremo", "Experiencias de tren escénico", "Pueblos lacustres y paseos en barco", "Atmósfera alpina suiza", "Oportunidades de fotografía"],
+        notForYou: ["Vacaciones de playa", "Vida nocturna de gran ciudad", "Viaje de mochilero económico", "Paisajes llanos", "Resorts todo incluido"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Pueblo y Harder Kulm",
+          summary: "Orientación en Interlaken y mirador al atardecer.",
+          morning: "Parque Höhematte y paseo por el centro",
+          afternoon: "Funicular al Harder Kulm para vistas panorámicas",
+          evening: "Cena con vistas a los picos iluminados",
+        },
+        {
+          day: 2,
+          title: "Excursión al Jungfrau",
+          summary: "Viaje en tren a la Cima de Europa.",
+          morning: "Tren al Jungfraujoch vía Kleine Scheidegg",
+          afternoon: "Palacio de Hielo y mirador Sphinx",
+          evening: "Regreso a Interlaken para una cena tranquila",
+        },
+        {
+          day: 3,
+          title: "Lagos y pueblos",
+          summary: "Paseos en barco y encanto lacustre.",
+          morning: "Barco a Brienz y paseo por la orilla",
+          afternoon: "Pueblo de Iseltwald o Cascadas de Giessbach",
+          evening: "Última noche junto al lago Thun",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Alturas del Jungfraujoch",
+          description:
+            "La estación de tren más alta de Europa ofrece glaciares, cuevas de hielo y vistas que alcanzan cuatro países en días despejados.",
+          image: {
+            src: "https://images.unsplash.com/photo-1531210483974-4f8205670a71?auto=format&fit=crop&w=1200&q=80",
+            alt: "Picos nevados y glaciar en el Jungfraujoch.",
+          },
+        },
+        {
+          title: "Terraza de Harder Kulm",
+          description:
+            "Un corto viaje en funicular te lleva a una plataforma de observación suspendida entre lagos, con el Eiger, Mönch y Jungfrau directamente enfrente.",
+          image: {
+            src: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1200&q=80",
+            alt: "Plataforma de observación de Harder Kulm con vistas a Interlaken y los Alpes.",
+          },
+        },
+        {
+          title: "Pueblos lacustres",
+          description:
+            "Brienz e Iseltwald ofrecen un tranquilo encanto junto al agua, chalets de madera y la oportunidad de relajarse después de las excursiones de montaña.",
+          image: {
+            src: "https://images.unsplash.com/photo-1594735942592-3e9e7c8d8b4c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pueblo suizo tradicional de Iseltwald en el lago Brienz.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Junio a septiembre para picos despejados; diciembre a marzo para nieve" },
+        { label: "Cómo llegar", value: "Tren de 2,5 horas desde Zúrich o 2 horas desde Berna" },
+        { label: "Transporte", value: "El Swiss Travel Pass cubre trenes y barcos; compra billete del Jungfrau aparte" },
+        { label: "Entradas", value: "Reserva tren al Jungfraujoch con antelación en temporada alta" },
+        { label: "Alojamiento", value: "Centro del pueblo o cerca de la estación Interlaken Ost" },
+      ],
+      checklist: [
+        "Reserva billetes de tren al Jungfraujoch",
+        "Lleva capas cálidas para alta altitud",
+        "Lleva gafas de sol y protector solar para el reflejo de la nieve",
+        "Guarda horarios de tren sin conexión",
+        "Planifica un almuerzo junto al lago",
+        "Consulta previsión del tiempo para días de montaña",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Interlaken?", answer: "Sí para lo principal. Puedes hacer Jungfraujoch, Harder Kulm y un día de lago cómodamente sin prisas." },
+        { question: "¿Vale la pena el coste del viaje al Jungfraujoch?", answer: "Es caro pero inolvidable en un día despejado. Consulta las webcams antes de reservar para asegurar buena visibilidad." },
+        { question: "¿Necesito coche?", answer: "No. Trenes, barcos y funiculares conectan todo. Un Swiss Travel Pass simplifica la logística." },
+        { question: "¿Dónde debería alojarme?", answer: "El centro del pueblo es conveniente. Cerca de la estación Interlaken Ost te pone más cerca de los trenes del Jungfrau." },
+        { question: "¿Y si el tiempo es malo?", answer: "Harder Kulm y los barcos del lago funcionan en la mayoría de condiciones. Reserva el Jungfraujoch para el día más despejado de tu viaje." },
+        { question: "¿Debería visitar Lauterbrunnen?", answer: "Sí si tienes tiempo. El valle de las cascadas está de camino al Jungfraujoch y merece una parada." },
+        { question: "¿Interlaken es caminable?", answer: "Muy. El centro del pueblo es compacto y llano. La mayoría de excursiones salen de las estaciones de tren." },
+      ],
+      relatedItineraries: [
+        { slug: "zurich", city: "Zúrich", days: 3, description: "Paseos junto al lago y museos compactos." },
+        { slug: "lucerne", city: "Lucerna", days: 3, description: "Puente de la Capilla y acceso a montañas." },
+        { slug: "geneva", city: "Ginebra", days: 2, description: "Vistas al lago y casco antiguo compacto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "santa-fe": {
+      slug: "santa-fe",
+      city: "Santa Fe",
+      country: "EE. UU.",
+      days: 2,
+      pace: "Relajado",
+      idealFor: ["Amantes del arte", "Primera vez", "Caminantes tranquilos"],
+      style: ["Arquitectura adobe", "Galerías", "Luz del desierto"],
+      pacing: [
+        "Santa Fe se disfruta con calma. Ancla cada día en una zona—la Plaza y Canyon Road, o el Railyard y museos—y deja tiempo para comidas largas y galerías.",
+        "Agrupa el tiempo por barrio para caminar poco. El centro histórico es compacto; combina la Plaza con el Palace of the Governors por la mañana y dedica una tarde a Canyon Road o al Museo Georgia O'Keeffe.",
+        "Reserva una noche tranquila para un paseo por la Plaza y una cena relajada.",
+      ],
+      hero: {
+        title: "Santa Fe en 2 días",
+        subtitle:
+          "Calles adobe, galerías de arte y luz del desierto alto a un ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1689272290237-cd5364acf395?auto=format&fit=crop&w=1600&q=80",
+          alt: "Edificios adobe y luz cálida en Santa Fe.",
+        },
+      },
+      cityStats: [
+        { value: "400+", label: "Años de historia" },
+        { value: "250+", label: "Galerías de arte" },
+        { value: "2.100 m", label: "Altitud" },
+        { value: "80k+", label: "Habitantes" },
+      ],
+      fit: {
+        forYou: ["Arte y arquitectura adobe", "Centro compacto y caminable", "Ritmo relajado en dos días", "Primera vez en la ciudad", "Luz del desierto y calles tranquilas"],
+        notForYou: ["Solo playa o costa", "Vida nocturna intensa", "Días repletos solo de museos", "Parques temáticos", "Estilo mochilero low-cost"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Plaza y núcleo histórico",
+          summary: "Palace of the Governors, Plaza y calles adobe.",
+          morning: "Palace of the Governors y zona de la Plaza",
+          afternoon: "Galerías de Canyon Road y paseo adobe",
+          evening: "Cena cerca de la Plaza y paseo nocturno",
+        },
+        {
+          day: 2,
+          title: "Museos y Railyard",
+          summary: "Museo Georgia O'Keeffe y distrito Railyard.",
+          morning: "Museo Georgia O'Keeffe",
+          afternoon: "Railyard Arts District o Museum Hill",
+          evening: "Último paseo por la Plaza y cena tranquila",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Adobe y luz",
+          description:
+            "Los edificios adobe y la luz del desierto alto definen Santa Fe. Las mañanas y tardes son ideales para pasear y fotos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=1200&q=80",
+            alt: "Arquitectura adobe y luz del desierto en Santa Fe.",
+          },
+        },
+        {
+          title: "Canyon Road",
+          description:
+            "Galerías y estudios bordean esta calle histórica. Un paseo lento con paradas en algunas favoritas es mejor que correr.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=1200&q=80",
+            alt: "Galerías y muros adobe en Canyon Road, Santa Fe.",
+          },
+        },
+        {
+          title: "Vida en la Plaza",
+          description:
+            "La Plaza es el corazón del pueblo. Un rato en un banco con café o helado captura el ritmo de la ciudad.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Plaza de Santa Fe con edificios históricos y árboles.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Cómo llegar", value: "Aeropuerto Sunport de Albuquerque; shuttle o coche" },
+        { label: "Transporte", value: "A pie por el centro histórico; coche opcional para Museum Hill" },
+        { label: "Entradas", value: "Reserva el Museo O'Keeffe con antelación en temporada alta" },
+        { label: "Dónde alojarse", value: "Cerca de la Plaza o Canyon Road" },
+      ],
+      checklist: [
+        "Reserva entrada al Museo Georgia O'Keeffe",
+        "Lleva capas para mañanas frescas y tardes cálidas",
+        "Lleva protector solar y gorro",
+        "Guarda mapas sin conexión de Santa Fe",
+        "Planifica una pausa larga en galería o café",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Santa Fe?", answer: "Sí para lo esencial. Puedes ver la Plaza, Canyon Road y uno o dos museos con calma." },
+        { question: "¿Necesito coche?", answer: "No para el centro histórico. El coche ayuda para Museum Hill o excursiones a pueblos cercanos." },
+        { question: "¿Santa Fe es caminable?", answer: "Sí. La Plaza, Canyon Road y el Railyard están a poca distancia." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de la Plaza para estar en el centro. La zona de Canyon Road es más tranquila y también caminable." },
+        { question: "¿Y la altitud?", answer: "A 2.100 m, tómalo con calma el primer día. Hidrátate y no te excedas." },
+        { question: "¿Cuándo hay mejor luz?", answer: "Por la mañana y al atardecer. El sol del mediodía es fuerte; planifica paradas a la sombra o en interiores." },
+        { question: "¿Debo reservar restaurantes?", answer: "En sitios populares los fines de semana, sí. Entre semana suele bastar sin reserva." },
+      ],
+      relatedItineraries: [
+        { slug: "denver", city: "Denver", days: 3, description: "Vistas de montaña, cervecerías y paseos urbanos." },
+        { slug: "austin", city: "Austin", days: 3, description: "Música en vivo, comida y barrios relajados." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Patrimonio musical, comida sureña y centro." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    charleston: {
+      slug: "charleston",
+      city: "Charleston",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de la historia", "Comida primero"],
+      style: ["Calles históricas", "Paseos junto al agua", "Comida sureña"],
+      pacing: [
+        "Charleston se disfruta con calma. Ancla cada día en una zona—el Distrito Histórico, el frente fluvial o un museo y mercado—y deja tiempo para comidas largas y porches.",
+        "Agrupa el tiempo por barrio. La península es compacta; combina Rainbow Row con el Battery por la mañana y dedica otro día a King Street y el mercado.",
+        "Reserva una tarde tranquila para Waterfront Park o un paseo por el puerto.",
+      ],
+      hero: {
+        title: "Charleston en 3 días",
+        subtitle:
+          "Calles históricas, vistas al agua y comida sureña a un ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1653443109860-04c904bded58?auto=format&fit=crop&w=1600&q=80",
+          alt: "Calle histórica de Charleston con edificios pastel y adoquines.",
+        },
+      },
+      cityStats: [
+        { value: "350+", label: "Años de historia" },
+        { value: "2.800+", label: "Edificios históricos" },
+        { value: "6 km", label: "De frente fluvial" },
+        { value: "7M+", label: "Visitantes anuales" },
+      ],
+      fit: {
+        forYou: ["Arquitectura y calles históricas", "Paseos por el agua y parques", "Comida sureña y hospitalidad", "Un plan claro con margen", "Primera vez"],
+        notForYou: ["Solo playa", "Horario repleto solo de museos", "Vida nocturna hasta tarde", "Parques temáticos", "Turismo muy apresurado"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Núcleo del Distrito Histórico",
+          summary: "Rainbow Row, Battery y frente fluvial.",
+          morning: "Rainbow Row y paseo por East Battery",
+          afternoon: "Waterfront Park y vista al puerto",
+          evening: "Paseo por King Street y cena",
+        },
+        {
+          day: 2,
+          title: "Mercados y museos",
+          summary: "City Market, casas históricas y ritmo tranquilo.",
+          morning: "City Market y Barrio Francés",
+          afternoon: "Casa histórica o museo",
+          evening: "Cena en el distrito histórico",
+        },
+        {
+          day: 3,
+          title: "King Street y barrios",
+          summary: "Compras, galerías y últimos paseos.",
+          morning: "King Street y península sur",
+          afternoon: "Museo o jardín",
+          evening: "Último paseo junto al agua y cena",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Calles históricas",
+          description:
+            "Las casas pastel y las calles adoquinadas de Charleston parecen de otra época. Paseos lentos revelan detalles y vida en los porches.",
+          image: {
+            src: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&w=1200&q=80",
+            alt: "Casas históricas pastel y calle en Charleston.",
+          },
+        },
+        {
+          title: "Waterfront Park",
+          description:
+            "El muelle y el paseo ofrecen vistas al puerto y sombra. Un banco aquí es una buena pausa entre visitas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80",
+            alt: "Muelle del Waterfront Park y puerto en Charleston.",
+          },
+        },
+        {
+          title: "Comida sureña",
+          description:
+            "La cocina lowcountry y la hospitalidad sureña marcan el día. Planifica al menos una comida larga y tranquila.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+            alt: "Comida sureña y mesa en Charleston.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Cómo llegar", value: "Aeropuerto Internacional de Charleston; centro a 20 min" },
+        { label: "Transporte", value: "A pie por el centro histórico; pedicab o coche para trayectos largos" },
+        { label: "Entradas", value: "Reserva visitas a casas históricas en temporada alta" },
+        { label: "Dónde alojarse", value: "Distrito Histórico o Barrio Francés" },
+      ],
+      checklist: [
+        "Reserva una visita a casa histórica o museo",
+        "Lleva calzado cómodo para caminar",
+        "Lleva una capa ligera para el aire acondicionado",
+        "Guarda mapas sin conexión de Charleston",
+        "Planifica un almuerzo sureño largo",
+        "Lleva botella de agua reutilizable",
+        "Consulta eventos por temporada",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Charleston?", answer: "Sí para lo esencial. Puedes ver el Distrito Histórico, el frente fluvial, el mercado y uno o dos museos con calma." },
+        { question: "¿Charleston es caminable?", answer: "Sí. La península es compacta y llana. La mayoría de sitios están a unos 20 min a pie." },
+        { question: "¿Dónde alojarme?", answer: "El Distrito Histórico te mantiene en el centro. El Barrio Francés es más tranquilo y también caminable." },
+        { question: "¿Debo reservar restaurantes?", answer: "En sitios populares sí, sobre todo fines de semana. Reserva uno o dos y deja el resto flexible." },
+        { question: "¿Qué pasa con el calor y la humedad?", answer: "El verano puede ser muy caluroso. Madruga, haz pausas al mediodía y planifica sombra o interiores." },
+        { question: "¿Vale la pena el tour en carruaje?", answer: "Opcional. Caminar es gratis y flexible; los carruajes añaden relato si quieres una visión general." },
+        { question: "¿Cuándo hay mejor luz para fotos?", answer: "Por la mañana y al atardecer. Rainbow Row y el Battery se ven mejor con luz suave." },
+      ],
+      relatedItineraries: [
+        { slug: "savannah", city: "Savannah", days: 3, description: "Plazas históricas, río y ritmo sureño." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Patrimonio musical, comida y centro." },
+        { slug: "new-orleans", city: "Nueva Orleans", days: 3, description: "French Quarter, jazz y comida criolla." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    asheville: {
+      slug: "asheville",
+      city: "Asheville",
+      country: "EE. UU.",
+      days: 2,
+      pace: "Relajado",
+      idealFor: ["Primera vez", "Arte y naturaleza", "Comida y cerveza"],
+      style: ["Vistas de montaña", "Cervecerías", "Paseos por el centro"],
+      pacing: [
+        "Asheville se disfruta con calma. Ancla cada día en un foco—Biltmore o Blue Ridge Parkway, o centro y River Arts District—y deja tiempo para cervecerías y cafés.",
+        "Agrupa el tiempo por zona para minimizar coche. Combina Biltmore con una tarde relajada, o un tramo del Parkway y el centro en un día.",
+        "Reserva una noche abierta para cena en el centro y un paseo.",
+      ],
+      hero: {
+        title: "Asheville en 2 días",
+        subtitle:
+          "Vistas de montaña, cervecerías artesanales y un centro compacto a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1670446728605-29b68e95e8be?auto=format&fit=crop&w=1600&q=80",
+          alt: "Montañas Blue Ridge y bosque cerca de Asheville.",
+        },
+      },
+      cityStats: [
+        { value: "890+", label: "Hectáreas en Biltmore Estate" },
+        { value: "30+", label: "Cervecerías artesanales" },
+        { value: "650 m", label: "Altitud del centro" },
+        { value: "90k+", label: "Habitantes" },
+      ],
+      fit: {
+        forYou: ["Paisaje de montaña y Biltmore", "Cerveza artesanal y comida local", "Centro compacto", "Ritmo relajado en dos días", "Arte y galerías"],
+        notForYou: ["Solo playa o costa", "Solo vida nocturna intensa", "Días repletos de parques temáticos", "Senderismo largo en este plan", "Turismo muy apresurado"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Biltmore o Blue Ridge",
+          summary: "Jardines de la finca o vistas del Parkway y centro.",
+          morning: "Biltmore Estate: jardines y casa",
+          afternoon: "Pueblo Biltmore o vuelta al centro",
+          evening: "Cena en el centro y cervecería",
+        },
+        {
+          day: 2,
+          title: "Centro y River Arts",
+          summary: "Galerías, cervecerías y ambiente local.",
+          morning: "Centro de Asheville y Pack Square",
+          afternoon: "River Arts District o Grove Arcade",
+          evening: "Última cena y paseo",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Fondo de montaña",
+          description:
+            "Las Blue Ridge enmarcan Asheville. Incluso un corto trayecto por el Parkway o una vista desde el pueblo capta el entorno.",
+          image: {
+            src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+            alt: "Montañas Blue Ridge y colinas cerca de Asheville.",
+          },
+        },
+        {
+          title: "Centro y cervecerías",
+          description:
+            "El centro compacto tiene cervecerías, restaurantes y galerías. Un paseo lento con una parada o dos es mejor que correr.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle del centro de Asheville con tiendas y restaurantes.",
+          },
+        },
+        {
+          title: "Biltmore Estate",
+          description:
+            "La finca ofrece visitas a la casa, jardines y bodega. Planifica al menos medio día si vas; la luz de la mañana es mejor.",
+          image: {
+            src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
+            alt: "Arquitectura y jardines de Biltmore Estate.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Cómo llegar", value: "Aeropuerto Regional de Asheville o coche desde Charlotte" },
+        { label: "Transporte", value: "Coche útil para Biltmore y Parkway; el centro es caminable" },
+        { label: "Entradas", value: "Reserva Biltmore con antelación; entradas con fecha" },
+        { label: "Dónde alojarse", value: "Centro o cerca de Biltmore" },
+      ],
+      checklist: [
+        "Reserva entradas a Biltmore Estate",
+        "Lleva capas para el tiempo de montaña",
+        "Lleva calzado cómodo para caminar",
+        "Guarda mapas sin conexión de Asheville y Parkway",
+        "Planifica una pausa larga en cervecería o almuerzo",
+        "Consulta estado del Parkway en invierno",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Asheville?", answer: "Sí para lo esencial. Puedes hacer Biltmore o Parkway más centro con calma." },
+        { question: "¿Necesito coche?", answer: "Ayuda para Biltmore y Blue Ridge Parkway. El centro es caminable una vez allí." },
+        { question: "¿Vale la pena el coste de Biltmore?", answer: "Sí si te gustan las fincas y jardines. Planifica al menos medio día; los jardines son grandes." },
+        { question: "¿Dónde alojarme?", answer: "El centro te acerca a restaurantes y cervecerías. Cerca de Biltmore es más tranquilo." },
+        { question: "¿Y en invierno?", answer: "Frío y a veces hielo. Tramos del Parkway pueden cerrar. Biltmore y centro siguen siendo viables." },
+        { question: "¿Debo recorrer todo el Parkway?", answer: "Incluso un tramo corto (p. ej. a Craggy Gardens) da vistas estupendas. Todo el Parkway es un día largo." },
+        { question: "¿Debo reservar restaurantes?", answer: "En sitios populares los fines de semana, sí. Entre semana suele bastar sin reserva." },
+      ],
+      relatedItineraries: [
+        { slug: "nashville", city: "Nashville", days: 3, description: "Música, comida y centro." },
+        { slug: "charleston", city: "Charleston", days: 3, description: "Calles históricas y comida sureña." },
+        { slug: "savannah", city: "Savannah", days: 3, description: "Plazas, río y ritmo relajado." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    memphis: {
+      slug: "memphis",
+      city: "Memphis",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Amantes de la música", "Primera vez", "Comida primero"],
+      style: ["Blues y soul", "Frente fluvial", "Comida sureña"],
+      pacing: [
+        "Memphis se disfruta con un ritmo constante. Ancla cada día en una zona—Beale Street y museos, o Graceland, o el río y derechos civiles—y deja tiempo para barbacoa y música en vivo.",
+        "Agrupa el tiempo por barrio. El centro es caminable; Graceland queda a un corto trayecto. Combina el Museo Nacional de Derechos Civiles con un paseo por South Main en un día.",
+        "Reserva una noche tranquila para Beale Street o un paseo junto al río.",
+      ],
+      hero: {
+        title: "Memphis en 3 días",
+        subtitle:
+          "Patrimonio musical, paseos junto al río y barbacoa sureña a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1560651480-d2381777204f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Beale Street y neones en Memphis al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "200+", label: "Años de historia" },
+        { value: "20+", label: "Locales de música en vivo en Beale" },
+        { value: "8 km", label: "De frente fluvial" },
+        { value: "10M+", label: "Visitantes anuales" },
+      ],
+      fit: {
+        forYou: ["Historia del blues, soul y rock", "Barbacoa y comida sureña", "Paseos por el río y el centro", "Un plan claro con margen", "Primera vez"],
+        notForYou: ["Solo playa o costa", "Horario repleto solo de museos", "Solo ambiente muy tranquilo", "Parques temáticos", "Turismo muy apresurado"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Beale Street y centro",
+          summary: "Historia de la música, Beale Street y paseos por el centro.",
+          morning: "Beale Street y Sun Studio o Museo Stax",
+          afternoon: "Museo Nacional de Derechos Civiles",
+          evening: "Música en vivo en Beale Street y cena",
+        },
+        {
+          day: 2,
+          title: "Graceland y Elvis",
+          summary: "Graceland y exposiciones del museo.",
+          morning: "Mansión Graceland y exposiciones",
+          afternoon: "Recinto Graceland o vuelta al centro",
+          evening: "Cena en el centro y música opcional",
+        },
+        {
+          day: 3,
+          title: "Frente fluvial y barrios",
+          summary: "Vistas del Mississippi, South Main y últimas paradas.",
+          morning: "Mud Island o Tom Lee Park frente al río",
+          afternoon: "Distrito de arte South Main",
+          evening: "Última barbacoa o música",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Beale Street",
+          description:
+            "El corazón de la música en Memphis. De día es más tranquilo; por la noche llegan los neones y el blues en vivo. Un paseo lento y un local captan el ambiente.",
+          image: {
+            src: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
+            alt: "Beale Street de noche con neones en Memphis.",
+          },
+        },
+        {
+          title: "Frente fluvial del Mississippi",
+          description:
+            "El río define Memphis. Un paseo junto al agua o un corto crucero ofrecen otra perspectiva de la ciudad.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Río Mississippi y skyline de Memphis.",
+          },
+        },
+        {
+          title: "Barbacoa y soul food",
+          description:
+            "La barbacoa y la soul food de Memphis forman parte de la experiencia. Planifica al menos una comida larga y tranquila.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Barbacoa sureña y acompañamientos en Memphis.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a mayo o septiembre a octubre" },
+        { label: "Cómo llegar", value: "Aeropuerto Internacional de Memphis; centro a 15 min" },
+        { label: "Transporte", value: "A pie por el centro; coche o ride para Graceland" },
+        { label: "Entradas", value: "Reserva Graceland y Museo de Derechos Civiles con antelación" },
+        { label: "Dónde alojarse", value: "Centro o South Main" },
+      ],
+      checklist: [
+        "Reserva entradas a Graceland",
+        "Reserva hora en el Museo de Derechos Civiles",
+        "Lleva calzado cómodo para caminar",
+        "Guarda mapas sin conexión de Memphis",
+        "Planifica una noche larga de barbacoa o música",
+        "Lleva botella de agua reutilizable",
+        "Consulta la agenda de Beale Street",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Memphis?", answer: "Sí para lo esencial. Puedes ver Beale Street, Graceland, el Museo de Derechos Civiles y el frente fluvial con calma." },
+        { question: "¿El centro es caminable?", answer: "Sí. Beale Street, el río y South Main están a poca distancia." },
+        { question: "¿Cómo llego a Graceland?", answer: "En coche o ride-share; unos 15 min al sur del centro. Reserva medio día para la visita completa." },
+        { question: "¿Dónde alojarme?", answer: "El centro te acerca a Beale Street y al río. South Main es más tranquilo y también caminable." },
+        { question: "¿Debo reservar en sitios de barbacoa?", answer: "Los populares pueden tener cola en horas punta. Comer entre semana suele ser más fácil que cenar el fin de semana." },
+        { question: "¿Cuándo hay mejor música en vivo?", answer: "Por la noche en Beale Street. De día es más tranquilo; de noche hay más bandas y ambiente." },
+        { question: "¿Vale la pena el Museo de Derechos Civiles?", answer: "Sí. Planifica al menos dos horas. Es impactante y muy bien hecho; reserva en temporada alta." },
+      ],
+      relatedItineraries: [
+        { slug: "nashville", city: "Nashville", days: 3, description: "Patrimonio musical, comida y centro." },
+        { slug: "new-orleans", city: "Nueva Orleans", days: 3, description: "French Quarter, jazz y comida criolla." },
+        { slug: "austin", city: "Austin", days: 3, description: "Música en vivo, comida y ambiente al aire libre." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    savannah: {
+      slug: "savannah",
+      city: "Savannah",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de la historia", "Caminantes tranquilos"],
+      style: ["Plazas históricas", "Frente fluvial", "Ritmo sureño"],
+      pacing: [
+        "Savannah se disfruta con calma. Ancla cada día en una zona—las plazas históricas, River Street o un museo y jardín—y deja tiempo para almuerzos largos y bancos a la sombra.",
+        "Agrupa el tiempo por barrio. La cuadrícula de plazas es compacta; combina Forsyth Park con las plazas del sur por la mañana y dedica otro día a River Street y el paseo de los factors.",
+        "Reserva una tarde tranquila para un banco en una plaza o un paseo lento junto al río.",
+      ],
+      hero: {
+        title: "Savannah en 3 días",
+        subtitle:
+          "Plazas históricas, calles con robles y paseos junto al río a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1599666782416-c5b8ed6e480d?auto=format&fit=crop&w=1600&q=80",
+          alt: "Plaza histórica de Savannah con robles y fuente.",
+        },
+      },
+      cityStats: [
+        { value: "22", label: "Plazas históricas" },
+        { value: "270+", label: "Años de historia" },
+        { value: "3 km", label: "De frente fluvial" },
+        { value: "14M+", label: "Visitantes anuales" },
+      ],
+      fit: {
+        forYou: ["Plazas y arquitectura históricas", "Paseos por el río y parques", "Comida sureña y hospitalidad", "Un plan claro con margen", "Primera vez"],
+        notForYou: ["Solo playa", "Horario repleto solo de museos", "Vida nocturna hasta tarde", "Parques temáticos", "Turismo muy apresurado"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Plazas históricas y Forsyth",
+          summary: "Forsyth Park, plazas y calles con robles.",
+          morning: "Forsyth Park y fuente",
+          afternoon: "Plazas de Bull Street y Monterey Square",
+          evening: "Cena en el Distrito Histórico",
+        },
+        {
+          day: 2,
+          title: "River Street y paseo de los factors",
+          summary: "Frente fluvial, adoquines y vistas al puerto.",
+          morning: "River Street y paseo de los factors",
+          afternoon: "City Market o museos del puerto",
+          evening: "Cena en River Street y paseo nocturno",
+        },
+        {
+          day: 3,
+          title: "Museos y barrios",
+          summary: "Casa-museo, jardines y últimos paseos.",
+          morning: "Casa histórica o jardín",
+          afternoon: "Plazas restantes y Broughton Street",
+          evening: "Último paseo por las plazas y cena",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Las plazas",
+          description:
+            "Las 22 plazas de Savannah son salas de estar al aire libre. Sombra de robles, fuentes y bancos invitan a pausas lentas entre visitas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Plaza histórica de Savannah con robles y fuente.",
+          },
+        },
+        {
+          title: "River Street",
+          description:
+            "El frente fluvial adoquinado bordea el río Savannah. Restaurantes, tiendas y vistas al puerto para un paseo relajado.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "River Street y frente fluvial en Savannah.",
+          },
+        },
+        {
+          title: "Calles con robles",
+          description:
+            "El musgo español y los robles vivos definen las calles. La luz de la mañana y del atardecer es mejor para pasear y fotos.",
+          image: {
+            src: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle con robles en el Distrito Histórico de Savannah.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Cómo llegar", value: "Aeropuerto Savannah/Hilton Head; centro a 20 min" },
+        { label: "Transporte", value: "A pie por la cuadrícula histórica; ferry gratuito al otro lado del río" },
+        { label: "Entradas", value: "Reserva visitas a casas históricas en temporada alta" },
+        { label: "Dónde alojarse", value: "Distrito Histórico cerca de una plaza" },
+      ],
+      checklist: [
+        "Reserva una visita a casa histórica o jardín",
+        "Lleva calzado cómodo para caminar",
+        "Lleva una capa ligera para el aire acondicionado",
+        "Guarda mapas sin conexión de Savannah",
+        "Planifica un almuerzo sureño largo",
+        "Lleva botella de agua reutilizable",
+        "Consulta eventos y festivales por temporada",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Savannah?", answer: "Sí para lo esencial. Puedes ver las plazas principales, River Street y uno o dos museos con calma." },
+        { question: "¿Savannah es caminable?", answer: "Sí. La cuadrícula histórica es compacta y llana. La mayoría de sitios están a unos 15 min a pie." },
+        { question: "¿Dónde alojarme?", answer: "El Distrito Histórico cerca de una plaza te mantiene en el centro. Evita alojarte lejos de la cuadrícula si quieres caminar." },
+        { question: "¿Debo reservar restaurantes?", answer: "En sitios populares sí, sobre todo fines de semana. Reserva uno o dos y deja el resto flexible." },
+        { question: "¿Qué pasa con el calor y la humedad?", answer: "El verano puede ser muy caluroso. Madruga, usa la sombra de las plazas y planifica interiores o frente fluvial al mediodía." },
+        { question: "¿Vale la pena el tour en trolley?", answer: "Opcional. Caminar es gratis y flexible; los trolleys añaden relato si quieres una visión general primero." },
+        { question: "¿Cuándo hay mejor luz para fotos?", answer: "Por la mañana y al atardecer. Las plazas y las calles con robles se ven mejor con luz suave." },
+      ],
+      relatedItineraries: [
+        { slug: "charleston", city: "Charleston", days: 3, description: "Calles históricas, frente fluvial y comida sureña." },
+        { slug: "new-orleans", city: "Nueva Orleans", days: 3, description: "French Quarter, jazz y comida criolla." },
+        { slug: "nashville", city: "Nashville", days: 3, description: "Patrimonio musical, comida y centro." },
       ],
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
