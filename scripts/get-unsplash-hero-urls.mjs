@@ -5,6 +5,7 @@
  * Usage: node scripts/get-unsplash-hero-urls.mjs
  *        node scripts/get-unsplash-hero-urls.mjs --hero-only   (only the 16 city-guide cities)
  *        node scripts/get-unsplash-hero-urls.mjs --hero-only --by-id  (fetch 5 fallback cities by photo ID; use if search hits rate limit)
+ *        node scripts/get-unsplash-hero-urls.mjs --replace-hero  (only the 10 city-guide hero replacement slugs)
  * If rate limit is hit, run again later or use --hero-only --by-id for oxford, santa-fe, asheville, savannah, graz.
  */
 
@@ -57,6 +58,17 @@ const QUERIES = [
   { slug: 'catania', city: 'Catania', query: 'Catania Sicily city' },
   { slug: 'minneapolis', city: 'Minneapolis', query: 'Minneapolis Minnesota skyline' },
   { slug: 'santo-domingo', city: 'Santo Domingo', query: 'Santo Domingo colonial' },
+  // Hero replacement set (use --replace-hero to run only these)
+  { slug: 'vientiane', city: 'Vientiane', query: 'Vientiane Laos Pha That Luang Mekong' },
+  { slug: 'yangon', city: 'Yangon', query: 'Yangon Myanmar Shwedagon Pagoda' },
+  { slug: 'guatemala-city', city: 'Guatemala City', query: 'Guatemala City Guatemala skyline' },
+  { slug: 'san-jose-costa-rica', city: 'San José', query: 'San Jose Costa Rica National Theatre city' },
+  { slug: 'addis-ababa', city: 'Addis Ababa', query: 'Addis Ababa Ethiopia city' },
+  { slug: 'reims', city: 'Reims', query: 'Reims Cathedral France champagne' },
+  { slug: 'bremen', city: 'Bremen', query: 'Bremen Germany Markt Roland' },
+  { slug: 'hanover', city: 'Hanover', query: 'Hanover Germany Herrenhausen Gardens' },
+  { slug: 'limerick', city: 'Limerick', query: 'Limerick Ireland King John Castle Shannon' },
+  { slug: 'ostrava', city: 'Ostrava', query: 'Ostrava Czech Republic Dolni Vitkovice' },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -64,6 +76,11 @@ const base = 'https://api.unsplash.com/search/photos';
 const photoBase = 'https://api.unsplash.com/photos';
 const HERO_ONLY = process.argv.includes('--hero-only');
 const BY_ID = process.argv.includes('--by-id');
+const REPLACE_HERO = process.argv.includes('--replace-hero');
+const HERO_REPLACEMENT_SLUGS = [
+  'vientiane', 'yangon', 'guatemala-city', 'san-jose-costa-rica', 'addis-ababa',
+  'reims', 'bremen', 'hanover', 'limerick', 'ostrava',
+];
 // Known Unsplash photo IDs for cities that often get NO_RESULT from search (e.g. due to rate limit)
 const PHOTO_IDS = {
   oxford: '73Y466xwLJM',
@@ -72,9 +89,11 @@ const PHOTO_IDS = {
   savannah: 'r2Uz3Rbs6hE',
   graz: '4vSb71TnB5A',
 };
-const queriesToRun = HERO_ONLY
-  ? QUERIES.filter((q) => ['oxford', 'santa-fe', 'asheville', 'savannah', 'graz'].includes(q.slug))
-  : QUERIES;
+const queriesToRun = REPLACE_HERO
+  ? QUERIES.filter((q) => HERO_REPLACEMENT_SLUGS.includes(q.slug))
+  : HERO_ONLY
+    ? QUERIES.filter((q) => ['oxford', 'santa-fe', 'asheville', 'savannah', 'graz'].includes(q.slug))
+    : QUERIES;
 
 if (BY_ID && HERO_ONLY) {
   for (const slug of Object.keys(PHOTO_IDS)) {

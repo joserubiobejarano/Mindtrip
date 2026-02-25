@@ -1723,6 +1723,701 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    reims: {
+      slug: "reims",
+      city: "Reims",
+      country: "France",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Champagne fans", "Cathedral and history"],
+      style: ["Cathedral", "Champagne houses", "Compact center"],
+      pacing: [
+        "Reims works well in two calm days. Day one: cathedral and a champagne house. Day two: old town and a second cellar or museum.",
+        "The center is small and walkable. Group the cathedral with Place Drouet d'Erlon, then add the Tau Palace or a cellar tour.",
+        "Book at least one champagne visit in advance; leave the rest of the time for cafes and short strolls.",
+      ],
+      hero: {
+        title: "Reims in 2 days",
+        subtitle:
+          "Cathedral, champagne cellars, and a compact historic center at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1551566521-71f20843069f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Reims Cathedral facade with Gothic details.",
+        },
+      },
+      cityStats: [
+        { value: "800+", label: "Years of cathedral history" },
+        { value: "Champagne", label: "Capital of the region" },
+        { value: "Compact", label: "Walkable center" },
+      ],
+      fit: {
+        forYou: ["Cathedral and heritage", "Champagne tastings", "Short break", "Walkable city", "Calm pacing"],
+        notForYou: ["Beach or outdoors only", "Heavy nightlife", "Long countryside drives only", "Museum-heavy week", "Budget-only trip"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Cathedral and champagne",
+          summary: "Notre-Dame de Reims and a cellar visit.",
+          morning: "Reims Cathedral and Tau Palace",
+          afternoon: "Place Drouet d'Erlon and lunch",
+          evening: "Champagne house tour and tasting",
+        },
+        {
+          day: 2,
+          title: "Old town and second cellar",
+          summary: "Historic streets and another champagne stop.",
+          morning: "Old town streets and Porte de Mars",
+          afternoon: "Second champagne house or museum",
+          evening: "Dinner and a short stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The cathedral",
+          description:
+            "Notre-Dame de Reims is a Gothic landmark. Allow time for the facade and interior.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569949230765-2a2c4b0c0b0b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Reims Cathedral with rose window and towers.",
+          },
+        },
+        {
+          title: "Champagne cellars",
+          description:
+            "Tours and tastings are the city's signature. Book ahead for popular houses.",
+          image: {
+            src: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80",
+            alt: "Champagne bottles in a Reims cellar.",
+          },
+        },
+        {
+          title: "Place Drouet d'Erlon",
+          description:
+            "The main pedestrian strip is ideal for cafes, people-watching, and a slow meal.",
+          image: {
+            src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cafe terrace on a Reims street.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October" },
+        { label: "Getting there", value: "TGV from Paris; direct to Reims Centre" },
+        { label: "Transit", value: "Center is walkable; no car needed" },
+        { label: "Tastings", value: "Book champagne visits in advance" },
+        { label: "Stay", value: "Near cathedral or Place Drouet d'Erlon" },
+      ],
+      checklist: [
+        "Book at least one champagne house visit",
+        "Comfortable shoes for cathedral and cobblestones",
+        "Light layer for cellars",
+        "Save offline map of center",
+        "Plan one slow cafe break",
+        "Refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Reims?",
+          answer:
+            "Yes. One day for the cathedral and a cellar, one for the old town and a second tasting or museum. Keeps the pace relaxed.",
+        },
+        {
+          question: "Do I need to book champagne tours?",
+          answer:
+            "Yes for popular houses, especially at weekends. Book a few days ahead in peak season.",
+        },
+        {
+          question: "Is Reims walkable?",
+          answer:
+            "Yes. The cathedral, Place Drouet d'Erlon, and most cellars are within a short walk.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near the cathedral or along Place Drouet d'Erlon for easy access to sights and restaurants.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Cathedral opens mid-morning; start there then move to lunch and a cellar. No need to rush.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots, yes on weekends. Otherwise you can walk in for lunch or dinner.",
+        },
+        {
+          question: "Can I do Reims as a day trip from Paris?",
+          answer:
+            "Yes by TGV, but two days lets you enjoy the cathedral, two cellars, and the old town without rushing.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "paris", city: "Paris", days: 3, description: "Landmarks, museums, and cafes." },
+        { slug: "lyon", city: "Lyon", days: 3, description: "Food, old town, and riverside walks." },
+        { slug: "strasbourg", city: "Strasbourg", days: 2, description: "Cathedral, canals, and half-timbered streets." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bremen: {
+      slug: "bremen",
+      city: "Bremen",
+      country: "Germany",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Fairytale charm", "Compact city breaks"],
+      style: ["Markt square", "Schnoor quarter", "Riverside walks"],
+      pacing: [
+        "Bremen fits two calm days. Day one: Markt, Town Hall, Roland and Böttcherstraße. Day two: Schnoor and the Weser.",
+        "The center is small. You can walk from the Markt to Schnoor in minutes; leave time for coffee and cake.",
+        "One museum or tower is enough; keep the rest of the day flexible for strolls.",
+      ],
+      hero: {
+        title: "Bremen in 2 days",
+        subtitle:
+          "Markt square, Schnoor quarter, and relaxed riverside walks without rushing.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1743951362118-fa011ef9720b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Bremen Markt with Town Hall and Roland statue.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Town Hall and Roland" },
+        { value: "Compact", label: "Walkable Altstadt" },
+        { value: "Weser", label: "River promenade" },
+      ],
+      fit: {
+        forYou: ["Fairytale squares", "Short city break", "Walkable center", "Cafe and cake", "Relaxed pace"],
+        notForYou: ["Beach only", "Heavy nightlife", "Long day trips only", "Many museums in one day", "Remote nature only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Markt and Böttcherstraße",
+          summary: "Town Hall, Roland, and the art street.",
+          morning: "Markt square, Town Hall and Roland",
+          afternoon: "Böttcherstraße and lunch",
+          evening: "Riverside or Markt area dinner",
+        },
+        {
+          day: 2,
+          title: "Schnoor and Weser",
+          summary: "Historic lanes and river views.",
+          morning: "Schnoor quarter streets",
+          afternoon: "Weser promenade and Schlanke Mathilde",
+          evening: "Last stroll and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The Markt",
+          description:
+            "Town Hall and Roland are UNESCO-listed. The square is the heart of the city.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555242354-90933d7da551?auto=format&fit=crop&w=1200&q=80",
+            alt: "Bremen Town Hall and Roland in the Markt.",
+          },
+        },
+        {
+          title: "Schnoor",
+          description:
+            "Narrow lanes and old houses. Ideal for a slow walk and a cafe stop.",
+          image: {
+            src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+            alt: "Schnoor quarter narrow street in Bremen.",
+          },
+        },
+        {
+          title: "Weser promenade",
+          description:
+            "The river runs along the old town. A short walk here rounds off the day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Weser river and Bremen waterfront.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October" },
+        { label: "Getting there", value: "Train from Hamburg, Hanover, or Berlin" },
+        { label: "Transit", value: "Center is walkable" },
+        { label: "Tickets", value: "Town Hall tour bookable in advance" },
+        { label: "Stay", value: "Near Markt or Schnoor" },
+      ],
+      checklist: [
+        "Comfortable walking shoes",
+        "Light layer for evenings",
+        "Offline map of Altstadt",
+        "Plan one cafe and cake stop",
+        "Refillable water bottle",
+        "Check Town Hall tour times",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Bremen?",
+          answer:
+            "Yes. One day for Markt, Roland and Böttcherstraße, one for Schnoor and the Weser. Pace stays relaxed.",
+        },
+        {
+          question: "Do I need to book the Town Hall?",
+          answer:
+            "Tours run at set times; booking ahead is useful in peak season.",
+        },
+        {
+          question: "Is Bremen walkable?",
+          answer:
+            "Yes. The Markt, Schnoor and Weser are all within a short walk.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near the Markt or in the Schnoor area for easy access to sights and restaurants.",
+        },
+        {
+          question: "What time should I start?",
+          answer:
+            "Markt is lively from mid-morning. No need to start very early; two days is unhurried.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular places at weekends, yes. Otherwise walk-ins are usually fine.",
+        },
+        {
+          question: "Can I combine Bremen with Hamburg?",
+          answer:
+            "Yes. Hamburg is about an hour by train; both work as a short break or combined trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "hamburg", city: "Hamburg", days: 3, description: "Harbor, canals, and neighborhoods." },
+        { slug: "hanover", city: "Hanover", days: 2, description: "Gardens, old town, and Maschsee." },
+        { slug: "cologne", city: "Cologne", days: 3, description: "Cathedral, Rhine, and old town." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    hanover: {
+      slug: "hanover",
+      city: "Hanover",
+      country: "Germany",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Gardens and parks", "Compact breaks"],
+      style: ["Herrenhausen", "Old town", "Maschsee"],
+      pacing: [
+        "Hanover in two days: one for Herrenhausen Gardens and the other for the old town and Maschsee.",
+        "The center is compact. Start at the Marktkirche area, then walk to the lake or the gardens by tram.",
+        "Leave an afternoon free for a lake walk or a relaxed cafe so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Hanover in 2 days",
+        subtitle:
+          "Herrenhausen Gardens, old town, and calm walks by the Maschsee.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1690138988740-410136b760a1?auto=format&fit=crop&w=1600&q=80",
+          alt: "Herrenhausen Gardens in Hanover with baroque layout.",
+        },
+      },
+      cityStats: [
+        { value: "Baroque", label: "Herrenhausen Gardens" },
+        { value: "Compact", label: "Walkable center" },
+        { value: "Maschsee", label: "Lake and promenade" },
+      ],
+      fit: {
+        forYou: ["Gardens and green space", "Short break", "Walkable city", "Calm pace", "One or two museums"],
+        notForYou: ["Beach only", "Heavy nightlife", "Many museums in one day", "Remote hiking only", "Fast-paced touring"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Herrenhausen Gardens",
+          summary: "Baroque gardens and museum.",
+          morning: "Herrenhausen Gardens and Großer Garten",
+          afternoon: "Museum or greenhouse, then return to center",
+          evening: "Dinner in old town",
+        },
+        {
+          day: 2,
+          title: "Old town and Maschsee",
+          summary: "Marktkirche, streets and lake.",
+          morning: "Marktkirche and old town streets",
+          afternoon: "Maschsee promenade",
+          evening: "Last stroll and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Herrenhausen Gardens",
+          description:
+            "The baroque gardens are Hanover's highlight. Allow half a day for a relaxed visit.",
+          image: {
+            src: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=80",
+            alt: "Herrenhausen baroque gardens in Hanover.",
+          },
+        },
+        {
+          title: "Old town",
+          description:
+            "Marktkirche and the surrounding streets form a compact, walkable core.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "Hanover old town with Marktkirche.",
+          },
+        },
+        {
+          title: "Maschsee",
+          description:
+            "The lake is ideal for a walk or a short boat trip. Calm way to end the day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Maschsee lake and promenade in Hanover.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for gardens" },
+        { label: "Getting there", value: "Train from Hamburg, Berlin, or Frankfurt" },
+        { label: "Transit", value: "Tram to Herrenhausen; center walkable" },
+        { label: "Tickets", value: "Gardens charge entry; check opening times" },
+        { label: "Stay", value: "Near Marktkirche or Maschsee" },
+      ],
+      checklist: [
+        "Comfortable shoes for gardens and lake",
+        "Light layer for evenings",
+        "Offline map",
+        "Plan one cafe break",
+        "Refillable water bottle",
+        "Check garden opening times",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Hanover?",
+          answer:
+            "Yes. One day for Herrenhausen, one for the old town and Maschsee. Keeps the pace relaxed.",
+        },
+        {
+          question: "Do I need to book the gardens?",
+          answer:
+            "Usually not; buy tickets at the entrance. Check for special events.",
+        },
+        {
+          question: "Is Hanover walkable?",
+          answer:
+            "The center is. Use the tram for Herrenhausen and optionally for Maschsee.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near Marktkirche for the old town, or near Maschsee for lake walks.",
+        },
+        {
+          question: "What time should I start?",
+          answer:
+            "Gardens open mid-morning. No need to rush; two days is enough.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots at weekends, yes. Otherwise walk-ins are often fine.",
+        },
+        {
+          question: "Can I combine Hanover with Hamburg?",
+          answer:
+            "Yes. About 1.5 hours by train; both work for a short break or combined trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "hamburg", city: "Hamburg", days: 3, description: "Harbor, canals, and neighborhoods." },
+        { slug: "bremen", city: "Bremen", days: 2, description: "Markt, Schnoor, and riverside." },
+        { slug: "berlin", city: "Berlin", days: 3, description: "Museums, history, and neighborhoods." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    limerick: {
+      slug: "limerick",
+      city: "Limerick",
+      country: "Ireland",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and river", "Short breaks"],
+      style: ["King John's Castle", "Shannon", "Walkable center"],
+      pacing: [
+        "Limerick in two days: castle and river one day, museums and streets the next. Keep the pace calm.",
+        "The center is small. You can walk from the castle to the Hunt Museum and the river in minutes.",
+        "Leave an afternoon free for a riverside walk or a pub so the trip feels relaxed.",
+      ],
+      hero: {
+        title: "Limerick in 2 days",
+        subtitle:
+          "King John's Castle, River Shannon, and a walkable city center at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1660687446300-b05801428ca9?auto=format&fit=crop&w=1600&q=80",
+          alt: "King John's Castle and River Shannon in Limerick.",
+        },
+      },
+      cityStats: [
+        { value: "13th c.", label: "King John's Castle" },
+        { value: "Shannon", label: "River through city" },
+        { value: "Compact", label: "Walkable center" },
+      ],
+      fit: {
+        forYou: ["Castle and history", "River walks", "Short break", "Walkable city", "Pub and cafe"],
+        notForYou: ["Beach only", "Heavy nightlife", "Many museums in one day", "Remote countryside only", "Fast-paced touring"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Castle and river",
+          summary: "King John's Castle and Shannon walks.",
+          morning: "King John's Castle and exhibition",
+          afternoon: "Riverside walk and Treaty Stone",
+          evening: "Dinner in city center",
+        },
+        {
+          day: 2,
+          title: "Museums and streets",
+          summary: "Hunt Museum and old town.",
+          morning: "Hunt Museum or St. Mary's Cathedral",
+          afternoon: "O'Connell Street and Georgian quarter",
+          evening: "Pub or dinner and last stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "King John's Castle",
+          description:
+            "The castle dominates the river. Allow a couple of hours for the exhibition and views.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569949230765-2a2c4b0c0b0b?auto=format&fit=crop&w=1200&q=80",
+            alt: "King John's Castle on the Shannon in Limerick.",
+          },
+        },
+        {
+          title: "River Shannon",
+          description:
+            "The river runs through the city. A short walk along the banks is a calm way to spend time.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "River Shannon at Limerick.",
+          },
+        },
+        {
+          title: "City center",
+          description:
+            "O'Connell Street and the Georgian area are compact and good for a slow stroll.",
+          image: {
+            src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1200&q=80",
+            alt: "Limerick city center street.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to September" },
+        { label: "Getting there", value: "Train or bus from Dublin, Cork, or Shannon Airport" },
+        { label: "Transit", value: "Center is walkable" },
+        { label: "Tickets", value: "Book castle online in peak season" },
+        { label: "Stay", value: "Near O'Connell Street or the river" },
+      ],
+      checklist: [
+        "Book castle ticket in peak season",
+        "Comfortable walking shoes",
+        "Rain jacket",
+        "Offline map",
+        "Plan one pub or cafe stop",
+        "Refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Limerick?",
+          answer:
+            "Yes. One day for the castle and river, one for museums and streets. Pace stays relaxed.",
+        },
+        {
+          question: "Do I need to book the castle?",
+          answer:
+            "In peak season, yes. Otherwise you can often buy at the door.",
+        },
+        {
+          question: "Is Limerick walkable?",
+          answer:
+            "Yes. Castle, Hunt Museum, river and center are within a short walk.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near O'Connell Street or the river for easy access to sights and restaurants.",
+        },
+        {
+          question: "What time should I start?",
+          answer:
+            "Castle opens mid-morning. Two days gives you plenty of time; no need to rush.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular pubs or restaurants at weekends, yes. Otherwise walk-ins are common.",
+        },
+        {
+          question: "Can I combine with Cork or Galway?",
+          answer:
+            "Yes. Both are about an hour by train or bus; good for a longer Ireland trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "dublin", city: "Dublin", days: 3, description: "Trinity, pubs, and riverside." },
+        { slug: "cork", city: "Cork", days: 2, description: "English Market, river, and compact center." },
+        { slug: "galway", city: "Galway", days: 3, description: "Streets, music, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    ostrava: {
+      slug: "ostrava",
+      city: "Ostrava",
+      country: "Czech Republic",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Industrial heritage", "Offbeat city breaks"],
+      style: ["Dolní Vítkovice", "Castle", "Relaxed walks"],
+      pacing: [
+        "Ostrava in two days: one for Dolní Vítkovice and the other for the castle and city center.",
+        "The former industrial sites are the main draw; add the castle and Stodolní for variety.",
+        "Keep one afternoon flexible for a cafe or a slow walk so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Ostrava in 2 days",
+        subtitle:
+          "Industrial heritage, Dolní Vítkovice, and relaxed city walks.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1678501715674-55c5daa4b23f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Dolní Vítkovice industrial site in Ostrava.",
+        },
+      },
+      cityStats: [
+        { value: "Industrial", label: "Dolní Vítkovice complex" },
+        { value: "Castle", label: "Ostrava Castle" },
+        { value: "Stodolní", label: "Street and nightlife" },
+      ],
+      fit: {
+        forYou: ["Industrial heritage", "Short break", "Offbeat destination", "Walkable core", "Calm pace"],
+        notForYou: ["Classic fairy-tale towns only", "Beach only", "Heavy museum days", "Remote nature only", "Fast-paced touring"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Dolní Vítkovice",
+          summary: "Former ironworks and viewpoints.",
+          morning: "Dolní Vítkovice area and Bolt Tower",
+          afternoon: "Exhibitions or guided tour",
+          evening: "Dinner in center or Stodolní",
+        },
+        {
+          day: 2,
+          title: "Castle and center",
+          summary: "Ostrava Castle and city streets.",
+          morning: "Ostrava Castle and museum",
+          afternoon: "City center and Masaryk Square",
+          evening: "Last stroll and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Dolní Vítkovice",
+          description:
+            "The former ironworks are now a culture and heritage site. Allow half a day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1589519160732-57fc498494f8?auto=format&fit=crop&w=1200&q=80",
+            alt: "Dolní Vítkovice industrial heritage in Ostrava.",
+          },
+        },
+        {
+          title: "Ostrava Castle",
+          description:
+            "The castle houses a museum and gives a contrast to the industrial sites.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569949230765-2a2c4b0c0b0b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Ostrava Castle and courtyard.",
+          },
+        },
+        {
+          title: "City center",
+          description:
+            "Masaryk Square and the surrounding streets are compact and good for a short walk.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "Ostrava city center and square.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October" },
+        { label: "Getting there", value: "Train from Prague, Brno, or Krakow" },
+        { label: "Transit", value: "Tram and bus; center walkable" },
+        { label: "Tickets", value: "Dolní Vítkovice and castle charge entry" },
+        { label: "Stay", value: "Near center or Stodolní" },
+      ],
+      checklist: [
+        "Comfortable walking shoes",
+        "Check Dolní Vítkovice opening times",
+        "Offline map",
+        "Plan one cafe break",
+        "Refillable water bottle",
+        "Light layer for evenings",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Ostrava?",
+          answer:
+            "Yes. One day for Dolní Vítkovice, one for the castle and center. Keeps the pace relaxed.",
+        },
+        {
+          question: "Do I need to book Dolní Vítkovice?",
+          answer:
+            "For guided tours or events, yes. General entry is usually available at the door.",
+        },
+        {
+          question: "Is Ostrava walkable?",
+          answer:
+            "The center is. Use tram or bus for Dolní Vítkovice and the castle.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near the center or Stodolní for restaurants and easy access to sights.",
+        },
+        {
+          question: "What time should I start?",
+          answer:
+            "Dolní Vítkovice opens mid-morning. Two days is enough; no need to rush.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular places at weekends, yes. Otherwise walk-ins are often fine.",
+        },
+        {
+          question: "Can I combine Ostrava with Prague?",
+          answer:
+            "Yes. About 3 hours by train; good for a longer Czech trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "prague", city: "Prague", days: 3, description: "Old Town, castle, and river." },
+        { slug: "krakow", city: "Krakow", days: 3, description: "Square, castle, and old town." },
+        { slug: "vienna", city: "Vienna", days: 3, description: "Palaces, museums, and grand avenues." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
     baltimore: {
       slug: "baltimore",
       city: "Baltimore",
@@ -40149,6 +40844,606 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    vientiane: {
+      slug: "vientiane",
+      city: "Vientiane",
+      country: "Laos",
+      days: 3,
+      pace: "Relaxed",
+      idealFor: ["First-timers", "Temple lovers", "Slow travelers"],
+      style: ["Buddhist temples", "Mekong riverside", "Cafe stops"],
+      pacing: [
+        "Vientiane rewards a slow pace. Focus on one or two temples per day, long coffee breaks, and sunset along the Mekong.",
+        "Group sights by area to keep walks short. The riverside and historic quarter are compact; leave room for markets and street food.",
+        "Save an open afternoon for a riverside stroll or a quiet temple so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Vientiane in 3 days",
+        subtitle:
+          "Temples, Mekong sunsets, and relaxed riverside pacing for first-time visitors.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1677727644366-d002e7a147b6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Pha That Luang golden stupa in Vientiane at golden hour.",
+        },
+      },
+      cityStats: [
+        { value: "400+", label: "Years as capital" },
+        { value: "20+", label: "Temples and wats" },
+        { value: "1.8 km", label: "Mekong riverfront" },
+        { value: "200K+", label: "Residents" },
+      ],
+      fit: {
+        forYou: ["Temple hopping with breaks", "Riverside sunsets", "Compact walkable center", "Calm, low-key pace", "Markets and street food"],
+        notForYou: ["Nightlife focus", "Packed museum days", "Long day trips", "Adventure activities", "Rushed sightseeing"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Riverside and historic temples",
+          summary: "Mekong promenade and Wat Si Saket area.",
+          morning: "Mekong riverside walk and morning market",
+          afternoon: "Wat Si Saket and Haw Phra Kaew",
+          evening: "Sunset by the river and dinner",
+        },
+        {
+          day: 2,
+          title: "Pha That Luang and surrounds",
+          summary: "Golden stupa and nearby sights.",
+          morning: "Pha That Luang and grounds",
+          afternoon: "Patuxai and park",
+          evening: "Riverside or night market",
+        },
+        {
+          day: 3,
+          title: "Markets and last stops",
+          summary: "Morning market, cafes, and relaxed wrap-up.",
+          morning: "Talat Sao or Talat Thong Khan Kham",
+          afternoon: "Cafe break and last temple or museum",
+          evening: "Final riverside stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Temples and stupas",
+          description:
+            "Vientiane's wats are calm and photogenic. Plan morning visits to avoid heat and leave afternoons light.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569024897167-0b2d2e3f4a5b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Buddhist temple in Vientiane with golden details.",
+          },
+        },
+        {
+          title: "Mekong riverside",
+          description:
+            "The riverfront is the city's living room. Sunset walks and evening food stalls set a relaxed tone.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mekong river at dusk in Vientiane.",
+          },
+        },
+        {
+          title: "Markets and cafes",
+          description:
+            "Morning markets and roadside coffee make for easy, slow-paced days between temple visits.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Street scene and cafe in Vientiane.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to February" },
+        { label: "Airport transfer", value: "Taxi or tuk-tuk to center" },
+        { label: "Transit tips", value: "Walk the center; tuk-tuk for farther temples" },
+        { label: "Ticketing", value: "Small fee at main temples" },
+        { label: "Neighborhood stay", value: "Riverside or near Nam Phu" },
+      ],
+      checklist: [
+        "Pack light, breathable clothes",
+        "Carry sunscreen and a hat",
+        "Save offline maps",
+        "Plan one slow cafe break daily",
+        "Carry a refillable water bottle",
+        "Respect temple dress codes",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Vientiane?", answer: "Yes. The city is compact. You can cover the main temples, riverside, and markets at a relaxed pace with room for breaks." },
+        { question: "Do I need to book temples in advance?", answer: "No. Entry is walk-up. Just dress modestly and remove shoes where required." },
+        { question: "Is Vientiane walkable?", answer: "Yes. The center and riverside are walkable. Use tuk-tuks for Pha That Luang or in the heat." },
+        { question: "Where should I stay?", answer: "Near the Mekong or Nam Phu for easy walks to temples and the river." },
+        { question: "What time should I start each day?", answer: "Mornings are cooler and better for temples. Take a long break at midday and resume in the afternoon." },
+        { question: "Do I need to book restaurants?", answer: "Usually no. Street food and casual spots are walk-in. Reserve only for a special dinner if you like." },
+        { question: "Is the Mekong safe to swim?", answer: "Generally not recommended. Enjoy the views and riverside walks instead." },
+      ],
+      relatedItineraries: [
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Golden temples, markets, and street food." },
+        { slug: "hanoi", city: "Hanoi", days: 3, description: "Old Quarter, lakes, and Vietnamese food." },
+        { slug: "chiang-mai", city: "Chiang Mai", days: 3, description: "Temples, old city, and mountain views." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    yangon: {
+      slug: "yangon",
+      city: "Yangon",
+      country: "Myanmar",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Temple lovers", "Culture seekers"],
+      style: ["Golden pagodas", "Colonial streets", "Markets"],
+      pacing: [
+        "Yangon works best at a steady pace. Anchor each day with one major sight—Shwedagon, downtown, or a market—then leave room for tea shops and street walks.",
+        "Group time by area. Shwedagon deserves a long morning or evening; pair downtown and Bogyoke on another day.",
+        "Keep one afternoon flexible for heat breaks, cafes, or a second visit to Shwedagon at sunset.",
+      ],
+      hero: {
+        title: "Yangon in 3 days",
+        subtitle:
+          "Golden pagodas, colonial downtown, and calm temple pacing for first-time visitors.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1515832730975-869da433df66?auto=format&fit=crop&w=1600&q=80",
+          alt: "Shwedagon Pagoda in Yangon at golden hour.",
+        },
+      },
+      cityStats: [
+        { value: "2,500+", label: "Years of Shwedagon" },
+        { value: "99 m", label: "Shwedagon height" },
+        { value: "5M+", label: "Metro population" },
+        { value: "Colonial", label: "Downtown heritage" },
+      ],
+      fit: {
+        forYou: ["Iconic pagoda visits", "Colonial architecture", "Markets and tea culture", "Walkable downtown", "Sunset at Shwedagon"],
+        notForYou: ["Beach or nature focus", "Nightlife", "Rushed temple-hopping", "Long day trips", "Heavy museum days"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Shwedagon Pagoda",
+          summary: "Full morning or evening at the golden pagoda.",
+          morning: "Shwedagon Pagoda and grounds",
+          afternoon: "Rest or nearby Kandawgyi Lake",
+          evening: "Shwedagon at sunset or dinner",
+        },
+        {
+          day: 2,
+          title: "Colonial downtown",
+          summary: "Historic streets and Bogyoke Market.",
+          morning: "Downtown colonial buildings and Sule Pagoda",
+          afternoon: "Bogyoke Market and streets",
+          evening: "Chinatown or riverside",
+        },
+        {
+          day: 3,
+          title: "Temples and wrap-up",
+          summary: "Botataung or Chaukhtatgyi and last stops.",
+          morning: "Botataung Pagoda or Chaukhtatgyi Buddha",
+          afternoon: "Tea shop and last market stroll",
+          evening: "Final pagoda visit or dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Shwedagon at golden hour",
+          description:
+            "The pagoda glows at sunrise and sunset. Plan at least one visit in late afternoon or evening.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555242354-90933d7da551?auto=format&fit=crop&w=1200&q=80",
+            alt: "Shwedagon Pagoda golden stupa in Yangon.",
+          },
+        },
+        {
+          title: "Colonial downtown",
+          description:
+            "Downtown Yangon has one of the largest collections of colonial-era buildings in Asia. Walk slowly and look up.",
+          image: {
+            src: "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colonial building in downtown Yangon.",
+          },
+        },
+        {
+          title: "Markets and tea shops",
+          description:
+            "Bogyoke Market and street tea shops are where the city slows down. Leave time for both.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Market and street life in Yangon.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to February" },
+        { label: "Airport transfer", value: "Taxi or bus to center" },
+        { label: "Transit tips", value: "Walk downtown; taxi or circular train for distance" },
+        { label: "Ticketing", value: "Shwedagon and main pagodas have entry fees" },
+        { label: "Neighborhood stay", value: "Downtown or near Shwedagon" },
+      ],
+      checklist: [
+        "Dress modestly for temples",
+        "Remove shoes at pagoda entrances",
+        "Pack sunscreen and a hat",
+        "Save offline maps",
+        "Plan one tea-shop break daily",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Yangon?", answer: "Yes for Shwedagon, downtown, and markets. You can add a second Shwedagon visit or a day trip if you have energy." },
+        { question: "When is the best time for Shwedagon?", answer: "Early morning or late afternoon into evening. Light is best and it is cooler." },
+        { question: "Is Yangon walkable?", answer: "Downtown is walkable. Use taxis or the circular train for Shwedagon or Bogyoke if you prefer." },
+        { question: "Where should I stay?", answer: "Downtown keeps you close to colonial streets and Bogyoke; near Shwedagon is good for evening visits." },
+        { question: "Do I need to book pagodas?", answer: "No. Pay at the gate. Dress modestly and follow local rules (no shorts, remove shoes)." },
+        { question: "Are restaurants easy to find?", answer: "Yes. Tea shops, street food, and restaurants are plentiful. Reserve only for a special meal." },
+        { question: "Is it safe to travel in Yangon?", answer: "Check current travel advice. In normal times the city is used to visitors; take usual precautions." },
+      ],
+      relatedItineraries: [
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Golden temples, markets, and street food." },
+        { slug: "hanoi", city: "Hanoi", days: 3, description: "Old Quarter, lakes, and Vietnamese food." },
+        { slug: "chiang-mai", city: "Chiang Mai", days: 3, description: "Temples, old city, and mountain views." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "guatemala-city": {
+      slug: "guatemala-city",
+      city: "Guatemala City",
+      country: "Guatemala",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture seekers", "Museum fans"],
+      style: ["Historic center", "Museums", "Easy pacing"],
+      pacing: [
+        "Guatemala City rewards a calm approach. One or two main sights per day, with time for lunch and short walks, works well.",
+        "Focus on Zone 1 and Zone 10 for the historic center and museums. Keep transit light by grouping nearby stops.",
+        "Leave one afternoon open for a market, cafe, or rest so the trip stays relaxed.",
+      ],
+      hero: {
+        title: "Guatemala City in 3 days",
+        subtitle:
+          "Historic center, museums, and calm urban pacing for first-time visitors.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1713063297072-051cb0e1f7f7?auto=format&fit=crop&w=1600&q=80",
+          alt: "Guatemala City skyline and urban view.",
+        },
+      },
+      cityStats: [
+        { value: "3M+", label: "Metro population" },
+        { value: "Zone 1", label: "Historic center" },
+        { value: "Multiple", label: "Museums and sites" },
+        { value: "Highland", label: "Altitude ~1,500 m" },
+      ],
+      fit: {
+        forYou: ["Museums and history", "Compact center", "Markets and food", "Calm pace", "Day-trip base"],
+        notForYou: ["Beach focus", "Nightlife", "Packed schedules", "Adventure-only", "Very long day trips"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Historic center",
+          summary: "Zone 1, plaza, and main sights.",
+          morning: "Plaza Mayor and Cathedral",
+          afternoon: "Palacio Nacional or museums",
+          evening: "Dinner in Zone 1 or 10",
+        },
+        {
+          day: 2,
+          title: "Museums and culture",
+          summary: "Museo Popol Vuh, Ixchel, or similar.",
+          morning: "Museo Popol Vuh or archaeology museum",
+          afternoon: "Ixchel or another museum",
+          evening: "Relaxed dinner and stroll",
+        },
+        {
+          day: 3,
+          title: "Markets and wrap-up",
+          summary: "Market visit and last stops.",
+          morning: "Central Market or Mercado de Artesanías",
+          afternoon: "La Aurora Zoo or last museum",
+          evening: "Final dinner or prep for travel",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Historic Zone 1",
+          description:
+            "The center has colonial-era buildings and a busy plaza. Mornings are good for walking before the heat.",
+          image: {
+            src: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic center of Guatemala City.",
+          },
+        },
+        {
+          title: "Museums",
+          description:
+            "Popol Vuh and Ixchel offer strong Maya and textile collections. Plan a few hours for one or two.",
+          image: {
+            src: "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?auto=format&fit=crop&w=1200&q=80",
+            alt: "Museum or cultural site in Guatemala City.",
+          },
+        },
+        {
+          title: "Markets and food",
+          description:
+            "Central Market and local eateries give a taste of daily life. Go in the morning for the best selection.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Market in Guatemala City.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to April" },
+        { label: "Airport transfer", value: "Taxi or shuttle to center" },
+        { label: "Transit tips", value: "Taxis or Uber for cross-town; Zone 1 is walkable" },
+        { label: "Ticketing", value: "Museums have modest entry fees" },
+        { label: "Neighborhood stay", value: "Zone 1 or Zone 10" },
+      ],
+      checklist: [
+        "Pack for mild highland weather",
+        "Carry sunscreen and a hat",
+        "Save offline maps",
+        "Plan one relaxed lunch daily",
+        "Carry a refillable water bottle",
+        "Check opening hours for museums",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Guatemala City?", answer: "Yes for the center, a few museums, and markets. You can add a half-day trip to Antigua if you like." },
+        { question: "Do I need to book museums?", answer: "Usually no. Walk-in is fine. Check hours; some close Monday." },
+        { question: "Is the city walkable?", answer: "Zone 1 is walkable. Use taxis or Uber for Zone 10 or other areas." },
+        { question: "Where should I stay?", answer: "Zone 1 for history and plaza; Zone 10 for museums and quieter streets." },
+        { question: "Is it safe?", answer: "Stick to main areas and daytime. Use official taxis or Uber; avoid walking alone late at night." },
+        { question: "What about day trips to Antigua?", answer: "Antigua is about an hour away. You can do a half- or full-day trip from the city." },
+        { question: "Do I need to book restaurants?", answer: "Most places are walk-in. Reserve for a special dinner if you prefer." },
+      ],
+      relatedItineraries: [
+        { slug: "panama-city", city: "Panama City", days: 3, description: "Canal, Casco Viejo, and waterfront." },
+        { slug: "quito", city: "Quito", days: 3, description: "Historic center and Andean views." },
+        { slug: "mexico-city", city: "Mexico City", days: 3, description: "Historic center, museums, and food." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "san-jose-costa-rica": {
+      slug: "san-jose-costa-rica",
+      city: "San José",
+      country: "Costa Rica",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture seekers", "Urban explorers"],
+      style: ["Museums", "Markets", "Walkable center"],
+      pacing: [
+        "San José works well at a calm pace. One headline sight per day—theatre, museum, or market—plus time for coffee and walks keeps the trip relaxed.",
+        "The center is compact. Group the National Theatre, Plaza de la Cultura, and Central Market on one day; add museums on another.",
+        "Leave one afternoon open for a cafe, park, or last-minute market so the schedule stays flexible.",
+      ],
+      hero: {
+        title: "San José in 3 days",
+        subtitle:
+          "National Theatre, markets, and relaxed city pacing for first-time visitors.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1582035437103-a63fd343177f?auto=format&fit=crop&w=1600&q=80",
+          alt: "San José cityscape with mountains in the background.",
+        },
+      },
+      cityStats: [
+        { value: "1.4M", label: "Metro population" },
+        { value: "1897", label: "National Theatre opened" },
+        { value: "Central", label: "Valley location" },
+        { value: "Coffee", label: "Capital of coffee culture" },
+      ],
+      fit: {
+        forYou: ["Theatre and museums", "Markets and food", "Compact center", "Coffee culture", "Calm pace"],
+        notForYou: ["Beach-only trip", "Nightlife focus", "Rushed sightseeing", "Adventure-only", "Long day trips only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "National Theatre and plaza",
+          summary: "Theatre tour, Plaza de la Cultura, and center walk.",
+          morning: "National Theatre tour and interior",
+          afternoon: "Plaza de la Cultura and nearby streets",
+          evening: "Dinner in the center",
+        },
+        {
+          day: 2,
+          title: "Museums and parks",
+          summary: "Museums and a green break.",
+          morning: "Museo del Oro or Museo de Jade",
+          afternoon: "Parque La Sabana or another museum",
+          evening: "Relaxed dinner",
+        },
+        {
+          day: 3,
+          title: "Central Market and wrap-up",
+          summary: "Market, cafes, and last stops.",
+          morning: "Central Market and breakfast",
+          afternoon: "Cafe and last museum or park",
+          evening: "Final dinner or travel prep",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "National Theatre",
+          description:
+            "The theatre is the city's landmark. Book a tour to see the interior and learn its history.",
+          image: {
+            src: "https://images.unsplash.com/photo-1514306199707-a089e7c2e1e4?auto=format&fit=crop&w=1200&q=80",
+            alt: "National Theatre of Costa Rica in San José.",
+          },
+        },
+        {
+          title: "Central Market",
+          description:
+            "The market is full of produce, snacks, and local life. Mornings are best for a relaxed stroll.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Central Market in San José.",
+          },
+        },
+        {
+          title: "Coffee and parks",
+          description:
+            "San José is a coffee capital. Pair a cafe stop with a walk in La Sabana or another park.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cafe and street in San José.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "December to April" },
+        { label: "Airport transfer", value: "Taxi or bus to center" },
+        { label: "Transit tips", value: "Walk the center; bus or taxi for suburbs" },
+        { label: "Ticketing", value: "Book National Theatre tour in advance" },
+        { label: "Neighborhood stay", value: "Center or Barrio Amón" },
+      ],
+      checklist: [
+        "Book National Theatre tour",
+        "Pack a light layer for rain",
+        "Save offline maps",
+        "Plan one cafe break daily",
+        "Carry a refillable water bottle",
+        "Check museum opening hours",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for San José?", answer: "Yes for the theatre, a couple of museums, and the market. You can add a day trip to a coffee farm or volcano." },
+        { question: "Do I need to book the National Theatre?", answer: "Tours are popular. Booking ahead is recommended, especially in high season." },
+        { question: "Is San José walkable?", answer: "The center is walkable. Use buses or taxis for La Sabana or other neighborhoods." },
+        { question: "Where should I stay?", answer: "Center or Barrio Amón for easy access to the theatre, plaza, and market." },
+        { question: "What about safety?", answer: "Stick to main areas and daytime. Keep valuables secure and use official taxis at night." },
+        { question: "Do I need to book restaurants?", answer: "Most places are walk-in. Reserve for a special dinner if you like." },
+        { question: "Can I do a coffee tour from the city?", answer: "Yes. Half-day coffee tours are common; book through your hotel or a local operator." },
+      ],
+      relatedItineraries: [
+        { slug: "panama-city", city: "Panama City", days: 3, description: "Canal, Casco Viejo, and waterfront." },
+        { slug: "quito", city: "Quito", days: 3, description: "Historic center and Andean views." },
+        { slug: "mexico-city", city: "Mexico City", days: 3, description: "Historic center, museums, and food." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "addis-ababa": {
+      slug: "addis-ababa",
+      city: "Addis Ababa",
+      country: "Ethiopia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture seekers", "Coffee lovers"],
+      style: ["Museums", "Markets", "Coffee culture"],
+      pacing: [
+        "Addis Ababa rewards a steady pace. One or two main sights per day—museum, market, or cathedral—plus time for coffee and walks works well.",
+        "Group sights by area. Mercato, the National Museum, and Holy Trinity can be spread over two days with room for breaks.",
+        "Leave one afternoon open for a coffee ceremony or a relaxed market stroll so the trip stays calm.",
+      ],
+      hero: {
+        title: "Addis Ababa in 3 days",
+        subtitle:
+          "Museums, Mercato, and coffee culture at a calm pace for first-time visitors.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1668003314070-9ef38c3cafb8?auto=format&fit=crop&w=1600&q=80",
+          alt: "Addis Ababa cityscape with mountains in the distance.",
+        },
+      },
+      cityStats: [
+        { value: "3.3M+", label: "City population" },
+        { value: "2,400 m", label: "Altitude" },
+        { value: "Birthplace", label: "Of coffee" },
+        { value: "UNECA", label: "African Union HQ" },
+      ],
+      fit: {
+        forYou: ["Museums and history", "Markets and coffee", "Compact center", "Calm pace", "Cultural depth"],
+        notForYou: ["Beach focus", "Nightlife", "Rushed tours", "Adventure-only", "Minimal walking"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "National Museum and Lucy",
+          summary: "National Museum and key historic sites.",
+          morning: "National Museum of Ethiopia and Lucy",
+          afternoon: "Holy Trinity Cathedral or nearby",
+          evening: "Dinner and coffee ceremony",
+        },
+        {
+          day: 2,
+          title: "Mercato and streets",
+          summary: "Mercato market and local neighborhoods.",
+          morning: "Mercato market and stalls",
+          afternoon: "Rest or Red Terror Martyrs Memorial",
+          evening: "Dinner in Bole or Piassa",
+        },
+        {
+          day: 3,
+          title: "Museums and wrap-up",
+          summary: "Ethnological or other museum and last stops.",
+          morning: "Ethnological Museum or St. George Cathedral",
+          afternoon: "Cafe and last market or museum",
+          evening: "Final dinner or travel prep",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "National Museum",
+          description:
+            "Lucy and the archaeology hall are the highlights. Plan at least two hours for a relaxed visit.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569024897167-0b2d2e3f4a5b?auto=format&fit=crop&w=1200&q=80",
+            alt: "National Museum of Ethiopia in Addis Ababa.",
+          },
+        },
+        {
+          title: "Mercato",
+          description:
+            "One of Africa's largest markets. Go in the morning and take your time; it can feel overwhelming but is rewarding.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mercato market in Addis Ababa.",
+          },
+        },
+        {
+          title: "Coffee culture",
+          description:
+            "Ethiopia is the birthplace of coffee. A traditional ceremony is a must; allow an hour to enjoy it.",
+          image: {
+            src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80",
+            alt: "Ethiopian coffee ceremony in Addis Ababa.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to June" },
+        { label: "Airport transfer", value: "Taxi or ride app to center" },
+        { label: "Transit tips", value: "Taxis for distance; some areas walkable" },
+        { label: "Ticketing", value: "Museums have entry fees" },
+        { label: "Neighborhood stay", value: "Bole or Piassa" },
+      ],
+      checklist: [
+        "Pack for high altitude and sun",
+        "Carry sunscreen and a hat",
+        "Save offline maps",
+        "Plan one coffee ceremony",
+        "Carry a refillable water bottle",
+        "Respect religious sites",
+      ],
+      faqs: [
+        { question: "Is 3 days enough for Addis Ababa?", answer: "Yes for the National Museum, Mercato, and a couple of churches or museums. You can add a day trip if you like." },
+        { question: "Do I need to book museums?", answer: "Usually no. Walk-in is fine. Check opening hours." },
+        { question: "Is the city walkable?", answer: "Parts are walkable; taxis are useful for Mercato and cross-town. Altitude may tire you at first." },
+        { question: "Where should I stay?", answer: "Bole is modern and convenient; Piassa is more central and historic." },
+        { question: "What about altitude?", answer: "Addis is at 2,400 m. Take it easy the first day; stay hydrated." },
+        { question: "Do I need to book restaurants?", answer: "Most places are walk-in. Reserve for a special dinner if you prefer." },
+        { question: "Is Mercato safe?", answer: "Go in the morning and keep valuables secure. It is busy; normal precautions apply." },
+      ],
+      relatedItineraries: [
+        { slug: "nairobi", city: "Nairobi", days: 3, description: "Museums, parks, and wildlife options." },
+        { slug: "cairo", city: "Cairo", days: 3, description: "Pyramids, museums, and bazaars." },
+        { slug: "accra", city: "Accra", days: 3, description: "Independence sites, markets, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
   }),
   es: withDefaults("es", {
     paris: {
@@ -74074,6 +75369,676 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { slug: "charleston", city: "Charleston", days: 3, description: "Calles históricas, frente fluvial y comida sureña." },
         { slug: "new-orleans", city: "Nueva Orleans", days: 3, description: "French Quarter, jazz y comida criolla." },
         { slug: "nashville", city: "Nashville", days: 3, description: "Patrimonio musical, comida y centro." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    vientiane: {
+      slug: "vientiane",
+      city: "Vientián",
+      country: "Laos",
+      days: 3,
+      pace: "Tranquilo",
+      idealFor: ["Primera vez", "Amantes de templos", "Viajeros tranquilos"],
+      style: ["Templos budistas", "Ribera del Mekong", "Paradas en cafés"],
+      pacing: [
+        "Vientián se disfruta con calma. Centra cada día en uno o dos templos, pausas para café y atardecer junto al Mekong.",
+        "Agrupa los sitios por zona para caminar poco. La ribera y el barrio histórico son compactos; deja tiempo para mercados y comida callejera.",
+        "Reserva una tarde libre para un paseo junto al río o un templo tranquilo.",
+      ],
+      hero: {
+        title: "Vientián en 3 días",
+        subtitle:
+          "Templos, atardeceres en el Mekong y ritmo relajado para quien visita por primera vez.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1677727644366-d002e7a147b6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Estupa dorada de Pha That Luang en Vientián a la hora dorada.",
+        },
+      },
+      cityStats: [
+        { value: "400+", label: "Años como capital" },
+        { value: "20+", label: "Templos y wats" },
+        { value: "1,8 km", label: "Frente fluvial Mekong" },
+        { value: "200.000+", label: "Habitantes" },
+      ],
+      fit: {
+        forYou: ["Templos con pausas", "Atardeceres en el río", "Centro compacto y caminable", "Ritmo tranquilo", "Mercados y comida callejera"],
+        notForYou: ["Solo vida nocturna", "Días repletos de museos", "Excursiones largas", "Solo aventura", "Turismo muy apresurado"],
+      },
+      dayPlans: [
+        { day: 1, title: "Ribera y templos históricos", summary: "Paseo junto al Mekong y zona de Wat Si Saket.", morning: "Paseo junto al Mekong y mercado matinal", afternoon: "Wat Si Saket y Haw Phra Kaew", evening: "Atardecer junto al río y cena" },
+        { day: 2, title: "Pha That Luang y alrededores", summary: "Estupa dorada y alrededores.", morning: "Pha That Luang y alrededores", afternoon: "Patuxai y parque", evening: "Ribera o mercado nocturno" },
+        { day: 3, title: "Mercados y últimos sitios", summary: "Mercado matinal, cafés y cierre tranquilo.", morning: "Talat Sao o Talat Thong Khan Kham", afternoon: "Pausa en café y último templo o museo", evening: "Último paseo junto al río" },
+      ],
+      imageInfoCards: [
+        { title: "Templos y estupas", description: "Los wats de Vientián son tranquilos y fotogénicos. Visítalos por la mañana y deja las tardes ligeras.", image: { src: "https://images.unsplash.com/photo-1569024897167-0b2d2e3f4a5b?auto=format&fit=crop&w=1200&q=80", alt: "Templo budista en Vientián con detalles dorados." } },
+        { title: "Ribera del Mekong", description: "El frente fluvial es el salón de la ciudad. Paseos al atardecer y puestos de comida marcan el ritmo.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Río Mekong al atardecer en Vientián." } },
+        { title: "Mercados y cafés", description: "Mercados matinales y café en la calle hacen los días lentos entre visitas a templos.", image: { src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80", alt: "Calle y café en Vientián." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a febrero" },
+        { label: "Traslado aeropuerto", value: "Taxi o tuk-tuk al centro" },
+        { label: "Transporte", value: "A pie por el centro; tuk-tuk para templos lejanos" },
+        { label: "Entradas", value: "Pequeña tarifa en templos principales" },
+        { label: "Dónde alojarse", value: "Ribera o cerca de Nam Phu" },
+      ],
+      checklist: ["Ropa ligera y transpirable", "Protector solar y sombrero", "Mapas sin conexión", "Una pausa tranquila en café al día", "Botella de agua reutilizable", "Respetar código de vestimenta en templos"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Vientián?", answer: "Sí. La ciudad es compacta. Puedes ver los templos principales, la ribera y los mercados con calma." },
+        { question: "¿Hay que reservar templos?", answer: "No. La entrada es directa. Viste con modestia y quítate los zapatos donde indiquen." },
+        { question: "¿Vientián es caminable?", answer: "Sí. El centro y la ribera se recorren a pie. Usa tuk-tuk para Pha That Luang o con calor." },
+        { question: "¿Dónde alojarme?", answer: "Cerca del Mekong o de Nam Phu para ir a pie a templos y río." },
+        { question: "¿A qué hora empezar cada día?", answer: "Las mañanas son más frescas y mejores para templos. Haz una pausa larga al mediodía." },
+        { question: "¿Hay que reservar restaurantes?", answer: "Normalmente no. Comida callejera y locales informales son sin reserva." },
+        { question: "¿Se puede nadar en el Mekong?", answer: "En general no se recomienda. Disfruta las vistas y los paseos junto al río." },
+      ],
+      relatedItineraries: [
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Templos dorados, mercados y comida callejera." },
+        { slug: "hanoi", city: "Hanoi", days: 3, description: "Barrio Antiguo, lagos y comida vietnamita." },
+        { slug: "chiang-mai", city: "Chiang Mai", days: 3, description: "Templos, ciudad antigua y vistas a la montaña." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    yangon: {
+      slug: "yangon",
+      city: "Yangón",
+      country: "Myanmar",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de templos", "Cultura"],
+      style: ["Pagodas doradas", "Calles coloniales", "Mercados"],
+      pacing: [
+        "Yangón se disfruta a ritmo constante. Un gran sitio al día—Shwedagon, centro o mercado—y tiempo para té y paseos.",
+        "Agrupa por zona. Shwedagon merece una mañana o tarde; combina centro y Bogyoke otro día.",
+        "Deja una tarde flexible para descansar del calor, cafés o segunda visita a Shwedagon al atardecer.",
+      ],
+      hero: {
+        title: "Yangón en 3 días",
+        subtitle:
+          "Pagodas doradas, centro colonial y ritmo tranquilo para quien visita por primera vez.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1515832730975-869da433df66?auto=format&fit=crop&w=1600&q=80",
+          alt: "Pagoda Shwedagon en Yangón a la hora dorada.",
+        },
+      },
+      cityStats: [
+        { value: "2.500+", label: "Años de Shwedagon" },
+        { value: "99 m", label: "Altura de Shwedagon" },
+        { value: "5M+", label: "Población metropolitana" },
+        { value: "Colonial", label: "Patrimonio del centro" },
+      ],
+      fit: {
+        forYou: ["Visitas a pagodas icónicas", "Arquitectura colonial", "Mercados y cultura del té", "Centro caminable", "Shwedagon al atardecer"],
+        notForYou: ["Solo playa o naturaleza", "Vida nocturna", "Templos a toda prisa", "Excursiones largas", "Solo museos"],
+      },
+      dayPlans: [
+        { day: 1, title: "Pagoda Shwedagon", summary: "Mañana o tarde completa en la pagoda dorada.", morning: "Pagoda Shwedagon y recinto", afternoon: "Descanso o lago Kandawgyi", evening: "Shwedagon al atardecer o cena" },
+        { day: 2, title: "Centro colonial", summary: "Calles históricas y mercado Bogyoke.", morning: "Edificios coloniales y pagoda Sule", afternoon: "Mercado Bogyoke y calles", evening: "Barrio chino o ribera" },
+        { day: 3, title: "Templos y cierre", summary: "Botataung o Chaukhtatgyi y últimos sitios.", morning: "Pagoda Botataung o Buddha Chaukhtatgyi", afternoon: "Té y último paseo por mercado", evening: "Última visita a pagoda o cena" },
+      ],
+      imageInfoCards: [
+        { title: "Shwedagon a la hora dorada", description: "La pagoda brilla al amanecer y al atardecer. Planifica al menos una visita por la tarde o noche.", image: { src: "https://images.unsplash.com/photo-1555242354-90933d7da551?auto=format&fit=crop&w=1200&q=80", alt: "Estupa dorada de Shwedagon en Yangón." } },
+        { title: "Centro colonial", description: "El centro tiene una de las mayores concentraciones de edificios coloniales de Asia. Pasea con calma.", image: { src: "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?auto=format&fit=crop&w=1200&q=80", alt: "Edificio colonial en el centro de Yangón." } },
+        { title: "Mercados y casas de té", description: "Mercado Bogyoke y casas de té son donde la ciudad se ralentiza. Deja tiempo para ambos.", image: { src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80", alt: "Mercado y vida callejera en Yangón." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a febrero" },
+        { label: "Traslado aeropuerto", value: "Taxi o bus al centro" },
+        { label: "Transporte", value: "A pie por el centro; taxi o tren circular para distancias" },
+        { label: "Entradas", value: "Shwedagon y pagodas principales tienen tarifa" },
+        { label: "Dónde alojarse", value: "Centro o cerca de Shwedagon" },
+      ],
+      checklist: ["Vestir con modestia en templos", "Quitarse zapatos en pagodas", "Protector solar y sombrero", "Mapas sin conexión", "Una pausa en casa de té al día", "Botella de agua reutilizable"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Yangón?", answer: "Sí para Shwedagon, centro y mercados. Puedes añadir una segunda visita a Shwedagon o excursión." },
+        { question: "¿Cuándo es mejor ir a Shwedagon?", answer: "Primera hora de la mañana o tarde-noche. Mejor luz y menos calor." },
+        { question: "¿Yangón es caminable?", answer: "El centro sí. Usa taxis o tren circular para Shwedagon o Bogyoke." },
+        { question: "¿Dónde alojarme?", answer: "Centro para calles coloniales y Bogyoke; cerca de Shwedagon para visitas al atardecer." },
+        { question: "¿Hay que reservar pagodas?", answer: "No. Se paga en la entrada. Viste con modestia y quítate los zapatos." },
+        { question: "¿Hay restaurantes fácilmente?", answer: "Sí. Casas de té, comida callejera y restaurantes. Reserva solo para una cena especial." },
+        { question: "¿Es seguro viajar a Yangón?", answer: "Consulta la situación actual. En condiciones normales la ciudad recibe visitantes; precauciones habituales." },
+      ],
+      relatedItineraries: [
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Templos dorados, mercados y comida callejera." },
+        { slug: "hanoi", city: "Hanoi", days: 3, description: "Barrio Antiguo, lagos y comida vietnamita." },
+        { slug: "chiang-mai", city: "Chiang Mai", days: 3, description: "Templos, ciudad antigua y montaña." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "guatemala-city": {
+      slug: "guatemala-city",
+      city: "Ciudad de Guatemala",
+      country: "Guatemala",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura", "Amantes de museos"],
+      style: ["Centro histórico", "Museos", "Ritmo tranquilo"],
+      pacing: [
+        "Ciudad de Guatemala se disfruta con calma. Uno o dos sitios principales al día y tiempo para comer y paseos cortos.",
+        "Centra en Zona 1 y Zona 10 para el centro histórico y museos. Agrupa sitios cercanos para moverte poco.",
+        "Deja una tarde libre para mercado, café o descanso.",
+      ],
+      hero: {
+        title: "Ciudad de Guatemala en 3 días",
+        subtitle:
+          "Centro histórico, museos y ritmo urbano tranquilo para quien visita por primera vez.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1713063297072-051cb0e1f7f7?auto=format&fit=crop&w=1600&q=80",
+          alt: "Skyline y vista urbana de Ciudad de Guatemala.",
+        },
+      },
+      cityStats: [
+        { value: "3M+", label: "Población metropolitana" },
+        { value: "Zona 1", label: "Centro histórico" },
+        { value: "Varios", label: "Museos y sitios" },
+        { value: "Altiplano", label: "Altitud ~1.500 m" },
+      ],
+      fit: {
+        forYou: ["Museos e historia", "Centro compacto", "Mercados y comida", "Ritmo tranquilo", "Base para excursiones"],
+        notForYou: ["Solo playa", "Vida nocturna", "Horarios repletos", "Solo aventura", "Excursiones muy largas"],
+      },
+      dayPlans: [
+        { day: 1, title: "Centro histórico", summary: "Zona 1, plaza y sitios principales.", morning: "Plaza Mayor y Catedral", afternoon: "Palacio Nacional o museos", evening: "Cena en Zona 1 o 10" },
+        { day: 2, title: "Museos y cultura", summary: "Museo Popol Vuh, Ixchel o similar.", morning: "Museo Popol Vuh o museo de arqueología", afternoon: "Ixchel u otro museo", evening: "Cena tranquila y paseo" },
+        { day: 3, title: "Mercados y cierre", summary: "Mercado y últimos sitios.", morning: "Mercado Central o de Artesanías", afternoon: "Zoo La Aurora o último museo", evening: "Última cena o preparar viaje" },
+      ],
+      imageInfoCards: [
+        { title: "Zona 1 histórica", description: "El centro tiene edificios coloniales y una plaza animada. Las mañanas son buenas para caminar.", image: { src: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80", alt: "Centro histórico de Ciudad de Guatemala." } },
+        { title: "Museos", description: "Popol Vuh e Ixchel ofrecen buenas colecciones maya y textil. Reserva unas horas para uno o dos.", image: { src: "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?auto=format&fit=crop&w=1200&q=80", alt: "Museo o sitio cultural en Ciudad de Guatemala." } },
+        { title: "Mercados y comida", description: "Mercado Central y comedores dan sabor local. Ve por la mañana para mejor selección.", image: { src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80", alt: "Mercado en Ciudad de Guatemala." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a abril" },
+        { label: "Traslado aeropuerto", value: "Taxi o shuttle al centro" },
+        { label: "Transporte", value: "Taxis o Uber para cruzar ciudad; Zona 1 caminable" },
+        { label: "Entradas", value: "Museos con tarifas modestas" },
+        { label: "Dónde alojarse", value: "Zona 1 o Zona 10" },
+      ],
+      checklist: ["Ropa para clima de altiplano", "Protector solar y sombrero", "Mapas sin conexión", "Un almuerzo tranquilo al día", "Botella de agua reutilizable", "Revisar horarios de museos"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Ciudad de Guatemala?", answer: "Sí para el centro, algunos museos y mercados. Puedes añadir media jornada a Antigua." },
+        { question: "¿Hay que reservar museos?", answer: "Normalmente no. Entrada directa. Revisa horarios; algunos cierran lunes." },
+        { question: "¿La ciudad es caminable?", answer: "Zona 1 sí. Usa taxis o Uber para Zona 10 u otras zonas." },
+        { question: "¿Dónde alojarme?", answer: "Zona 1 para historia y plaza; Zona 10 para museos y calles más tranquilas." },
+        { question: "¿Es segura?", answer: "Quédate en zonas principales y de día. Usa taxis oficiales o Uber." },
+        { question: "¿Y excursiones a Antigua?", answer: "Antigua está a una hora. Puedes hacer media o jornada completa desde la ciudad." },
+        { question: "¿Hay que reservar restaurantes?", answer: "La mayoría son sin reserva. Reserva para una cena especial si quieres." },
+      ],
+      relatedItineraries: [
+        { slug: "panama-city", city: "Ciudad de Panamá", days: 3, description: "Canal, Casco Viejo y frente fluvial." },
+        { slug: "quito", city: "Quito", days: 3, description: "Centro histórico y vistas andinas." },
+        { slug: "mexico-city", city: "Ciudad de México", days: 3, description: "Centro histórico, museos y comida." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "san-jose-costa-rica": {
+      slug: "san-jose-costa-rica",
+      city: "San José",
+      country: "Costa Rica",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura", "Exploradores urbanos"],
+      style: ["Museos", "Mercados", "Centro caminable"],
+      pacing: [
+        "San José se disfruta con calma. Un gran sitio al día—teatro, museo o mercado—y tiempo para café y paseos.",
+        "El centro es compacto. Agrupa Teatro Nacional, Plaza de la Cultura y Mercado Central un día; museos otro.",
+        "Deja una tarde libre para café, parque o último mercado.",
+      ],
+      hero: {
+        title: "San José en 3 días",
+        subtitle:
+          "Teatro Nacional, mercados y ritmo urbano tranquilo para quien visita por primera vez.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1582035437103-a63fd343177f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Vista de San José con montañas al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "1,4M", label: "Población metropolitana" },
+        { value: "1897", label: "Apertura del Teatro Nacional" },
+        { value: "Central", label: "Ubicación en el valle" },
+        { value: "Café", label: "Capital del café" },
+      ],
+      fit: {
+        forYou: ["Teatro y museos", "Mercados y comida", "Centro compacto", "Cultura del café", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Vida nocturna", "Turismo apresurado", "Solo aventura", "Solo excursiones largas"],
+      },
+      dayPlans: [
+        { day: 1, title: "Teatro Nacional y plaza", summary: "Visita al teatro, Plaza de la Cultura y paseo por el centro.", morning: "Visita al Teatro Nacional", afternoon: "Plaza de la Cultura y calles cercanas", evening: "Cena en el centro" },
+        { day: 2, title: "Museos y parques", summary: "Museos y pausa verde.", morning: "Museo del Oro o del Jade", afternoon: "Parque La Sabana u otro museo", evening: "Cena tranquila" },
+        { day: 3, title: "Mercado Central y cierre", summary: "Mercado, cafés y últimos sitios.", morning: "Mercado Central y desayuno", afternoon: "Café y último museo o parque", evening: "Última cena o preparar viaje" },
+      ],
+      imageInfoCards: [
+        { title: "Teatro Nacional", description: "El teatro es el emblema de la ciudad. Reserva una visita para ver el interior.", image: { src: "https://images.unsplash.com/photo-1514306199707-a089e7c2e1e4?auto=format&fit=crop&w=1200&q=80", alt: "Teatro Nacional de Costa Rica en San José." } },
+        { title: "Mercado Central", description: "El mercado está lleno de productos, snacks y vida local. Las mañanas son mejores para pasear.", image: { src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80", alt: "Mercado Central en San José." } },
+        { title: "Café y parques", description: "San José es capital del café. Combina una parada en café con un paseo por La Sabana u otro parque.", image: { src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80", alt: "Café y calle en San José." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Diciembre a abril" },
+        { label: "Traslado aeropuerto", value: "Taxi o bus al centro" },
+        { label: "Transporte", value: "A pie por el centro; bus o taxi para afuera" },
+        { label: "Entradas", value: "Reserva visita al Teatro Nacional" },
+        { label: "Dónde alojarse", value: "Centro o Barrio Amón" },
+      ],
+      checklist: ["Reservar visita al Teatro Nacional", "Ropa ligera por si llueve", "Mapas sin conexión", "Una pausa en café al día", "Botella de agua reutilizable", "Revisar horarios de museos"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en San José?", answer: "Sí para el teatro, un par de museos y el mercado. Puedes añadir excursión a cafetal o volcán." },
+        { question: "¿Hay que reservar el Teatro Nacional?", answer: "Las visitas son populares. Conviene reservar, sobre todo en temporada alta." },
+        { question: "¿San José es caminable?", answer: "El centro sí. Usa buses o taxis para La Sabana u otros barrios." },
+        { question: "¿Dónde alojarme?", answer: "Centro o Barrio Amón para teatro, plaza y mercado." },
+        { question: "¿Y la seguridad?", answer: "Quédate en zonas principales y de día. Taxis oficiales de noche." },
+        { question: "¿Hay que reservar restaurantes?", answer: "La mayoría sin reserva. Reserva para una cena especial si quieres." },
+        { question: "¿Se puede hacer tour de café desde la ciudad?", answer: "Sí. Los tours de medio día son habituales; reserva en el hotel o con un operador." },
+      ],
+      relatedItineraries: [
+        { slug: "panama-city", city: "Ciudad de Panamá", days: 3, description: "Canal, Casco Viejo y frente fluvial." },
+        { slug: "quito", city: "Quito", days: 3, description: "Centro histórico y vistas andinas." },
+        { slug: "mexico-city", city: "Ciudad de México", days: 3, description: "Centro histórico, museos y comida." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    reims: {
+      slug: "reims",
+      city: "Reims",
+      country: "Francia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Champagne", "Catedral e historia"],
+      style: ["Catedral", "Casas de champagne", "Centro compacto"],
+      pacing: [
+        "Reims se disfruta en dos días tranquilos. Día uno: catedral y una casa de champagne. Día dos: casco antiguo y una segunda cava o museo.",
+        "El centro es pequeño y caminable. Agrupa la catedral con la Place Drouet d'Erlon y añade el Palacio del Tau o una visita a cava.",
+        "Reserva al menos una visita de champagne con antelación; deja el resto del tiempo para cafés y paseos cortos.",
+      ],
+      hero: {
+        title: "Reims en 2 días",
+        subtitle:
+          "Catedral, cavas de champagne y un centro histórico compacto a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1551566521-71f20843069f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Fachada de la catedral de Reims con detalles góticos.",
+        },
+      },
+      cityStats: [
+        { value: "800+", label: "Años de historia de la catedral" },
+        { value: "Champagne", label: "Capital de la región" },
+        { value: "Compacto", label: "Centro caminable" },
+      ],
+      fit: {
+        forYou: ["Catedral y patrimonio", "Catas de champagne", "Escapada corta", "Ciudad caminable", "Ritmo tranquilo"],
+        notForYou: ["Solo playa o naturaleza", "Vida nocturna", "Solo rutas largas en coche", "Semana solo de museos", "Viaje solo low cost"],
+      },
+      dayPlans: [
+        { day: 1, title: "Catedral y champagne", summary: "Notre-Dame de Reims y una visita a cava.", morning: "Catedral de Reims y Palacio del Tau", afternoon: "Place Drouet d'Erlon y almuerzo", evening: "Visita a casa de champagne y cata" },
+        { day: 2, title: "Casco antiguo y segunda cava", summary: "Calles históricas y otra parada de champagne.", morning: "Calles del casco antiguo y Porte de Mars", afternoon: "Segunda casa de champagne o museo", evening: "Cena y paseo corto" },
+      ],
+      imageInfoCards: [
+        { title: "La catedral", description: "Notre-Dame de Reims es un icono gótico. Dedica tiempo a la fachada y al interior.", image: { src: "https://images.unsplash.com/photo-1569949230765-2a2c4b0c0b0b?auto=format&fit=crop&w=1200&q=80", alt: "Catedral de Reims con rosetón y torres." } },
+        { title: "Cavas de champagne", description: "Las visitas y catas son la seña de la ciudad. Reserva con antelación en casas populares.", image: { src: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80", alt: "Botellas de champagne en una cava de Reims." } },
+        { title: "Place Drouet d'Erlon", description: "La calle peatonal principal es ideal para cafés, terrazas y una comida tranquila.", image: { src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1200&q=80", alt: "Terraza de café en una calle de Reims." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre" },
+        { label: "Llegar", value: "TGV desde París; directo a Reims Centre" },
+        { label: "Transporte", value: "El centro es caminable; no hace falta coche" },
+        { label: "Catas", value: "Reserva visitas a champagne con antelación" },
+        { label: "Alojamiento", value: "Cerca de la catedral o Place Drouet d'Erlon" },
+      ],
+      checklist: ["Reserva al menos una visita a casa de champagne", "Zapatos cómodos para catedral y adoquines", "Capa ligera para las cavas", "Mapa sin conexión del centro", "Planifica una pausa en café", "Botella de agua reutilizable"],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Reims?", answer: "Sí. Un día para la catedral y una cava, otro para el casco antiguo y una segunda cata o museo. El ritmo se mantiene relajado." },
+        { question: "¿Hay que reservar las visitas a champagne?", answer: "Sí en casas populares, sobre todo en fin de semana. Reserva con unos días de antelación en temporada alta." },
+        { question: "¿Reims es caminable?", answer: "Sí. La catedral, Place Drouet d'Erlon y la mayoría de cavas están a poca distancia." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de la catedral o en la Place Drouet d'Erlon para tener a mano los sitios y restaurantes." },
+        { question: "¿A qué hora empezar cada día?", answer: "La catedral abre a media mañana; empieza ahí y luego almuerzo y cava. No hace falta madrugar." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares los fines de semana, sí. El resto puedes entrar sin reserva." },
+        { question: "¿Se puede hacer Reims en día desde París?", answer: "Sí en TGV, pero dos días te permiten disfrutar la catedral, dos cavas y el casco antiguo sin prisas." },
+      ],
+      relatedItineraries: [
+        { slug: "paris", city: "París", days: 3, description: "Monumentos, museos y cafés." },
+        { slug: "lyon", city: "Lyon", days: 3, description: "Gastronomía, casco antiguo y paseos junto al río." },
+        { slug: "strasbourg", city: "Estrasburgo", days: 2, description: "Catedral, canales y calles entramadas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    bremen: {
+      slug: "bremen",
+      city: "Bremen",
+      country: "Alemania",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cuento de hadas", "Escapadas urbanas compactas"],
+      style: ["Markt", "Barrio Schnoor", "Paseos junto al río"],
+      pacing: [
+        "Bremen encaja en dos días tranquilos. Día uno: Markt, ayuntamiento, Roland y Böttcherstraße. Día dos: Schnoor y el Weser.",
+        "El centro es pequeño. Del Markt al Schnoor se va en minutos; deja tiempo para café y tarta.",
+        "Un museo o torre basta; deja el resto del día flexible para paseos.",
+      ],
+      hero: {
+        title: "Bremen en 2 días",
+        subtitle:
+          "Markt, barrio Schnoor y paseos tranquilos junto al río sin prisas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1743951362118-fa011ef9720b?auto=format&fit=crop&w=1600&q=80",
+          alt: "Markt de Bremen con ayuntamiento y estatua de Roland.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Ayuntamiento y Roland" },
+        { value: "Compacto", label: "Altstadt caminable" },
+        { value: "Weser", label: "Paseo fluvial" },
+      ],
+      fit: {
+        forYou: ["Plazas de cuento", "Escapada corta", "Centro caminable", "Café y tarta", "Ritmo relajado"],
+        notForYou: ["Solo playa", "Vida nocturna", "Solo excursiones largas", "Muchos museos en un día", "Solo naturaleza lejana"],
+      },
+      dayPlans: [
+        { day: 1, title: "Markt y Böttcherstraße", summary: "Ayuntamiento, Roland y la calle del arte.", morning: "Markt, ayuntamiento y Roland", afternoon: "Böttcherstraße y almuerzo", evening: "Cena junto al río o en el Markt" },
+        { day: 2, title: "Schnoor y Weser", summary: "Callejones históricos y vistas al río.", morning: "Calles del barrio Schnoor", afternoon: "Paseo del Weser y Schlanke Mathilde", evening: "Último paseo y cena" },
+      ],
+      imageInfoCards: [
+        { title: "El Markt", description: "El ayuntamiento y Roland son Patrimonio UNESCO. La plaza es el corazón de la ciudad.", image: { src: "https://images.unsplash.com/photo-1555242354-90933d7da551?auto=format&fit=crop&w=1200&q=80", alt: "Ayuntamiento y Roland en el Markt de Bremen." } },
+        { title: "Schnoor", description: "Callejones y casas antiguas. Ideal para un paseo lento y una parada en café.", image: { src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80", alt: "Calle estrecha del barrio Schnoor en Bremen." } },
+        { title: "Paseo del Weser", description: "El río bordea el casco antiguo. Un paseo corto aquí redondea el día.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Río Weser y frente fluvial en Bremen." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre" },
+        { label: "Llegar", value: "Tren desde Hamburgo, Hanover o Berlín" },
+        { label: "Transporte", value: "El centro es caminable" },
+        { label: "Entradas", value: "Visita al ayuntamiento reservable" },
+        { label: "Alojamiento", value: "Cerca del Markt o Schnoor" },
+      ],
+      checklist: ["Zapatos cómodos para caminar", "Capa ligera para la noche", "Mapa sin conexión del Altstadt", "Planifica una parada de café y tarta", "Botella de agua reutilizable", "Revisa horarios de visita al ayuntamiento"],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Bremen?", answer: "Sí. Un día para Markt, Roland y Böttcherstraße y otro para Schnoor y el Weser. El ritmo se mantiene relajado." },
+        { question: "¿Hay que reservar el ayuntamiento?", answer: "Las visitas son a horas fijas; conviene reservar en temporada alta." },
+        { question: "¿Bremen es caminable?", answer: "Sí. El Markt, Schnoor y el Weser quedan a poca distancia." },
+        { question: "¿Dónde alojarme?", answer: "Cerca del Markt o del barrio Schnoor para tener a mano los sitios y restaurantes." },
+        { question: "¿A qué hora empezar?", answer: "El Markt anima a media mañana. No hace falta madrugar; dos días dan de sobra." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares los fines de semana, sí. El resto suele bastar sin reserva." },
+        { question: "¿Puedo combinar Bremen con Hamburgo?", answer: "Sí. Hamburgo está a una hora en tren; ambas ciudades encajan en una escapada o un viaje combinado." },
+      ],
+      relatedItineraries: [
+        { slug: "hamburg", city: "Hamburgo", days: 3, description: "Puerto, canales y barrios." },
+        { slug: "hanover", city: "Hanover", days: 2, description: "Jardines, casco antiguo y Maschsee." },
+        { slug: "cologne", city: "Colonia", days: 3, description: "Catedral, Rin y casco antiguo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    hanover: {
+      slug: "hanover",
+      city: "Hanover",
+      country: "Alemania",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Jardines y parques", "Escapadas compactas"],
+      style: ["Herrenhausen", "Casco antiguo", "Maschsee"],
+      pacing: [
+        "Hanover en dos días: uno para los jardines de Herrenhausen y otro para el casco antiguo y el Maschsee.",
+        "El centro es compacto. Empieza por la zona de la Marktkirche y luego camina hasta el lago o los jardines en tranvía.",
+        "Deja una tarde libre para un paseo junto al lago o un café tranquilo.",
+      ],
+      hero: {
+        title: "Hanover en 2 días",
+        subtitle:
+          "Jardines de Herrenhausen, casco antiguo y paseos tranquilos junto al Maschsee.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1690138988740-410136b760a1?auto=format&fit=crop&w=1600&q=80",
+          alt: "Jardines de Herrenhausen en Hanover con diseño barroco.",
+        },
+      },
+      cityStats: [
+        { value: "Barroco", label: "Jardines de Herrenhausen" },
+        { value: "Compacto", label: "Centro caminable" },
+        { value: "Maschsee", label: "Lago y paseo" },
+      ],
+      fit: {
+        forYou: ["Jardines y verde", "Escapada corta", "Ciudad caminable", "Ritmo tranquilo", "Uno o dos museos"],
+        notForYou: ["Solo playa", "Vida nocturna", "Muchos museos en un día", "Solo senderismo lejano", "Turismo muy rápido"],
+      },
+      dayPlans: [
+        { day: 1, title: "Jardines de Herrenhausen", summary: "Jardines barrocos y museo.", morning: "Jardines de Herrenhausen y Großer Garten", afternoon: "Museo o invernadero y vuelta al centro", evening: "Cena en el casco antiguo" },
+        { day: 2, title: "Casco antiguo y Maschsee", summary: "Marktkirche, calles y lago.", morning: "Marktkirche y calles del casco antiguo", afternoon: "Paseo del Maschsee", evening: "Último paseo y cena" },
+      ],
+      imageInfoCards: [
+        { title: "Jardines de Herrenhausen", description: "Los jardines barrocos son el plato fuerte de Hanover. Reserva media jornada para una visita tranquila.", image: { src: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=80", alt: "Jardines barrocos de Herrenhausen en Hanover." } },
+        { title: "Casco antiguo", description: "La Marktkirche y las calles de alrededor forman un núcleo compacto y caminable.", image: { src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80", alt: "Casco antiguo de Hanover con Marktkirche." } },
+        { title: "Maschsee", description: "El lago es ideal para un paseo o un corto paseo en barca. Forma tranquila de cerrar el día.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Lago Maschsee y paseo en Hanover." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre para los jardines" },
+        { label: "Llegar", value: "Tren desde Hamburgo, Berlín o Fráncfort" },
+        { label: "Transporte", value: "Tranvía a Herrenhausen; centro caminable" },
+        { label: "Entradas", value: "Los jardines tienen entrada; revisa horarios" },
+        { label: "Alojamiento", value: "Cerca de la Marktkirche o del Maschsee" },
+      ],
+      checklist: ["Zapatos cómodos para jardines y lago", "Capa ligera para la noche", "Mapa sin conexión", "Planifica una pausa en café", "Botella de agua reutilizable", "Revisa horarios de los jardines"],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Hanover?", answer: "Sí. Un día para Herrenhausen y otro para el casco antiguo y el Maschsee. El ritmo se mantiene relajado." },
+        { question: "¿Hay que reservar los jardines?", answer: "Normalmente no; entradas en taquilla. Revisa eventos especiales." },
+        { question: "¿Hanover es caminable?", answer: "El centro sí. Usa el tranvía para Herrenhausen y opcionalmente para el Maschsee." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de la Marktkirche para el casco antiguo o del Maschsee para paseos junto al lago." },
+        { question: "¿A qué hora empezar?", answer: "Los jardines abren a media mañana. No hace falta madrugar; dos días dan de sobra." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares los fines de semana, sí. El resto suele bastar sin reserva." },
+        { question: "¿Puedo combinar Hanover con Hamburgo?", answer: "Sí. Una hora y media en tren; ambas ciudades encajan en una escapada o un viaje combinado." },
+      ],
+      relatedItineraries: [
+        { slug: "hamburg", city: "Hamburgo", days: 3, description: "Puerto, canales y barrios." },
+        { slug: "bremen", city: "Bremen", days: 2, description: "Markt, Schnoor y río." },
+        { slug: "berlin", city: "Berlín", days: 3, description: "Museos, historia y barrios." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    limerick: {
+      slug: "limerick",
+      city: "Limerick",
+      country: "Irlanda",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y río", "Escapadas cortas"],
+      style: ["Castillo de King John", "Shannon", "Centro caminable"],
+      pacing: [
+        "Limerick en dos días: castillo y río un día, museos y calles al siguiente. Mantén el ritmo tranquilo.",
+        "El centro es pequeño. Del castillo al Hunt Museum y al río se va en minutos.",
+        "Deja una tarde libre para un paseo junto al río o un pub.",
+      ],
+      hero: {
+        title: "Limerick en 2 días",
+        subtitle:
+          "Castillo de King John, río Shannon y un centro caminable a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1660687446300-b05801428ca9?auto=format&fit=crop&w=1600&q=80",
+          alt: "Castillo de King John y río Shannon en Limerick.",
+        },
+      },
+      cityStats: [
+        { value: "s. XIII", label: "Castillo de King John" },
+        { value: "Shannon", label: "Río que cruza la ciudad" },
+        { value: "Compacto", label: "Centro caminable" },
+      ],
+      fit: {
+        forYou: ["Castillo e historia", "Paseos junto al río", "Escapada corta", "Ciudad caminable", "Pub y café"],
+        notForYou: ["Solo playa", "Vida nocturna", "Muchos museos en un día", "Solo campo lejano", "Turismo muy rápido"],
+      },
+      dayPlans: [
+        { day: 1, title: "Castillo y río", summary: "Castillo de King John y paseos por el Shannon.", morning: "Castillo de King John y exposición", afternoon: "Paseo junto al río y Treaty Stone", evening: "Cena en el centro" },
+        { day: 2, title: "Museos y calles", summary: "Hunt Museum y casco antiguo.", morning: "Hunt Museum o catedral de St. Mary", afternoon: "O'Connell Street y barrio georgiano", evening: "Pub o cena y último paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Castillo de King John", description: "El castillo domina el río. Reserva un par de horas para la exposición y las vistas.", image: { src: "https://images.unsplash.com/photo-1569949230765-2a2c4b0c0b0b?auto=format&fit=crop&w=1200&q=80", alt: "Castillo de King John sobre el Shannon en Limerick." } },
+        { title: "Río Shannon", description: "El río cruza la ciudad. Un paseo corto por la orilla es una forma tranquila de pasar el tiempo.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Río Shannon a su paso por Limerick." } },
+        { title: "Centro", description: "O'Connell Street y la zona georgiana son compactos y buenos para un paseo lento.", image: { src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1200&q=80", alt: "Calle del centro de Limerick." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a septiembre" },
+        { label: "Llegar", value: "Tren o bus desde Dublín, Cork o aeropuerto de Shannon" },
+        { label: "Transporte", value: "El centro es caminable" },
+        { label: "Entradas", value: "Reserva castillo online en temporada alta" },
+        { label: "Alojamiento", value: "Cerca de O'Connell Street o del río" },
+      ],
+      checklist: ["Reserva entrada al castillo en temporada alta", "Zapatos cómodos", "Chubasquero", "Mapa sin conexión", "Planifica una parada en pub o café", "Botella de agua reutilizable"],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Limerick?", answer: "Sí. Un día para el castillo y el río y otro para museos y calles. El ritmo se mantiene relajado." },
+        { question: "¿Hay que reservar el castillo?", answer: "En temporada alta, sí. El resto del año suele haber entradas en taquilla." },
+        { question: "¿Limerick es caminable?", answer: "Sí. Castillo, Hunt Museum, río y centro quedan a poca distancia." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de O'Connell Street o del río para tener a mano los sitios y restaurantes." },
+        { question: "¿A qué hora empezar?", answer: "El castillo abre a media mañana. Dos días dan de sobra; no hace falta madrugar." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En pubs o restaurantes populares los fines de semana, sí. El resto suele bastar sin reserva." },
+        { question: "¿Puedo combinar con Cork o Galway?", answer: "Sí. Ambas están a una hora en tren o bus; buena opción para un viaje más largo por Irlanda." },
+      ],
+      relatedItineraries: [
+        { slug: "dublin", city: "Dublín", days: 3, description: "Trinity, pubs y río." },
+        { slug: "cork", city: "Cork", days: 2, description: "English Market, río y centro compacto." },
+        { slug: "galway", city: "Galway", days: 3, description: "Calles, música y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    ostrava: {
+      slug: "ostrava",
+      city: "Ostrava",
+      country: "República Checa",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Patrimonio industrial", "Escapadas distintas"],
+      style: ["Dolní Vítkovice", "Castillo", "Paseos tranquilos"],
+      pacing: [
+        "Ostrava en dos días: uno para Dolní Vítkovice y otro para el castillo y el centro.",
+        "Los antiguos espacios industriales son el plato fuerte; añade el castillo y Stodolní para variar.",
+        "Deja una tarde flexible para un café o un paseo lento.",
+      ],
+      hero: {
+        title: "Ostrava en 2 días",
+        subtitle:
+          "Patrimonio industrial, Dolní Vítkovice y paseos tranquilos por la ciudad.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1678501715674-55c5daa4b23f?auto=format&fit=crop&w=1600&q=80",
+          alt: "Complejo industrial Dolní Vítkovice en Ostrava.",
+        },
+      },
+      cityStats: [
+        { value: "Industrial", label: "Complejo Dolní Vítkovice" },
+        { value: "Castillo", label: "Castillo de Ostrava" },
+        { value: "Stodolní", label: "Calle y vida nocturna" },
+      ],
+      fit: {
+        forYou: ["Patrimonio industrial", "Escapada corta", "Destino distinto", "Núcleo caminable", "Ritmo tranquilo"],
+        notForYou: ["Solo pueblos de cuento", "Solo playa", "Días solo de museos", "Solo naturaleza lejana", "Turismo muy rápido"],
+      },
+      dayPlans: [
+        { day: 1, title: "Dolní Vítkovice", summary: "Antigua siderurgia y miradores.", morning: "Zona de Dolní Vítkovice y Bolt Tower", afternoon: "Exposiciones o visita guiada", evening: "Cena en el centro o Stodolní" },
+        { day: 2, title: "Castillo y centro", summary: "Castillo de Ostrava y calles del centro.", morning: "Castillo de Ostrava y museo", afternoon: "Centro y plaza Masaryk", evening: "Último paseo y cena" },
+      ],
+      imageInfoCards: [
+        { title: "Dolní Vítkovice", description: "La antigua siderurgia es ahora un espacio de cultura y patrimonio. Reserva media jornada.", image: { src: "https://images.unsplash.com/photo-1589519160732-57fc498494f8?auto=format&fit=crop&w=1200&q=80", alt: "Patrimonio industrial Dolní Vítkovice en Ostrava." } },
+        { title: "Castillo de Ostrava", description: "El castillo alberga un museo y contrasta con los espacios industriales.", image: { src: "https://images.unsplash.com/photo-1569949230765-2a2c4b0c0b0b?auto=format&fit=crop&w=1200&q=80", alt: "Castillo de Ostrava y patio." } },
+        { title: "Centro", description: "La plaza Masaryk y las calles de alrededor son compactas y buenas para un paseo corto.", image: { src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80", alt: "Centro y plaza de Ostrava." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre" },
+        { label: "Llegar", value: "Tren desde Praga, Brno o Cracovia" },
+        { label: "Transporte", value: "Tranvía y bus; centro caminable" },
+        { label: "Entradas", value: "Dolní Vítkovice y castillo tienen entrada" },
+        { label: "Alojamiento", value: "Cerca del centro o Stodolní" },
+      ],
+      checklist: ["Zapatos cómodos", "Revisa horarios de Dolní Vítkovice", "Mapa sin conexión", "Planifica una pausa en café", "Botella de agua reutilizable", "Capa ligera para la noche"],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Ostrava?", answer: "Sí. Un día para Dolní Vítkovice y otro para el castillo y el centro. El ritmo se mantiene relajado." },
+        { question: "¿Hay que reservar Dolní Vítkovice?", answer: "Para visitas guiadas o eventos, sí. La entrada general suele estar en taquilla." },
+        { question: "¿Ostrava es caminable?", answer: "El centro sí. Usa tranvía o bus para Dolní Vítkovice y el castillo." },
+        { question: "¿Dónde alojarme?", answer: "Cerca del centro o de Stodolní para restaurantes y buen acceso a los sitios." },
+        { question: "¿A qué hora empezar?", answer: "Dolní Vítkovice abre a media mañana. Dos días dan de sobra; no hace falta madrugar." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares los fines de semana, sí. El resto suele bastar sin reserva." },
+        { question: "¿Puedo combinar Ostrava con Praga?", answer: "Sí. Unas 3 horas en tren; buena opción para un viaje más largo por Chequia." },
+      ],
+      relatedItineraries: [
+        { slug: "prague", city: "Praga", days: 3, description: "Casco antiguo, castillo y río." },
+        { slug: "krakow", city: "Cracovia", days: 3, description: "Plaza, castillo y casco antiguo." },
+        { slug: "vienna", city: "Viena", days: 3, description: "Palacios, museos y grandes avenidas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "addis-ababa": {
+      slug: "addis-ababa",
+      city: "Adís Abeba",
+      country: "Etiopía",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura", "Amantes del café"],
+      style: ["Museos", "Mercados", "Cultura del café"],
+      pacing: [
+        "Adís Abeba se disfruta a ritmo constante. Uno o dos sitios principales al día—museo, mercado o catedral—y tiempo para café y paseos.",
+        "Agrupa por zona: Mercato, Museo Nacional y Holy Trinity pueden repartirse en dos días con pausas.",
+        "Deja una tarde libre para ceremonia del café o paseo tranquilo por el mercado.",
+      ],
+      hero: {
+        title: "Adís Abeba en 3 días",
+        subtitle:
+          "Museos, Mercato y cultura del café con ritmo tranquilo para quien visita por primera vez.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1668003314070-9ef38c3cafb8?auto=format&fit=crop&w=1600&q=80",
+          alt: "Vista de Adís Abeba con montañas al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "3,3M+", label: "Población" },
+        { value: "2.400 m", label: "Altitud" },
+        { value: "Cuna", label: "Del café" },
+        { value: "UNECA", label: "Sede Unión Africana" },
+      ],
+      fit: {
+        forYou: ["Museos e historia", "Mercados y café", "Centro compacto", "Ritmo tranquilo", "Cultura"],
+        notForYou: ["Solo playa", "Vida nocturna", "Tours muy apresurados", "Solo aventura", "Poco caminar"],
+      },
+      dayPlans: [
+        { day: 1, title: "Museo Nacional y Lucy", summary: "Museo Nacional y sitios clave.", morning: "Museo Nacional de Etiopía y Lucy", afternoon: "Catedral Holy Trinity o cercanos", evening: "Cena y ceremonia del café" },
+        { day: 2, title: "Mercato y calles", summary: "Mercado Mercato y barrios.", morning: "Mercado Mercato y puestos", afternoon: "Descanso o Memorial Red Terror", evening: "Cena en Bole o Piassa" },
+        { day: 3, title: "Museos y cierre", summary: "Museo Etnológico u otro y últimos sitios.", morning: "Museo Etnológico o Catedral San Jorge", afternoon: "Café y último mercado o museo", evening: "Última cena o preparar viaje" },
+      ],
+      imageInfoCards: [
+        { title: "Museo Nacional", description: "Lucy y la sala de arqueología son lo más destacado. Reserva al menos dos horas para una visita tranquila.", image: { src: "https://images.unsplash.com/photo-1569024897167-0b2d2e3f4a5b?auto=format&fit=crop&w=1200&q=80", alt: "Museo Nacional de Etiopía en Adís Abeba." } },
+        { title: "Mercato", description: "Uno de los mercados más grandes de África. Ve por la mañana y tómate tu tiempo.", image: { src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80", alt: "Mercado Mercato en Adís Abeba." } },
+        { title: "Cultura del café", description: "Etiopía es la cuna del café. Una ceremonia tradicional es imprescindible; reserva una hora.", image: { src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=1200&q=80", alt: "Ceremonia del café etíope en Adís Abeba." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a junio" },
+        { label: "Traslado aeropuerto", value: "Taxi o app al centro" },
+        { label: "Transporte", value: "Taxis para distancias; algunas zonas caminables" },
+        { label: "Entradas", value: "Museos con tarifa de entrada" },
+        { label: "Dónde alojarse", value: "Bole o Piassa" },
+      ],
+      checklist: ["Ropa para altitud y sol", "Protector solar y sombrero", "Mapas sin conexión", "Planificar una ceremonia del café", "Botella de agua reutilizable", "Respetar sitios religiosos"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Adís Abeba?", answer: "Sí para el Museo Nacional, Mercato y un par de iglesias o museos. Puedes añadir excursión si quieres." },
+        { question: "¿Hay que reservar museos?", answer: "Normalmente no. Entrada directa. Revisa horarios." },
+        { question: "¿La ciudad es caminable?", answer: "Partes sí; taxis útiles para Mercato y cruzar ciudad. La altitud puede cansar al principio." },
+        { question: "¿Dónde alojarme?", answer: "Bole es moderno y práctico; Piassa más céntrico e histórico." },
+        { question: "¿Qué hay de la altitud?", answer: "Adís está a 2.400 m. Ve con calma el primer día e hidrátate." },
+        { question: "¿Hay que reservar restaurantes?", answer: "La mayoría sin reserva. Reserva para una cena especial si quieres." },
+        { question: "¿Mercato es seguro?", answer: "Ve por la mañana y guarda bien los objetos de valor. Es muy concurrido; precauciones normales." },
+      ],
+      relatedItineraries: [
+        { slug: "nairobi", city: "Nairobi", days: 3, description: "Museos, parques y opciones de naturaleza." },
+        { slug: "cairo", city: "El Cairo", days: 3, description: "Pirámides, museos y bazares." },
+        { slug: "accra", city: "Accra", days: 3, description: "Independencia, mercados y costa." },
       ],
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
