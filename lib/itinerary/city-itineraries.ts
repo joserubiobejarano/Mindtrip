@@ -2418,6 +2418,738 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    "las-palmas": {
+      slug: "las-palmas",
+      city: "Las Palmas",
+      country: "Spain",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Beach and city mix", "Relaxed pace"],
+      style: ["Beach time", "Old town", "Canarian food"],
+      pacing: [
+        "Las Palmas rewards a calm rhythm. Anchor each day with one main area—the beach, Vegueta, or a mix—then leave room for long lunches, beach walks, and unplanned stops.",
+        "Group time by zone to keep transit light. Pair Las Canteras with Triana for a full day; add Vegueta and Casa de Colón on another for history and shade.",
+        "Save an open afternoon for the beach or a slow cafe so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Las Palmas in 3 days",
+        subtitle:
+          "Beach, old town Vegueta, and relaxed Canarian pace without rushing.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=80",
+          alt: "Las Canteras beach and promenade in Las Palmas de Gran Canaria.",
+        },
+      },
+      cityStats: [
+        { value: "3 km", label: "Las Canteras beach length" },
+        { value: "500+", label: "Years of Vegueta history" },
+        { value: "380K", label: "City population" },
+      ],
+      fit: {
+        forYou: ["Beach and city in one trip", "First-time visitors", "Walkable core", "Relaxed pace with good food", "Sun and culture"],
+        notForYou: ["Museum-only focus", "Nightlife-heavy trips", "Remote hiking only", "Packed back-to-back sights", "Winter snow"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Las Canteras and Triana",
+          summary: "Beach morning and shopping streets.",
+          morning: "Las Canteras beach walk and swim",
+          afternoon: "Triana and Calle Mayor de Triana",
+          evening: "Sunset on the beach and dinner nearby",
+        },
+        {
+          day: 2,
+          title: "Vegueta old town",
+          summary: "Historic center and Casa de Colón.",
+          morning: "Vegueta streets and Plaza de Santa Ana",
+          afternoon: "Casa de Colón and cathedral area",
+          evening: "Dinner in Vegueta or port area",
+        },
+        {
+          day: 3,
+          title: "Beach and local life",
+          summary: "Relaxed beach time and last stops.",
+          morning: "Beach or Parque Doramas",
+          afternoon: "Last shopping or museum if desired",
+          evening: "Final beach stroll and dinner",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Las Canteras beach",
+          description:
+            "The city beach is a long curve of sand with a calm promenade. Mornings and late afternoons are ideal for a walk or swim.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Las Canteras beach and sea in Las Palmas.",
+          },
+        },
+        {
+          title: "Vegueta",
+          description:
+            "The old town holds the cathedral, Casa de Colón, and narrow streets. Plan a morning or afternoon to explore on foot.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic streets in Vegueta, Las Palmas.",
+          },
+        },
+        {
+          title: "Canarian pace",
+          description:
+            "Long lunches, beach breaks, and evening paseos set the tone. Leave room for tapas and local recommendations.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Outdoor dining and local life in Las Palmas.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "October to April for mild heat" },
+        { label: "Airport transfer", value: "Bus or taxi to city center" },
+        { label: "Transit tips", value: "Walk beach and Vegueta; bus for longer hops" },
+        { label: "Neighborhood stay", value: "Near Las Canteras or Triana" },
+      ],
+      checklist: [
+        "Pack sun protection and swimwear",
+        "Comfortable shoes for Vegueta",
+        "Save offline map for beach and old town",
+        "Plan one slow beach or cafe break daily",
+        "Carry a refillable water bottle",
+        "Check Casa de Colón opening hours if visiting",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Las Palmas?",
+          answer:
+            "Yes for the beach, Vegueta, and a relaxed pace. You can cover the main areas without rushing.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No. The beach and old town are walkable; buses cover the rest if needed.",
+        },
+        {
+          question: "Is Las Palmas walkable?",
+          answer:
+            "Yes. Las Canteras and Vegueta are easy on foot; Triana connects the two.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near Las Canteras for beach access, or Triana for shops and a short walk to both beach and Vegueta.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "No need to rush. Beach days can start mid-morning; Vegueta is pleasant in the morning or late afternoon.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots at weekend dinner, yes. Many places accept walk-ins for lunch.",
+        },
+        {
+          question: "Can I do day trips to other parts of the island?",
+          answer:
+            "Yes. Rent a car or take a bus for Maspalomas, Tejeda, or the north. Keep one full day in the city if you only have three.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudi, beaches, and walkable neighborhoods." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "City of Arts, old town, and coast." },
+        { slug: "seville", city: "Seville", days: 3, description: "Plazas, Alcázar, and Andalusian rhythm." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    coimbra: {
+      slug: "coimbra",
+      city: "Coimbra",
+      country: "Portugal",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and university", "River walks"],
+      style: ["University town", "Historic center", "Relaxed pace"],
+      pacing: [
+        "Coimbra works well at a calm pace. Anchor each day with one main area—the university, the river, or the old town—then leave room for long lunches and slow strolls.",
+        "Group time by neighborhood. Pair the university and Biblioteca Joanina with the cathedral area; add the river and Santa Clara on another day.",
+        "Save an open afternoon for the Mondego or a cafe so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Coimbra in 3 days",
+        subtitle:
+          "University, river, and historic center at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8a?auto=format&fit=crop&w=1600&q=80",
+          alt: "University of Coimbra and old town from across the river.",
+        },
+      },
+      cityStats: [
+        { value: "1290", label: "University founded" },
+        { value: "200K+", label: "Metro population" },
+        { value: "UNESCO", label: "University area" },
+      ],
+      fit: {
+        forYou: ["University and history", "First-time visitors", "Walkable center", "River and hill views", "Relaxed pace"],
+        notForYou: ["Beach-only focus", "Heavy nightlife", "Remote countryside only", "Back-to-back museums", "Rushed sightseeing"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "University and Alta",
+          summary: "University of Coimbra and Biblioteca Joanina.",
+          morning: "University of Coimbra and Joanina Library",
+          afternoon: "Sao Miguel Chapel and university square",
+          evening: "Dinner in Alta or descent to Baixa",
+        },
+        {
+          day: 2,
+          title: "Baixa and river",
+          summary: "Old town and Mondego views.",
+          morning: "Sé Velha and Baixa streets",
+          afternoon: "River Mondego promenade",
+          evening: "Santa Clara or riverside dinner",
+        },
+        {
+          day: 3,
+          title: "Santa Clara and slow close",
+          summary: "Convent area and last stops.",
+          morning: "Santa Clara-a-Velha or Santa Cruz",
+          afternoon: "Last museum or river walk",
+          evening: "Final dinner in the center",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The university",
+          description:
+            "The hilltop university dominates the city. Book a visit to the library and royal palace for the full experience.",
+          image: {
+            src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80",
+            alt: "University of Coimbra historic building.",
+          },
+        },
+        {
+          title: "River Mondego",
+          description:
+            "The river links the two banks. A walk along the promenade gives views of the university and the old town.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "River Mondego and Coimbra from the bank.",
+          },
+        },
+        {
+          title: "Old town streets",
+          description:
+            "Narrow lanes and student life give the center its character. Plan a slow walk and a long lunch.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic street in Coimbra old town.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Train", value: "Direct from Lisbon and Porto" },
+        { label: "Transit tips", value: "Walk the center; bus or taxi for Santa Clara" },
+        { label: "Ticketing", value: "Book university tour in peak season" },
+        { label: "Neighborhood stay", value: "Baixa or near the university" },
+      ],
+      checklist: [
+        "Book university and library visit",
+        "Comfortable shoes for hills",
+        "Save offline map for center",
+        "Plan one slow cafe break daily",
+        "Carry a refillable water bottle",
+        "Check river boat times if taking a short cruise",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Coimbra?",
+          answer:
+            "Yes for the university, old town, and river. You can see the highlights at a relaxed pace.",
+        },
+        {
+          question: "Do I need to book the university?",
+          answer:
+            "Yes for the Joanina Library and guided tour in peak season. Book a few days ahead.",
+        },
+        {
+          question: "Is Coimbra walkable?",
+          answer:
+            "Yes, but it is hilly. The center is compact; allow time for the climb to the university.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Baixa keeps you near restaurants and the river; near the university for early visits and views.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start by mid-morning for the university to avoid the hottest climb. Afternoons are good for the river and Baixa.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots at weekend dinner, yes. Lunch is often easier without a reservation.",
+        },
+        {
+          question: "Can I combine Coimbra with Lisbon or Porto?",
+          answer:
+            "Yes. Trains link all three. Three days in Coimbra is enough; add a night in Lisbon or Porto for a longer trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "lisbon", city: "Lisbon", days: 3, description: "Hills, trams, and river." },
+        { slug: "porto", city: "Porto", days: 3, description: "River, cellars, and old town." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "City of Arts, old town, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cadiz: {
+      slug: "cadiz",
+      city: "Cádiz",
+      country: "Spain",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Old town and sea", "Relaxed pace"],
+      style: ["Historic center", "Sea views", "Andalusian rhythm"],
+      pacing: [
+        "Cádiz rewards a calm rhythm. Anchor each day with one main area—the cathedral, La Caleta, or the old town lanes—then leave room for long lunches and sunset strolls.",
+        "Group time by zone. The center is compact; pair the cathedral with Tavira Tower and the market, then add La Caleta and the seafront on another day.",
+        "Save an open afternoon for a beach or a slow cafe so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Cádiz in 3 days",
+        subtitle:
+          "Old town, sea views, and relaxed Andalusian pace without rushing.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1600&q=80",
+          alt: "Cádiz cathedral and old town from the water.",
+        },
+      },
+      cityStats: [
+        { value: "3,000+", label: "Years of history" },
+        { value: "Compact", label: "Walkable old town" },
+        { value: "La Caleta", label: "Iconic city beach" },
+      ],
+      fit: {
+        forYou: ["Old town and sea", "First-time visitors", "Walkable center", "Relaxed pace with good food", "Sun and history"],
+        notForYou: ["Museum-only focus", "Nightlife-heavy trips", "Remote nature only", "Packed back-to-back sights", "Winter snow"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Cathedral and Tavira Tower",
+          summary: "Cathedral area and camera obscura views.",
+          morning: "Cádiz Cathedral and square",
+          afternoon: "Tavira Tower and market area",
+          evening: "Dinner in the center and evening stroll",
+        },
+        {
+          day: 2,
+          title: "La Caleta and seafront",
+          summary: "Beach and coastal walk.",
+          morning: "La Caleta beach and Castillos",
+          afternoon: "Seafront promenade walk",
+          evening: "Sunset at La Caleta or dinner nearby",
+        },
+        {
+          day: 3,
+          title: "Old town lanes and close",
+          summary: "Barrio del Pópulo and last stops.",
+          morning: "Barrio del Pópulo and narrow streets",
+          afternoon: "Last museum or market visit",
+          evening: "Final dinner and paseo",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The cathedral",
+          description:
+            "The cathedral dominates the skyline. Combine a visit with the square and nearby streets for a full morning.",
+          image: {
+            src: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cádiz cathedral and square.",
+          },
+        },
+        {
+          title: "La Caleta",
+          description:
+            "The small beach between two castles is a city icon. Mornings and sunsets are ideal.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "La Caleta beach in Cádiz.",
+          },
+        },
+        {
+          title: "Old town streets",
+          description:
+            "Narrow lanes and white-washed corners give Cádiz its character. Leave time for unplanned stops and tapas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "White-washed street in Cádiz old town.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Train", value: "From Seville and Jerez" },
+        { label: "Transit tips", value: "Walk the old town; no car needed" },
+        { label: "Neighborhood stay", value: "Old town near cathedral or La Caleta" },
+      ],
+      checklist: [
+        "Book Tavira Tower if you want camera obscura",
+        "Comfortable shoes for cobblestones",
+        "Save offline map for old town",
+        "Plan one slow cafe or beach break daily",
+        "Carry a refillable water bottle",
+        "Check cathedral opening hours",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Cádiz?",
+          answer:
+            "Yes for the cathedral, La Caleta, and the old town at a relaxed pace.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No. The old town is compact and walkable; train links to Seville and Jerez.",
+        },
+        {
+          question: "Is Cádiz walkable?",
+          answer:
+            "Yes. The center is small; you can cover the main areas on foot.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old town near the cathedral or closer to La Caleta for beach access.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "No need to rush. Mornings are good for the cathedral and Tavira; save La Caleta for afternoon or sunset.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots at weekend dinner, yes. Lunch and tapas often work without a reservation.",
+        },
+        {
+          question: "Can I combine Cádiz with Seville?",
+          answer:
+            "Yes. About 1.5 hours by train; easy to do both in one trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "seville", city: "Seville", days: 3, description: "Plazas, Alcázar, and Andalusian rhythm." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "City of Arts, old town, and coast." },
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudi, beaches, and walkable neighborhoods." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    gijon: {
+      slug: "gijon",
+      city: "Gijón",
+      country: "Spain",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Waterfront and cider", "Relaxed pace"],
+      style: ["Beach and port", "Cimavilla", "Cider culture"],
+      pacing: [
+        "Gijón works well at a calm pace. Anchor each day with one main area—the waterfront, Cimavilla, or Laboral—then leave room for sidra and long lunches.",
+        "Group time by zone. Pair the beach and Cimavilla for a full day; add the port and Laboral on others for variety.",
+        "Save an open afternoon for a waterfront walk or a sidrería so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Gijón in 3 days",
+        subtitle:
+          "Waterfront, Cimavilla old town, and Asturian cider culture at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1600&q=80",
+          alt: "Gijón waterfront and San Lorenzo beach.",
+        },
+      },
+      cityStats: [
+        { value: "2.5 km", label: "San Lorenzo beach" },
+        { value: "Cimavilla", label: "Historic fishermen quarter" },
+        { value: "Sidra", label: "Cider culture" },
+      ],
+      fit: {
+        forYou: ["Beach and city", "First-time visitors", "Walkable waterfront", "Cider and local food", "Relaxed pace"],
+        notForYou: ["Museum-only focus", "Nightlife-heavy trips", "Remote mountains only", "Packed back-to-back sights", "No seafood"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "San Lorenzo and Cimavilla",
+          summary: "Beach and old fishermen quarter.",
+          morning: "San Lorenzo beach walk",
+          afternoon: "Cimavilla streets and marina",
+          evening: "Sidrería and dinner in Cimavilla",
+        },
+        {
+          day: 2,
+          title: "Port and Laboral",
+          summary: "Port area and Laboral Ciudad de la Cultura.",
+          morning: "Port and fishing quarter",
+          afternoon: "Laboral Ciudad de la Cultura",
+          evening: "Waterfront dinner",
+        },
+        {
+          day: 3,
+          title: "Slow close and last stops",
+          summary: "Last beach or museum and relaxed end.",
+          morning: "Beach or Parque Isabel la Católica",
+          afternoon: "Last museum or shopping if desired",
+          evening: "Final sidrería or waterfront stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "San Lorenzo beach",
+          description:
+            "The city beach runs along the bay. Mornings and late afternoons are ideal for a walk or a swim.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "San Lorenzo beach in Gijón.",
+          },
+        },
+        {
+          title: "Cimavilla",
+          description:
+            "The old fishermen quarter has narrow streets and sidrerías. Plan a meal and a slow walk here.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cimavilla quarter in Gijón.",
+          },
+        },
+        {
+          title: "Sidra and local food",
+          description:
+            "Asturian cider and seafood set the tone. Leave room for a long lunch or an evening at a sidrería.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cider and local food in Gijón.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for beach" },
+        { label: "Train", value: "From Oviedo, Santander, and Madrid" },
+        { label: "Transit tips", value: "Walk beach and Cimavilla; bus for Laboral" },
+        { label: "Neighborhood stay", value: "Near San Lorenzo or Cimavilla" },
+      ],
+      checklist: [
+        "Comfortable shoes for beach and old town",
+        "Save offline map for waterfront",
+        "Plan one sidrería visit",
+        "Carry a refillable water bottle",
+        "Pack a light layer for evenings",
+        "Check Laboral opening hours if visiting",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Gijón?",
+          answer:
+            "Yes for the beach, Cimavilla, and a relaxed pace. You can add Laboral or a day trip to Oviedo if you like.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No for the city. A car helps for day trips to the coast or Oviedo.",
+        },
+        {
+          question: "Is Gijón walkable?",
+          answer:
+            "Yes. San Lorenzo and Cimavilla are easy on foot; bus to Laboral if needed.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near San Lorenzo for beach access, or Cimavilla for old town and sidrerías.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "No need to rush. Beach days can start mid-morning; Cimavilla is pleasant morning or evening.",
+        },
+        {
+          question: "Do I need to book sidrerías in advance?",
+          answer:
+            "For popular spots at weekend dinner, yes. Lunch is often easier without a reservation.",
+        },
+        {
+          question: "Can I combine Gijón with Oviedo?",
+          answer:
+            "Yes. About 30 minutes by train or bus; easy to do both in one trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "oviedo", city: "Oviedo", days: 3, description: "Pre-Romanesque, old town, and Asturian food." },
+        { slug: "bilbao", city: "Bilbao", days: 2, description: "Guggenheim and riverside." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "City of Arts, old town, and coast." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    oviedo: {
+      slug: "oviedo",
+      city: "Oviedo",
+      country: "Spain",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Pre-Romanesque and old town", "Food-focused"],
+      style: ["Santa María del Naranco", "Cathedral", "Asturian cuisine"],
+      pacing: [
+        "Oviedo rewards a calm pace. Anchor each day with one main area—the pre-Romanesque sites, the cathedral, or the old town—then leave room for long lunches and slow strolls.",
+        "Group time by zone. Pair Santa María del Naranco with San Miguel de Lillo; add the cathedral and Campo de San Francisco on another day.",
+        "Save an open afternoon for the park or a sidrería so the trip feels unhurried.",
+      ],
+      hero: {
+        title: "Oviedo in 3 days",
+        subtitle:
+          "Pre-Romanesque sites, cathedral, and Asturian food at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1600&q=80",
+          alt: "Oviedo cathedral and old town skyline.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Pre-Romanesque monuments" },
+        { value: "9th c.", label: "Santa María del Naranco" },
+        { value: "Compact", label: "Walkable center" },
+      ],
+      fit: {
+        forYou: ["History and architecture", "First-time visitors", "Walkable center", "Asturian food and sidra", "Relaxed pace"],
+        notForYou: ["Beach-only focus", "Nightlife-heavy trips", "Remote hiking only", "Packed back-to-back museums", "No sidra"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Pre-Romanesque on the hill",
+          summary: "Santa María del Naranco and San Miguel de Lillo.",
+          morning: "Santa María del Naranco",
+          afternoon: "San Miguel de Lillo and descent to center",
+          evening: "Dinner in the old town",
+        },
+        {
+          day: 2,
+          title: "Cathedral and Campo de San Francisco",
+          summary: "Cathedral and main park.",
+          morning: "Oviedo Cathedral and surroundings",
+          afternoon: "Campo de San Francisco and streets",
+          evening: "Sidrería and dinner",
+        },
+        {
+          day: 3,
+          title: "Old town and slow close",
+          summary: "Last streets and food.",
+          morning: "Old town lanes and market",
+          afternoon: "Last museum or park if desired",
+          evening: "Final dinner and paseo",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Santa María del Naranco",
+          description:
+            "The pre-Romanesque palace is a UNESCO site on the hill. Combine with San Miguel de Lillo for a half day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Santa María del Naranco, Oviedo.",
+          },
+        },
+        {
+          title: "The cathedral",
+          description:
+            "The cathedral and the old town form a compact core. Plan a morning to visit and walk the streets.",
+          image: {
+            src: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Oviedo Cathedral.",
+          },
+        },
+        {
+          title: "Asturian food",
+          description:
+            "Sidra, cheese, and local dishes set the tone. Leave room for a long lunch or a sidrería stop.",
+          image: {
+            src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80",
+            alt: "Asturian food and cider in Oviedo.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Train", value: "From Gijón, Santander, and Madrid" },
+        { label: "Transit tips", value: "Walk the center; bus or taxi to Naranco" },
+        { label: "Ticketing", value: "Pre-Romanesque sites have entry; check hours" },
+        { label: "Neighborhood stay", value: "Old town near cathedral" },
+      ],
+      checklist: [
+        "Book or check Naranco site hours",
+        "Comfortable shoes for hill and center",
+        "Save offline map for old town",
+        "Plan one sidrería visit",
+        "Carry a refillable water bottle",
+        "Check cathedral and pre-Romanesque site times",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Oviedo?",
+          answer:
+            "Yes for the pre-Romanesque sites, cathedral, and old town at a relaxed pace.",
+        },
+        {
+          question: "Do I need a car to reach Santa María del Naranco?",
+          answer:
+            "Bus or taxi from the center. Allow about 15–20 minutes; combine with San Miguel de Lillo.",
+        },
+        {
+          question: "Is Oviedo walkable?",
+          answer:
+            "Yes. The center is compact. The Naranco sites require a short ride.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old town near the cathedral for restaurants and the main sights.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Start by mid-morning for Naranco to have time for both sites and the descent. Cathedral day can be more flexible.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular sidrerías at weekend dinner, yes. Lunch is often easier without a reservation.",
+        },
+        {
+          question: "Can I combine Oviedo with Gijón?",
+          answer:
+            "Yes. About 30 minutes by train or bus; easy to do both in one trip.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "gijon", city: "Gijón", days: 3, description: "Waterfront, Cimavilla, and cider culture." },
+        { slug: "bilbao", city: "Bilbao", days: 2, description: "Guggenheim and riverside." },
+        { slug: "santiago", city: "Santiago de Compostela", days: 3, description: "Cathedral, old town, and pilgrim vibe." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
     baltimore: {
       slug: "baltimore",
       city: "Baltimore",
@@ -75971,6 +76703,338 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { slug: "prague", city: "Praga", days: 3, description: "Casco antiguo, castillo y río." },
         { slug: "krakow", city: "Cracovia", days: 3, description: "Plaza, castillo y casco antiguo." },
         { slug: "vienna", city: "Viena", days: 3, description: "Palacios, museos y grandes avenidas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "las-palmas": {
+      slug: "las-palmas",
+      city: "Las Palmas",
+      country: "España",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Playa y ciudad", "Ritmo tranquilo"],
+      style: ["Playa", "Casco antiguo", "Comida canaria"],
+      pacing: [
+        "Las Palmas se disfruta con calma. Ancla cada día en una zona—la playa, Vegueta o una mezcla—y deja tiempo para almuerzos largos, paseos por la playa y paradas espontáneas.",
+        "Agrupa el tiempo por zona para moverte poco. Combina Las Canteras con Triana un día; añade Vegueta y Casa de Colón otro para historia y sombra.",
+        "Reserva una tarde libre para la playa o un café tranquilo para que el viaje no se sienta apresurado.",
+      ],
+      hero: {
+        title: "Las Palmas en 3 días",
+        subtitle:
+          "Playa, casco antiguo Vegueta y ritmo canario tranquilo sin prisas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=80",
+          alt: "Playa de Las Canteras y paseo marítimo en Las Palmas de Gran Canaria.",
+        },
+      },
+      cityStats: [
+        { value: "3 km", label: "Longitud de la playa de Las Canteras" },
+        { value: "500+", label: "Años de historia de Vegueta" },
+        { value: "380K", label: "Población de la ciudad" },
+      ],
+      fit: {
+        forYou: ["Playa y ciudad en un viaje", "Primera vez", "Centro caminable", "Ritmo tranquilo y buena comida", "Sol y cultura"],
+        notForYou: ["Solo museos", "Viajes de mucha vida nocturna", "Solo senderismo lejano", "Siguientes sin parar", "Nieve invernal"],
+      },
+      dayPlans: [
+        { day: 1, title: "Las Canteras y Triana", summary: "Mañana de playa y calles comerciales.", morning: "Paseo y baño en Las Canteras", afternoon: "Triana y Calle Mayor de Triana", evening: "Atardecer en la playa y cena cerca" },
+        { day: 2, title: "Casco antiguo Vegueta", summary: "Centro histórico y Casa de Colón.", morning: "Calles de Vegueta y Plaza de Santa Ana", afternoon: "Casa de Colón y zona de la catedral", evening: "Cena en Vegueta o zona del puerto" },
+        { day: 3, title: "Playa y vida local", summary: "Tiempo tranquilo en la playa y últimas paradas.", morning: "Playa o Parque Doramas", afternoon: "Últimas compras o museo si apetece", evening: "Último paseo por la playa y cena" },
+      ],
+      imageInfoCards: [
+        { title: "Playa de Las Canteras", description: "La playa urbana es una larga curva de arena con paseo tranquilo. Mañanas y tardes son ideales para pasear o nadar.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Playa de Las Canteras y mar en Las Palmas." } },
+        { title: "Vegueta", description: "El casco antiguo alberga la catedral, Casa de Colón y calles estrechas. Reserva una mañana o tarde para explorar a pie.", image: { src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80", alt: "Calles históricas en Vegueta, Las Palmas." } },
+        { title: "Ritmo canario", description: "Almuerzos largos, pausas en la playa y paseos al atardecer marcan el tono. Deja margen para tapas y recomendaciones locales.", image: { src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80", alt: "Comida al aire libre y vida local en Las Palmas." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Octubre a abril para calor suave" },
+        { label: "Traslado aeropuerto", value: "Bus o taxi al centro" },
+        { label: "Transporte", value: "A pie por playa y Vegueta; bus para trayectos largos" },
+        { label: "Dónde alojarse", value: "Cerca de Las Canteras o Triana" },
+      ],
+      checklist: ["Protector solar y bañador", "Zapatos cómodos para Vegueta", "Mapa sin conexión de playa y casco antiguo", "Planifica una pausa de playa o café al día", "Botella de agua reutilizable", "Revisa horarios de Casa de Colón si quieres visitar"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Las Palmas?", answer: "Sí para la playa, Vegueta y un ritmo tranquilo. Puedes cubrir las zonas principales sin prisas." },
+        { question: "¿Necesito coche?", answer: "No. La playa y el casco antiguo son caminables; los buses cubren el resto si hace falta." },
+        { question: "¿Las Palmas es caminable?", answer: "Sí. Las Canteras y Vegueta se hacen a pie; Triana une ambas." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de Las Canteras para la playa, o Triana para tiendas y paseo corto a playa y Vegueta." },
+        { question: "¿A qué hora empezar cada día?", answer: "No hace falta madrugar. Los días de playa pueden empezar a media mañana; Vegueta es agradable por la mañana o tarde." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares para cenar en fin de semana, sí. Muchos aceptan sin reserva a mediodía." },
+        { question: "¿Puedo hacer excursiones a otras partes de la isla?", answer: "Sí. Coche de alquiler o bus a Maspalomas, Tejeda o el norte. Si solo tienes tres días, deja uno completo en la ciudad." },
+      ],
+      relatedItineraries: [
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudí, playas y barrios caminables." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "Ciudad de las Artes, casco antiguo y costa." },
+        { slug: "seville", city: "Sevilla", days: 3, description: "Plazas, Alcázar y ritmo andaluz." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    coimbra: {
+      slug: "coimbra",
+      city: "Coímbra",
+      country: "Portugal",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y universidad", "Paseos junto al río"],
+      style: ["Ciudad universitaria", "Centro histórico", "Ritmo tranquilo"],
+      pacing: [
+        "Coímbra se disfruta con calma. Ancla cada día en una zona—la universidad, el río o el casco antiguo—y deja tiempo para almuerzos largos y paseos lentos.",
+        "Agrupa el tiempo por barrio. Combina la universidad y la Biblioteca Joanina con la zona de la catedral; añade el río y Santa Clara otro día.",
+        "Reserva una tarde libre para el Mondego o un café para que el viaje no se sienta apresurado.",
+      ],
+      hero: {
+        title: "Coímbra en 3 días",
+        subtitle:
+          "Universidad, río y centro histórico a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Universidad de Coímbra y casco antiguo desde el otro lado del río.",
+        },
+      },
+      cityStats: [
+        { value: "1290", label: "Año de fundación de la universidad" },
+        { value: "200K+", label: "Población metropolitana" },
+        { value: "UNESCO", label: "Zona universitaria" },
+      ],
+      fit: {
+        forYou: ["Universidad e historia", "Primera vez", "Centro caminable", "Río y vistas", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Mucha vida nocturna", "Solo campo lejano", "Museos sin parar", "Turismo muy rápido"],
+      },
+      dayPlans: [
+        { day: 1, title: "Universidad y Alta", summary: "Universidad de Coímbra y Biblioteca Joanina.", morning: "Universidad de Coímbra y Biblioteca Joanina", afternoon: "Capilla de São Miguel y plaza de la universidad", evening: "Cena en Alta o bajada a Baixa" },
+        { day: 2, title: "Baixa y río", summary: "Casco antiguo y vistas al Mondego.", morning: "Sé Velha y calles de Baixa", afternoon: "Paseo del río Mondego", evening: "Santa Clara o cena junto al río" },
+        { day: 3, title: "Santa Clara y cierre tranquilo", summary: "Zona del convento y últimas paradas.", morning: "Santa Clara-a-Velha o Santa Cruz", afternoon: "Último museo o paseo por el río", evening: "Última cena en el centro" },
+      ],
+      imageInfoCards: [
+        { title: "La universidad", description: "La universidad en la colina domina la ciudad. Reserva una visita a la biblioteca y al palacio real para la experiencia completa.", image: { src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80", alt: "Edificio histórico de la Universidad de Coímbra." } },
+        { title: "Río Mondego", description: "El río une las dos orillas. Un paseo por el paseo fluvial ofrece vistas de la universidad y del casco antiguo.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Río Mondego y Coímbra desde la orilla." } },
+        { title: "Calles del casco antiguo", description: "Callejuelas y vida estudiantil dan carácter al centro. Planifica un paseo lento y un almuerzo largo.", image: { src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80", alt: "Calle histórica del casco antiguo de Coímbra." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Tren", value: "Directo desde Lisboa y Oporto" },
+        { label: "Transporte", value: "A pie por el centro; bus o taxi para Santa Clara" },
+        { label: "Entradas", value: "Reserva visita a la universidad en temporada alta" },
+        { label: "Dónde alojarse", value: "Baixa o cerca de la universidad" },
+      ],
+      checklist: ["Reserva visita a universidad y biblioteca", "Zapatos cómodos para cuestas", "Mapa sin conexión del centro", "Planifica una pausa en café al día", "Botella de agua reutilizable", "Revisa horarios del barco en el río si quieres un paseo corto"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Coímbra?", answer: "Sí para la universidad, casco antiguo y río. Puedes ver lo esencial a ritmo tranquilo." },
+        { question: "¿Hay que reservar la universidad?", answer: "Sí para la Biblioteca Joanina y visita guiada en temporada alta. Reserva con unos días de antelación." },
+        { question: "¿Coímbra es caminable?", answer: "Sí, pero con cuestas. El centro es compacto; calcula tiempo para la subida a la universidad." },
+        { question: "¿Dónde alojarme?", answer: "Baixa te deja cerca de restaurantes y el río; cerca de la universidad para visitas tempranas y vistas." },
+        { question: "¿A qué hora empezar cada día?", answer: "Empieza a media mañana en la universidad para evitar la subida con más calor. Tardes bien para el río y Baixa." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares para cenar en fin de semana, sí. A mediodía suele bastar sin reserva." },
+        { question: "¿Puedo combinar Coímbra con Lisboa u Oporto?", answer: "Sí. Trenes conectan las tres. Tres días en Coímbra bastan; añade una noche en Lisboa u Oporto para un viaje más largo." },
+      ],
+      relatedItineraries: [
+        { slug: "lisbon", city: "Lisboa", days: 3, description: "Colinas, tranvías y río." },
+        { slug: "porto", city: "Oporto", days: 3, description: "Río, bodegas y casco antiguo." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "Ciudad de las Artes, casco antiguo y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    cadiz: {
+      slug: "cadiz",
+      city: "Cádiz",
+      country: "España",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Casco antiguo y mar", "Ritmo tranquilo"],
+      style: ["Centro histórico", "Vistas al mar", "Ritmo andaluz"],
+      pacing: [
+        "Cádiz se disfruta con calma. Ancla cada día en una zona—la catedral, La Caleta o las calles del casco antiguo—y deja tiempo para almuerzos largos y paseos al atardecer.",
+        "Agrupa el tiempo por zona. El centro es compacto; combina la catedral con la Torre Tavira y el mercado, y añade La Caleta y el paseo marítimo otro día.",
+        "Reserva una tarde libre para la playa o un café tranquilo para que el viaje no se sienta apresurado.",
+      ],
+      hero: {
+        title: "Cádiz en 3 días",
+        subtitle:
+          "Casco antiguo, vistas al mar y ritmo andaluz tranquilo sin prisas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1600&q=80",
+          alt: "Catedral de Cádiz y casco antiguo desde el agua.",
+        },
+      },
+      cityStats: [
+        { value: "3.000+", label: "Años de historia" },
+        { value: "Compacto", label: "Casco antiguo caminable" },
+        { value: "La Caleta", label: "Playa icónica de la ciudad" },
+      ],
+      fit: {
+        forYou: ["Casco antiguo y mar", "Primera vez", "Centro caminable", "Ritmo tranquilo y buena comida", "Sol e historia"],
+        notForYou: ["Solo museos", "Viajes de mucha vida nocturna", "Solo naturaleza lejana", "Siguientes sin parar", "Nieve invernal"],
+      },
+      dayPlans: [
+        { day: 1, title: "Catedral y Torre Tavira", summary: "Zona de la catedral y vistas de la cámara oscura.", morning: "Catedral de Cádiz y plaza", afternoon: "Torre Tavira y zona del mercado", evening: "Cena en el centro y paseo nocturno" },
+        { day: 2, title: "La Caleta y paseo marítimo", summary: "Playa y paseo costero.", morning: "Playa de La Caleta y Castillos", afternoon: "Paseo por el paseo marítimo", evening: "Atardecer en La Caleta o cena cerca" },
+        { day: 3, title: "Calles del casco antiguo y cierre", summary: "Barrio del Pópulo y últimas paradas.", morning: "Barrio del Pópulo y calles estrechas", afternoon: "Último museo o mercado", evening: "Última cena y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "La catedral", description: "La catedral domina el skyline. Combina la visita con la plaza y las calles cercanas para una mañana completa.", image: { src: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1200&q=80", alt: "Catedral de Cádiz y plaza." } },
+        { title: "La Caleta", description: "La playa pequeña entre dos castillos es un icono de la ciudad. Mañanas y atardeceres son ideales.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Playa de La Caleta en Cádiz." } },
+        { title: "Calles del casco antiguo", description: "Callejuelas y rincones encalados dan carácter a Cádiz. Deja tiempo para paradas espontáneas y tapas.", image: { src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80", alt: "Calle encalada en el casco antiguo de Cádiz." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Tren", value: "Desde Sevilla y Jerez" },
+        { label: "Transporte", value: "A pie por el casco antiguo; no hace falta coche" },
+        { label: "Dónde alojarse", value: "Casco antiguo cerca de la catedral o La Caleta" },
+      ],
+      checklist: ["Reserva Torre Tavira si quieres cámara oscura", "Zapatos cómodos para adoquines", "Mapa sin conexión del casco antiguo", "Planifica una pausa de café o playa al día", "Botella de agua reutilizable", "Revisa horarios de la catedral"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Cádiz?", answer: "Sí para la catedral, La Caleta y el casco antiguo a ritmo tranquilo." },
+        { question: "¿Necesito coche?", answer: "No. El casco antiguo es compacto y caminable; tren a Sevilla y Jerez." },
+        { question: "¿Cádiz es caminable?", answer: "Sí. El centro es pequeño; puedes cubrir las zonas principales a pie." },
+        { question: "¿Dónde alojarme?", answer: "Casco antiguo cerca de la catedral o más cerca de La Caleta para la playa." },
+        { question: "¿A qué hora empezar cada día?", answer: "No hace falta madrugar. Mañanas bien para catedral y Tavira; La Caleta para tarde o atardecer." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sitios populares para cenar en fin de semana, sí. Comida y tapas suelen funcionar sin reserva." },
+        { question: "¿Puedo combinar Cádiz con Sevilla?", answer: "Sí. Unas 1,5 horas en tren; fácil hacer ambas en un mismo viaje." },
+      ],
+      relatedItineraries: [
+        { slug: "seville", city: "Sevilla", days: 3, description: "Plazas, Alcázar y ritmo andaluz." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "Ciudad de las Artes, casco antiguo y costa." },
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudí, playas y barrios caminables." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    gijon: {
+      slug: "gijon",
+      city: "Gijón",
+      country: "España",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Frente marítimo y sidra", "Ritmo tranquilo"],
+      style: ["Playa y puerto", "Cimavilla", "Cultura de la sidra"],
+      pacing: [
+        "Gijón se disfruta con calma. Ancla cada día en una zona—el frente marítimo, Cimavilla o Laboral—y deja tiempo para sidra y almuerzos largos.",
+        "Agrupa el tiempo por zona. Combina playa y Cimavilla un día completo; añade puerto y Laboral otros días para variar.",
+        "Reserva una tarde libre para un paseo por el frente marítimo o una sidrería para que el viaje no se sienta apresurado.",
+      ],
+      hero: {
+        title: "Gijón en 3 días",
+        subtitle:
+          "Frente marítimo, casco antiguo Cimavilla y cultura asturiana de la sidra a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1600&q=80",
+          alt: "Frente marítimo de Gijón y playa de San Lorenzo.",
+        },
+      },
+      cityStats: [
+        { value: "2,5 km", label: "Playa de San Lorenzo" },
+        { value: "Cimavilla", label: "Barrio histórico de pescadores" },
+        { value: "Sidra", label: "Cultura de la sidra" },
+      ],
+      fit: {
+        forYou: ["Playa y ciudad", "Primera vez", "Frente marítimo caminable", "Sidra y comida local", "Ritmo tranquilo"],
+        notForYou: ["Solo museos", "Viajes de mucha vida nocturna", "Solo montaña lejana", "Siguientes sin parar", "Sin marisco"],
+      },
+      dayPlans: [
+        { day: 1, title: "San Lorenzo y Cimavilla", summary: "Playa y barrio antiguo de pescadores.", morning: "Paseo por la playa de San Lorenzo", afternoon: "Calles de Cimavilla y marina", evening: "Sidrería y cena en Cimavilla" },
+        { day: 2, title: "Puerto y Laboral", summary: "Zona del puerto y Laboral Ciudad de la Cultura.", morning: "Puerto y barrio pesquero", afternoon: "Laboral Ciudad de la Cultura", evening: "Cena en el frente marítimo" },
+        { day: 3, title: "Cierre tranquilo y últimas paradas", summary: "Última playa o museo y final relajado.", morning: "Playa o Parque Isabel la Católica", afternoon: "Último museo o compras si apetece", evening: "Última sidrería o paseo por el frente marítimo" },
+      ],
+      imageInfoCards: [
+        { title: "Playa de San Lorenzo", description: "La playa urbana recorre la bahía. Mañanas y tardes son ideales para pasear o nadar.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Playa de San Lorenzo en Gijón." } },
+        { title: "Cimavilla", description: "El barrio antiguo de pescadores tiene calles estrechas y sidrerías. Planifica una comida y un paseo lento aquí.", image: { src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80", alt: "Barrio de Cimavilla en Gijón." } },
+        { title: "Sidra y comida local", description: "La sidra asturiana y el marisco marcan el tono. Deja margen para un almuerzo largo o una parada en sidrería.", image: { src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80", alt: "Sidra y comida local en Gijón." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para playa" },
+        { label: "Tren", value: "Desde Oviedo, Santander y Madrid" },
+        { label: "Transporte", value: "A pie por playa y Cimavilla; bus para Laboral" },
+        { label: "Dónde alojarse", value: "Cerca de San Lorenzo o Cimavilla" },
+      ],
+      checklist: ["Zapatos cómodos para playa y casco antiguo", "Mapa sin conexión del frente marítimo", "Planifica una visita a sidrería", "Botella de agua reutilizable", "Capa ligera para la noche", "Revisa horarios de Laboral si quieres visitar"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Gijón?", answer: "Sí para la playa, Cimavilla y un ritmo tranquilo. Puedes añadir Laboral o una excursión a Oviedo si quieres." },
+        { question: "¿Necesito coche?", answer: "No para la ciudad. El coche ayuda para excursiones a la costa o Oviedo." },
+        { question: "¿Gijón es caminable?", answer: "Sí. San Lorenzo y Cimavilla se hacen a pie; bus a Laboral si hace falta." },
+        { question: "¿Dónde alojarme?", answer: "Cerca de San Lorenzo para la playa, o Cimavilla para casco antiguo y sidrerías." },
+        { question: "¿A qué hora empezar cada día?", answer: "No hace falta madrugar. Los días de playa pueden empezar a media mañana; Cimavilla es agradable por la mañana o noche." },
+        { question: "¿Hay que reservar en sidrerías?", answer: "En sidrerías populares para cenar en fin de semana, sí. A mediodía suele bastar sin reserva." },
+        { question: "¿Puedo combinar Gijón con Oviedo?", answer: "Sí. Unos 30 minutos en tren o bus; fácil hacer ambas en un mismo viaje." },
+      ],
+      relatedItineraries: [
+        { slug: "oviedo", city: "Oviedo", days: 3, description: "Prerrománico, casco antiguo y comida asturiana." },
+        { slug: "bilbao", city: "Bilbao", days: 2, description: "Guggenheim y río." },
+        { slug: "valencia", city: "Valencia", days: 3, description: "Ciudad de las Artes, casco antiguo y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    oviedo: {
+      slug: "oviedo",
+      city: "Oviedo",
+      country: "España",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Prerrománico y casco antiguo", "Enfoque en comida"],
+      style: ["Santa María del Naranco", "Catedral", "Cocina asturiana"],
+      pacing: [
+        "Oviedo se disfruta con calma. Ancla cada día en una zona—los sitios prerrománicos, la catedral o el casco antiguo—y deja tiempo para almuerzos largos y paseos lentos.",
+        "Agrupa el tiempo por zona. Combina Santa María del Naranco con San Miguel de Lillo; añade la catedral y el Campo de San Francisco otro día.",
+        "Reserva una tarde libre para el parque o una sidrería para que el viaje no se sienta apresurado.",
+      ],
+      hero: {
+        title: "Oviedo en 3 días",
+        subtitle:
+          "Sitios prerrománicos, catedral y comida asturiana a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1600&q=80",
+          alt: "Catedral de Oviedo y skyline del casco antiguo.",
+        },
+      },
+      cityStats: [
+        { value: "UNESCO", label: "Monumentos prerrománicos" },
+        { value: "s. IX", label: "Santa María del Naranco" },
+        { value: "Compacto", label: "Centro caminable" },
+      ],
+      fit: {
+        forYou: ["Historia y arquitectura", "Primera vez", "Centro caminable", "Comida asturiana y sidra", "Ritmo tranquilo"],
+        notForYou: ["Solo playa", "Viajes de mucha vida nocturna", "Solo senderismo lejano", "Museos sin parar", "Sin sidra"],
+      },
+      dayPlans: [
+        { day: 1, title: "Prerrománico en la colina", summary: "Santa María del Naranco y San Miguel de Lillo.", morning: "Santa María del Naranco", afternoon: "San Miguel de Lillo y bajada al centro", evening: "Cena en el casco antiguo" },
+        { day: 2, title: "Catedral y Campo de San Francisco", summary: "Catedral y parque principal.", morning: "Catedral de Oviedo y alrededores", afternoon: "Campo de San Francisco y calles", evening: "Sidrería y cena" },
+        { day: 3, title: "Casco antiguo y cierre tranquilo", summary: "Últimas calles y comida.", morning: "Calles del casco antiguo y mercado", afternoon: "Último museo o parque si apetece", evening: "Última cena y paseo" },
+      ],
+      imageInfoCards: [
+        { title: "Santa María del Naranco", description: "El palacio prerrománico es un sitio UNESCO en la colina. Combina con San Miguel de Lillo para media jornada.", image: { src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80", alt: "Santa María del Naranco, Oviedo." } },
+        { title: "La catedral", description: "La catedral y el casco antiguo forman un núcleo compacto. Reserva una mañana para visitar y pasear por las calles.", image: { src: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1200&q=80", alt: "Catedral de Oviedo." } },
+        { title: "Comida asturiana", description: "Sidra, queso y platos locales marcan el tono. Deja margen para un almuerzo largo o una parada en sidrería.", image: { src: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1200&q=80", alt: "Comida asturiana y sidra en Oviedo." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Tren", value: "Desde Gijón, Santander y Madrid" },
+        { label: "Transporte", value: "A pie por el centro; bus o taxi a Naranco" },
+        { label: "Entradas", value: "Sitios prerrománicos tienen entrada; revisa horarios" },
+        { label: "Dónde alojarse", value: "Casco antiguo cerca de la catedral" },
+      ],
+      checklist: ["Reserva o revisa horarios de Naranco", "Zapatos cómodos para colina y centro", "Mapa sin conexión del casco antiguo", "Planifica una visita a sidrería", "Botella de agua reutilizable", "Revisa horarios de catedral y sitios prerrománicos"],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Oviedo?", answer: "Sí para los sitios prerrománicos, la catedral y el casco antiguo a ritmo tranquilo." },
+        { question: "¿Necesito coche para llegar a Santa María del Naranco?", answer: "Bus o taxi desde el centro. Unos 15–20 min; combina con San Miguel de Lillo." },
+        { question: "¿Oviedo es caminable?", answer: "Sí. El centro es compacto. Los sitios de Naranco requieren un trayecto corto." },
+        { question: "¿Dónde alojarme?", answer: "Casco antiguo cerca de la catedral para restaurantes y los principales sitios." },
+        { question: "¿A qué hora empezar cada día?", answer: "Empieza a media mañana en Naranco para tener tiempo para ambos sitios y la bajada. El día de la catedral puede ser más flexible." },
+        { question: "¿Hay que reservar restaurantes?", answer: "En sidrerías populares para cenar en fin de semana, sí. A mediodía suele bastar sin reserva." },
+        { question: "¿Puedo combinar Oviedo con Gijón?", answer: "Sí. Unos 30 minutos en tren o bus; fácil hacer ambas en un mismo viaje." },
+      ],
+      relatedItineraries: [
+        { slug: "gijon", city: "Gijón", days: 3, description: "Frente marítimo, Cimavilla y cultura de la sidra." },
+        { slug: "bilbao", city: "Bilbao", days: 2, description: "Guggenheim y río." },
+        { slug: "santiago", city: "Santiago de Compostela", days: 3, description: "Catedral, casco antiguo y ambiente peregrino." },
       ],
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",

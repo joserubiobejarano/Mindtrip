@@ -3340,6 +3340,66 @@ export const cityPages: CitySeo[] = [
     contentLevel: "full",
     primaryKeyword: "2 days in Ostrava",
   },
+  {
+    slug: "las-palmas",
+    name: "Las Palmas",
+    country: "Spain",
+    days: 3,
+    description:
+      "A 3-day Las Palmas travel guide with beaches, Vegueta old town, and relaxed Canarian pace.",
+    highlights: ["Las Canteras Beach", "Vegueta", "Casa de Colón"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Las Palmas",
+  },
+  {
+    slug: "coimbra",
+    name: "Coimbra",
+    country: "Portugal",
+    days: 3,
+    description:
+      "A 3-day Coimbra travel guide focused on the university, river walks, and historic center.",
+    highlights: ["University of Coimbra", "Biblioteca Joanina", "River Mondego"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Coimbra",
+  },
+  {
+    slug: "cadiz",
+    name: "Cádiz",
+    country: "Spain",
+    days: 3,
+    description:
+      "A 3-day Cádiz travel guide with old town lanes, sea views, and relaxed Andalusian rhythm.",
+    highlights: ["Cádiz Cathedral", "La Caleta", "Tavira Tower"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Cádiz",
+  },
+  {
+    slug: "gijon",
+    name: "Gijón",
+    country: "Spain",
+    days: 3,
+    description:
+      "A 3-day Gijón travel guide combining waterfront, cider culture, and compact old town.",
+    highlights: ["San Lorenzo Beach", "Cimavilla", "Laboral Ciudad de la Cultura"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Gijón",
+  },
+  {
+    slug: "oviedo",
+    name: "Oviedo",
+    country: "Spain",
+    days: 3,
+    description:
+      "A 3-day Oviedo travel guide with pre-Romanesque sites, old town, and Asturian food.",
+    highlights: ["Santa María del Naranco", "Cathedral", "Campo de San Francisco"],
+    intent: "mixed",
+    contentLevel: "lite",
+    primaryKeyword: "3 days in Oviedo",
+  },
 ];
 
 export function getCityBySlug(slug: string): CitySeo | undefined {

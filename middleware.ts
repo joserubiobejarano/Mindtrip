@@ -64,6 +64,9 @@ const isProtectedRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, request) => {
   const { pathname } = request.nextUrl
+  if (pathname === '/') {
+    return NextResponse.next()
+  }
   if (pathname === CITY_ROUTE_PREFIX || pathname.startsWith(`${CITY_ROUTE_PREFIX}/`)) {
     const locale = getPreferredLocale(request.headers.get('accept-language'))
     const url = request.nextUrl.clone()

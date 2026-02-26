@@ -3,6 +3,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   async redirects() {
     return [
+      { source: "/", destination: "/en", permanent: true },
       {
         source: "/:path*",
         has: [
