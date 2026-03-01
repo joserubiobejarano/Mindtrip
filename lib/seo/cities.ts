@@ -3400,6 +3400,66 @@ export const cityPages: CitySeo[] = [
     contentLevel: "lite",
     primaryKeyword: "3 days in Oviedo",
   },
+  {
+    slug: "aarhus",
+    name: "Aarhus",
+    country: "Denmark",
+    days: 3,
+    description:
+      "A 3-day Aarhus travel guide pairing ARoS museum, Latin Quarter, and relaxed waterfront walks.",
+    highlights: ["ARoS Museum", "Latin Quarter", "Dokk1"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Aarhus",
+  },
+  {
+    slug: "penang",
+    name: "Penang",
+    country: "Malaysia",
+    days: 3,
+    description:
+      "A 3-day Penang travel guide focused on George Town heritage, street food, and coastal viewpoints.",
+    highlights: ["George Town UNESCO", "Street food", "Penang Hill"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Penang",
+  },
+  {
+    slug: "salt-lake-city",
+    name: "Salt Lake City",
+    country: "USA",
+    days: 3,
+    description:
+      "A 3-day Salt Lake City travel guide with Temple Square, mountains, and relaxed downtown walks.",
+    highlights: ["Temple Square", "Natural History Museum", "City Creek"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Salt Lake City",
+  },
+  {
+    slug: "la-paz",
+    name: "La Paz",
+    country: "Bolivia",
+    days: 3,
+    description:
+      "A 3-day La Paz travel guide blending cable cars, Witches' Market, and high-altitude views.",
+    highlights: ["Teleférico", "Witches' Market", "Valle de la Luna"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in La Paz",
+  },
+  {
+    slug: "trondheim",
+    name: "Trondheim",
+    country: "Norway",
+    days: 3,
+    description:
+      "A 3-day Trondheim travel guide featuring Nidaros Cathedral, Bakklandet, and waterfront strolls.",
+    highlights: ["Nidaros Cathedral", "Bakklandet", "Nidelva riverfront"],
+    intent: "mixed",
+    contentLevel: "full",
+    primaryKeyword: "3 days in Trondheim",
+  },
 ];
 
 export function getCityBySlug(slug: string): CitySeo | undefined {

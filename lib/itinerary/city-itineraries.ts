@@ -2437,7 +2437,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Beach, old town Vegueta, and relaxed Canarian pace without rushing.",
         eyebrow: "Travel guide",
         image: {
-          src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1682333307117-1a4c977c1d6d?auto=format&fit=crop&w=1600&q=80",
           alt: "Las Canteras beach and promenade in Las Palmas de Gran Canaria.",
         },
       },
@@ -2583,7 +2583,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "University, river, and historic center at a relaxed pace.",
         eyebrow: "Travel guide",
         image: {
-          src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8a?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1624484582399-9896973f8a16?auto=format&fit=crop&w=1600&q=80",
           alt: "University of Coimbra and old town from across the river.",
         },
       },
@@ -2730,7 +2730,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Old town, sea views, and relaxed Andalusian pace without rushing.",
         eyebrow: "Travel guide",
         image: {
-          src: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1728983428469-4c3f46e025ab?auto=format&fit=crop&w=1600&q=80",
           alt: "Cádiz cathedral and old town from the water.",
         },
       },
@@ -2876,7 +2876,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Waterfront, Cimavilla old town, and Asturian cider culture at a relaxed pace.",
         eyebrow: "Travel guide",
         image: {
-          src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1549356384-62459eaf492f?auto=format&fit=crop&w=1600&q=80",
           alt: "Gijón waterfront and San Lorenzo beach.",
         },
       },
@@ -3022,7 +3022,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Pre-Romanesque sites, cathedral, and Asturian food at a relaxed pace.",
         eyebrow: "Travel guide",
         image: {
-          src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1691087644936-8829e156f59c?auto=format&fit=crop&w=1600&q=80",
           alt: "Oviedo cathedral and old town skyline.",
         },
       },
@@ -42176,6 +42176,781 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    aarhus: {
+      slug: "aarhus",
+      city: "Aarhus",
+      country: "Denmark",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Art lovers", "Compact-city travelers"],
+      style: ["Museums", "Old town walks", "Waterfront strolls"],
+      pacing: [
+        "Aarhus rewards a calm pace. Treat each day with one main focus, then leave room for cafes, spontaneous market stops, and slow walks along the river.",
+        "Group time by neighborhood. The Latin Quarter and ARoS area work well together, then add a day for the harbor and Dokk1 or Moesgaard Museum.",
+        "Build in at least one open-ended afternoon for the Latin Quarter lanes, a waterfront coffee, or a sunset from ARoS rooftop.",
+      ],
+      hero: {
+        title: "Aarhus in 3 days",
+        subtitle:
+          "Hit the essentials with room to breathe, focusing on ARoS, the Latin Quarter, and relaxed waterfront walks.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1595146463222-19603449c6af?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful rainbow walkway on ARoS museum rooftop in Aarhus.",
+        },
+      },
+      cityStats: [
+        { value: "340k", label: "Residents in the metro area" },
+        { value: "1000+", label: "Years of history" },
+        { value: "25+", label: "Museums and galleries" },
+        { value: "2nd", label: "Largest city in Denmark" },
+      ],
+      fit: {
+        forYou: ["A first visit with art and old town charm", "Short walks between sights", "Calm museum pacing", "Compact, walkable city", "Modern architecture meets history"],
+        notForYou: ["Beach-focused trips", "Late-night nightlife", "Large metropolis energy", "Remote nature treks", "Budget backpacker style"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "ARoS and city center",
+          summary: "Rainbow panorama, museum halls, and downtown strolls.",
+          morning: "ARoS Art Museum and Rainbow Panorama",
+          afternoon: "Latin Quarter and cathedral area",
+          evening: "Riverfront dinner and evening lights",
+        },
+        {
+          day: 2,
+          title: "Latin Quarter and harbor",
+          summary: "Old town lanes, Dokk1, and waterfront views.",
+          morning: "Latin Quarter streets and cafes",
+          afternoon: "Dokk1 library and harbor walk",
+          evening: "Dinner in the canal area",
+        },
+        {
+          day: 3,
+          title: "Museums and neighborhoods",
+          summary: "Moesgaard or Den Gamle By, with relaxed pacing.",
+          morning: "Moesgaard Museum or Den Gamle By",
+          afternoon: "University area or Marselisborg",
+          evening: "Final walk and cafe stop",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "ARoS and the rainbow",
+          description:
+            "The rainbow walkway on ARoS rooftop offers city-wide views. A slow loop keeps the visit memorable without rushing.",
+          image: {
+            src: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=1200&q=80",
+            alt: "Rainbow panorama walkway on ARoS museum rooftop in Aarhus.",
+          },
+        },
+        {
+          title: "Latin Quarter charm",
+          description:
+            "Cobbled lanes, timber frames, and small shops define the Latin Quarter. An unhurried walk captures the mood.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic cobbled street in Aarhus Latin Quarter.",
+          },
+        },
+        {
+          title: "Waterfront and harbor",
+          description:
+            "Dokk1 and the harbor area blend modern architecture with sea views. A relaxed afternoon works well here.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Modern harbor and waterfront in Aarhus.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for pleasant weather" },
+        { label: "Airport transfer", value: "Bus or train from Aarhus Airport" },
+        { label: "Transit tips", value: "Walk the center; bus for Moesgaard or harbor" },
+        { label: "Ticketing", value: "Book ARoS online for faster entry in peak season" },
+        { label: "Neighborhood stay", value: "Latin Quarter or near ARoS" },
+      ],
+      goodToKnow: [
+        { label: "Crowd timing", value: "ARoS is quieter in the morning" },
+        { label: "Seasonal notes", value: "Rain likely year-round; pack a layer" },
+        { label: "Museum advice", value: "Den Gamle By and Moesgaard need half a day each" },
+        { label: "Common mistakes", value: "Overbooking too many museums in one day" },
+        { label: "Local tip", value: "Try smorrebrod and Danish pastries" },
+      ],
+      checklist: [
+        "Book ARoS ticket if visiting in peak season",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Aarhus",
+        "Plan one slow cafe break daily",
+        "Carry a refillable water bottle",
+        "Check Den Gamle By or Moesgaard hours",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Aarhus?",
+          answer:
+            "Yes for the core highlights. Expect one major sight per day, short walks between neighborhoods, and enough breathing room for cafes and waterfront strolls.",
+        },
+        {
+          question: "Should I buy advance tickets for ARoS?",
+          answer:
+            "In peak season, pre-booking helps. Otherwise, walk-in is usually fine.",
+        },
+        {
+          question: "Do I need a transit pass?",
+          answer:
+            "Not for the center. A day pass helps if you visit Moesgaard or the harbor.",
+        },
+        {
+          question: "Is Aarhus walkable?",
+          answer:
+            "Yes. The Latin Quarter, ARoS, and downtown are close together. Most days work on foot.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The Latin Quarter keeps you central for old town and cafes. Near ARoS is good for museum-focused days.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Morning entry at ARoS helps avoid crowds. Other days can start a bit later for a relaxed pace.",
+        },
+        {
+          question: "Do I need to book restaurants in advance?",
+          answer:
+            "For popular spots, yes on weekends. Keep one or two reservations, then leave the rest flexible.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "copenhagen", city: "Copenhagen", days: 3, description: "Museums, harbor walks, and hygge." },
+        { slug: "oslo", city: "Oslo", days: 3, description: "Fjord views, museums, and relaxed city pace." },
+        { slug: "stockholm", city: "Stockholm", days: 3, description: "Old town, archipelago vibes, and design." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    penang: {
+      slug: "penang",
+      city: "Penang",
+      country: "Malaysia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Food lovers", "Heritage explorers"],
+      style: ["Street food", "UNESCO old town", "Temple visits"],
+      pacing: [
+        "Penang rewards a relaxed rhythm. Focus on one area per day, leave time for spontaneous food stops, and avoid rushing between temples.",
+        "Group George Town sights by street. Armenian Street and Chulia Street work well together, then add a day for Penang Hill or beaches.",
+        "Save at least one afternoon for unhurried street food and cafe hopping in George Town.",
+      ],
+      hero: {
+        title: "Penang in 3 days",
+        subtitle:
+          "Hit the essentials with room to breathe, focusing on George Town heritage, street food, and temple visits.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1668320209684-08f36136e941?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful shophouses and street art in George Town, Penang.",
+        },
+      },
+      cityStats: [
+        { value: "1.7M", label: "Residents in Penang" },
+        { value: "2008", label: "George Town UNESCO listed" },
+        { value: "200+", label: "Street food hawkers" },
+        { value: "50+", label: "Temples and clan houses" },
+      ],
+      fit: {
+        forYou: ["Street food and heritage", "Walkable old town", "Temple and mural hunting", "Relaxed coastal vibe", "First-time Southeast Asia"],
+        notForYou: ["Beach-only trips", "Late-night party focus", "Air-conditioned indoor days", "Remote wilderness", "Minimal walking"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "George Town heritage",
+          summary: "Street art, shophouses, and key temples.",
+          morning: "Armenian Street and street art",
+          afternoon: "Kek Lok Si or Khoo Kongsi",
+          evening: "Chulia Street dinner and night market",
+        },
+        {
+          day: 2,
+          title: "Temples and clan houses",
+          summary: "Chinese temples, clan houses, and cafes.",
+          morning: "Kapitan Keling Mosque and Cheong Fatt Tze",
+          afternoon: "Penang Peranakan Mansion",
+          evening: "Gurney Drive or New Lane hawker stalls",
+        },
+        {
+          day: 3,
+          title: "Penang Hill and beaches",
+          summary: "Hill views, botanical garden, or coastal stop.",
+          morning: "Penang Hill and botanical garden",
+          afternoon: "Batu Ferringhi or Teluk Bahang",
+          evening: "Final food stop and evening stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Street art and murals",
+          description:
+            "George Town's murals are iconic. A slow walk along Armenian and Chulia Street lets you find them without rushing.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80",
+            alt: "Street art and colorful shophouses in George Town, Penang.",
+          },
+        },
+        {
+          title: "Street food culture",
+          description:
+            "Hawker stalls and kopitiams define Penang. Plan for spontaneous stops and shared dishes.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Street food stalls in Penang.",
+          },
+        },
+        {
+          title: "Heritage shophouses",
+          description:
+            "Colonial and Peranakan architecture line the streets. Cheong Fatt Tze and Khoo Kongsi are highlights.",
+          image: {
+            src: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic shophouse in George Town, Penang.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "November to February; avoid monsoon peaks" },
+        { label: "Airport transfer", value: "Grab or taxi from Penang Airport" },
+        { label: "Transit tips", value: "Walk George Town; Grab for Penang Hill or beaches" },
+        { label: "Ticketing", value: "Penang Hill and some temples sell tickets on site" },
+        { label: "Neighborhood stay", value: "George Town center" },
+      ],
+      goodToKnow: [
+        { label: "Crowd timing", value: "Early morning for street art photos" },
+        { label: "Food tip", value: "Hawker stalls open late morning; dinner is peak" },
+        { label: "Dress code", value: "Cover shoulders and knees for temples" },
+        { label: "Common mistakes", value: "Trying to see every mural in one go" },
+        { label: "Local tip", value: "Char kway teow and laksa are must-tries" },
+      ],
+      checklist: [
+        "Pack light, breathable clothes",
+        "Bring sunscreen and hat",
+        "Save offline maps for George Town",
+        "Check temple opening hours",
+        "Plan flexible meal times for hawker stalls",
+        "Carry small bills for street food",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Penang?",
+          answer:
+            "Yes for George Town, key temples, and plenty of street food. Add a day if you want more beach time.",
+        },
+        {
+          question: "Do I need to book Penang Hill?",
+          answer:
+            "Walk-in is fine. Go early to avoid midday heat and crowds.",
+        },
+        {
+          question: "Is George Town walkable?",
+          answer:
+            "Yes. The old town is compact. Use Grab for Penang Hill or beaches.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "George Town center, near Armenian or Chulia Street, keeps you close to food and sights.",
+        },
+        {
+          question: "What about street food hygiene?",
+          answer:
+            "Stick to busy stalls with high turnover. Avoid ice in drinks if you have a sensitive stomach.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "Most hawker stalls are walk-in. Book for a nice dinner if you prefer.",
+        },
+        {
+          question: "Is it safe to walk at night?",
+          answer:
+            "George Town is generally safe. Stick to well-lit areas and usual precautions.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "kuala-lumpur", city: "Kuala Lumpur", days: 3, description: "Twin Towers, markets, and food." },
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Temples, street food, and markets." },
+        { slug: "singapore", city: "Singapore", days: 3, description: "Gardens, hawker food, and neighborhoods." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "salt-lake-city": {
+      slug: "salt-lake-city",
+      city: "Salt Lake City",
+      country: "USA",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Mountain lovers", "History enthusiasts"],
+      style: ["Temple Square", "Museums", "Mountain views"],
+      pacing: [
+        "Salt Lake City rewards a calm pace. Treat each day with one main focus, then leave room for downtown walks and mountain views.",
+        "Group sights by area. Temple Square and downtown work together, then add a day for Natural History Museum or a mountain drive.",
+        "Save one afternoon for City Creek or a relaxed stroll around the capitol.",
+      ],
+      hero: {
+        title: "Salt Lake City in 3 days",
+        subtitle:
+          "Hit the essentials with room to breathe, focusing on Temple Square, museums, and easy mountain access.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1601322280090-589b23857997?auto=format&fit=crop&w=1600&q=80",
+          alt: "Temple Square and Salt Lake Temple with mountain backdrop.",
+        },
+      },
+      cityStats: [
+        { value: "1.2M", label: "Metro population" },
+        { value: "1847", label: "City founded by pioneers" },
+        { value: "4,300ft", label: "Elevation" },
+        { value: "7", label: "Ski resorts within an hour" },
+      ],
+      fit: {
+        forYou: ["First visit with Temple Square and museums", "Mountain access", "Clean, walkable downtown", "Outdoor options nearby", "Family-friendly pacing"],
+        notForYou: ["Beach focus", "Late-night nightlife", "Tropical climate", "Remote wilderness camping", "Non-stop party vibe"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Temple Square and downtown",
+          summary: "Temple grounds, Tabernacle, and city center.",
+          morning: "Temple Square and Tabernacle",
+          afternoon: "City Creek Center and downtown walk",
+          evening: "Dinner downtown or at The Gateway",
+        },
+        {
+          day: 2,
+          title: "Museums and capitol",
+          summary: "Natural History Museum or capitol grounds.",
+          morning: "Natural History Museum of Utah",
+          afternoon: "Utah State Capitol and Memory Grove",
+          evening: "Sugar House or 9th and 9th dinner",
+        },
+        {
+          day: 3,
+          title: "Mountains or Park City",
+          summary: "Mountain drive, Park City, or Red Butte Garden.",
+          morning: "Scenic drive or Park City Main Street",
+          afternoon: "Red Butte Garden or Olympic Park",
+          evening: "Final downtown stroll",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Temple Square",
+          description:
+            "The Salt Lake Temple and grounds are the city's heart. Allow time for the Tabernacle and visitor center.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?auto=format&fit=crop&w=1200&q=80",
+            alt: "Salt Lake Temple with mountain backdrop.",
+          },
+        },
+        {
+          title: "Mountain backdrop",
+          description:
+            "The Wasatch Range frames the city. Even a short drive offers dramatic views and easy access to nature.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80",
+            alt: "Mountain views near Salt Lake City.",
+          },
+        },
+        {
+          title: "Downtown and City Creek",
+          description:
+            "City Creek Center and downtown are walkable and clean. A relaxed stroll works well between sights.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "Downtown Salt Lake City with urban scenery.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Airport transfer", value: "Light rail TRAX or taxi from SLC Airport" },
+        { label: "Transit tips", value: "TRAX for downtown and Temple Square; car for mountains" },
+        { label: "Ticketing", value: "Temple Square is free; museums sell tickets on site" },
+        { label: "Neighborhood stay", value: "Downtown or Sugar House" },
+      ],
+      goodToKnow: [
+        { label: "Temple Square", value: "Respect religious site; dress modestly" },
+        { label: "Altitude", value: "4,300 ft; stay hydrated" },
+        { label: "Ski season", value: "December to April for nearby resorts" },
+        { label: "Common mistakes", value: "Underestimating mountain drive times" },
+        { label: "Local tip", value: "Try fry sauce with fries" },
+      ],
+      checklist: [
+        "Pack layers for mountain weather",
+        "Bring sunscreen and hat",
+        "Save offline maps for SLC",
+        "Check museum hours",
+        "Plan Temple Square visit in morning",
+        "Carry water for altitude",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Salt Lake City?",
+          answer:
+            "Yes for Temple Square, a museum or two, and a mountain drive. Add a day for skiing or Park City.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for downtown. A car helps for mountains, Park City, or ski resorts.",
+        },
+        {
+          question: "Is Temple Square free?",
+          answer:
+            "Yes. Grounds and Tabernacle tours are free. Modest dress is requested.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown keeps you close to Temple Square and TRAX. Sugar House is more neighborhood-focused.",
+        },
+        {
+          question: "What about altitude?",
+          answer:
+            "4,300 ft is generally mild. Stay hydrated and take it easy the first day if you are sensitive.",
+        },
+        {
+          question: "Do I need to book museums?",
+          answer:
+            "Walk-in is usually fine. Book online for popular times at Natural History Museum.",
+        },
+        {
+          question: "Is Salt Lake City walkable?",
+          answer:
+            "Downtown is very walkable. TRAX extends reach to University and suburbs.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "denver", city: "Denver", days: 3, description: "Museums, craft beer, and mountain access." },
+        { slug: "seattle", city: "Seattle", days: 3, description: "Waterfront, coffee, and nearby nature." },
+        { slug: "phoenix", city: "Phoenix", days: 3, description: "Desert views and outdoor activities." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "la-paz": {
+      slug: "la-paz",
+      city: "La Paz",
+      country: "Bolivia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Adventure travelers", "Culture seekers"],
+      style: ["Cable cars", "Markets", "High-altitude views"],
+      pacing: [
+        "La Paz rewards a slow pace. Altitude affects everyone; plan light days, stay hydrated, and avoid rushing.",
+        "Group sights by cable car lines. The Red and Yellow lines connect key areas. Save energy for the Witches' Market and Valle de la Luna.",
+        "Build in rest time. Cocoa tea helps with altitude; take breaks and enjoy the views.",
+      ],
+      hero: {
+        title: "La Paz in 3 days",
+        subtitle:
+          "Hit the essentials with room to breathe, focusing on cable cars, markets, and high-altitude views.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1585162621546-f0c171cd13a6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Cable cars and cityscape in La Paz, Bolivia.",
+        },
+      },
+      cityStats: [
+        { value: "3,650m", label: "Elevation" },
+        { value: "10+", label: "Cable car lines" },
+        { value: "2.7M", label: "Metro population" },
+        { value: "1548", label: "City founded" },
+      ],
+      fit: {
+        forYou: ["Unique cable car experience", "Indigenous markets", "High-altitude adventure", "Cultural immersion", "Compact city exploration"],
+        notForYou: ["Low-altitude preference", "Beach focus", "Minimal walking", "Luxury resort style", "Avoiding crowds"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Cable cars and historic center",
+          summary: "Teleferico rides, Plaza Murillo, and acclimatization.",
+          morning: "Red or Yellow line cable car",
+          afternoon: "Plaza Murillo and San Francisco Church",
+          evening: "Calle Sagarnaga and light dinner",
+        },
+        {
+          day: 2,
+          title: "Witches' Market and Sopocachi",
+          summary: "Mercado de las Brujas, cafes, and views.",
+          morning: "Witches' Market and Calle Linares",
+          afternoon: "Sopocachi neighborhood",
+          evening: "Cocoa tea and early rest",
+        },
+        {
+          day: 3,
+          title: "Valle de la Luna or El Alto",
+          summary: "Lunar landscape or El Alto market.",
+          morning: "Valle de la Luna",
+          afternoon: "El Alto market or Mi Teleferico views",
+          evening: "Final stroll and souvenir shopping",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Cable car network",
+          description:
+            "Mi Teleferico connects hills and valleys. A ride offers city-wide views and easy movement between neighborhoods.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cable cars over La Paz cityscape.",
+          },
+        },
+        {
+          title: "Witches' Market",
+          description:
+            "Calle Linares hosts dried herbs, talismans, and traditional crafts. A slow walk captures the atmosphere.",
+          image: {
+            src: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colorful market stalls in La Paz.",
+          },
+        },
+        {
+          title: "High-altitude bowl",
+          description:
+            "La Paz sits in a canyon. Hillside neighborhoods and cable cars create a unique urban landscape.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "La Paz cityscape from above.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October; dry season" },
+        { label: "Airport transfer", value: "Taxi from El Alto Airport; allow time for altitude" },
+        { label: "Transit tips", value: "Cable cars and minibuses; taxis for longer trips" },
+        { label: "Altitude", value: "Rest day one; cocoa tea; avoid alcohol initially" },
+        { label: "Neighborhood stay", value: "Centro or Sopocachi" },
+      ],
+      goodToKnow: [
+        { label: "Altitude", value: "3,650m; take it easy the first 24–48 hours" },
+        { label: "Cocoa tea", value: "Helps with altitude; widely available" },
+        { label: "Dress", value: "Layers; sun strong at elevation" },
+        { label: "Common mistakes", value: "Overexerting on day one" },
+        { label: "Local tip", value: "Try saltenas for a snack" },
+      ],
+      checklist: [
+        "Acclimatize before strenuous activity",
+        "Carry water and cocoa tea",
+        "Pack layers and sunscreen",
+        "Save offline maps",
+        "Book cable car tickets if needed",
+        "Plan light first day",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for La Paz?",
+          answer:
+            "Yes for cable cars, Witches' Market, and Valle de la Luna. Add a day for Uyuni or Lake Titicaca if traveling further.",
+        },
+        {
+          question: "How do I handle altitude?",
+          answer:
+            "Rest the first day, drink cocoa tea, avoid alcohol, and take it easy. Most people adjust within 24–48 hours.",
+        },
+        {
+          question: "Do I need to book cable cars?",
+          answer:
+            "Usually no. Buy tickets at stations. Lines can be long at peak times.",
+        },
+        {
+          question: "Is La Paz walkable?",
+          answer:
+            "The center is walkable but steep. Cable cars help with hills. Altitude may slow you down.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Centro or Sopocachi keep you central. Lower altitude in Sopocachi can help with acclimatization.",
+        },
+        {
+          question: "Is it safe?",
+          answer:
+            "Use normal precautions. Avoid isolated areas at night; keep valuables secure.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "Most places are walk-in. Reserve for upscale spots if you prefer.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "cusco", city: "Cusco", days: 3, description: "Inca ruins, altitude, and markets." },
+        { slug: "quito", city: "Quito", days: 3, description: "Old town and Andean views." },
+        { slug: "lima", city: "Lima", days: 3, description: "Coastal food and museums." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    trondheim: {
+      slug: "trondheim",
+      city: "Trondheim",
+      country: "Norway",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History lovers", "Compact-city travelers"],
+      style: ["Cathedral", "Old town", "Waterfront"],
+      pacing: [
+        "Trondheim rewards a calm pace. Focus on the cathedral and Bakklandet, then leave room for cafes and river walks.",
+        "Group sights by area. Nidaros Cathedral and the Archbishop's Palace work together, then add Bakklandet and the riverfront.",
+        "Save one afternoon for an unhurried stroll along the Nidelva or a cafe stop in Bakklandet.",
+      ],
+      hero: {
+        title: "Trondheim in 3 days",
+        subtitle:
+          "Hit the essentials with room to breathe, focusing on Nidaros Cathedral, Bakklandet, and waterfront walks.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1654122675921-56be5e643a19?auto=format&fit=crop&w=1600&q=80",
+          alt: "Colorful wooden warehouses along the Nidelva in Trondheim.",
+        },
+      },
+      cityStats: [
+        { value: "997", label: "City founded" },
+        { value: "200k", label: "Metro population" },
+        { value: "3rd", label: "Largest city in Norway" },
+        { value: "1", label: "Nidaros Cathedral pilgrimage site" },
+      ],
+      fit: {
+        forYou: ["Cathedral and medieval history", "Compact old town", "Scenic riverfront", "Relaxed Norwegian pace", "First-time Norway"],
+        notForYou: ["Beach focus", "Late-night nightlife", "Big city energy", "Ski-only trips", "Remote wilderness"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Nidaros Cathedral and center",
+          summary: "Cathedral tour, Archbishop's Palace, and downtown.",
+          morning: "Nidaros Cathedral",
+          afternoon: "Archbishop's Palace and Market Square",
+          evening: "Dinner in the center",
+        },
+        {
+          day: 2,
+          title: "Bakklandet and riverfront",
+          summary: "Old town lanes and Nidelva views.",
+          morning: "Bakklandet streets and cafes",
+          afternoon: "Old Town Bridge and Nidelva walk",
+          evening: "Riverside dinner",
+        },
+        {
+          day: 3,
+          title: "Museums and Rockheim",
+          summary: "Rockheim or Trondheim Science Center.",
+          morning: "Rockheim or Science Center",
+          afternoon: "Munkholmen ferry or final stroll",
+          evening: "Cafe and departure prep",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Nidaros Cathedral",
+          description:
+            "Norway's national cathedral dominates the skyline. Allow time for the exterior and interior tour.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Colorful wooden buildings along the Nidelva in Trondheim.",
+          },
+        },
+        {
+          title: "Bakklandet charm",
+          description:
+            "Wooden houses and cobbled lanes define Bakklandet. A slow walk captures the neighborhood mood.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic wooden buildings in Trondheim.",
+          },
+        },
+        {
+          title: "Nidelva riverfront",
+          description:
+            "The river and warehouses create a postcard view. The Old Town Bridge offers the classic photo spot.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Riverfront and warehouses in Trondheim.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for long days" },
+        { label: "Airport transfer", value: "Bus or train from Trondheim Airport" },
+        { label: "Transit tips", value: "Walk the center; bus for Rockheim or Munkholmen" },
+        { label: "Ticketing", value: "Nidaros Cathedral has entry fee; book online for tours" },
+        { label: "Neighborhood stay", value: "Center or Bakklandet" },
+      ],
+      goodToKnow: [
+        { label: "Crowd timing", value: "Cathedral is quieter in the morning" },
+        { label: "Seasonal notes", value: "Long summer days; short winter daylight" },
+        { label: "Museum tip", value: "Rockheim is fun for music lovers" },
+        { label: "Common mistakes", value: "Rushing the cathedral" },
+        { label: "Local tip", value: "Try fårikål or fish soup" },
+      ],
+      checklist: [
+        "Book Nidaros Cathedral tour if desired",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Trondheim",
+        "Plan one cafe break in Bakklandet",
+        "Check Rockheim or Science Center hours",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Trondheim?",
+          answer:
+            "Yes for the cathedral, Bakklandet, and a museum or two. Add a day for Munkholmen or a fjord trip.",
+        },
+        {
+          question: "Do I need to book Nidaros Cathedral?",
+          answer:
+            "Walk-in is fine for general entry. Guided tours can be booked in advance.",
+        },
+        {
+          question: "Is Trondheim walkable?",
+          answer:
+            "Yes. The center and Bakklandet are compact. Most sights are on foot.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "The center keeps you close to the cathedral. Bakklandet offers quieter, scenic streets.",
+        },
+        {
+          question: "What about winter?",
+          answer:
+            "Shorter daylight; dress warmly. The cathedral and museums work well in winter.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No for the city. A car helps for fjord or coastal day trips.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots, yes on weekends. Many places accept walk-ins.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "oslo", city: "Oslo", days: 3, description: "Museums, harbor, and fjord access." },
+        { slug: "bergen", city: "Bergen", days: 3, description: "Bryggen, fish market, and fjords." },
+        { slug: "copenhagen", city: "Copenhagen", days: 3, description: "Harbor, hygge, and design." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
   }),
   es: withDefaults("es", {
     paris: {
@@ -76726,7 +77501,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Playa, casco antiguo Vegueta y ritmo canario tranquilo sin prisas.",
         eyebrow: "Guía de viaje",
         image: {
-          src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1682333307117-1a4c977c1d6d?auto=format&fit=crop&w=1600&q=80",
           alt: "Playa de Las Canteras y paseo marítimo en Las Palmas de Gran Canaria.",
         },
       },
@@ -76792,7 +77567,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Universidad, río y centro histórico a ritmo relajado.",
         eyebrow: "Guía de viaje",
         image: {
-          src: "https://images.unsplash.com/photo-1555881400-74d7acaacd8a?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1624484582399-9896973f8a16?auto=format&fit=crop&w=1600&q=80",
           alt: "Universidad de Coímbra y casco antiguo desde el otro lado del río.",
         },
       },
@@ -76859,7 +77634,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Casco antiguo, vistas al mar y ritmo andaluz tranquilo sin prisas.",
         eyebrow: "Guía de viaje",
         image: {
-          src: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1728983428469-4c3f46e025ab?auto=format&fit=crop&w=1600&q=80",
           alt: "Catedral de Cádiz y casco antiguo desde el agua.",
         },
       },
@@ -76925,7 +77700,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Frente marítimo, casco antiguo Cimavilla y cultura asturiana de la sidra a ritmo relajado.",
         eyebrow: "Guía de viaje",
         image: {
-          src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1549356384-62459eaf492f?auto=format&fit=crop&w=1600&q=80",
           alt: "Frente marítimo de Gijón y playa de San Lorenzo.",
         },
       },
@@ -76991,7 +77766,7 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
           "Sitios prerrománicos, catedral y comida asturiana a ritmo relajado.",
         eyebrow: "Guía de viaje",
         image: {
-          src: "https://images.unsplash.com/photo-1513635269975-59663e0ac291?auto=format&fit=crop&w=1600&q=80",
+          src: "https://images.unsplash.com/photo-1691087644936-8829e156f59c?auto=format&fit=crop&w=1600&q=80",
           alt: "Catedral de Oviedo y skyline del casco antiguo.",
         },
       },
@@ -77103,6 +77878,756 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { slug: "nairobi", city: "Nairobi", days: 3, description: "Museos, parques y opciones de naturaleza." },
         { slug: "cairo", city: "El Cairo", days: 3, description: "Pirámides, museos y bazares." },
         { slug: "accra", city: "Accra", days: 3, description: "Independencia, mercados y costa." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    aarhus: {
+      slug: "aarhus",
+      city: "Aarhus",
+      country: "Dinamarca",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes del arte", "Ciudades compactas"],
+      style: ["Museos", "Paseos por el casco antiguo", "Paseos frente al mar"],
+      hero: {
+        title: "Aarhus en 3 días",
+        subtitle:
+          "Visita lo esencial con margen para respirar: ARoS, el Barrio Latino y paseos relajados por el frente marítimo.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1595146463222-19603449c6af?auto=format&fit=crop&w=1600&q=80",
+          alt: "Pasarela del arcoíris en la azotea del museo ARoS en Aarhus.",
+        },
+      },
+      cityStats: [
+        { value: "340k", label: "Habitantes en el área metropolitana" },
+        { value: "1000+", label: "Años de historia" },
+        { value: "25+", label: "Museos y galerías" },
+        { value: "2ª", label: "Ciudad más grande de Dinamarca" },
+      ],
+      fit: {
+        forYou: ["Primera visita con arte y casco antiguo", "Paseos cortos entre atractivos", "Ritmo tranquilo en museos", "Ciudad compacta y caminable", "Arquitectura moderna e historia"],
+        notForYou: ["Viajes centrados en playa", "Vida nocturna hasta tarde", "Energía de gran metrópolis", "Senderismo en naturaleza remota", "Estilo mochilero económico"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "ARoS y centro",
+          summary: "Panorama del arcoíris, salas del museo y paseos por el centro.",
+          morning: "Museo de Arte ARoS y Panorama del Arcoíris",
+          afternoon: "Barrio Latino y zona de la catedral",
+          evening: "Cena frente al río y luces nocturnas",
+        },
+        {
+          day: 2,
+          title: "Barrio Latino y puerto",
+          summary: "Calles del casco antiguo, Dokk1 y vistas al agua.",
+          morning: "Calles y cafés del Barrio Latino",
+          afternoon: "Biblioteca Dokk1 y paseo por el puerto",
+          evening: "Cena en la zona del canal",
+        },
+        {
+          day: 3,
+          title: "Museos y barrios",
+          summary: "Moesgaard o Den Gamle By, con ritmo relajado.",
+          morning: "Museo Moesgaard o Den Gamle By",
+          afternoon: "Zona universitaria o Marselisborg",
+          evening: "Último paseo y parada en café",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "ARoS y el arcoíris",
+          description:
+            "La pasarela del arcoíris en la azotea de ARoS ofrece vistas de la ciudad. Un recorrido tranquilo hace la visita memorable sin prisas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=1200&q=80",
+            alt: "Pasarela panorámica del arcoíris en la azotea del museo ARoS en Aarhus.",
+          },
+        },
+        {
+          title: "Encanto del Barrio Latino",
+          description:
+            "Calles empedradas, entramados de madera y pequeñas tiendas definen el Barrio Latino. Un paseo tranquilo capta el ambiente.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle empedrada histórica en el Barrio Latino de Aarhus.",
+          },
+        },
+        {
+          title: "Puerto y frente marítimo",
+          description:
+            "Dokk1 y la zona portuaria combinan arquitectura moderna con vistas al mar. Una tarde relajada encaja bien aquí.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Puerto moderno y frente marítimo en Aarhus.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para buen tiempo" },
+        { label: "Traslado aeropuerto", value: "Autobús o tren desde el aeropuerto de Aarhus" },
+        { label: "Transporte", value: "Camina por el centro; autobús para Moesgaard o puerto" },
+        { label: "Entradas", value: "Reserva ARoS online para entrada rápida en temporada alta" },
+        { label: "Dónde alojarse", value: "Barrio Latino o cerca de ARoS" },
+      ],
+      goodToKnow: [
+        { label: "Horario de multitudes", value: "ARoS está más tranquilo por la mañana" },
+        { label: "Notas estacionales", value: "Lluvia frecuente todo el año; lleva capa" },
+        { label: "Consejo museos", value: "Den Gamle By y Moesgaard necesitan medio día cada uno" },
+        { label: "Errores comunes", value: "Programar demasiados museos en un día" },
+        { label: "Consejo local", value: "Prueba smorrebrod y pasteles daneses" },
+      ],
+      checklist: [
+        "Reserva entrada a ARoS si visitas en temporada alta",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapas sin conexión para Aarhus",
+        "Planifica una pausa diaria en café",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios de Den Gamle By o Moesgaard",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Aarhus?",
+          answer:
+            "Sí para los principales atractivos. Cuenta con un gran sitio al día, paseos cortos entre barrios y margen para cafés y paseos junto al agua.",
+        },
+        {
+          question: "¿Debo comprar entradas para ARoS con antelación?",
+          answer:
+            "En temporada alta ayuda reservar. Si no, suele bastar con entrar sin cita.",
+        },
+        {
+          question: "¿Necesito pase de transporte?",
+          answer:
+            "No para el centro. Un billete de día ayuda si visitas Moesgaard o el puerto.",
+        },
+        {
+          question: "¿Aarhus es caminable?",
+          answer:
+            "Sí. El Barrio Latino, ARoS y el centro están cerca. La mayoría de días se hacen a pie.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El Barrio Latino te mantiene céntrico para el casco antiguo y cafés. Cerca de ARoS es bueno para días centrados en museos.",
+        },
+        {
+          question: "¿A qué hora debería empezar cada día?",
+          answer:
+            "La entrada matinal a ARoS ayuda a evitar multitudes. Los otros días puedes empezar un poco más tarde para un ritmo relajado.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes con antelación?",
+          answer:
+            "Para lugares populares, sí los fines de semana. Reserva uno o dos y deja el resto flexible.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "copenhagen", city: "Copenhague", days: 3, description: "Museos, paseos por el puerto e hygge." },
+        { slug: "oslo", city: "Oslo", days: 3, description: "Vistas al fiordo, museos y ritmo tranquilo." },
+        { slug: "stockholm", city: "Estocolmo", days: 3, description: "Casco antiguo, ambiente de archipiélago y diseño." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    penang: {
+      slug: "penang",
+      city: "Penang",
+      country: "Malasia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de la comida", "Exploradores del patrimonio"],
+      style: ["Comida callejera", "Casco antiguo UNESCO", "Visitas a templos"],
+      hero: {
+        title: "Penang en 3 días",
+        subtitle:
+          "Visita lo esencial con margen para respirar: patrimonio de George Town, comida callejera y templos.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1668320209684-08f36136e941?auto=format&fit=crop&w=1600&q=80",
+          alt: "Casetas coloridas y arte callejero en George Town, Penang.",
+        },
+      },
+      cityStats: [
+        { value: "1,7M", label: "Habitantes en Penang" },
+        { value: "2008", label: "George Town declarado UNESCO" },
+        { value: "200+", label: "Vendedores de comida callejera" },
+        { value: "50+", label: "Templos y casas de clanes" },
+      ],
+      fit: {
+        forYou: ["Comida callejera y patrimonio", "Casco antiguo caminable", "Caza de templos y murales", "Ambiente costero relajado", "Primera vez en el Sudeste Asiático"],
+        notForYou: ["Solo playa", "Vida nocturna hasta tarde", "Días solo en interiores con aire acondicionado", "Naturaleza remota", "Poco caminar"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Patrimonio de George Town",
+          summary: "Arte callejero, casetas y templos principales.",
+          morning: "Calle Armenia y arte callejero",
+          afternoon: "Kek Lok Si o Khoo Kongsi",
+          evening: "Cena en calle Chulia y mercado nocturno",
+        },
+        {
+          day: 2,
+          title: "Templos y casas de clanes",
+          summary: "Templos chinos, casas de clanes y cafés.",
+          morning: "Mezquita Kapitan Keling y Cheong Fatt Tze",
+          afternoon: "Mansión Peranakan de Penang",
+          evening: "Puestos de Gurney Drive o New Lane",
+        },
+        {
+          day: 3,
+          title: "Penang Hill y playas",
+          summary: "Vistas desde la colina, jardín botánico o parada costera.",
+          morning: "Penang Hill y jardín botánico",
+          afternoon: "Batu Ferringhi o Teluk Bahang",
+          evening: "Última parada gastronómica y paseo nocturno",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Arte callejero y murales",
+          description:
+            "Los murales de George Town son icónicos. Un paseo tranquilo por Armenia y Chulia te permite descubrirlos sin prisas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80",
+            alt: "Arte callejero y casetas coloridas en George Town, Penang.",
+          },
+        },
+        {
+          title: "Cultura de comida callejera",
+          description:
+            "Puestos y kopitiams definen Penang. Planifica paradas espontáneas y platos para compartir.",
+          image: {
+            src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Puestos de comida callejera en Penang.",
+          },
+        },
+        {
+          title: "Casetas patrimoniales",
+          description:
+            "Arquitectura colonial y peranakan bordean las calles. Cheong Fatt Tze y Khoo Kongsi son destacados.",
+          image: {
+            src: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80",
+            alt: "Casona histórica en George Town, Penang.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Noviembre a febrero; evita picos de monzón" },
+        { label: "Traslado aeropuerto", value: "Grab o taxi desde el aeropuerto de Penang" },
+        { label: "Transporte", value: "Camina George Town; Grab para Penang Hill o playas" },
+        { label: "Entradas", value: "Penang Hill y algunos templos venden entradas in situ" },
+        { label: "Dónde alojarse", value: "Centro de George Town" },
+      ],
+      goodToKnow: [
+        { label: "Horario de multitudes", value: "Mañana temprana para fotos de arte callejero" },
+        { label: "Consejo comida", value: "Los puestos abren a media mañana; la cena es pico" },
+        { label: "Vestimenta", value: "Cubre hombros y rodillas en templos" },
+        { label: "Errores comunes", value: "Intentar ver todos los murales de una vez" },
+        { label: "Consejo local", value: "Char kway teow y laksa son imprescindibles" },
+      ],
+      checklist: [
+        "Lleva ropa ligera y transpirable",
+        "Protector solar y sombrero",
+        "Guarda mapas sin conexión para George Town",
+        "Consulta horarios de templos",
+        "Planifica comidas flexibles para puestos",
+        "Lleva billetes pequeños para comida callejera",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Penang?",
+          answer:
+            "Sí para George Town, templos principales y mucha comida callejera. Añade un día si quieres más tiempo en la playa.",
+        },
+        {
+          question: "¿Necesito reservar Penang Hill?",
+          answer:
+            "Entrada directa está bien. Ve temprano para evitar calor y multitudes del mediodía.",
+        },
+        {
+          question: "¿George Town es caminable?",
+          answer:
+            "Sí. El casco antiguo es compacto. Usa Grab para Penang Hill o playas.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Centro de George Town, cerca de Armenia o Chulia, te mantiene cerca de comida y atracciones.",
+        },
+        {
+          question: "¿Y la higiene de la comida callejera?",
+          answer:
+            "Prefiere puestos con mucho movimiento. Evita hielo en bebidas si tienes estómago sensible.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "La mayoría de puestos aceptan entrada directa. Reserva para una cena especial si prefieres.",
+        },
+        {
+          question: "¿Es seguro caminar de noche?",
+          answer:
+            "George Town suele ser seguro. Quédate en zonas bien iluminadas y precauciones normales.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "kuala-lumpur", city: "Kuala Lumpur", days: 3, description: "Torres Gemelas, mercados y comida." },
+        { slug: "bangkok", city: "Bangkok", days: 3, description: "Templos, comida callejera y mercados." },
+        { slug: "singapore", city: "Singapur", days: 3, description: "Jardines, comida hawker y barrios." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "salt-lake-city": {
+      slug: "salt-lake-city",
+      city: "Salt Lake City",
+      country: "EE. UU.",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de la montaña", "Entusiastas de la historia"],
+      style: ["Temple Square", "Museos", "Vistas de montaña"],
+      hero: {
+        title: "Salt Lake City en 3 días",
+        subtitle:
+          "Visita lo esencial con margen para respirar: Temple Square, museos y fácil acceso a la montaña.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1601322280090-589b23857997?auto=format&fit=crop&w=1600&q=80",
+          alt: "Temple Square y Templo de Salt Lake con montañas al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "1,2M", label: "Población metropolitana" },
+        { value: "1847", label: "Fundación de la ciudad por pioneros" },
+        { value: "4.300 pies", label: "Altitud" },
+        { value: "7", label: "Estaciones de esquí en una hora" },
+      ],
+      fit: {
+        forYou: ["Primera visita con Temple Square y museos", "Acceso a montaña", "Centro limpio y caminable", "Opciones al aire libre cerca", "Ritmo familiar"],
+        notForYou: ["Solo playa", "Vida nocturna hasta tarde", "Clima tropical", "Camping en naturaleza remota", "Ambiente de fiesta constante"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Temple Square y centro",
+          summary: "Recinto del templo, Tabernáculo y centro de la ciudad.",
+          morning: "Temple Square y Tabernáculo",
+          afternoon: "City Creek Center y paseo por el centro",
+          evening: "Cena en el centro o en The Gateway",
+        },
+        {
+          day: 2,
+          title: "Museos y capitolio",
+          summary: "Museo de Historia Natural o jardines del capitolio.",
+          morning: "Museo de Historia Natural de Utah",
+          afternoon: "Capitolio del Estado de Utah y Memory Grove",
+          evening: "Cena en Sugar House o 9th and 9th",
+        },
+        {
+          day: 3,
+          title: "Montañas o Park City",
+          summary: "Ruta de montaña, Main Street de Park City o Red Butte Garden.",
+          morning: "Ruta escénica o Main Street de Park City",
+          afternoon: "Red Butte Garden o Olympic Park",
+          evening: "Último paseo por el centro",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Temple Square",
+          description:
+            "El Templo de Salt Lake y sus jardines son el corazón de la ciudad. Dedica tiempo al Tabernáculo y centro de visitantes.",
+          image: {
+            src: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?auto=format&fit=crop&w=1200&q=80",
+            alt: "Templo de Salt Lake con montañas al fondo.",
+          },
+        },
+        {
+          title: "Montañas al fondo",
+          description:
+            "La cordillera Wasatch enmarca la ciudad. Incluso un trayecto corto ofrece vistas espectaculares y fácil acceso a la naturaleza.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80",
+            alt: "Vistas de montaña cerca de Salt Lake City.",
+          },
+        },
+        {
+          title: "Centro y City Creek",
+          description:
+            "City Creek Center y el centro son caminables y limpios. Un paseo relajado encaja bien entre atracciones.",
+          image: {
+            src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+            alt: "Centro de Salt Lake City con escenario urbano.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Traslado aeropuerto", value: "Tren ligero TRAX o taxi desde aeropuerto SLC" },
+        { label: "Transporte", value: "TRAX para centro y Temple Square; coche para montañas" },
+        { label: "Entradas", value: "Temple Square gratis; museos venden entradas in situ" },
+        { label: "Dónde alojarse", value: "Centro o Sugar House" },
+      ],
+      goodToKnow: [
+        { label: "Temple Square", value: "Respeta sitio religioso; viste con modestia" },
+        { label: "Altitud", value: "4.300 pies; mantente hidratado" },
+        { label: "Temporada de esquí", value: "Diciembre a abril para estaciones cercanas" },
+        { label: "Errores comunes", value: "Subestimar tiempos de trayecto a montaña" },
+        { label: "Consejo local", value: "Prueba la fry sauce con patatas fritas" },
+      ],
+      checklist: [
+        "Lleva capas para clima de montaña",
+        "Protector solar y sombrero",
+        "Guarda mapas sin conexión para SLC",
+        "Consulta horarios de museos",
+        "Planifica visita a Temple Square por la mañana",
+        "Lleva agua por la altitud",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Salt Lake City?",
+          answer:
+            "Sí para Temple Square, uno o dos museos y una ruta de montaña. Añade un día para esquí o Park City.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "No para el centro. Un coche ayuda para montañas, Park City o estaciones de esquí.",
+        },
+        {
+          question: "¿Temple Square es gratis?",
+          answer:
+            "Sí. Los jardines y las visitas al Tabernáculo son gratis. Se pide vestimenta modesta.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro te mantiene cerca de Temple Square y TRAX. Sugar House tiene un ambiente más de barrio.",
+        },
+        {
+          question: "¿Y la altitud?",
+          answer:
+            "4.300 pies suele ser suave. Mantente hidratado y ve con calma el primer día si eres sensible.",
+        },
+        {
+          question: "¿Necesito reservar museos?",
+          answer:
+            "Entrada directa suele bastar. Reserva online para horarios populares en el Museo de Historia Natural.",
+        },
+        {
+          question: "¿Salt Lake City es caminable?",
+          answer:
+            "El centro es muy caminable. TRAX amplía el alcance a la universidad y suburbios.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "denver", city: "Denver", days: 3, description: "Museos, cerveza artesanal y acceso a montaña." },
+        { slug: "seattle", city: "Seattle", days: 3, description: "Frente marítimo, café y naturaleza cercana." },
+        { slug: "phoenix", city: "Phoenix", days: 3, description: "Vistas del desierto y actividades al aire libre." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "la-paz": {
+      slug: "la-paz",
+      city: "La Paz",
+      country: "Bolivia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Viajeros aventureros", "Buscadores de cultura"],
+      style: ["Teleféricos", "Mercados", "Vistas de altitud"],
+      hero: {
+        title: "La Paz en 3 días",
+        subtitle:
+          "Visita lo esencial con margen para respirar: teleféricos, mercados y vistas de gran altitud.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1585162621546-f0c171cd13a6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Teleféricos y skyline de La Paz, Bolivia.",
+        },
+      },
+      cityStats: [
+        { value: "3.650 m", label: "Altitud" },
+        { value: "10+", label: "Líneas de teleférico" },
+        { value: "2,7M", label: "Población metropolitana" },
+        { value: "1548", label: "Fundación de la ciudad" },
+      ],
+      fit: {
+        forYou: ["Experiencia única de teleférico", "Mercados indígenas", "Aventura de gran altitud", "Inmersión cultural", "Exploración urbana compacta"],
+        notForYou: ["Preferencia por baja altitud", "Solo playa", "Poco caminar", "Estilo resort de lujo", "Evitar multitudes"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Teleféricos y centro histórico",
+          summary: "Recorridos en Mi Teleférico, Plaza Murillo y aclimatación.",
+          morning: "Línea Roja o Amarilla del teleférico",
+          afternoon: "Plaza Murillo e Iglesia de San Francisco",
+          evening: "Calle Sagarnaga y cena ligera",
+        },
+        {
+          day: 2,
+          title: "Mercado de las Brujas y Sopocachi",
+          summary: "Mercado de las Brujas, cafés y vistas.",
+          morning: "Mercado de las Brujas y Calle Linares",
+          afternoon: "Barrio Sopocachi",
+          evening: "Té de coca y descanso temprano",
+        },
+        {
+          day: 3,
+          title: "Valle de la Luna o El Alto",
+          summary: "Paisaje lunar o mercado de El Alto.",
+          morning: "Valle de la Luna",
+          afternoon: "Mercado de El Alto o vistas de Mi Teleférico",
+          evening: "Último paseo y compra de recuerdos",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Red de teleféricos",
+          description:
+            "Mi Teleférico conecta colinas y valles. Un recorrido ofrece vistas de toda la ciudad y movimiento fácil entre barrios.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Teleféricos sobre el skyline de La Paz.",
+          },
+        },
+        {
+          title: "Mercado de las Brujas",
+          description:
+            "Calle Linares acoge hierbas secas, talismanes y artesanías tradicionales. Un paseo tranquilo capta el ambiente.",
+          image: {
+            src: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80",
+            alt: "Puestos de mercado coloridos en La Paz.",
+          },
+        },
+        {
+          title: "Cuenca de gran altitud",
+          description:
+            "La Paz se asienta en un cañón. Barrios en laderas y teleféricos crean un paisaje urbano único.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Skyline de La Paz desde arriba.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre; temporada seca" },
+        { label: "Traslado aeropuerto", value: "Taxi desde aeropuerto El Alto; ten en cuenta la altitud" },
+        { label: "Transporte", value: "Teleféricos y minibuses; taxis para trayectos largos" },
+        { label: "Altitud", value: "Día de descanso al llegar; té de coca; evita alcohol al principio" },
+        { label: "Dónde alojarse", value: "Centro o Sopocachi" },
+      ],
+      goodToKnow: [
+        { label: "Altitud", value: "3.650 m; ve con calma las primeras 24–48 horas" },
+        { label: "Té de coca", value: "Ayuda con la altitud; está muy disponible" },
+        { label: "Vestimenta", value: "Capas; el sol fuerte a esta altura" },
+        { label: "Errores comunes", value: "Esforzarte demasiado el primer día" },
+        { label: "Consejo local", value: "Prueba las salteñas" },
+      ],
+      checklist: [
+        "Aclimatiza antes de actividad exigente",
+        "Lleva agua y té de coca",
+        "Capas y protector solar",
+        "Guarda mapas sin conexión",
+        "Reserva billetes de teleférico si hace falta",
+        "Planifica un primer día ligero",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en La Paz?",
+          answer:
+            "Sí para teleféricos, Mercado de las Brujas y Valle de la Luna. Añade un día para Uyuni o lago Titicaca si viajas más lejos.",
+        },
+        {
+          question: "¿Cómo manejar la altitud?",
+          answer:
+            "Descansa el primer día, toma té de coca, evita alcohol y ve con calma. La mayoría se adapta en 24–48 horas.",
+        },
+        {
+          question: "¿Necesito reservar teleféricos?",
+          answer:
+            "Normalmente no. Compra billetes en las estaciones. Puede haber colas en horarios punta.",
+        },
+        {
+          question: "¿La Paz es caminable?",
+          answer:
+            "El centro es caminable pero empinado. Los teleféricos ayudan con las colinas. La altitud puede frenarte.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "Centro o Sopocachi te mantienen céntrico. Menor altitud en Sopocachi puede ayudar con la aclimatación.",
+        },
+        {
+          question: "¿Es seguro?",
+          answer:
+            "Usa precauciones normales. Evita zonas aisladas de noche; guarda bien los objetos de valor.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "La mayoría aceptan entrada directa. Reserva para sitios de gama alta si prefieres.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "cusco", city: "Cusco", days: 3, description: "Ruinas incas, altitud y mercados." },
+        { slug: "quito", city: "Quito", days: 3, description: "Casco antiguo y vistas andinas." },
+        { slug: "lima", city: "Lima", days: 3, description: "Comida costera y museos." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    trondheim: {
+      slug: "trondheim",
+      city: "Trondheim",
+      country: "Noruega",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Amantes de la historia", "Ciudades compactas"],
+      style: ["Catedral", "Casco antiguo", "Frente al río"],
+      hero: {
+        title: "Trondheim en 3 días",
+        subtitle:
+          "Visita lo esencial con margen para respirar: catedral Nidaros, Bakklandet y paseos junto al río.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1654122675921-56be5e643a19?auto=format&fit=crop&w=1600&q=80",
+          alt: "Almacenes de madera coloridos a orillas del Nidelva en Trondheim.",
+        },
+      },
+      cityStats: [
+        { value: "997", label: "Fundación de la ciudad" },
+        { value: "200k", label: "Población metropolitana" },
+        { value: "3ª", label: "Ciudad más grande de Noruega" },
+        { value: "1", label: "Sitio de peregrinación catedral Nidaros" },
+      ],
+      fit: {
+        forYou: ["Catedral e historia medieval", "Casco antiguo compacto", "Frente al río escénico", "Ritmo noruego relajado", "Primera vez en Noruega"],
+        notForYou: ["Solo playa", "Vida nocturna hasta tarde", "Energía de gran ciudad", "Viajes solo de esquí", "Naturaleza remota"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Catedral Nidaros y centro",
+          summary: "Visita a la catedral, palacio del arzobispo y centro.",
+          morning: "Catedral Nidaros",
+          afternoon: "Palacio del arzobispo y plaza del mercado",
+          evening: "Cena en el centro",
+        },
+        {
+          day: 2,
+          title: "Bakklandet y frente al río",
+          summary: "Calles del casco antiguo y vistas al Nidelva.",
+          morning: "Calles y cafés de Bakklandet",
+          afternoon: "Puente Viejo y paseo por el Nidelva",
+          evening: "Cena junto al río",
+        },
+        {
+          day: 3,
+          title: "Museos y Rockheim",
+          summary: "Rockheim o Centro de Ciencia de Trondheim.",
+          morning: "Rockheim o Centro de Ciencia",
+          afternoon: "Ferry a Munkholmen o último paseo",
+          evening: "Café y preparación de salida",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Catedral Nidaros",
+          description:
+            "La catedral nacional de Noruega domina el skyline. Dedica tiempo a exterior e interior.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Edificios de madera coloridos a orillas del Nidelva en Trondheim.",
+          },
+        },
+        {
+          title: "Encanto de Bakklandet",
+          description:
+            "Casas de madera y calles empedradas definen Bakklandet. Un paseo tranquilo capta el ambiente del barrio.",
+          image: {
+            src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Edificios históricos de madera en Trondheim.",
+          },
+        },
+        {
+          title: "Frente al río Nidelva",
+          description:
+            "El río y los almacenes crean la imagen típica. El Puente Viejo ofrece el mejor lugar para la foto.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Frente al río y almacenes en Trondheim.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para días largos" },
+        { label: "Traslado aeropuerto", value: "Autobús o tren desde aeropuerto de Trondheim" },
+        { label: "Transporte", value: "Camina por el centro; autobús para Rockheim o Munkholmen" },
+        { label: "Entradas", value: "La catedral Nidaros tiene tarifa; reserva tours online" },
+        { label: "Dónde alojarse", value: "Centro o Bakklandet" },
+      ],
+      goodToKnow: [
+        { label: "Horario de multitudes", value: "La catedral está más tranquila por la mañana" },
+        { label: "Notas estacionales", value: "Días largos en verano; poca luz en invierno" },
+        { label: "Consejo museo", value: "Rockheim es ideal para amantes de la música" },
+        { label: "Errores comunes", value: "Correr en la catedral" },
+        { label: "Consejo local", value: "Prueba fårikål o sopa de pescado" },
+      ],
+      checklist: [
+        "Reserva tour en catedral Nidaros si quieres",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapas sin conexión para Trondheim",
+        "Planifica una pausa en café en Bakklandet",
+        "Consulta horarios de Rockheim o Centro de Ciencia",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 3 días en Trondheim?",
+          answer:
+            "Sí para la catedral, Bakklandet y uno o dos museos. Añade un día para Munkholmen o un viaje al fiordo.",
+        },
+        {
+          question: "¿Necesito reservar la catedral Nidaros?",
+          answer:
+            "Entrada directa basta para visita general. Los tours guiados se pueden reservar con antelación.",
+        },
+        {
+          question: "¿Trondheim es caminable?",
+          answer:
+            "Sí. El centro y Bakklandet son compactos. La mayoría de atracciones están a pie.",
+        },
+        {
+          question: "¿Dónde me conviene alojarme?",
+          answer:
+            "El centro te mantiene cerca de la catedral. Bakklandet ofrece calles más tranquilas y escénicas.",
+        },
+        {
+          question: "¿Y el invierno?",
+          answer:
+            "Menos horas de luz; viste para abrigar. La catedral y museos funcionan bien en invierno.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "No para la ciudad. Un coche ayuda para excursiones al fiordo o costa.",
+        },
+        {
+          question: "¿Necesito reservar restaurantes?",
+          answer:
+            "Para sitios populares, sí los fines de semana. Muchos aceptan entrada directa.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "oslo", city: "Oslo", days: 3, description: "Museos, puerto y acceso a fiordos." },
+        { slug: "bergen", city: "Bergen", days: 3, description: "Bryggen, mercado de pescado y fiordos." },
+        { slug: "copenhagen", city: "Copenhague", days: 3, description: "Puerto, hygge y diseño." },
       ],
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",

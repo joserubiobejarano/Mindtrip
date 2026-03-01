@@ -68,7 +68,17 @@ const QUERIES = [
   { slug: 'bremen', city: 'Bremen', query: 'Bremen Germany Markt Roland' },
   { slug: 'hanover', city: 'Hanover', query: 'Hanover Germany Herrenhausen Gardens' },
   { slug: 'limerick', city: 'Limerick', query: 'Limerick Ireland King John Castle Shannon' },
-  { slug: 'ostrava', city: 'Ostrava', query: 'Ostrava Czech Republic Dolni Vitkovice' },
+  { slug: 'ostrava', city: 'Ostrava', query: 'Ostrava Czech Republic' },
+  { slug: 'las-palmas', city: 'Las Palmas', query: 'Las Palmas Gran Canaria Las Canteras beach' },
+  { slug: 'coimbra', city: 'Coimbra', query: 'Coimbra Portugal university city' },
+  { slug: 'cadiz', city: 'Cádiz', query: 'Cadiz Spain old town' },
+  { slug: 'gijon', city: 'Gijón', query: 'Gijon Spain Asturias beach' },
+  { slug: 'oviedo', city: 'Oviedo', query: 'Oviedo Spain cathedral Asturias' },
+  { slug: 'aarhus', city: 'Aarhus', query: 'Aarhus Denmark ARoS rainbow panorama' },
+  { slug: 'penang', city: 'Penang', query: 'Penang Malaysia George Town shophouses' },
+  { slug: 'salt-lake-city', city: 'Salt Lake City', query: 'Salt Lake City Utah mountains' },
+  { slug: 'la-paz', city: 'La Paz', query: 'La Paz Bolivia cable car cityscape' },
+  { slug: 'trondheim', city: 'Trondheim', query: 'Trondheim Norway Nidaros Cathedral Bakklandet' },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -78,8 +88,8 @@ const HERO_ONLY = process.argv.includes('--hero-only');
 const BY_ID = process.argv.includes('--by-id');
 const REPLACE_HERO = process.argv.includes('--replace-hero');
 const HERO_REPLACEMENT_SLUGS = [
-  'vientiane', 'yangon', 'guatemala-city', 'san-jose-costa-rica', 'addis-ababa',
-  'reims', 'bremen', 'hanover', 'limerick', 'ostrava',
+  'ostrava', 'las-palmas', 'coimbra', 'cadiz', 'gijon', 'oviedo',
+  'aarhus', 'penang', 'salt-lake-city', 'la-paz', 'trondheim',
 ];
 // Known Unsplash photo IDs for cities that often get NO_RESULT from search (e.g. due to rate limit)
 const PHOTO_IDS = {
