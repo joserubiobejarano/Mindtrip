@@ -42951,6 +42951,1450 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",
     },
+    canberra: {
+      slug: "canberra",
+      city: "Canberra",
+      country: "Australia",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Culture and institutions", "Walkers"],
+      style: ["National museums", "Lake walks", "Compact capital"],
+      pacing: [
+        "Canberra works well at a calm pace. Anchor each day with one major institution or area, then leave room for lake walks, cafes, and short drives if you add a winery or lookout.",
+        "Group time by zone: Parliament and the Triangle one day, Lake Burley Griffin and galleries another, then a mix of museums or a trip to the Australian War Memorial.",
+        "Build in at least one unhurried lakeside stretch. The water and parks give the city its character and make three days feel relaxed rather than packed.",
+      ],
+      hero: {
+        title: "Canberra in 3 days",
+        subtitle:
+          "National institutions, lake walks, and a relaxed capital-city pace without rushing.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1627818337274-dc29a12d304a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Parliament House and Lake Burley Griffin in Canberra.",
+        },
+      },
+      cityStats: [
+        { value: "1913", label: "Capital founded" },
+        { value: "450k+", label: "Metro population" },
+        { value: "11", label: "National institutions in the Triangle" },
+        { value: "26km", label: "Lake Burley Griffin shoreline" },
+      ],
+      fit: {
+        forYou: ["First visit to the capital", "Museums and galleries", "Outdoor and lake walks", "Calm, uncrowded pace", "Clear day-by-day structure"],
+        notForYou: ["Beach or nightlife focus", "Non-stop adventure activities", "Tiny village vibe", "Ski or outback focus", "Single-day whirlwind"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Parliament and the Triangle",
+          summary: "Parliament House, institutions, and lake views.",
+          morning: "Parliament House tour and grounds",
+          afternoon: "National Gallery or Questacon and lakefront",
+          evening: "Kingston or NewActon dinner",
+        },
+        {
+          day: 2,
+          title: "Lake and museums",
+          summary: "Lake Burley Griffin walk and a major museum.",
+          morning: "Lake walk or bike and Commonwealth Park",
+          afternoon: "Australian War Memorial or National Museum",
+          evening: "Braddon or Civic dinner",
+        },
+        {
+          day: 3,
+          title: "Galleries and lookouts",
+          summary: "Final museum or gallery and a viewpoint.",
+          morning: "National Portrait Gallery or another institution",
+          afternoon: "Mount Ainslie or Black Mountain lookout",
+          evening: "Cafe and departure prep",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Parliament and the lake",
+          description:
+            "The Parliament zone and Lake Burley Griffin define the city. Allow time for the building and a short waterfront stroll.",
+          image: {
+            src: "https://images.unsplash.com/photo-1627818337274-dc29a12d304a?auto=format&fit=crop&w=1200&q=80",
+            alt: "Parliament House and Lake Burley Griffin, Canberra.",
+          },
+        },
+        {
+          title: "National institutions",
+          description:
+            "Museums and galleries are clustered in the Triangle. Pick one or two per day to keep the pace relaxed.",
+          image: {
+            src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
+            alt: "National Museum of Australia building and lake, Canberra.",
+          },
+        },
+        {
+          title: "Lake and parks",
+          description:
+            "Lake Burley Griffin and the surrounding parks offer walking, cycling, and calm open space between museum visits.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80",
+            alt: "Lake and greenery in Canberra.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "March to May or September to November" },
+        { label: "Airport transfer", value: "Taxi or ride-share from Canberra Airport" },
+        { label: "Transit tips", value: "Light rail and buses; car useful for War Memorial and lookouts" },
+        { label: "Ticketing", value: "Parliament and most institutions free; book War Memorial if needed" },
+        { label: "Neighborhood stay", value: "Civic, Braddon, or Kingston" },
+      ],
+      checklist: [
+        "Check Parliament House sitting times if you want to watch",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Canberra",
+        "Plan one lake or park break per day",
+        "Book War Memorial if visiting on a busy day",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Canberra?",
+          answer:
+            "Yes for the main institutions, Parliament, and lake. You can cover the Triangle, War Memorial, and a couple of museums without rushing.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not essential for the center; light rail and buses serve the Triangle and Civic. A car helps for War Memorial, lookouts, and wineries.",
+        },
+        {
+          question: "Is Canberra walkable?",
+          answer:
+            "The Parliamentary Triangle and lakefront are walkable. Some institutions are a short drive or bus apart.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Civic or Braddon keep you central for dining and light rail. Kingston is handy for the lake and South Side.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Parliament and museums open from mid-morning. Starting by 9:30 or 10 keeps the day relaxed.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots on weekends, yes. Weekdays are often walk-in friendly.",
+        },
+        {
+          question: "What about summer?",
+          answer:
+            "It can be hot. Plan indoor time for the middle of the day and use the lake for early or late strolls.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "sydney", city: "Sydney", days: 3, description: "Harbor, beaches, and city sights." },
+        { slug: "melbourne", city: "Melbourne", days: 3, description: "Laneways, coffee, and culture." },
+        { slug: "wellington", city: "Wellington", days: 3, description: "Compact capital, museums, and waterfront." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    christchurch: {
+      slug: "christchurch",
+      city: "Christchurch",
+      country: "New Zealand",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Garden and heritage fans", "Relaxed explorers"],
+      style: ["Botanic Gardens", "Rebuilt center", "Day-trip base"],
+      pacing: [
+        "Christchurch rewards a calm pace. One headline focus per day—gardens, museum, or a short day trip—plus time for the Avon, cafes, and the rebuilt center.",
+        "Keep the first day central: Botanic Gardens and the Arts Centre or Cathedral area. Add a museum or tram day, then consider Lyttelton or the coast if you want variety.",
+        "Leave at least one afternoon open for the Avon River, Hagley Park, or a slow walk through the central city to see how it has been reimagined.",
+      ],
+      hero: {
+        title: "Christchurch in 3 days",
+        subtitle:
+          "Gardens, heritage rebuild, and a relaxed base for the South Island.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1760162510197-741b5e65b9b6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Christchurch Botanic Gardens and Avon River.",
+        },
+      },
+      cityStats: [
+        { value: "1850", label: "Settlement founded" },
+        { value: "380k+", label: "Metro population" },
+        { value: "21ha", label: "Botanic Gardens" },
+        { value: "2nd", label: "Largest city in New Zealand" },
+      ],
+      fit: {
+        forYou: ["Gardens and green space", "Post-rebuild city exploration", "First-time South Island", "Calm, uncrowded pace", "Easy day-trip options"],
+        notForYou: ["Big-city nightlife", "Beach-only trip", "Non-stop adventure", "Ski-only focus", "Single-day dash"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Botanic Gardens and Avon",
+          summary: "Gardens, river, and central heritage.",
+          morning: "Christchurch Botanic Gardens",
+          afternoon: "Avon River walk and Arts Centre",
+          evening: "Cathedral Square area dinner",
+        },
+        {
+          day: 2,
+          title: "Museums and tram",
+          summary: "Canterbury Museum and city tram or walk.",
+          morning: "Canterbury Museum",
+          afternoon: "Tram or walking tour of the center",
+          evening: "Riverside or New Regent Street",
+        },
+        {
+          day: 3,
+          title: "Lyttelton or coast",
+          summary: "Port town or coastal drive and final stroll.",
+          morning: "Lyttelton or Sumner",
+          afternoon: "Hagley Park or final city walk",
+          evening: "Cafe and departure prep",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Botanic Gardens",
+          description:
+            "The Botanic Gardens and Avon River are the heart of the city. Allow a full morning or afternoon to wander.",
+          image: {
+            src: "https://images.unsplash.com/photo-1760162510197-741b5e65b9b6?auto=format&fit=crop&w=1200&q=80",
+            alt: "Christchurch Botanic Gardens and greenery.",
+          },
+        },
+        {
+          title: "Rebuilt center",
+          description:
+            "The central city has been reimagined after the earthquakes. A tram or walk reveals new builds and heritage.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507699629798-687287a4e313?auto=format&fit=crop&w=1200&q=80",
+            alt: "Christchurch city center and architecture.",
+          },
+        },
+        {
+          title: "Avon and parks",
+          description:
+            "The Avon River and Hagley Park offer calm walks and punting. A good way to break up museum or shopping time.",
+          image: {
+            src: "https://images.unsplash.com/photo-1760162510197-741b5e65b9b6?auto=format&fit=crop&w=1200&q=80",
+            alt: "Avon River and green space in Christchurch.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "September to April for gardens and weather" },
+        { label: "Airport transfer", value: "Taxi, shuttle, or bus from Christchurch Airport" },
+        { label: "Transit tips", value: "Walk the center; bus or car for Lyttelton and coast" },
+        { label: "Ticketing", value: "Gardens free; tram and some attractions ticketed" },
+        { label: "Neighborhood stay", value: "Central city or near Botanic Gardens" },
+      ],
+      checklist: [
+        "Pack comfortable walking shoes",
+        "Save offline maps for Christchurch",
+        "Plan one garden or river break per day",
+        "Check tram times if using",
+        "Book Lyttelton or coast transport if day-tripping",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Christchurch?",
+          answer:
+            "Yes for the gardens, a museum, the center, and a half-day or day trip. Add a day if you want more coast or Lyttelton.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for the central city and gardens. A car helps for Lyttelton, Sumner, or Banks Peninsula.",
+        },
+        {
+          question: "Is Christchurch walkable?",
+          answer:
+            "The center and Botanic Gardens are very walkable. Buses and tram cover the rest.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Central city or near the Botanic Gardens for easy access to gardens, Avon, and cafes.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Gardens and museums open from mid-morning. Starting by 9:30 keeps the day relaxed.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots on weekends, yes. Many cafes and restaurants accept walk-ins.",
+        },
+        {
+          question: "What about winter?",
+          answer:
+            "Cool and shorter days. Gardens and museums are still rewarding; dress in layers.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "auckland", city: "Auckland", days: 3, description: "Harbor, islands, and city sights." },
+        { slug: "wellington", city: "Wellington", days: 3, description: "Compact capital and waterfront." },
+        { slug: "queenstown", city: "Queenstown", days: 3, description: "Lakes and mountains." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    heidelberg: {
+      slug: "heidelberg",
+      city: "Heidelberg",
+      country: "Germany",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Castle and old town", "Walkers"],
+      style: ["Castle", "River and bridge", "Compact center"],
+      pacing: [
+        "Heidelberg fits two calm days. Day one: castle and old town. Day two: Philosophers' Walk, bridge, and a second pass at the center or a museum.",
+        "The center is small and walkable. Keep the castle for a focused morning, then use the afternoon for the Altstadt and river.",
+        "Leave time for the Old Bridge and a cafe. The pace is slow by design so the castle and views sink in.",
+      ],
+      hero: {
+        title: "Heidelberg in 2 days",
+        subtitle:
+          "Castle, old town, and riverside walks at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1655808346988-25127b19970a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Heidelberg Castle above the old town and Neckar River.",
+        },
+      },
+      cityStats: [
+        { value: "13th c.", label: "Castle origins" },
+        { value: "160k+", label: "Residents" },
+        { value: "1", label: "Old Bridge (Karl-Theodor-Brücke)" },
+        { value: "2km", label: "Philosophers' Walk path" },
+      ],
+      fit: {
+        forYou: ["Castle and views", "Compact old town", "River and bridge", "Short break", "First-time Germany"],
+        notForYou: ["Big-city nightlife", "Long museum days", "Beach or ski", "Multi-day hiking", "Rushed one-day tour"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Castle and old town",
+          summary: "Castle visit and Altstadt stroll.",
+          morning: "Heidelberg Castle",
+          afternoon: "Old town (Hauptstrasse) and Marktplatz",
+          evening: "Old Bridge and dinner",
+        },
+        {
+          day: 2,
+          title: "Philosophers' Walk and bridge",
+          summary: "Hillside path and river views.",
+          morning: "Philosophers' Walk",
+          afternoon: "Old Bridge and Karlstor area",
+          evening: "Final cafe and departure",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The castle",
+          description:
+            "The castle dominates the skyline. Allow a few hours for the exterior, courtyard, and optional interior tour.",
+          image: {
+            src: "https://images.unsplash.com/photo-1655808346988-25127b19970a?auto=format&fit=crop&w=1200&q=80",
+            alt: "Heidelberg Castle and old town from across the Neckar.",
+          },
+        },
+        {
+          title: "Old Bridge",
+          description:
+            "The Karl-Theodor-Brücke and river views are a must. Best in morning or late afternoon light.",
+          image: {
+            src: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Heidelberg Old Bridge over the Neckar River.",
+          },
+        },
+        {
+          title: "Old town",
+          description:
+            "Hauptstrasse and Marktplatz offer cafes, shops, and a relaxed stroll through the Altstadt.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Heidelberg old town street and buildings.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for weather and long days" },
+        { label: "Airport transfer", value: "Train from Frankfurt or Mannheim" },
+        { label: "Transit tips", value: "Walk the center; Bergbahn to castle" },
+        { label: "Ticketing", value: "Castle courtyard free; interior and barrel by ticket" },
+        { label: "Neighborhood stay", value: "Altstadt or near the bridge" },
+      ],
+      checklist: [
+        "Book castle interior tour if you want it",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Heidelberg",
+        "Plan a cafe break on Hauptstrasse",
+        "Check Bergbahn times for castle",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Heidelberg?",
+          answer:
+            "Yes for the castle, old town, bridge, and Philosophers' Walk. It is a compact city.",
+        },
+        {
+          question: "Do I need to book the castle?",
+          answer:
+            "Courtyard and exterior are accessible. Book ahead for guided interior tours in peak season.",
+        },
+        {
+          question: "Is Heidelberg walkable?",
+          answer:
+            "Yes. The center and bridge are on foot. The castle is a steep walk or Bergbahn ride.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Altstadt keeps you in the center. Near the bridge is handy for views and river walks.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Castle in the morning to avoid crowds. Bridge and old town work any time.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots on weekends, yes. Weekdays are often walk-in friendly.",
+        },
+        {
+          question: "What about winter?",
+          answer:
+            "Shorter days and cold. Castle and old town are still rewarding; dress warmly.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "munich", city: "Munich", days: 3, description: "Beer gardens, museums, and squares." },
+        { slug: "frankfurt", city: "Frankfurt", days: 2, description: "Riverside and museums." },
+        { slug: "cologne", city: "Cologne", days: 3, description: "Cathedral and old town." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    poznan: {
+      slug: "poznan",
+      city: "Poznan",
+      country: "Poland",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "History and square", "Short breaks"],
+      style: ["Old Market Square", "Town Hall", "Compact center"],
+      pacing: [
+        "Poznan fits two calm days. Day one: Old Market Square, Town Hall, and old town streets. Day two: Cathedral Island, a museum, or a second pass at the square.",
+        "The center is small. One headline focus per day plus cafe and stroll time keeps the pace relaxed.",
+        "Leave time for the famous clock and a coffee on the square. Evenings are low-key and walkable.",
+      ],
+      hero: {
+        title: "Poznan in 2 days",
+        subtitle:
+          "Old Market Square, Town Hall, and a relaxed old town at a calm pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1601114540911-45453e0062c5?auto=format&fit=crop&w=1600&q=80",
+          alt: "Old Market Square and colorful townhouses in Poznan.",
+        },
+      },
+      cityStats: [
+        { value: "10th c.", label: "City origins" },
+        { value: "530k+", label: "Metro population" },
+        { value: "1", label: "Famous mechanical goats at noon" },
+        { value: "3rd", label: "Largest city in Poland (metro)" },
+      ],
+      fit: {
+        forYou: ["Old square and Town Hall", "Compact old town", "First-time Poland", "Short break", "Cafe and stroll pace"],
+        notForYou: ["Big-city nightlife", "Long museum marathons", "Beach or mountains", "Single-day rush", "Remote wilderness"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old Market Square and Town Hall",
+          summary: "Rynek, Town Hall, and old town streets.",
+          morning: "Old Market Square and Town Hall",
+          afternoon: "Old town streets and Parish Church",
+          evening: "Dinner on or near the square",
+        },
+        {
+          day: 2,
+          title: "Cathedral Island and museums",
+          summary: "Ostrów Tumski and a museum or second square visit.",
+          morning: "Cathedral Island (Ostrów Tumski)",
+          afternoon: "Museum or return to the square",
+          evening: "Cafe and departure",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Old Market Square",
+          description:
+            "The Rynek is the heart of the city. Town Hall, colorful facades, and the famous noon goats draw visitors.",
+          image: {
+            src: "https://images.unsplash.com/photo-1601114540911-45453e0062c5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Old Market Square and townhouses in Poznan.",
+          },
+        },
+        {
+          title: "Town Hall",
+          description:
+            "The Renaissance Town Hall and mechanical goats at noon are a Poznan classic. Arrive a few minutes before 12.",
+          image: {
+            src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic Town Hall and square in Poznan.",
+          },
+        },
+        {
+          title: "Cathedral Island",
+          description:
+            "Ostrów Tumski is the oldest part of the city. Cathedral and quiet streets make a calm half-day.",
+          image: {
+            src: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Cathedral and historic buildings on Cathedral Island, Poznan.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for weather and square life" },
+        { label: "Airport transfer", value: "Train or taxi from Poznan Airport" },
+        { label: "Transit tips", value: "Walk the center; tram for Cathedral Island" },
+        { label: "Ticketing", value: "Square free; Town Hall and some museums ticketed" },
+        { label: "Neighborhood stay", value: "Old town or near the square" },
+      ],
+      checklist: [
+        "Time the noon goats at Town Hall",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Poznan",
+        "Plan a cafe break on the square",
+        "Check cathedral and museum hours",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Poznan?",
+          answer:
+            "Yes for the square, Town Hall, old town, and Cathedral Island. It is a compact city.",
+        },
+        {
+          question: "When do the goats appear?",
+          answer:
+            "The mechanical goats butt at noon daily in the Town Hall tower. Get there a few minutes before 12.",
+        },
+        {
+          question: "Is Poznan walkable?",
+          answer:
+            "Yes. The Old Market and old town are on foot. Cathedral Island is a short walk or tram.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old town or near the square for easy access to the Rynek, Town Hall, and restaurants.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Morning is good for the square before crowds. Noon at Town Hall for the goats.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots on weekends, yes. Many places accept walk-ins.",
+        },
+        {
+          question: "What about winter?",
+          answer:
+            "Cold and sometimes snowy. The square and Town Hall are still rewarding; dress warmly.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "krakow", city: "Krakow", days: 3, description: "Old town, Wawel, and Kazimierz." },
+        { slug: "warsaw", city: "Warsaw", days: 3, description: "Old town rebuild and museums." },
+        { slug: "gdansk", city: "Gdansk", days: 3, description: "Harbor and old town." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    halifax: {
+      slug: "halifax",
+      city: "Halifax",
+      country: "Canada",
+      days: 3,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Maritime history", "Waterfront fans"],
+      style: ["Citadel", "Harbor", "Museums"],
+      pacing: [
+        "Halifax works at a calm pace. One headline focus per day—Citadel, waterfront, or museum—plus time for walks, food, and harbor views.",
+        "Group time by area: Citadel and downtown one day, waterfront and Maritime Museum another, then a mix of museum or a short drive to a coastal spot.",
+        "Build in at least one unhurried waterfront stretch. The harbor and boardwalk define the city and keep three days relaxed.",
+      ],
+      hero: {
+        title: "Halifax in 3 days",
+        subtitle:
+          "Citadel, waterfront, and maritime history at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1715249958361-4cc511be22bb?auto=format&fit=crop&w=1600&q=80",
+          alt: "Halifax waterfront and harbor view.",
+        },
+      },
+      cityStats: [
+        { value: "1749", label: "City founded" },
+        { value: "430k+", label: "Metro population" },
+        { value: "2.4km", label: "Waterfront boardwalk" },
+        { value: "1", label: "Star-shaped Citadel" },
+      ],
+      fit: {
+        forYou: ["Maritime history", "Waterfront walks", "First-time Atlantic Canada", "Calm pace", "Museums and forts"],
+        notForYou: ["Big-city nightlife", "Beach-only trip", "Non-stop adventure", "Ski focus", "Single-day dash"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Citadel and downtown",
+          summary: "Citadel Hill and downtown Halifax.",
+          morning: "Halifax Citadel",
+          afternoon: "Downtown and Grand Parade",
+          evening: "Waterfront dinner",
+        },
+        {
+          day: 2,
+          title: "Waterfront and museum",
+          summary: "Boardwalk and Maritime Museum.",
+          morning: "Waterfront boardwalk",
+          afternoon: "Maritime Museum of the Atlantic",
+          evening: "Harbor views and dinner",
+        },
+        {
+          day: 3,
+          title: "Museums and harbor",
+          summary: "Second museum or harbor cruise and final stroll.",
+          morning: "Canadian Museum of Immigration or Discovery Centre",
+          afternoon: "Harbor cruise or final boardwalk walk",
+          evening: "Cafe and departure prep",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Citadel Hill",
+          description:
+            "The star-shaped fort dominates the skyline. Allow a few hours for the ramparts and exhibits.",
+          image: {
+            src: "https://images.unsplash.com/photo-1715249958361-4cc511be22bb?auto=format&fit=crop&w=1200&q=80",
+            alt: "Halifax Citadel and city view.",
+          },
+        },
+        {
+          title: "Waterfront boardwalk",
+          description:
+            "The boardwalk links piers, shops, and restaurants. A slow walk is a must.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Halifax waterfront and harbor.",
+          },
+        },
+        {
+          title: "Maritime Museum",
+          description:
+            "The Maritime Museum covers Titanic, Halifax Explosion, and seafaring history. Plan at least two hours.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200&q=80",
+            alt: "Maritime Museum and waterfront, Halifax.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to October for weather and harbor life" },
+        { label: "Airport transfer", value: "Taxi or shuttle from Halifax Stanfield" },
+        { label: "Transit tips", value: "Walk downtown and waterfront; bus or ferry for outlying spots" },
+        { label: "Ticketing", value: "Citadel and Maritime Museum ticketed; book in peak season" },
+        { label: "Neighborhood stay", value: "Downtown or waterfront" },
+      ],
+      checklist: [
+        "Book Citadel or museum if visiting in peak season",
+        "Pack comfortable walking shoes",
+        "Save offline maps for Halifax",
+        "Plan one waterfront break per day",
+        "Check harbor cruise times if interested",
+        "Carry a refillable water bottle",
+      ],
+      faqs: [
+        {
+          question: "Is 3 days enough for Halifax?",
+          answer:
+            "Yes for the Citadel, waterfront, Maritime Museum, and a relaxed pace. Add a day for Peggy's Cove or the South Shore.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "Not for downtown and waterfront. A car helps for Peggy's Cove and coastal drives.",
+        },
+        {
+          question: "Is Halifax walkable?",
+          answer:
+            "Yes. Downtown and the boardwalk are very walkable. Buses and ferry extend the range.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Downtown or near the waterfront for easy access to the Citadel, boardwalk, and restaurants.",
+        },
+        {
+          question: "What time should I start each day?",
+          answer:
+            "Citadel in the morning to avoid crowds. Waterfront works any time.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots on weekends, yes. Many waterfront places accept walk-ins.",
+        },
+        {
+          question: "What about winter?",
+          answer:
+            "Cold and shorter days. Citadel and museums are still rewarding; dress warmly.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "quebec-city", city: "Quebec City", days: 3, description: "Old town and fort." },
+        { slug: "montreal", city: "Montreal", days: 3, description: "Culture, food, and neighborhoods." },
+        { slug: "toronto", city: "Toronto", days: 3, description: "Museums and waterfront." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    siena: {
+      slug: "siena",
+      city: "Siena",
+      country: "Italy",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Medieval towns", "Tuscany day-trippers"],
+      style: ["Piazza del Campo", "Cathedral", "Compact center"],
+      pacing: [
+        "Siena works well in two calm days. Day one: cathedral and Piazza del Campo. Day two: contrade streets and a viewpoint or museum.",
+        "The center is small and walkable. Group the cathedral with the piazza, then explore one or two neighborhoods without rushing.",
+        "Leave time for a long lunch and an unhurried stroll. The joy is in the stone streets and the views, not a packed checklist.",
+      ],
+      hero: {
+        title: "Siena in 2 days",
+        subtitle:
+          "Medieval center, Piazza del Campo, and the cathedral at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1660814534469-ed907b9333ef?auto=format&fit=crop&w=1600&q=80",
+          alt: "Siena rooftops and Tuscan hills at sunset.",
+        },
+      },
+      cityStats: [
+        { value: "1240", label: "Piazza del Campo shell shape completed" },
+        { value: "17", label: "Historic contrade districts" },
+        { value: "~54k", label: "Residents in the historic center" },
+      ],
+      fit: {
+        forYou: ["A compact medieval city", "Piazza and cathedral focus", "Short walking days", "Tuscany base or day trip", "Quiet streets and views"],
+        notForYou: ["Beach or coast", "Long museum days only", "Nightlife focus", "Multi-day hiking", "Big-city buzz"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Cathedral and Piazza del Campo",
+          summary: "Duomo, piazza, and first views of the center.",
+          morning: "Siena Cathedral and Piccolomini Library",
+          afternoon: "Piazza del Campo and Torre del Mangia area",
+          evening: "Dinner in a contrada street",
+        },
+        {
+          day: 2,
+          title: "Contrade and viewpoints",
+          summary: "Neighborhood streets and a final panorama.",
+          morning: "San Domenico and the contrade streets",
+          afternoon: "Fortezza Medicea or a quiet museum",
+          evening: "Last stroll and gelato",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Piazza del Campo",
+          description:
+            "The shell-shaped piazza is the heart of Siena. Sit with a coffee and watch the light change on the facades.",
+          image: {
+            src: "https://images.unsplash.com/photo-1523906834658-6e6ef70e59c1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Piazza del Campo and Palazzo Pubblico in Siena.",
+          },
+        },
+        {
+          title: "The cathedral",
+          description:
+            "The Duomo’s striped marble and inlaid floors deserve a slow visit. Book ahead in high season.",
+          image: {
+            src: "https://images.unsplash.com/photo-1552832238-cdac84581f45?auto=format&fit=crop&w=1200&q=80",
+            alt: "Siena Cathedral facade and bell tower.",
+          },
+        },
+        {
+          title: "Narrow streets",
+          description:
+            "The contrade districts are made for wandering. No need to see every one; pick two or three and take your time.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Medieval street in Siena.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Getting there", value: "Train from Florence or bus; no airport in Siena" },
+        { label: "Transit tips", value: "Everything in the center is walkable" },
+        { label: "Ticketing", value: "Book cathedral and tower in advance in peak season" },
+        { label: "Neighborhood stay", value: "Near Piazza del Campo or San Domenico" },
+      ],
+      goodToKnow: [
+        { label: "Crowd timing", value: "Start at the cathedral by 9:00 in summer" },
+        { label: "Palio", value: "If visiting during Palio (July/August), book early and expect crowds" },
+        { label: "Dress code", value: "Shoulders and knees covered for cathedral entry" },
+      ],
+      checklist: [
+        "Book cathedral and Torre del Mangia if visiting in peak season",
+        "Pack comfortable walking shoes",
+        "Save offline map of the center",
+        "Plan one long lunch in a contrada",
+        "Carry a refillable water bottle",
+        "Check opening hours for museums",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Siena?",
+          answer:
+            "Yes for the cathedral, Piazza del Campo, and a relaxed look at the contrade. Add a day for San Gimignano or the countryside.",
+        },
+        {
+          question: "Do I need to book the cathedral?",
+          answer:
+            "In peak season, yes. Timed entry helps avoid long waits. Book a few days ahead.",
+        },
+        {
+          question: "Is Siena walkable?",
+          answer:
+            "Yes. The historic center is compact. You can walk from one end to the other in under 30 minutes.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near Piazza del Campo for the center, or near San Domenico for a slightly quieter base. Both are walkable.",
+        },
+        {
+          question: "What time should I start?",
+          answer:
+            "Cathedral in the morning to beat the crowds. The piazza is fine any time.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots at weekends, yes. Weekdays are more flexible.",
+        },
+        {
+          question: "Can I do Siena as a day trip from Florence?",
+          answer:
+            "Yes. Trains run often. Two days gives you a calmer pace and an evening in town.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "florence", city: "Florence", days: 3, description: "Art, river walks, and Renaissance squares." },
+        { slug: "rome", city: "Rome", days: 3, description: "Ancient icons, piazzas, and cafe breaks." },
+        { slug: "bologna", city: "Bologna", days: 3, description: "Food, porticoes, and a compact center." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    annecy: {
+      slug: "annecy",
+      city: "Annecy",
+      country: "France",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Lake and mountains", "Compact old towns"],
+      style: ["Lake Annecy", "Old Town", "Canal walks"],
+      pacing: [
+        "Annecy fits two calm days. Day one: old town and Palais de l'Isle. Day two: lake shore and a boat or bike if you like.",
+        "The center is small. You can cover the main sights on foot and still have time for long lunches and waterfront strolls.",
+        "Keep one afternoon flexible for the lake—swim, rent a boat, or simply sit by the water.",
+      ],
+      hero: {
+        title: "Annecy in 2 days",
+        subtitle:
+          "Old town, lake views, and Alpine atmosphere at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1715695528648-fab241181450?auto=format&fit=crop&w=1600&q=80",
+          alt: "Lake Annecy with mountains in the background.",
+        },
+      },
+      cityStats: [
+        { value: "~130k", label: "Metro population" },
+        { value: "14km", label: "Lake length" },
+        { value: "12th C.", label: "Palais de l'Isle origins" },
+      ],
+      fit: {
+        forYou: ["Lake and mountain views", "Compact old town", "Short walking days", "Relaxed pace", "Photo-friendly canals"],
+        notForYou: ["Big-city nightlife", "Long museum days", "Beach-only trip", "Ski focus", "Non-stop activities"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Old town and canals",
+          summary: "Palais de l'Isle, old town streets, and lakefront.",
+          morning: "Palais de l'Isle and canal streets",
+          afternoon: "Old town lunch and Château d'Annecy area",
+          evening: "Lakefront stroll and dinner",
+        },
+        {
+          day: 2,
+          title: "Lake and views",
+          summary: "Lake shore, optional boat or bike, and last strolls.",
+          morning: "Lake promenade and gardens",
+          afternoon: "Boat trip or cycle path, or relax by the water",
+          evening: "Final walk and cafe",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Palais de l'Isle",
+          description:
+            "The island palace on the canal is Annecy’s postcard view. Allow time for the museum and the surrounding quays.",
+          image: {
+            src: "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Palais de l'Isle on the canal in Annecy.",
+          },
+        },
+        {
+          title: "Lake Annecy",
+          description:
+            "Clear water and mountain backdrop. A short walk or bike ride along the shore is a must.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Lake Annecy with Alpine scenery.",
+          },
+        },
+        {
+          title: "Old town streets",
+          description:
+            "Colorful facades and canals make the center easy to explore on foot. No rush needed.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Canal and old town in Annecy.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "May to September for lake weather; spring and autumn for fewer crowds" },
+        { label: "Getting there", value: "Train from Lyon or Geneva; bus from Chambéry" },
+        { label: "Transit tips", value: "Center is walkable; bikes available for the lake loop" },
+        { label: "Ticketing", value: "Palais de l'Isle and Château have entry fees; book in summer" },
+        { label: "Neighborhood stay", value: "Old town or near the lake" },
+      ],
+      goodToKnow: [
+        { label: "Lake swimming", value: "Allowed in summer; several beaches and designated areas" },
+        { label: "Market days", value: "Old town market adds life to the center; check weekday" },
+        { label: "Altitude", value: "Lake at ~448m; mild but can be cool in evening" },
+      ],
+      checklist: [
+        "Pack swimwear if visiting in summer",
+        "Comfortable shoes for old town and lake path",
+        "Save offline map of the center",
+        "Plan one meal by the water",
+        "Carry a refillable water bottle",
+        "Check boat and bike rental hours",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Annecy?",
+          answer:
+            "Yes for the old town, Palais de l'Isle, and a good taste of the lake. Add a day for a longer bike loop or a village.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No for the town and lake shore. Train and bus reach Annecy; walking and bikes cover the rest.",
+        },
+        {
+          question: "Is Annecy walkable?",
+          answer:
+            "Yes. The old town and lakefront are compact. You can walk everywhere in the center.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old town for atmosphere, or near the lake for views and easy access to the water.",
+        },
+        {
+          question: "When is the best time to visit?",
+          answer:
+            "May to September for warm weather and lake activities. Spring and autumn are quieter.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular terraces in summer, yes. Weekdays and lunch are easier.",
+        },
+        {
+          question: "Can I swim in the lake?",
+          answer:
+            "Yes in designated areas in summer. Water is clean and clear; check local signs.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "lyon", city: "Lyon", days: 3, description: "Food, rivers, and historic quarters." },
+        { slug: "geneva", city: "Geneva", days: 2, description: "Lake views and compact center." },
+        { slug: "nice", city: "Nice", days: 3, description: "Riviera, old town, and sea." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    monaco: {
+      slug: "monaco",
+      city: "Monaco",
+      country: "Monaco",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Glitz and views", "Compact city-states"],
+      style: ["Palace", "Monte Carlo", "Mediterranean"],
+      pacing: [
+        "Monaco fits two calm days. Day one: palace, old town, and oceanographic museum. Day two: Monte Carlo, gardens, and harbor.",
+        "The principality is tiny. Walking and the bus are enough. No need to rush between sights.",
+        "Leave time for a waterfront stroll and a coffee or meal with a view. The scale is small; the views are big.",
+      ],
+      hero: {
+        title: "Monaco in 2 days",
+        subtitle:
+          "Palace, casino district, and Mediterranean views at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1697529682806-0e884d1fe515?auto=format&fit=crop&w=1600&q=80",
+          alt: "Monaco harbor and Monte Carlo from the sea.",
+        },
+      },
+      cityStats: [
+        { value: "~2km²", label: "Total area" },
+        { value: "1297", label: "Grimaldi rule began" },
+        { value: "~40k", label: "Residents" },
+      ],
+      fit: {
+        forYou: ["Palace and harbor views", "Compact walkable city", "One or two museum stops", "Gardens and sea", "Glitzy atmosphere"],
+        notForYou: ["Budget backpacking", "Quiet rural escape", "Long hiking", "Beach-only trip", "Low-key only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Palace and old town",
+          summary: "Prince's Palace, cathedral, and oceanographic museum.",
+          morning: "Prince's Palace and changing of the guard",
+          afternoon: "Cathedral and Oceanographic Museum",
+          evening: "Old town dinner and harbor view",
+        },
+        {
+          day: 2,
+          title: "Monte Carlo and gardens",
+          summary: "Casino area, gardens, and harbor stroll.",
+          morning: "Casino square and Café de Paris area",
+          afternoon: "Jardin Exotique or Japanese Garden",
+          evening: "Harbor walk and last views",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Prince's Palace",
+          description:
+            "The palace on the Rock is the symbol of Monaco. Time your visit for the changing of the guard if you can.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Prince's Palace on the Rock, Monaco.",
+          },
+        },
+        {
+          title: "Monte Carlo",
+          description:
+            "The casino square and harbor are the postcard. A stroll is enough; no need to gamble.",
+          image: {
+            src: "https://images.unsplash.com/photo-1697529682806-0e884d1fe515?auto=format&fit=crop&w=1200&q=80",
+            alt: "Monte Carlo casino and harbor.",
+          },
+        },
+        {
+          title: "Harbor and coast",
+          description:
+            "Yachts and Mediterranean blue. A walk along the port is free and rewarding.",
+          image: {
+            src: "https://images.unsplash.com/photo-1697529682806-0e884d1fe515?auto=format&fit=crop&w=1200&q=80",
+            alt: "Monaco harbor and coastline.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October; summer can be busy" },
+        { label: "Getting there", value: "Train from Nice; helicopter from Nice airport; no commercial airport in Monaco" },
+        { label: "Transit tips", value: "Walk or use the local bus; elevators help with the hills" },
+        { label: "Ticketing", value: "Palace and Oceanographic Museum charge entry; book in peak season" },
+        { label: "Neighborhood stay", value: "Monte Carlo or near the palace" },
+      ],
+      goodToKnow: [
+        { label: "Dress code", value: "Smart casual for casino; no shorts in gaming rooms" },
+        { label: "Changing of the guard", value: "Around 11:55 at the palace; get there a bit early" },
+        { label: "Currency", value: "Euro; cards widely accepted" },
+      ],
+      checklist: [
+        "Book palace or museum if visiting in peak season",
+        "Comfortable shoes for walking and steps",
+        "Save offline map; coverage is good but small streets can confuse",
+        "Plan one meal with a view",
+        "Carry a refillable water bottle",
+        "Check casino dress code if you plan to enter",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Monaco?",
+          answer:
+            "Yes. The principality is small. Two days cover the palace, museum, Monte Carlo, and gardens without rushing.",
+        },
+        {
+          question: "Do I need a car?",
+          answer:
+            "No. Trains from Nice are frequent. Inside Monaco, walking and the bus are enough.",
+        },
+        {
+          question: "Is Monaco walkable?",
+          answer:
+            "Yes, but hilly. The Rock and Monte Carlo are linked by bus and elevators. Allow time for steps.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Monte Carlo for the casino and harbor, or near the palace for the old town. Both are close.",
+        },
+        {
+          question: "Do I need to dress up for the casino?",
+          answer:
+            "Smart casual for the gaming rooms. The square and terraces are more relaxed.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For Michelin or harbor views, yes. Plenty of casual options without booking.",
+        },
+        {
+          question: "Is the Oceanographic Museum worth it?",
+          answer:
+            "Yes for aquarium and views. Allow at least two hours. Book ahead in summer.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "nice", city: "Nice", days: 3, description: "Riviera, old town, and sea." },
+        { slug: "cannes", city: "Cannes", days: 2, description: "Promenade, beaches, and film heritage." },
+        { slug: "genoa", city: "Genoa", days: 3, description: "Port, old town, and pesto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "santiago-de-compostela": {
+      slug: "santiago-de-compostela",
+      city: "Santiago de Compostela",
+      country: "Spain",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["Pilgrimage heritage", "First-timers", "Compact old towns"],
+      style: ["Cathedral", "Old Town", "Camino spirit"],
+      pacing: [
+        "Santiago fits two calm days. Day one: cathedral, Obradoiro square, and old town. Day two: museums, market, and a final stroll.",
+        "The center is compact. The cathedral is the anchor; the rest is stone streets, squares, and pilgrim atmosphere.",
+        "Leave time for people-watching in the squares and a long lunch. The city rewards a slow pace.",
+      ],
+      hero: {
+        title: "Santiago de Compostela in 2 days",
+        subtitle:
+          "Cathedral, old town, and pilgrimage heritage at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1638704645810-708030b50ce5?auto=format&fit=crop&w=1600&q=80",
+          alt: "Santiago de Compostela Cathedral and Obradoiro Square.",
+        },
+      },
+      cityStats: [
+        { value: "9th C.", label: "Cathedral origins" },
+        { value: "~97k", label: "Residents" },
+        { value: "UNESCO", label: "Old town World Heritage" },
+      ],
+      fit: {
+        forYou: ["Cathedral and pilgrimage history", "Compact walkable center", "Stone streets and squares", "Museums and markets", "Calm pace"],
+        notForYou: ["Beach or coast", "Nightlife focus", "Big-city buzz", "Non-stop activities", "Shopping-only trip"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Cathedral and Obradoiro",
+          summary: "Cathedral, square, and first look at the old town.",
+          morning: "Cathedral and Pilgrim's Mass if timing fits",
+          afternoon: "Obradoiro and old town streets",
+          evening: "Dinner in the old town",
+        },
+        {
+          day: 2,
+          title: "Museums and market",
+          summary: "Pilgrimage museum, market, and last strolls.",
+          morning: "Museum of Pilgrimage or cathedral museum",
+          afternoon: "Mercado de Abastos and Rúa do Franco",
+          evening: "Final walk through the squares",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "The cathedral",
+          description:
+            "The Baroque facade and the Botafumeiro define Santiago. Allow time for the interior and the crypt.",
+          image: {
+            src: "https://images.unsplash.com/photo-1638704645810-708030b50ce5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Santiago de Compostela Cathedral.",
+          },
+        },
+        {
+          title: "Obradoiro Square",
+          description:
+            "The main square in front of the cathedral. Pilgrims and visitors meet here; sit and watch the flow.",
+          image: {
+            src: "https://images.unsplash.com/photo-1552832238-cdac84581f45?auto=format&fit=crop&w=1200&q=80",
+            alt: "Obradoiro Square and cathedral, Santiago.",
+          },
+        },
+        {
+          title: "Old town streets",
+          description:
+            "Stone arcades and pilgrim hostels. The old town is small; one good walk covers a lot.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Old town street in Santiago de Compostela.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to June or September to October" },
+        { label: "Getting there", value: "Train from Madrid, A Coruña, or Vigo; airport with European links" },
+        { label: "Transit tips", value: "The center is walkable; no car needed" },
+        { label: "Ticketing", value: "Cathedral free; museums have entry fees; book in Holy Year" },
+        { label: "Neighborhood stay", value: "Old town near the cathedral" },
+      ],
+      goodToKnow: [
+        { label: "Pilgrim's Mass", value: "Daily at noon; Botafumeiro on special dates" },
+        { label: "Holy Year", value: "When 25 July falls on Sunday; expect more pilgrims and book early" },
+        { label: "Dress code", value: "Shoulders and knees covered for cathedral" },
+      ],
+      checklist: [
+        "Check Pilgrim's Mass time if you want to attend",
+        "Comfortable walking shoes for cobbles",
+        "Save offline map of the old town",
+        "Plan one meal in the old town",
+        "Carry a refillable water bottle",
+        "Book accommodation in Holy Year or summer",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Santiago de Compostela?",
+          answer:
+            "Yes for the cathedral, old town, and a museum or market. Add a day for a short Camino stretch or the coast.",
+        },
+        {
+          question: "Do I need to have walked the Camino?",
+          answer:
+            "No. The city welcomes all visitors. Many come for the heritage and the atmosphere without walking the route.",
+        },
+        {
+          question: "Is Santiago walkable?",
+          answer:
+            "Yes. The old town is compact. Everything is within a short walk of the cathedral.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Old town near Obradoiro or Rúa do Franco. You’ll be steps from the cathedral and restaurants.",
+        },
+        {
+          question: "When is the Botafumeiro used?",
+          answer:
+            "At Pilgrim's Mass on certain feast days and sometimes for groups. Check the cathedral schedule.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular places at weekends, yes. Weekdays and lunch are easier.",
+        },
+        {
+          question: "What about the Mercado de Abastos?",
+          answer:
+            "The main market; morning is best. Combine with a walk through the old town.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "porto", city: "Porto", days: 3, description: "River, wine, and tiles." },
+        { slug: "madrid", city: "Madrid", days: 3, description: "Museums, parks, and tapas." },
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudi, neighborhoods, and beaches." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    utrecht: {
+      slug: "utrecht",
+      city: "Utrecht",
+      country: "Netherlands",
+      days: 2,
+      pace: "Balanced",
+      idealFor: ["First-timers", "Canals and towers", "Compact Dutch cities"],
+      style: ["Dom Tower", "Canal wharves", "Museums"],
+      pacing: [
+        "Utrecht fits two calm days. Day one: Dom Tower and cathedral area. Day two: canals, museums, and a relaxed stroll.",
+        "The center is small. The wharf-level canals are unique; leave time to walk them and sit by the water.",
+        "One museum or climb is enough per day. The rest is cafes, canals, and unhurried exploration.",
+      ],
+      hero: {
+        title: "Utrecht in 2 days",
+        subtitle:
+          "Dom Tower, canal wharves, and a compact historic center at a relaxed pace.",
+        eyebrow: "Travel guide",
+        image: {
+          src: "https://images.unsplash.com/photo-1743844183879-e0fc461aed77?auto=format&fit=crop&w=1600&q=80",
+          alt: "Utrecht canals and Dom Tower from the water.",
+        },
+      },
+      cityStats: [
+        { value: "112m", label: "Dom Tower height" },
+        { value: "~360k", label: "Metro population" },
+        { value: "2nd", label: "Largest Dutch rail hub" },
+      ],
+      fit: {
+        forYou: ["Canals and tower views", "Compact center", "One or two museums", "Cafe and wharf culture", "Walkable city"],
+        notForYou: ["Beach or coast", "Big-city nightlife", "Long museum marathons", "Ski or mountains", "Remote quiet only"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Dom Tower and cathedral",
+          summary: "Tower climb, cathedral square, and first canal views.",
+          morning: "Dom Tower climb and cathedral area",
+          afternoon: "Cathedral square and Oudegracht",
+          evening: "Canal-side dinner",
+        },
+        {
+          day: 2,
+          title: "Canals and museums",
+          summary: "Wharf walk, museum, and last strolls.",
+          morning: "Wharf-level canal walk",
+          afternoon: "Central Museum or Railway Museum",
+          evening: "Final canal stroll and cafe",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Dom Tower",
+          description:
+            "The tallest church tower in the Netherlands. Book a climb for views; the square below is free.",
+          image: {
+            src: "https://images.unsplash.com/photo-1743844183879-e0fc461aed77?auto=format&fit=crop&w=1200&q=80",
+            alt: "Dom Tower and canal in Utrecht.",
+          },
+        },
+        {
+          title: "Canal wharves",
+          description:
+            "The two-level wharves along the Oudegracht are unique. Walk, sit, or have a drink at water level.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Canal wharves in Utrecht.",
+          },
+        },
+        {
+          title: "Historic center",
+          description:
+            "Compact and walkable. Museums, cafes, and churches are all within a short radius.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Historic street in Utrecht.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Best time", value: "April to October for weather; spring for fewer crowds" },
+        { label: "Getting there", value: "Train from Amsterdam, Schiphol, or Rotterdam; central hub" },
+        { label: "Transit tips", value: "Center is walkable; bikes available for longer loops" },
+        { label: "Ticketing", value: "Dom Tower climb and museums have entry; book tower in peak season" },
+        { label: "Neighborhood stay", value: "Near Dom Square or Oudegracht" },
+      ],
+      goodToKnow: [
+        { label: "Dom Tower", value: "Guided climb only; book ahead in summer" },
+        { label: "Wharf terraces", value: "Cafes and restaurants at canal level; unique to Utrecht" },
+        { label: "Bike culture", value: "Easy to rent; follow local rules and park in designated spots" },
+      ],
+      checklist: [
+        "Book Dom Tower climb if visiting in peak season",
+        "Comfortable shoes for cobbles and walking",
+        "Save offline map of the center",
+        "Plan one meal by the canal",
+        "Carry a refillable water bottle",
+        "Check museum opening days",
+      ],
+      faqs: [
+        {
+          question: "Is 2 days enough for Utrecht?",
+          answer:
+            "Yes for the Dom Tower, canals, and a museum or two. Add a day for a bike trip or a second museum.",
+        },
+        {
+          question: "Do I need to book the Dom Tower?",
+          answer:
+            "In peak season, yes. Climbs are guided and have limited slots. Book a few days ahead.",
+        },
+        {
+          question: "Is Utrecht walkable?",
+          answer:
+            "Yes. The center is compact. The Dom, canals, and main museums are within a short walk.",
+        },
+        {
+          question: "Where should I stay?",
+          answer:
+            "Near Dom Square or along the Oudegracht. Both put you in the center.",
+        },
+        {
+          question: "How is Utrecht different from Amsterdam?",
+          answer:
+            "Smaller and less crowded. The wharf-level canals are unique. Same train line from Schiphol.",
+        },
+        {
+          question: "Do I need to book restaurants?",
+          answer:
+            "For popular spots at weekends, yes. Weekdays and lunch are more flexible.",
+        },
+        {
+          question: "Is the Railway Museum worth it?",
+          answer:
+            "Yes if you like trains and family-friendly exhibits. Allow half a day. A short tram ride from the center.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "amsterdam", city: "Amsterdam", days: 3, description: "Canals, museums, and neighborhoods." },
+        { slug: "rotterdam", city: "Rotterdam", days: 3, description: "Architecture, harbor, and modern city." },
+        { slug: "bruges", city: "Bruges", days: 2, description: "Canals, squares, and chocolate." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
   }),
   es: withDefaults("es", {
     paris: {
@@ -78628,6 +80072,1099 @@ const cityItineraries: Record<ItineraryLocale, Record<string, CityItinerary>> = 
         { slug: "oslo", city: "Oslo", days: 3, description: "Museos, puerto y acceso a fiordos." },
         { slug: "bergen", city: "Bergen", days: 3, description: "Bryggen, mercado de pescado y fiordos." },
         { slug: "copenhagen", city: "Copenhague", days: 3, description: "Puerto, hygge y diseño." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    canberra: {
+      slug: "canberra",
+      city: "Canberra",
+      country: "Australia",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Cultura e instituciones", "Caminantes"],
+      style: ["Museos nacionales", "Paseos por el lago", "Capital compacta"],
+      pacing: [
+        "Canberra se disfruta con calma. Ancla cada día en una institución o zona—Parlamento, lago o museos—y deja tiempo para paseos, cafés y una excursión opcional.",
+        "Agrupa el tiempo por zona: Parlamento y el Triángulo un día, lago Burley Griffin y galerías otro, y un museo o el Memorial de Guerra al tercero.",
+        "Incluye al menos una tarde tranquila junto al lago. El agua y los parques dan carácter a la ciudad y hacen que tres días se sientan relajados.",
+      ],
+      hero: {
+        title: "Canberra en 3 días",
+        subtitle:
+          "Instituciones nacionales, paseos por el lago y ritmo relajado de capital sin prisas.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1627818337274-dc29a12d304a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Parlamento y lago Burley Griffin en Canberra.",
+        },
+      },
+      cityStats: [
+        { value: "1913", label: "Fundación de la capital" },
+        { value: "450k+", label: "Población metropolitana" },
+        { value: "11", label: "Instituciones nacionales en el Triángulo" },
+        { value: "26km", label: "Orilla del lago Burley Griffin" },
+      ],
+      fit: {
+        forYou: ["Primera visita a la capital", "Museos y galerías", "Paseos al aire libre y por el lago", "Ritmo tranquilo y sin aglomeraciones", "Estructura día a día clara"],
+        notForYou: ["Solo playa o vida nocturna", "Actividades de aventura sin parar", "Ambiente de pueblo pequeño", "Solo esquí o outback", "Visita relámpago de un día"],
+      },
+      dayPlans: [
+        { day: 1, title: "Parlamento y el Triángulo", summary: "Parlamento, instituciones y vistas al lago.", morning: "Visita al Parlamento y alrededores", afternoon: "Galería Nacional o Questacon y orilla del lago", evening: "Cena en Kingston o NewActon" },
+        { day: 2, title: "Lago y museos", summary: "Paseo por el lago Burley Griffin y un museo principal.", morning: "Paseo o bici por el lago y Commonwealth Park", afternoon: "Memorial de Guerra Australiano o Museo Nacional", evening: "Cena en Braddon o Civic" },
+        { day: 3, title: "Galerías y miradores", summary: "Último museo o galería y un mirador.", morning: "Galería Nacional de Retratos u otra institución", afternoon: "Mirador Mount Ainslie o Black Mountain", evening: "Café y preparación de salida" },
+      ],
+      imageInfoCards: [
+        { title: "Parlamento y el lago", description: "El eje del Parlamento y el lago Burley Griffin definen la ciudad. Dedica tiempo al edificio y un paseo corto por la orilla.", image: { src: "https://images.unsplash.com/photo-1627818337274-dc29a12d304a?auto=format&fit=crop&w=1200&q=80", alt: "Parlamento y lago Burley Griffin, Canberra." } },
+        { title: "Instituciones nacionales", description: "Museos y galerías se agrupan en el Triángulo. Elige una o dos por día para mantener el ritmo tranquilo.", image: { src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80", alt: "Museo Nacional de Australia y lago, Canberra." } },
+        { title: "Lago y parques", description: "El lago Burley Griffin y los parques ofrecen paseos, bicicleta y espacio abierto entre visitas a museos.", image: { src: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80", alt: "Lago y zonas verdes en Canberra." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Marzo a mayo o septiembre a noviembre" },
+        { label: "Traslado aeropuerto", value: "Taxi o ride-share desde el aeropuerto de Canberra" },
+        { label: "Transporte", value: "Tranvía y autobuses; coche útil para Memorial y miradores" },
+        { label: "Entradas", value: "Parlamento y la mayoría de instituciones gratis; reserva Memorial si hace falta" },
+        { label: "Dónde alojarse", value: "Civic, Braddon o Kingston" },
+      ],
+      checklist: [
+        "Consulta horarios del Parlamento si quieres asistir a una sesión",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapas sin conexión de Canberra",
+        "Planifica una pausa de lago o parque al día",
+        "Reserva el Memorial de Guerra si vas en día concurrido",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Canberra?", answer: "Sí para las instituciones principales, Parlamento y lago. Puedes cubrir el Triángulo, Memorial de Guerra y un par de museos sin prisas." },
+        { question: "¿Necesito coche?", answer: "No es imprescindible para el centro; tranvía y autobuses sirven el Triángulo y Civic. Un coche ayuda para el Memorial, miradores y bodegas." },
+        { question: "¿Canberra es caminable?", answer: "El Triángulo Parlamentario y la orilla del lago son caminables. Algunas instituciones quedan a un corto trayecto en coche o autobús." },
+        { question: "¿Dónde alojarme?", answer: "Civic o Braddon te dejan en el centro para comer y tranvía. Kingston es práctico para el lago y la zona sur." },
+        { question: "¿A qué hora empezar cada día?", answer: "Parlamento y museos abren a media mañana. Empezar sobre las 9:30 o 10 mantiene el día relajado." },
+        { question: "¿Hay que reservar restaurantes?", answer: "Para sitios populares en fin de semana, sí. Entre semana suele bastar con entrada directa." },
+        { question: "¿Y el verano?", answer: "Puede hacer calor. Planifica tiempo interior a mediodía y usa el lago para paseos temprano o tarde." },
+      ],
+      relatedItineraries: [
+        { slug: "sydney", city: "Sídney", days: 3, description: "Puerto, playas y atracciones urbanas." },
+        { slug: "melbourne", city: "Melbourne", days: 3, description: "Callejones, café y cultura." },
+        { slug: "wellington", city: "Wellington", days: 3, description: "Capital compacta, museos y frente marítimo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    christchurch: {
+      slug: "christchurch",
+      city: "Christchurch",
+      country: "Nueva Zelanda",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Jardines y patrimonio", "Exploradores tranquilos"],
+      style: ["Jardines Botánicos", "Centro reconstruido", "Base para excursiones"],
+      pacing: [
+        "Christchurch se disfruta con calma. Un foco principal al día—jardines, museo o excursión corta—más tiempo para el Avon, cafés y el centro reconstruido.",
+        "El primer día céntralo en el centro: Jardines Botánicos y Arts Centre o catedral. Añade un día de museo o tranvía, y opcionalmente Lyttelton o la costa.",
+        "Deja al menos una tarde libre para el río Avon, Hagley Park o un paseo lento por el centro para ver cómo se ha reimaginado.",
+      ],
+      hero: {
+        title: "Christchurch en 3 días",
+        subtitle:
+          "Jardines, patrimonio reconstruido y base relajada para la Isla Sur.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1760162510197-741b5e65b9b6?auto=format&fit=crop&w=1600&q=80",
+          alt: "Jardines Botánicos de Christchurch y río Avon.",
+        },
+      },
+      cityStats: [
+        { value: "1850", label: "Fundación del asentamiento" },
+        { value: "380k+", label: "Población metropolitana" },
+        { value: "21ha", label: "Jardines Botánicos" },
+        { value: "2ª", label: "Ciudad más grande de Nueva Zelanda" },
+      ],
+      fit: {
+        forYou: ["Jardines y zonas verdes", "Exploración posreconstrucción", "Primera vez en la Isla Sur", "Ritmo tranquilo", "Excursiones de un día fáciles"],
+        notForYou: ["Vida nocturna de gran ciudad", "Solo playa", "Aventura sin parar", "Solo esquí", "Visita relámpago de un día"],
+      },
+      dayPlans: [
+        { day: 1, title: "Jardines Botánicos y Avon", summary: "Jardines, río y patrimonio central.", morning: "Jardines Botánicos de Christchurch", afternoon: "Paseo por el Avon y Arts Centre", evening: "Cena por Cathedral Square" },
+        { day: 2, title: "Museos y tranvía", summary: "Museo de Canterbury y tranvía o paseo por la ciudad.", morning: "Museo de Canterbury", afternoon: "Tranvía o paseo guiado por el centro", evening: "Riverside o New Regent Street" },
+        { day: 3, title: "Lyttelton o costa", summary: "Puerto o costa y último paseo.", morning: "Lyttelton o Sumner", afternoon: "Hagley Park o último paseo por la ciudad", evening: "Café y preparación de salida" },
+      ],
+      imageInfoCards: [
+        { title: "Jardines Botánicos", description: "Los Jardines Botánicos y el río Avon son el corazón de la ciudad. Dedica una mañana o tarde completa a pasear.", image: { src: "https://images.unsplash.com/photo-1760162510197-741b5e65b9b6?auto=format&fit=crop&w=1200&q=80", alt: "Jardines Botánicos de Christchurch y zonas verdes." } },
+        { title: "Centro reconstruido", description: "El centro se ha reimaginado tras los terremotos. El tranvía o un paseo muestran edificios nuevos y patrimonio.", image: { src: "https://images.unsplash.com/photo-1507699629798-687287a4e313?auto=format&fit=crop&w=1200&q=80", alt: "Centro de Christchurch y arquitectura." } },
+        { title: "Avon y parques", description: "El río Avon y Hagley Park ofrecen paseos tranquilos y paseos en barca. Buena forma de alternar con museos o compras.", image: { src: "https://images.unsplash.com/photo-1760162510197-741b5e65b9b6?auto=format&fit=crop&w=1200&q=80", alt: "Río Avon y zonas verdes en Christchurch." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Septiembre a abril para jardines y clima" },
+        { label: "Traslado aeropuerto", value: "Taxi, shuttle o autobús desde el aeropuerto de Christchurch" },
+        { label: "Transporte", value: "A pie por el centro; autobús o coche para Lyttelton y costa" },
+        { label: "Entradas", value: "Jardines gratis; tranvía y algunas atracciones de pago" },
+        { label: "Dónde alojarse", value: "Centro o cerca de los Jardines Botánicos" },
+      ],
+      checklist: [
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapas sin conexión de Christchurch",
+        "Planifica una pausa de jardín o río al día",
+        "Consulta horarios del tranvía si lo usas",
+        "Reserva transporte a Lyttelton o costa si haces excursión",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Christchurch?", answer: "Sí para los jardines, un museo, el centro y media o una excursión de día. Añade un día si quieres más costa o Lyttelton." },
+        { question: "¿Necesito coche?", answer: "No para el centro y jardines. Un coche ayuda para Lyttelton, Sumner o la península de Banks." },
+        { question: "¿Christchurch es caminable?", answer: "Sí. El centro y los Jardines Botánicos son muy caminables. Autobuses y tranvía cubren el resto." },
+        { question: "¿Dónde alojarme?", answer: "Centro o cerca de los Jardines Botánicos para tener jardines, Avon y cafés a mano." },
+        { question: "¿A qué hora empezar cada día?", answer: "Jardines y museos abren a media mañana. Empezar sobre las 9:30 mantiene el día relajado." },
+        { question: "¿Hay que reservar restaurantes?", answer: "Para sitios populares en fin de semana, sí. Muchos cafés y restaurantes aceptan entrada directa." },
+        { question: "¿Y el invierno?", answer: "Fresco y menos horas de luz. Jardines y museos siguen siendo recomendables; viste en capas." },
+      ],
+      relatedItineraries: [
+        { slug: "auckland", city: "Auckland", days: 3, description: "Puerto, islas y atracciones urbanas." },
+        { slug: "wellington", city: "Wellington", days: 3, description: "Capital compacta y frente marítimo." },
+        { slug: "queenstown", city: "Queenstown", days: 3, description: "Lagos y montañas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    heidelberg: {
+      slug: "heidelberg",
+      city: "Heidelberg",
+      country: "Alemania",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Castillo y casco antiguo", "Caminantes"],
+      style: ["Castillo", "Río y puente", "Centro compacto"],
+      pacing: [
+        "Heidelberg encaja en dos días tranquilos. Día uno: castillo y casco antiguo. Día dos: paseo de los filósofos, puente y segunda vuelta por el centro o un museo.",
+        "El centro es pequeño y caminable. Reserva la mañana para el castillo y usa la tarde para la Altstadt y el río.",
+        "Deja tiempo para el puente viejo y un café. El ritmo es lento a propósito para que el castillo y las vistas calen.",
+      ],
+      hero: {
+        title: "Heidelberg en 2 días",
+        subtitle:
+          "Castillo, casco antiguo y paseos junto al río a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1655808346988-25127b19970a?auto=format&fit=crop&w=1600&q=80",
+          alt: "Castillo de Heidelberg sobre el casco antiguo y el río Neckar.",
+        },
+      },
+      cityStats: [
+        { value: "s. XIII", label: "Orígenes del castillo" },
+        { value: "160k+", label: "Habitantes" },
+        { value: "1", label: "Puente viejo (Karl-Theodor-Brücke)" },
+        { value: "2km", label: "Sendero del paseo de los filósofos" },
+      ],
+      fit: {
+        forYou: ["Castillo y vistas", "Casco antiguo compacto", "Río y puente", "Escapada corta", "Primera vez en Alemania"],
+        notForYou: ["Vida nocturna de gran ciudad", "Días largos solo de museos", "Playa o esquí", "Senderismo de varios días", "Tour relámpago de un día"],
+      },
+      dayPlans: [
+        { day: 1, title: "Castillo y casco antiguo", summary: "Visita al castillo y paseo por la Altstadt.", morning: "Castillo de Heidelberg", afternoon: "Casco antiguo (Hauptstrasse) y Marktplatz", evening: "Puente viejo y cena" },
+        { day: 2, title: "Paseo de los filósofos y puente", summary: "Sendero en la colina y vistas al río.", morning: "Paseo de los filósofos", afternoon: "Puente viejo y zona Karlstor", evening: "Último café y salida" },
+      ],
+      imageInfoCards: [
+        { title: "El castillo", description: "El castillo domina el skyline. Dedica unas horas al exterior, patio y opcionalmente interior.", image: { src: "https://images.unsplash.com/photo-1655808346988-25127b19970a?auto=format&fit=crop&w=1200&q=80", alt: "Castillo de Heidelberg y casco antiguo desde el Neckar." } },
+        { title: "Puente viejo", description: "La Karl-Theodor-Brücke y las vistas al río son imprescindibles. Mejor con luz de mañana o tarde.", image: { src: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=1200&q=80", alt: "Puente viejo de Heidelberg sobre el Neckar." } },
+        { title: "Casco antiguo", description: "Hauptstrasse y Marktplatz ofrecen cafés, tiendas y un paseo tranquilo por la Altstadt.", image: { src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80", alt: "Calle y edificios del casco antiguo de Heidelberg." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre por clima y horas de luz" },
+        { label: "Traslado aeropuerto", value: "Tren desde Fráncfort o Mannheim" },
+        { label: "Transporte", value: "A pie por el centro; Bergbahn al castillo" },
+        { label: "Entradas", value: "Patio del castillo gratis; interior y barril con entrada" },
+        { label: "Dónde alojarse", value: "Altstadt o cerca del puente" },
+      ],
+      checklist: [
+        "Reserva visita al interior del castillo si la quieres",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapas sin conexión de Heidelberg",
+        "Planifica una pausa en café en Hauptstrasse",
+        "Consulta horarios del Bergbahn al castillo",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Heidelberg?", answer: "Sí para el castillo, casco antiguo, puente y paseo de los filósofos. Es una ciudad compacta." },
+        { question: "¿Hay que reservar el castillo?", answer: "El patio y exterior son accesibles. Reserva con antelación para tours guiados al interior en temporada alta." },
+        { question: "¿Heidelberg es caminable?", answer: "Sí. El centro y el puente están a pie. El castillo es subida empinada o Bergbahn." },
+        { question: "¿Dónde alojarme?", answer: "Altstadt para estar en el centro. Cerca del puente es práctico para vistas y paseos junto al río." },
+        { question: "¿A qué hora empezar cada día?", answer: "Castillo por la mañana para evitar multitudes. Puente y casco antiguo valen a cualquier hora." },
+        { question: "¿Hay que reservar restaurantes?", answer: "Para sitios populares en fin de semana, sí. Entre semana suele bastar con entrada directa." },
+        { question: "¿Y el invierno?", answer: "Menos horas de luz y frío. Castillo y casco antiguo siguen siendo recomendables; abrígate." },
+      ],
+      relatedItineraries: [
+        { slug: "munich", city: "Múnich", days: 3, description: "Jardines de cerveza, museos y plazas." },
+        { slug: "frankfurt", city: "Fráncfort", days: 2, description: "Río y museos." },
+        { slug: "cologne", city: "Colonia", days: 3, description: "Catedral y casco antiguo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    poznan: {
+      slug: "poznan",
+      city: "Poznan",
+      country: "Polonia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia y plaza", "Escapadas cortas"],
+      style: ["Plaza del Mercado Viejo", "Ayuntamiento", "Centro compacto"],
+      pacing: [
+        "Poznan encaja en dos días tranquilos. Día uno: Plaza del Mercado Viejo, Ayuntamiento y calles del casco antiguo. Día dos: isla de la Catedral, museo o segunda vuelta por la plaza.",
+        "El centro es pequeño. Un foco principal al día más café y paseo mantiene el ritmo relajado.",
+        "Deja tiempo para el reloj famoso y un café en la plaza. Las tardes son tranquilas y caminables.",
+      ],
+      hero: {
+        title: "Poznan en 2 días",
+        subtitle:
+          "Plaza del Mercado Viejo, Ayuntamiento y casco antiguo a ritmo tranquilo.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1601114540911-45453e0062c5?auto=format&fit=crop&w=1600&q=80",
+          alt: "Plaza del Mercado Viejo y casas coloridas en Poznan.",
+        },
+      },
+      cityStats: [
+        { value: "s. X", label: "Orígenes de la ciudad" },
+        { value: "530k+", label: "Población metropolitana" },
+        { value: "1", label: "Famosas cabras mecánicas al mediodía" },
+        { value: "3ª", label: "Ciudad más grande de Polonia (metro)" },
+      ],
+      fit: {
+        forYou: ["Plaza vieja y Ayuntamiento", "Casco antiguo compacto", "Primera vez en Polonia", "Escapada corta", "Ritmo de café y paseo"],
+        notForYou: ["Vida nocturna de gran ciudad", "Maratones de museos", "Solo playa o montaña", "Visita relámpago de un día", "Naturaleza remota"],
+      },
+      dayPlans: [
+        { day: 1, title: "Plaza del Mercado Viejo y Ayuntamiento", summary: "Rynek, Ayuntamiento y calles del casco antiguo.", morning: "Plaza del Mercado Viejo y Ayuntamiento", afternoon: "Calles del casco antiguo e iglesia parroquial", evening: "Cena en la plaza o cerca" },
+        { day: 2, title: "Isla de la Catedral y museos", summary: "Ostrów Tumski y museo o segunda visita a la plaza.", morning: "Isla de la Catedral (Ostrów Tumski)", afternoon: "Museo o vuelta a la plaza", evening: "Café y salida" },
+      ],
+      imageInfoCards: [
+        { title: "Plaza del Mercado Viejo", description: "El Rynek es el corazón de la ciudad. Ayuntamiento, fachadas coloridas y las famosas cabras del mediodía atraen a los visitantes.", image: { src: "https://images.unsplash.com/photo-1601114540911-45453e0062c5?auto=format&fit=crop&w=1200&q=80", alt: "Plaza del Mercado Viejo y casas en Poznan." } },
+        { title: "Ayuntamiento", description: "El Ayuntamiento renacentista y las cabras mecánicas al mediodía son un clásico de Poznan. Llega unos minutos antes de las 12.", image: { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", alt: "Ayuntamiento histórico y plaza en Poznan." } },
+        { title: "Isla de la Catedral", description: "Ostrów Tumski es la parte más antigua de la ciudad. Catedral y calles tranquilas para una media jornada tranquila.", image: { src: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80", alt: "Catedral y edificios históricos en la isla de la Catedral, Poznan." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre por clima y vida en la plaza" },
+        { label: "Traslado aeropuerto", value: "Tren o taxi desde el aeropuerto de Poznan" },
+        { label: "Transporte", value: "A pie por el centro; tranvía para la isla de la Catedral" },
+        { label: "Entradas", value: "Plaza gratis; Ayuntamiento y algunos museos de pago" },
+        { label: "Dónde alojarse", value: "Casco antiguo o cerca de la plaza" },
+      ],
+      checklist: [
+        "Coordina la hora de las cabras del mediodía en el Ayuntamiento",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapas sin conexión de Poznan",
+        "Planifica una pausa en café en la plaza",
+        "Consulta horarios de catedral y museos",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 2 días en Poznan?", answer: "Sí para la plaza, Ayuntamiento, casco antiguo e isla de la Catedral. Es una ciudad compacta." },
+        { question: "¿Cuándo salen las cabras?", answer: "Las cabras mecánicas dan cabezazos al mediodía cada día en la torre del Ayuntamiento. Llega unos minutos antes de las 12." },
+        { question: "¿Poznan es caminable?", answer: "Sí. El Mercado Viejo y el casco antiguo están a pie. La isla de la Catedral queda a un corto paseo o tranvía." },
+        { question: "¿Dónde alojarme?", answer: "Casco antiguo o cerca de la plaza para tener el Rynek, Ayuntamiento y restaurantes a mano." },
+        { question: "¿A qué hora empezar cada día?", answer: "Por la mañana la plaza está bien antes de aglomeraciones. Mediodía en el Ayuntamiento para las cabras." },
+        { question: "¿Hay que reservar restaurantes?", answer: "Para sitios populares en fin de semana, sí. Muchos aceptan entrada directa." },
+        { question: "¿Y el invierno?", answer: "Frío y a veces nieve. La plaza y el Ayuntamiento siguen siendo recomendables; abrígate." },
+      ],
+      relatedItineraries: [
+        { slug: "krakow", city: "Cracovia", days: 3, description: "Casco antiguo, Wawel y Kazimierz." },
+        { slug: "warsaw", city: "Varsovia", days: 3, description: "Reconstrucción del casco antiguo y museos." },
+        { slug: "gdansk", city: "Gdansk", days: 3, description: "Puerto y casco antiguo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    halifax: {
+      slug: "halifax",
+      city: "Halifax",
+      country: "Canadá",
+      days: 3,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Historia marítima", "Amantes del frente marítimo"],
+      style: ["Ciudadela", "Puerto", "Museos"],
+      pacing: [
+        "Halifax se disfruta con calma. Un foco principal al día—Ciudadela, frente marítimo o museo—más tiempo para paseos, comida y vistas al puerto.",
+        "Agrupa por zona: Ciudadela y centro un día, frente marítimo y Museo Marítimo otro, y un museo o corto trayecto a la costa al tercero.",
+        "Incluye al menos una tarde tranquila en el frente marítimo. El puerto y el paseo marítimo definen la ciudad y mantienen tres días relajados.",
+      ],
+      hero: {
+        title: "Halifax en 3 días",
+        subtitle:
+          "Ciudadela, frente marítimo e historia marítima a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1715249958361-4cc511be22bb?auto=format&fit=crop&w=1600&q=80",
+          alt: "Frente marítimo y vista del puerto de Halifax.",
+        },
+      },
+      cityStats: [
+        { value: "1749", label: "Fundación de la ciudad" },
+        { value: "430k+", label: "Población metropolitana" },
+        { value: "2,4km", label: "Paseo marítimo" },
+        { value: "1", label: "Ciudadela en forma de estrella" },
+      ],
+      fit: {
+        forYou: ["Historia marítima", "Paseos por el frente marítimo", "Primera vez en Atlántico canadiense", "Ritmo tranquilo", "Museos y fuertes"],
+        notForYou: ["Vida nocturna de gran ciudad", "Solo playa", "Aventura sin parar", "Solo esquí", "Visita relámpago de un día"],
+      },
+      dayPlans: [
+        { day: 1, title: "Ciudadela y centro", summary: "Ciudadela de Halifax y centro.", morning: "Ciudadela de Halifax", afternoon: "Centro y Grand Parade", evening: "Cena en el frente marítimo" },
+        { day: 2, title: "Frente marítimo y museo", summary: "Paseo marítimo y Museo Marítimo.", morning: "Paseo marítimo", afternoon: "Museo Marítimo del Atlántico", evening: "Vistas al puerto y cena" },
+        { day: 3, title: "Museos y puerto", summary: "Segundo museo o crucero por el puerto y último paseo.", morning: "Museo Canadiense de Inmigración o Discovery Centre", afternoon: "Crucero por el puerto o último paseo por el paseo marítimo", evening: "Café y preparación de salida" },
+      ],
+      imageInfoCards: [
+        { title: "Ciudadela", description: "El fuerte en forma de estrella domina el skyline. Dedica unas horas a las murallas y las exposiciones.", image: { src: "https://images.unsplash.com/photo-1715249958361-4cc511be22bb?auto=format&fit=crop&w=1200&q=80", alt: "Ciudadela de Halifax y vista de la ciudad." } },
+        { title: "Paseo marítimo", description: "El paseo marítimo une muelles, tiendas y restaurantes. Un paseo tranquilo es imprescindible.", image: { src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80", alt: "Frente marítimo y puerto de Halifax." } },
+        { title: "Museo Marítimo", description: "El Museo Marítimo cubre Titanic, explosión de Halifax e historia naval. Planifica al menos dos horas.", image: { src: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200&q=80", alt: "Museo Marítimo y frente marítimo, Halifax." } },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a octubre por clima y vida en el puerto" },
+        { label: "Traslado aeropuerto", value: "Taxi o shuttle desde Halifax Stanfield" },
+        { label: "Transporte", value: "A pie por el centro y frente marítimo; autobús o ferry para otros puntos" },
+        { label: "Entradas", value: "Ciudadela y Museo Marítimo de pago; reserva en temporada alta" },
+        { label: "Dónde alojarse", value: "Centro o frente marítimo" },
+      ],
+      checklist: [
+        "Reserva Ciudadela o museo si vas en temporada alta",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapas sin conexión de Halifax",
+        "Planifica una pausa en el frente marítimo al día",
+        "Consulta horarios de cruceros por el puerto si te interesan",
+        "Lleva botella de agua reutilizable",
+      ],
+      faqs: [
+        { question: "¿Son suficientes 3 días en Halifax?", answer: "Sí para la Ciudadela, frente marítimo, Museo Marítimo y ritmo tranquilo. Añade un día para Peggy's Cove o la costa sur." },
+        { question: "¿Necesito coche?", answer: "No para el centro y frente marítimo. Un coche ayuda para Peggy's Cove y rutas costeras." },
+        { question: "¿Halifax es caminable?", answer: "Sí. El centro y el paseo marítimo son muy caminables. Autobuses y ferry amplían el radio." },
+        { question: "¿Dónde alojarme?", answer: "Centro o cerca del frente marítimo para tener la Ciudadela, paseo marítimo y restaurantes a mano." },
+        { question: "¿A qué hora empezar cada día?", answer: "Ciudadela por la mañana para evitar multitudes. El frente marítimo vale a cualquier hora." },
+        { question: "¿Hay que reservar restaurantes?", answer: "Para sitios populares en fin de semana, sí. Muchos sitios del frente marítimo aceptan entrada directa." },
+        { question: "¿Y el invierno?", answer: "Frío y menos horas de luz. Ciudadela y museos siguen siendo recomendables; abrígate." },
+      ],
+      relatedItineraries: [
+        { slug: "quebec-city", city: "Ciudad de Quebec", days: 3, description: "Casco antiguo y fuerte." },
+        { slug: "montreal", city: "Montreal", days: 3, description: "Cultura, comida y barrios." },
+        { slug: "toronto", city: "Toronto", days: 3, description: "Museos y frente marítimo." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    siena: {
+      slug: "siena",
+      city: "Siena",
+      country: "Italia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Pueblos medievales", "Excursionistas a la Toscana"],
+      style: ["Piazza del Campo", "Catedral", "Centro compacto"],
+      pacing: [
+        "Siena se disfruta bien en dos días tranquilos. Día uno: catedral y Piazza del Campo. Día dos: calles de las contrade y un mirador o museo.",
+        "El centro es pequeño y caminable. Agrupa la catedral con la plaza y luego explora uno o dos barrios sin prisas.",
+        "Deja tiempo para un almuerzo largo y un paseo tranquilo. La alegría está en las calles de piedra y las vistas, no en una lista repleta.",
+      ],
+      hero: {
+        title: "Siena en 2 días",
+        subtitle:
+          "Centro medieval, Piazza del Campo y catedral a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1660814534469-ed907b9333ef?auto=format&fit=crop&w=1600&q=80",
+          alt: "Tejados de Siena y colinas toscanas al atardecer.",
+        },
+      },
+      cityStats: [
+        { value: "1240", label: "Forma de concha de la Piazza del Campo completada" },
+        { value: "17", label: "Distritos históricos de contrade" },
+        { value: "~54k", label: "Habitantes en el centro histórico" },
+      ],
+      fit: {
+        forYou: ["Una ciudad medieval compacta", "Enfoque en plaza y catedral", "Días de paseo cortos", "Base o excursión en la Toscana", "Calles tranquilas y vistas"],
+        notForYou: ["Playa o costa", "Solo museos largos", "Vida nocturna", "Senderismo de varios días", "Ambiente de gran ciudad"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Catedral y Piazza del Campo",
+          summary: "Duomo, plaza y primeras vistas del centro.",
+          morning: "Catedral de Siena y Biblioteca Piccolomini",
+          afternoon: "Piazza del Campo y zona de la Torre del Mangia",
+          evening: "Cena en una calle de contrada",
+        },
+        {
+          day: 2,
+          title: "Contrade y miradores",
+          summary: "Calles del barrio y una última panorámica.",
+          morning: "San Domenico y calles de las contrade",
+          afternoon: "Fortezza Medicea o un museo tranquilo",
+          evening: "Último paseo y gelato",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Piazza del Campo",
+          description:
+            "La plaza en forma de concha es el corazón de Siena. Siéntate con un café y mira cómo cambia la luz en las fachadas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1523906834658-6e6ef70e59c1?auto=format&fit=crop&w=1200&q=80",
+            alt: "Piazza del Campo y Palazzo Pubblico en Siena.",
+          },
+        },
+        {
+          title: "La catedral",
+          description:
+            "El mármol a rayas y los suelos de taracea del Duomo merecen una visita tranquila. Reserva con antelación en temporada alta.",
+          image: {
+            src: "https://images.unsplash.com/photo-1552832238-cdac84581f45?auto=format&fit=crop&w=1200&q=80",
+            alt: "Fachada y campanario de la Catedral de Siena.",
+          },
+        },
+        {
+          title: "Calles estrechas",
+          description:
+            "Los barrios de las contrade invitan a perderse. No hace falta ver todos; elige dos o tres y tómate tu tiempo.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle medieval en Siena.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Cómo llegar", value: "Tren desde Florencia o autobús; no hay aeropuerto en Siena" },
+        { label: "Transporte", value: "Todo el centro se recorre a pie" },
+        { label: "Entradas", value: "Reserva catedral y torre con antelación en temporada alta" },
+        { label: "Dónde alojarse", value: "Cerca de la Piazza del Campo o de San Domenico" },
+      ],
+      goodToKnow: [
+        { label: "Horario de multitudes", value: "Empieza en la catedral sobre las 9:00 en verano" },
+        { label: "Palio", value: "Si visitas durante el Palio (julio/agosto), reserva pronto y espera más gente" },
+        { label: "Código de vestimenta", value: "Hombros y rodillas cubiertos para entrar a la catedral" },
+      ],
+      checklist: [
+        "Reserva catedral y Torre del Mangia si vas en temporada alta",
+        "Lleva zapatos cómodos para caminar",
+        "Guarda mapa sin conexión del centro",
+        "Planifica un almuerzo largo en una contrada",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios de museos",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días en Siena?",
+          answer:
+            "Sí para la catedral, Piazza del Campo y una visión tranquila de las contrade. Añade un día para San Gimignano o el campo.",
+        },
+        {
+          question: "¿Hay que reservar la catedral?",
+          answer:
+            "En temporada alta, sí. La entrada con horario ayuda a evitar colas. Reserva con unos días de antelación.",
+        },
+        {
+          question: "¿Siena es caminable?",
+          answer:
+            "Sí. El centro histórico es compacto. Puedes cruzar de un extremo al otro en menos de 30 minutos.",
+        },
+        {
+          question: "¿Dónde alojarme?",
+          answer:
+            "Cerca de la Piazza del Campo para el centro, o de San Domenico para una base algo más tranquila. Ambos son caminables.",
+        },
+        {
+          question: "¿A qué hora empezar?",
+          answer:
+            "Catedral por la mañana para evitar multitudes. La plaza vale a cualquier hora.",
+        },
+        {
+          question: "¿Hay que reservar restaurantes?",
+          answer:
+            "Para sitios populares en fin de semana, sí. Entre semana hay más flexibilidad.",
+        },
+        {
+          question: "¿Puedo hacer Siena en excursión desde Florencia?",
+          answer:
+            "Sí. Los trenes son frecuentes. Dos días te dan un ritmo más tranquilo y una noche en la ciudad.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "florence", city: "Florencia", days: 3, description: "Arte, paseos por el río y plazas renacentistas." },
+        { slug: "rome", city: "Roma", days: 3, description: "Iconos antiguos, plazas y pausas en cafés." },
+        { slug: "bologna", city: "Bolonia", days: 3, description: "Comida, pórticos y centro compacto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    annecy: {
+      slug: "annecy",
+      city: "Annecy",
+      country: "Francia",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Lago y montañas", "Cascos antiguos compactos"],
+      style: ["Lago de Annecy", "Casco antiguo", "Paseos por canales"],
+      pacing: [
+        "Annecy encaja en dos días tranquilos. Día uno: casco antiguo y Palais de l'Isle. Día dos: orilla del lago y barco o bici si te apetece.",
+        "El centro es pequeño. Puedes ver los principales puntos a pie y aún tener tiempo para almuerzos largos y paseos junto al agua.",
+        "Reserva una tarde flexible para el lago: nadar, alquilar barca o simplemente sentarte junto al agua.",
+      ],
+      hero: {
+        title: "Annecy en 2 días",
+        subtitle:
+          "Casco antiguo, vistas al lago y ambiente alpino a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1715695528648-fab241181450?auto=format&fit=crop&w=1600&q=80",
+          alt: "Lago de Annecy con montañas al fondo.",
+        },
+      },
+      cityStats: [
+        { value: "~130k", label: "Población metropolitana" },
+        { value: "14km", label: "Longitud del lago" },
+        { value: "s. XII", label: "Orígenes del Palais de l'Isle" },
+      ],
+      fit: {
+        forYou: ["Vistas de lago y montaña", "Casco antiguo compacto", "Días de paseo cortos", "Ritmo tranquilo", "Canales fotogénicos"],
+        notForYou: ["Vida nocturna de gran ciudad", "Solo museos largos", "Solo playa", "Solo esquí", "Actividades sin parar"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Casco antiguo y canales",
+          summary: "Palais de l'Isle, calles del casco antiguo y orilla del lago.",
+          morning: "Palais de l'Isle y calles de los canales",
+          afternoon: "Almuerzo en el casco antiguo y zona del Château d'Annecy",
+          evening: "Paseo por la orilla y cena",
+        },
+        {
+          day: 2,
+          title: "Lago y vistas",
+          summary: "Paseo marítimo del lago, barco o bici opcional y últimos paseos.",
+          morning: "Paseo por el lago y jardines",
+          afternoon: "Paseo en barco o carril bici, o relajarse junto al agua",
+          evening: "Último paseo y café",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Palais de l'Isle",
+          description:
+            "El palacio-isla en el canal es la estampa de Annecy. Dedica tiempo al museo y a los muelles.",
+          image: {
+            src: "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80",
+            alt: "Palais de l'Isle en el canal de Annecy.",
+          },
+        },
+        {
+          title: "Lago de Annecy",
+          description:
+            "Agua clara y montañas al fondo. Un paseo o bici por la orilla es imprescindible.",
+          image: {
+            src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+            alt: "Lago de Annecy con paisaje alpino.",
+          },
+        },
+        {
+          title: "Calles del casco antiguo",
+          description:
+            "Fachadas de colores y canales hacen del centro un lugar fácil de explorar a pie. Sin prisas.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Canal y casco antiguo en Annecy.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Mayo a septiembre para clima de lago; primavera y otoño con menos gente" },
+        { label: "Cómo llegar", value: "Tren desde Lyon o Ginebra; autobús desde Chambéry" },
+        { label: "Transporte", value: "El centro se recorre a pie; bicis para la vuelta al lago" },
+        { label: "Entradas", value: "Palais de l'Isle y Château tienen tarifa; reserva en verano" },
+        { label: "Dónde alojarse", value: "Casco antiguo o cerca del lago" },
+      ],
+      goodToKnow: [
+        { label: "Baño en el lago", value: "Permitido en verano; varias playas y zonas delimitadas" },
+        { label: "Días de mercado", value: "El mercado del casco antiguo anima el centro; consulta el día" },
+        { label: "Altitud", value: "Lago a ~448 m; suave pero puede refrescar por la noche" },
+      ],
+      checklist: [
+        "Lleva bañador si visitas en verano",
+        "Zapatos cómodos para casco antiguo y senda del lago",
+        "Guarda mapa sin conexión del centro",
+        "Planifica una comida junto al agua",
+        "Lleva botella de agua reutilizable",
+        "Consulta horarios de barcos y alquiler de bicis",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días en Annecy?",
+          answer:
+            "Sí para el casco antiguo, Palais de l'Isle y una buena dosis del lago. Añade un día para una vuelta larga en bici o un pueblo.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "No para el pueblo y la orilla. Tren y autobús llegan a Annecy; a pie y bici cubren el resto.",
+        },
+        {
+          question: "¿Annecy es caminable?",
+          answer:
+            "Sí. El casco antiguo y la orilla son compactos. Puedes ir a pie a todo el centro.",
+        },
+        {
+          question: "¿Dónde alojarme?",
+          answer:
+            "Casco antiguo por ambiente, o cerca del lago por vistas y acceso al agua.",
+        },
+        {
+          question: "¿Cuándo es la mejor época?",
+          answer:
+            "Mayo a septiembre para calor y actividades en el lago. Primavera y otoño son más tranquilos.",
+        },
+        {
+          question: "¿Hay que reservar restaurantes?",
+          answer:
+            "Para terrazas populares en verano, sí. Entre semana y al mediodía es más fácil.",
+        },
+        {
+          question: "¿Se puede nadar en el lago?",
+          answer:
+            "Sí en zonas delimitadas en verano. El agua es limpia y clara; consulta la señalización local.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "lyon", city: "Lyon", days: 3, description: "Comida, ríos y barrios históricos." },
+        { slug: "geneva", city: "Ginebra", days: 2, description: "Vistas al lago y centro compacto." },
+        { slug: "nice", city: "Niza", days: 3, description: "Riviera, casco antiguo y mar." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    monaco: {
+      slug: "monaco",
+      city: "Mónaco",
+      country: "Mónaco",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Glamour y vistas", "Micropaíses compactos"],
+      style: ["Palacio", "Monte Carlo", "Mediterráneo"],
+      pacing: [
+        "Mónaco encaja en dos días tranquilos. Día uno: palacio, casco antiguo y museo oceanográfico. Día dos: Monte Carlo, jardines y puerto.",
+        "El principado es minúsculo. A pie y autobús bastan. No hace falta correr entre visitas.",
+        "Deja tiempo para un paseo junto al agua y un café o comida con vistas. El tamaño es pequeño; las vistas son grandes.",
+      ],
+      hero: {
+        title: "Mónaco en 2 días",
+        subtitle:
+          "Palacio, zona del casino y vistas al Mediterráneo a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1697529682806-0e884d1fe515?auto=format&fit=crop&w=1600&q=80",
+          alt: "Puerto de Mónaco y Monte Carlo desde el mar.",
+        },
+      },
+      cityStats: [
+        { value: "~2 km²", label: "Superficie total" },
+        { value: "1297", label: "Inicio del dominio Grimaldi" },
+        { value: "~40k", label: "Habitantes" },
+      ],
+      fit: {
+        forYou: ["Vistas del palacio y puerto", "Ciudad compacta y caminable", "Uno o dos museos", "Jardines y mar", "Ambiente glamuroso"],
+        notForYou: ["Mochilero con poco presupuesto", "Escape rural tranquilo", "Senderismo largo", "Solo playa", "Solo bajo perfil"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Palacio y casco antiguo",
+          summary: "Palacio del Príncipe, catedral y museo oceanográfico.",
+          morning: "Palacio del Príncipe y cambio de guardia",
+          afternoon: "Catedral y Museo Oceanográfico",
+          evening: "Cena en el casco antiguo y vista al puerto",
+        },
+        {
+          day: 2,
+          title: "Monte Carlo y jardines",
+          summary: "Zona del casino, jardines y paseo por el puerto.",
+          morning: "Plaza del casino y zona del Café de Paris",
+          afternoon: "Jardín Exótico o Jardín Japonés",
+          evening: "Paseo por el puerto y últimas vistas",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Palacio del Príncipe",
+          description:
+            "El palacio sobre la Roca es el símbolo de Mónaco. Si puedes, coincide tu visita con el cambio de guardia.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Palacio del Príncipe en la Roca, Mónaco.",
+          },
+        },
+        {
+          title: "Monte Carlo",
+          description:
+            "La plaza del casino y el puerto son la estampa típica. Un paseo basta; no hace falta jugar.",
+          image: {
+            src: "https://images.unsplash.com/photo-1697529682806-0e884d1fe515?auto=format&fit=crop&w=1200&q=80",
+            alt: "Casino y puerto de Monte Carlo.",
+          },
+        },
+        {
+          title: "Puerto y costa",
+          description:
+            "Yates y azul mediterráneo. Un paseo por el puerto es gratis y muy recomendable.",
+          image: {
+            src: "https://images.unsplash.com/photo-1697529682806-0e884d1fe515?auto=format&fit=crop&w=1200&q=80",
+            alt: "Puerto y costa de Mónaco.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre; verano puede estar muy concurrido" },
+        { label: "Cómo llegar", value: "Tren desde Niza; helicóptero desde aeropuerto de Niza; no hay aeropuerto comercial en Mónaco" },
+        { label: "Transporte", value: "A pie o autobús local; los ascensores ayudan con las cuestas" },
+        { label: "Entradas", value: "Palacio y Museo Oceanográfico de pago; reserva en temporada alta" },
+        { label: "Dónde alojarse", value: "Monte Carlo o cerca del palacio" },
+      ],
+      goodToKnow: [
+        { label: "Código de vestimenta", value: "Smart casual para el casino; no pantalones cortos en las salas de juego" },
+        { label: "Cambio de guardia", value: "Sobre las 11:55 en el palacio; llega un poco antes" },
+        { label: "Moneda", value: "Euro; tarjetas muy aceptadas" },
+      ],
+      checklist: [
+        "Reserva palacio o museo si vas en temporada alta",
+        "Zapatos cómodos para andar y escaleras",
+        "Guarda mapa sin conexión; la cobertura es buena pero las calles pueden despistar",
+        "Planifica una comida con vistas",
+        "Lleva botella de agua reutilizable",
+        "Consulta el código de vestimenta del casino si quieres entrar",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días en Mónaco?",
+          answer:
+            "Sí. El principado es pequeño. Dos días cubren palacio, museo, Monte Carlo y jardines sin prisas.",
+        },
+        {
+          question: "¿Necesito coche?",
+          answer:
+            "No. Los trenes desde Niza son frecuentes. Dentro de Mónaco, a pie y autobús bastan.",
+        },
+        {
+          question: "¿Mónaco es caminable?",
+          answer:
+            "Sí, pero con cuestas. La Roca y Monte Carlo se unen con autobús y ascensores. Ten en cuenta escaleras.",
+        },
+        {
+          question: "¿Dónde alojarme?",
+          answer:
+            "Monte Carlo para casino y puerto, o cerca del palacio para el casco antiguo. Ambos están cerca.",
+        },
+        {
+          question: "¿Hay que vestir formal para el casino?",
+          answer:
+            "Smart casual para las salas de juego. La plaza y las terrazas son más informales.",
+        },
+        {
+          question: "¿Hay que reservar restaurantes?",
+          answer:
+            "Para estrellas Michelin o vistas al puerto, sí. Hay muchas opciones informales sin reserva.",
+        },
+        {
+          question: "¿Merece la pena el Museo Oceanográfico?",
+          answer:
+            "Sí por el acuario y las vistas. Dedica al menos dos horas. Reserva en verano.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "nice", city: "Niza", days: 3, description: "Riviera, casco antiguo y mar." },
+        { slug: "cannes", city: "Cannes", days: 2, description: "Paseo marítimo, playas y patrimonio del cine." },
+        { slug: "genoa", city: "Génova", days: 3, description: "Puerto, casco antiguo y pesto." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    "santiago-de-compostela": {
+      slug: "santiago-de-compostela",
+      city: "Santiago de Compostela",
+      country: "España",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Patrimonio del Camino", "Primera vez", "Cascos antiguos compactos"],
+      style: ["Catedral", "Casco antiguo", "Espíritu del Camino"],
+      pacing: [
+        "Santiago encaja en dos días tranquilos. Día uno: catedral, plaza del Obradoiro y casco antiguo. Día dos: museos, mercado y último paseo.",
+        "El centro es compacto. La catedral es el ancla; el resto son calles de piedra, plazas y ambiente de peregrinos.",
+        "Deja tiempo para ver pasar gente en las plazas y un almuerzo largo. La ciudad recompensa un ritmo lento.",
+      ],
+      hero: {
+        title: "Santiago de Compostela en 2 días",
+        subtitle:
+          "Catedral, casco antiguo y patrimonio del Camino a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1638704645810-708030b50ce5?auto=format&fit=crop&w=1600&q=80",
+          alt: "Catedral de Santiago de Compostela y plaza del Obradoiro.",
+        },
+      },
+      cityStats: [
+        { value: "s. IX", label: "Orígenes de la catedral" },
+        { value: "~97k", label: "Habitantes" },
+        { value: "UNESCO", label: "Casco antiguo Patrimonio Mundial" },
+      ],
+      fit: {
+        forYou: ["Catedral e historia del Camino", "Centro compacto y caminable", "Calles y plazas de piedra", "Museos y mercados", "Ritmo tranquilo"],
+        notForYou: ["Playa o costa", "Vida nocturna", "Gran ciudad", "Actividades sin parar", "Solo compras"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Catedral y Obradoiro",
+          summary: "Catedral, plaza y primera mirada al casco antiguo.",
+          morning: "Catedral y Misa del Peregrino si cuadra el horario",
+          afternoon: "Obradoiro y calles del casco antiguo",
+          evening: "Cena en el casco antiguo",
+        },
+        {
+          day: 2,
+          title: "Museos y mercado",
+          summary: "Museo del Peregrino, mercado y últimos paseos.",
+          morning: "Museo de las Peregrinaciones o museo catedralicio",
+          afternoon: "Mercado de Abastos y Rúa do Franco",
+          evening: "Último paseo por las plazas",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "La catedral",
+          description:
+            "La fachada barroca y el Botafumeiro definen Santiago. Dedica tiempo al interior y a la cripta.",
+          image: {
+            src: "https://images.unsplash.com/photo-1638704645810-708030b50ce5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Catedral de Santiago de Compostela.",
+          },
+        },
+        {
+          title: "Plaza del Obradoiro",
+          description:
+            "La plaza principal frente a la catedral. Peregrinos y visitantes se reúnen aquí; siéntate y mira el ir y venir.",
+          image: {
+            src: "https://images.unsplash.com/photo-1552832238-cdac84581f45?auto=format&fit=crop&w=1200&q=80",
+            alt: "Plaza del Obradoiro y catedral, Santiago.",
+          },
+        },
+        {
+          title: "Calles del casco antiguo",
+          description:
+            "Arcadas de piedra y albergues de peregrinos. El casco antiguo es pequeño; un buen paseo cubre mucho.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle del casco antiguo en Santiago de Compostela.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a junio o septiembre a octubre" },
+        { label: "Cómo llegar", value: "Tren desde Madrid, A Coruña o Vigo; aeropuerto con enlaces europeos" },
+        { label: "Transporte", value: "El centro se recorre a pie; no hace falta coche" },
+        { label: "Entradas", value: "Catedral gratis; museos de pago; reserva en Año Santo" },
+        { label: "Dónde alojarse", value: "Casco antiguo cerca de la catedral" },
+      ],
+      goodToKnow: [
+        { label: "Misa del Peregrino", value: "Diaria al mediodía; Botafumeiro en fechas señaladas" },
+        { label: "Año Santo", value: "Cuando el 25 de julio cae en domingo; más peregrinos y reserva con antelación" },
+        { label: "Código de vestimenta", value: "Hombros y rodillas cubiertos para la catedral" },
+      ],
+      checklist: [
+        "Consulta el horario de la Misa del Peregrino si quieres asistir",
+        "Zapatos cómodos para adoquines",
+        "Guarda mapa sin conexión del casco antiguo",
+        "Planifica una comida en el casco antiguo",
+        "Lleva botella de agua reutilizable",
+        "Reserva alojamiento en Año Santo o verano",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días en Santiago de Compostela?",
+          answer:
+            "Sí para la catedral, casco antiguo y un museo o mercado. Añade un día para un tramo corto del Camino o la costa.",
+        },
+        {
+          question: "¿Hay que haber hecho el Camino?",
+          answer:
+            "No. La ciudad acoge a todos. Muchos vienen por el patrimonio y el ambiente sin haber hecho la ruta.",
+        },
+        {
+          question: "¿Santiago es caminable?",
+          answer:
+            "Sí. El casco antiguo es compacto. Todo está a un paseo corto de la catedral.",
+        },
+        {
+          question: "¿Dónde alojarme?",
+          answer:
+            "Casco antiguo cerca del Obradoiro o de la Rúa do Franco. A pocos pasos de la catedral y los restaurantes.",
+        },
+        {
+          question: "¿Cuándo se usa el Botafumeiro?",
+          answer:
+            "En la Misa del Peregrino en ciertas fiestas y a veces para grupos. Consulta el horario de la catedral.",
+        },
+        {
+          question: "¿Hay que reservar restaurantes?",
+          answer:
+            "Para sitios populares en fin de semana, sí. Entre semana y al mediodía es más fácil.",
+        },
+        {
+          question: "¿Y el Mercado de Abastos?",
+          answer:
+            "El mercado principal; mejor por la mañana. Combínalo con un paseo por el casco antiguo.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "porto", city: "Oporto", days: 3, description: "Río, vino y azulejos." },
+        { slug: "madrid", city: "Madrid", days: 3, description: "Museos, parques y tapas." },
+        { slug: "barcelona", city: "Barcelona", days: 3, description: "Gaudí, barrios y playas." },
+      ],
+      primaryCtaHref: "/",
+      secondaryCtaHref: "/cities",
+    },
+    utrecht: {
+      slug: "utrecht",
+      city: "Utrecht",
+      country: "Países Bajos",
+      days: 2,
+      pace: "Equilibrado",
+      idealFor: ["Primera vez", "Canales y torres", "Ciudades holandesas compactas"],
+      style: ["Torre Dom", "Muelles de canales", "Museos"],
+      pacing: [
+        "Utrecht encaja en dos días tranquilos. Día uno: Torre Dom y zona catedralicia. Día dos: canales, museos y un paseo relajado.",
+        "El centro es pequeño. Los muelles a nivel del agua son únicos; deja tiempo para recorrerlos y sentarte junto al canal.",
+        "Un museo o subida a la torre por día basta. El resto son cafés, canales y exploración tranquila.",
+      ],
+      hero: {
+        title: "Utrecht en 2 días",
+        subtitle:
+          "Torre Dom, muelles de canales y centro histórico compacto a ritmo relajado.",
+        eyebrow: "Guía de viaje",
+        image: {
+          src: "https://images.unsplash.com/photo-1743844183879-e0fc461aed77?auto=format&fit=crop&w=1600&q=80",
+          alt: "Canales de Utrecht y Torre Dom desde el agua.",
+        },
+      },
+      cityStats: [
+        { value: "112 m", label: "Altura de la Torre Dom" },
+        { value: "~360k", label: "Población metropolitana" },
+        { value: "2.ª", label: "Mayor núcleo ferroviario holandés" },
+      ],
+      fit: {
+        forYou: ["Canales y vistas desde la torre", "Centro compacto", "Uno o dos museos", "Cultura de café y muelle", "Ciudad caminable"],
+        notForYou: ["Playa o costa", "Vida nocturna de gran ciudad", "Maratones de museos", "Esquí o montaña", "Solo tranquilidad remota"],
+      },
+      dayPlans: [
+        {
+          day: 1,
+          title: "Torre Dom y catedral",
+          summary: "Subida a la torre, plaza catedralicia y primeras vistas a los canales.",
+          morning: "Subida a la Torre Dom y zona catedralicia",
+          afternoon: "Plaza de la catedral y Oudegracht",
+          evening: "Cena junto al canal",
+        },
+        {
+          day: 2,
+          title: "Canales y museos",
+          summary: "Paseo por los muelles, museo y últimos paseos.",
+          morning: "Paseo por los muelles del canal",
+          afternoon: "Centraal Museum o Museo del Ferrocarril",
+          evening: "Último paseo por el canal y café",
+        },
+      ],
+      imageInfoCards: [
+        {
+          title: "Torre Dom",
+          description:
+            "La torre de iglesia más alta de Países Bajos. Reserva una subida para las vistas; la plaza es gratis.",
+          image: {
+            src: "https://images.unsplash.com/photo-1743844183879-e0fc461aed77?auto=format&fit=crop&w=1200&q=80",
+            alt: "Torre Dom y canal en Utrecht.",
+          },
+        },
+        {
+          title: "Muelles de canales",
+          description:
+            "Los muelles a dos niveles junto a la Oudegracht son únicos. Pasea, siéntate o toma algo a nivel del agua.",
+          image: {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80",
+            alt: "Muelles de canales en Utrecht.",
+          },
+        },
+        {
+          title: "Centro histórico",
+          description:
+            "Compacto y caminable. Museos, cafés e iglesias en un radio corto.",
+          image: {
+            src: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+            alt: "Calle histórica en Utrecht.",
+          },
+        },
+      ],
+      logistics: [
+        { label: "Mejor época", value: "Abril a octubre por clima; primavera con menos gente" },
+        { label: "Cómo llegar", value: "Tren desde Ámsterdam, Schiphol o Róterdam; núcleo central" },
+        { label: "Transporte", value: "El centro se recorre a pie; bicis para rutas más largas" },
+        { label: "Entradas", value: "Subida a la Torre Dom y museos de pago; reserva torre en temporada alta" },
+        { label: "Dónde alojarse", value: "Cerca de la plaza Dom o de la Oudegracht" },
+      ],
+      goodToKnow: [
+        { label: "Torre Dom", value: "Solo subida guiada; reserva con antelación en verano" },
+        { label: "Terrazas en los muelles", value: "Cafés y restaurantes a nivel del canal; único de Utrecht" },
+        { label: "Cultura de la bici", value: "Fácil alquilar; sigue las normas y aparca en los sitios indicados" },
+      ],
+      checklist: [
+        "Reserva subida a la Torre Dom si vas en temporada alta",
+        "Zapatos cómodos para adoquines y caminar",
+        "Guarda mapa sin conexión del centro",
+        "Planifica una comida junto al canal",
+        "Lleva botella de agua reutilizable",
+        "Consulta días de apertura de museos",
+      ],
+      faqs: [
+        {
+          question: "¿Son suficientes 2 días en Utrecht?",
+          answer:
+            "Sí para la Torre Dom, canales y uno o dos museos. Añade un día para una ruta en bici o un segundo museo.",
+        },
+        {
+          question: "¿Hay que reservar la Torre Dom?",
+          answer:
+            "En temporada alta, sí. Las subidas son guiadas y con plazas limitadas. Reserva con unos días.",
+        },
+        {
+          question: "¿Utrecht es caminable?",
+          answer:
+            "Sí. El centro es compacto. Dom, canales y museos principales están a un paseo corto.",
+        },
+        {
+          question: "¿Dónde alojarme?",
+          answer:
+            "Cerca de la plaza Dom o de la Oudegracht. Ambas te dejan en el centro.",
+        },
+        {
+          question: "¿En qué se diferencia Utrecht de Ámsterdam?",
+          answer:
+            "Más pequeña y con menos aglomeraciones. Los muelles a nivel del agua son únicos. Misma línea de tren desde Schiphol.",
+        },
+        {
+          question: "¿Hay que reservar restaurantes?",
+          answer:
+            "Para sitios populares en fin de semana, sí. Entre semana y al mediodía hay más flexibilidad.",
+        },
+        {
+          question: "¿Merece la pena el Museo del Ferrocarril?",
+          answer:
+            "Sí si te gustan los trenes y exposiciones para familias. Dedica media jornada. Un corto trayecto en tranvía desde el centro.",
+        },
+      ],
+      relatedItineraries: [
+        { slug: "amsterdam", city: "Ámsterdam", days: 3, description: "Canales, museos y barrios." },
+        { slug: "rotterdam", city: "Róterdam", days: 3, description: "Arquitectura, puerto y ciudad moderna." },
+        { slug: "bruges", city: "Brujas", days: 2, description: "Canales, plazas y chocolate." },
       ],
       primaryCtaHref: "/",
       secondaryCtaHref: "/cities",

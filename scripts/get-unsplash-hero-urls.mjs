@@ -6,6 +6,7 @@
  *        node scripts/get-unsplash-hero-urls.mjs --hero-only   (only the 16 city-guide cities)
  *        node scripts/get-unsplash-hero-urls.mjs --hero-only --by-id  (fetch 5 fallback cities by photo ID; use if search hits rate limit)
  *        node scripts/get-unsplash-hero-urls.mjs --replace-hero  (only the 10 city-guide hero replacement slugs)
+ *        node scripts/get-unsplash-hero-urls.mjs --fix-hero  (only the 11 city-guide hero fix slugs: wrong images)
  * If rate limit is hit, run again later or use --hero-only --by-id for oxford, santa-fe, asheville, savannah, graz.
  */
 
@@ -81,12 +82,31 @@ const QUERIES = [
   { slug: 'trondheim', city: 'Trondheim', query: 'Trondheim Norway Nidaros Cathedral Bakklandet' },
 ];
 
+// Hero fix set: city guides with non–city-related hero images (use --fix-hero to run only these)
+const HERO_FIX_SLUGS = [
+  'canberra', 'christchurch', 'heidelberg', 'poznan', 'halifax', 'siena',
+  'annecy', 'monaco', 'utrecht', 'santiago-de-compostela',
+];
+const FIX_HERO_QUERIES = [
+  { slug: 'canberra', city: 'Canberra', query: 'Canberra Australia Parliament House Lake Burley Griffin' },
+  { slug: 'christchurch', city: 'Christchurch', query: 'Christchurch New Zealand Botanic Gardens Avon' },
+  { slug: 'heidelberg', city: 'Heidelberg', query: 'Heidelberg Germany castle old town Neckar' },
+  { slug: 'poznan', city: 'Poznan', query: 'Poznan Poland' },
+  { slug: 'halifax', city: 'Halifax', query: 'Halifax Nova Scotia Canada' },
+  { slug: 'siena', city: 'Siena', query: 'Siena Italy Piazza del Campo Tuscany' },
+  { slug: 'annecy', city: 'Annecy', query: 'Annecy France lake Lac' },
+  { slug: 'monaco', city: 'Monaco', query: 'Monaco Monte Carlo harbor Mediterranean' },
+  { slug: 'utrecht', city: 'Utrecht', query: 'Utrecht Netherlands Dom Tower canals' },
+  { slug: 'santiago-de-compostela', city: 'Santiago de Compostela', query: 'Santiago de Compostela cathedral Spain Camino' },
+];
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const base = 'https://api.unsplash.com/search/photos';
 const photoBase = 'https://api.unsplash.com/photos';
 const HERO_ONLY = process.argv.includes('--hero-only');
 const BY_ID = process.argv.includes('--by-id');
 const REPLACE_HERO = process.argv.includes('--replace-hero');
+const FIX_HERO = process.argv.includes('--fix-hero');
 const HERO_REPLACEMENT_SLUGS = [
   'ostrava', 'las-palmas', 'coimbra', 'cadiz', 'gijon', 'oviedo',
   'aarhus', 'penang', 'salt-lake-city', 'la-paz', 'trondheim',
@@ -99,11 +119,13 @@ const PHOTO_IDS = {
   savannah: 'r2Uz3Rbs6hE',
   graz: '4vSb71TnB5A',
 };
-const queriesToRun = REPLACE_HERO
-  ? QUERIES.filter((q) => HERO_REPLACEMENT_SLUGS.includes(q.slug))
-  : HERO_ONLY
-    ? QUERIES.filter((q) => ['oxford', 'santa-fe', 'asheville', 'savannah', 'graz'].includes(q.slug))
-    : QUERIES;
+const queriesToRun = FIX_HERO
+  ? FIX_HERO_QUERIES
+  : REPLACE_HERO
+    ? QUERIES.filter((q) => HERO_REPLACEMENT_SLUGS.includes(q.slug))
+    : HERO_ONLY
+      ? QUERIES.filter((q) => ['oxford', 'santa-fe', 'asheville', 'savannah', 'graz'].includes(q.slug))
+      : QUERIES;
 
 if (BY_ID && HERO_ONLY) {
   for (const slug of Object.keys(PHOTO_IDS)) {
