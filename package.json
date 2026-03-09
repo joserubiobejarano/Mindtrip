@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:ntfs": "powershell -ExecutionPolicy Bypass -NoProfile -File scripts/build-on-ntfs.ps1",
     "start": "next start",
     "lint": "next lint"
   },

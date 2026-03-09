@@ -7,6 +7,7 @@
  *        node scripts/get-unsplash-hero-urls.mjs --hero-only --by-id  (fetch 5 fallback cities by photo ID; use if search hits rate limit)
  *        node scripts/get-unsplash-hero-urls.mjs --replace-hero  (only the 10 city-guide hero replacement slugs)
  *        node scripts/get-unsplash-hero-urls.mjs --fix-hero  (only the 11 city-guide hero fix slugs: wrong images)
+ *        node scripts/get-unsplash-hero-urls.mjs --fix-guide-hero  (14 city guides: Trieste, Salamanca, Toledo, etc.)
  * If rate limit is hit, run again later or use --hero-only --by-id for oxford, santa-fe, asheville, savannah, graz.
  */
 
@@ -112,6 +113,24 @@ const FIX_HERO_QUERIES = [
   { slug: 'tangier', city: 'Tangier', query: 'Tangier Morocco city' },
 ];
 
+// 14 city guides with broken or non–city-related hero images (use --fix-guide-hero to run only these)
+const GUIDE_HERO_FIX_QUERIES = [
+  { slug: 'trieste', city: 'Trieste', query: 'Trieste Italy Piazza Unità Adriatic Miramare' },
+  { slug: 'salamanca', city: 'Salamanca', query: 'Salamanca Spain Plaza Mayor university golden stone' },
+  { slug: 'toledo', city: 'Toledo', query: 'Toledo Spain skyline cathedral Alcázar' },
+  { slug: 'avignon', city: 'Avignon', query: 'Avignon France Palace of the Popes Pont Saint-Bénézet' },
+  { slug: 'montpellier', city: 'Montpellier', query: 'Montpellier France Place de la Comédie' },
+  { slug: 'regensburg', city: 'Regensburg', query: 'Regensburg Germany Stone Bridge Danube old town' },
+  { slug: 'freiburg', city: 'Freiburg', query: 'Freiburg Germany Minster Münsterplatz' },
+  { slug: 'bergamo', city: 'Bergamo', query: 'Bergamo Italy Città Alta Venetian walls' },
+  { slug: 'padua', city: 'Padua', query: 'Padua Italy Prato della Valle' },
+  { slug: 'modena', city: 'Modena', query: 'Modena Italy cathedral Ghirlandina Piazza Grande' },
+  { slug: 'ravenna', city: 'Ravenna', query: 'Ravenna Italy mosaics San Vitale' },
+  { slug: 'colmar', city: 'Colmar', query: 'Colmar France half-timbered Little Venice Alsace' },
+  { slug: 'metz', city: 'Metz', query: 'Metz France cathedral Centre Pompidou' },
+  { slug: 'perugia', city: 'Perugia', query: 'Perugia Italy Piazza IV Novembre Umbria' },
+];
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const base = 'https://api.unsplash.com/search/photos';
 const photoBase = 'https://api.unsplash.com/photos';
@@ -119,6 +138,7 @@ const HERO_ONLY = process.argv.includes('--hero-only');
 const BY_ID = process.argv.includes('--by-id');
 const REPLACE_HERO = process.argv.includes('--replace-hero');
 const FIX_HERO = process.argv.includes('--fix-hero');
+const FIX_GUIDE_HERO = process.argv.includes('--fix-guide-hero');
 const HERO_REPLACEMENT_SLUGS = [
   'ostrava', 'las-palmas', 'coimbra', 'cadiz', 'gijon', 'oviedo',
   'aarhus', 'penang', 'salt-lake-city', 'la-paz', 'trondheim',
@@ -131,7 +151,9 @@ const PHOTO_IDS = {
   savannah: 'r2Uz3Rbs6hE',
   graz: '4vSb71TnB5A',
 };
-const queriesToRun = FIX_HERO
+const queriesToRun = FIX_GUIDE_HERO
+  ? GUIDE_HERO_FIX_QUERIES
+  : FIX_HERO
   ? FIX_HERO_QUERIES
   : REPLACE_HERO
     ? QUERIES.filter((q) => HERO_REPLACEMENT_SLUGS.includes(q.slug))

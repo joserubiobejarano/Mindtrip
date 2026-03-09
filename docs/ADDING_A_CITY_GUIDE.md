@@ -6,8 +6,14 @@ This guide covers the marketing-only city pages (no in-app itinerary UI).
 - `lib/seo/cities.ts`: add the city to `cityPages` for hub/metadata. Each entry must include `intent`, `contentLevel`, and `primaryKeyword` (see **When to use full vs lite** and **SEO data model** below).
 - `lib/itinerary/city-itineraries.ts`: add full guide data under each locale (`en`, `es`).
 
+## Architecture and discoverability
+- **City guide URLs** remain under `/en/cities/[slug]` and `/es/cities/[slug]`. Do not move or change these.
+- **Country hubs** live under `/en/countries/[slug]` and `/es/countries/[slug]` (e.g. Italy, Spain, France, Germany, Portugal). New cities in `cityPages` with matching `country` appear automatically on the corresponding country hub.
+- **Homepage** includes crawlable "Popular travel guides" and "Browse by country" link sections. Cities are discoverable from homepage, city hub (`/cities`), and country hubs.
+
 ## Default guide duration (2–3 days)
 - **New city guides must default to 3 days.** Two-day guides are allowed for small or compact cities.
+- **Duration policy:** 3-day for standard cities; 2-day for smaller/compact cities; 5-day and 7-day guides only for selected major cities later (not yet implemented).
 - **Do not create 4+ day guides as default guides.** Four-, five-, or seven-day content must be created later as explicit **duration variants**, each with:
   - a unique slug (e.g. `rome-4-days`),
   - a unique `primaryKeyword` (e.g. `"4 days in Rome"`),
@@ -26,7 +32,7 @@ This guide covers the marketing-only city pages (no in-app itinerary UI).
 - `logistics` (4+ items)
 - `checklist` (6+ items)
 - `faqs` (7 Q/A pairs)
-- `relatedItineraries` (3 items with valid slugs that exist for the locale)
+- `relatedItineraries` (3+ items recommended; the page displays 6 related guides via deterministic augmentation)
 - `primaryCtaHref`, `secondaryCtaHref`
 
 ## SEO Copy Rules
@@ -61,7 +67,7 @@ Set `intent` on each city in `cityPages`. Intent influences how we think about i
 
 Full guides should align with `docs/GUIDE_QUALITY_CHECKLIST.md` P0 and P1:
 
-- Hero, 3–5 city stats, 3 image cards, day plans matching `days`, 7 FAQs, 3 related itineraries, 4+ logistics, 6+ checklist, primary/secondary CTAs.
+- Hero, 3–5 city stats, 3 image cards, day plans matching `days`, 7 FAQs, 6 related guides (augmented from 3+ in data), 4+ logistics, 6+ checklist, primary/secondary CTAs.
 - Avoid heavy repetition across sections; include Spanish localization.
 
 ## SEO data model (`cityPages`)
@@ -106,7 +112,6 @@ Each city in `lib/seo/cities.ts` must define:
 4. Verify hero image, stats, pacing block, FAQ, and related cards render.
 
 ## URLs to verify before shipping
-- `/cities/<slug>`
-- `/es/cities/<slug>`
-- `/cities`
-- `/es/cities`
+- `/en/cities/<slug>` and `/es/cities/<slug>` (city guides; do not change)
+- `/en/cities` and `/es/cities` (city hub)
+- `/en/countries/<slug>` and `/es/countries/<slug>` (country hubs where applicable)

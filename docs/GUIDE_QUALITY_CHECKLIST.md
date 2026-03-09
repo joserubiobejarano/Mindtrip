@@ -8,7 +8,7 @@ Use this checklist before shipping any new city guide. The bar is "Rome quality.
 - Image cards section includes 3 cards with title, description, and image.
 - Day plans count matches the number of days and each day has all fields filled.
 - FAQ section includes 7 Q/A pairs with full-length answers.
-- Related itineraries section includes 3 links with valid slugs.
+- Related itineraries section includes 6 links with valid slugs (deterministic augmentation from 3+ in data).
 - All image URLs are valid (https or local `/` paths).
 - Primary and secondary CTA links are set.
 
@@ -32,6 +32,8 @@ Use this checklist before shipping any new city guide. The bar is "Rome quality.
 ## SEO
 - Follow the "SEO Copy Rules" in `docs/ADDING_A_CITY_GUIDE.md`, including fully localized Spanish metadata.
 - Set `intent`, `contentLevel`, and `primaryKeyword` on each city in `cityPages` per `docs/ADDING_A_CITY_GUIDE.md`. `primaryKeyword` must not duplicate any other indexed city guide.
+- **Internal linking:** Each guide should link to 6 related guides and be reachable from homepage ("Popular travel guides"), city hub (`/en/cities`, `/es/cities`), and country hub (`/en/countries/[slug]`, `/es/countries/[slug]`).
+- **URL architecture:** City guides remain under `/cities/[slug]`; country hubs live under `/countries/[slug]`. Do not change existing city guide URLs.
 
 ## Ship / No-Ship rule
 - Ship only if all P0 checks pass and there are no missing sections or broken images in dev.

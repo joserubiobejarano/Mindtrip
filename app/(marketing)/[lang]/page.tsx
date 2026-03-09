@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HomePageClient } from "@/components/home-page-client";
+import { HomepageSeoLinksSection } from "@/components/seo/HomepageSeoLinksSection";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getSiteUrl, siteConfig } from "@/lib/seo/site";
@@ -72,6 +73,7 @@ export default async function LocalizedHomePage({
     <>
       <StructuredData data={structuredData} id={`kruno-home-ld-${lang}`} />
       <HomePageClient showChrome={false} isSignedIn={false} />
+      <HomepageSeoLinksSection lang={lang} />
     </>
   );
 }

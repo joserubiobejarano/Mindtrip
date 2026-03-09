@@ -33,6 +33,13 @@ type MarketingCopy = {
   exploreInfluencersTitle: string;
   exploreCitiesCta: string;
   exploreInfluencersCta: string;
+  popularTravelGuidesTitle: string;
+  popularTravelGuidesSubtitle: string;
+  browseByCountryTitle: string;
+  browseByCountrySubtitle: string;
+  countryHubIntro: string;
+  countryHubCityGuideLabel: string;
+  citiesHubBrowseByCountry: string;
 };
 
 const marketingCopy: Record<MarketingLocale, MarketingCopy> = {
@@ -76,6 +83,14 @@ const marketingCopy: Record<MarketingLocale, MarketingCopy> = {
     exploreInfluencersTitle: "Influencer styles",
     exploreCitiesCta: "View all cities →",
     exploreInfluencersCta: "View all creators →",
+    popularTravelGuidesTitle: "Popular travel guides",
+    popularTravelGuidesSubtitle:
+      "Explore our most-read city guides with day-by-day itineraries and practical tips.",
+    browseByCountryTitle: "Browse by country",
+    browseByCountrySubtitle: "Find city guides organized by destination country.",
+    countryHubIntro: "Explore our city travel guides for this destination.",
+    countryHubCityGuideLabel: "View guide →",
+    citiesHubBrowseByCountry: "Browse by country",
   },
   es: {
     homeMetaTitle: "Kruno - Planificador de viajes inteligente",
@@ -119,6 +134,14 @@ const marketingCopy: Record<MarketingLocale, MarketingCopy> = {
     exploreInfluencersTitle: "Estilos de influencers",
     exploreCitiesCta: "Ver todas las ciudades →",
     exploreInfluencersCta: "Ver todos los creadores →",
+    popularTravelGuidesTitle: "Guías de viaje populares",
+    popularTravelGuidesSubtitle:
+      "Explora nuestras guías de ciudades más leídas con itinerarios día a día y consejos prácticos.",
+    browseByCountryTitle: "Explorar por país",
+    browseByCountrySubtitle: "Encuentra guías de ciudades organizadas por país de destino.",
+    countryHubIntro: "Explora nuestras guías de viaje por ciudad para este destino.",
+    countryHubCityGuideLabel: "Ver guía →",
+    citiesHubBrowseByCountry: "Explorar por país",
   },
 };
 

@@ -30,7 +30,7 @@ export function RelatedItineraries({
   return (
     <section className="space-y-6">
       <h2 className="text-center text-2xl font-semibold">{title}</h2>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
           <Link
             key={item.slug}
@@ -44,7 +44,7 @@ export function RelatedItineraries({
                   alt={item.image.alt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
                 />
               </div>
             ) : null}

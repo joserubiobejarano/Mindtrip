@@ -22,6 +22,7 @@ import { RelatedItineraries } from "@/components/itinerary/RelatedItineraries";
 import { PrimaryCTA } from "@/components/itinerary/PrimaryCTA";
 import { SectionBand } from "@/components/itinerary/SectionBand";
 import { collectInvalidImageUrls, validateGuide } from "@/lib/guides/validateGuide";
+import { getRelatedGuides } from "@/lib/seo/related-guides";
 
 export function generateStaticParams() {
   return cityPages.map((city) => ({ slug: city.slug }));
@@ -198,7 +199,8 @@ export default async function CityItineraryPage({
       },
     })),
   };
-  const relatedItemsWithImages = itinerary.relatedItineraries.map((item) => ({
+  const relatedGuides = getRelatedGuides(city, "en", itinerary.relatedItineraries);
+  const relatedItemsWithImages = relatedGuides.map((item) => ({
     ...item,
     image: getCityItinerary("en", item.slug)?.hero.image,
   }));

@@ -28,6 +28,7 @@ import { RelatedItineraries } from "@/components/itinerary/RelatedItineraries";
 import { PrimaryCTA } from "@/components/itinerary/PrimaryCTA";
 import { SectionBand } from "@/components/itinerary/SectionBand";
 import { collectInvalidImageUrls, validateGuide } from "@/lib/guides/validateGuide";
+import { getRelatedGuides } from "@/lib/seo/related-guides";
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.flatMap((lang) =>
@@ -245,7 +246,8 @@ export default async function LocalizedCityItineraryPage({
       },
     })),
   };
-  const relatedItemsWithImages = itinerary.relatedItineraries.map((item) => ({
+  const relatedGuides = getRelatedGuides(city, lang, itinerary.relatedItineraries);
+  const relatedItemsWithImages = relatedGuides.map((item) => ({
     ...item,
     image: getCityItinerary(lang, item.slug)?.hero.image,
   }));

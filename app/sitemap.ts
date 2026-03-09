@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/seo/site";
 import { cityPages } from "@/lib/seo/cities";
+import { countryHubs } from "@/lib/seo/countries";
 import { influencerPages } from "@/lib/seo/influencers";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -42,6 +43,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
+  const countryEntries = countryHubs.flatMap((country) => [
+    {
+      url: `${siteUrl}/en/countries/${country.slugEn}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+    },
+    {
+      url: `${siteUrl}/es/countries/${country.slugEs}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+    },
+  ]);
+
   const influencerEntries = influencerPages.flatMap((influencer) =>
     locales.map((locale) => ({
       url: `${siteUrl}/${locale}/influencers/${influencer.slug}`,
@@ -51,5 +67,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  return [...staticEntries, ...marketingEntries, ...cityEntries, ...influencerEntries];
+  return [...staticEntries, ...marketingEntries, ...cityEntries, ...countryEntries, ...influencerEntries];
 }
