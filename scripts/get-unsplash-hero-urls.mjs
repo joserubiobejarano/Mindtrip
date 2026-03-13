@@ -9,6 +9,7 @@
  *        node scripts/get-unsplash-hero-urls.mjs --fix-hero  (only the 11 city-guide hero fix slugs: wrong images)
  *        node scripts/get-unsplash-hero-urls.mjs --fix-guide-hero  (14 city guides: Trieste, Salamanca, Toledo, etc.)
  *        node scripts/get-unsplash-hero-urls.mjs --fix-guide-hero-2  (11 city guides: Yokohama, Arequipa, Salvador, etc.)
+ *        node scripts/get-unsplash-hero-urls.mjs --fix-guide-hero-3  (12 city guides: Varna, Burgas, Constanța, Debrecen, Novi Sad, Ohrid, Astana, Chania, Corfu, Heraklion, Nafplio, Sarande)
  * If rate limit is hit, run again later or use --hero-only --by-id for oxford, santa-fe, asheville, savannah, graz.
  */
 
@@ -147,6 +148,22 @@ const GUIDE_HERO_FIX_2_QUERIES = [
   { slug: 'zadar', city: 'Zadar', query: 'Zadar Croatia Sea Organ sunset waterfront' },
 ];
 
+// 12 city guides with broken or non–city-related hero images (use --fix-guide-hero-3 to run only these)
+const GUIDE_HERO_FIX_3_QUERIES = [
+  { slug: 'varna', city: 'Varna', query: 'Black Sea Bulgaria coast' },
+  { slug: 'burgas', city: 'Burgas', query: 'Bulgaria Black Sea coast beach' },
+  { slug: 'constanta', city: 'Constanța', query: 'Romania Black Sea Constanta' },
+  { slug: 'debrecen', city: 'Debrecen', query: 'Debrecen Hungary Great Church' },
+  { slug: 'novi-sad', city: 'Novi Sad', query: 'Novi Sad Serbia Petrovaradin Fortress Danube' },
+  { slug: 'ohrid', city: 'Ohrid', query: 'Ohrid North Macedonia Lake St John church' },
+  { slug: 'astana', city: 'Astana', query: 'Astana Kazakhstan Bayterek Tower' },
+  { slug: 'chania', city: 'Chania', query: 'Chania Crete Greece harbor old town' },
+  { slug: 'corfu', city: 'Corfu', query: 'Corfu Greece old town fortress' },
+  { slug: 'heraklion', city: 'Heraklion', query: 'Heraklion Crete Greece harbor' },
+  { slug: 'nafplio', city: 'Nafplio', query: 'Nafplio Greece fortress Peloponnese' },
+  { slug: 'sarande', city: 'Sarande', query: 'Albania coast beach Mediterranean' },
+];
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const base = 'https://api.unsplash.com/search/photos';
 const photoBase = 'https://api.unsplash.com/photos';
@@ -156,6 +173,7 @@ const REPLACE_HERO = process.argv.includes('--replace-hero');
 const FIX_HERO = process.argv.includes('--fix-hero');
 const FIX_GUIDE_HERO = process.argv.includes('--fix-guide-hero');
 const FIX_GUIDE_HERO_2 = process.argv.includes('--fix-guide-hero-2');
+const FIX_GUIDE_HERO_3 = process.argv.includes('--fix-guide-hero-3');
 const HERO_REPLACEMENT_SLUGS = [
   'ostrava', 'las-palmas', 'coimbra', 'cadiz', 'gijon', 'oviedo',
   'aarhus', 'penang', 'salt-lake-city', 'la-paz', 'trondheim',
@@ -168,7 +186,9 @@ const PHOTO_IDS = {
   savannah: 'r2Uz3Rbs6hE',
   graz: '4vSb71TnB5A',
 };
-const queriesToRun = FIX_GUIDE_HERO_2
+const queriesToRun = FIX_GUIDE_HERO_3
+  ? GUIDE_HERO_FIX_3_QUERIES
+  : FIX_GUIDE_HERO_2
   ? GUIDE_HERO_FIX_2_QUERIES
   : FIX_GUIDE_HERO
   ? GUIDE_HERO_FIX_QUERIES
